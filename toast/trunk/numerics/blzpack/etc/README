@@ -1,0 +1,19 @@
+## 09/25/1999 ##########################################################
+#                                                                      #
+#  The directory blzpack/etc.                                          #
+#                                                                      #
+########################################################################
+
+   The current directory is organized as follows:
+
+   README  : this file.
+   double  : contains the double precision version of RSTORR, as well as
+             double precision interfaces for the sequential and parallel
+             (MPI, PVM) version of the library.
+   integer : contains ISTORR and integer interfaces for the sequential
+             and parallel (MPI, PVM) version of the library.
+   single  : contains the single precision version of RSTORR, as well as
+             single precision interfaces for the sequential and parallel
+             (MPI, PVM) version of the library.
+
+end of README ##########################################################

@@ -1,0 +1,18 @@
+## 09/25/1999 ##########################################################
+#                                                                      #
+#  The directory blzpack/doc.                                          #
+#                                                                      #
+########################################################################
+
+   The current directory is organized as follows:
+
+   README        : this file.
+   basics.txt    : outlines the fundamentals of BLZPACK.
+   bibliog.tex   : bibliography in tex format.
+   flowchart.txt : flowchart and glossary of subprograms.
+   manual.ps     : user's guide for BLZPACK (PostScript).
+
+   The drivers and input files given in manual.ps are located in the
+   directory blzpack/drv. 
+
+end of README ##########################################################

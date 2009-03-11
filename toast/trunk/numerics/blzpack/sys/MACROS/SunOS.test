@@ -1,0 +1,13 @@
+FC      = f77
+FCOPT   = -g -u # -O4
+FCNOPT  = -g -u
+FCINCL  = -I../ -I$(PVM_ROOT)/include
+FCLOAD  = 
+PARLIB  = -L$(PVM_ROOT)/lib/$(PVM_ARCH) -lfpvm3 -lgpvm3 -lpvm3 \
+	  -lnsl -lsocket -lc
+RANLIB  = touch
+
+BLAS    = $(HOME)/LIB/LAPACK/blas_SUN4SOL2.a
+EIGTB   = tbcopy.2.f tbtrid.2.f
+LAPACK  = $(HOME)/LIB/LAPACK/lapack_SUN4SOL2.a
+SOLVER  = /scratch/osni/work/MA47A.o /scratch/osni/work/MA47AD.o

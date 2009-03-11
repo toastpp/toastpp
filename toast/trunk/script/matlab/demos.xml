@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<demos>
+
+<name>TOAST</name>
+<type>toolbox</type>
+<icon>html/toast_logo_100.jpg</icon>
+<description>
+The TOAST toolbox is a collection of functions and scripts
+for image reconstruction in optical diffusion imaging (ODT).
+It contains a finite element solver (FEM) for modelling
+diffuse light transport in scattering media that can be applied
+to two- and three-dimensional problems.
+Inverse solvers include nonlinear conjugate gradient as well
+as Newton-type solvers for iterative minimisation of a cost
+functional.
+</description>
+
+<demosection>
+   <label>Parameters and measurements</label>
+   <demoitem>
+      <label>A demo of the TOAST forward solver</label>
+      <callback>rundemo('toast_demo1')</callback>
+      <file>html/toast_demo1.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+   <demoitem>
+      <label>Temporal point spread functions</label>
+      <callback>rundemo('toast_demo1a')</callback>
+      <file>html/toast_demo1a.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+   <demoitem>
+      <label>Photon measurement density functions</label>
+      <callback>rundemo('toast_demo2')</callback>
+      <file>html/toast_demo2.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+</demosection>
+
+<demosection>
+    <label>Image reconstruction</label>
+   <demoitem>
+      <label>Basic image reconstruction example</label>
+      <callback>rundemo('toast_demo3')</callback>
+      <file>html/toast_demo3.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+   <demoitem>
+      <label>Source-detector arrangements</label>
+      <callback>rundemo('toast_demo4')</callback>
+      <file>html/toast_demo4.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+   <demoitem>
+      <label>Structural priors</label>
+      <callback>rundemo('toast_demo5')</callback>
+      <file>html/toast_demo5.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+   <demoitem>
+      <label>3-D image reconstruction</label>
+      <callback>rundemo('toast_demo6')</callback>
+      <file>html/toast_demo6.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+   <demoitem>
+      <label>Multi-spectral reconstruction</label>
+      <callback>rundemo('toast_demo7')</callback>
+      <file>html/toast_demo7.html</file>
+      <type>M-GUI</type>
+   </demoitem>
+</demosection>
+
+<demosection>
+    <label>Tutorials</label>
+    <demoitem>
+        <label>Simple absorption reconstruction</label>
+        <callback>rundemo('reconCW1')</callback>
+        <file>html/toast_tut1.html</file>
+        <type>M-file</type>
+    </demoitem>
+</demosection>
+
+</demos>

@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>toastMakeMesh</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMakeMesh
+</div>
+<div class="param">
+
+<h1>toastMakeMesh</h1>
+<p>Create a TOAST mesh from vertex and index lists.
+
+<h2>Syntax</h2>
+<div class="code">
+hMesh = toastMakeMesh (vtx, idx, eltp, [prm])
+</div>
+
+<h2>Parameters</h2>
+<table>
+<tr><td><b>[In]</b></td>
+  <td>vtx</td><td><i>real [h x 2] or [h x 3]</i></td><td>array of vertex positions (2-D or 3-D)</td></tr>
+  <tr><td></td>
+  <td>idx</td><td><i>integer [t x v]</i></td><td>element index list</td></tr>
+  <tr><td></td>
+  <td>eltp</td><td><i>integer [t]</i></td><td>element type array</td></tr>
+  <tr><td></td>
+  <td>prm</td><td><i>real [h x 1..3]</i></td><td>(optional) nodal parameter list</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+    </table>
+  </td></tr>
+</table>
+Dimensions: <i>h</i> = number of nodes (size of <a href="basis.html">h-basis</a>),
+<i>t</i> = number of elements,
+<i>v</i> = max. number of nodes per element
+
+<h2>Notes</h2>
+<p>vtx is a double array of dimension h x 2 or h x 3, where h is number of nodes.
+  It contains the node coordinates.
+ 
+<p>idx is a 1-based integer array of dimension t x v, where t is number of
+  elements, and v is max. number of nodes in an element.
+  It contains the global node indices for all element nodes.
+ 
+<p>The element index list must be sorted in the order that TOAST expects.
+      (see element header files for local node order).
+      
+<p>eltp is an integer array of dimension t x 1. It contains the element type
+  identifiers for all mesh elements. Currently supported element types are:
+  <table col="2">
+  <tr><td><b>id</b></td><td><b>element type</b></td></tr>
+  <tr><td>1</td><td>3-noded triangle (old format, deprecated)</td></tr>
+  <tr><td>3</td><td>4-noded tetrahedron</td></tr>
+  <tr><td>4</td><td>6-noded wedge</td></tr>
+  <tr><td>5</td><td>8-noded regular voxel</td></tr>
+  <tr><td>6</td><td>6-noded triangle</td></tr>
+  <tr><td>7</td><td>10-noded tetrahedron</td></tr>
+  <tr><td>8</td><td>6-noded isoparametric triangle</td></tr>
+  <tr><td>9</td><td>10-noded triangle</td></tr>
+  <tr><td>10</td><td>10-noded isoparametric triangle</td></tr>
+  <tr><td>11</td><td>10-noded isoparametric tetrahedron</td></tr>
+  <tr><td>14</td><td>4-noded regular pixel</td></tr>
+  <tr><td>15</td><td>3-noded triangle</td></tr>
+  </table>
+ 
+<p>prm is an optional double array of dimension n x 1..3, containing nodal
+  values of absorption (column 1), scatter (column 2) and refractive index
+  (column 3). If prm is not provided, or if it contains less than 3 columns,
+  dummy values are inserted for the missing parameters.
+
+<p>toastMakeMesh labels boundary nodes according to their mesh connectivity.
+  To apply different boundary flags, and to add internal boundaries, use
+  the toastMarkMeshBoundary function. 
+
+<h2>See also</h2>
+<a href="toastMarkMeshBoundary.html">toastMarkMeshBoundary</a>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>toastReadParam</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastReadParam
+</div>
+
+<div class="param">
+<h1>toastReadParam</h1>
+<p>Read configuration parameters and options for the forward or inverse solver
+from a TOAST parameter file into a MATLAB
+data structure.
+
+<h2>Syntax</h2>
+<div class="code">
+prm = toastReadParam(prmfile)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>prmfile</td><td><i>string</i></td><td>parameter file name</td>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>prm</td><td><i>struct</i></td><td>structure containing the parsed parameters</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>This function reads the toast forward solver parameters used by toastFwd
+or the reconstruction parameters used by toastRecon from a file and stores them
+in a structure that can be passed directly to toastFwd or toastRecon.
+
+<h2>See also</h2>
+<a href="prm.html">Parameter structure</a>,
+<a href="toastFwd.html">toastFwd</a>,
+<a href="toastRecon.html">toastRecon</a>
+
+</div>
+</body>
+</html>

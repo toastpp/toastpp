@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>toastElementSize</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastElementSize
+</div>
+
+<div class="param">
+<h1>toastElementSize</h1>
+<p>Return an array with mesh element sizes.
+
+<h2>Syntax</h2>
+<div class="code">
+s = toastElementSize(hMesh)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>s</td><td><i>real vector</i></td><td>array of element sizes</td></tr>
+</tr></table>
+
+<h2>Notes</h2>
+<p>Returns the areas (2-D meshes) or volumes (3-D meshes) of each element
+  of a TOAST mesh in a column vector.
+  Note that negative element sizes usually indicate an incorrect node order.
+
+</div>
+</body>
+</html>

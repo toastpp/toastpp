@@ -1,0 +1,2 @@
+#!/usr/bin/tclsh
+auto_mkindex $env(TOAST_SCRIPT_PATH)

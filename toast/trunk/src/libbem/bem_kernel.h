@@ -1,0 +1,45 @@
+#ifndef __BEM_KERNEL
+#define __BEM_KERNEL
+
+#define BEMLIB_IMPLEMENTATION
+
+#include "bemlib.h"
+
+/**
+ * \brief Base class for BEM kernels.
+ */
+class BEMLIB BEM_Kernel {
+public:
+	BEM_Kernel () {}
+
+	/**
+	 * \brief reset the wave number for the following calculations
+	 * \param newk new wave number
+	 */
+	void SetWavenumber (toast::complex newk) { k = newk; }
+
+	/**
+	 * \brief Calculates the Greens function for the element at
+	 *   local point 'loc' from loading point 'load'.
+	 * \param loc local point on the element
+	 * \param load loading point
+	 * \param k wave number
+	 */
+	virtual CVector Calculate (BEM_Element *el, Point2D &loc, const Point3D &load) = 0;
+
+protected:
+	toast::complex k; ///< wave number
+};
+
+/**
+ * \brief BEM Helmholtz kernel.
+ */
+class BEMLIB BEM_Kernel_Helmholtz: public BEM_Kernel {
+public:
+	BEM_Kernel_Helmholtz (): BEM_Kernel () {}
+
+	CVector Calculate (BEM_Element *el, Point2D &loc, const Point3D &load);
+};
+
+
+#endif // !__BEM_KERNEL

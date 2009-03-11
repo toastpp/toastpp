@@ -1,0 +1,15 @@
+## 09/25/1999 ##########################################################
+#                                                                      #
+#  The directory blzpack/src.                                          #
+#                                                                      #
+########################################################################
+
+   The current directory is organized as follows:
+
+   README      : this file.
+   addresses.h : defines addresses in the arrays RSTOR and ISTOR. 
+   defaults.h  : sets defaults.
+   double      : contains the double precision version of BLZPACK.
+   single      : contains the single precision version of BLZPACK.
+
+end of README ##########################################################

@@ -1,0 +1,47 @@
+## 12/07/1999 ##########################################################
+#                                                                      #
+#  patches.txt lists bugs fixes and/or code modifications.             #
+#                                                                      #
+########################################################################
+
+November 1999: 
+
+. manual.ps: 15+LISTOR replaced by 17+LISTOR and 4+LRSTOR replaced by
+             5+LRSTOR; 150 replaced by 180 as default for k1; driver
+             models updated.
+. blzdrd.f : 15+LISTOR replaced by 17+LISTOR, 4+LRSTOR replaced by
+             5+LRSTOR, and min(N,150) replaced by min(N,180) in the
+             leading comments; modification in logical flags for 
+             algorithm control in reverse communication strategy;
+             one argument removed in the call to blzset.
+. blzeig.f : modification in logical flags for algorithm control in
+             reverse communication strategy.
+. blzext.f : modification in logical flags for algorithm control in
+             reverse communication strategy.
+. blzrbx.f : modification in logical flags for algorithm control in
+             reverse communication strategy.
+. blzset.f : temporary arrays introduced to avoid accessing ISTOR and
+             RSTOR when calling blzdrd/s in workspace query mode;
+             condition for workspace query modified; one argument 
+             removed; call to lzerrs added.
+. blzstp.f : condition added in logical flag ENDON to abort execution
+             when an indefinite matrix B is detected; argument added
+             in the call to subroutine lzstp5.
+. datchk.f : condition for workspace query modified.
+. datset.f : condition for workspace query modified; one argument
+             removed.
+. lzchek.f : condition added in logical flag EIGON.
+. lzhist.f : modification in the test with NONEWS (4 changed to 3).
+. lzmmry.f : condition for workspace query modified.
+. lzrang.f : modification in the initial bounds for the generalized
+             engenvalue problem in buckling mode.
+. lzstp5.f : argument added.
+. ssbnds.f : modification in the check for an empty computational
+             interval.
+. ssneed.f : new case for changing sigma introduced.
+. ssorgn.f : modification in the shift selection.
+. ssspec.f : modification in the shift selection.
+. tbconv.f : more conservative threshold for convergence in single
+             precision arithmetic.
+
+end of patches.txt #####################################################
