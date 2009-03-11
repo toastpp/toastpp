@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="matlab_R2006b"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		FavorSizeOrSpeed="1"
+		WholeProgramOptimization="true"
+	/>
+	<UserMacro
+		Name="MatlabDir"
+		Value="C:\Program Files\MATLAB\R2006b\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="MatlabIncludeDir"
+		Value="$(MatlabDir)extern\include\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="MatlabLibDir"
+		Value="$(MatlabDir)extern\lib\win32\microsoft\"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

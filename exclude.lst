@@ -1,0 +1,17 @@
+*/CVS/Root
+*/CVS/Entries
+*/CVS/Repository
+*/CVS/
+*/private/*
+*~
+#*
+*.suo
+*.ncb
+*.user
+*.aps
+*.obj
+*.idb
+*.pdb
+*.dep
+BuildLog.htm
+

@@ -1,0 +1,12 @@
+FC      = g77
+FCOPT   = -funroll-all-loops -fno-f2c -O3
+FCNOPT  = 
+FCINCL  = -I../
+FCLOAD  = 
+PARLIB  =
+RANLIB  = touch
+
+BLAS    = $(HOME)/LIB/blas_LINUX.a
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  = $(HOME)/LIB/lapack_LINUX.a
+SOLVER  = $(HOME)/LIB/MA47AD.o $(HOME)/LIB/MA47A.o

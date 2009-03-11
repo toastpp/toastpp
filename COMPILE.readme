@@ -1,0 +1,185 @@
+TOAST compilation and installation from source tree.           25.1.08
+====================================================
+
+Contents
+--------
+
+1.   Obtaining the toast sources
+1.1  Toast sources from CVS
+1.2  Toast sources from a tarball
+
+2.   Compiling the sources
+2.1  Linux
+2.2  Windows
+
+
+1. Obtaining the toast sources
+------------------------------
+
+1.1 Toast sources from CVS
+--------------------------
+
+You can only check out the toast sources from CVS, if
+
+- you have an account at cs.ucl.ac.uk
+- you are a member of the 'medim' group (type 'groups' at the shell
+  prompt to find out).
+
+If you don't have access to CVS, you need to get the sources in a
+tar-ball from the authors (see Sec. 1.2).
+
+Define the following environment variables:
+
+setenv CVSROOT :ext:<username>@sonic.cs.ucl.ac.uk:/cs/research/medim/projects0/green/projects/cvsroot
+setenv CVS_RSH ssh
+
+(Replace <username> with your CS login name.)
+
+If you are using bash instead of csh, the environment variables are set up as follows:
+
+export CVSROOT=:ext:<username>@sonic.cs.ucl.ac.uk:/cs/research/medim/projects0/green/projects/cvsroot
+export CVS_RSH=ssh
+
+Go into the directory where you want to install the toast sources, e.g.:
+
+cd $HOME
+
+Check out the toast sources:
+
+cvs checkout toast
+
+This will create the 'toast' directory containing the toast source tree.
+
+You also need the sources for the external numerics libraries which are not part of the
+toast cvs repository:
+
+cd toast
+sftp sonic.cs.ucl.ac.uk
+cd /cs/research/medim/projects0/green/projects/common/toast/toastlib
+get numerics.tar.gz
+quit
+tar xzvf numerics.tar.gz
+
+
+1.2 Toast sources from a tarball
+--------------------------------
+
+If you have obtained a tarball containing the toast sources (e.g. toast-src.tar.gz),
+go to the directory where you want to install the toast source tree and unpack the
+tarball:
+
+cd $HOME
+tar xzvf toast-src.tar.gz
+
+This will create the 'toast' directory containing the toast source tree.
+
+You then have to unpack the numerics libraries:
+
+cd toast
+tar xzvf numerics.tar.gz
+
+
+
+2. Compiling the sources
+------------------------
+
+2.1 Linux
+---------
+
+2.1.1 Preliminaries:
+--------------------
+
+You need the GNU g++ and g77 compilers (version 3.2 or later).
+
+Make sure that you have the following packages installed in your Linux
+distribution and that the corresponding libraries and header files are in
+common locations, where they can be found by the compiler:
+
+Tcl
+Tcl-devel
+Tk
+Tk-devel
+Tix
+Tix-devel
+BLT
+BLT-devel
+
+These libraries are required for compiling the toast GUI applications. If
+necessary, you may have to create symbolic links for the libraries and headers,
+or copy them into the toast directories (toast/include and toast/lib).
+
+As a last resort, the toast source tarball contains the source distributions
+for these libraries (toast-gui.tar.gz) which you can unpack and compile if
+your system does not have the required packages. These sources are however
+not up to date and may not compile or run on newer Linuxes.
+
+
+2.1.2 Configuration and compilation:
+------------------------------------
+
+Configure the makefiles:
+
+	./configure
+
+(for additional configuration options, type: ./configure --help)
+
+Set the toast environment:
+
+	source toast.env
+
+(note that toast.env is set up for csh. You may have to edit the script to
+run in other shells).
+
+Make the numerics libraries:
+
+	make numerics
+
+Make the toast libararies and applications:
+
+	make
+
+The run-time libraries are installed in $TOASTDIR/lib. Make sure that your
+LD_LIBRARY_PATH variable points to this directory (this is done automatically
+by the toast.env script).
+The toast applications are installed in $TOASTDIR/bin. You may want to set
+your path variable to include that directory.
+
+
+
+Troubleshooting FAQ
+-------------------
+
+1. BLT libraries not found
+
+   The BLT package (Tcl/Tk addon) is used for drawing 2D graphs in Tk windows.
+   Unfortunately the BLT package appears to install itself in nonstandard
+   locations, such as /usr/lib/blt2.4, which is not searched by the compiler
+   by default.
+
+   To fix missing BLT library errors, add symbolic links to the libraries
+   from the toast lib directory:
+
+	cd $TOASTDIR/lib
+	ln -s /usr/lib/blt2.4/libBLT24.so libBLT24.so
+	ln -s libBLT24.so libBLT.so
+
+   (for missing BLT header files, see next question)
+
+
+2. BLT-devel package doesn't exist, or 'blt.h not found' compiler errors
+
+   The BLT-devel package (containing the BLT header files) appears not to be
+   widely available. If you can't locate it for your system, you may have to
+   download the BLT source package to obtain the header files from there.
+   Alternatively, toast comes with an older BLT package (2.4u) in the
+   toast-gui.tar.gz archive, and the header files in there still seem to
+   work. Either way, copy the header files (blt*.h) from the BLT src
+   directory into your $TOASTDIR/include directory.
+
+
+3. FORTRAN compiler problems
+
+   Where available, use gfortran instead of g77 to compile the Fortran
+   libraries (BLAS, LaPACK, etc.). If configure insists on g77, you can
+   change the preferences by setting environment variable F77 to gfortran.
+   g77 appears to cause problems on 64-bit architectures.

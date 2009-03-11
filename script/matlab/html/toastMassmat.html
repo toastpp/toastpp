@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>toastMassmat</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMassmat
+</div>
+
+<div class="param">
+<h1>toastMassmat</h1>
+<p>Generate an FEM mass matrix for solving time-domain problems.
+
+<h2>Syntax</h2>
+<div class="code">
+B = toastMassmat (hMesh)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>B</td><td><i>real sparse [h x h]</i></td><td>FEM mass matrix for time-dependent problems</td></tr>
+</tr></table>
+Dimensions: <i>h</i> = size of <a href="basis.html">h-basis</a>
+
+<h2>Notes</h2>
+<p>Returns a sparse real h x h matrix (h: number of nodes in the mesh)
+  containing mass matrix B. B is composed from element-wise integrals of
+  products of shape functions. Unlike the system matrix returned by toastSysmat,
+  B does not depend on optical parameters.
+ 
+<p>B is required for the evaluation of the time-dependent FEM diffusion
+  equation, where it appears in the time derivative term.
+
+<h2>See also</h2>
+  <a href="toastSysmat.html">toastSysmat</a>,
+  <a href="toastFields.html">toastFields</a>
+  
+</div>
+</body>
+</html>

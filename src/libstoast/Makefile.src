@@ -1,0 +1,34 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libstoast
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libstoast
+
+all:: $(LIB)
+
+SRCS = 	solution.cc mwsolution.cc raster.cc source.cc fwdsolver.cc \
+	fwdsolver_mw.cc jacobian.cc of.cc regul.cc pscaler.cc pparse.cc
+
+ifdef MAKE_MPI
+SRCS += jacobian_mpi.cc
+endif
+
+
+OBJS = ${SRCS:.cc=.o} 
+HDRS = ${SRCS:.cc=.h}
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(FEINC) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(OBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+clean::
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

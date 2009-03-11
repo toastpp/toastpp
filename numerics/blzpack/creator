@@ -1,0 +1,257 @@
+#!/bin/csh
+
+# 09/25/1999 ###########################################################
+#                                                                      #
+# creator is a script file which generates the library libblzpack.a    #
+# ======= and if required tests the library.                           #
+#                                                                      #
+# Usage:                                                               #
+#                                                                      #
+#      creator [-h] [-f] [-k] [-s] [-mpi] [-pvm] [-test] [-m file]     #
+#                                                                      #
+# Options:                                                             #
+#                                                                      #
+#      -h      : prints this help and quit                             #
+#      -f      : creates a library including BLAS kernels              #
+#                (default: BLAS library is defined in MACROS)          #
+#      -k      : keeps object files                                    #
+#                (default: object files will be deleted)               #
+#      -s      : creates a single precision library                    #
+#                (default: double precision library)                   #
+#      -mpi    : creates a parallel version, mpi interface             #
+#      -pvm    : creates a parallel version, pvm interface             #
+#      -test   : runs tests in drv/single or drv/double                #
+#      -m file : uses macros defined in file                           #
+#                                                                      #
+########################################################################
+#                                                                      #
+# creator uses `uname' to figure out about the operating system; the   #
+# systems currently supported are:                                     #
+#                                                                      #
+#      AIX      (IBM Risc 6000)                                        #
+#      HP-UX    (HP 9000)                                              #
+#      IRIX64   (SGI Onyx 2)                                           #
+#      Linux                                                           #
+#      SunOS    (Sun Ultra-30)                                         #
+#      Unicos   (J90, T3E-900)                                         #
+#                                                                      #
+########################################################################
+
+# default options ######################################################
+
+set case = sp
+set test = none
+set type = none
+
+set BLAS      = none
+set MACROS    = default
+set OBJECT    = delete
+set PRECISION = double
+set VERSION   = SEQ
+
+# MS: added 071122 #####################################################
+
+if ($?MAKE == 0) then
+    set MAKE = make
+endif
+
+# system identification ################################################
+
+set SYSTEM = `uname`
+
+if      ( "$SYSTEM" == 'AIX'    || \
+          "$SYSTEM" == 'HP-UX'  || \
+          "$SYSTEM" == 'IRIX64' || \
+          "$SYSTEM" == 'Linux'  || \
+	  "$SYSTEM" == 'CYGWIN_NT-5.1' || \
+          "$SYSTEM" == 'SunOS'  || \
+          "$SYSTEM" == 'sn9605' || \
+          "$SYSTEM" == 'sn6711' ) then
+        echo '* System:' $SYSTEM
+        if      ( "$SYSTEM" == 'sn9605' ) then
+                set SYSTEM = J90
+        else if ( "$SYSTEM" == 'sn6711' ) then
+                set SYSTEM = T3E
+	else if ( "$SYSTEM" == 'CYGWIN_NT-5.1' ) then
+	        set SYSTEM = Linux
+        endif
+else
+        echo '* System:' $SYSTEM 'not supported, do creator -h'
+        exit 0
+endif
+
+# arguments interpretation #############################################
+
+@ i=1
+
+@ last = $#argv
+
+while ( $i <= $last )
+  set option = $argv[$i]
+  if      ( "$option" == '-h'   ) then
+          echo 'Usage: creator [-h] [-f] [-k] [-s] [-mpi] [-pvm]'
+          echo '               [-test] [-m file]'
+          echo 'Options:'
+          echo ' -h      : prints this help and quit'
+          echo ' -f      : creates a library including BLAS kernels'
+          echo '           (default: BLAS library is defined in MACROS)'
+          echo ' -k      : keeps object files'
+          echo '           (default: object files will be deleted)'
+          echo ' -s      : creates a single precision library'
+          echo '           (default: double precision library)'
+          echo ' -mpi    : creates a parallel version, mpi interface'
+          echo ' -pvm    : creates a parallel version, pvm interface'
+          echo ' -test   : runs tests in drv/single or drv/double'
+          echo ' -m file : uses macros defined in file'
+          echo 'Systems supported (machines used):'
+          echo '  AIX    (IBM Risc 6000)'
+          echo '  HP-UX  (HP 9000)'
+          echo '  IRIX64 (SGI Onyx 2)'
+          echo '  Linux'
+          echo '  SunOS  (Sun Ultra-30)'
+          echo '  sn6711 (CRAY T3E-900)' 
+          echo '  sn9605 (CRAY J90)' 
+          exit 1
+  else if ( "$option" == '-f'    ) then
+          set BLAS = included
+  else if ( "$option" == '-k'    ) then
+          set OBJECT = keep
+  else if ( "$option" == '-mpi'  ) then
+          set VERSION = MPI
+  else if ( "$option" == '-pvm'  ) then
+          set VERSION = PVM
+  else if ( "$option" == '-s'    ) then
+          set PRECISION = single
+  else if ( "$option" == '-test' ) then
+          set test = yes
+  else if ( "$option" == '-m'    ) then
+          @ i++
+          set MACROS = $argv[$i]
+  else 
+          echo '* Option '$argv[$i] 'not supported, use -h for options'
+          exit 2
+  endif
+  @ i++
+end
+
+# check for an existing installation ###################################
+
+if ( -e ./lib/install ) then
+   set system    = `awk '{print $1}' ./lib/install`
+   set version   = `awk '{print $2}' ./lib/install`
+   set precision = `awk '{print $3}' ./lib/install`
+   set blas      = `awk '{print $4}' ./lib/install`
+   set object    = `awk '{print $5}' ./lib/install`
+   if ( "$SYSTEM" != "$system" ) then
+      echo '* Current library is not compatible with system'
+      echo '* Run cleaner and then creator'                   
+      exit 3
+   endif
+else 
+   set system    = new_installation
+   set version   = new_installation 
+   set precision = new_installation 
+   set blas      = new_installation 
+   set object    = new_installation 
+endif 
+
+# MACROS ###############################################################
+
+if      ( "$MACROS" == "default" ) then
+        set MACROS = ./sys/MACROS/$SYSTEM
+else if ( ! -e $MACROS ) then
+        echo '* File '$MACROS' not found'
+        exit 4
+endif
+
+# library version ######################################################
+
+if ( "$SYSTEM" == 'J90' || "$SYSTEM" == 'T3E' ) then
+   if ( "$PRECISION" == 'double' ) then
+      echo '* Double precision not implemented on this platform'
+      exit 5
+   endif
+endif
+
+# systems dependencies #################################################
+
+set BLZAUX = ./sys/integer/$SYSTEM.f
+set BLZAUX = `echo ./sys/$PRECISION/$SYSTEM.f $BLZAUX`
+
+# interfaces ###########################################################
+
+if ( "$SYSTEM" == 'T3E' && "$VERSION" == 'PVM' ) then
+   set BLZAUX = `echo ./etc/single/PVM.T3E.f $BLZAUX`
+   set BLZAUX = `echo ./etc/integer/PVM.T3E.f $BLZAUX`
+else
+   set BLZAUX = `echo ./etc/integer/$VERSION.f $BLZAUX`
+   set BLZAUX = `echo ./etc/$PRECISION/$VERSION.f $BLZAUX`
+endif
+
+set BLZAUX = `echo ./etc/integer/istorr.f $BLZAUX`
+set BLZAUX = `echo ./etc/$PRECISION/rstorr.f $BLZAUX`
+
+# BLAS #################################################################
+
+if ( "$BLAS" == 'included' ) then
+   set BLZAUX = `echo ./etc/$PRECISION/BLAS.f $BLZAUX`
+endif
+
+# copy files to the right directory ####################################
+
+if ( "$SYSTEM" != "$system" || "$VERSION" != "$version" || \
+     "$PRECISION" != "$precision" || "$BLAS" != "$blas" || \
+     "$OBJECT" != "$object" ) then
+   cat $BLZAUX >! ./src/$PRECISION/blzaux.f
+   cp $MACROS ./src/$PRECISION/MACROS
+   cp $MACROS ./drv/$PRECISION/MACROS
+endif
+
+# create the library ###################################################
+
+if      ( -e ./lib/libblzpack.a && "$test" == 'yes' ) then
+        echo '* Library libblzpack.a already exists'
+        echo '  system    : '$system
+        echo '  version   : '$version
+        echo '  precision : '$precision
+else if ( -e ./src/$PRECISION/MACROS ) then
+        echo '* Creating libblzpack.a'
+        echo '  system    : '$SYSTEM
+        echo '  version   : '$VERSION
+        echo '  precision : '$PRECISION
+        if ( ! -d ./lib ) mkdir ./lib
+        cd ./src/$PRECISION 
+        $MAKE libblzpack.a
+        $MAKE libblzpack.so
+        cd ../../
+        if ( -e ./src/$PRECISION/libblzpack.a ) then
+           mv ./src/$PRECISION/libblzpack.a ./lib/libblzpack.a
+           echo $SYSTEM $VERSION $PRECISION $BLAS $OBJECT \
+                >! ./lib/install
+           echo 'PRECISION = '$PRECISION >! ./lib/precision
+        endif
+        if ( -e ./src/$PRECISION/libblzpack.so ) then
+           mv ./src/$PRECISION/libblzpack.so ./lib/libblzpack.so
+           echo $SYSTEM $VERSION $PRECISION $BLAS $OBJECT \
+                >! ./lib/install
+           echo 'PRECISION = '$PRECISION >! ./lib/precision
+        endif
+        if ( "$OBJECT" == 'delete' ) ./cleaner -o
+endif
+
+# test the library (sequential mode only) ##############################
+
+if ( "$test" == 'yes' ) then
+   if ( "$VERSION" == 'MPI' || "$VERSION" == 'PVM' ) then
+      echo '* creator does not test the parallel version of blzpack,'
+      echo '  (use the Makefile in drv/data for this purpose)'
+    else
+      echo '* testing drvsp1.x, drvsp2.x, drvsp3.x and drvsp4.x'
+      echo '  (output files are placed in drv/data)'
+      cd ./drv/data
+      $MAKE clean
+      $MAKE testdrvsp
+    endif
+endif
+
+# end of creator #######################################################

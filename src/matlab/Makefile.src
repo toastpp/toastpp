@@ -1,0 +1,93 @@
+include $(TOASTDIR)/Makefile.incl
+SHELL = /bin/csh
+VPATH = $(TSRC)/matlab
+
+SRCS =  toastBasisToMeshMatrix.cc \
+	toastCatchErrors.cc \
+	toastDataLinkList.cc \
+	toastDeleteBasis.cc \
+	toastDeleteMesh.cc \
+	toastDeleteRegul.cc \
+	toastElementData.cc \
+	toastElementSize.cc \
+	toastElmat.cc \
+	toastFields.cc \
+	toastFindElement.cc \
+	toastGetBasisSize.cc \
+	toastGetQM.cc \
+	toastGradient.cc \
+	toastImageGradient.cc \
+	toastIntFG.cc \
+	toastIntGradFGradG.cc \
+	toastJacobian.cc \
+	toastJacobianCW.cc \
+	toastKrylov.cc \
+	toastLabelRegion.cc \
+	toastMakeMesh.cc \
+	toastMapBasisToMesh.cc \
+	toastMapGridToBasis.cc \
+	toastMapGridToMesh.cc \
+	toastMapGridToSol.cc \
+	toastMapMeshToBasis.cc \
+	toastMapMeshToGrid.cc \
+	toastMapMeshToSol.cc \
+	toastMapSolToBasis.cc \
+	toastMapSolToGrid.cc \
+	toastMapSolToMesh.cc \
+	toastMarkMeshBoundary.cc \
+	toastMassmat.cc \
+	toastMeshBB.cc \
+	toastMeshData.cc \
+	toastMeshDimension.cc \
+	toastMeshElementCount.cc \
+	toastMeshLin2Quad.cc \
+	toastMeshNodeCount.cc \
+	toastMeshSize.cc \
+	toastMeshToBasisMatrix.cc \
+	toastMPos.cc \
+	toastMvec.cc \
+	toastPointCloud.cc \
+	toastQPos.cc \
+	toastQvec.cc \
+	toastReadComplexMatrix.cc \
+	toastReadComplexVector.cc \
+	toastReadMesh.cc \
+	toastReadNIM.cc \
+	toastReadQM.cc \
+	toastReadRealVector.cc \
+	toastRegul.cc \
+	toastRegulGradient.cc \
+	toastRegulHDiag.cc \
+	toastRegulHess.cc \
+	toastRegulHess1f.cc \
+	toastRegulKappa.cc \
+	toastRegulValue.cc \
+	toastSampleField.cc \
+	toastSetBasis.cc \
+	toastSetQM.cc \
+	toastShapeFunction.cc \
+	toastShapeFunctionGrad.cc \
+	toastSolutionMask.cc \
+	toastSurfData.cc \
+	toastSysmat.cc \
+	toastWriteComplexHBMatrix.cc \
+	toastWriteMesh.cc \
+	toastWriteNIM.cc \
+	toastWriteQM.cc \
+	toastWriteRealHBMatrix.cc \
+	toastWriteRealVector.cc \
+	construct_bem_matrix.cc \
+	surface_int.cc
+
+OBJS = ${SRCS:.cc=.$(MEXEXT)}
+
+all:: $(OBJS)
+
+%.o : %.cc
+	$(MEX) -c $<
+
+%.$(MEXEXT) : %.cc toastmex.o util.o
+	$(MEX) $^
+
+clean::
+	rm -f *.$(MEXEXT)

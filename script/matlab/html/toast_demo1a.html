@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>TOAST Demo: Time-dependent forward solver</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+<LINK REL="stylesheet" HREF="demo.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<body>
+<div class="header">
+   <div class="left"><a href="matlab:edit toast_demo1a">Open source in the editor</a></div>
+   <div class="right"><a href="matlab:rundemo('toast_demo1a')">Run this demo</a></div>
+</div>
+
+<div class="content">
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="matlab:demo toolbox toast">Demos</a> &gt;
+Time-dependent forward solver
+</div>
+
+<table col="2">
+<tr><td width="64px"><img src="toast_demo1a.png"></td>
+<td><h1>TOAST Demo: Time-dependent forward solver</h1></td>
+</tr></table>
+<p>This demo shows an example for
+applying the TOAST forward solver
+in a time-dependent problem.
+
+<p>It generates the transilluminated
+temporal intensity profile, or
+temporal point spread function
+(TPSF) at the detector positions,
+arising from a delta-source in
+time.
+
+<p>TOAST uses a finite-difference
+scheme to propagate the solution
+in time. You can select the time
+window, number of temporal
+samples, and the coupling factor
+connecting the time steps.
+
+<p>A coupling factor of 0.5
+corrresponds to the Crank-
+Nicholson scheme. A factor of 1
+corresponds to an implicit
+scheme.
+
+<p>This demo allows to calculate
+the forward solution either in a
+homogeneous ('flat') or
+inhomogeneous ('blobs')
+medium. It can be seen that even
+in an inhomogeneous case, the
+time profile is smooth without
+obvious features, demonstrating
+the low TPSF information content.
+
+<p>For the reconstruction, usually a
+small number of features is
+extracted such as integrated
+intensity, mean arrival time, or the
+Fourier-transformed signal sampled
+at a small number of frequencies.
+
+</div>
+
+</body>
+</html>

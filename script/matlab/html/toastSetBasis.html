@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>toastSetBasis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastSetBasis
+</div>
+
+<div class="param">
+<h1>toastSetBasis</h1>
+<p>Define a mapper between FEM and reconstruction bases.
+
+<h2>Syntax</h2>
+<div class="code">
+hBasis = toastSetBasis(hMesh,bdim)<br>
+hBasis = toastSetBasis(hMesh,bdim,gdim)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+<tr><td></td>
+  <td>bdim</td><td><i>integer vector [2] or [3]</i></td><td>raster dimensions of the b-basis grid</td></tr>
+<tr><td></td>
+  <td>gdim</td><td><i>integer vector [2] or [3]</i></td><td>raster dimensions of the g-basis grid</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>A <i>basis mapper</i> provides an interface to map a scalar field, defined over the domain,
+  from one basis expansion to another.
+
+<p>TOAST uses different <a href="basis.html">basis definitions</a> for the forward and inverse
+problem. The forward solution is computed on a finite element grid which may be unstructured
+  (h-basis).
+  The inverse solution is normally calculated on an independent regular grid (b-basis).
+  Optionally, an additional high-resolution regular grid (g-basis) is used to improve the mapping
+  between h and b-basis.
+  
+<p>toastSetBasis creates a mapper instance. Parameter hMesh is a mesh handle which defines the
+  h-basis. The inverse basis is a regular bi- or tri-linear basis of grid size
+  bdim(1) x bdim(2) or bdim(1) x bdim(2) x bdim(3). The area of the b-basis is set to the bounding
+  box of the mesh.
+  
+<p>If the gdim parameter is provided, it is used to define a high-resolution regular grid (g-basis).
+  gdim should be of higher resolution than bdim (typically an integer multiple of bdim in each
+  dimension). If gdim is not specified, no intermediate grid is used for the mapping between
+  h-basis and b-basis. The g-basis is usually only required if the b-basis has a low resolution,
+  to avoid losses during the mapping process.
+
+<h2>See also</h2>
+<a href="toastDeleteBasis.html">toastDeleteBasis</a>,
+<a href="basis.html">Basis definitions</a>,
+<a href="toastMapBasisToMesh.html">toastMapBasisToMesh</a>,
+<a href="toastMapGridToBasis.html">toastMapGridToBasis</a>
+</div>
+
+</body>
+</html>

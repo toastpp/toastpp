@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>toastMeshToBasisMatrix</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMeshToBasisMatrix
+</div>
+
+<div class="param">
+<h1>toastMeshToBasisMatrix</h1>
+<p>Returns the linear transformation matrix that maps a nodal image into
+a regular grid.
+
+<h2>Syntax</h2>
+<div class="code">
+M = toastMeshToBasisMatrix (hBasis)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>M</td><td><i>real, sparse [b x h]</i></td><td>transformation matrix</td>
+</tr></table>
+Dimensions: <i>h</i> = size of <a href="basis.html">h-basis</a>,
+<i>b</i> = size of <a href="basis.html">b-basis</a>.
+
+<h2>Notes</h2>
+<p>Using the matrix returned by toastMeshToBasisMatrix for a basis
+transformation is equivalent to applying the toastMapMeshToBasis function.
+
+<p>Therefore, the operation
+<div class="code"> 
+     M = toastMeshToBasisMatrix (hBasis);<br>
+     bimg = M * himg;
+</div>
+  has the same result as
+<div class="code">
+     bimg = toastMapMeshToBasis (hBasis, himg)
+</div>
+  (where himg is an image in nodal basis representation, and hBasis is
+  a valid basis mapper handle).
+
+<h2>See also</h2>
+<a href="toastMapMeshToBasis.html">toastMapMeshToBasis</a>
+
+</div>
+
+</body>
+</html>

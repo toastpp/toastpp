@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>toastImageGradient</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastImageGradient
+</div>
+
+<div class="param">
+<h1>toastImageGradient</h1>
+<p>Return the gradient of an image.
+
+<h2>Syntax</h2>
+<div class="code">
+grad = toastImageGradient(hBasis,img)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+  <tr><td></td>
+  <td>img</td><td><i>real or complex vector [g]</i></td><td>image</td></tr>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>grad</td><td><i>real or complex matrix [n x g]</i></td><td>image gradient</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>Calculates the gradient of the image given in fine resolution
+  (<a href="basis.html">g-basis</a>). Any pixels outside the object domain are removed from the
+  calculation, to suppress gradients at the domain boundary. The gradients
+  are returned as a dense matrix of dimension n x g, where n is the
+  domain dimension (2 or 3). Real and complex images are supported.
+
+</div>
+</body>
+</html>

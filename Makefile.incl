@@ -1,0 +1,95 @@
+SHELL = /bin/sh
+
+# =======================================================================
+# TOAST directory Tree
+
+ifndef TOASTDIR
+TOASTDIR = $(PWD)
+endif
+TOASTVER = $(TOASTDIR)/gcc4.1.1_shared
+ARCHDIR = linux32
+
+TSRC = $(TOASTDIR)/src
+TINC = $(TOASTDIR)/include
+TDOC = $(TOASTDIR)/doc
+
+TOASTOBJ = $(TOASTVER)/obj
+TBIN = $(TOASTVER)/bin
+TLIB = $(TOASTVER)/lib
+
+# =======================================================================
+# Compilers and binutils
+
+CC       = gcc
+CXX      = g++
+CCFLAGS  = -g -O2 -DNEED_EXPLICIT_INSTANTIATION -fno-implicit-templates -Wno-deprecated
+CCLIBS   = -L/usr/X11R6/lib -lm
+SHLIB_CFLAGS = -fPIC
+
+F77      = gfortran
+FFLAGS   = -g -O2
+FLIBS    =  -L/usr/lib/gcc/i386-redhat-linux/4.1.1 -L/usr/lib/gcc/i386-redhat-linux/4.1.1/../../.. -lgfortranbegin -lgfortran -lm -lgcc_s
+
+LD       = $(CXX)    # may need to be queried from configure
+LDFLAGS  =  -L/home/ucacmas/toast2/lib -s
+
+MAKE     = make
+RM       = rm -f
+RANLIB   = :
+
+LIB_SUFFIX = .so
+MAKE_LIB = g++ -shared -o ${LIB} ${OBJS} ${LIBS}
+
+MEX      = mex -v
+
+# =======================================================================
+# BLAS and LAPACK libraries (determined by configure)
+
+BLASLIB   = -lblas
+SPBLASLIB = -lfsbtk
+LAPACKLIB = -llapack
+ILUPACKDIR = 
+ifdef ILUPACKDIR
+ILUPACKINC = -I$(ILUPACKDIR)/include
+ILUPACKLIBDIR = $(ILUPACKDIR)/lib/linux
+ILUPACKLIB = -L$(ILUPACKLIBDIR) -lpardiso_GNU_IA32
+ILUFLAGS = -DHAVE_ILU
+endif
+
+# =======================================================================
+# Libraries
+
+#LIBS     = -ldl  -lieee 
+LIBS      = -ldl  -lm
+TLIBS     = -lfe -lmath $(ILUPACKLIB) -lsuperlu -lblzpack \
+            -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB)  $(FLIBS)
+FELIB     = -L$(TLIB) $(TLIBS)
+TOASTLIB  = -L$(TLIB) -ltoast $(TLIBS)
+TOASTCLIB = -L$(TLIB) -lctoast -ltoast $(TLIBS)
+STOASTLIB = -L$(TLIB) -lstoast $(TLIBS)
+
+#XINC     = 
+#XLIB     =  -lX11 -lnsl -ldl
+#XVIEWINC = $(XINC) -I/usr/openwin/include
+#XVIEWLIB = $(XLIB) -L/usr/openwin/lib -lxview -lolgx
+
+GUIFLAGS  = -I$(TSRC)/libtcl 
+GUILIBS   = -ltoasttcl  -lBLT  -ltix -ltk -ltcl  -lX11   -lSM -lICE
+
+GLLIB     = -L/usr/lib -L/usr/X11R6/lib -lglut -lGLU -lGL -lXmu -lXext -lX11 \
+	-lXi -ltogl
+
+# =======================================================================
+FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask -I$(TSRC)/libmath \
+	    -I$(TSRC)/libfe -I$(TSRC)/libdiffreg $(ILUPACKINC)
+TOASTINC  = $(FEINC) -I$(TSRC)/libtoast
+TOASTCINC = $(TOASTINC) -I$(TSRC)/libctoast
+STOASTINC = $(FEINC) -I$(TSRC)/libstoast
+INCLUDE   = $(TOASTCINC)
+# =======================================================================
+
+# =======================================================================
+FEFLAGS   = $(CCFLAGS) $(ILUFLAGS) $(FEINC)
+STOASTFLAGS = $(CCFLAGS) $(ILUFLAGS) $(STOASTINC)
+FLAGS = $(CCFLAGS) $(ILUFLAGS) $(INCLUDE)
+# =======================================================================

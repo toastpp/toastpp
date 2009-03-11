@@ -1,0 +1,86 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libmath
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libmath
+
+all:: $(LIB)
+
+SRCS = \
+	mathdef.cc \
+	util.cc \
+	timing.cc \
+	complex.cc \
+	vector.cc \
+	matrix.cc \
+	dnsmatrix.cc \
+	symatrix.cc \
+	dgmatrix.cc \
+	gsmatrix.cc \
+	cdmatrix.cc \
+	crmatrix.cc \
+	scrmatrix.cc \
+	crmatrix_cm.cc \
+	precon.cc \
+	nr.cc \
+	scomplex.cc \
+	error.cc \
+	cr_cholesky.cc \
+	eigpair.cc \
+	arpack.cc \
+	gmres.cc \
+	fourn.cc \
+	ilutoast.cc
+
+ifdef MAKE_MPI
+SRCS += \
+	crmatrix_mpi.cc \
+	dnsmatrix_mpi.cc \
+	toast_mpi.cc
+endif
+
+OBJS = ${SRCS:.cc=.o} 
+HDRS = ${SRCS:.cc=.h}
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+#fourn.o :: fourn.c
+#	gcc  $(FLAGS) $(SHLIB_CFLAGS) -c $?
+#
+
+$(LIB): $(OBJS) fourn.o ilupack
+	@$(RM) $(LIB)
+	$(MAKE_LIB) ${ILUPACKSTATIC}
+	$(RANLIB) $(LIB)
+	make ilupack_clean
+
+ilupack::
+ifdef ILUPACKDIR
+ifeq '$(LIB_SUFFIX)' '.a'
+# if we are building a static library, the ILUPACK binaries need to be
+# unpacked and repacked directly into libmath.a
+	rm -rf /tmp/ilupack_expand
+	mkdir /tmp/ilupack_expand
+	pushd /tmp/ilupack_expand;\
+	ar x ${ILUPACKLIBDIR}/libZilupack.a;\
+	ar x ${ILUPACKLIBDIR}/libamd.a;\
+	ar x ${ILUPACKLIBDIR}/libsparspak.a;\
+	ar x ${ILUPACKLIBDIR}/libblaslike.a;\
+	popd
+ILUPACKSTATIC = /tmp/ilupack_expand/*
+else
+ILUPACKSTATIC = ${ILUPACKLIBDIR}/libZilupack.a ${ILUPACKLIBDIR}/libamd.a ${ILUPACKLIBDIR}/libsparspak.a ${ILUPACKLIBDIR}/libblaslike.a
+endif
+endif
+
+ilupack_clean::
+	rm -rf /tmp/ilupack_expand
+
+clean::  ilupack_clean
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

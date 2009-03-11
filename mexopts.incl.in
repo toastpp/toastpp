@@ -1,0 +1,41 @@
+# ===========================================================================
+# Toast-specific compiler and linker options for compiling toast-matlab
+# functions with mex.
+#
+#                  !!! IMPORTANT !!!
+#
+# Add the following line to the _END_ of your mexopts.sh file:
+#
+# 	source $TOASTVER/mexopts.incl
+#
+# If you have multiple toast binary targets and want to pick a specific one
+# for matlab, use something like this:
+#
+#	source $TOASTDIR/gcc3.4.6_shared/mexopts.incl
+#
+# ===========================================================================
+
+TOAST_SRC="$TOASTDIR/src"
+
+TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libbemdiff"
+
+TOAST_LIB="-L $TOASTDIR/@OBJDIR@/lib -lbemdiff -lstoast -lfe -lmath -larpack -lblzpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk @FLIBS@"
+
+TOAST_FLAG="-Wno-deprecated $TOAST_INC"
+
+
+
+# ===========================================================================
+# BEM-specific settings (uncomment for compiling matlab-bem
+# ===========================================================================
+#    TOAST_INC="$TOAST_INC -I $TOAST_SRC/libbemadj3d"
+#    TOAST_LIB="$TOAST_LIB -lbemadj3d"
+#    TOAST_FLAG="-Wno-deprecated $TOAST_INC"
+# ===========================================================================
+# end BEM-specific settings
+# ===========================================================================
+
+
+
+CXXFLAGS="$CXXFLAGS $TOAST_FLAG"
+CXXLIBS="$CXXLIBS $TOAST_LIB"

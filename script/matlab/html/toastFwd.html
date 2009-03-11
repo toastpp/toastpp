@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>toastFwd</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastFwd
+</div>
+
+<div class="param">
+<h1>toastFwd</h1>
+<p>The TOAST forward solver for diffusion light transport (frequency-domain version:
+complex-valued problem).
+
+<h2>Syntax</h2>
+<div class="code">
+[mdata pdata] = toastFwd (prm)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>prm</td><td><i>struct</i></td><td>contains options and parameters for the forward solver</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>mdata</td><td><i>real [nqm]</i></td><td>log amplitude boundary data for all source and detector combinations.</td></tr>
+<tr><td></td>
+  <td>pdata</td><td><i>real [nqm]</i></td><td>phase boundary data for all source and detector combinations.</td></tr>
+</table>
+Dimensions: <i>nqm</i> = number of measurements
+
+<h2>Notes</h2>
+<p>This is a high-level function that contains the TOAST FEM frequency domain forward solver for
+modelling diffuse light transport in a scattering medium.
+It calculates the boundary measurements for a given FEM mesh, absorption,
+scattering and refractive index distributions, and boundary source and detector
+profiles.
+
+<p>All model parameters and options are provided by the 'prm' input argument.
+For a description of the prm structure, see <a href="prm.html">Parameter
+structure</a>.
+
+<p>prm can either be generated manually, read from a file with <a href="toastReadParam.html">toastReadParam</a>, or defined interactively with a GUI tool,
+<a href="fwd_gui.html">fwd_gui</a>.
+
+<p>The calculated boundary data are returned in mdata and pdata,
+as log amplitude and phase. The data files are 1-D real vectors,
+containing the measurements for all source and detector
+combinations defined in the QM link list. The data are arranged
+so that the detector index changes most rapidly.
+
+<p>If the prm.lnampfile and/or prm.phasefile fields are defined, then the
+boundary data are also written to the files specified by these entries.
+
+<h2>See also</h2>
+<a href="prm.html">Parameter structure</a>,
+<a href="toastReadParam.html">toastReadParam</a>,
+<a href="toastFwdCW.html">toastFwdCW</a>,
+<a href="fwd_gui.html">fwd_gui</a>
+
+</div>
+</body>
+</html>

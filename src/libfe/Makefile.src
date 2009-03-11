@@ -1,0 +1,34 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libfe
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libfe
+
+all:: $(LIB)
+
+SRCS = 	point.cc node.cc ndlist.cc element.cc ellist.cc surface.cc \
+	ptsource.cc timespec.cc mesh.cc param.cc qmmesh.cc \
+	tri3old.cc tri3.cc tri6.cc tri6_ip.cc tri10.cc tri10_ip.cc \
+	quad4.cc pix4.cc vox8.cc vox27.cc \
+	tet4.cc tet10.cc tet10_ip.cc wdg6.cc wdg18inf.cc \
+	tri3D3.cc tri3D6.cc line2d2.cc \
+	lin_qr.cc tri_qr.cc tet_qr.cc
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = ${SRCS:.cc=.h}
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(OBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

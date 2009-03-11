@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>toastMapGridToBasis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMapGridToBasis
+</div>
+
+<div class="param">
+<h1>toastMapGridToBasis</h1>
+<p>Map an image between two different basis representations: from g-basis to
+b-basis (see <a href="basis.html">Basis definitions</a>).
+
+<h2>Syntax</h2>
+<div class="code">
+bimg = toastMapGridToBasis (hBasis, gimg)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+<tr><td></td>
+  <td>gimg</td><td><i>real or complex [g]</i></td><td>image (basis coefficients) in g-basis expansion</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>bimg</td><td><i>real or complex [b]</i></td><td>image (basis coefficients) mapped into b-basis expansion</td>
+</tr></table>
+Dimensions: <i>g</i> = size of <a href="basis.html">g-basis</a>,
+<i>b</i> = size of <a href="basis.html">b-basis</a>.
+
+<h2>Notes</h2>
+<p>Arbitrary functions can generally not be represented exactly in any of the
+basis expansions. Therefore, mapping from one basis to another may incur a
+loss, and mapping back to the first basis may not recover the original basis
+coefficients precisely.
+
+<p>Images can be real or complex-valued.
+
+<p>This function is similar to <a href="toastMapGridToSol.html">toastMapGridToSol</a>,
+but it maps the complete bounding box of the problem domain, including voxels outside
+the area of support. This is useful e.g. for displaying images.
+
+<p>Both g and b-basis are regular grids. The mapping between them is implemented
+as a bi- or tri-linear interpolation.
+
+<p>If the hBasis handle was created by a call to toastSetBasis with only a single
+regular grid parameter, then the g-basis and b-basis expansions are identical, and
+toastMapGridToBasis passes the input image directly through to output.
+
+<h2>See also</h2>
+<a href="basis.html">Basis definitions</a>,
+<a href="toastSetBasis.html">toastSetBasis</a>,
+<a href="toastMapBasisToMesh.html">toastMapBasisToMesh</a>,
+<a href="toastMapGridToSol.html">toastMapGridToSol</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+FC      = xlf
+FCOPT   = -O3 -qstrict
+FCNOPT  = 
+FCINCL  = -I../
+FCLOAD  =
+PARLIB  =
+RANLIB  = ranlib 
+
+BLAS    =
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =

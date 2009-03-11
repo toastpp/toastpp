@@ -1,0 +1,137 @@
+SHELL = /bin/sh
+include ../Makefile.incl
+
+NUMERICSDIR = $(TOASTDIR)/numerics
+LIBDIR = $(TLIB)
+INCDIR = $(TOASTDIR)/include
+
+all:: blas fspblas lapack superlu blzpack arpack liblbfgs
+
+blas::
+	mkdir -p $(TOASTOBJ)/BLAS; \
+	cd $(TOASTOBJ)/BLAS; \
+	cp $(NUMERICSDIR)/BLAS/Makefile .; \
+	$(MAKE); \
+	mv libblas.* $(LIBDIR)
+
+fspblas::
+	mkdir -p $(TOASTOBJ)/fspblas; \
+	cd $(TOASTOBJ)/fspblas; \
+	cp $(NUMERICSDIR)/fspblas/Makefile .; \
+	$(MAKE); \
+	mv *$(LIB_SUFFIX) $(LIBDIR)
+
+lapack::
+	mkdir -p $(TOASTOBJ)/LAPACK/SRC; \
+	cd $(TOASTOBJ)/LAPACK; \
+	cp $(NUMERICSDIR)/LAPACK/Makefile .; \
+	cp $(NUMERICSDIR)/LAPACK/make.inc .; \
+	cp $(NUMERICSDIR)/LAPACK/SRC/Makefile SRC; \
+	$(MAKE) lapacklib; \
+	mv liblapack.* $(LIBDIR)
+
+superlu::
+	mkdir -p $(TOASTOBJ)/SuperLU/SRC; \
+	cd $(TOASTOBJ)/SuperLU; \
+	cp $(NUMERICSDIR)/SuperLU/Makefile .; \
+	cp $(NUMERICSDIR)/SuperLU/make.inc .; \
+	cp $(NUMERICSDIR)/SuperLU/SRC/Makefile SRC; \
+	$(MAKE) superlulib; \
+	mv libsuperlu$(LIB_SUFFIX) $(LIBDIR); \
+	cp $(NUMERICSDIR)/SuperLU/SRC/*.h $(INCDIR)
+
+blzpack::
+	mkdir -p $(TOASTOBJ)/blzpack/src/double; \
+	cd $(TOASTOBJ)/blzpack; \
+	cp $(NUMERICSDIR)/blzpack/creator .; \
+	cp $(NUMERICSDIR)/blzpack/cleaner .; \
+	cp $(NUMERICSDIR)/blzpack/src/double/Makefile src/double; \
+	cp $(NUMERICSDIR)/blzpack/src/*.h src; \
+	cp -r $(NUMERICSDIR)/blzpack/sys .; \
+	cp -r $(NUMERICSDIR)/blzpack/drv .; \
+	cp -r $(NUMERICSDIR)/blzpack/etc .; \
+	./creator; \
+	mv lib/libblzpack$(LIB_SUFFIX) $(LIBDIR)
+
+arpack::
+	mkdir -p $(TOASTOBJ)/ARPACK/SRC; \
+	mkdir -p $(TOASTOBJ)/ARPACK/UTIL; \
+	mkdir -p $(TOASTOBJ)/ARPACK/OBJS; \
+	cd $(TOASTOBJ)/ARPACK; \
+	cp $(NUMERICSDIR)/ARPACK/Makefile .; \
+	cp $(NUMERICSDIR)/ARPACK/ARmake.inc .; \
+	cp $(NUMERICSDIR)/ARPACK/SRC/Makefile SRC; \
+	cp $(NUMERICSDIR)/ARPACK/UTIL/Makefile UTIL; \
+	$(MAKE) lib; \
+	mv OBJS/libarpack* $(LIBDIR)
+
+liblbfgs::
+	mkdir -p $(TOASTOBJ)/liblbfgs/lib; \
+	mkdir -p $(TOASTOBJ)/liblbfgs/include; \
+	mkdir -p $(TOASTOBJ)/liblbfgs/lib; \
+	cd $(TOASTOBJ)/liblbfgs; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/configure .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/{install-sh,ltmain.sh} .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/{missing,depcomp} .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/config.{sub,guess,h.in} .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/Makefile.in .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/{README,INSTALL,COPYING,AUTHORS,ChangeLog,NEWS} .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/include/* include; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/lib/* lib; \
+	mkdir sample; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/{Makefile.in,sample.c} ./sample;\
+	./configure; \
+	make; \
+	cp lib/.libs/*$(LIB_SUFFIX) $(LIBDIR); \
+	cp include/* $(TOASTDIR)/include
+
+clean:: blas_clean fspblas_clean lapack_clean superlu_clean blzpack_clean \
+	arpack_clean liblbfgs_clean
+
+blas_clean::
+	$(RM) -r $(TOASTOBJ)/BLAS
+
+fspblas_clean::
+	$(RM) -r $(TOASTOBJ)/fspblas
+
+lapack_clean::
+	$(RM) -r $(TOASTOBJ)/LAPACK
+
+superlu_clean::
+	$(RM) -r $(TOASTOBJ)/SuperLU
+
+arpack_clean::
+	$(RM) -r $(TOASTOBJ)/ARPACK
+
+blzpack_clean::
+	$(RM) -r $(TOASTOBJ)/blzpack
+
+liblbfgs_clean::
+	$(RM) -r $(TOASTOBJ)/liblbfgs
+
+distclean:: blas_distclean fspblas_distclean lapack_distclean \
+	superlu_distclean blzpack_distclean arpack_distclean liblbfgs_distclean
+
+blas_distclean::blas_clean
+	$(RM) $(LIBDIR)/libblas*
+
+fspblas_distclean::fspblas_clean
+	$(RM) $(LIBDIR)/libfsbtk*
+
+lapack_distclean::lapack_clean
+	$(RM) $(LIBDIR)/liblapack*
+
+superlu_distclean::superlu_clean
+	$(RM) $(LIBDIR)/libsuperlu*; \
+	$(RM) $(INCDIR)/Cnames.h $(INCDIR)/colamd.h $(INCDIR)/?sp_defs.h \
+		$(INCDIR)/?complex.h $(INCDIR)/supermatrix.h \
+		$(INCDIR)/util.h
+
+blzpack_distclean::blzpack_clean
+	$(RM) -f $(LIBDIR)/libblzpack*
+
+arpack_distclean::arpack_clean
+	$(RM) $(LIBDIR)/libarpack*
+
+liblbfgs_distclean::liblbfgs_clean
+	$(RM) $(LIBDIR)/liblbfgs*
