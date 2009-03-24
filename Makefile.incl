@@ -21,6 +21,7 @@ TLIB = $(TOASTVER)/lib
 # Compilers and binutils
 
 CC       = gcc
+CFLAGS   = -g -O2
 CXX      = g++
 CCFLAGS  = -g -O2 -DNEED_EXPLICIT_INSTANTIATION -fno-implicit-templates -Wno-deprecated
 CCLIBS   = -L/usr/X11R6/lib -lm
@@ -31,7 +32,7 @@ FFLAGS   = -g -O2
 FLIBS    =  -L/usr/lib/gcc/i386-redhat-linux/4.1.1 -L/usr/lib/gcc/i386-redhat-linux/4.1.1/../../.. -lgfortranbegin -lgfortran -lm -lgcc_s
 
 LD       = $(CXX)    # may need to be queried from configure
-LDFLAGS  =  -L/home/ucacmas/toast2/lib -s
+LDFLAGS  =  -L/home/ucacmas/toast2/trunk/lib -s
 
 MAKE     = make
 RM       = rm -f
@@ -41,6 +42,7 @@ LIB_SUFFIX = .so
 MAKE_LIB = g++ -shared -o ${LIB} ${OBJS} ${LIBS}
 
 MEX      = mex -v
+MEXEXT   = mexglx
 
 # =======================================================================
 # BLAS and LAPACK libraries (determined by configure)
@@ -55,6 +57,11 @@ ILUPACKLIBDIR = $(ILUPACKDIR)/lib/linux
 ILUPACKLIB = -L$(ILUPACKLIBDIR) -lpardiso_GNU_IA32
 ILUFLAGS = -DHAVE_ILU
 endif
+
+# =======================================================================
+# MPI flags
+
+MAKE_MPI = 
 
 # =======================================================================
 # Libraries
