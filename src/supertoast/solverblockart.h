@@ -1,15 +1,15 @@
 // ==========================================================================
 // SolverART: ART nonlinear inverse solver
 
-#ifndef __SOLVERART_H
-#define __SOLVERART_H
+#ifndef __SOLVERBLOCKART_H
+#define __SOLVERBLOCKART_H
 
 #include "solver.h"
 
-class SolverART: public Solver {
+class SolverBlockART: public Solver {
 public:
-    SolverART (ParamParser *_pp = NULL);
-    SOLVER Type() { return SOLVER_ART; }
+    SolverBlockART (ParamParser *_pp = NULL);
+    SOLVER Type() { return SOLVER_BLOCKART; }
     void Solve (CFwdSolver &FWS, const Raster &raster,
        const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
        const RVector &sd, Solution &bsol, Solution &msol,
@@ -24,5 +24,5 @@ private:
     double lambda; // ART relaxation parameter
 };
 
-#endif // !__SOLVERART_H
+#endif // !__SOLVERBLOCKART_H
 
