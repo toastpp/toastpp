@@ -18,6 +18,7 @@ enum SOLVER {
     SOLVER_BFGS,            //   Broyden-Fletcher-Goldfarb-Shanno
     SOLVER_LBFGS,           //   limited memory version of BFGS
     SOLVER_ART,             //   algebraic reconstruction technique
+    SOLVER_BLOCKART,        //   Block-ART solver
     SOLVER_LINEAR           //   linear solver (only for difference recon)
 };
 

@@ -8,6 +8,7 @@
 #include "solverbfgs.h"
 #include "solverlbfgs.h"
 #include "solverart.h"
+#include "solverblockart.h"
 #include "solverlin.h"
 
 using namespace std;
@@ -18,13 +19,14 @@ using namespace std;
 Solver *Solver::Create (SOLVER solver)
 {
     switch (solver) {
-    case SOLVER_PCG:    return new SolverPCG; break;
-    case SOLVER_LM:     return new SolverLM; break;
-    case SOLVER_BFGS:   return new SolverBFGS; break;
-    case SOLVER_LBFGS:  return new SolverLBFGS; break;
-    case SOLVER_ART:    return new SolverART; break;
-    case SOLVER_LINEAR: return new SolverLIN; break;
-    default:            return 0;
+    case SOLVER_PCG:      return new SolverPCG; break;
+    case SOLVER_LM:       return new SolverLM; break;
+    case SOLVER_BFGS:     return new SolverBFGS; break;
+    case SOLVER_LBFGS:    return new SolverLBFGS; break;
+    case SOLVER_ART:      return new SolverART; break;
+    case SOLVER_BLOCKART: return new SolverBlockART; break;
+    case SOLVER_LINEAR:   return new SolverLIN; break;
+    default:              return 0;
     }
 }
 
@@ -44,6 +46,8 @@ Solver *Solver::Create (ParamParser *_pp)
 	    s = new SolverLBFGS (_pp);
 	else if (!strcasecmp (cbuf, "ART"))
 	    s = new SolverART (_pp);
+	else if (!strcasecmp (cbuf, "BLOCKART"))
+	    s = new SolverBlockART (_pp);
 	else if (!strcasecmp (cbuf, "LINEAR"))
 	    s = new SolverLIN (_pp);
     }
@@ -56,8 +60,9 @@ Solver *Solver::Create (ParamParser *_pp)
 	cout << "(4) BFGS (Broyden-Fletcher-Goldfarb-Shanno)\n";
 	cout << "(5) LBFGS (limited memory version of BFGS)\n";
 	cout << "(6) ART (algebraic reconstruction technique)\n";
-	cout << "(7) LINEAR (difference reconstructions only)\n";
-	cout << "[1|2|3|4|5|6|7] >> ";
+	cout << "(7) Block-ART (block version of ART)\n";
+	cout << "(8) LINEAR (difference reconstructions only)\n";
+	cout << "[1|2|3|4|5|6|7|8] >> ";
 	cin >> cmd;
 	switch (cmd) {
 	case 1: s = new SolverPCG (_pp); break;
@@ -65,7 +70,8 @@ Solver *Solver::Create (ParamParser *_pp)
 	case 4: s = new SolverBFGS (_pp); break;
 	case 5: s = new SolverLBFGS (_pp); break;
 	case 6: s = new SolverART (_pp); break;
-	case 7: s = new SolverLIN (_pp); break;
+	case 7: s = new SolverBlockART (_pp); break;
+	case 8: s = new SolverLIN (_pp); break;
 	}
     }
     s->ReadParams (*_pp);

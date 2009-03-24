@@ -1,10 +1,10 @@
 // ==========================================================================
-// SolverART: ART and BlockART nonlinear solvers
+// BlockART nonlinear solver
 // ==========================================================================
 
 #include "stoastlib.h"
 #include "pscaler.h"
-#include "solverart.h"
+#include "solverblockart.h"
 #include "fwdsolver.h"
 #include "jacobian.h"
 #include "util.h"
@@ -23,9 +23,6 @@ extern double clock0;
 // ==========================================================================
 // local prototypes
 
-static RCompRowMatrix BuildRHessian (Regularisation *reg, const RVector &x,
-			      int nprm);
-
 struct ART_DATA {
     RDenseMatrix *J;
     double tau;
@@ -35,50 +32,38 @@ struct ART_DATA {
 // ART algorithm (inner loop, run once over all measurement to obtain
 // an update
 
-// Callback function: return a row of the Jacobian
-typedef RVector (*clbkART_Ai)(int i, void *context);
-
-void ART_loop (const RVector &b, RVector &x, double lambda,
-    clbkART_Ai Ai, void *context)
+void BlockART_loop (const RVector &b, RVector &x, double lambda,
+    void *context)
 {
-    int i, ii, m = b.Dim(), n = x.Dim();
+    const int blocksize = 50;
+    int i, i0, i1, mb, m = b.Dim(), n = x.Dim();
 
-    // build a row permutation vector
-    IVector perm(m);
-    for (i = 0; i < m; i++) perm[i] = i;
-    for (i = 0; i < 2*m; i++) {
-	int i1 = (int)(m * (rand()/(RAND_MAX+1.0)));
-	int i2 = (int)(m * (rand()/(RAND_MAX+1.0)));
-	int tmp = perm[i1];
-	perm[i1] = perm[i2]; perm[i2] = tmp;
-    }
-
-    RVector Rgrad(n);
     RDenseMatrix *J = ((ART_DATA*)context)->J;
     double tau = ((ART_DATA*)context)->tau;
 
-    for (ii = 0; ii < m; ii++) {
-	i = perm[ii];
-	RVector ai = Ai(i, J);
+    for (i0 = 0; i0 < m; i0 += blocksize) {
+	i1 = ::min (i0+blocksize, m);
+	mb = i1-i0;
+	RDenseMatrix Jblock (mb, J->nCols());
+	for (i = 0; i < mb; i++)
+	    Jblock.SetRow(i, J->Row(i0+i));
+	RSymMatrix JJTblock = AAT (Jblock);
+	for (i = 0; i < mb; i++)
+	    JJTblock(i,i) += tau;
+	CHdecomp (JJTblock);
 
-	x += lambda/((ai & ai) + tau) * (ai * (b[i] - (ai & x)));
+	RVector bblock(b, i0, mb);
+	RVector dyblock = bblock - Jblock * x;
+	dyblock = CHsubst (JJTblock, dyblock);
+	
+	x += lambda * (transpose(Jblock) * dyblock);
     }
 }
 
 
 // ==========================================================================
-// ART callback function
 
-RVector ART_Ai (int i, void *context)
-{
-    RDenseMatrix *J = (RDenseMatrix*)context;
-    return J->Row(i);
-}
-
-
-// ==========================================================================
-
-SolverART::SolverART (ParamParser *_pp): Solver (_pp)
+SolverBlockART::SolverBlockART (ParamParser *_pp): Solver (_pp)
 {
     itmax = 0;
     itmax_art = 10;
@@ -88,12 +73,12 @@ SolverART::SolverART (ParamParser *_pp): Solver (_pp)
 
 // ==========================================================================
 
-void SolverART::Solve (CFwdSolver &FWS, const Raster &raster,
+void SolverBlockART::Solve (CFwdSolver &FWS, const Raster &raster,
     const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
     const RVector &sd, Solution &bsol, Solution &msol,
     const CCompRowMatrix &qvec, const CCompRowMatrix &mvec, double omega)
 {
-    cout << "Starting ART solver ..." << endl;
+    cout << "Starting Block-ART solver ..." << endl;
 
     int i, q, m, r, ai, iter;
     const QMMesh *mesh = FWS.MeshPtr();
@@ -166,7 +151,7 @@ void SolverART::Solve (CFwdSolver &FWS, const Raster &raster,
 
 	LOGOUT("Starting ART iteration ...");
 	for (ai = 0; ai < itmax_art; ai++)
-	    ART_loop (b, upd, 0.001, ART_Ai, (void*)&art_data);
+	    BlockART_loop (b, upd, 0.001, (void*)&art_data);
 	LOGOUT("Finished!");
 
 	// update solution
@@ -231,7 +216,7 @@ void SolverART::Solve (CFwdSolver &FWS, const Raster &raster,
 
 // ==========================================================================
 
-void SolverART::ReadParams (ParamParser &pp)
+void SolverBlockART::ReadParams (ParamParser &pp)
 {
     // === MAX NUMBER OF (OUTER) ITERATIONS ===
     if (!pp.GetInt ("ITMAX", itmax) || itmax < 0) do {
@@ -256,7 +241,7 @@ void SolverART::ReadParams (ParamParser &pp)
 
 // ==========================================================================
 
-void SolverART::WriteParams (ParamParser &pp)
+void SolverBlockART::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "ART");
     pp.PutInt ("ITMAX", itmax);
@@ -281,31 +266,3 @@ void SolverART::BlockSolve (const RVector &b, const RDenseMatrix &A,
     x = transpose(A) * xb;
 }
 #endif
-
-// ==========================================================================
-// Build the Hessian of the prior from individual parameter contributions
-
-static RCompRowMatrix BuildRHessian (Regularisation *reg, const RVector &x,
-    int nprm)
-{
-    int n = x.Dim();
-    int n0 = n/nprm;
-    int i, j;
-
-    RCompRowMatrix H, Hi, Hij;
-    for (i = 0; i < nprm; i++) {
-	for (j = 0; j < nprm; j++) {
-	    if (!j) {
-		Hi.New(n0,n0);
-		if (j==i) reg->SetHess1 (Hi, x, j);
-	    } else {
-		Hij.New(n0,n0);
-		if (j==i) reg->SetHess1 (Hij, x, j);
-		Hi = cath (Hi, Hij);
-	    }
-	}
-	if (!i) H = Hi;
-	else    H = catv (H, Hi);
-    }
-    return H;
-}

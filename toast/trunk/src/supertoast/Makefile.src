@@ -34,7 +34,7 @@ fwdfem : fwdfem.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 supertoast : supertoast.o util.o solver.o solverlm.o solverpcg.o solverlin.o \
-	solverbfgs.o solverlbfgs.o solverart.o
+	solverbfgs.o solverlbfgs.o solverart.o solverblockart.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
 supertoast_mw : supertoast_mw.o util.o solver_mw.o solverlm_mw.o
