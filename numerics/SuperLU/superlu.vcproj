@@ -90,7 +90,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="copy $(ProjectDir)SRC\*.h $(ToastRootDir)include"
+				CommandLine="copy &quot;$(ProjectDir)SRC\*.h&quot; &quot;$(ToastRootDir)include&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
