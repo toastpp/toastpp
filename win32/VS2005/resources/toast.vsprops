@@ -8,7 +8,7 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="$(ToastRootDir),$(ToastRootDir)include,$(ToastSrcDir)libmath,$(ToastSrcDir)libfe,$(ToastSrcDir)libstoast,$(ToastSrcDir)libbemdiff"
+		AdditionalIncludeDirectories="$(ToastRootDir),$(ToastRootDir)include,$(ToastSrcDir)libmath,$(ToastSrcDir)libfe,$(ToastSrcDir)libstoast,$(ToastSrcDir)libbemdiff,$(ToastSrcDir)libbem"
 		PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
 	/>
 	<Tool

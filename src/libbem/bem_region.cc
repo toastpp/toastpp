@@ -4,8 +4,11 @@
 #include "bem_region.h"
 #include "bem_surface.h"
 
+using namespace std;
+
 BEM_Region::BEM_Region (BEM_Surface *outer, BEM_Region *parent)
 {
+	nChildren = 0;
 	outerSurf = outer;
 	Parent = parent;
 	kernel = new BEM_Kernel_Helmholtz;
@@ -104,6 +107,7 @@ void BEM_Region::ConstructRegionMatrix (CDenseMatrix &A, CDenseMatrix &B)
 	for (i = 0; i < nsurf; i++) {
 		Point3D *nlist = surf[i]->NodeList();
 		for (nd = 0; nd < surf[i]->nNodes(); nd++) {
+			cerr << nd << endl;
 			colofs = 0;
 			for (j = 0; j < nsurf; j++) {
 				invert = (j > 0);
