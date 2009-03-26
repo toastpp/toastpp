@@ -149,7 +149,7 @@ void SolverBlockART::Solve (CFwdSolver &FWS, const Raster &raster,
 	// ART iteration
 	upd.Clear();
 
-	LOGOUT("Starting ART iteration ...");
+	LOGOUT("Starting Block-ART iteration ...");
 	for (ai = 0; ai < itmax_art; ai++)
 	    BlockART_loop (b, upd, 0.001, (void*)&art_data);
 	LOGOUT("Finished!");
