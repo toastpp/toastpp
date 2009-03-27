@@ -92,7 +92,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)..\$(ConfigurationName)\bin&quot;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\supertoast\solverblockart.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\supertoast\solverlbfgs.cc"
 				>
 			</File>
@@ -234,6 +238,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\supertoast\solverbfgs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\supertoast\solverblockart.h"
 				>
 			</File>
 			<File

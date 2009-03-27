@@ -66,7 +66,8 @@ CVector BEM_Triangle6::Integrate_Singular (BEM_Kernel *kernel, int nodep, const 
 	Point2D loc;
 
 	static RVector jac_tab(dimension+1), shapf(dimension);
-	static CVector kern_tab(i_kern), a_aux(dim2);
+	static CVector kern_tab(i_kern);
+	CVector a_aux(dim2);
 	//==================================================================
 	//  purpose: Singular integrals in triangular element
 	//  element is divided by 2 sub-triangles
@@ -353,8 +354,8 @@ CVector BEM_Triangle6::Integrate_Nonsingular (BEM_Kernel *kernel, const Point3D 
 	double  a_wsj;
 	complex kern1;
 	static RVector jac_tab(dimension+1);//, shapf(dimension);
-	static CVector kern_tab(i_kern),a_aux(dim2);
-   
+	static CVector kern_tab(i_kern);
+	CVector a_aux(dim2);
 	//==================================================================
 	// purpose: to calculate nonsingular integrals 
 	//  node is in local numerating system
@@ -464,7 +465,7 @@ RVector &BEM_Triangle6::QuadratureShapeF (int i) const
 	static bool need_setup = true;
 	if (need_setup) {
 		for (int j = 0; j < n_gauss6; j++)
-			qf[j] = ShapeF (QuadraturePoint (i));
+			qf[j] = ShapeF (QuadraturePoint (j));
 		need_setup = false;
 	}
 	return qf[i];
@@ -477,7 +478,7 @@ RVector &BEM_Triangle6::QuadratureShapeD (int i) const
 	static bool need_setup = true;
 	if (need_setup) {
 		for (int j = 0; j < n_gauss6; j++)
-			qd[j] = ShapeD (QuadraturePoint (i));
+			qd[j] = ShapeD (QuadraturePoint (j));
 		need_setup = false;
 	}
 	return qd[i];
@@ -490,7 +491,7 @@ RVector &BEM_Triangle6::QuadratureJacobi (int i) const
 	static bool need_setup = true;
 	if (need_setup) {
 		for (int j = 0; j < n_gauss6; j++)
-			qj[j] = Jacobi (QuadraturePoint (i));
+			qj[j] = Jacobi (QuadraturePoint (j));
 		need_setup = false;
 	}
 	return qj[i];

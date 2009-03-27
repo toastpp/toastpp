@@ -90,7 +90,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="mkdir $(ToastMexDir)&#x0D;&#x0A;copy $(TargetPath) $(ToastMexDir)&#x0D;&#x0A;"
+				CommandLine="mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

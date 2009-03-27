@@ -22,8 +22,10 @@ BEM_Region::~BEM_Region ()
 
 toast::complex BEM_Region::WaveNumber () const
 {
-	double kappa = 1.0/(3.0*(mua+mus));
-	return sqrt(toast::complex (mua/kappa, 2.0*pi*freq/(0.3/ref)));
+	double kappa = 1.0/(3.0*(mua+mus)); // diffusion coefficient [mm]
+	double c = 0.3e12/ref;              // speed of light [mm/s]
+	double omega = 2.0*pi*freq;         // angular velocity [cycles/s]
+	return sqrt(toast::complex (mua/kappa, -omega/(c*kappa)));
 }
 
 void BEM_Region::ResetOuterSurface (BEM_Surface *outer)
@@ -107,26 +109,30 @@ void BEM_Region::ConstructRegionMatrix (CDenseMatrix &A, CDenseMatrix &B)
 	for (i = 0; i < nsurf; i++) {
 		Point3D *nlist = surf[i]->NodeList();
 		for (nd = 0; nd < surf[i]->nNodes(); nd++) {
-			cerr << nd << endl;
+			//cerr << nd << endl;
 			colofs = 0;
 			for (j = 0; j < nsurf; j++) {
 				invert = (j > 0);
 				integrate_local = (i == j);
 				for (el = 0; el < surf[j]->nElements(); el++) {
-					if (integrate_local)
+					//cerr<<el<<endl;
+					if (integrate_local){
 						integral = surf[j]->Integrate (kernel, nd, el, invert);
-					else
+						
+					}
+					else{
 						integral = surf[j]->Integrate_Nonsingular (kernel, nlist[nd], el, invert);
-
+					}
 					int nnd = surf[j]->Element(el)->nNode();
 					for (k = 0; k < nnd; k++) {
 						int ndidx = surf[j]->Element(el)->NodeIndex(k);
 						A(rowofs+nd,colofs+ndidx) += integral[k];
 						B(rowofs+nd,colofs+ndidx) += integral[k+nnd];
+						
 					}
 
 				} // end loop el
-				colofs += surf[j]->nNodes();
+				//colofs += surf[j]->nNodes();
 			} // end loop element nsurf
 		} // end loop nd
 		rowofs += surf[i]->nNodes();
