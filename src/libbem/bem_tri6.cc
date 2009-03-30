@@ -52,6 +52,12 @@ const double wg_k[6]={wgpts2,wgpts1,wgpts0,wgpts0,wgpts1,wgpts2};
 BEM_Triangle6::BEM_Triangle6 (BEM_Surface *s, IVector &ndidx): BEM_Element (s, ndidx)
 {
 	Initialise (ndidx);
+	qj = 0;
+}
+
+BEM_Triangle6::~BEM_Triangle6()
+{
+	if (qj) delete []qj;
 }
 
 CVector BEM_Triangle6::Integrate_Singular (BEM_Kernel *kernel, int nodep, const Point3D &load, bool invert)
@@ -487,12 +493,10 @@ RVector &BEM_Triangle6::QuadratureShapeD (int i) const
 RVector &BEM_Triangle6::QuadratureJacobi (int i) const
 {
 	// returns values of Jacobi matrix at quadrature point i
-	static RVector qj[n_gauss6];
-	static bool need_setup = true;
-	if (need_setup) {
+	if (!qj) {
+		qj = new RVector[n_gauss6];
 		for (int j = 0; j < n_gauss6; j++)
 			qj[j] = Jacobi (QuadraturePoint (j));
-		need_setup = false;
 	}
 	return qj[i];
 }

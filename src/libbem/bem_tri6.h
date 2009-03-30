@@ -9,6 +9,7 @@
 class BEMLIB BEM_Triangle6: public BEM_Element {
 public:
 	BEM_Triangle6 (BEM_Surface *s, IVector &ndidx);
+	~BEM_Triangle6();
 
 	int nNode() const { return 6; }
 
@@ -64,6 +65,9 @@ public:
 	 * \brief Returns the Jacobi matrix for quadrature point i
 	 */
 	RVector &QuadratureJacobi (int i) const;
+
+private:
+	mutable RVector *qj; // stores the Jacobi quadrature points
 };
 
 #endif // !__BEM_TRIANGLE6_H

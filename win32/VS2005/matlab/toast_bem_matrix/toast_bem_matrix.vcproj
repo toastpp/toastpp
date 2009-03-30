@@ -185,6 +185,10 @@
 				RelativePath="..\..\..\..\src\matlab\toastmex.cc"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\src\matlab\util.cc"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -193,6 +197,10 @@
 			>
 			<File
 				RelativePath="..\..\..\..\src\matlab\toastmex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\matlab\util.h"
 				>
 			</File>
 		</Filter>
