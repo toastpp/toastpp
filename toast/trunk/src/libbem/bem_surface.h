@@ -19,12 +19,28 @@ public:
 	BEM_Surface (RDenseMatrix &N, IDenseMatrix &E); 
 
 	/**
+	 * \brief Construct a BEM surface from a FEM volume mesh.
+	 * \param mesh FEM mesh (currently must be 10-noded tetrahedra)
+	 */
+	BEM_Surface (Mesh &mesh);
+
+	/**
 	 * \brief Constructs a surface from a stream.
 	 * \param is input stream instance
 	 * \note The stream is assumed to contain a mesh
 	 *   in toast format.
 	 */
 	BEM_Surface (std::istream &is);
+
+	/**
+	 * \brief Returns the node coordinates as a matrix
+	 */
+	RDenseMatrix CoordinateMatrix() const;
+
+	/**
+	 * \brief Returns the element index array as a matrix
+	 */
+	IDenseMatrix IndexMatrix() const;
 
 	/**
 	 * \brief Integration over element 'el' for an arbitrary

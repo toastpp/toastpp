@@ -42,6 +42,59 @@ BEM_Surface::BEM_Surface (RDenseMatrix &N, IDenseMatrix &E)
 	}
 }
 
+BEM_Surface::BEM_Surface (Mesh &mesh)
+{
+	// create a surface from a FEM volume mesh
+
+	// sanity check
+
+
+	xASSERT(mesh.Dimension() == 3, Wrong mesh dimension);
+
+	int i, j, k, *bndellist, *bndsdlist;
+	int nlen = mesh.nlen();
+
+	// boundary vertex array
+    nNd = mesh.nlist.NumberOf (BND_ANY);
+	Nd = new Point3D[nNd];
+	for (i = k = 0; i < mesh.nlen(); i++)
+		if (mesh.nlist[i].isBnd()) {
+			Point &nd = mesh.nlist[i];
+			for (j = 0; j < 3; j++)
+				Nd[k][j] = nd[j];
+			k++;
+		}
+
+	nEl = mesh.BoundaryList (&bndellist, &bndsdlist);
+
+	El = new BEM_Element*[nEl];
+
+    int *bndidx = new int[nlen];
+    for (j = k = 0; j < nlen; j++)
+	bndidx[j] = (mesh.nlist[j].isBnd() ? k++ : -1);
+    
+	for (i = 0; i < nEl; i++) {
+		PElement fem_el = mesh.elist[bndellist[i]];
+		int side = bndsdlist[i];
+		int nnd = fem_el->nSideNode(side);
+		IVector fem_idx(nnd);
+		for (j = 0; j < nnd; j++) {
+			fem_idx[j] = bndidx[fem_el->Node[fem_el->SideNode(side,j)]];
+			dASSERT(fem_idx[j] >= 0, Index mismatch);
+			dASSERT(fem_idx[j] < nNd, Index mismatch);
+		}
+
+		// map from FEM to BEM ordering
+		static int perm[6] = {0,2,4,1,3,5};
+
+		IVector bem_idx(nnd);
+		for (j = 0; j < 6; j++)
+			bem_idx[perm[j]] = fem_idx[j];
+
+		El[i] = new BEM_Triangle6 (this, bem_idx);
+	}
+}
+
 BEM_Surface::BEM_Surface (std::istream &is)
 {
 	Mesh mesh;
@@ -69,6 +122,33 @@ BEM_Surface::BEM_Surface (std::istream &is)
 				break;
 		}
 	}
+}
+
+RDenseMatrix BEM_Surface::CoordinateMatrix() const
+{
+	int i, j;
+
+	RDenseMatrix R(nNd, 3);
+	for (i = 0; i < nNd; i++)
+		for (j = 0; j < 3; j++)
+			R(i,j) = Nd[i][j];
+	return R;
+}
+
+IDenseMatrix BEM_Surface::IndexMatrix() const
+{
+	int i, j, nnd = 0;
+	for (i = 0; i < nEl; i++)
+		nnd = ::max (nnd, El[i]->nNode());
+
+	IDenseMatrix E(nEl, nnd);
+	for (i = 0; i < nEl; i++) {
+		for (j = 0; j < El[i]->nNode(); j++)
+			E(i,j) = El[i]->NodeIndex(j);
+		for (; j < nnd; j++)
+			E(i,j) = -1; // not used
+	}
+	return E;
 }
 
 BEMLIB std::ostream& operator<< (std::ostream& o, BEM_Surface &surf)
