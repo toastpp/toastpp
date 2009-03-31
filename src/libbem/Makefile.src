@@ -1,0 +1,37 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libbem
+
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libbem
+
+all:: $(LIB)
+
+SRCS =  bem_element.cc \
+	bem_kernel.cc \
+	bem_mesh.cc \
+	bem_region.cc \
+	bem_surface.cc \
+	bem_tri6.cc 
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = ${SRCS:.cc=.h}
+
+#%.cc: %.h
+#	touch $@
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(OBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+clean:: 
+	$(RM) *.o *~
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
