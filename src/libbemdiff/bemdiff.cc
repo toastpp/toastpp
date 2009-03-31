@@ -1940,7 +1940,7 @@ CVector bemdiff::nonsin_mat(int ic, int ielemq, double xp, double yp, double zp 
 
 
       
-      kern_tab = kernel_mat( ielemq, ig , xp, yp, zp);
+    //  kern_tab = kernel_mat( ielemq, ig , xp, yp, zp);
       
       kern1 = kern_tab[0]*x_nm1(ielemq,ig) + kern_tab[1]*y_nm1(ielemq,ig) + kern_tab[2]*z_nm1(ielemq,ig);
     
