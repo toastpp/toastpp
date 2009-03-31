@@ -54,7 +54,7 @@ public:
 	/**
 	 * \brief Returns the surface the element belongs to
 	 */
-	BEM_Surface *Surface() const { return surf; }
+	const BEM_Surface *Surface() const { return surf; }
 
 	/**
 	 * \brief Returns the shape functions for all element nodes at
@@ -91,7 +91,7 @@ protected:
 	/**
 	 * \brief Pointer to surface
 	 */
-	BEM_Surface *surf;
+	const BEM_Surface *surf;
 
 private:
 };
