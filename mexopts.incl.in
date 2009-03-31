@@ -17,9 +17,9 @@
 
 TOAST_SRC="$TOASTDIR/src"
 
-TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libbemdiff"
+TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libbemdiff -I $TOAST_SRC/libbem"
 
-TOAST_LIB="-L $TOASTDIR/@OBJDIR@/lib -lbemdiff -lstoast -lfe -lmath -larpack -lblzpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk @FLIBS@"
+TOAST_LIB="-L $TOASTDIR/@OBJDIR@/lib -lbemdiff -lbem -lstoast -lfe -lmath -larpack -lblzpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk @FLIBS@"
 
 TOAST_FLAG="-Wno-deprecated $TOAST_INC"
 

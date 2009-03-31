@@ -32,12 +32,13 @@ BEM_Surface::BEM_Surface (RDenseMatrix &N, IDenseMatrix &E)
 	El = new BEM_Element*[nEl];
 	for (i = 0; i < nEl; i++) {
 		switch (ElType) {
-			case TRI6:
-				El[i] = new BEM_Triangle6 (this, E.Row(i)); 
-				break;
-			default:
-				xERROR ("This should not have happened");
-				break;
+		case TRI6: {
+			  IVector Ei = E.Row(i);
+			  El[i] = new BEM_Triangle6 (this, Ei); 
+		} break;
+		default:
+		  xERROR ("This should not have happened");
+		  break;
 		}
 	}
 }
@@ -114,12 +115,13 @@ BEM_Surface::BEM_Surface (std::istream &is)
 	El = new BEM_Element*[nEl];
 	for (i = 0; i < nEl; i++) {
 		switch (mesh.elist[i]->Type()) {
-			case ELID_TRI3D6:
-				El[i] = new BEM_Triangle6 (this, IVector(6, mesh.elist[i]->Node));
-				break;
-			default:
-				xERROR("Element type not supported");
-				break;
+		case ELID_TRI3D6: {
+		  IVector Ei(6, mesh.elist[i]->Node);
+				El[i] = new BEM_Triangle6 (this, Ei);
+		} break;
+		default:
+		  xERROR("Element type not supported");
+		  break;
 		}
 	}
 }
