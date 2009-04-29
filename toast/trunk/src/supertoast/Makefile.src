@@ -179,6 +179,9 @@ test_fullnewton : test_fullnewton.cc pparse.o tparse.o raster2.o fwdsolver.o \
 	solution.o source.o util.o pscaler.o jacobian2.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
 
+test_edd : test_edd.cc
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
+
 tmp : tmp.o fwdsolver.o solution.o source.o raster2.o util.o pparse.o jacobian2.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FECLIB)
 

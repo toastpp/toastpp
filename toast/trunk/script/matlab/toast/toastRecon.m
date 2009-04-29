@@ -334,9 +334,9 @@ end
 
 function disp_iter(res)
 
+figure(1);
+set(gcf,'Name','toastRecon');
 if length(res.bdim) == 2
-    figure(1);
-    set(gcf,'Name','toastRecon');
     subplot(2,2,1), imagesc(reshape(res.bmua,res.bdim(1),res.bdim(2))), axis equal, axis tight, colorbar;
     set(gca,'Units','normalized','OuterPosition',[0 0.5 0.5 0.5]);
     title('initial \mu_a');
@@ -347,6 +347,19 @@ if length(res.bdim) == 2
     semilogy(res.of);xlabel('iteration');axis tight;title(['Objective:']);
     set(gca,'Units','normalized','OuterPosition',[0 0 1 0.5]);
     drawnow;
+else
+    muamin=min(res.bmua);
+    muamax=max(res.bmua);
+    musmin=min(res.bmus);
+    musmax=max(res.bmus);
+    bmua = reshape(res.bmua,res.bdim);
+    bmus = reshape(res.bmus,res.bdim);
+    for i=1:4
+        idx = round(bdim(3)/4*(i-0.5));
+        subplot(4,2,i); imagesc(bmua(:,:,idx),[muamin muamax]); axis equal tight
+        subplot(4,2,i+4); imagesc(bmus(:,:,idx),[musmin musmax]); axis equal tight
+    end
+    save recon_gui_res.mat res
 end
 
 end

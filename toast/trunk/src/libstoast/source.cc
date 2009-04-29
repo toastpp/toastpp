@@ -9,7 +9,9 @@ RVector QVec_Gaussian (const Mesh &mesh, const Point &cnt, double w,
     Element *pel;
     int i, j, is, js, el, nnode, *node;
     double d, q, w2 = w*w;
-    double fac1 = 1.0 / sqrt (2.0*Pi * w2);
+    double fac1 = 1.0 / (sqrt (2.0*Pi) * w);
+    if (mesh.Dimension() == 3) fac1 /= (sqrt (2.0*Pi) * w);
+    if (mode != SRCMODE_NEUMANN) fac1 /= (sqrt (2.0*Pi) * w);
     double fac2 = -0.5/w2;
 
     // assemble source vector

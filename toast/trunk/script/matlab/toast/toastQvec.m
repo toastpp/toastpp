@@ -6,7 +6,7 @@ function p = toastQvec
 %
 %    hMesh:  mesh handle
 %    qtype:  source type (string: 'Neumann', 'Isotropic')
-%    qprof:  source profile (string: 'Gaussian', 'Cosine', 'TrigBasis')
+%    qprof:  source profile (string: 'Point', 'Gaussian', 'Cosine', 'TrigBasis')
 %    qwidth: source radius [mm] (real)
 %    prm:    source parameter structure (see notes)
 %
@@ -23,7 +23,8 @@ function p = toastQvec
 % mesh volume.
 %
 % The width parameter defines the size of the sources (1/e radius for
-% Gaussian sources, 1/2 radius for trigonometric sources).
+% Gaussian sources, 1/2 radius for trigonometric sources). It is ignored
+% for point sources.
 %
 % The source vectors are returned as column vectors in a sparse m x n
 % matrix Q, where m is the mesh node count, and n is the number of
