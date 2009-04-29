@@ -9,6 +9,7 @@
 #include "supermatrix.h"
 #include "zsp_defs.h"
 #include "toasttype.h"
+#include "mathlib.h"
 
 class Solution;
 class MWsolution;

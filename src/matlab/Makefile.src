@@ -23,6 +23,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastJacobianCW.cc \
 	toastKrylov.cc \
 	toastLabelRegion.cc \
+	toastLBFGS.cc \
 	toastMakeMesh.cc \
 	toastMapBasisToMesh.cc \
 	toastMapGridToBasis.cc \

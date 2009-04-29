@@ -42,4 +42,13 @@ public:
 };
 
 
+/**
+ * \brief BEM Helmholtz derivative kernel dG/domega (used for moments calculation)
+ */
+class BEMLIB BEM_Kernel_Domega: public BEM_Kernel {
+public:
+    BEM_Kernel_Domega (): BEM_Kernel () {}
+    CVector Calculate (BEM_Element *el, Point2D &loc, const Point3D &load);
+};
+
 #endif // !__BEM_KERNEL

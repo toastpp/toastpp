@@ -27,9 +27,9 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order);
 // MAIN 
 
 int CalcQvec (const QMMesh *mesh, SourceMode qtype, SRC_PROFILE qprof,
-    double qwidth, mxArray **res) 
+    double qwidth, const RVector &refind, mxArray **res) 
 {
-    int i, n, nQ;
+    int i, j, n, nQ;
 
     n = mesh->nlen();
     nQ = mesh->nQ;
@@ -40,6 +40,9 @@ int CalcQvec (const QMMesh *mesh, SourceMode qtype, SRC_PROFILE qprof,
     for (i = 0; i < nQ; i++) {
 	CVector q(n);
 	switch (qprof) {
+	case PROF_POINT:
+	    SetReal (q, QVec_Point (*mesh, mesh->Q[i], qtype));
+	    break;
 	case PROF_GAUSSIAN:
 	    SetReal (q, QVec_Gaussian (*mesh, mesh->Q[i], qwidth, qtype));
 	    break;
@@ -49,6 +52,12 @@ int CalcQvec (const QMMesh *mesh, SourceMode qtype, SRC_PROFILE qprof,
 	case PROF_COMPLETETRIG:
 	    q = CompleteTrigSourceVector (*mesh, i);
 	    break;
+	}
+	for (j = 0; j < n; j++) {
+	    const double c0 = 0.3;
+	    double c = c0/refind[j];
+	    double A = A_Keijzer(refind[j]);
+	    q[j] *= c/(2.0*A);
 	}
 	qvec.SetRow (i, q);
     }
@@ -121,11 +130,13 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order)
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     QMMesh *mesh = (QMMesh*)Handle2Ptr (mxGetScalar (prhs[0]));
+    int idx, n = mesh->nlen();
 
     char typestr[256] = "";
     char profstr[256] = "";
     double w = 0.0;
-
+    RVector refind = mesh->plist.N(); // use mesh parameter by default
+    
     if (nrhs >= 1 && mxIsStruct (prhs[1])) {
 
 	// read source parameters from structure
@@ -136,14 +147,27 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (field) mxGetString (field, profstr, 256);
 	field = mxGetField (prhs[1], 0, "width");
 	if (field) w = mxGetScalar (field);
+	field = mxGetField (prhs[1], 0, "refind");
+	if (field) CopyVector (refind, field);
 
-    } else if (nrhs >= 3) {
+    } else if (nrhs >= 2) {
 
 	// read source parameters from function parameters
 	if (mxIsChar(prhs[1])) mxGetString (prhs[1], typestr, 256);
 	if (mxIsChar(prhs[2])) mxGetString (prhs[2], profstr, 256);
-	if (mxIsNumeric(prhs[3])) w = mxGetScalar (prhs[3]);
-
+	if (nrhs >= 3) {
+	    idx = 3;
+	    if (mxIsNumeric(prhs[idx]) && mxGetNumberOfElements(prhs[idx])==1){
+		w = mxGetScalar (prhs[idx]);
+		idx++;
+	    }
+	    if (nrhs >= idx && mxIsNumeric(prhs[idx]) &&
+		mxGetNumberOfElements(prhs[idx]) > 1) {
+		CopyVector (refind, prhs[idx]);
+		idx++;
+	    }
+	}
+		
     } else {
 
 	mexErrMsgTxt ("toastQvec: Invalid function parameters");
@@ -156,14 +180,17 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else    mexErrMsgTxt ("toastQvec: Invalid source type");
 
     SRC_PROFILE qprof;
-    if      (!strcasecmp (profstr, "Gaussian"))  qprof = PROF_GAUSSIAN;
+    if      (!strcasecmp (profstr, "Point"))     qprof = PROF_POINT;
+    else if (!strcasecmp (profstr, "Gaussian"))  qprof = PROF_GAUSSIAN;
     else if (!strcasecmp (profstr, "Cosine"))    qprof = PROF_COSINE;
     else if (!strcasecmp (profstr, "TrigBasis")) qprof = PROF_COMPLETETRIG;
     else    mexErrMsgTxt ("toastQvec: Invalid source profile");
 
     double qwidth;
-    if   (w > 0) qwidth = w;
-    else mexErrMsgTxt ("toastQvec: Invalid source width");
+    if (qprof != PROF_POINT) {
+	if   (w > 0) qwidth = w;
+	else mexErrMsgTxt ("toastQvec: Invalid source width");
+    }
 
-    CalcQvec (mesh, qtype, qprof, qwidth, &plhs[0]);
+    CalcQvec (mesh, qtype, qprof, qwidth, refind, &plhs[0]);
 }
