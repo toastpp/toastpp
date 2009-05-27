@@ -17,6 +17,7 @@ using namespace std;
 QMMesh::QMMesh (): Mesh ()
 { 
     nQ = nM = 0;
+    QMofs = 0;
     Mel = 0;
     Mcosingder = 0;
     source_profile = 0;
@@ -32,12 +33,15 @@ QMMesh::~QMMesh ()
     int i;
 
     if (nQ > 0) {
-	for (i = 0; i < nQ; i++)
+	for (i = 0; i < nQ; i++) {
 	    if (nQMref[i]) delete []QMref[i];
+	    if (QMofs && QMofs[i]) delete []QMofs[i];
+	}
 	delete []Q;
 	delete []QMref;
 	delete []nQMref;
 	delete []Qofs;
+	if (QMofs) delete []QMofs;
     }
     if (nM > 0) {
 	delete []M;
@@ -229,11 +233,14 @@ void QMMesh::SetupQM (Point *q, int nq, Point *m, int nm)
     nQMref = new int[nQ];
     Qofs   = new int[nQ];
     QMref  = new int*[nQ];
+    QMofs  = new int*[nQ];
     for (i = 0; i < nQ; i++) {
 	nQMref[i] = nM;
 	Qofs[i] = (i ? Qofs[i-1]+nQMref[i-1] : 0);
 	QMref[i] = new int[nM];
 	for (j = 0; j < nM; j++) QMref[i][j] = j;
+	QMofs[i] = new int[nM];
+	for (j = 0; j < nM; j++) QMofs[i][j] = Qofs[i]+j;
     }
     InitM ();
 }
@@ -388,12 +395,16 @@ void QMMesh::LoadQM (istream &is)
     nQMref = new int[nQ];
     Qofs   = new int[nQ];
     QMref  = new int*[nQ];
+    QMofs  = new int*[nQ];
     for (i = 0; i < nQ; i++) {
 	is >> nQMref[i];
 	Qofs[i] = (i ? Qofs[i-1]+nQMref[i-1] : 0);
 	do { is.get(c); } while (c != ':');
 	QMref[i] = new int[nQMref[i]];
 	for (j = 0; j < nQMref[i]; j++) is >> QMref[i][j];
+	QMofs[i] = new int[nM];
+	for (j = 0; j < nM; j++) QMofs[i][j] = -1;
+	for (j = 0; j < nQMref[i]; j++) QMofs[i][QMref[i][j]] = Qofs[i]+j;
     }
 
     InitM ();

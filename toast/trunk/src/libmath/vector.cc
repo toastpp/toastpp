@@ -958,6 +958,23 @@ VT SparseDotp (const TVector<VT> &v1, int *idx1, int nidx1,
     return sum;
 }
 
+template<>
+MATHLIB TVector<double> UnfoldComplex (const RVector &v)
+{
+    // nothing to do for real case
+    return v;
+}
+
+template<>
+MATHLIB RVector UnfoldComplex (const CVector &v)
+{
+    int n = v.Dim();
+    RVector rvec(n*2);
+    RVector rvec_r(rvec,0,n); rvec_r = Re(v);
+    RVector rvec_i(rvec,n,n); rvec_i = Im(v);
+    return rvec;
+}
+
 template<class VT>
 void TVector<VT>::Scan (const char *cbuf, int nmax)
 {

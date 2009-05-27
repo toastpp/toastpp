@@ -88,6 +88,15 @@ public:
     Solution &operator*= (const RVector &v);
     Solution &operator+= (const Solution &sol);
     Solution &operator+= (const RVector &v);
+
+    void WriteImgGeneric (int imgno, char *filename, 
+        int prmind, bool append = true);
+    // write param[prmind] to image file
+
+    static void WriteImgGeneric (int imgno, char *filename,
+        const RVector &img, bool append = true);
+    // write img to image file
+
     void WriteImg_mua (int imgno, char *nimname, bool append = true);
     void WriteImg_mus (int imgno, char *nimname, bool append = true);
 

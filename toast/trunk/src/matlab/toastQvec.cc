@@ -136,7 +136,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     char profstr[256] = "";
     double w = 0.0;
     RVector refind = mesh->plist.N(); // use mesh parameter by default
-    
+
     if (nrhs >= 1 && mxIsStruct (prhs[1])) {
 
 	// read source parameters from structure
@@ -150,18 +150,18 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	field = mxGetField (prhs[1], 0, "refind");
 	if (field) CopyVector (refind, field);
 
-    } else if (nrhs >= 2) {
+    } else if (nrhs >= 3) {
 
 	// read source parameters from function parameters
 	if (mxIsChar(prhs[1])) mxGetString (prhs[1], typestr, 256);
 	if (mxIsChar(prhs[2])) mxGetString (prhs[2], profstr, 256);
-	if (nrhs >= 3) {
+	if (nrhs >= 4) {
 	    idx = 3;
 	    if (mxIsNumeric(prhs[idx]) && mxGetNumberOfElements(prhs[idx])==1){
 		w = mxGetScalar (prhs[idx]);
 		idx++;
 	    }
-	    if (nrhs >= idx && mxIsNumeric(prhs[idx]) &&
+	    if (nrhs > idx && mxIsNumeric(prhs[idx]) &&
 		mxGetNumberOfElements(prhs[idx]) > 1) {
 		CopyVector (refind, prhs[idx]);
 		idx++;

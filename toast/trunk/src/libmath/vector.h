@@ -171,6 +171,9 @@ VT SparseDotp (const TVector<VT> &v1, int *idx1, int nidx1,
 	       const TVector<VT> &v2, int *idx2, int nidx2,
 	       int from, int to);
 
+template<class VT>
+MATHLIB TVector<double> UnfoldComplex (const TVector<VT> &v);
+
 // ==========================================================================
 // class TVector
 
@@ -919,6 +922,17 @@ public:
     friend VT SparseDotp<> (const TVector<VT> &v1, int *idx1, int nidx1,
 			    const TVector<VT> &v2, int *idx2, int nidx2,
 			    int from, int to);
+
+    /**
+     * \brief Unfold real and imaginary parts of a complex vector.
+     * \param v input vector argument
+     * \return Unfolded real vector
+     * \note For complex template types, this method creates a real output
+     *   vector of twice the size of the input vector, containing the real
+     *   and imaginary parts of the vector.
+     * \note For real template types, this simply returns the input vector.
+     */
+    friend MATHLIB TVector<double> UnfoldComplex<> (const TVector<VT> &v);
 
     /**
      * \brief Initialise vector elements from a string.

@@ -87,6 +87,7 @@ void MWsolution::RegisterChange()
 	RVector tmp_cMua(meshlength);
 	RVector tmp_ckappa(meshlength);
 	RVector tmp_Musp(meshlength);
+	tmp_cMua = GetParam(nmuaChromo+3+i); // background mua
 	for (int j = 0; j < nmuaChromo; j++)
 	    tmp_cMua += extcoef(i, j) * GetParam(j);
 
@@ -102,20 +103,6 @@ void MWsolution::RegisterChange()
 	swsol[i]->SetParam(OT_CKAPPA, tmp_ckappa);
 	swsol[i]->SetParam(OT_C2A, tmp_C2A);
     }
-}
-
-void MWsolution::WriteImgGeneric (int imgno, char *nimname, 
-				  int prmind, bool append)
-{
-    int i, n = param[prmind].Dim();
-    ofstream ofs;
-    if (append) ofs.open (nimname, ios::app);
-    else        ofs.open (nimname);
-    
-    ofs << "Image " << imgno << endl;
-    for (i = 0; i < n; i++)
-        ofs << param[prmind][i] << ' ';
-    ofs << endl;
 }
 
 RVector MWsolution::GetJacobianCoeff_A (int wavelind) const

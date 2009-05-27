@@ -1,19 +1,25 @@
-function hMesh = mkslab(bb,gdim)
+function hMesh = mkslab(bb,gdim,varargin)
 
 % Create a toast mesh for a slab geometry consisting of regular
 % voxel elements.
 %
-% Synopsis: hMesh = mkslab (bb,gdim)
+% Synopsis: hMesh = mkslab (bb,gdim[,p])
 %
 % bb:    bounding box (mm): 2x3 real matrix containing min and
 %        max coordinates of the slab
 % gdim:  1x3 integer vector: contains element grid dimensions
+% p:     optional matrix of nodal plane positions
 % hMesh: mesh handle
 %
 % Note: The grid dimensions refer to the element grid. Node
 %     dimensions are element dimensions+1 in each direction.
 %     Therefore, gdim=[10 10 10] will create a mesh with 1000
 %     elements and 1331 nodes.
+%
+%     If p is provided, it must be a matrix of size 3 x max(gdim)+1,
+%     containing the coordinates of the node planes of the slab, where
+%     p(1,:) contains the x-coordinates, p(2,:) the y-coordinates, and
+%     p(3,:) the z-coordinates.
 %
 % Usage example:
 %     hMesh = mkslab ([[0 0 0];[10 10 10]], [10 10 10]);
@@ -23,10 +29,14 @@ dim = 3;
 
 % Build vertex coordinate matrix
 
-p = zeros(dim,max(gdim)+1);
-for d = 1:dim
-    p(d,:) = [[0:gdim(d)] * (bb(2,d)-bb(1,d)) / gdim(d) + bb(1,d), ...
-              zeros(1,max(gdim)-gdim(d))];
+if nargin < 3
+    p = zeros(dim,max(gdim)+1);
+    for d = 1:dim
+        p(d,:) = [[0:gdim(d)] * (bb(2,d)-bb(1,d)) / gdim(d) + bb(1,d), ...
+                  zeros(1,max(gdim)-gdim(d))];
+    end
+else
+    p = varargin{1};
 end
 
 vdim = gdim+1;

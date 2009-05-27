@@ -1892,8 +1892,8 @@ void GenerateJacobian (CFwdSolverMW &FWS, const Raster &raster,
     int nchromo = excoef.nCols();
     int nlambda = excoef.nRows();
     int nprm    = sol.nParam();
-    bool bFactorA = sol.IsActive(nprm-3);
-    bool bPowerb  = sol.IsActive(nprm-2);
+    bool bFactorA = sol.IsActive(nchromo);
+    bool bPowerb  = sol.IsActive(nchromo+1);
     bool bScatter = bFactorA || bPowerb;
     bool lambda_ok, q_ok;
 

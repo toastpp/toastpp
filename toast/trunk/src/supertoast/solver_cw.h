@@ -28,8 +28,7 @@ public:
     virtual void Solve (RFwdSolverMW &FWS, const Raster &raster,
        const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
        const RVector &sd, Solution &bsol, MWsolution &msol,
-       const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
-       double omega) = 0;
+       const RCompRowMatrix &qvec, const RCompRowMatrix &mvec) = 0;
     virtual void ReadParams (ParamParser &pp) {}
     virtual void WriteParams (ParamParser &pp) {}
     static Solver_CW *Create (SOLVER solver);
@@ -39,4 +38,4 @@ protected:
     ParamParser *pp;
 };
 
-#endif // !__SOLVER_H
+#endif // !__SOLVER_CW_H

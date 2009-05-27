@@ -25,9 +25,13 @@ public:
     int nQM;		// total number of measurements (not always nQ*nM !)
     Point *Q, *M;	// lists of source/measurement points
 
-    int *nQMref;	// length table for sm cross reference list
-    int **QMref;	// source-measurement cross reference list
+    int *nQMref;	// nQMref[q]: number of detectors connected to q
+    int **QMref;	// QMref[q][i] is the absolute detector index
+                        // for the i-th detector connected to q
     int *Qofs;          // offset of source blocks in data array
+    int **QMofs;        // QMofs[q][m] is the absolute offset into data
+                        // array for measurement from source q and detector
+                        // m (or -1 if combination is not used)
 
     int *Mel;		// list of measurement elements
     RDenseMatrix *Mcosingder; // list of cosin*gder matrices for measurement

@@ -40,11 +40,12 @@ supertoast : supertoast.o util.o solver.o solverlm.o solverpcg.o solverlin.o \
 supertoast_mw : supertoast_mw.o util.o solver_mw.o solverlm_mw.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
-supertoast_cw_mw : supertoast_cw_mw.o util.o solver_cw.o solverlm_cw_mw.o
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+supertoast_cw_mw : supertoast_cw_mw.o util.o solver_cw.o solverlm_cw_mw.o \
+	solverpcg_cw_mw.o solverlbfgs_cw_mw.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
 supertoast_mpi : supertoast_mpi.o util.o solver.o solverlm_mpi.o solverpcg.o \
-	solverlin.o solverbfgs.o solverlbfgs.o solverart.o
+	solverlin.o solverbfgs.o solverlbfgs.o solverart.o solverblockart.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
 supertoast_mw_mpi : supertoast_mw.o util.o solver_mw.o \

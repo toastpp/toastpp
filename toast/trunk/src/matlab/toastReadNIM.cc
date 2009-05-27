@@ -11,7 +11,7 @@ bool ReadNim (char *name, int idx, RVector &img)
 
     ifstream ifs (name);
     if (!ifs.getline (cbuf, 256)) return false;
-    if (strcmp (cbuf, "NIM")) return false;
+    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
     do {
         ifs.getline (cbuf, 256);
 	if (!strncasecmp (cbuf, "ImageSize", 9))
