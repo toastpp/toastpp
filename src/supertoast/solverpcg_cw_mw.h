@@ -1,19 +1,19 @@
 // ==========================================================================
 // SolverPCG: preconditioned nonlinear conjugate gradients
 
-#ifndef __SOLVERPCG_H
-#define __SOLVERPCG_H
+#ifndef __SOLVERPCG_CW_MW_H
+#define __SOLVERPCG_CW_MW_H
 
-#include "solver.h"
+#include "solver_cw.h"
 
-class SolverPCG: public Solver {
+class SolverPCG_CW_MW: public Solver_CW {
 public:
-    SolverPCG (ParamParser *_pp = NULL);
+    SolverPCG_CW_MW (ParamParser *_pp = NULL);
     SOLVER Type() { return SOLVER_PCG; }
-    void Solve (CFwdSolver &FWS, const Raster &raster,
+    void Solve (RFwdSolverMW &FWS, const Raster &raster,
        const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
-       const RVector &sd, Solution &bsol, Solution &msol,
-       const CCompRowMatrix &qvec, const CCompRowMatrix &mvec, double omega);
+       const RVector &sd, Solution &bsol, MWsolution &msol,
+       const RCompRowMatrix &qvec, const RCompRowMatrix &mvec);
     void ReadParams (ParamParser &pp);
     void WriteParams (ParamParser &pp);
 
@@ -30,4 +30,4 @@ private:
     } precon;
 };
 
-#endif // !__SOLVER_PCG
+#endif // !__SOLVERPCG_CW_MW

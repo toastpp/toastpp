@@ -13,7 +13,7 @@ extern "C" {
   int dseupd_ (int *rvec, char *howmny, int *select, double *d, double *z,
 	       int *ldv, double *sigma, char *bmat, int *n, char *which,
 	       int *nev, double *tol, double *resid, int *ncv, double *v,
-	       int *ldv, int *iparam, int *ipntr, double *workd,
+	       int *ldz, int *iparam, int *ipntr, double *workd,
 	       double *workl, int *lworkl, int *info);
 }
 

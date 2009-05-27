@@ -229,6 +229,25 @@ Solution &Solution::operator+= (const Solution &sol)
     return *this;
 }
 
+void Solution::WriteImgGeneric (int imgno, char *filename,
+    const RVector &img, bool append)
+{
+    int i, n = img.Dim();
+    ofstream ofs;
+    if (append) ofs.open (filename, ios::app);
+    else        ofs.open (filename);
+    
+    ofs << "Image " << imgno << endl;
+    for (i = 0; i < n; i++) ofs << img[i] << ' ';
+    ofs << endl;    
+}
+
+void Solution::WriteImgGeneric (int imgno, char *filename, 
+				int prmind, bool append)
+{
+    WriteImgGeneric (imgno, filename, param[prmind], append);
+}
+
 void Solution::WriteImg_mua (int imgno, char *nimname, bool append)
 {
     int i, n = param[0].Dim();

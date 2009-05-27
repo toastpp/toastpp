@@ -71,15 +71,25 @@ liblbfgs::
 	mkdir -p $(TOASTOBJ)/liblbfgs/lib; \
 	cd $(TOASTOBJ)/liblbfgs; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/configure .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/{install-sh,ltmain.sh} .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/{missing,depcomp} .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/config.{sub,guess,h.in} .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/install-sh .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/ltmain.sh .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/missing .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/depcomp .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/config.sub .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/config.guess .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/config.h.in .; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/Makefile.in .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/{README,INSTALL,COPYING,AUTHORS,ChangeLog,NEWS} .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/README .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/INSTALL .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/COPYING .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/AUTHORS .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/ChangeLog .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/NEWS .; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/include/* include; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/lib/* lib; \
 	mkdir sample; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/{Makefile.in,sample.c} ./sample;\
+	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/Makefile.in ./sample; \
+	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/sample.c ./sample;\
 	./configure; \
 	make; \
 	cp lib/.libs/*$(LIB_SUFFIX) $(LIBDIR); \

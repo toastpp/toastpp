@@ -128,8 +128,8 @@ int bWriteJ    = 0;
 int bWriteGrad = 0;
 //int bOutputNIM = 1;
 //int bOutputRaw = 0;
-int bOutputUpdate = 1;
-int bOutputGradient = 1;
+int bOutputUpdate = 0;
+int bOutputGradient = 0;
 double avg_cmua = 1.0, avg_ckappa = 1.0;
 ParamParser pp;
 
@@ -142,7 +142,7 @@ void SelectLMOptions ();
 void SelectMesh (char *meshname, QMMesh &mesh);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (int &mtype, double &mwidth);
-void SelectInitialParams (const Mesh &mesh, Solution &msol);
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol);
 void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
     int whichWavel);
 void SelectData (int nqm, RVector &data);
@@ -335,10 +335,12 @@ int main (int argc, char *argv[])
 	}
     }
     
-
     // multi-wavelength solution in mesh basis
-    MWsolution msol(nofMuachromo + 3, n, nofwavel, extcoef, wlength);
-    // 3 is for A & b and N=refractive index
+    int nprm = nofMuachromo; // chromophores
+    nprm += 2;               // scattering parameters A and b
+    nprm += 1;               // refractive index
+    nprm += nofwavel;        // background mua at each wavelength
+    MWsolution msol(nprm, n, nofwavel, extcoef, wlength);
 
     SelectInitialParams (mesh, msol);
 
@@ -408,8 +410,8 @@ int main (int argc, char *argv[])
     slen = raster->SLen();
 
     // solution in sparse user basis
-    Solution bsol(nofMuachromo + 3, raster->SLen());
-    for (i = 0; i < nofMuachromo+3; i++)
+    Solution bsol(nprm, raster->SLen());
+    for (i = 0; i < nprm; i++)
 	bsol.SetActive (i, msol.IsActive(i));
     raster->Map_MeshToSol (msol, bsol, true);
 
@@ -510,12 +512,16 @@ int main (int argc, char *argv[])
 	}
 	break;
     case IMGFMT_RAW:
-        Solution rsol (OT_NPARAM, raster->BLen());
-	raster->Map_SolToBasis (bsol, rsol, true);
-	WriteRimHeader (raster->BDim(), "recon_mua.raw");
-	WriteRimHeader (raster->BDim(), "recon_mus.raw");
-	rsol.WriteImg_mua (0, "recon_mua.raw");
-	rsol.WriteImg_mus (0, "recon_mus.raw");
+	for (i = 0; i < bsol.nParam(); i++) {
+	    if (bsol.IsActive(i)) {
+		char fname[256];
+		RVector img(blen);
+		sprintf (fname, "reconParam_%d.raw", i+1);
+		raster->Map_SolToBasis(bsol.GetParam(i), img);
+		WriteRimHeader (raster->BDim(), fname);
+		Solution::WriteImgGeneric (0, fname, img);
+	    }
+	}
 	break;
     }
 
@@ -659,8 +665,7 @@ int main (int argc, char *argv[])
 
     // ==================================================================
     // Start the solver
-    solver->Solve (FWS, *raster, pscaler, OF, data, sd, bsol, msol, qvec, mvec,
-        0);
+    solver->Solve (FWS, *raster, pscaler, OF, data, sd, bsol, msol, qvec,mvec);
     delete solver;
 
 #ifdef UNDEF
@@ -1014,7 +1019,7 @@ int ScanRegions (const Mesh &mesh, int *nregnode)
     return nreg;
 }
 
-void SelectInitialParams (const Mesh &mesh, Solution &msol)
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol)
 {
     char cbuf[256], *valstr;
     int resettp = 0;
@@ -1027,19 +1032,20 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
       char resetstr[256];
       char reconstr[256];
 
-      if (p < nparam - 3) {
-	sprintf (resetstr,"CHROMOPHORE_%d",p+1);
-	sprintf (reconstr, "RECON_CHROMOPHORE_%d",p+1);
-      } else if (p == nparam -3) {
-	sprintf (resetstr,"SCATTERING_PREFACTOR_A");
-	sprintf (reconstr, "RECON_SCATTERING_PREFACTOR_A");
-      }
-      else if (p == nparam -2) {
-	sprintf (resetstr,"SCATTERING_POWER_B");
-	sprintf (reconstr, "RECON_SCATTERING_POWER_B");
-      }
-      else if (p == nparam -1) {
-	sprintf (resetstr,"RESET_N");
+      if (p < msol.nmuaChromo) {
+	  sprintf (resetstr,"CHROMOPHORE_%d",p+1);
+	  sprintf (reconstr, "RECON_CHROMOPHORE_%d",p+1);
+      } else if (p == msol.nmuaChromo) {
+	  sprintf (resetstr,"SCATTERING_PREFACTOR_A");
+	  sprintf (reconstr, "RECON_SCATTERING_PREFACTOR_A");
+      } else if (p == msol.nmuaChromo+1) {
+	  sprintf (resetstr,"SCATTERING_POWER_B");
+	  sprintf (reconstr, "RECON_SCATTERING_POWER_B");
+      } else if (p == msol.nmuaChromo+2) {
+	  sprintf (resetstr,"RESET_N");
+      } else {
+	  sprintf (resetstr, "BACKGROUND_MUA_%d",
+		   (int)msol.wlength[p-msol.nmuaChromo-3]);
       }
 
       param[p].New(mesh.nlen());
@@ -1115,7 +1121,7 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
 	    pp.PutString (resetstr, cbuf);
 	}
 
-	if (p < nparam - 1) {
+	if (p < msol.nmuaChromo+2) {
 	  bool active;
 	    if (!pp.GetBool (reconstr, active)) {
 		char c;
@@ -1131,7 +1137,7 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
 	}
 	msol.SetParam (p, param[p]);
     }
-    g_refind = mean (param[nparam-1]); // assuming homogeneous n
+    g_refind = mean (param[msol.nmuaChromo+2]); // assuming homogeneous n
     
     //msol.SetParam (OT_CMUA, param[0]*c0/param[2]);
     //msol.SetParam (OT_CKAPPA, c0/(3*param[2]*(param[0]+param[1])));
@@ -1980,6 +1986,8 @@ void ReadDataFile (char *fname, RVector &data)
     do {
         ifs >> c;
     } while (ifs.good() && c != '[');
+    if (!ifs.good())
+	xERROR(Data file not found or invalid);
     for (i = 0; i < n; i++)
         ifs >> data[i];
 }

@@ -55,7 +55,7 @@ RVector RescaleHessianPart (RDenseMatrix &Jpart, const RVector &x,
 bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const RCompRowMatrix &qvec,
     const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &grad, double f0, double &fmin, double &lambda,
+    const RVector &grad, double f0, double &fmin, double &lambda,
     MWsolution &meshsol, const RVector &p0, const RVector &p,
     const Regularisation *reg, const RMatrix *cov = 0);
 
@@ -131,7 +131,8 @@ struct JAC_DATA {
     const RCompRowMatrix *RHess;   // Hessian of prior (1 matrix per parameter)
     const RVector *M;              // normalisation diagonal matrix
     const double *lambda;          // diagonal scaling factor
-          double omega;            // modulation frequency
+    const MWsolution *sol;         // solution instance
+    const RDenseMatrix *excoef;    // extinction coefficients
 };
 
 // ==========================================================================
@@ -256,7 +257,10 @@ static RVector JTJx_clbk (const RVector &x, void *context)
 	n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast ((void*)JTJx.data_buffer(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #else // serial version
-    JTJx =  ATx (*J, Ax (*J, x));
+    RVector y = Ax(*J,x);
+    JTJx = ATx(*J,y);
+
+    //JTJx =  ATx (*J, Ax (*J, x));
 #endif
    
     return JTJx + Px + lambda*x;
@@ -269,7 +273,7 @@ static RVector JTJx_clbk (const RVector &x, void *context)
 // Note: parameter and data scaling not yet implemented
 
 RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
-    const CFwdSolverMW &FWS, const CCompRowMatrix &mvec, const CVector *dphi_h,
+    const RFwdSolverMW &FWS, const RCompRowMatrix &mvec, const RVector *dphi_h,
     const RVector &sd, const RVector &x)
 {
     int i, j, q;
@@ -281,14 +285,14 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
     int slen = raster.SLen();
     int ofs_lnmod = 0;
     int ofs_phase = nqm;
-    CVector qdelta_g(glen);
-    CVector qdelta_h(nlen);
-    CVector phi_h_delta(nlen);
-    CVector dphi_p(slen);
-    CVector dphi_g(glen);
-    CVector *dphi_g_grad = new CVector[dim];
-    CVector *dphi_g_gradgrad = new CVector[dim];
-    CVector tmp(slen);
+    RVector qdelta_g(glen);
+    RVector qdelta_h(nlen);
+    RVector phi_h_delta(nlen);
+    RVector dphi_p(slen);
+    RVector dphi_g(glen);
+    RVector *dphi_g_grad = new RVector[dim];
+    RVector *dphi_g_gradgrad = new RVector[dim];
+    RVector tmp(slen);
     RVector y_h_delta (nqm*2);
 
     for (i = 0; i < dim; i++) {
@@ -299,20 +303,20 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
     RVector alpha_h(x, 0, slen);
     RVector beta_h(x, slen, slen);
     RVector alpha_g(glen), beta_g(glen);
-    CVector calpha_g(glen), cbeta_g(glen);
+    //RVector calpha_g(glen), cbeta_g(glen);
     raster.Map_SolToGrid (alpha_h, alpha_g);
     raster.Map_SolToGrid (beta_h, beta_g);
-    SetReal (calpha_g, alpha_g);
-    SetReal (cbeta_g, beta_g);
+    //SetReal (calpha_g, alpha_g);
+    //SetReal (cbeta_g, beta_g);
 
     for (q = 0; q < nq; q++) {
 	// build up perturbation rhs (qdelta_g)
 	raster.Map_MeshToGrid (dphi_h[q], dphi_g);
-	qdelta_g = -calpha_g * dphi_g;
+	qdelta_g = -alpha_g * dphi_g;
 	ImageGradient (raster.GDim(), raster.GSize(), dphi_g, dphi_g_grad, 
 		       raster.Elref());
 	for (i = 0; i < dim; i++) {
-	    dphi_g_grad[i] *= cbeta_g;
+	    dphi_g_grad[i] *= beta_g;
 	    // note: improve divergence calculation
 	    ImageGradient (raster.GDim(), raster.GSize(), dphi_g_grad[i],
 			   dphi_g_gradgrad, raster.Elref());
@@ -325,17 +329,17 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	RVector gsize = raster.GSize();
 	IVector bdim = raster.BDim();
 	for (i = 0; i < gsize.Dim(); i++) scl *= gsize[i]/bdim[i];
-	qdelta_g *= toast::complex(1.0/scl,0);
+	qdelta_g *= 1.0/scl;
 
 	// remap to mesh basis
 	raster.Map_GridToMesh (qdelta_g, qdelta_h);
 
 	// scale with element support size
-	CVector escl(nlen);
+	RVector escl(nlen);
 	for (i = 0; i < mesh.elen(); i++) {
 	    Element *pel = mesh.elist[i];
 	    for (j = 0; j < pel->nNode(); j++) {
-		escl[pel->Node[j]].re += pel->IntF(j);
+		escl[pel->Node[j]] += pel->IntF(j);
 	    }
 	}
 	qdelta_h *= escl;
@@ -345,23 +349,21 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	// boundary projections
 	int nm = mesh.nQMref[q];
-	CVector projdelta = ProjectSingle (&mesh, q, mvec, phi_h_delta);
+	RVector projdelta = ProjectSingle (&mesh, q, mvec, phi_h_delta);
 
 	if (FWS.GetDataScaling() == DATA_LOG) {
-	    CVector proj (nm);
-	    Project_cplx (mesh, q, dphi_h[q], proj);
+	    RVector proj = FWS.ProjectSingle (q, mvec, dphi_h[q], DATA_LIN);
 	    for (i = 0; i < nm; i++) {
 		double scl = norm2 (proj[i]);
-		complex c = projdelta[i]*conj(proj[i]);
+		double c = projdelta[i]*proj[i];
 		projdelta[i] = c/scl;
 	    }
 	}
 
 	// map data types into real vector
 	for (i = 0; i < nm; i++) {
-	    complex proji = projdelta[i];
-	    y_h_delta[ofs_lnmod++] = proji.re;
-	    y_h_delta[ofs_phase++] = proji.im;
+	    double proji = projdelta[i];
+	    y_h_delta[ofs_lnmod++] = proji;
 	}
     }
     // scale with sd
@@ -379,111 +381,138 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 // (dphi_h and aphi_h) passed in mesh basis
 
 RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
-    const CFwdSolverMW &FWS, const CCompRowMatrix &mvec, const CVector *dphi_h,
-    const CVector *aphi_h, const RVector &sd, const RVector &x)
+    const RFwdSolverMW &FWS, const MWsolution &sol, const RCompRowMatrix &mvec,
+    const RVector *dphi_h, const RVector *aphi_h, const RVector &sd,
+    const RVector &x, const RDenseMatrix &excoef)
 {
     if (!aphi_h)
 	return FrechetDerivative (mesh,raster,FWS,mvec, dphi_h, sd, x);
     // no adjoint fields - use direct method
 
     tic();
-    int i, q, m, mm, ofs;
+    int i, j, w, q, m, ofs, mofs;
     int n    = x.Dim();
     int nq   = mesh.nQ;
+    int nm   = mesh.nM;
     int nqm  = mesh.nQM;
     int nlen = mesh.nlen();
     int glen = raster.GLen();
     int slen = raster.SLen();
     int dim  = mesh.Dimension();
+    int nofwavel = sol.nofwavel;
+    int nchromo = excoef.nCols();
+    int nprm    = sol.nParam();
+    bool bFactorA = sol.IsActive(nchromo);
+    bool bPowerb  = sol.IsActive(nchromo+1);
     const IVector &gdim = raster.GDim();
     const RVector &gsize = raster.GSize();
-    CVector res(nqm);
-    RVector rres(nqm*2);
+    RVector res(nqm*nofwavel);
 
     // multiply the direct fields with the rhs before
     // multiplying in the adjoint fields
 
-    CVector pd(glen), pa(glen);
-    RVector xa(x, 0, n/2), xb(x, n/2, n/2);
-    RVector xag(glen), xbg(glen);
-    raster.Map_SolToGrid (xa, xag);
-    raster.Map_SolToGrid (xb, xbg);
-    CVector xacg(glen), xbcg(glen);
-    SetReal (xacg, xag);
-    SetReal (xbcg, xbg);
+    RVector pd(glen), pa(glen);
 
-    CVector *pd_grad = new CVector[dim];
-    CVector *pa_grad = new CVector[dim];
-    CVector pas(slen), *pas_grad = new CVector[dim];
-    CVector *pds_alpha = new CVector[nq];
-    CVector **pds_alpha_grad = new CVector*[nq];
-    for (i = 0; i < nq; i++) pds_alpha_grad[i] = new CVector[dim];
-    CVector *proj = new CVector[nq];
-    int *qofs = new int[nq];
-    CVector pd_alpha, *pd_alpha_grad = new CVector[dim];
+    RVector *pd_grad = new RVector[dim];
+    RVector *pa_grad = new RVector[dim];
+    RVector pas(slen), *pas_grad = new RVector[dim];
+    RVector *pds = new RVector[nq];
+    RVector **pds_grad = new RVector*[nq];
+    for (i = 0; i < nq; i++) pds_grad[i] = new RVector[dim];
+    RVector *proj = new RVector[nq];
+    //int *qofs = new int[nq];
+    RVector sA, sb;
 
     for (i = 0; i < dim; i++)
 	pas_grad[i].New(slen);
 
-    // loop over sources
-    for (q = 0; q < nq; q++) {
-	qofs[q] = (q ? qofs[q-1]+mesh.nQMref[q-1] : 0);
-	raster.Map_MeshToGrid (dphi_h[q], pd);
-	ImageGradient (gdim, gsize, pd, pd_grad, raster.Elref());
+    // loop over wavelengths
+    for (w = 0; w < nofwavel; w++) {
+	const RVector *wdphi_h = dphi_h + nq*w;
+	const RVector *waphi_h = aphi_h + nm*w;
+	if (bFactorA)
+	    raster.Map_MeshToSol (sol.GetJacobianCoeff_A(w), sA);
+	if (bPowerb)
+	    raster.Map_MeshToSol (sol.GetJacobianCoeff_b(w), sb);
 
-	if (FWS.GetDataScaling() == DATA_LOG) {
-	    proj[q].New (mesh.nQMref[q]);
-	    Project_cplx (mesh, q, dphi_h[q], proj[q]);
-	}
-	pd_alpha = pd * xacg;
-	pds_alpha[q].New (slen);
-	raster.Map_GridToSol (pd_alpha, pds_alpha[q]);
-	for (i = 0; i < dim; i++) {
-	    pd_alpha_grad[i] = pd_grad[i] * xbcg;
-	    pds_alpha_grad[q][i].New(slen);
-	    raster.Map_GridToSol (pd_alpha_grad[i], pds_alpha_grad[q][i]);
-	}
-    }
-    // loop over detectors
-    for (m = 0; m < mesh.nM; m++) {
-	raster.Map_MeshToGrid (aphi_h[m], pa);
-	raster.Map_GridToSol (pa, pas);
-	ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
-	for (i = 0; i < dim; i++)
-	    raster.Map_GridToSol (pa_grad[i], pas_grad[i]);
-	
+	// loop over sources
 	for (q = 0; q < nq; q++) {
-	    if (!mesh.Connected (q,m)) continue;
-	    mm = mesh.QMref[q][m];
-	    ofs = qofs[q] + mm;
-	    res[ofs] = -pds_alpha[q] & pas;
-	    for (i = 0; i < dim; i++)
-		res[ofs] -= pds_alpha_grad[q][i] & pas_grad[i];
+	    //qofs[q] = (q ? qofs[q-1]+mesh.nQMref[q-1] : 0);
+	    raster.Map_MeshToGrid (wdphi_h[q], pd);
+	    ImageGradient (gdim, gsize, pd, pd_grad, raster.Elref());
+	    
 	    if (FWS.GetDataScaling() == DATA_LOG) {
-		double scl = norm2 (proj[q][mm]);
-		complex c = res[ofs]*conj(proj[q][mm]);
-		res[ofs] = c/scl;
+		proj[q].New (mesh.nQMref[q]);
+		proj[q] = FWS.ProjectSingle (q, mvec, wdphi_h[q], DATA_LIN);
+	    }
+	    pds[q].New (slen);
+	    raster.Map_GridToSol (pd, pds[q]);
+	    for (i = 0; i < dim; i++) {
+		pds_grad[q][i].New(slen);
+		raster.Map_GridToSol (pd_grad[i], pds_grad[q][i]);
+	    }
+	}
+	// loop over detectors
+	for (m = 0; m < mesh.nM; m++) {
+	    raster.Map_MeshToGrid (waphi_h[m], pa);
+	    raster.Map_GridToSol (pa, pas);
+	    ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
+	    for (i = 0; i < dim; i++)
+		raster.Map_GridToSol (pa_grad[i], pas_grad[i]);
+	    
+	    for (q = 0; q < nq; q++) {
+		if (!mesh.Connected (q,m)) continue;
+		ofs = mesh.QMofs[q][m];
+		mofs = ofs-mesh.Qofs[q];
+		//mm = mesh.QMref[q][m];
+		//ofs = w*nqm + qofs[q] + mm;
+		res[ofs+w*nqm] = 0;
+		int prmofs = 0;
+		// sum over chromophores
+		for (j = 0; j < nchromo; j++) {
+		    RVector xj(x,prmofs,slen);
+		    res[ofs+w*nqm] -= ((pds[q]*xj) & pas) * excoef(w,j);
+		    prmofs += slen;
+		}
+		// scattering prefactor
+		if (bFactorA) {
+		    RVector xj(x,prmofs,slen);
+		    xj *= sA;
+		    for (i = 0; i < dim; i++)
+			res[ofs+w*nqm] -= (pds_grad[q][i]*xj) & pas_grad[i];
+		    prmofs += slen;
+		}
+		// scattering power
+		if (bPowerb) {
+		    RVector xj(x,prmofs,slen);
+		    xj *= sb;
+		    for (i = 0; i < dim; i++)
+			res[ofs+w*nqm] -= (pds_grad[q][i]*xj) & pas_grad[i];
+		    prmofs += slen;
+		}
+		if (FWS.GetDataScaling() == DATA_LOG) {
+		    double scl = norm2 (proj[q][mofs]);
+		    double c = res[ofs+w*nqm]*proj[q][mofs];
+		    res[ofs+w*nqm] = c/scl;
+		}
 	    }
 	}
     }
-    // copy result to real vector and scale with sd
-    for (i = 0; i < nqm; i++) {
-	rres[i]     = re(res[i]) / sd[i];
-	rres[i+nqm] = im(res[i]) / sd[i+nqm];
-    }
+
+    // scale with sd
+    res /= sd;
 
     delete []pd_grad;
     delete []pa_grad;
     delete []pas_grad;
-    delete []pds_alpha;
-    for (i = 0; i < nq; i++) delete []pds_alpha_grad[i];
-    delete []pds_alpha_grad;
+    delete []pds;
+    for (i = 0; i < nq; i++) delete []pds_grad[i];
+    delete []pds_grad;
     delete []proj;
-    delete []qofs;
-    delete []pd_alpha_grad;
+    //delete []qofs;
 
     cerr << "Frechet timing: " << toc() << endl;
-    return rres;
+    return res;
 }
 
 // ==========================================================================
@@ -491,8 +520,9 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 // Direct method (requires only direct fields)
 
 RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
-    const CFwdSolverMW &FWS, const CCompRowMatrix &mvec, const CVector *dphi_h,
-    const RVector &sd, const RVector &y)
+    const RFwdSolverMW &FWS, const MWsolution &sol, const RCompRowMatrix &mvec,
+    const RVector *dphi_h, const RVector &sd, const RVector &y,
+    const RDenseMatrix &excoef)
 {
     int i, j, q, m, n, idx, ofs_mod, ofs_arg, nQ = mesh.nQ;
     int glen = raster.GLen();
@@ -502,9 +532,9 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
     const IVector &gdim = raster.GDim();
     const RVector &gsize = raster.GSize();
     const int *elref = raster.Elref();
-    CVector wqa (mesh.nlen());
+    RVector wqa (mesh.nlen());
     RVector wqb (mesh.nlen());
-    CVector dgrad (slen);
+    RVector dgrad (slen);
     ofs_mod = 0;         // data offset for Mod data
     ofs_arg = mesh.nQM;  // data offset for Arg data
     RVector rres (slen*2);
@@ -514,8 +544,8 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
     for (q = 0; q < mesh.nQ; q++) {
 
         // expand field and gradient
-        CVector cdfield (glen);
-        CVector *cdfield_grad = new CVector[dim];
+        RVector cdfield (glen);
+        RVector *cdfield_grad = new RVector[dim];
 	raster.Map_MeshToGrid (dphi_h[q], cdfield);
 	ImageGradient (gdim, gsize, cdfield, cdfield_grad, elref);
 
@@ -526,62 +556,53 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	RVector b_mod(n);
 	b_mod = y_mod/s_mod;
 
-	RVector y_arg (y, ofs_arg, n);
-	RVector s_arg (sd, ofs_arg, n);
-	RVector b_arg(n);
-	b_arg = y_arg/s_arg;
-
 	RVector ype(n);
 	ype = 1.0;  // will change if data type is normalised
 
-	CVector cproj(n);
-	Project_cplx (mesh, q, dphi_h[q], cproj);
-	wqa = complex(0,0);
+	RVector cproj(n);
+	cproj = FWS.ProjectSingle (q, mvec, dphi_h[q], DATA_LIN);
+	wqa = 0.0;
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh.nM; m++) {
 	    if (!mesh.Connected (q, m)) continue;
-	    const CVector qs = mvec.Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
-	    double dn = 1.0/(rp*rp + ip*ip);
+	    const RVector qs = mvec.Row(m);
+	    double rp = cproj[idx];
+	    double dn = 1.0/(rp*rp);
 
 	    // amplitude term
 	    term = /* -2.0 * */ b_mod[idx] /* / (ype[idx]*s_mod[idx]) */;
-	    wqa += qs * complex (term*rp*dn, -term*ip*dn);
-
-	    // phase term
-	    term = /* -2.0 * */ b_arg[idx] /* / (ype[idx]*s_arg[idx]) */;
-	    wqa += qs * complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * (term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
 	}
 
 	// adjoint field and gradient
-	CVector wphia (mesh.nlen());
+	RVector wphia (mesh.nlen());
 	FWS.CalcField (wqa, wphia);
 
-	CVector cafield(glen);
-	CVector *cafield_grad = new CVector[dim];
+	RVector cafield(glen);
+	RVector *cafield_grad = new RVector[dim];
 	raster.Map_MeshToGrid (wphia, cafield);
 	ImageGradient (gdim, gsize, cafield, cafield_grad, elref);
 
 	// absorption contribution
 	raster.Map_GridToSol (cdfield * cafield, dgrad);
-	grad_cmua -= Re(dgrad);
+	grad_cmua -= dgrad;
 
 	// diffusion contribution
 	// multiply complex field gradients
-	CVector gk(glen);
+	RVector gk(glen);
 	for (i = 0; i < glen; i++)
 	    for (j = 0; j < dim; j++)
 	        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
 	raster.Map_GridToSol (gk, dgrad);
-	grad_ckappa -= Re(dgrad);
+	grad_ckappa -= dgrad;
 
 	ofs_mod += n; // step to next source
 	ofs_arg += n;
+
 	delete []cdfield_grad;
 	delete []cafield_grad;
     }
@@ -594,91 +615,128 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 // available, falls back to direct method above
 
 RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
-    const CFwdSolverMW &FWS, const CCompRowMatrix &mvec, const CVector *dphi_h,
-    const CVector *aphi_h, const RVector &sd, const RVector &y)
+    const RFwdSolverMW &FWS, const MWsolution &sol, const RCompRowMatrix &mvec,
+    const RVector *dphi_h, const RVector *aphi_h, const RVector &sd,
+    const RVector &y, const RDenseMatrix &excoef)
 {
     if (!aphi_h) 
-	return AdjointFrechetDerivative (mesh, raster, FWS, mvec, dphi_h,
-					 sd, y);
+	return AdjointFrechetDerivative (mesh, raster, FWS, sol, mvec, dphi_h,
+					 sd, y, excoef);
     // no adjoint fields - use direct method
 
     tic();
-    int i, q, m, mm, ofs;
+    int i, j, w, q, m, ofs, mofs;
     int nq   = mesh.nQ;
+    int nm   = mesh.nM;
     int nqm  = mesh.nQM;
     int nlen = mesh.nlen();
     int glen = raster.GLen();
     int slen = raster.SLen();
     int dim  = mesh.Dimension();
+    int nofwavel = sol.nofwavel;
+    int nchromo = excoef.nCols();
+    int nprm    = sol.nParam();
+    int nactive = sol.nActive();
+    bool bFactorA = sol.IsActive(nchromo);
+    bool bPowerb  = sol.IsActive(nchromo+1);
+    bool bScatter = bFactorA || bPowerb;
+
     const IVector &gdim = raster.GDim();
     const RVector &gsize = raster.GSize();
-    RVector rres(slen*2);
+    RVector rres(slen*nactive);
     RVector ysd = y/sd; // data scaling
 
-    CVector pd(glen), *pds = new CVector[nq], pa(glen), pas(slen);
-    CVector das(slen), dbs(slen);
-    CVector db(glen);
+    RVector pd(glen), *pds = new RVector[nq], pa(glen), pas(slen);
+    RVector das(slen), dbs(slen);
+    RVector db(glen);
+    RVector sA, sb;
 
-    CVector *pd_grad = new CVector[dim];
-    CVector **pds_grad = new CVector*[nq];
-    for (i = 0; i < nq; i++) pds_grad[i] = new CVector[dim];
-    CVector *pa_grad = new CVector[dim];
-    CVector *pas_grad = new CVector[dim];
-    CVector *proj = new CVector[nq];
-    int *qofs = new int[nq];
+    RVector *pd_grad = new RVector[dim];
+    RVector **pds_grad = new RVector*[nq];
+    for (i = 0; i < nq; i++) pds_grad[i] = new RVector[dim];
+    RVector *pa_grad = new RVector[dim];
+    RVector *pas_grad = new RVector[dim];
+    RVector *proj = new RVector[nq];
+    //int *qofs = new int[nq];
 
     for (i = 0; i < dim; i++)
 	pas_grad[i].New(slen);
 
-    // loop over sources
-    for (q = ofs = 0; q < nq; q++) {
-	qofs[q] = (q ? qofs[q-1]+mesh.nQMref[q-1] : 0);
-	raster.Map_MeshToGrid (dphi_h[q], pd);
-	ImageGradient (gdim, gsize, pd, pd_grad, raster.Elref());
+    // loop over wavelengths
+    for (w = 0; w < nofwavel; w++) {
+	const RVector *wdphi_h = dphi_h + nq*w;
+	const RVector *waphi_h = aphi_h + nm*w;
 
-	if (FWS.GetDataScaling() == DATA_LOG) {
-	    proj[q].New (mesh.nQMref[q]);
-	    Project_cplx (mesh, q, dphi_h[q], proj[q]);
-	}
-	pds[q].New(slen);
-	raster.Map_GridToSol (pd, pds[q]);
-	for (i = 0; i < dim; i++) {
-	    pds_grad[q][i].New(slen);
-	    raster.Map_GridToSol (pd_grad[i], pds_grad[q][i]);
-	}
-    }
-
-    // loop over detectors
-    for (m = 0; m < mesh.nM; m++) {
-	raster.Map_MeshToGrid (aphi_h[m], pa);
-	ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
-	raster.Map_GridToSol (pa, pas);
-	for (i = 0; i < dim; i++)
-	    raster.Map_GridToSol (pa_grad[i], pas_grad[i]);
-
-	for (q = 0; q < nq; q++) {
-	    if (!mesh.Connected (q,m)) continue;
-	    mm = mesh.QMref[q][m];
-	    ofs = qofs[q] + mm;
-	    das = pds[q] * pas;
-	    dbs.Clear();
-	    for (i = 0; i < dim; i++)
-		dbs += pds_grad[q][i] * pas_grad[i];
-	    double yre = ysd[ofs], yim = ysd[ofs+nqm];
+	// loop over sources
+	for (q = ofs = 0; q < nq; q++) {
+	    //qofs[q] = (q ? qofs[q-1]+mesh.nQMref[q-1] : 0);
+	    raster.Map_MeshToGrid (wdphi_h[q], pd);
+	    ImageGradient (gdim, gsize, pd, pd_grad, raster.Elref());
+	    
 	    if (FWS.GetDataScaling() == DATA_LOG) {
-		// rescale for log data (lnamp + phase)
-		complex logscl = proj[q][mm]/norm2 (proj[q][mm]);
-		complex logdat = complex(yre,yim) * logscl;
-		yre = logdat.re;
-		yim = logdat.im;
+		proj[q].New (mesh.nQMref[q]);
+		proj[q] = FWS.ProjectSingle (q, mvec, wdphi_h[q], DATA_LIN);
 	    }
-	    for (i = 0; i < slen; i++) {
-		// apply data to PMDF; write to real vector
-		rres[i]      -= das[i].re*yre + das[i].im*yim;
-		rres[i+slen] -= dbs[i].re*yre + dbs[i].im*yim;
+	    pds[q].New(slen);
+	    raster.Map_GridToSol (pd, pds[q]);
+	    for (i = 0; i < dim; i++) {
+		pds_grad[q][i].New(slen);
+		raster.Map_GridToSol (pd_grad[i], pds_grad[q][i]);
+	    }
+	}
+	
+	// loop over detectors
+	for (m = 0; m < mesh.nM; m++) {
+	    raster.Map_MeshToGrid (waphi_h[m], pa);
+	    ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
+	    raster.Map_GridToSol (pa, pas);
+	    for (i = 0; i < dim; i++)
+		raster.Map_GridToSol (pa_grad[i], pas_grad[i]);
+	    
+	    for (q = 0; q < nq; q++) {
+		if (!mesh.Connected (q,m)) continue;
+		ofs = mesh.QMofs[q][m];
+		mofs = ofs-mesh.Qofs[q];
+		//mm = mesh.QMref[q][m];
+		//ofs = nqm*w + qofs[q] + mm;
+		das = pds[q] * pas;
+		dbs.Clear();
+		for (i = 0; i < dim; i++)
+		    dbs += pds_grad[q][i] * pas_grad[i];
+		double y = ysd[ofs+w*nqm];
+		if (FWS.GetDataScaling() == DATA_LOG) {
+		    // rescale for log data (lnamp + phase)
+		    double logscl = proj[q][mofs]/norm2 (proj[q][mofs]);
+		    double logdat = y * logscl;
+		    y = logdat;
+		}
+
+		// chromophore blocks
+		int prmofs = 0;
+		for (j = 0; j < nchromo; j++) {
+		    double ex = excoef (w,j);
+		    for (i = 0; i < slen; i++)
+			rres[prmofs+i] -= das[i]*ex*y;
+		    prmofs += slen;
+		}
+		// scattering prefactor
+		if (bFactorA) {
+		    raster.Map_MeshToSol (sol.GetJacobianCoeff_A(w), sA);
+		    for (i = 0; i < slen; i++)
+			rres[prmofs+i] -= dbs[i]*sA[i]*y;
+		    prmofs += slen;
+		}
+		// scattering power
+		if (bPowerb) {
+		    raster.Map_MeshToSol (sol.GetJacobianCoeff_b(w), sb);
+		    for (i = 0; i < slen; i++)
+			rres[prmofs+i] -= dbs[i]*sb[i]*y;
+		    prmofs += slen;
+		}
 	    }
 	}
     }
+
     delete []pds;
     delete []pd_grad;
     for (i = 0; i < nq; i++) delete []pds_grad[i];
@@ -686,7 +744,7 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
     delete []pa_grad;
     delete []pas_grad;
     delete []proj;
-    delete []qofs;
+    //delete []qofs;
 
     cerr << "Adjoint Frechet timing: " << toc() << endl;
     return rres;
@@ -698,76 +756,110 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 // direct and adjoint fields
 
 RVector ImplicitHessianScaling (const QMMesh &mesh, const Raster &raster,
-    const CFwdSolverMW &FWS, const CCompRowMatrix &mvec, const CVector *dphi_h,
-    const CVector *aphi_h, const RVector &sd, const RVector &prmscl)
+    const RFwdSolverMW &FWS, const MWsolution &sol, const RCompRowMatrix &mvec,
+    const RVector *dphi_h, const RVector *aphi_h, const RVector &sd,
+    const RVector &prmscl, const RDenseMatrix &excoef)
 {
-    int i, q, m, mm, ofs;
+    int i, j, w, q, m, ofs, mofs;
     int nq   = mesh.nQ;
+    int nm   = mesh.nM;
+    int nqm  = mesh.nQM;
     int nlen = mesh.nlen();
     int glen = raster.GLen();
     int slen = raster.SLen();
     int dim  = mesh.Dimension();
-    int nqm  = mesh.nQM;
+    int nprm = sol.nParam();
+    int nofwavel = sol.nofwavel;
+    int nchromo  = excoef.nCols();
+    bool bFactorA = sol.IsActive(nchromo);
+    bool bPowerb  = sol.IsActive(nchromo+1);
+    bool bScatter = bFactorA || bPowerb;
+
     const IVector &gdim = raster.GDim();
     const RVector &gsize = raster.GSize();
-    RVector M(slen*2);
-    tic();
+    RVector M(slen*sol.nActive());
 
-    CVector *pd = new CVector[nq];
-    CVector pa(glen);
-    CVector das(slen), dbs(slen);
-    CVector db(glen);
+    RVector *pd = new RVector[nq];
+    RVector pa(glen);
+    RVector das(slen), dbs(slen);
+    RVector db(glen);
+    RVector sA, sb;
 
-    CVector **pd_grad = new CVector*[nq];
-    for (i = 0; i < nq; i++) pd_grad[i] = new CVector[dim];
-    CVector *pa_grad = new CVector[dim];
-    CVector *proj = new CVector[nq];
-    int *qofs = new int[nq];
+    RVector **pd_grad = new RVector*[nq];
+    for (i = 0; i < nq; i++) pd_grad[i] = new RVector[dim];
+    RVector *pa_grad = new RVector[dim];
+    RVector *proj = new RVector[nq];
+    //int *qofs = new int[nq];
+    
+    // loop over wavelengths
+    for (w = 0; w < nofwavel; w++) {
+	const RVector *wdphi_h = dphi_h + w*nq;
+	const RVector *waphi_h = aphi_h + w*nm;
+	if (bFactorA)
+	    raster.Map_MeshToSol (sol.GetJacobianCoeff_A(w), sA);
+	if (bPowerb)
+	    raster.Map_MeshToSol (sol.GetJacobianCoeff_b(w), sb);
 
-    // loop over sources
-    for (q = ofs = 0; q < nq; q++) {
-	qofs[q] = (q ? qofs[q-1]+mesh.nQMref[q-1] : 0);
-	pd[q].New(glen);
-	for (i = 0; i < dim; i++) pd_grad[q][i].New(glen);
-	raster.Map_MeshToGrid (dphi_h[q], pd[q]);
-	ImageGradient (gdim, gsize, pd[q], pd_grad[q], raster.Elref());
-
-	if (FWS.GetDataScaling() == DATA_LOG) {
-	    proj[q].New (mesh.nQMref[q]);
-	    Project_cplx (mesh, q, dphi_h[q], proj[q]);
-	    
-	}
-    }
-
-    // loop over detectors
-    for (m = 0; m < mesh.nM; m++) {
-	raster.Map_MeshToGrid (aphi_h[m], pa);
-	ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
-
+	// loop over sources
 	for (q = 0; q < nq; q++) {
-	    if (!mesh.Connected (q,m)) continue;
-	    mm = mesh.QMref[q][m];
-	    ofs = qofs[q] + mm;
-	    CVector da = pd[q] * pa;
-	    raster.Map_GridToSol (da, das);
-	    db.Clear();
-	    for (i = 0; i < dim; i++)
-		db += pd_grad[q][i] * pa_grad[i];
-	    raster.Map_GridToSol (db, dbs);
+	    //qofs[q] = (q ? qofs[q-1]+mesh.nQMref[q-1] : 0);
+	    pd[q].New(glen);
+	    for (i = 0; i < dim; i++) pd_grad[q][i].New(glen);
+	    raster.Map_MeshToGrid (wdphi_h[q], pd[q]);
+	    ImageGradient (gdim, gsize, pd[q], pd_grad[q], raster.Elref());
+
 	    if (FWS.GetDataScaling() == DATA_LOG) {
-		double scl = norm2 (proj[q][mm]);
-		das *= (conj(proj[q][mm])/scl);
-		dbs *= (conj(proj[q][mm])/scl);
+		proj[q].New (mesh.nQMref[q]);
+		proj[q] = FWS.ProjectSingle (q, mvec, wdphi_h[q], DATA_LIN);
 	    }
-	    for (i = 0; i < slen; i++) { // data scaling
-		das[i].re /= sd[ofs];
-		dbs[i].re /= sd[ofs];
-		das[i].im /= sd[ofs+nqm];
-		dbs[i].im /= sd[ofs+nqm];
-	    }
-	    for (i = 0; i < slen; i++) {
-		M[i]      += norm2 (das[i]);
-		M[i+slen] += norm2 (dbs[i]);
+	}
+
+	// loop over detectors
+	for (m = 0; m < nm; m++) {
+	    raster.Map_MeshToGrid (waphi_h[m], pa);
+	    ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
+
+	    for (q = 0; q < nq; q++) {
+		if (!mesh.Connected (q,m)) continue;
+		ofs = mesh.QMofs[q][m];
+		mofs = ofs-mesh.Qofs[q];
+		//mm = mesh.QMref[q][m];
+		//ofs = qofs[q] + mm;
+		RVector da = pd[q] * pa;
+		raster.Map_GridToSol (da, das);
+		db.Clear();
+		for (i = 0; i < dim; i++)
+		    db += pd_grad[q][i] * pa_grad[i];
+		raster.Map_GridToSol (db, dbs);
+		if (FWS.GetDataScaling() == DATA_LOG) {
+		    double scl = norm2 (proj[q][mofs]);
+		    das *= (proj[q][mofs]/scl);
+		    dbs *= (proj[q][mofs]/scl);
+		}
+		for (i = 0; i < slen; i++) { // data scaling
+		    das[i] /= sd[ofs+w*nqm];
+		    dbs[i] /= sd[ofs+w*nqm];
+		}
+		// chromophore blocks
+		int prmofs = 0;
+		for (j = 0; j < nchromo; j++) {
+		    double ex = excoef (w,j);
+		    for (i = 0; i < slen; i++)
+			M[prmofs+i] += norm2(das[i]*ex);
+		    prmofs += slen;
+		}
+		// scattering prefactor
+		if (bFactorA) {
+		    for (i = 0; i < slen; i++)
+			M[prmofs+i] += norm2(dbs[i]*sA[i]);
+		    prmofs += slen;
+		}
+		// scattering power
+		if (bPowerb) {
+		    for (i = 0; i < slen; i++)
+			M[prmofs+i] += norm2(dbs[i]*sb[i]);
+		    prmofs += slen;
+		}
 	    }
 	}
     }
@@ -776,7 +868,7 @@ RVector ImplicitHessianScaling (const QMMesh &mesh, const Raster &raster,
     delete []pd_grad;
     delete []pa_grad;
     delete []proj;
-    delete []qofs;
+    //delete []qofs;
 
     M *= prmscl*prmscl; // parameter scaling
     return M;
@@ -787,8 +879,8 @@ RVector ImplicitHessianScaling (const QMMesh &mesh, const Raster &raster,
 // Hessian to 1. This version solves one direct and adjoint field
 
 RVector ExplicitHessianScaling1 (const QMMesh &mesh, const Raster &raster,
-    const CFwdSolverMW &FWS, const CCompRowMatrix &qvec,
-    const CCompRowMatrix &mvec,  const RVector &sd, const RVector &prmscl)
+    const RFwdSolverMW &FWS, const RCompRowMatrix &qvec,
+    const RCompRowMatrix &mvec,  const RVector &sd, const RVector &prmscl)
 {
     int i, q, m;
     int nq   = mesh.nQ;
@@ -802,16 +894,16 @@ RVector ExplicitHessianScaling1 (const QMMesh &mesh, const Raster &raster,
     RVector M(slen*2);
     tic();
 
-    CVector pd, pa(glen);
-    CVector das(slen), dbs(slen);
-    CVector db(glen);
+    RVector pd, pa(glen);
+    RVector das(slen), dbs(slen);
+    RVector db(glen);
 
-    CVector *pd_grad = new CVector[dim];
-    CVector *pa_grad = new CVector[dim];
-    CVector *proj = new CVector[nq];
+    RVector *pd_grad = new RVector[dim];
+    RVector *pa_grad = new RVector[dim];
+    RVector *proj = new RVector[nq];
     int *qofs = new int[nq];
 
-    CVector qsum(nlen), msum(nlen), dphi(nlen), aphi(nlen);
+    RVector qsum(nlen), msum(nlen), dphi(nlen), aphi(nlen);
 
     cout << "Using Explicit Hessian Scaling\n";
     // loop over sources
@@ -833,7 +925,7 @@ RVector ExplicitHessianScaling1 (const QMMesh &mesh, const Raster &raster,
 
     raster.Map_MeshToGrid (aphi, pa);
     ImageGradient (gdim, gsize, pa, pa_grad, raster.Elref());
-    CVector da = pd * pa;
+    RVector da = pd * pa;
     raster.Map_GridToSol (da, das);
     db.Clear();
     for (i = 0; i < dim; i++)
@@ -841,7 +933,7 @@ RVector ExplicitHessianScaling1 (const QMMesh &mesh, const Raster &raster,
     raster.Map_GridToSol (db, dbs);
     for (i = 0; i < slen; i++) {
 		M[i]      += norm2 (das[i]);
-		M[i+slen] += norm2 (dbs[i]);
+		//M[i+slen] += norm2 (dbs[i]);
     }
     delete []pd_grad;
     delete []pa_grad;
@@ -1028,6 +1120,66 @@ RVector DistScaling (const Raster &raster, const RVector &logx)
 }
 
 // ==========================================================================
+
+static RVector Frechet_clbk (const RVector &x, void *context)
+{
+    // Jacobian-free version of the Hx callback function
+
+    // unpack the data
+    JAC_DATA *data = (JAC_DATA*)context;
+    const QMMesh *mesh = data->mesh;         // mesh
+    const Raster *raster = data->raster;     // basis mapper
+    const RFwdSolverMW *FWS = data->FWS;     // forward solver
+          RVector **dphi_h = data->dphi;     // fields in mesh basis
+	  RVector **aphi_h = data->aphi;     // adjoint fields
+    const RCompRowMatrix *mvec = data->mvec; // measurement vectors
+    const RVector *dat = data->dat;         // data
+    const RVector *sd = data->sd;            // sd
+    const RVector *prmscl = data->prmscl;    // parameter scaling vector
+    const RCompRowMatrix *RHess = data->RHess;
+    const RVector &M  = *data->M;
+    const double lambda = *data->lambda;
+    const MWsolution *sol = data->sol;
+    const RDenseMatrix *excoef = data->excoef;
+
+    RVector xscl(x);
+    xscl *= M;        // apply scaling Jx -> JMx
+    xscl *= *prmscl;  // apply param scaling dy/dx -> dy/d(log x)
+
+    // Frechet derivative z = F' x
+    RVector y = FrechetDerivative (*mesh, *raster, *FWS, *sol, *mvec,
+        *dphi_h, *aphi_h, *sd, xscl, *excoef);
+
+    // Adjoint Frechet derivative F'* z
+    RVector z = AdjointFrechetDerivative (*mesh, *raster, *FWS, *sol, *mvec,
+        *dphi_h, *aphi_h, *sd, y, *excoef);
+
+    z *= M;        // apply scaling J^T y -> M J^T y
+    z *= *prmscl;  // apply param scaling dy/dx -> dy/d(log x)
+
+
+    int n = x.Dim();
+    RVector Px(n);
+
+    // add prior to Hessian
+    if (RHess) {
+	int i, j, k, nz, *colidx = new int[n];
+	double *val = new double[n];
+	for (i = 0; i < n; i++) {
+	    nz = RHess->SparseRow (i, colidx, val);
+	    for (k = 0; k < nz; k++) {
+		j = colidx[k];
+		Px[i] += val[k] * x[j] * M[i]*M[j];
+	    }
+	}
+	delete []colidx;
+	delete []val;
+    }
+
+    return z + Px + lambda*x;
+}
+
+// ==========================================================================
 SolverLM_CW_MW::SolverLM_CW_MW (ParamParser *_pp): Solver_CW (_pp)
 {
     nrmax = 50;
@@ -1055,15 +1207,10 @@ SolverLM_CW_MW::~SolverLM_CW_MW ()
 void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
     const RVector &sd, Solution &bsol, MWsolution &msol,
-    const RCompRowMatrix &qvec, const RCompRowMatrix &mvec, double omega)
+    const RCompRowMatrix &qvec, const RCompRowMatrix &mvec)
 {
     int np = 1;                       // number of processors
     int rank = 0;                     // processor id
-#ifdef TOAST_MPI
-    MPI_Barrier (MPI_COMM_WORLD); // wait for everybody
-    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    MPI_Comm_size (MPI_COMM_WORLD, &np);
-#endif // TOAST_MPI
 
     bool Use_precon = true;
     bool Gradient_descent = false;
@@ -1071,6 +1218,8 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     // initialisations
     int i, inr;
     const QMMesh *mesh = FWS.MeshPtr();
+    int nq   = mesh->nQ;
+    int nm   = mesh->nM;
     int nqm  = mesh->nQM;
     int dim  = raster.Dim();
     int ndat = data.Dim();
@@ -1103,30 +1252,30 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     RVector x(x0), x1(x0);
     // current solution, trial solution (scaled);
 
-    // allocate field vectors
-    dphi = new RVector[mesh->nQ];
-    for (i = 0; i < mesh->nQ; i++) dphi[i].New (nlen);
+    // allocate field vectors for all wavelengths
+    dphi = new RVector[nq*nofwavel];
+    for (i = 0; i < nq*nofwavel; i++) dphi[i].New (nlen);
     if ((precon != LM_PRECON_GMRES_DIRECT) || hscale == LM_HSCALE_IMPLICIT) {
-	aphi = new RVector[mesh->nM];
-	for (i = 0; i < mesh->nM; i++) aphi[i].New (nlen);
+	aphi = new RVector[nm*nofwavel];
+	for (i = 0; i < nm*nofwavel; i++) aphi[i].New (nlen);
     }
 
     // reset forward solver
     LOGOUT("Resetting forward solver");
     for (i = 0; i < nofwavel; i++) {
-	FWS.Reset (*msol.swsol[i], omega);
-	FWS.CalcFields (qvec, dphi);
-	RVector proj_i(proj, i*mesh->nQM, mesh->nQM);
-	proj_i = FWS.ProjectAll (mvec, dphi);
-    }
+	FWS.Reset (*msol.swsol[i], 0);
+	FWS.CalcFields (qvec, dphi+i*nq);
+	RVector proj_i(proj, i*nqm, nqm);
+	proj_i = FWS.ProjectAll (mvec, dphi+i*nq);
 
-//    if (aphi) {
-//    // calculate adjoint fields
-//	FWS.CalcFields (*mesh, mesh->nM, mvec, aphi);
-//	if (hscale == LM_HSCALE_IMPLICIT)
-//	    aphi_hscale = aphi;
-//	if (precon == LM_PRECON_GMRES_DIRECT) aphi = 0;
-//    }
+	if (aphi) // calculate adjoint fields
+	    FWS.CalcFields (mvec, aphi+i*nm);
+    }
+    if (aphi) {
+	if (hscale == LM_HSCALE_IMPLICIT)
+	    aphi_hscale = aphi;
+	if (precon == LM_PRECON_GMRES_DIRECT) aphi = 0;
+    }
     
     int i_count = 0; // iteration counter
     
@@ -1150,7 +1299,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     
     bool logparam = !strcmp (pscaler->ScalingMethod(), "LOG");
     JAC_DATA jdata = {mesh, &raster, &FWS, &dphi, &aphi, &mvec, &data, &sd,
-		      &prmscl, reg, &RHess, &M, &lambda, omega};
+		      &prmscl, reg, &RHess, &M, &lambda, &msol, &extcoef};
     // set the components for the implicit definition of the Jacobian
     
     of  = ObjectiveFunction::get_value (data, proj, sd, cov);
@@ -1163,30 +1312,17 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     //    test_biscale();
     LOGOUT_1PRM("Starting error: %f", errstart);
     
-#ifndef TOAST_MPI
-    LOGOUT_2PRM("Iteration 0  CPU %f  OF %f",
+    LOGOUT_2PRM("Iteration 0  CPU %f  OF %g",
 		toc(clock0), err0);
-    J = new RDenseMatrix (ndat, n);
+
+    if (precon == LM_PRECON_GMRES_JACOBIANFREE ||
+	precon == LM_PRECON_GMRES_DIRECT) {
+	// implicit Jacobian: skip matrix allocation for J
+    } else {
+	J = new RDenseMatrix (ndat, n);
+    }
+
     hdata.J = J;
-#else
-    int ndatp = (mesh->nQM+np-1)/np;  // process data space dimension
-    hdata.np = np;                    // number of processors
-    hdata.rank = rank;                // processor id
-    hdata.rtot = mesh->nQM;           // number of rows in full Jacobian
-    hdata.r0 = ndatp*rank;
-    hdata.r1 = std::min(ndatp*(rank+1), hdata.rtot); // last+1 row to process
-    hdata.Jpart = new RDenseMatrix((hdata.r1-hdata.r0)*nofwavel, n);
-    hdata.raster = &raster;
-    hdata.mesh = mesh;
-    hdata.sol = &bsol;
-    hdata.mvec = &mvec;
-    hdata.sd = &sd;
-    hdata.dphi = dphi;
-    hdata.aphi = aphi;
-    hdata.dscale = FWS.GetDataScaling();
-    hdata.extcoef = &extcoef;
-    RDenseMatrix Jpart((hdata.r1-hdata.r0)*nofwavel, n);
-#endif
     
     // LM iteration loop
     for (inr = 0; (!nrmax || inr < nrmax) &&
@@ -1199,58 +1335,63 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	// update Hessian of prior
 	RHess = BuildRHessian (reg, x, nprm);
 	
-	// generate Jacobian for each wavelength
-	LOGOUT("Calculating Jacobian ...");
-	
-	tic();
-	GenerateJacobian (FWS, raster, mesh, msol, qvec, mvec,
-			  FWS.GetDataScaling(), *(RDenseMatrix*)J, extcoef);
-	cerr << "T(Jacobian)=" << toc() << endl;
-	tic();
+	if (J) { // explicit Jacobian version
 
+	    // generate Jacobian for all wavelengths
+	    LOGOUT("Calculating Jacobian ...");
+	    GenerateJacobian (FWS, raster, mesh, msol, qvec, mvec,
+	        FWS.GetDataScaling(), *(RDenseMatrix*)J, extcoef);
 
-#ifdef TOAST_MPI	    
-	// data scaling: rescale Jacobian with 1/sd
-	RVector sdpart = Mergewavels (sd, hdata.r0,hdata.r1-hdata.r0,
-				      nofwavel);
-	Jpart.RowScale (inv(sdpart));
+	    // apply model error correction
+	    if (modelerr) {
+		*J = mul (mcov, *J);
+	    }
 	    
-	// apply solution space rescaling S
-	pscaler->ScaleJacobian (bsol.GetActiveParams(), Jpart);
+	    // apply data space rescaling T
+	    J->RowScale (inv(sd));
+
+	    // apply solution space rescaling S
+	    pscaler->ScaleJacobian (bsol.GetActiveParams(), *J);
 	    
-	// apply Hessian normalisation M
-	M = RescaleHessianPart (Jpart, x, &RHess, rank);
-	Jpart.ColScale (M);
-#else
-	// apply model error correction
-	if (modelerr) {
-	    *J = mul (mcov, *J);
+	    // apply Hessian normalisation M
+	    M = RescaleHessian (J, x, &RHess);
+	    J->ColScale (M);
+
+	    if (bWriteJ) WriteJacobian (J, raster, *mesh);
+	    
+	    // calculate Gradient
+	    J->ATx (b,r);                            // gradient
+
+	} else { // implicit Jacobian version
+
+	    // determine Hessian normalisation M
+	    switch (hscale) {
+	    case LM_HSCALE_NONE:
+		M = 1.0;
+		break;
+	    case LM_HSCALE_IMPLICIT:
+		// This version contains adjoint field array
+		M = ImplicitHessianScaling (*mesh, raster, FWS, msol, mvec,
+		    dphi, aphi_hscale, sd, prmscl, extcoef);
+		break;
+	    case LM_HSCALE_EXPLICIT:
+		M = ExplicitHessianScaling1 (*mesh, raster, FWS, qvec, mvec,
+		    sd, prmscl);
+		break;
+	    case LM_HSCALE_DISTANCE:
+		M = DistScaling (raster, x);
+		break;
+	    }
+	    M += RHess.Diag();
+	    M = inv(sqrt(M));
+
+	    // calculate gradient
+	    r = AdjointFrechetDerivative (*mesh, raster, FWS, msol, mvec, dphi,
+					  aphi, sd, b, extcoef);
+	    r *= M;       // apply scaling J^T y -> M J^T y - CHECK THIS!!!
+	    r *= prmscl;  // apply param scaling dy/dx -> dy/d(log x)
 	}
-	    
-	// apply solution space rescaling S
-	pscaler->ScaleJacobian (bsol.GetActiveParams(), *J);
-	cerr << "T(paramscale)=" << toc() << endl;
-	tic();
-	    
-	// apply data space rescaling T
-	J->RowScale (inv(sd));
-	cerr << "T(datascale)=" << toc() << endl;
-	tic();
 
-	// apply Hessian normalisation M
-	M = RescaleHessian (J, x, &RHess);
-	J->ColScale (M);
-	cerr << "T(diagscale)=" << toc() << endl;
-	tic();
-
-	if (bWriteJ) WriteJacobian (J, raster, *mesh);
-#endif
-	    
-	// calculate Gradient
-	J->ATx (b,r);                            // gradient
-	cerr << "T(gradient)=" << toc() << endl;
-	tic();
-	    
 	LOGOUT_1PRM("Gradient norm: %f", l2norm(r));
 	
 	// add prior to gradient
@@ -1299,6 +1440,14 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		    //GMRES (JTJx_clbk, &hdata, r, h, tol);
 		    //GMRES (Hess_full (hdata, x), r, h, tol); // debug only
 	            } break;
+		case LM_PRECON_GMRES_JACOBIANFREE:
+		case LM_PRECON_GMRES_DIRECT: {
+		    double tol = gmres_tol;
+		    static RPrecon_Diag prec;
+		    prec.ResetFromDiagonal (M);
+		    GMRES (Frechet_clbk, &jdata, r, h, tol, &prec, 20);
+		    //GMRES (Frechet_clbk, &jdata, r, h, tol);
+		    } break;
 		}
 	    
 	    }
@@ -1324,8 +1473,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		static double alpha_ls = stepsize;
 		//if (alpha < 0.0) alpha = stepsize; // initialise step length
 		if (!LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec,
-                  data, sd, omega, d, err0, fmin, alpha_ls, msol, x0, x,
-		  reg, cov)) {
+                  data, sd, d, err0, fmin, alpha_ls, msol, x0, x, reg, cov)) {
 		    LOGOUT ("No decrease in line search");
 		    lambda *= lambda_scale;
 		    if (lambda_scale == 1.0) {
@@ -1356,15 +1504,16 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    raster.Map_ActiveSolToMesh (pscaler->Unscale(x1), msol);
 	    msol.RegisterChange();
 
-	    if (!status_valid) {
+	    if (1/*!status_valid*/) {
 		for (i = 0; i < nofwavel; i++) {
 		    FWS.Reset (*msol.swsol[i], 0);
-		    FWS.CalcFields (qvec, dphi);
-		    //if (aphi) FWS.CalcFields (*mesh, mesh->nM, mvec, aphi);
-		    //else if (aphi_hscale)
-		    //FWS.CalcFields (*mesh, mesh->nM, mvec, aphi_hscale);
-		    RVector proj_i(proj, i*mesh->nQM, mesh->nQM);
-		    proj_i = FWS.ProjectAll (mvec, dphi);
+		    FWS.CalcFields (qvec, dphi+i*nq);
+		    if (aphi)
+			FWS.CalcFields (mvec, aphi+i*nm);
+		    else if (aphi_hscale)
+			FWS.CalcFields (mvec, aphi_hscale+i*nm);
+		    RVector proj_i(proj, i*nqm, nqm);
+		    proj_i = FWS.ProjectAll (mvec, dphi+i*nq);
 		}
 		err1 = ObjectiveFunction::get_value (data, proj, sd, cov);
 	    }
@@ -1378,12 +1527,13 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		msol.RegisterChange();
 		for (i = 0; i < nofwavel; i++) {
 		    FWS.Reset (*msol.swsol[i], 0);
-		    FWS.CalcFields (qvec, dphi);
-		    //if (aphi) FWS.CalcFields (*mesh, mesh->nM, mvec, aphi);
-		    //else if (aphi_hscale)
-		    //	FWS.CalcFields (*mesh, mesh->nM, mvec, aphi_hscale);
-		    RVector proj_i(proj, i*mesh->nQM, mesh->nQM);
-		    proj_i = FWS.ProjectAll (mvec, dphi);
+		    FWS.CalcFields (qvec, dphi+i*nq);
+		    if (aphi)
+			FWS.CalcFields (mvec, aphi+i*nm);
+		    else if (aphi_hscale)
+		    	FWS.CalcFields (mvec, aphi_hscale+i*nm);
+		    RVector proj_i(proj, i*nqm, nqm);
+		    proj_i = FWS.ProjectAll (mvec, dphi+i*nq);
 		}
 
 		switch (g_imgfmt) {
@@ -1442,7 +1592,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 
 	    i_count++;
 	}
-	LOGOUT_3PRM("Iteration %d  CPU %f  OF %f",
+	LOGOUT_3PRM("Iteration %d  CPU %f  OF %g",
 	    inr+1, toc(clock0), err0);
     } // end of NR loop;
 
@@ -1744,7 +1894,7 @@ void SolverLM_CW_MW::WriteParams (ParamParser &pp)
 bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const RCompRowMatrix &qvec,
     const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &grad, double f0, double &fmin, double &lambda,
+    const RVector &grad, double f0, double &fmin, double &lambda,
     MWsolution &meshsol, const RVector &p0, const RVector &p,
     const Regularisation *reg, const RMatrix *cov)
 {
@@ -2016,8 +2166,8 @@ void GenerateJacobian (RFwdSolverMW &FWS, const Raster &raster,
     int nchromo = excoef.nCols();
     int nlambda = excoef.nRows();
     int nprm    = sol.nParam();
-    bool bFactorA = sol.IsActive(nprm-3);
-    bool bPowerb  = sol.IsActive(nprm-2);
+    bool bFactorA = sol.IsActive(nchromo);
+    bool bPowerb  = sol.IsActive(nchromo+1);
     bool bScatter = bFactorA || bPowerb;
 
     J.New(0,0);

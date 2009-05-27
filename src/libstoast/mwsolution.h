@@ -19,10 +19,6 @@ public:
   void RegisterChange();
   // convert chromophores, Scatter Params and N to cmua, ckappa, n
 
-  void WriteImgGeneric (int imgno, char *nimname, 
-				    int prmind, bool append = true);
-  // write param[prmind] to nim file
-  
   RVector GetJacobianCoeff_A (int wavelind) const;
   // del(cKappa)/del(A)
   

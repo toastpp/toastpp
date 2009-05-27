@@ -3,6 +3,8 @@ SHELL = /bin/csh
 VPATH = $(TSRC)/matlab
 
 SRCS =  toastBasisToMeshMatrix.cc \
+	toastBndmat.cc \
+	toastBndReflectionTerm.cc \
 	toastCatchErrors.cc \
 	toastDataLinkList.cc \
 	toastDeleteBasis.cc \
@@ -71,6 +73,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastSolutionMask.cc \
 	toastSurfData.cc \
 	toastSysmat.cc \
+	toastVolmat.cc \
 	toastWriteComplexHBMatrix.cc \
 	toastWriteMesh.cc \
 	toastWriteNIM.cc \

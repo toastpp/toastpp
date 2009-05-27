@@ -294,7 +294,8 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
 	ype = 1.0;  // will change if data type is normalised
 
 	CVector cproj(n);
-	Project_cplx (mesh, q, dphi[q], cproj);
+	//Project_cplx (mesh, q, dphi[q], cproj);
+	cproj = ProjectSingle (&mesh, q, mvec, dphi[q], DATA_LIN);
 	wqa = complex(0,0);
 	wqb = 0.0;
 

@@ -226,7 +226,7 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     F->Zero();
     prm = sol.GetParam (OT_CMUA);
     AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_PFF);
+		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
     prm = sol.GetParam (OT_CKAPPA);
     AddToSysMatrix (*meshptr, *F, &prm,
 		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
@@ -411,7 +411,7 @@ void TFwdSolver<T>::CalcFields (const QMMesh &mesh, int nq, int q0, int q1,
 
 template<class T>
 TVector<T> TFwdSolver<T>::ProjectSingle (int q, const TCompRowMatrix<T> &mvec,
-    const TVector<T> &phi, DataScale scl)
+    const TVector<T> &phi, DataScale scl) const
 {
     if (scl == DATA_DEFAULT) scl = dscale;
     return ::ProjectSingle (meshptr, q, mvec, phi, scl);

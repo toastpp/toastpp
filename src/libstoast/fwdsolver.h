@@ -310,7 +310,7 @@ public:
      * \return data vector (size nQMref[q])
      */
     TVector<T> ProjectSingle (int q, const TCompRowMatrix<T> &mvec,
-        const TVector<T> &phi, DataScale scl = DATA_DEFAULT);
+        const TVector<T> &phi, DataScale scl = DATA_DEFAULT) const;
 
     /**
      * \brief Return boundary data for all sources and all

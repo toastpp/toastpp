@@ -15,7 +15,7 @@ public:
     void Solve (RFwdSolverMW &FWS, const Raster &raster,
        const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
        const RVector &sd, Solution &bsol, MWsolution &msol,
-       const RCompRowMatrix &qvec, const RCompRowMatrix &mvec, double omega);
+       const RCompRowMatrix &qvec, const RCompRowMatrix &mvec);
     void ReadParams (ParamParser &pp);
     void WriteParams (ParamParser &pp);
 
