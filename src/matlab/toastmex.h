@@ -43,6 +43,7 @@ void CopyVector (CVector &vec, const mxArray *array);
 void CopyMatrix (RDenseMatrix &mat, const mxArray *array);
 void CopyMatrix (IDenseMatrix &mat, const mxArray *array);
 
+void CopyTMatrix (RDenseMatrix &mat, const mxArray *array);
 void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array);
 void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array);
 

@@ -13,6 +13,7 @@
 
 #include "mex.h"
 #include "stoastlib.h"
+#include "toastmex.h"
 #include "util.h"
 
 // ============================================================================
@@ -21,7 +22,9 @@
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    int i;
+    int i, j, arg;
+    RDenseMatrix *bb = 0;
+    bool bIntermediate = false;
 
     // mesh
     QMMesh *mesh = (QMMesh*)Handle2Ptr (mxGetScalar (prhs[0]));
@@ -37,15 +40,27 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // sampling grid dimensions
     IVector gdim(dim);
     if (nrhs > 2) {
-	if (mxGetNumberOfElements (prhs[2]) != dim)
-	    mexErrMsgTxt ("Invalid sampling grid dimensions");
-	for (i = 0; i < dim; i++)
-	    gdim[i] = (int)mxGetPr (prhs[2])[i];
+	arg = 2;
+	if (mxGetNumberOfElements (prhs[arg]) == dim) {
+	    // argument is intermediate grid dimension
+	    for (i = 0; i < dim; i++)
+		gdim[i] = (int)mxGetPr (prhs[arg])[i];
+	    bIntermediate = true;
+	    arg++;
+	}
+	if (nrhs > arg) {
+	    if (mxGetM (prhs[arg]) == dim && mxGetN (prhs[arg]) == 2) {
+		// argument is grid bounding box
+		bb = new RDenseMatrix (2,dim);
+		CopyTMatrix (*bb, prhs[arg]);
+		arg++;
+	    }
+	}
     }
 
     Raster *raster;
-    if (nrhs > 2) raster = new Raster (gdim, bdim, mesh);
-    else          raster = new Raster (bdim, mesh);
+    if (bIntermediate) raster = new Raster (gdim, bdim, mesh, bb);
+    else               raster = new Raster (bdim, mesh, bb);
 	
     plhs[0] = mxCreateScalarDouble (Ptr2Handle (raster));
 
@@ -64,4 +79,13 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     mexPrintf ("Sol. size:  %d\n", raster->SLen());
     mexPrintf ("Mesh size:  %d\n", mesh->nlen());
+    if (bb) {
+	mexPrintf ("Grid bounding box:\n");
+	for (i = 0; i < 2; i++) {
+	    for (j = 0; j < dim; j++)
+		mexPrintf ("  %12g", bb->Get(i,j));
+	    mexPrintf ("\n");
+	}
+	delete bb;
+    }
 }

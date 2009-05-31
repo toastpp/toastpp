@@ -15,7 +15,7 @@ using namespace toast;
 // ==========================================================================
 // class Raster
 
-Raster::Raster (IVector &_gdim, Mesh *mesh)
+Raster::Raster (IVector &_gdim, Mesh *mesh, RDenseMatrix *bb)
 {
     int i, j;
 
@@ -24,7 +24,12 @@ Raster::Raster (IVector &_gdim, Mesh *mesh)
     meshptr = mesh;
     xASSERT(dim == meshptr->Dimension(),
 	    Raster and mesh have incompatible dimensions);
-    meshptr->BoundingBox (bbmin, bbmax);
+    if (bb && bb->nCols() >= dim && bb->nRows() >= 2) {
+	bbmin = bb->Row(0);
+	bbmax = bb->Row(1);
+    } else {
+	meshptr->BoundingBox (bbmin, bbmax);
+    }
     gdim.New(dim); gdim = _gdim;
     bdim.New(dim); bdim = _gdim;
     paddim.New(dim);
@@ -130,7 +135,7 @@ Raster::Raster (IVector &_gdim, Mesh *mesh)
     //cout << "Raster constructor: t=" << toc() << endl;
 }
 
-Raster::Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh)
+Raster::Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh, RDenseMatrix *bb)
 {
     int i, j;
 
@@ -142,7 +147,12 @@ Raster::Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh)
     xASSERT(dim == meshptr->Dimension(),
 	    Raster and mesh have incompatible dimensions);
 
-    meshptr->BoundingBox (bbmin, bbmax);
+    if (bb && bb->nCols() >= dim && bb->nRows() >= 2) {
+	bbmin = bb->Row(0);
+	bbmax = bb->Row(1);
+    } else {
+	meshptr->BoundingBox (bbmin, bbmax);
+    }
     gdim.New(dim); gdim = _gdim;
     bdim.New(dim); bdim = _bdim;
     paddim.New(dim);
