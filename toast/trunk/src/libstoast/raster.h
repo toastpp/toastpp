@@ -1,16 +1,4 @@
 // -*-C++-*-
-// =========================================================================
-// This class represents the intermediate high-resolution pixel grid
-// between the mesh basis and the "user" basis
-//
-// The following bases are used:
-//   * FEM mesh basis ("mesh")
-//   * optionally: High-res intermediate pixel grid ("grid")
-//   * Low-res user pixel grid ("basis")
-//   * Low-res user pixel basis excluding pixels without mesh support ("sol")
-//
-// It provides methods to map between the forward and inverse bases
-// =========================================================================
 
 #ifndef __RASTER_H
 #define __RASTER_H
@@ -35,16 +23,41 @@
 #endif
 static int POW2[] = {1,2,4,8,16,32,64,128,256,512,1024,2096,4192};
 
+// =========================================================================
+/**
+ * \brief This class represents the intermediate high-resolution pixel grid
+ *   between the mesh (forward) basis and the regular (inverse) basis.
+ *
+ * The following bases are used:
+ *   - FEM mesh basis ("mesh")
+ *   - optionally: High-res intermediate pixel grid ("grid")
+ *   - Low-res user pixel grid ("basis")
+ *   - Low-res user pixel basis excluding pixels without mesh support ("sol")
+ *
+ * It provides methods to map between the forward and inverse bases.
+ */
 class STOASTLIB Raster {
 public:
-    Raster (IVector &_gdim, Mesh *mesh);
-    // gdim: dimensions of solution pixel basis
-    // mesh: FEM basis
+    /**
+     * \brief Create a new basis mapper.
+     * \param _gdim regular grid raster dimensions (size: 2 or 3)
+     * \param mesh pointer to mesh instance defining the mesh basis
+     * \param bb bounding box (size: 2x3 or 3x3)
+     * \note If the bounding box is not provided, it is calculated from
+     *   the mesh geometry.
+     */
+    Raster (IVector &_gdim, Mesh *mesh, RDenseMatrix *bb = 0);
 
-    Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh);
-    // gdim: dimensions of intermediate hires grid
-    // bdim: dimensions of solution pixel basis
-    // mesh: FEM basis
+    /**
+     * \brief Create a new basis mapper.
+     * \param _gdim intermediate highres grid raster dimensions (size: 2 or 3)
+     * \param _bdim regular grid raster dimensions (size: 2 or 3)
+     * \param mesh pointer to mesh instance defining the mesh basis
+     * \param bb bounding box (size: 2x3 or 3x3)
+     * \note If the bounding box is not provided, it is calculated from
+     *   the mesh geometry.
+     */
+    Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh, RDenseMatrix *bb = 0);
 
     ~Raster();
 

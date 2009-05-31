@@ -25,7 +25,7 @@
 #define LE 4
 
 char *Relstr[5] = {"EQ", "GT", "GE", "LT", "LE"};
-char *Dimstr[3] = {"X", "Y", "Z"};
+char *Dimstr[4] = {"X", "Y", "Z", "R"};
 
 using namespace std;
 
@@ -44,7 +44,12 @@ void Assert (bool cond, const char *msg)
 bool Inside (Mesh *mesh, int nd, int dim, int rel, double v)
 {
     const double EPS = 1e-8;
-    double nv = mesh->nlist[nd][dim];
+    double nv;
+    if (dim < 3)
+	nv = mesh->nlist[nd][dim];
+    else
+	nv = length(mesh->nlist[nd]);
+
     switch (rel) {
     case EQ:
 	return (fabs(nv-v) < EPS);
@@ -131,6 +136,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	case 'X': dim = 0; break;
 	case 'Y': dim = 1; break;
 	case 'Z': dim = 2; break;
+	case 'R': dim = 3; break;
 	}
 	for (i = 0; i <= 4; i++) {
 	    if (!strcasecmp (relstr, Relstr[i])) {

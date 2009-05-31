@@ -405,6 +405,23 @@ void CopyMatrix (IDenseMatrix &mat, const mxArray *array)
 }
 
 // ============================================================================
+// Copy a dense matrix from MATLAB to TOAST format
+
+void CopyTMatrix (RDenseMatrix &mat, const mxArray *array)
+{
+    mwIndex i, j;
+    mwIndex m = mxGetM(array);
+    mwIndex n = mxGetN(array);
+    double *pr = mxGetPr (array);
+
+    mat.New ((int)n,(int)m);
+    double *val = mat.valptr();
+    for (j = 0; j < n; j++)
+	for (i = 0; i < m; i++)
+	    val[j*n+i] = *pr++;
+}
+
+// ============================================================================
 // Transpose and copy a sparse matrix from MATLAB to TOAST format
 
 void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
