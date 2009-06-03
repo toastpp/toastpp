@@ -21,32 +21,45 @@
 #define REFIND  2	// refractive index id
 #define C_ALL   3	// `all coefficients'
 
-// Element type identifiers
-#define ELID_NONE 0
-#define ELID_TRI3OLD 1
-#define ELID_RCT4 2
-#define ELID_TET4 3
-#define ELID_WDG6 4
-#define ELID_VOX8 5
-#define ELID_TRI6 6
-#define ELID_TET10 7
-#define ELID_TRI6_IP 8
-#define ELID_TRI10 9
-#define ELID_TRI10_IP 10
-#define ELID_TET10_IP 11
-#define ELID_WDG18INF 12
-#define ELID_QUAD4 13
-#define ELID_PIX4 14
-#define ELID_TRI3 15
-#define ELID_TRI3D3 16
-#define ELID_TRI3D6 17
-#define ELID_VOX27 18
-#define ELID_LINE2D2 19
+/**
+ * \defgroup eltp Element type identifiers
+ * Numerical identifiers to distinguish between FEM element types.
+ * \sa Element::Type
+ */
+//@{
+#define ELID_NONE 0        ///< undefined element type
+#define ELID_TRI3OLD 1     ///< old-style 3-noded triangle
+#define ELID_RCT4 2        ///< old-style 3-noded pixel
+#define ELID_TET4 3        ///< 4-noded tetrahedron
+#define ELID_WDG6 4        ///< 6-noded wedge
+#define ELID_VOX8 5        ///< 8-noded voxel
+#define ELID_TRI6 6        ///< 6-noded triangle
+#define ELID_TET10 7       ///< 10-noded tetrahedron
+#define ELID_TRI6_IP 8     ///< 6-noded isoparametric triangle
+#define ELID_TRI10 9       ///< 10-noded triangle
+#define ELID_TRI10_IP 10   ///< 10-noded isoparametric triangle
+#define ELID_TET10_IP 11   ///< 10-noded isoparametric tetrahedron
+#define ELID_WDG18INF 12   ///< 18-noded infinite wedge element
+#define ELID_QUAD4 13      ///< 4-noded quadrilateral
+#define ELID_PIX4 14       ///< 4-noded regular pixel
+#define ELID_TRI3 15       ///< 3-noded triangle
+#define ELID_TRI3D3 16     ///< 3-noded surface triangle
+#define ELID_TRI3D6 17     ///< 6-noded surface triangle
+#define ELID_VOX27 18      ///< 27-noded voxel
+#define ELID_LINE2D2 19    ///< 2-noded line
+//@}
 
-// Element capability flags
-#define ELCAPS_CURVED_BOUNDARY 1 // element can have curved boundaries
-#define ELCAPS_SUBSAMPLING 2     // element implements IntFFF and IntFDD by
-                                 // subsampling
+/**
+ * \defgroup elcap Element capability flags
+ * Bitflags for characterising element properties.
+ * \sa Element::GetCaps
+ */
+//@{
+/// element can have curved boundaries
+#define ELCAPS_CURVED_BOUNDARY 0x1
+/// element implements IntFFF and IntFDD by subsampling
+#define ELCAPS_SUBSAMPLING     0x2
+//@}
 
 class Surface;
 
@@ -97,154 +110,390 @@ public:
      */
     virtual void PostInitialisation () {}
 
+    /**
+     * \brief %Element assignment.
+     * \param el right-hand side element operand
+     * \note Allows operations of the form
+     *   \code el1 = el2;
+     *   \endcode
+     * \note This operation is only allowed if both elements are of the same
+     *   type (e.g. 4-noded tetrahedra, etc.) It is not possible to change the
+     *   type of an element.
+     * \note This operation copies the node indices from \e el to \e *this.
+     */
     void operator= (const Element& el);
     // basic element assignment
 
-    virtual BYTE Type (void) const = 0;
-    // derived classes return the element type id
+    /**
+     * \brief Returns an element type identifier.
+     * \return Element type identifier (see \ref eltp).
+     */
+    virtual BYTE Type () const = 0;
 
+    /**
+     * \brief Returns element capability flags.
+     * \return Bitflags for element caps. (see \ref elcap)
+     */
     virtual unsigned long GetCaps () const = 0;
-    // Return element capability flags
 
-    virtual int Dimension (void) const = 0;
-    // derived classes return element dimension (2 or 3)
+    /**
+     * \brief Returns the spatial dimension of the element
+     * \return 2 for 2-D elements (triangles, pixels etc.), 3 for 3-D elements
+     *   (tetrahedra, voxels, etc.)
+     */
+    virtual int Dimension () const = 0;
 
-    virtual int nNode (void) const = 0;
-    // derived classes return number of nodes per element
+    /**
+     * \brief Returns the number of nodes associated with the element.
+     * \return Number of nodes
+     */
+    virtual int nNode () const = 0;
 
-    virtual int nSide (void) const = 0;
-    // derived classes return number of sides per element
+    /**
+     * \brief Returns the number of element sides
+     * \return Number of sides
+     * \note For 3-D elements, this returns the number of element faces (4
+     *   for tetrahedra, 6, for voxels, etc). For 2-D elements, it returns
+     *   the number of boundary segments (3 for triangles, 4 for pixels, etc.)
+     */
+    virtual int nSide () const = 0;
 
-    virtual int nSideNode (int /*side*/) const = 0;
-    // derived classes return number of nodes attached to side 'side'
+    /**
+     * \brief Returns the number of vertices associated with a side.
+     * \param side side index (>= 0)
+     * \return Number of vertices connected to the side.
+     * \sa nSide, nNode, nSideNode
+     */
+    virtual int nSideNode (int side) const = 0;
 
-    virtual int SideNode (int /*side*/, int /*node*/) const = 0;
-    // derived classes return number of 'node'-th node of side 'side'
+    /**
+     * \brief Returns relative node index for a side vertex.
+     * \param side side index (>= 0)
+     * \param node side node index (>= 0)
+     * \return Relative node index
+     * \note Returns the node index for one of the vertices of a side.
+     * \note \e side must be in the range 0 .. nSide()-1
+     * \note \e node must be in the range 0 .. \ref nSideNode (side)
+     * \note The return value is in the range 0 .. nNode()-1
+     * \sa nNode, nSide, nSideNode
+     */
+    virtual int SideNode (int side, int node) const = 0;
 
+    /**
+     * \brief Checks if a node is part of the element.
+     * \param node absolute node index (>= 0)
+     * \return \e true if \e node appears in the element's node index list,
+     *   \e false otherwise.
+     */
     virtual bool IsNode (int node);
-    // returns TRUE if node 'node' belongs to the element
 
+    /**
+     * \brief Checks if a face defined by vertex nodes is part of the element.
+     * \param nn number of node indices in the supplied array
+     * \param nd array of absolute node indices of length \e nn
+     * \return If all node indices in \e nd are part of the element, and are
+     *   associated with a single one of the element's sides, the relative side
+     *   index (>= 0) is returned. Otherwise, -1 is returned.
+     */
     int IsSide (int nn, int *nd);
-    // If all nodes in list 'nd' (of size 'nn') belong to one side of
-    // the element, then the side number is returned. Else -1 is returned
 
+    /**
+     * \brief Checks if a node is associated with a specific side.
+     * \param side side index (>= 0)
+     * \param node relative node index (>= 0)
+     * \return \e true if \e node belongs to \e side, \e false otherwise.
+     * \note side must be in the range 0 .. nSide()-1
+     * \note node must be in the range 0 .. nNode()-1
+     * \sa nSide, nNode
+     */
     virtual bool IsSideNode (int side, int node);
-    // returns TRUE if 'node' belongs to 'side' of the element
 
+    /**
+     * \brief Checks if a side is on the mesh surface.
+     * \param side side index (>= 0)
+     * \return \e true if the specified side is a boundary side, \e false
+     *   otherwise.
+     * \note The \ref Initialise method must have been executed prior to
+     *   any calls to IsBoundarySide.
+     * \sa Initialise, HasBoundarySide
+     */
     bool IsBoundarySide (int side) {
         RANGE_CHECK (side >= 0 && side < nSide());
 	return bndside[side];
     }
-    // returns TRUE if side 'side' is a boundary side
 
+    /**
+     * \brief Checks if the element contains any surface sides.
+     * \return \e true if the element has at least one boundary side, \e false
+     *   otherwise.
+     * \note The \ref Initialise method must have been executed prior to
+     *   any calls to HasBoundarySide.
+     * \sa Initialise, IsBoundarySide
+     */
     bool HasBoundarySide ()
     { return bndel; }
-    // returns TRUE if the element contains a boundary side
 
+    /**
+     * \brief Checks if the element contains any internal interface sides.
+     * \return \e true if the element has at least one internal interface side,
+     *   \e false otherwise.
+     * \note Interfaces define the boundaries between different mesh regions,
+     *   e.g. for the application of boundary conditions.
+     * \note The \ref Initialise method must have been executed prior to
+     *   any calls to HasInterfaceSide.
+     * \sa Initialise, HasBoundarySide
+     */
     bool HasInterfaceSide ()
     { return interfaceel; }
-    // returns TRUE if the element contains an interface side
 
-    virtual Point Local (const NodeList& /*nlist*/, const Point& /*glob*/)
+    /**
+     * \brief Maps a point from global to local element coordinates.
+     * \param nlist mesh node list
+     * \param glob global point coordinates
+     * \return Point coordinates in the element's local reference system.
+     * \note Point glob should have dimension Dimension()
+     * \note \e glob does not have to be located inside the element.
+     * \sa NodeLocal, Global
+     */
+    virtual Point Local (const NodeList& nlist, const Point& glob)
 	const = 0;
-    // abstract; derived classes return the local coordinate corresponding to
-    // 'glob'
 
+    /**
+     * \brief Returns the local coordinates of an element node.
+     * \param node node index (>= 0)
+     * \return Node coordinates in the element's local reference system.
+     * \sa Local, Global
+     */
     virtual Point NodeLocal (int node) const = 0;
-    // derived classes return local coordinates of node 'node'
 
+    /**
+     * \brief Maps a point from surface coordinates to local element
+     *   coordinates.
+     * \param side side index (>= 0)
+     * \param p surface point coordinates.
+     * \return Point coordinates in the element's local reference system.
+     * \note Surface point p should have dimension Dimension()-1
+     * \sa Local, NodeLocal
+     */
     virtual Point SurfToLocal (int side, const Point &p) const
     { xERROR(Not implemented); return Point(); }
 
+    /**
+     * \brief Translates a point to an element surface.
+     * \param [in] side side index (>= 0)
+     * \param [in,out] loc point to be transformed.
+     * \note Moves \e loc onto side \e side by translating it along the
+     *   side normal.
+     */
     virtual void MapToSide (int side, Point &loc) const;
-    // map Point 'loc' onto side 'side' by moving it along the side's
-    // normal
 
+    /**
+     * \brief Returns the centre point of a side.
+     * \param side side index (>= 0)
+     * \return side centre, defined as the barycentre of the associated
+     *   nodes.
+     */
     virtual Point SideCentre (int side) const;
-    // returns the centre of side 'side' in local coordinates
 
+    /**
+     * \brief Maps a point from local element coordinates to global
+     *   coordinates.
+     * \param nlist mesh node list
+     * \param loc point in local element coordinates
+     * \note Point loc should have dimension Dimension()
+     * \note \e loc does not have to be located inside the element.
+     * \sa Local, NodeLocal
+     */
     Point Global (const NodeList &nlist, const Point& loc) const;
-    // returns the global coordinate corresponding to local coordinate 'loc'
 
+    /**
+     * \brief Returns the element's global node coordinates.
+     * \param nlist mesh node list
+     * \return Global node coordinates in an \ref nNode x \ref Dimension
+     *   matrix.
+     * \note This method extracts the coordinates of the nodes associated
+     *   with the element from \e nlist and returns them as a dense matrix.
+     */
     virtual RDenseMatrix Elgeom (const NodeList& nlist) const;
-    // returns a matrix containing the global coordinates of all element nodes
 
-    virtual RVector DirectionCosine (int/*side*/, RDenseMatrix&/*jacin*/) = 0;
-    // abstract; derived classes return a vector of direction cosines in global
-    // coordinates of the normal to side 'side'.
+    /**
+     * \brief Returns the direction cosines of a side normal.
+     * \param side side index (>= 0)
+     * \param jacin inverse of Jacobian
+     * \return direction cosines of the normal to \e side in global
+     *   coordinates.
+     * \sa LNormal
+     */
+    virtual RVector DirectionCosine (int side, RDenseMatrix &jacin) = 0;
 
-    virtual const RVector &LNormal (int /*side*/) const = 0;
-    // Normal of side 'side' in local coordinates
+    /**
+     * \brief Returns a side normal in local coordinates.
+     * \param side side index (>= 0)
+     * \return Normal to \e side in local element coordinates.
+     * \sa DirectionCosine
+     */
+    virtual const RVector &LNormal (int side) const = 0;
 
+    /**
+     * \brief Returns the element size.
+     * \return Area (for 2-D elements) or volume (for 3-D elements) of the
+     *   element.
+     * \sa SideSize
+     */
     virtual double Size() const = 0;
-    // return element size (area for 2-D elements, volume for 3-D elements)
 
-    virtual double SideSize (int sd, const NodeList &nlist) const
+    /**
+     * \brief Returns the size of an element side.
+     * \param side side index (>= 0)
+     * \param nlist mesh node list
+     * \return Size of the element face (length for 2-D elements, area for
+     *   3-D elements).
+     * \sa Size
+     */
+    virtual double SideSize (int side, const NodeList &nlist) const
     { xERROR (Not implemented); return 0; }
-    // return size of side 'sd' of the element
 
-    virtual bool LContains (const Point& /*loc*/, bool pad = true) const = 0;
-    // abstract; derived classes return TRUE if point 'loc' (in local
-    // coordinates of the element) is within the element
-    // if pad==true then points very close to the surface are considered
-    // to be within the element
+    /**
+     * \brief Checks if a local point coordinate is inside the element.
+     * \param loc point in local coordinates
+     * \param pad Apply padding to the element to ensure that boundary points
+     *   are considered inside.
+     * \return \e true if the point is inside the element, \e false otherwise.
+     * \note If \e pad == false, then the status of points exactly on the
+     *   element boundary is undefined. They may or may not be considered
+     *   inside. Use pad = true to ensure that they are regarded as inside.
+     * \sa GContains
+     */
+    virtual bool LContains (const Point& loc, bool pad = true) const = 0;
 
-    virtual bool GContains (const Point& /*glob*/, const NodeList& /*nlist*/)
-	const;
-    // abstract; derived classes return TRUE if point 'glob' (in global
-    // coordinates) is within the element. nlist is the mesh node coordinate
-    // list
+    /**
+     * \brief Checks if a global point coordinate is inside the element.
+     * \param glob point in global coordinates
+     * \param nlist mesh node list
+     * \return \e true if the point is inside the element, \e false otherwise.
+     * \sa LContains
+     */
+    virtual bool GContains (const Point& glob, const NodeList &nlist) const;
   
+    /**
+     * \brief Returns a list of boundary sides.
+     * \param nlist mesh node list
+     * \param address of list to be filled with boundary side indices
+     * \return Number of boundary sides in the element.
+     * \note This method fills array \e list with side indices (>= 0) of
+     *   all boundary sides associated with the element.
+     * \note \e list must have been allocated by the caller with sufficient
+     *   length to receive all boundary side indices.
+     * \bug This method assumes that a side is a boundary side if all its
+     *   associated nodes are boundary nodes. This is not always correct, in
+     *   particular at corners.
+     * \sa IsBoundarySide, HasBoundarySide, IsSideNode
+     */
     virtual int BndSideList (const NodeList& nlist, int *list);
-    // creates a list of boundary side numbers in *list
-    // and returns the number of boundary sides owned by the element
-    // *list has to be allocated before the call to BndSideList
 
-    virtual RVector LocalShapeF (const Point& /*loc*/) const = 0;
-    // vector of shape functions u_i(loc) at point 'loc' given in local
-    // element coordinates
+    /**
+     * \brief Returns the values of the shape functions at a local point.
+     * \param loc point coordinates in the local element system
+     * \return Vector (size \ref nNode) of shape function values at the point
+     *   for all shape functions associated with the element.
+     * \sa GlobalShapeF, LocalShapeD, GlobalShapeD
+     */
+    virtual RVector LocalShapeF (const Point &loc) const = 0;
 
-    virtual RDenseMatrix LocalShapeD (const Point& /*loc*/) const = 0;
-    // matrix of shape function derivatives (d u_i)/(d x_j) at point 'loc'
-    // given in local element coordinates
+    /**
+     * \brief Returns the values of the shape function derivatives at a local
+     *   point.
+     * \param loc point coordinates in the local element system
+     * \return Matrix (size \ref nNode x \ref Dimension) of shape function
+     *   derivatives \f$ du_i/d x_j \f$ at the point for all shape functions
+     *   associated with the element.
+     * \sa LocalShapeF, GlobalShapeF, GlobalShapeD
+     */
+    virtual RDenseMatrix LocalShapeD (const Point &loc) const = 0;
 
+    /**
+     * \brief Returns the values of the shape functions at a global point.
+     * \param nlist mesh node list
+     * \param glob point coordinates in the local element system
+     * \return Vector (size \ref nNode) of shape function values at the point
+     *   for all shape functions associated with the element.
+     * \sa LocalShapeF, LocalShapeD, GlobalShapeD
+     */
     virtual RVector GlobalShapeF (const NodeList &nlist, const Point &glob)
     const { return LocalShapeF (Local (nlist, glob)); }
-    // returns the shape functions for each node at point 'glob' given in
-    // global coordinates
 
+    /**
+     * \brief Returns the values of the shape function derivatives at a global
+     *   point.
+     * \param glob global point coordinates
+     * \return Matrix (size \ref nNode x \ref Dimension) of shape function
+     *   derivatives \f$ du_i/d x_j \f$ at the point for all shape functions
+     *   associated with the element.
+     * \sa LocalShapeF, GlobalShapeF, GlobalShapeD
+     */
     virtual RDenseMatrix GlobalShapeD (const NodeList &nlist,
         const Point &glob) const
     { return LocalShapeD (Local (nlist, glob)); }
-    // returns the derivatives of shape functions at point 'glob' given in
-    // global coordinates
 
+    /**
+     * \brief Returns the weights and abscissae of quadrature rules over the
+     *   element.
+     * \param order quadrature order (>= 1)
+     * \param wght pointer to an array of quadrature weights
+     * \param absc pointer to an array of quadrature abscissae
+     * \return Number of quadrature points
+     * \note The required order of a quadrature rule depends on the type of
+     *   integral to be performed. Examples:
+     *   - IntF:  order = 1
+     *   - IntFF, IntD: order = 2
+     *   - intFFF, IntFD: order = 3
+     *   - IntDD: order = 4
+     *   etc.
+     */
     virtual int QuadRule (int order, const double **wght, const Point **absc)
         const { xERROR(Not implemented); return 0; }
-    // returns weights and abscissae of a quadrature rule over the element
-    //
-    // order  required for
-    // -----------------------
-    // 1      IntF
-    // 2      IntFF, IntD
-    // 3      IntFFF, IntFD
-    // 4      IntDD
-    // etc. (you get the idea)
 
+    /**
+     * \brief Integral of a shape function over the element.
+     * \param i node index (range: 0 .. \ref nNode-1)
+     * \return value of the integral 
+     *   \f[ \int_\Omega u_i(\vec{r}) d\vec{r} \f]
+     * \sa IntFF, IntFFF, IntDD, IntFD
+     */
     virtual double IntF (int i) const = 0;
-    // Return integral of shape function over element
 
+    /**
+     * \brief Integrals of all products of two shape functions over the
+     *   element.
+     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
+     *   \f[ \int_\Omega u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     * \sa IntFF(int,int)const, IntF, IntFFF, IntDD, IntFD
+     */
     virtual RSymMatrix IntFF () const = 0;
-    // Return integral over element of product of shape functions:
-    // FF = Int_el { F_i(r) F_j(r) } dr
 
+    /**
+     * \brief Integral of a product of two shape functions over the
+     *   element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \return Value of the integral 
+     *   \f[ \int_\Omega u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     * \sa IntFF()const, IntF, IntFFF, IntDD, IntFD
+     */
     virtual double IntFF (int i, int j) const = 0;
-    // Return a single element of IntFF
 
+    /**
+     * \brief Integral of a product of three shape functions over the
+     *   element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \param k third node index (range 0 .. \ref nNode-1)
+     * \return Value of the integral 
+     *   \f[ \int_\Omega u_i(\vec{r}) u_j(\vec{r}) u_k(\vec{r}) d\vec{r}
+     *   \f]
+     * \sa IntF, IntFF, IntDD, IntFD
+     */
     virtual double IntFFF (int i, int j, int k) const = 0;
-    // returns a single element of integral over element of product of three
-    // shape functions:
-    // IntFFF = Int_el { F_i(r) * F_j(r) * F_k(r) } dr
 
 #ifdef UNDEF
   // MS 29.6.99 Removed because incompatible with quadratic shape functions
@@ -256,51 +505,132 @@ public:
     //   all indices different (ijk)
 #endif
 
+    /**
+     * \brief Integrals of all products of two shape functions and a nodal
+     *   function over the element.
+     * \param P nodal basis coefficients of a function defined over the mesh
+     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
+     *   \f[ \int_\Omega p(\vec{r}) u_i(\vec{r}) u_j(\vec{r}) d\vec{r} =
+     *   \sum_k p_k \int_\Omega u_i(\vec{r}) u_j(\vec{r})
+     *   u_k(\vec{r}) d\vec{r}  \f]
+     * \sa IntPFF(int,int,const RVector&)const, \n
+     *   IntF, IntFF, IntFFF, IntFD, IntDD, IntPDD
+     */
     virtual RSymMatrix IntPFF (const RVector& P) const = 0;
-    // Returns integral over element of product of two shape functions and a
-    // function P defined in nodal basis:
-    // PFF = Int_el { P(r) F_i(r) F_j(r) } dr
-    // Vector P contains the nodal solution for the complete mesh
 
+    /**
+     * \brief Integral of a product of two shape functions and a nodal
+     *   function over the element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \param P nodal basis coefficients of a function defined over the mesh
+     * \return The value of the integral
+     *   \f[ \int_\Omega p(\vec{r}) u_i(\vec{r}) u_j(\vec{r}) d\vec{r} =
+     *   \sum_k p_k \int_\Omega u_i(\vec{r}) u_j(\vec{r})
+     *   u_k(\vec{r}) d\vec{r}  \f]
+     * \sa IntPFF(const RVector&)const, \n
+     *   IntF, IntFF, IntFFF, IntFD, IntDD, IntPDD
+     */
     virtual double IntPFF (int i, int j, const RVector& P) const = 0;
-    // returns a single element of IntPFF
 
+    /**
+     * \brief Integrals of all products of two shape function derivatives over
+     *   the element.
+     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
+     *   \f[ \int_\Omega \nabla u_i(\vec{r}) \nabla u_j(\vec{r}) d\vec{r}
+     *   \f]
+     * \sa IntDD(int,int)const, \n
+     *   IntF, IntFF, IntFFF, IntFD, IntDD, IntPFF, IntPDD
+     */
     virtual RSymMatrix IntDD () const = 0;
-    // Returns integral over element of product of shape derivatives:
-    // DD = Int_el { D_i(r) D_j(r) } dr
 
+    /**
+     * \brief Integral of a product of two shape function derivatives over
+     *   the element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \return Value of the integral
+     *   \f[ \int_\Omega \nabla u_i(\vec{r}) \nabla u_j(\vec{r}) d\vec{r}
+     *   \f]
+     * \sa IntDD()const, \n
+     *   IntF, IntFF, IntFFF, IntFD, IntDD, IntPFF, IntPDD
+     */
     virtual double IntDD (int i, int j) const = 0;
-    // Returns a single element of IntDD
 
+    /**
+     * \brief Integral of a product of a shape function and a shape function
+     *   derivative over the element.
+     * \param i node index for shape function
+     * \param j node index for shape function derivative
+     * \return Vector of size \ref Dimension, containing the integral
+     *   \f[ \int_\Omega u_i(\vec{r}) \nabla u_j(\vec{r}) d\vec{r} \f]
+     * \sa IntDD, IntFDD, IntPDD
+     */
     virtual RVector IntFD (int i, int j) const
     { xERROR(Not implemented); return RVector(); }
-    // Returns a single element of IntFD
 
+    /**
+     * \brief Integral of a product of a shape function and two shape function
+     *   derivatives over the element.
+     * \param i node index for shape function
+     * \param j first node index for shape function derivative
+     * \param k second node index for shape function derivative
+     * \return Value of the integral
+     *   \f[ \int_\Omega u_i(\vec{r}) \nabla u_j(\vec{r})
+     *   \nabla u_k(\vec{r}) d\vec{r} \f]
+     * \sa IntDD, IntFD, IntPDD
+     */
     virtual double IntFDD (int i, int j, int k) const = 0;
-    // returns a single element of integral over element:
-    // IntFDD = Int_el { F_i(r) * D_j(r) * D_k(r) } dr
 
+    /**
+     * \brief All integrals of products of a nodal function and two shape
+     *   function derivatives over the element.
+     * \param P nodal function coefficients over the mesh
+     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
+     *   \f[ \int_\Omega p(\vec{r}) \nabla u_i(\vec{r})
+     *   \nabla u_j(\vec{r}) d\vec{r} =
+     *   \sum_k p_k \int_\Omega u_k(\vec{r}) \nabla u_i(\vec{r})
+     *   \nabla u_j(\vec{r}) d\vec{r} \f]
+     * \sa IntPDD(int,int,const RVector&)const, IntFDD, IntFD, IntPFF
+     */
     virtual RSymMatrix IntPDD (const RVector& P) const = 0;
-    // Returns integral over element of product of two shape derivatives and a
-    // function P defined in nodal basis:
-    // PDD = Int_el { P(r) D_i(r) D_j(r) } dr
-    // Vector P contains the nodal solution for the complete mesh
 
+    /**
+     * \brief Integrals of a product of a nodal function and two shape
+     *   function derivatives over the element.
+     * \param i first node index
+     * \param j second node index
+     * \param P nodal function coefficients over the mesh
+     * \return Value of the integral
+     *   \f[ \int_\Omega p(\vec{r}) \nabla u_i(\vec{r})
+     *   \nabla u_j(\vec{r}) d\vec{r} =
+     *   \sum_k p_k \int_\Omega u_k(\vec{r}) \nabla u_i(\vec{r})
+     *   \nabla u_j(\vec{r}) d\vec{r} \f]
+     * \sa IntPDD(const RVector&)const, IntFDD, IntFD, IntPFF
+     */
     virtual double IntPDD (int i, int j, const RVector &P) const = 0;
-    // Returns a single element of IntPDD
 
+    /**
+     * \brief Boundary integral of all products of two shape functions over
+     *   all boundary sides of the element.
+     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned matrix contains nonzero entries at (i,j) only if
+     *   nodes i and j are both boundary nodes.
+     * \note If the element does not contain boundary sides, the returned
+     *   matrix is zero.
+     * \sa BndIntFF(int,int), BndIntFFSide
+     */
     virtual RSymMatrix BndIntFF () const = 0;
-    // Returns line integral of product of two shape functions along sides of
-    // the element which belong to the mesh boundary
-    // If the element does not contain any boundary sides then the returned
-    // matrix is empty.
+
+    virtual double BndIntFF (int i, int j) = 0;
+    // returns a single element of BndIntFF
 
     virtual double BndIntFFSide (int i, int j,int sd)
     { xERROR(Not implemented); return 0; }
     // Boundary Integral for ONE SIDE OF ELEMENT ONLY
-
-    virtual double BndIntFF (int i, int j) = 0;
-    // returns a single element of BndIntFF
 
     virtual RSymMatrix BndIntPFF (const RVector &P) const = 0;
     // Returns line integral of product of two shape functions and a function
