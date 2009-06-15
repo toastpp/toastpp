@@ -428,6 +428,12 @@ int main (int argc, char *argv[])
 	break;
     }
 
+    cout << "  Original solution:\n";
+    cout << "    CMUA:   " << vmin (msol.GetParam(OT_CMUA)) << " to "
+	 << vmax (msol.GetParam(OT_CMUA)) << endl;
+    cout << "    CKAPPA: " << vmin (msol.GetParam(OT_CKAPPA)) << " to "
+	 << vmax (msol.GetParam(OT_CKAPPA)) << endl;
+
     cout << "  Mapped solution" << endl;
     cout << "    CMUA:   " << vmin (bsol.GetParam(OT_CMUA)) << " to "
 	 << vmax (bsol.GetParam(OT_CMUA)) << endl;
@@ -438,11 +444,11 @@ int main (int argc, char *argv[])
     // basis representation of the solution
     //  raster->Map_SolToMesh (bsol, msol, true);
 
-    cout << "  Re-mapped mesh:\n";
-    cout << "    CMUA:   " << vmin (msol.GetParam(OT_CMUA)) << " to "
-	 << vmax (msol.GetParam(OT_CMUA)) << endl;
-    cout << "    CKAPPA: " << vmin (msol.GetParam(OT_CKAPPA)) << " to "
-	 << vmax (msol.GetParam(OT_CKAPPA)) << endl;
+    //cout << "  Re-mapped solution:\n";
+    //cout << "    CMUA:   " << vmin (msol.GetParam(OT_CMUA)) << " to "
+    // << vmax (msol.GetParam(OT_CMUA)) << endl;
+    //cout << "    CKAPPA: " << vmin (msol.GetParam(OT_CKAPPA)) << " to "
+    // << vmax (msol.GetParam(OT_CKAPPA)) << endl;
 
     cout << "Assembling and pre-processing system matrix" << endl;
     FWS.Reset (msol, omega);
