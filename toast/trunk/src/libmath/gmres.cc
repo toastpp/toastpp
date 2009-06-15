@@ -9,7 +9,7 @@ using namespace toast;
 int itcount = 0;
 // global counter for GMRES iterations
 
-#define VERBOSE_GMRES
+//#define VERBOSE_GMRES
 // Uncomment this for verbose debugging output to stderr
 
 extern double relax;

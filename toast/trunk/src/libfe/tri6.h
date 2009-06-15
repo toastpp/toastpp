@@ -29,6 +29,25 @@
 #ifndef __TRI6_H
 #define __TRI6_H
 
+/**
+ * \brief A 6-noded 2-dimensional triangle element with straight sides
+ *   and second-order shape functions.
+ *
+ * The node arrangement is given by
+ * \code
+ *   N2             The local element has node coordinates
+ *    +                     N0 = (0,0)
+ *    |\                    N1 = (1,0)
+ *    | \                   N2 = (0,1)
+ *    |  \                  N3 = (0.5,0)
+ *  N5+   +N4               N4 = (0.5,0.5)
+ *    |    \                N5 = (0,0.5)
+ *    |     \
+ *    |      \      Sides:  side 0 contains N0,N1,N3 (y=0)
+ *  N0+---+---+N1           side 1 contains N1,N2,N4 (x+y=1)
+ *        N3                side 2 contains N2,N0,N5 (x=0)
+ * \endcode
+ */
 class FELIB Triangle6: public Element_Unstructured_2D {
 public:
 

@@ -20,7 +20,7 @@ prm.meas.det.width = str2num(scanprm(prmfile,'MEASUREMENTWIDTH'));
 prm.data.freq = str2num(scanprm(prmfile,'FREQ'));
 prm.data.lnampfile = scanprm(prmfile,'DATA_MOD');
 prm.data.phasefile = scanprm(prmfile,'DATA_ARG');
-prm.data.useref = logical(str2num(scanprm(prmfile,'REFDATA')));
+prm.data.useref = logical(str2num(lower(scanprm(prmfile,'REFDATA'))));
 if length(prm.data.useref) == 0
     prm.data.useref = false;
 end

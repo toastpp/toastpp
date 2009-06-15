@@ -35,6 +35,26 @@
 
 #include "toastdef.h"
 
+/**
+ * \brief A 10-noded 2-dimensional triangle element with straight edges
+ *   and 3rd order shape functions.
+ *
+ * The node arrangement is given by
+ * \code
+ *   N2             The local element has node coordinates
+ *    +                     N0 = (0,0)    N5 = (2/3,1/3)
+ *    |\                    N1 = (1,0)    N6 = (1/3,2/3)
+ *    | \                   N2 = (0,1)    N7 = (0,2/3)
+ *  N7+  +N6                N3 = (1/3,0)  N8 = (0,1/3)
+ *    |   \                 N4 = (2/3,0)  N9 = (1/3,1/3)
+ *    |    \        
+ *  N8+  +  +N5     Sides:  side 0 contains N0,N1,N3,N4 (y=0)
+ *    |  N9  \              side 1 contains N1,N2,N5,N6 (x+y=1)
+ *    |       \             side 2 contains N2,N0,N7,N8 (x=0)
+ *  N0+--+--+--+N1           
+ *      N3  N4              (N9 is internal)
+ * \endcode
+ */
 class FELIB Triangle10: public Element_Unstructured_2D {
 public:
 

@@ -45,6 +45,10 @@ clean::
 	done
 	$(RM) *~
 
+doc_clean::
+	cd doc;
+	$(MAKE) clean
+
 distclean::
 	for i in $(SUBDIRS); \
 	do \

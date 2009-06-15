@@ -225,11 +225,14 @@ void QMMesh::InitM ()
 
 void QMMesh::SetupQM (Point *q, int nq, Point *m, int nm)
 {
+    // 1. assume all sources are linked to all measurements
+    // 2. assume Point source and detector profiles
+
     int i, j;
     Q = q, nQ = nq;
     M = m, nM = nm;
+    nQM = nq*nm;
 
-    // assume all sources are linked to all measurements
     nQMref = new int[nQ];
     Qofs   = new int[nQ];
     QMref  = new int*[nQ];
@@ -242,6 +245,27 @@ void QMMesh::SetupQM (Point *q, int nq, Point *m, int nm)
 	QMofs[i] = new int[nM];
 	for (j = 0; j < nM; j++) QMofs[i][j] = Qofs[i]+j;
     }
+
+    // reset source profile specs
+    if (qptype) delete []qptype;     qptype = new MProfileType[nQ];
+    if (qwidth) delete []qwidth;     qwidth = new double[nQ];
+    if (qsup)   delete []qsup;       qsup = new double[nQ];
+    for (i = 0; i < nQ; i++) {
+        qptype[i] = PROFILE_POINT; // default
+	qwidth[i] = 0.0;
+	qsup[i] = 0.0;
+    }
+
+    // reset measurement profile specs
+    if (mptype) delete []mptype;     mptype = new MProfileType[nM];
+    if (mwidth) delete []mwidth;     mwidth = new double[nM];
+    if (msup)   delete []msup;       msup = new double[nM];
+    for (i = 0; i < nM; i++) {
+        mptype[i] = PROFILE_POINT; // default
+	mwidth[i] = 0.0;
+	msup[i] = 0.0;
+    }
+
     InitM ();
 }
 

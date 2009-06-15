@@ -35,6 +35,29 @@
 #ifndef __TET4_H
 #define __TET4_H
 
+/**
+ * \brief A 4-noded 3-dimensional tetrahedron element with straight edges
+ *   and linear shape functions.
+ *
+ * The node arrangement is given by
+ * \code
+ *    ^ z                  The local element has node coordinates
+ *    |                            N0 = (0,0,0)
+ *               ^ y               N1 = (1,0,0)
+ *  N3+-_       /                  N2 = (0,1,0)
+ *    |\ --_                       N3 = (0,0,1)
+ *    |  \  --+N2          
+ *    |   \  . \           Sides: side 0 (z=0)       contains N0,N1,N2
+ *    |     \   \                 side 1 (y=0)       contains N0,N3,N1
+ *    |    . \   \                side 2 (x=0)       contains N0,N2,N3
+ *    |   .   \   \               side 3 (1-x-y-z=0) contains N1,N3,N2
+ *    |  .      \  \
+ *    | .        \  \
+ *    |.           \ \
+ *    +---------------+  --> x
+ *   N0               N1
+ * \endcode
+ */
 class FELIB Tetrahedron4: public Element_Unstructured_3D {
 public:
 

@@ -68,6 +68,10 @@ class Surface;
 // ==========================================================================
 /**
  * \brief Base class for finite element types.
+ *
+ * This class defines the common interface for all Toast FEM elements, in
+ * particular a set of integrals of combinations of shape function,
+ * shape function derivatives and nodal functions over the element (Int*).
  */
 class FELIB Element {
 
@@ -625,30 +629,82 @@ public:
      */
     virtual RSymMatrix BndIntFF () const = 0;
 
+    /**
+     * \brief Boundary integral of a product of two shape functions over
+     *   all boundary sides of the element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The return value is nonzero only if both nodes \p i and \p j are
+     *   boundary nodes.
+     * \sa BndIntFF()const, BndIntFFSide
+     */
     virtual double BndIntFF (int i, int j) = 0;
-    // returns a single element of BndIntFF
 
+    /**
+     * \brief Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \note Nodes i and j must both belong to side sd.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
     virtual double BndIntFFSide (int i, int j,int sd)
     { xERROR(Not implemented); return 0; }
-    // Boundary Integral for ONE SIDE OF ELEMENT ONLY
 
+    /**
+     * \brief Surface integrals of all products of a nodal function and two
+     *   shape functions over all boundary sides of the element.
+     * \param P nodal function coefficients over the mesh
+     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
+     *   \f[ \int_{\partial\Omega} p(\vec{r}) u_i(\vec{r}) u_j(\vec{r})
+     *       d\vec{r} = \sum_k p_k \int_{\partial\Omega} u_i(\vec{r})
+     *       u_j(\vec{r}) u_k(\vec{r}) d\vec{r} \f]
+     * \note If the element does not contain boundary sides, the returned
+     *   matrix is zero.
+     * \sa BndIntPFF(int,int,const RVector&)const, BndIntFF
+     */
     virtual RSymMatrix BndIntPFF (const RVector &P) const = 0;
-    // Returns line integral of product of two shape functions and a function
-    // P defined in nodal basis along sides of the element which belong to the
-    // mesh boundary:
-    // lPFF = Int_bnd { P(r) F_i(r) F_j(r) } ds
-    // If the element does not contain any boundary sides then the returned
-    // matrix is empty.
 
+    /**
+     * \brief Surface integrals of a product of a nodal function and two
+     *   shape functions over all boundary sides of the element.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \param P nodal function coefficients over the mesh
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} p(\vec{r}) u_i(\vec{r}) u_j(\vec{r})
+     *       d\vec{r} = \sum_k p_k \int_{\partial\Omega} u_i(\vec{r})
+     *       u_j(\vec{r}) u_k(\vec{r}) d\vec{r} \f]
+     * \note If the element does not contain boundary sides, the returned
+     *   matrix is zero.
+     * \sa BndIntPFF(const RVector&)const, BndIntFF
+     */
     virtual double BndIntPFF (int i, int j, const RVector &P) const = 0;
-    // Returns a single element of BndIntPFF
 
     // ===============================================================
     // Integrals including mixed derivatives
 
+    /**
+     * \brief Integral of the product of a shape function and a partial shape
+     *   function derivative over the element.
+     * \param i node index for shape function (range 0 .. \ref nNode-1)
+     * \param j node index for shape function derivative
+     *   (range 0 .. \ref nNode-1)
+     * \param k coordinate index for derivative (range 0 .. \ref Dimension-1)
+     * \return Value of the integral
+     *   \f[ \int_\Omega u_i(\vec{r})
+     *   \frac{\partial u_j(\vec{r})}{\partial x_k} d\vec{r} \f]
+     */
     virtual double IntFd (int i, int j, int k) const
     { xERROR(Not implemented); return 0.0; }
-    // Returns a single element of Int [u_i du_j/dx_k] dr
 
     virtual double IntPd (const RVector &P, int j, int k) const
     { xERROR(Not implemented); return 0.0; }
@@ -882,6 +938,13 @@ protected:
 // ---> Element_Structured
 // ==========================================================================
 
+/**
+ * \brief Base class for all structured (regular) element types.
+ *
+ * All structured elements element in a mesh are assumed to have the same
+ * shape, size and orientation. Structured element types share global
+ * parameters, which makes them more memory-efficient than unstructured types.
+ */
 class FELIB Element_Structured: public Element {
 public:
     Element_Structured (): Element () {}
@@ -900,6 +963,12 @@ public:
 // ---> Element_Unstructured
 // ==========================================================================
 
+/**
+ * \brief Base class for all unstructured element types.
+ *
+ * Unstructured elements within a mesh differ in shape and size. Therefore
+ * they must store shape parameters on an individual element basis.
+ */
 class FELIB Element_Unstructured: public Element {
 public:
     Element_Unstructured (): Element () {}
@@ -963,6 +1032,9 @@ protected:
 //      ---> Element_Structured_2D
 // ==========================================================================
 
+/**
+ * \brief Base class for all 2-D structured element types.
+ */
 class FELIB Element_Structured_2D: public Element_Structured {
 public:
     Element_Structured_2D (): Element_Structured () {}
@@ -983,6 +1055,9 @@ public:
 //      ---> Element_Structured_3D
 // ==========================================================================
 
+/**
+ * \brief Base class for all 3-D structured element types.
+ */
 class FELIB Element_Structured_3D: public Element_Structured {
 public:
     Element_Structured_3D (): Element_Structured () {}
@@ -1003,6 +1078,9 @@ public:
 //      ---> Element_Unstructured_2D
 // ==========================================================================
 
+/**
+ * \brief Base class for all 2-D unstructured element types.
+ */
 class FELIB Element_Unstructured_2D: public Element_Unstructured {
 public:
     Element_Unstructured_2D (): Element_Unstructured () {}
@@ -1023,6 +1101,9 @@ public:
 //      ---> Element_Unstructured_3D
 // ==========================================================================
 
+/**
+ * \brief Base class for all 3-D unstructured element types.
+ */
 class FELIB Element_Unstructured_3D: public Element_Unstructured {
 public:
     Element_Unstructured_3D (): Element_Unstructured () {}
