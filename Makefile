@@ -79,8 +79,8 @@ matlab_clean:
 	$(MAKE) clean
 
 doc_clean::
-	cd docs; \
-	$(MAKE) clean
+	cd src; \
+	$(MAKE) doc_clean
 
 web_distribution_shared::
 	rm -f lib

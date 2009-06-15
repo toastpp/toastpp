@@ -32,14 +32,39 @@
 
 class Surface;
 
+/**
+ * \brief A 3-noded (linear) 2-dimensional triangle element.
+ *
+ * The node arrangement is given by
+ * \image html tri3.png "Node arrangement"
+ */
 class FELIB Triangle3: public Element_Unstructured_2D {
 public:
 
+    /**
+     * \brief Creates a new triangle, but does not assign any node indices.
+     */
     Triangle3();
-    Triangle3 (const Triangle3& el);
-    ~Triangle3();
-    // constructors, destructor
 
+    /**
+     * \brief Creates a new triangle as a copy of an existing one.
+     * \param el source element
+     */
+    Triangle3 (const Triangle3& el);
+
+    /**
+     * \brief Destroys the triangle.
+     */
+    ~Triangle3();
+
+    /**
+     * \brief Initialises the triangle.
+     * \param nlist mesh node list
+     * \note This method should be called one the mesh node indices have been
+     *   assigned, to allow setting up element parameters.
+     * \note Calculates Natural coordinates, and subsampling abscissae.
+     *   Precalculates some integrals.
+     */
     void Initialise (const NodeList& nlist);
 
     BYTE Type () const { return ELID_TRI3; }

@@ -71,6 +71,12 @@ cursor: hand;
 border-left: 4pt solid #339900;
 background-color: #F0F0F0; }
 
+DIV.eq {
+margin-left: 2em;
+margin-top: .6em;
+margin-bottom: .6em;
+}
+
 DIV.code {
 font-family: Courier;
 margin-left: 2em;
@@ -106,6 +112,10 @@ background-color: #C0C0FF;
 DIV.param table.inline {
 border: 1pt solid #808080;
 background-color: #E8E8FF;
+}
+
+DIV.eq td {
+background-color: #FFFFFF;
 }
 
 li.checklist { margin-bottom: 1ex; }

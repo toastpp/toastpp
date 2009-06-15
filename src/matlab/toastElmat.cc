@@ -104,15 +104,32 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			*pr++ = intdd(i*dim+j,k*dim+l);
 
     } else if (!strcmp(cbuf, "BndFF")) {
-	int ii, jj, sd = (int)mxGetScalar(prhs[3]) - 1; // side index
+	int ii, jj, sd;
+	if (nrhs > 3) sd = (int)mxGetScalar(prhs[3]) - 1; // side index
+	else sd = -1;
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	pr = mxGetPr(elmat);
-	for (ii = 0; ii < pel->nSideNode(sd); ii++) {
-	    i = pel->SideNode(sd,ii);
-	    pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
-	    for (jj = 0; jj < ii; jj++) {
-		j = pel->SideNode(sd,jj);
-		pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
+
+	if (sd >= 0) { // integral over a single side
+	    for (ii = 0; ii < pel->nSideNode(sd); ii++) {
+		i = pel->SideNode(sd,ii);
+		pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
+		for (jj = 0; jj < ii; jj++) {
+		    j = pel->SideNode(sd,jj);
+		    pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
+		}
+	    }
+	} else { // integral over all boundary sides
+	    for (sd = 0; sd < pel->nSide(); sd++) {
+		if (!pel->IsBoundarySide (sd)) continue;
+		for (ii = 0; ii < pel->nSideNode(sd); ii++) {
+		    i = pel->SideNode(sd,ii);
+		    pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
+		    for (jj = 0; jj < ii; jj++) {
+			j = pel->SideNode(sd,jj);
+			pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
+		    }
+		}
 	    }
 	}
     }

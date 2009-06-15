@@ -352,13 +352,14 @@ else
     muamax=max(res.bmua);
     musmin=min(res.bmus);
     musmax=max(res.bmus);
-    bmua = reshape(res.bmua,res.bdim);
-    bmus = reshape(res.bmus,res.bdim);
+    bmua = reshape(res.bmua,res.bdim');
+    bmus = reshape(res.bmus,res.bdim');
     for i=1:4
-        idx = round(bdim(3)/4*(i-0.5));
+        idx = round(res.bdim(3)/4*(i-0.5));
         subplot(4,2,i); imagesc(bmua(:,:,idx),[muamin muamax]); axis equal tight
         subplot(4,2,i+4); imagesc(bmus(:,:,idx),[musmin musmax]); axis equal tight
     end
+    drawnow
     save recon_gui_res.mat res
 end
 
