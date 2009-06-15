@@ -21,6 +21,7 @@ toastCatchErrors();
 
 global RES;  % a structure for collecting reconstruction results
 global LPRM; % a set of local parameters
+global scref;
 RES.of = [];
 
 % ----------------------------------------------------------------------
@@ -31,8 +32,6 @@ dispprm(prm,'');
 % ----------------------------------------------------------------------
 % Set up some variables
 c0 = 0.3;           % speed of light in vacuum [mm/ps]
-refind = 1.4;       % refractive index
-cm = c0/refind;     % speed of light in medium
 
 % ----------------------------------------------------------------------
 % Read a TOAST mesh definition from file.
@@ -147,11 +146,13 @@ RES.bmua = toastMapMeshToBasis (LPRM.hBasis, mua);
 RES.bmus = toastMapMeshToBasis (LPRM.hBasis, mus);
 bmua_itr(1,:) = RES.bmua;
 bmus_itr(1,:) = RES.bmus;
-bkap = toastMapMeshToBasis (LPRM.hBasis, kap);
-bcmua = RES.bmua*cm;
-bckap = bkap*cm;
+
+bcmua = toastMapMeshToBasis (LPRM.hBasis, mua .* (c0./ref));
+bckap = toastMapMeshToBasis (LPRM.hBasis, kap .* (c0./ref));
+
 scmua = bcmua(solmask);
 sckap = bckap(solmask);
+scref = toastMapMeshToSol (LPRM.hBasis, c0./ref);
 
 x = [scmua;sckap];
 logx = log(x);
@@ -300,13 +301,13 @@ function solve_iter (prm, itr, x, err)
 fprintf (1, '**** Iteration %d, objective %f\n', itr, err)
 
 global RES LPRM
-cm = 0.3/1.4;  % generalise!
+global scref;
 
 ps = length(x)/2;
 scmua = x(1:ps);
 sckap = x(ps+1:2*ps);
-smua  = scmua/cm;
-skap  = sckap/cm;
+smua  = scmua./scref;
+skap  = sckap./scref;
 smus  = 1./(3*skap) - smua;
 RES.bmua = zeros(prod(RES.bdim),1);  RES.bmua(RES.solmask) = smua;
 RES.bmus = zeros(prod(RES.bdim),1);  RES.bmus(RES.solmask) = smus;
