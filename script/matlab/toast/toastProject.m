@@ -46,7 +46,7 @@ switch upper(solver)
         nm = size(mvec,2);
 
         % incomplete LU factorisation of smat
-        [L U] = luinc(smat,1e-4);
+        [L U] = luinc(smat,1e-2);
         
         for i=1:nq
             [phi,flag] = bicgstab(smat,qvec(:,i),tol,1000,L,U);

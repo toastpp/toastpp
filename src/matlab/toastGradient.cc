@@ -131,6 +131,115 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 }
 
 
+// =========================================================================
+
+void AddDataGradient2 (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
+    const RVector &proj, const RVector &data, const RVector &sd, CVector *dphi,
+    const CCompRowMatrix &mvec, RVector &grad)
+{
+    int i, j, q, m, idx, ofs_mod, ofs_arg;
+    double term;
+    int glen = raster->GLen();
+    int slen = raster->SLen();
+    int dim  = raster->Dim();
+    const IVector &gdim = raster->GDim();
+    const RVector &gsize = raster->GSize();
+    const int *elref = raster->Elref();
+    CCompRowMatrix wqa (mesh->nQ, mesh->nlen());
+    CVector wqa_row(mesh->nlen());
+    RVector wqb (mesh->nlen());
+    CVector dgrad (slen);
+    ofs_mod = 0;
+    ofs_arg = mesh->nQM;
+    RVector grad_cmua (grad, 0, slen);
+    RVector grad_ckappa (grad, slen, slen);
+
+    for (q = 0; q < mesh->nQ; q++) {
+        int n = mesh->nQMref[q];
+
+	RVector y_mod (data, ofs_mod, n);
+	RVector s_mod (sd, ofs_mod, n);
+	RVector ypm_mod (proj, ofs_mod, n);
+	RVector b_mod(n);
+	b_mod = (y_mod-ypm_mod)/s_mod;
+
+	RVector y_arg (data, ofs_arg, n);
+	RVector s_arg (sd, ofs_arg, n);
+	RVector ypm_arg (proj, ofs_arg, n);
+	RVector b_arg(n);
+	b_arg = (y_arg-ypm_arg)/s_arg;
+
+	RVector ype(n);
+	ype = 1.0;  // will change if data type is normalised
+
+	CVector cproj(n);
+	//Project_cplx (*mesh, q, dphi[q], cproj);
+	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
+	wqa_row = complex(0,0);
+	wqb = 0.0;
+
+	for (m = idx = 0; m < mesh->nM; m++) {
+	    if (!mesh->Connected (q, m)) continue;
+	    const CVector qs = mvec.Row(m);
+	    double rp = cproj[idx].re;
+	    double ip = cproj[idx].im;
+	    double dn = 1.0/(rp*rp + ip*ip);
+
+	    // amplitude term
+	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
+	    wqa_row += qs * complex (term*rp*dn, -term*ip*dn);
+
+	    // phase term
+	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
+	    wqa_row += qs * complex (-term*ip*dn, -term*rp*dn);
+
+	    //wqb += Re(qs) * (term * ypm[idx]);
+	    idx++;
+	}
+	wqa.SetRow (q, wqa_row);
+    }
+
+    CVector *wphia = new CVector[mesh->nQ];
+    for (q = 0; q < mesh->nQ; q++) wphia[q].New (mesh->nlen());
+    FWS.CalcFields (wqa, wphia);
+
+    for (q = 0; q < mesh->nQ; q++) {
+        int n = mesh->nQMref[q];
+
+	// expand field and gradient
+        CVector cdfield (glen);
+        CVector *cdfield_grad = new CVector[dim];
+	raster->Map_MeshToGrid (dphi[q], cdfield);
+	ImageGradient (gdim, gsize, cdfield, cdfield_grad, elref);
+
+	CVector cafield(glen);
+	CVector *cafield_grad = new CVector[dim];
+	raster->Map_MeshToGrid (wphia[q], cafield);
+	ImageGradient (gdim, gsize, cafield, cafield_grad, elref);
+
+	// absorption contribution
+	raster->Map_GridToSol (cdfield * cafield, dgrad);
+	grad_cmua -= Re(dgrad);
+
+	// diffusion contribution
+	// multiply complex field gradients
+	CVector gk(glen);
+	for (i = 0; i < glen; i++)
+	    for (j = 0; j < dim; j++)
+	        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
+	raster->Map_GridToSol (gk, dgrad);
+	grad_ckappa -= Re(dgrad);
+
+	delete []cdfield_grad;
+	delete []cafield_grad;
+
+	ofs_mod += n; // step to next source
+	ofs_arg += n;
+    }
+}
+
+// =========================================================================
+
 void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     const RVector &mua, const RVector &mus, const RVector &ref, double freq,
     const RVector &data, const RVector &sd,
@@ -168,7 +277,7 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     FWS.CalcFields (qvec, dphi);
     proj = FWS.ProjectAll_real (mvec, dphi);
 
-    AddDataGradient (mesh, raster, FWS, proj, data, sd, dphi, mvec, grad);
+    AddDataGradient2 (mesh, raster, FWS, proj, data, sd, dphi, mvec, grad);
 
     delete []dphi;
 }

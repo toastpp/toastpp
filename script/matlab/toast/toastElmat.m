@@ -40,13 +40,14 @@ function p = toastElmat
 %       'FD'          : \int Fi Dj dr      :  n x n x d
 %       'FDD'         : \int Fi Dj Dk dr   :  n x n x n
 %       'dd'          : \int dFi/dxj dFk/dxl dr : n x d x n x d
+%       'BndF'        : \int Fi ds         :  n x 1
 %       'BndFF'       : \int Fi Fj ds      :  n x n
 %
-% For integral type 'BndFF', the product of shape functions is calculated
-% over all boundary sides of the element (i.e. sides forming part of the
-% mesh surface). Alternatively, by specifying a 4th parameter (sideidx)
-% to the call to toastElmat, the integral can be performed over a single
-% side of the element (whether boundary side or not):
+% For boundary integrals ('BndF' and 'BndFF'), the integrals are
+% performed over all boundary sides of the element (i.e. sides forming
+% part of the mesh surface). Alternatively, by specifying a 4th parameter
+% (sideidx) to the call to toastElmat, the integral can be performed over
+% a single side of the element (whether boundary side or not):
 %
 %     E = toastElmat(hMesh, elidx, 'BndFF', sideidx)
 %
@@ -56,3 +57,7 @@ function p = toastElmat
 % nodes in the element. Nonzero entries are located at positions (i,j)
 % where both nodes i and j belong to a boundary side, or to side
 % 'sideidx', if applicable.
+%
+% Note: 'BndIntF' currently has limited functionality:
+% - it is only supported for 4-noded tetrahedra
+% - it does not support the syntax using a 4th parameter (sideidx)
