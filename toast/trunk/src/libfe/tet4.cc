@@ -976,6 +976,12 @@ RSymMatrix Tetrahedron4::ComputeIntDD (const NodeList &nlist) const
     return dd;
 };
 
+static const RDenseMatrix bndintf = RDenseMatrix (4, 4,
+   "1 1 1 0\
+    1 1 0 1\
+    1 0 1 1\
+    0 1 1 1") * (1.0/6.0);
+
 static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (4,
    "2 \
     1 2 \
@@ -1007,6 +1013,15 @@ static const RSymMatrix *sym_bndintff[4] = {
    &sym_bndintff_sd3 
    };
 
+
+RVector Tetrahedron4::BndIntF () const
+{
+    RVector bf(4);
+    for (int sd = 0; sd < 4; sd++)
+	if (bndside[sd])
+	    bf += bndintf.Row(sd) * side_size[sd];
+    return bf;
+}
 
 
 double Tetrahedron4::BndIntFFSide (int i, int j,int sd)

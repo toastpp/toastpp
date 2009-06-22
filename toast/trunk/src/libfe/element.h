@@ -615,6 +615,22 @@ public:
     virtual double IntPDD (int i, int j, const RVector &P) const = 0;
 
     /**
+     * \brief Boundary integral of all shape functions over all boundary
+     *   sides of the element.
+     * \return Vector of size \ref nNode, containing the integrals
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of teh element that
+     *   are part of the mesh surface.
+     * \note The returned matrix contains nonzero entries at index i only if
+     *   node i is a boundary node.
+     * \note If the element does not contain boundary sides, the returned
+     *   vector is zero.
+     * \sa BndIntFF, BndIntFFSide
+     */
+    virtual RVector BndIntF () const
+    { xERROR(Not implemented); return 0; }
+
+    /**
      * \brief Boundary integral of all products of two shape functions over
      *   all boundary sides of the element.
      * \return Matrix of size \ref nNode x \ref nNode, containing the integrals

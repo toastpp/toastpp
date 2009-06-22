@@ -103,6 +103,15 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		    for (i = 0; i < nnd; i++)
 			*pr++ = intdd(i*dim+j,k*dim+l);
 
+    } else if (!strcmp(cbuf, "BndF")) {
+
+	// for now, only integrals over all boundary sides are supported
+	elmat = mxCreateDoubleMatrix (nnd, 1, mxREAL);
+	pr = mxGetPr(elmat);
+	RVector bndintf = pel->BndIntF();
+	for (i = 0; i < pel->nNode(); i++)
+	    pr[i] = bndintf[i];
+
     } else if (!strcmp(cbuf, "BndFF")) {
 	int ii, jj, sd;
 	if (nrhs > 3) sd = (int)mxGetScalar(prhs[3]) - 1; // side index

@@ -117,6 +117,8 @@ public:
     double IntPfd(const RVector &p,int j,int k,int l) const;
     // Int f(r) u_j du_k/du_l dr
 
+    RVector BndIntF () const;
+
     double BndIntFFSide (int i, int j,int sd);
 
     RSymMatrix BndIntPFF (const RVector &P) const
