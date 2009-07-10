@@ -132,6 +132,7 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 
 
 // =========================================================================
+// Note: This does not work properly
 
 void AddDataGradient2 (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
     const RVector &proj, const RVector &data, const RVector &sd, CVector *dphi,
@@ -277,7 +278,7 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     FWS.CalcFields (qvec, dphi);
     proj = FWS.ProjectAll_real (mvec, dphi);
 
-    AddDataGradient2 (mesh, raster, FWS, proj, data, sd, dphi, mvec, grad);
+    AddDataGradient (mesh, raster, FWS, proj, data, sd, dphi, mvec, grad);
 
     delete []dphi;
 }

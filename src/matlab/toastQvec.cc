@@ -27,7 +27,7 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order);
 // MAIN 
 
 int CalcQvec (const QMMesh *mesh, SourceMode qtype, SRC_PROFILE qprof,
-    double qwidth, const RVector &refind, mxArray **res) 
+    double qwidth, mxArray **res) 
 {
     int i, j, n, nQ;
 
@@ -37,6 +37,7 @@ int CalcQvec (const QMMesh *mesh, SourceMode qtype, SRC_PROFILE qprof,
 
     // build the source vectors
     qvec.New (nQ, n);
+
     for (i = 0; i < nQ; i++) {
 	CVector q(n);
 	switch (qprof) {
@@ -52,12 +53,6 @@ int CalcQvec (const QMMesh *mesh, SourceMode qtype, SRC_PROFILE qprof,
 	case PROF_COMPLETETRIG:
 	    q = CompleteTrigSourceVector (*mesh, i);
 	    break;
-	}
-	for (j = 0; j < n; j++) {
-	    const double c0 = 0.3;
-	    double c = c0/refind[j];
-	    double A = A_Keijzer(refind[j]);
-	    q[j] *= c/(2.0*A);
 	}
 	qvec.SetRow (i, q);
     }
@@ -135,7 +130,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     char typestr[256] = "";
     char profstr[256] = "";
     double w = 0.0;
-    RVector refind = mesh->plist.N(); // use mesh parameter by default
 
     if (nrhs >= 1 && mxIsStruct (prhs[1])) {
 
@@ -147,8 +141,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (field) mxGetString (field, profstr, 256);
 	field = mxGetField (prhs[1], 0, "width");
 	if (field) w = mxGetScalar (field);
-	field = mxGetField (prhs[1], 0, "refind");
-	if (field) CopyVector (refind, field);
 
     } else if (nrhs >= 3) {
 
@@ -161,11 +153,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		w = mxGetScalar (prhs[idx]);
 		idx++;
 	    }
-	    if (nrhs > idx && mxIsNumeric(prhs[idx]) &&
-		mxGetNumberOfElements(prhs[idx]) > 1) {
-		CopyVector (refind, prhs[idx]);
-		idx++;
-	    }
+	    // additional optional parameters to go here
 	}
 		
     } else {
@@ -192,5 +180,5 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	else mexErrMsgTxt ("toastQvec: Invalid source width");
     }
 
-    CalcQvec (mesh, qtype, qprof, qwidth, refind, &plhs[0]);
+    CalcQvec (mesh, qtype, qprof, qwidth, &plhs[0]);
 }

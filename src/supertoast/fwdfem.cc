@@ -96,6 +96,15 @@ int main (int argc, char *argv[]) {
     SelectData (pp, freq);
     omega = freq * 2.0*Pi*1e-6;
 
+    // build the field vectors
+    dphi = new CVector[nQ];
+    for (i = 0; i < nQ; i++) dphi[i].New(n);
+
+    // reset initial parameter estimates
+    Solution sol(OT_NPARAM, n);
+    SelectInitialParams (pp, mesh, sol);
+    //RVector c2a = sol.GetParam (OT_C2A);
+
     // build the source vectors
     qvec.New (nQ, n);
     LOGOUT1_INIT_PROGRESSBAR ("Source vectors", 50, nQ);
@@ -116,8 +125,6 @@ int main (int argc, char *argv[]) {
 	    break;
 	}
 	qvec.SetRow (i, q);
-
-	cerr << "max=" << vmax(q) << endl;
 
 	LOGOUT1_PROGRESS(i);
     }
@@ -147,14 +154,6 @@ int main (int argc, char *argv[]) {
 	mvec.SetRow (i, m);
 	LOGOUT1_PROGRESS(i);
     }
-
-    // build the field vectors
-    dphi = new CVector[nQ];
-    for (i = 0; i < nQ; i++) dphi[i].New(n);
-
-    // reset initial parameter estimates
-    Solution sol(OT_NPARAM, n);
-    SelectInitialParams (pp, mesh, sol);
 
     // allocate system matrix
     cout << endl << "Allocating system matrix" << endl;

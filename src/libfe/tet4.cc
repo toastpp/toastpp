@@ -1068,6 +1068,39 @@ RVector Tetrahedron4::BndIntFX (int side, double (*func)(const Point&),
     return bint;
 }
 
+double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
+{
+    // computes \int_s du_i/dx_j u_k ds over side sd
+    int nd;
+    dASSERT (sd >= 0 && sd < 4, Argument 1: index out of range);
+    dASSERT (j >= 0 && j < 3, Argument 3: index out of range);
+    int nsdnd = nSideNode(sd);
+#ifdef FEM_DEBUG
+    for (nd = 0; nd < nsdnd; nd++)
+	if (i == SideNode (sd,nd)) break;
+    dASSERT (nd < nsdnd, Argument 2: node index not found in side);
+    for (nd = 0; nd < nsdnd; nd++)
+	if (k == SideNode (sd,nd)) break;
+    dASSERT (nd < nsdnd, Argument 4: node index not found in side);
+#endif
+    double intf = IntF(k);
+    intf *= 1.0/(6.0*size);
+    switch (i) {
+    case 0:
+	intf *= (j == 0 ? b0 : j == 1 ? c0 : d0);
+	break;
+    case 1:
+	intf *= (j == 0 ? b1 : j == 1 ? c1 : d1);
+	break;
+    case 2:
+	intf *= (j == 0 ? b2 : j == 1 ? c2 : d2);
+	break;
+    case 3:
+	intf *= (j == 0 ? b3 : j == 1 ? c3 : d3);
+	break;
+    }
+}
+
 RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     const NodeList &nlist) const
 {
