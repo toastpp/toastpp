@@ -56,7 +56,6 @@ FELIB RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh,
 FELIB int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax);
 
-
 // ==========================================================================
 // class Mesh
 // ==========================================================================
@@ -234,6 +233,22 @@ public:
     // returns it in the 2D array `_nbhrs'. The number of neighbours for each
     // node is returned in the 1D array `_nnbhrs'. Both arrays should be
     // unassigned before the call.
+
+    /**
+     * \brief Checks if two mesh elements have a common side.
+     * \param [in] el1 element index 1 (>= 0)
+     * \param [in] el2 element index 2 (>= 0)
+     * \param [out] sd1 pointer to variable receiving the side index of the
+     *   connected side in the first element
+     * \param [out] sd2 pointer to variable receiving the side index of the
+     *   connected side in the second element
+     * \return True if the two elements have a common side, false otherwise.
+     * \note If sd1 and sd2 are left at their default values (NULL) the
+     *   side indices are not returned.
+     * \note If the elements are not connected, the *sd1 and *sd2 values are
+     *   left unchanged.
+     */
+    bool ElConnected (int el1, int el2, int *sd1 = NULL, int *sd2 = NULL);
 
     double Size (Point *centre = 0) const;
     // returns mesh size (= half length of longest bounding box size) and mesh

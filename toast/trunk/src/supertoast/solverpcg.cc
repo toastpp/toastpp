@@ -146,6 +146,7 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     // r = -f'(x)
     OF.get_gradient (raster, FWS, proj, dphi, mvec, &bsol, r);
 
+
 #ifdef OUTPUT_PMDF
     {
 	RVector r1(r,0,slen);

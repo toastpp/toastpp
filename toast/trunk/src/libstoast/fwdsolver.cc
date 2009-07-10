@@ -251,8 +251,15 @@ void TFwdSolver<complex>::AssembleSystemMatrix (const Solution &sol,
 		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
     prm = sol.GetParam (OT_C2A);
     AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
     AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
+}
+
+template<class T>
+void TFwdSolver<T>::AssembleSystemMatrixComponent (const RVector &prm, int type)
+{
+    F->Zero();
+    AddToSysMatrix (*meshptr, *F, &prm, type);
 }
 
 template<class T>

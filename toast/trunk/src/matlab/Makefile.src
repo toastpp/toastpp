@@ -73,6 +73,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastSolutionMask.cc \
 	toastSurfData.cc \
 	toastSysmat.cc \
+	toastSysmatComponent.cc \
 	toastVolmat.cc \
 	toastWriteComplexHBMatrix.cc \
 	toastWriteMesh.cc \

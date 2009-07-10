@@ -1046,6 +1046,49 @@ void Mesh::NodeNeighbourList (int **_nnbhrs, int ***_nbhrs)
 }
 
 // ***********************************************
+
+bool Mesh::ElConnected (int el1, int el2, int *sd1, int *sd2)
+{
+    dASSERT (el1 >= 0 && el1 < elen(), Argument 1: index out of range);
+    dASSERT (el2 >= 0 && el2 < elen(), Argument 2: index out of range);
+
+    Element *pel1 = elist[el1];
+    Element *pel2 = elist[el2];
+
+    int i1, i2, j1, j2;
+    int nsdnd1, nsdnd2, nd1, nd2;
+    int nsd1 = pel1->nSide();
+    int nsd2 = pel2->nSide();
+    int found;
+
+    for (i1 = 0; i1 < nsd1; i1++) {
+	nsdnd1 = pel1->nSideNode (i1);
+	for (i2 = 0; i2 < nsd2; i2++) {
+	    nsdnd2 = pel2->nSideNode (i2);
+	    if (nsdnd1 != nsdnd2) continue;
+	    found = true;
+	    for (j1 = 0; j1 < nsdnd1; j1++) {
+		nd1 = pel1->Node[pel1->SideNode (i1, j1)];
+		for (j2 = 0; j2 < nsdnd2; j2++) {
+		    nd2 = pel2->Node[pel2->SideNode (i2, j2)];
+		    if (nd1 == nd2) break;
+		}
+		if (j2 == nsdnd2) { // no matching vertex found
+		    found = false;
+		    break;
+		}
+	    }
+	    if (found) {
+		if (sd1) *sd1 = i1;
+		if (sd2) *sd2 = i2;
+		return true;
+	    }
+	}
+    }
+    return false;
+}
+
+// ***********************************************
 // nodal centre of gravity
 
 double Mesh::Size (Point *centre) const

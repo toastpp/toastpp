@@ -125,6 +125,19 @@ public:
     { xERROR(Not implemented); return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
 
+    /**
+     * \brief Calculates integral
+     *   \f$ \int_s \frac{partial u_i(s)}{\partial x_j} u_k(s) ds \f$
+     *   over an element side.
+     * \param sd side index (>= 0)
+     * \param i node index 1 (>= 0)
+     * \param j direction index (0 <= j < 3)
+     * \param k node index 2 (>= 0)
+     * \note i and k are element-relative node indices. Side sd must contain
+     *   both i and k.
+     */
+    double BndIntFD (int sd, int i, int j, int k);
+
     RVector BndIntFX (int side, double (*func)(const Point&),
         const NodeList &nlist) const;
     RVector BndIntFCos (int side, const RVector &cntcos, double a,

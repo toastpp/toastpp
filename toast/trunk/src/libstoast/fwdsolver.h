@@ -240,6 +240,8 @@ public:
     void AssembleSystemMatrix (const Solution &sol, double omega = 0,
         bool elbasis = false);
 
+    void AssembleSystemMatrixComponent (const RVector &prm, int type);
+
     /**
      * \brief Construct the FEM mass matrix for time-dependent problems.
      * \param mesh mesh pointer
