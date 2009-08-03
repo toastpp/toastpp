@@ -41,10 +41,10 @@ c0 = 0.3;
 cm = c0/refind;
 
 % Read a TOAST mesh definition from file.
-if isfield(prm,'basis') && isfield(prm.basis,'hMesh')
-    hMesh = prm.basis.hMesh;
+if isfield(prm,'fwdsolver') && isfield(prm.fwdsolver,'hmesh')
+    hMesh = prm.fwdsolver.hmesh;
 else
-    hMesh = toastReadMesh (prm.basis.meshfile);
+    hMesh = toastReadMesh (prm.fwdsolver.meshfile);
     toastReadQM (hMesh, prm.meas.qmfile);
 end
 n = toastMeshNodeCount (hMesh);
@@ -67,7 +67,7 @@ nm = size(mvec,2);
 
 % Apply forward model: generate projection data set f[x0]
 proj = toastProject (hMesh, mua, mus, ref, prm.data.freq, ...
-    qvec, mvec, prm.linsolver.method, prm.linsolver.tol);
+    qvec, mvec, prm.fwdsolver.method, prm.fwdsolver.tol);
 
 % Split into log amplitude and phase components
 mdata = proj(1:nqm);
