@@ -138,6 +138,23 @@ public:
      */
     double BndIntFD (int sd, int i, int j, int k);
 
+    /**
+     * \brief Calculates integral
+     *   \f$ \int_s \frac{partial u_i(s)}{\partial x_j} u_k(s) ds \f$
+     *   over an element side.
+     * \param sd side index (>= 0)
+     * \param el2 element index for neighbour element
+     * \param i node index 1 (>= 0)
+     * \param j direction index (0 <= j < 3)
+     * \param k node index 2 (>= 0) in neighbour element
+     * \note In this version, nodes i and k refer to different elements.
+     *   The derivative term du_i/dx_j refers to element *this, while
+     *   the shape function term u_k refers to the neighbour element (el2).
+     *   The neigbour element must be of the same type (Tetrahedron4), and
+     *   the two elements must be joined at side sd.
+     */
+    double BndIntFD (Mesh &mesh, int sd, int el2, int sd2, int i, int j, int k);
+
     RVector BndIntFX (int side, double (*func)(const Point&),
         const NodeList &nlist) const;
     RVector BndIntFCos (int side, const RVector &cntcos, double a,

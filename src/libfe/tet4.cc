@@ -1101,6 +1101,11 @@ double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
     }
 }
 
+double Tetrahedron4::BndIntFD (Mesh &mesh, int el2, int i, int j, int k)
+{
+    if (!mesh.ElConnected
+}
+
 RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     const NodeList &nlist) const
 {
