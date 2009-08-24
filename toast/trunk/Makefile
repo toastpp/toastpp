@@ -117,7 +117,7 @@ distro_common::
 
 distro_bin_win32::
 	cd ..; \
-	zip -9 -r toast_bin_win32.zip toast2008/win32/Release ; \
+	zip -9 -r toast_bin_win32.zip toast2008/win32/Release -x@toast2008/exclude.lst ; \
 	mv toast_bin_win32.zip toast2008
 
 distro_bin_linux::

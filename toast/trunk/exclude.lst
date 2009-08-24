@@ -14,5 +14,7 @@
 *.idb
 *.pdb
 *.dep
-BuildLog.htm
-
+*.res
+*.manifest
+*BuildLog.htm
+*/obj/*
