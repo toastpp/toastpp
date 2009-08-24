@@ -1099,12 +1099,15 @@ double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
 	intf *= (j == 0 ? b3 : j == 1 ? c3 : d3);
 	break;
     }
+	return intf;
 }
 
+#ifdef UNDEF
 double Tetrahedron4::BndIntFD (Mesh &mesh, int el2, int i, int j, int k)
 {
     if (!mesh.ElConnected
 }
+#endif
 
 RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     const NodeList &nlist) const

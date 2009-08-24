@@ -153,7 +153,7 @@ public:
      *   The neigbour element must be of the same type (Tetrahedron4), and
      *   the two elements must be joined at side sd.
      */
-    double BndIntFD (Mesh &mesh, int sd, int el2, int sd2, int i, int j, int k);
+    //double BndIntFD (Mesh &mesh, int sd, int el2, int sd2, int i, int j, int k);
 
     RVector BndIntFX (int side, double (*func)(const Point&),
         const NodeList &nlist) const;
