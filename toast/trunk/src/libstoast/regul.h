@@ -46,7 +46,7 @@ public:
     virtual ~Regularisation ();
 
     static Regularisation *Create (ParamParser *pp, const RVector *_x0,
-        const Raster *_raster);
+        const Raster *_raster, const RVector *_xs = 0);
     // create a regularisation instance from a parameter file
 
     virtual void ReadParams (ParamParser *pp);

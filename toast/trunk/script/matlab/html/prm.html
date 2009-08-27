@@ -106,10 +106,16 @@ estimate.</td><td>R</td></tr>
 <tr><td colspan="4" class="header"><a href="#prm_reg">Regularisation parameters (general)</a></td></tr>
 <tr><td>regul.method</td><td><i>string</i></td><td>Regularisation method. Possible values:<br>
     <code>None</code> (no regularisation)<br>
+    <code>TK0</code> (0th order Tikhonov)<br>
     <code>TK1</code> (1st order Tikhonov)<br>
     <code>TV</code> (total variation)<br>
     <code>Huber</code> (Huber regularisation)</td><td>R</td></tr>
 <tr><td>regul.tau</td><td><i>real</i></td><td>regularisation hyperparameter</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Regularisation parameters (TK0)</td></tr>
+<tr><td>regul.tk0.xs</td><td><i>real vector</i></td><td>
+Optional scaling vector. If not provided, xs=1 is assumed.
+</td><td>R</td></tr>
 
 <tr><td colspan="4" class="header">Regularisation parameters (TV)</td></tr>
 <tr><td>regul.tv.beta</td><td><i>real</i></td><td>&beta; parameter for TV regularisation (only used if regul.method = 'TV')</td><td>R</td></tr>

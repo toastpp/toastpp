@@ -55,6 +55,19 @@ function p = toastRegul
 %                      one pixel. This option cannot be combined with
 %                      KapRefImage. Default: no diffusivity information.
 %
+%   'TK0': 0th order Tikhonov regularisation
+%   ----------------------------------------
+%   Synopsis:
+%       hReg = toastRegul ('TK0', hBasis, x0, tau [, Property, value, ...])
+%
+%       Recognised properties:
+%       'Xs'           Next argument is a scaling vector with the same
+%                      length as x0.
+%
+%   Notes:
+%       The regularisation value is calculated as
+%       psi = tau * <dx,dx>, where dx = (x-x0)/Xs
+%  
 %   'TK1': 1st order Tikhonov (Laplacian) regularisation
 %   ----------------------------------------------------
 %   Synopsis:

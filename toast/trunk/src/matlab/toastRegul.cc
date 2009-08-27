@@ -197,6 +197,31 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    reg = new TV (tau, beta, &x0, raster, kapref, istensor);
 	}
 	
+    } else if (!strcasecmp (rtype, "TK0")) {
+	// 0-th order Tikhonov
+
+	// default settings
+	RVector xs (x0.Dim());
+	xs = 1;
+	if (regp) { // read TK0 parameters from structure
+	    field = mxGetField(regp,0,"tk0");
+	    if (field) field = mxGetField(field,0,"xs");
+	    if (field) CopyVector (xs, field);
+	} else { // read TK0 parameters from argument list
+	    while (prm < nrhs) {
+		mxGetString (prhs[prm++], cbuf, 256);
+		if (!strcasecmp (cbuf, "Xs")) {
+		    CopyVector (xs, prhs[prm++]);
+		    break;
+		}
+	    }
+	}
+
+	// echo regularisation parameters
+	mexPrintf ("Regularisation: 0th order Tikhonov (TK0)\n");
+	mexPrintf ("--> tau: %f\n", tau);
+	reg = new Tikhonov0 (tau, &x0, &xs);
+			     
     } else if (!strcasecmp (rtype, "TK1")) {
 	// 1-st order Tikhonov (Laplacian)
 	    

@@ -41,7 +41,7 @@ Regularisation::~Regularisation ()
 }
 
 Regularisation *Regularisation::Create (ParamParser *pp, const RVector *_x0,
-    const Raster *_raster)
+    const Raster *_raster, const RVector *_xs)
 {
     char cbuf[256];
     int prior = -1;
@@ -52,25 +52,30 @@ Regularisation *Regularisation::Create (ParamParser *pp, const RVector *_x0,
 	    prior = 0;
 	else if (!strcasecmp (cbuf, "TV"))
 	    prior = 1;
-	else if (!strcasecmp (cbuf, "TK1"))
+	else if (!strcasecmp (cbuf, "TK0"))
 	    prior = 2;
-	else if (!strcasecmp (cbuf, "HUBER"))
+	else if (!strcasecmp (cbuf, "TK1"))
 	    prior = 3;
+	else if (!strcasecmp (cbuf, "HUBER"))
+	    prior = 4;
     }
     while (prior < 0) {
 	cout << "\nSelect a regularisation method:\n";
 	cout << "(0) None\n";
 	cout << "(1) Total variation (TV)\n";
-	cout << "(2) Tikhonov 1st order (TK1)\n";
-	cout << "[0|1|2] >> ";
+	cout << "(2) Tikhonov 0th order (TK0)\n";
+	cout << "(3) Tikhonov 1st order (TK1)\n";
+	cout << "(4) Huber\n";
+	cout << "[0|1|2|3|4] >> ";
 	cin >> prior;
     }
 
     switch (prior) {
     case 0: reg = new NullRegularisation(); break;
     case 1: reg = new TV (1, 1, _x0, _raster); break;
-    case 2: reg = new TK1 (1, _x0, _raster); break;
-    case 3: reg = new Huber (1, 1, _x0, _raster); break;
+    case 2: reg = new Tikhonov0 (1, _x0, _xs); break;
+    case 3: reg = new TK1 (1, _x0, _raster); break;
+    case 4: reg = new Huber (1, 1, _x0, _raster); break;
     }
     if (reg) {
 	reg->ReadParams (pp);
