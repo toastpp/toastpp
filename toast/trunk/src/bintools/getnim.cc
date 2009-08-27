@@ -9,7 +9,9 @@ int main (int argc, char *argv[])
 {
     int i, img;
     char cbuf[256];
-    char meshstr[256], soltpstr[256];
+    char **hdrline;
+    int nhdrline;
+    //char meshstr[256], soltpstr[256];
     int imgno = -1; // default: last image
     int imsize = 0;
     double *imgbuf;
@@ -44,14 +46,21 @@ int main (int argc, char *argv[])
     if (imgno < 0) cerr << "last image in stream" << endl;
     else           cerr << "image " << imgno << endl;
 
+    nhdrline = 0;
     do {
 	cin.getline(cbuf,256);
-	if (!strncasecmp (cbuf, "ImageSize", 9)) {
+	if (!strncasecmp (cbuf, "ImageSize", 9))
 	    sscanf (cbuf+11, "%d", &imsize);
-	} else if (!strncasecmp (cbuf, "Mesh", 4)) {
-	    strcpy (meshstr, cbuf);
-	} else if (!strncasecmp (cbuf, "SolutionType", 12)) {
-	    strcpy (soltpstr, cbuf);
+	if (strcasecmp (cbuf, "EndHeader")) {
+	    char **tmp = new char*[nhdrline+1];
+	    if (nhdrline) {
+		memcpy (tmp, hdrline, nhdrline*sizeof(char*));
+		delete []hdrline;
+	    }
+	    hdrline = tmp;
+	    hdrline[nhdrline] = new char[strlen(cbuf)+1];
+	    strcpy (hdrline[nhdrline], cbuf);
+	    nhdrline++;
 	}
     } while (!cin.fail() && strcasecmp(cbuf, "EndHeader"));
 
@@ -73,9 +82,8 @@ int main (int argc, char *argv[])
 
 	if (img == imgno) {
 	    cout << (isnim ? "NIM" : "RIM") << endl;
-	    cout << meshstr << endl;
-	    cout << soltpstr << endl;
-	    cout << "ImageSize = " << imsize << endl;
+	    for (i = 0; i < nhdrline; i++)
+		cout << hdrline[i] << endl;
 	    cout << "EndHeader" << endl;
 	    cout << "Image 0" << endl;
 	    for (i = 0; i < imsize; i++)
@@ -85,7 +93,13 @@ int main (int argc, char *argv[])
 	    break;
 	}
     }
-	
+
+    if (nhdrline) {
+	for (i = 0; i < nhdrline; i++)
+	    delete []hdrline[i];
+	delete []hdrline;
+    }
+
     delete []imgbuf;
     return 0;
 }
