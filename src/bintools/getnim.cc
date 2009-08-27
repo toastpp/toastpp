@@ -16,6 +16,7 @@ int main (int argc, char *argv[])
     int imsize = 0;
     double *imgbuf;
     bool isnim;
+    bool omit_header = false;
 
     // command line parser
     for (i = 1; i < argc; i++) {
@@ -34,6 +35,9 @@ int main (int argc, char *argv[])
 		DisplayInfo();
 		exit(1);
 	    }
+	case 'x':
+	    omit_header = true;
+	    break;
 	}
     }
 
@@ -81,11 +85,13 @@ int main (int argc, char *argv[])
 	}
 
 	if (img == imgno) {
-	    cout << (isnim ? "NIM" : "RIM") << endl;
-	    for (i = 0; i < nhdrline; i++)
-		cout << hdrline[i] << endl;
-	    cout << "EndHeader" << endl;
-	    cout << "Image 0" << endl;
+	    if (!omit_header) {
+		cout << (isnim ? "NIM" : "RIM") << endl;
+		for (i = 0; i < nhdrline; i++)
+		    cout << hdrline[i] << endl;
+		cout << "EndHeader" << endl;
+		cout << "Image 0" << endl;
+	    }
 	    for (i = 0; i < imsize; i++)
 		cout << imgbuf[i] << ' ';
 	    cout << endl;
@@ -108,8 +114,9 @@ int main (int argc, char *argv[])
 void DisplayInfo()
 {
     cout << "getnim: Extract a single image from a NIM or RIM image file.\n";
-    cout << "\nSyntax: getnim [-n <imgno>] < infile > outfile\n";
-    cout << "<imgno>: Image index (0-based). Default: last image in stream.\n";
+    cout << "\nSyntax: getnim [-n <imgno>] [-x] < infile > outfile\n";
+    cout << "-n <imgno>: Image index (0-based). Default: last image in stream.\n";
+    cout << "-x: omit header: only write out image data.\n";
     cout << "\ngetnim is a filter which reads a stream of images in NIM\n"
 	 << "(nodal image) or RIM (raw image) format from stdin and\n"
 	 << "writes the extracted single image to stdout.\n";
