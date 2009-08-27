@@ -3,7 +3,8 @@ include $(TOASTDIR)/Makefile.incl
 VPATH = $(TSRC)/bintools
 OPATH = $(TOASTOBJ)/bintools
 
-BINS =  lin2cubicmesh \
+BINS =  getnim \
+	lin2cubicmesh \
 	lin2quadmesh \
 	makeqm \
 	makeqm3d \
