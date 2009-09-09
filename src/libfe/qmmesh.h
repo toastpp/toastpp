@@ -46,6 +46,7 @@ public:
 
     bool fixed_q_pos;   // TRUE if Q contains final source positions
     bool fixed_m_pos;   // TRUE if M contains final measurement positions
+    bool external_m_pos; // TRUE if M points are not in mesh
 
     QMMesh ();
     ~QMMesh ();

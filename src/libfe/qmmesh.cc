@@ -26,6 +26,7 @@ QMMesh::QMMesh (): Mesh ()
     mwidth = qwidth = 0;
     msup   = qsup = 0;
     fixed_q_pos = fixed_m_pos = false;
+    external_m_pos = false;
 }
 
 QMMesh::~QMMesh ()
@@ -368,6 +369,7 @@ void QMMesh::LoadQM (istream &is)
     nitem = sscanf (cbuf+15, "%d%s", &nM, flagstr);
     xASSERT(nitem >= 1, Number of measurements not found.);
     fixed_m_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
+    external_m_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
     M = new Point[nM];
 
     // reset measurement profile specs
@@ -431,7 +433,7 @@ void QMMesh::LoadQM (istream &is)
 	for (j = 0; j < nQMref[i]; j++) QMofs[i][QMref[i][j]] = Qofs[i]+j;
     }
 
-    InitM ();
+    if (!external_m_pos) InitM ();
 }
 
 void QMMesh::ScaleMesh (double scale)
