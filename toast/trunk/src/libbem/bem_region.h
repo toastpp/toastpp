@@ -101,6 +101,8 @@ public:
 	 */
 	BEM_Surface *GetInnerSurface (int idx);
 
+	toast::complex WaveNumberMinus() const;
+
 	toast::complex WaveNumber() const;
 
 protected:
