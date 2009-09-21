@@ -74,6 +74,8 @@ while ((itr <= prm.solver.itmax) && ...
     disp('Updating solution ...')
     logx = logx + dx*step;
     x = exp(logx);
+    
+        save(['iter',num2str(itr)],'x')
         
     proj = privProject (lprm.hMesh, lprm.hBasis, logx, ref, prm.data.freq, ...
         lprm.qvec, lprm.mvec, prm.fwdsolver.method, prm.fwdsolver.tol);
