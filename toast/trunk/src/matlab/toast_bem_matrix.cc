@@ -15,8 +15,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	int i, j, idx;
 
 	if (mxGetM(prhs[1]) > 1) { // pass explicit node and element list
-
-		cerr << "Using node/element matrices to initialise surface" << endl;
+        if (sout>0.5)
+		{	cerr << "Using node/element matrices to initialise surface" << endl;}
 		// copy node positions
 		RDenseMatrix s_nodes;
 		CopyMatrix (s_nodes, prhs[1]);
@@ -45,7 +45,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		bemsurf = new BEM_Surface(s_nodes, s_elements);
 		idx = 3;
-		cerr << "Finished!" << endl;
+		if (sout >0.5){
+			cerr << "Finished!" << endl;}
 
 	} else { // pass FEM volume mesh
 
@@ -53,7 +54,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		Mesh *mesh = (Mesh*)Handle2Ptr (mxGetScalar (prhs[1]));
 		bemsurf = new BEM_Surface (*mesh);
 		idx = 2;
-		cerr << "Finished!" << endl;
+			if (sout >0.5){
+			cerr << "Finished!" << endl;}
+
 
 	}
 
