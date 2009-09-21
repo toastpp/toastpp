@@ -1,0 +1,9 @@
+the file :
+
+matlab_R2006b.vsprops
+
+contains the macro that should be pointing to the correct version of matlab in each system! usually after updating with the SVN the version pointing to Martins matlab is overwriting the local file. 
+
+maybe we should remove it from the SVN.
+
+Thanasis
