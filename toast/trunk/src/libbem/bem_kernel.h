@@ -51,4 +51,13 @@ public:
     CVector Calculate (BEM_Element *el, Point2D &loc, const Point3D &load);
 };
 
+
+/**
+ * \brief BEM Helmholtz derivative kernel dG/dmua (used for derivatives calculation)
+ */
+class BEMLIB BEM_Kernel_Dk: public BEM_Kernel {
+public:
+    BEM_Kernel_Dk (): BEM_Kernel () {}
+    CVector Calculate (BEM_Element *el, Point2D &loc, const Point3D &load);
+};
 #endif // !__BEM_KERNEL
