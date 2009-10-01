@@ -307,9 +307,11 @@ public:
     /// \sa Allocate(), Unlink()
     void New (int dim) { Unlink (); Allocate (dim); }
 
-    /// \brief Zeroes all elements.
-    /// \remarks Resets all elements to (VT)0, but does not resize the vector.
-    /// \remarks Equivalent to, but more efficient than *this = 0
+    /**
+     * \brief Zeroes all elements.
+     * \remarks Resets all elements to (VT)0, but does not resize the vector.
+     * \remarks Equivalent to, but more efficient than *this = 0
+     */
     void Clear ();
 
     /// \brief Link the vector to the data block of another vector

@@ -957,7 +957,9 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 	b[r++] = br;
     }
 }
-#ifdef USE_SPBLAS
+#ifdef UNDEF// USE_SPBLAS
+// warning: SPBLAS appears to have a size limit to the matrix and fails with
+// an arithmetic exception if this is exceeded.
 template<>
 void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
     const
@@ -1019,7 +1021,8 @@ MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<complex> &x,
     TVector<complex> &b) const
 {
     dASSERT(x.Dim() == cols, Invalid size - vector x);
-    dASSERT(b.Dim() == rows, Invalid size - vector b);
+
+    if (b.Dim() != rows) b.New (rows);
 
     int r, i2;
     register int i, *pcolidx = colidx;

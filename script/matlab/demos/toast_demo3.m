@@ -107,7 +107,7 @@ prm.callback.iter = @callback_vis; % iteration callback from recon
 prm.fwdsolver.hmesh = toastReadMesh(prm.fwdsolver.meshfile);
 toastReadQM (prm.fwdsolver.hmesh,prm.meas.qmfile);
 
-prm.solver.basis.hbasis = toastSetBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim);
+prm.solver.basis.hbasis = toastSetBasis('LINEAR',prm.fwdsolver.hmesh,prm.solver.basis.bdim,prm.solver.basis.bdim);
 prm.smask = toastSolutionMask(prm.solver.basis.hbasis);
 n = toastMeshNodeCount(prm.fwdsolver.hmesh);
 load toast_demo1.mat

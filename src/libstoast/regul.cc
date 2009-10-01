@@ -1843,13 +1843,30 @@ RVector NullRegularisation::GetHessianDiag (const RVector &x) const
 Tikhonov0::Tikhonov0 (double _tau, const RVector *_x0, const RVector *_xs)
     : Regularisation (0, _tau, _x0)
 {
-    x0  = _x0;
-    xs  = _xs;
+    if (_x0)
+	x0 = new RVector(*_x0);
+    else
+	x0 = NULL;
+
+    if (_xs)
+	xs = new RVector(*_xs);
+    else
+	xs = NULL;
+    //x0  = _x0;
+    //xs  = _xs;
+}
+
+Tikhonov0::~Tikhonov0()
+{
+    if (xs) delete xs;
 }
 
 double Tikhonov0::GetValue (const RVector &x) const
 {
     RVector dx ((x - *x0) / *xs);
+
+    cerr << "TK0 value: " << (dx & dx) * tau << endl;
+
     return (dx & dx) * tau;
 }
 
@@ -1857,35 +1874,40 @@ RVector Tikhonov0::GetGradient (const RVector &x) const
 {
     return (x - *x0) / sqr (*xs) * (2.0*tau);
 }
+
 RVector Tikhonov0::GetKappa    (const RVector &x) const
 {
   LOGOUT("Diffusivity is not defined for zero order Tikhonov");
   cerr << "Diffusivity is not defined for zero order Tikhonov\n";
     return RVector (x.Dim());
 }
+
 RVector Tikhonov0::GetHess1f(const RVector &x,const RVector &f) const
 {
     return f*(2.0*tau)/sqr(*xs);
 }
+
 void Tikhonov0::SetHessian (RCompRowMatrix &Hess, const RVector &x)
 {
-  /*
-  RDiagMatrix Ident(x.Dim());
-  Hess = Iden;
-  for(int i = 0; i < x.Dim(); i++) 
-    Hess(i,i) = 1;
-  */
-  LOGOUT("SetHessian not implemented for Tikhonov0 class");
+    /*
+      RDiagMatrix Ident(x.Dim());
+      Hess = Iden;
+      for(int i = 0; i < x.Dim(); i++) 
+      Hess(i,i) = 1;
+    */
+    cerr << "SetHessian not implemented for Tikhonov0 class" << endl;
+    LOGOUT("SetHessian not implemented for Tikhonov0 class");
 }
-void Tikhonov0::SetHessianFromKappa (RCompRowMatrix &Hess, const RVector &kappa)
-{
-  /*
-  RDiagMatrix Ident(x.Dim());
-  Hess = Iden;
-  for(int i = 0; i < x.Dim(); i++) 
-    Hess(i,i) = kappa(i);
-  */
-  LOGOUT("SetHessianFromKappa not implemented for Tikhonov0 class");
+
+void Tikhonov0::SetHessianFromKappa (RCompRowMatrix &Hess, const RVector &kappa){
+    /*
+      RDiagMatrix Ident(x.Dim());
+      Hess = Iden;
+      for(int i = 0; i < x.Dim(); i++) 
+      Hess(i,i) = kappa(i);
+    */
+    cerr << "SetHessianFromKappa not implemented for Tikhonov0 class" << endl;
+    LOGOUT("SetHessianFromKappa not implemented for Tikhonov0 class");
 }
 
 

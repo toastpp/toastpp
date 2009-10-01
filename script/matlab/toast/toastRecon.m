@@ -49,7 +49,7 @@ dmask = toastDataLinkList (LPRM.hMesh);
 if isfield(prm,'solver') && isfield(prm.solver,'basis') && isfield(prm.solver.basis,'hbasis')
     LPRM.hBasis = prm.solver.basis.hbasis;
 else
-    LPRM.hBasis = toastSetBasis (LPRM.hMesh, prm.solver.basis.bdim);
+    LPRM.hBasis = toastSetBasis ('LINEAR',LPRM.hMesh, prm.solver.basis.bdim, prm.solver.basis.bdim);
 end
 RES.bdim = toastGetBasisSize(LPRM.hBasis);
 blen = prod(RES.bdim);

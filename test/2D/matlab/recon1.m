@@ -57,7 +57,7 @@ data = [mdata;pdata];
 m = length(data);
 
 % Set up the mapper between FEM and solution bases
-hBasis = toastSetBasis (hMesh, [bx by]);
+hBasis = toastSetBasis ('LINEAR', hMesh, [bx by]);
 solmask = toastSolutionMask (hBasis);
 solmask2 = [solmask solmask+blen];
 
@@ -103,7 +103,7 @@ tgtmua=toastReadNIM('../meshes/tgt_mua_ellips_tri10.nim');
 tgtmus=toastReadNIM('../meshes/tgt_mus_ellips_tri10.nim');
 tgtkap=1./(3*(tgtmua+tgtmus));
 hMesh2 = toastReadMesh('../meshes/ellips_tri10.msh');
-hBasis2 = toastSetBasis (hMesh2,[bx by]);
+hBasis2 = toastSetBasis ('LINEAR',hMesh2,[bx by]);
 btgtmua=toastMapMeshToGrid (hBasis2, tgtmua);
 btgtkap=toastMapMeshToGrid (hBasis2, tgtkap);
 toastDeleteBasis(hBasis2);
