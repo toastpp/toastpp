@@ -3,7 +3,7 @@ include $(TOASTDIR)/Makefile.incl
 VPATH = $(TSRC)/supertoast
 OPATH = $(TOASTOBJ)/supertoast
 #BINS = fwdfem supertoast supertoast2
-BINS = fwdfem supertoast supertoast_mw supertoast_cw_mw
+BINS = fwdfem supertoast supertoast_mw supertoast_cw_mw test_basis
 
 ifdef MAKE_MPI
 BINS += supertoast_mpi supertoast_mw_mpi supertoast_cw_mw_mpi
@@ -136,6 +136,9 @@ test_qr : test_qr.o
 
 test_block : test_block.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_basis : test_basis.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 multigrid : multigrid.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)

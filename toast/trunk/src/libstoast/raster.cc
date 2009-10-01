@@ -1,9 +1,5 @@
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
-#include "timing.h"
-
-using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // STENCIL2D and STENCIL3D: (used by PCG_PRECON_SPARSEJTJ only): number of
@@ -12,238 +8,55 @@ using namespace toast;
 #define STENCIL2D 5  // valid entries: 5, 9, 13
 #define STENCIL3D 7  // valid entries: 7, 19, 27, 33
 
+using namespace std;
+using namespace toast;
+
+static int POW2[] = {1,2,4,8,16,32,64,128,256,512,1024,2096,4192};
+
 // ==========================================================================
 // class Raster
 
-Raster::Raster (IVector &_gdim, Mesh *mesh, RDenseMatrix *bb)
+Raster::Raster (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
+    RDenseMatrix *bb)
 {
     int i, j;
 
-    bCoarseBasis = false; // no lo-res solution basis supported
-    dim = _gdim.Dim();
+    // set up dimensions
+    bdim = _bdim;      // native basis dimension
+    gdim = _gdim;      // high-res grid dimension
+    dim = bdim.Dim();
     meshptr = mesh;
+    xASSERT(dim == gdim.Dim(),
+	    Basis and grid have incompatible dimensions);
     xASSERT(dim == meshptr->Dimension(),
-	    Raster and mesh have incompatible dimensions);
-    if (bb && bb->nCols() >= dim && bb->nRows() >= 2) {
+	    Basis and mesh have incompatible dimensions);
+
+    // set up bounding box
+    if (bb) {
+	xASSERT(bb->nCols() == dim && bb->nRows() == 2,
+		Invalid bounding box dimensions);
 	bbmin = bb->Row(0);
 	bbmax = bb->Row(1);
     } else {
 	meshptr->BoundingBox (bbmin, bbmax);
     }
-    gdim.New(dim); gdim = _gdim;
-    bdim.New(dim); bdim = _gdim;
-    paddim.New(dim);
-    gsize.New(dim);
+    bbsize = bbmax-bbmin;
 
-    for (i = 0, glen = 1, padlen=1; i < dim; i++) {
-        j = 0; 
-	while(POW2[j] < gdim[i]) // find power of 2 greater than dimension
-	  j++;  // do nothing
-	paddim[i] =POW2[j];
-        glen *= gdim[i];
-	padlen  *= paddim[i];
-	gsize[i] = bbmax[i]-bbmin[i];
-    }
-    blen = glen;
-
-    //tic();
-    elref = GenerateElementPixelRef (*meshptr, gdim, &bbmin, &bbmax);
-    //cout << "GenerateElementPixelRef: t=" << toc() << endl;
-    //tic();
-    B     = GridMapMatrix (*meshptr, gdim, &bbmin, &bbmax, elref);
-    ((RCompRowMatrix*)B)->Shrink();
-    //cout << "GridMapMatrix:           t=" << toc() << endl;
-    //tic();
-
-#if MAP_GRIDTOMESH == MGM_PSEUDOINVERSE
-    if (B->nRows() > B->nCols()) {
-	cout << "Over-determined formulation" << endl;
-	BB = transp(*(RCompRowMatrix*)B) * *(RCompRowMatrix*)B;
-	BBover = true;
-    } else {
-	cout << "Under-determined formulation" << endl;
-	BB = *(RCompRowMatrix*)B * transp(*(RCompRowMatrix*)B);
-	BBover = false;
-    }
-    RVector diag = BB.Diag();
-    double lambda = l2norm(diag)*1e-2;
-    int n = BB.nRows();
-    int *drowptr = new int[n+1];
-    int *dcolidx = new int[n];
-    double *dval = new double[n];
-    for (i = 0; i <= n; i++) drowptr[i] = i;
-    for (i = 0; i <  n; i++) dcolidx[i] = i;
-    for (i = 0; i <  n; i++) dval[i] = lambda;
-    RCompRowMatrix dg (n, n, drowptr, dcolidx, dval);
-    delete []drowptr;
-    delete []dcolidx;
-    delete []dval;
-    BB += dg;
-    pBTB = new RPrecon_Diag;
-    pBTB->Reset (&BB);
-#else
-    pBTB = 0;
-#endif
-
-#if MAP_GRIDTOMESH == MGM_TRANSPOSE
-    BI = GridMapMatrix (*meshptr, gdim, &bbmin, &bbmax, elref);
-    BI->Transpone();
-#else
-    BI = NodeMapMatrix (*meshptr, gdim, &bbmin, &bbmax, elref);
-    //BI = NodeMapMatrix2 (*meshptr, gdim, &bbmin, &bbmax, elref);
-    ((RCompRowMatrix*)BI)->Shrink();
-#endif
-    //cout << "NodeMapMatrix:           t=" << toc() << endl;
-
-    //tic();
-    // calculate mesh support weighting factors for all pixels in
-    // user basis.
-    RVector s(glen);
-    bsupport.New (glen);
-    // s is the support mask for the hires pixel grid
-    for (i = 0; i < glen; i++)
-        if (elref[i] >= 0) s[i] = 1.0;
-
-    // map mask into user basis
-    //SubsampleLinPixel (s, bsupport, gdim, bdim, 0);
-    bsupport = s; // for now only binary mask is supported
-
-    // calculate basis->solution mapping index list
-    basis2sol.New (glen);    
-    for (i = slen = 0; i < glen; i++) {
-        if (bsupport[i] > 0.0) basis2sol[i] = slen++;
-	else                   basis2sol[i] = -1;
-    }
-    sol2basis.New (slen);
-    for (i = slen = 0; i < glen; i++) {
-	if (bsupport[i] > 0.0) sol2basis[slen++] = i;
-    }
-
-    // formulate basis->solution mapping in sparse matrix
-    int *rowptr = new int[slen+1];
-    int *colidx = new int[slen];
-    double *val = new double[slen];
-    for (i = 0; i <= slen; i++) rowptr[i] = i; // each row has one entry
-    for (i = 0; i < slen; i++) val[i] = 1.0;
-    for (i = j = 0; i < glen; i++)
-        if (bsupport[i] > 0.0) colidx[j++] = i;
-    D = new RCompRowMatrix (slen, glen, rowptr, colidx, val);
-
-    delete []rowptr;
-    delete []colidx;
-    delete []val;
-    //cout << "Raster constructor: t=" << toc() << endl;
-}
-
-Raster::Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh, RDenseMatrix *bb)
-{
-    int i, j;
-
-    bCoarseBasis = true; // this version supports a lo-res solution basis
-    dim     = _bdim.Dim();
-    meshptr = mesh;
-    xASSERT(dim == _gdim.Dim(),
-	    Raster and user basis have incompatible dimensions);
-    xASSERT(dim == meshptr->Dimension(),
-	    Raster and mesh have incompatible dimensions);
-
-    if (bb && bb->nCols() >= dim && bb->nRows() >= 2) {
-	bbmin = bb->Row(0);
-	bbmax = bb->Row(1);
-    } else {
-	meshptr->BoundingBox (bbmin, bbmax);
-    }
-    gdim.New(dim); gdim = _gdim;
-    bdim.New(dim); bdim = _bdim;
-    paddim.New(dim);
-    gsize.New(dim);
-
-    for (i = 0, glen = blen = 1, padlen=1; i < dim; i++) {
-        j = 0; 
-	while(POW2[j] < gdim[i]) // find power of 2 greater than dimension
-	  j++;  // do nothing
-	paddim[i] =POW2[j];
-        glen *= gdim[i];
-	padlen  *= paddim[i];
+    for (i = 0, blen = glen = 1; i < dim; i++) {
 	blen *= bdim[i];
-	gsize[i] = bbmax[i]-bbmin[i];
+	glen *= gdim[i];
     }
 
-    tic();
-    elref = GenerateElementPixelRef (*meshptr, gdim, &bbmin, &bbmax);
     belref = GenerateElementPixelRef (*meshptr, bdim, &bbmin, &bbmax);
-    cout << "GenerateElementPixelRef: t=" << toc() << endl;
-    tic();
-    B     = GridMapMatrix (*meshptr, gdim, &bbmin, &bbmax, elref);
-    ((RCompRowMatrix*)B)->Shrink();
-    cout << "GridMapMatrix:           t=" << toc() << endl;
-    tic();
-#if MAP_GRIDTOMESH == MGM_PSEUDOINVERSE
-    xERROR(Raster: Not implemented: mapping via pseudo-inverse);
-#endif
-#if MAP_GRIDTOMESH == MGM_TRANSPOSE
-    xERROR(Raster: Not implemented: mapping via transpose);
-#endif
-    pBTB = 0;
-    BI    = NodeMapMatrix (*meshptr, gdim, &bbmin, &bbmax, elref);
-    ((RCompRowMatrix*)BI)->Shrink();
-    cout << "NodeMapMatrix:           t=" << toc() << endl;
-    tic();
-    B2    = Grid2LinPixMatrix (gdim, bdim, elref);
-    ((RCompRowMatrix*)B2)->Shrink();
-    cout << "Grid2LinPixMatrix:       t=" << toc() << endl;
-    tic();
-    B2I   = LinPix2GridMatrix (gdim, bdim, elref);
-    ((RCompRowMatrix*)B2I)->Shrink();
+    gelref = GenerateElementPixelRef (*meshptr, gdim, &bbmin, &bbmax);
 
-#ifdef UNDEF
-    // to be incorporated
-    delete B2I;
-    B2I = CubicPix2GridMatrix (bdim, gdim, elref);
-    delete B2;
-    B2 = new RCompRowMatrix (*(RCompRowMatrix*)B2I);
-    B2->Transpone();
-
-    RCompRowMatrix tmp1 = *(RCompRowMatrix*)B2 * *(RCompRowMatrix*)B2I;
-#endif
-
-    cout << "LinPix2GridMatrix:       t=" << toc() << endl;
-    tic();
-    C     = new RCompRowMatrix;
-    cout << "Multiplying B2(" << B2->nRows() << ','
-	 << B2->nCols() << ',' << B2->nVal() << ')' << endl;
-    cout << "with         B(" << B->nRows() << ','
-	 << B->nCols() << ',' << B->nVal() << ')' << endl;
-    ((RCompRowMatrix*)B2)->AB (*(RCompRowMatrix*)B, *C);
-    ((RCompRowMatrix*)C)->Shrink();
-    cout << "Result       C(" << C->nRows() << ','
-	 << C->nCols() << ',' << C->nVal() << ')' << endl;
-    cout << "SparseMatrixMult:        t=" << toc() << endl;
-    tic();
-    CI    = new RCompRowMatrix;
-    cout << "Multiplying BI(" << BI->nRows() << ','
-	 << BI->nCols() << ',' << BI->nVal() << ')' << endl;
-    cout << "with       B2I(" << B2I->nRows() << ','
-	 << B2I->nCols() << ',' << B2I->nVal() << ')' << endl;
-    ((RCompRowMatrix*)BI)->AB (*(RCompRowMatrix*)B2I, *CI);
-    ((RCompRowMatrix*)CI)->Shrink();
-    cout << "Result      CI(" << CI->nRows() << ','
-	 << CI->nCols() << ',' << CI->nVal() << ')' << endl;
-    cout << "SparseMatrixMult:        t=" << toc() << endl;
-
-    tic();
-    // calculate mesh support weighting factors for all pixels in
-    // user basis.
-    RVector s(glen);
     bsupport.New (blen);
-    // s is the support mask for the hires pixel grid
-    for (i = 0; i < glen; i++)
-        if (elref[i] >= 0) s[i] = 1.0;
+    for (i = 0; i < blen; i++)
+	if (belref[i] >= 0) bsupport[i] = 1.0; // for now, only binary mask
 
-    // map mask into user basis
-    SubsampleLinPixel (s, bsupport, gdim, bdim, 0);
+    // calculate default basis->solution mapping index list
+    // (default is to use the basis voxel support array)
 
-    // calculate basis->solution mapping index list
     basis2sol.New (blen);    
     for (i = slen = 0; i < blen; i++) {
         if (bsupport[i] > 0.0) basis2sol[i] = slen++;
@@ -254,139 +67,47 @@ Raster::Raster (IVector &_gdim, IVector &_bdim, Mesh *mesh, RDenseMatrix *bb)
 	if (bsupport[i] > 0.0) sol2basis[slen++] = i;
     }
 
-    // formulate basis->solution mapping in sparse matrix
-    int *rowptr = new int[slen+1];
-    int *colidx = new int[slen];
-    double *val = new double[slen];
-    for (i = 0; i <= slen; i++) rowptr[i] = i; // each row has one entry
-    for (i = 0; i < slen; i++) val[i] = 1.0;
-    for (i = j = 0; i < blen; i++)
-        if (bsupport[i] > 0.0) colidx[j++] = i;
-    D = new RCompRowMatrix (slen, blen, rowptr, colidx, val);
+    // set up transformations between mesh and high-res grid
+    B     = GridMapMatrix (*meshptr, gdim, &bbmin, &bbmax, gelref);
+    BI    = NodeMapMatrix (*meshptr, gdim, &bbmin, &bbmax, gelref);
+    ((RCompRowMatrix*)BI)->Shrink();
 
-    delete []rowptr;
-    delete []colidx;
-    delete []val;
-    cout << "Raster constructor: t=" << toc() << endl;
+    // set up power-2 padding
+    paddim.New(dim);
+    for (i = 0, padlen = 1; i < dim; i++) {
+	j = 0;
+	while (POW2[j] < gdim[i])  // find power of 2 greate than dimension
+	    j++;
+	paddim[i] = POW2[j];
+	padlen *= paddim[i];
+    }
 }
 
-Raster::~Raster ()
+// ==========================================================================
+
+Raster::~Raster()
 {
-    delete []elref;
+    delete []belref;
+    delete []gelref;
     delete B;
     delete BI;
-    delete D;
-    if (pBTB) delete pBTB;
-
-    if (bCoarseBasis) {
-	delete []belref;
-	delete B2;
-	delete B2I;
-	delete C;
-	delete CI;
-    }
 }
 
-void Raster::GetPixelCoords (int i, IVector &pix) const
+// ==========================================================================
+
+void Raster::Map_MeshToGrid (const RVector &mvec, RVector &gvec) const
 {
-    int idx = sol2basis[i];
-    if (dim > 2) {
-	pix[2] = idx / (bdim[0]*bdim[1]);
-	idx -= pix[2] * bdim[0]*bdim[1];
-    }
-    pix[1] = idx / bdim[0];
-    pix[0] = idx % bdim[0];
+    B->Ax (mvec, gvec);
 }
 
-const RGenericSparseMatrix &Raster::Mesh2BasisMatrix() const
+// ==========================================================================
+
+void Raster::Map_MeshToGrid (const CVector &mvec, CVector &gvec) const
 {
-    if (bCoarseBasis) return *C;
-    else return Mesh2GridMatrix();
+    ((RCompRowMatrix*)B)->Ax_cplx (mvec, gvec);
 }
 
-const RGenericSparseMatrix &Raster::Basis2MeshMatrix() const
-{
-    if (bCoarseBasis) return *CI;
-    else return Grid2MeshMatrix();
-}
-
-void Raster::Map_MeshToSol (const RVector &mvec, RVector &svec) const
-{
-  
-    RVector bvec(blen);
-    Map_MeshToBasis (mvec, bvec);
-    Map_BasisToSol (bvec, svec);
-}
-
-void Raster::Map_GridToSol (const RVector &gvec, RVector &svec) const
-{
-    if (bCoarseBasis) {
-	RVector bvec(blen);
-	Map_GridToBasis (gvec, bvec);
-	Map_BasisToSol (bvec, svec);
-    } else {
-	Map_BasisToSol (gvec, svec);
-    }
-}
-
-void Raster::Map_SolToMesh (const RVector &svec, RVector &mvec) const
-{
-    RVector bvec(blen);
-    Map_SolToBasis (svec, bvec);
-    Map_BasisToMesh (bvec, mvec);
-}
-
-void Raster::Map_GridToMeshPI (const RVector &gvec, RVector &mvec) const
-{
-    // map grid->mesh by pseudo-inverse of the mesh->grid matrix
-    double tol = 1e-10;
-    int maxit = 100000;
-    if (BBover) {
-	RVector b = B->ATx (gvec);
-	int n = CG (BB, b, mvec, tol, pBTB, maxit);
-	if (n < maxit) { // converged
-	    cerr << "G->M: niter=" << n << ", res=" << tol << endl;
-	} else {
-	    cerr << "No convergence, use direct mapping\n";
-	    BI->Ax (gvec, mvec);
-	}
-    } else {
-	RVector m(gvec.Dim());
-	int n = CG (BB, gvec, m, tol, pBTB, maxit);
-	if (n < maxit) { // converged
-	    mvec = B->ATx (m);
-	    cerr << "G->M: niter=" << n << ", res=" << tol << endl;
-	} else {
-	    cerr << "No convergence\n";
-	    //cerr << "No convergence, use direct mapping\n";
-	    //BI->Ax (gvec, mvec);
-	}
-    }
-    RVector tmp;
-    B->Ax(mvec,tmp);
-    cerr << "residual: " << l2norm(tmp-gvec)/l2norm(gvec) << endl;
-}
-
-void Raster::Map_MeshToSol (const CVector &mvec, CVector &svec) const
-{
-    RVector tmp(svec.Dim());
-    Map_MeshToSol (Re(mvec), tmp); SetReal (svec, tmp);
-    Map_MeshToSol (Im(mvec), tmp); SetImag (svec, tmp);
-}
-
-void Raster::Map_SolToMesh (const CVector &svec, CVector &mvec) const
-{
-    RVector tmp(mvec.Dim());
-    Map_SolToMesh (Re(svec), tmp); SetReal (mvec, tmp);
-    Map_SolToMesh (Im(svec), tmp); SetImag (mvec, tmp);
-}
-
-void Raster::Map_GridToSol (const CVector &gvec, CVector &svec) const
-{
-    CVector bvec(blen);
-    Map_GridToBasis (gvec, bvec);
-    Map_BasisToSol (bvec, svec);
-}
+// ==========================================================================
 
 void Raster::Map_MeshToGrid (const Solution &msol, Solution &gsol, bool mapall)
     const
@@ -396,6 +117,22 @@ void Raster::Map_MeshToGrid (const Solution &msol, Solution &gsol, bool mapall)
   	    Map_MeshToGrid (msol.param[i], gsol.param[i]);
 }
 
+// ==========================================================================
+
+void Raster::Map_GridToMesh (const RVector &gvec, RVector &mvec) const
+{
+    BI->Ax (gvec, mvec);
+}
+
+// ==========================================================================
+
+void Raster::Map_GridToMesh (const CVector &gvec, CVector &mvec) const
+{
+    ((RCompRowMatrix*)BI)->Ax_cplx (gvec, mvec);
+}
+
+// ==========================================================================
+
 void Raster::Map_GridToMesh (const Solution &gsol, Solution &msol, bool mapall)
     const
 {
@@ -403,6 +140,44 @@ void Raster::Map_GridToMesh (const Solution &gsol, Solution &msol, bool mapall)
         if (mapall || gsol.active[i])
 	    Map_GridToMesh (gsol.param[i], msol.param[i]);
 }
+
+// ==========================================================================
+
+void Raster::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
+{
+    RVector gvec(glen);
+    Map_MeshToGrid (mvec, gvec);
+    Map_GridToBasis (gvec, bvec);
+}
+
+// ==========================================================================
+
+void Raster::Map_MeshToBasis (const CVector &mvec, CVector &bvec) const
+{
+    CVector gvec(glen);
+    Map_MeshToGrid (mvec, gvec);
+    Map_GridToBasis (gvec, bvec);
+}
+
+// ==========================================================================
+
+void Raster::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
+{
+    RVector gvec(glen);
+    Map_BasisToGrid (bvec, gvec);
+    Map_GridToMesh (gvec, mvec);
+}
+
+// ==========================================================================
+
+void Raster::Map_BasisToMesh (const CVector &bvec, CVector &mvec) const
+{
+    CVector gvec(glen);
+    Map_BasisToGrid (bvec, gvec);
+    Map_GridToMesh (gvec, mvec);
+}
+
+// ==========================================================================
 
 void Raster::Map_GridToBasis (const Solution &gsol, Solution &bsol,
     bool mapall) const
@@ -412,6 +187,8 @@ void Raster::Map_GridToBasis (const Solution &gsol, Solution &bsol,
 	    Map_GridToBasis (gsol.param[i], bsol.param[i]);
 }
 
+// ==========================================================================
+
 void Raster::Map_BasisToGrid (const Solution &bsol, Solution &gsol,
     bool mapall) const
 {
@@ -420,29 +197,61 @@ void Raster::Map_BasisToGrid (const Solution &bsol, Solution &gsol,
 	    Map_BasisToGrid (bsol.param[i], gsol.param[i]);
 }
 
-void Raster::Map_MeshToBasis (const Solution &msol, Solution &bsol,
-    bool mapall) const
+// ==========================================================================
+
+void Raster::Map_BasisToSol (const RVector &bvec, RVector &svec) const
 {
-    for (int i = 0; i < msol.nParam(); i++)
-        if (mapall || msol.active[i])
-	    Map_MeshToBasis (msol.param[i], bsol.param[i]);
+    if (slen == blen) {
+	svec = bvec;  // identity operation
+    } else {
+	if (svec.Dim() != slen) svec.New (slen);
+	for (int i = 0; i < slen; i++)
+	    svec[i] = bvec[sol2basis[i]];
+    }
 }
 
-void Raster::Map_BasisToMesh (const Solution &bsol, Solution &msol,
-    bool mapall) const
+// ==========================================================================
+
+void Raster::Map_BasisToSol (const CVector &bvec, CVector &svec) const
 {
-    for (int i = 0; i < bsol.nParam(); i++)
-        if (mapall || bsol.active[i])
-	    Map_BasisToMesh (bsol.param[i], msol.param[i]);
+    if (slen == blen) {
+	svec = bvec;  // identity operation
+    } else {
+	if (svec.Dim() != slen) svec.New (slen);
+	for (int i = 0; i < slen; i++)
+	    svec[i] = bvec[sol2basis[i]];
+    }
 }
 
-void Raster::Map_BasisToSol (const Solution &bsol, Solution &ssol,
-    bool mapall) const
+// ==========================================================================
+
+void Raster::Map_SolToBasis (const RVector &svec, RVector &bvec) const
 {
-    for (int i = 0; i < bsol.nParam(); i++)
-        if (mapall || bsol.active[i])
-	    Map_BasisToSol (bsol.param[i], ssol.param[i]);
+    if (slen == blen) {
+	bvec = svec;  // identity operation
+    } else {
+	if (bvec.Dim() != blen) bvec.New (blen);
+	else                    bvec.Clear();
+	for (int i = 0; i < slen; i++)
+	    bvec[sol2basis[i]] = svec[i];
+    }
 }
+
+// ==========================================================================
+
+void Raster::Map_SolToBasis (const CVector &svec, CVector &bvec) const
+{
+    if (slen == blen) {
+	bvec = svec;  // identity operation
+    } else {
+	if (bvec.Dim() != blen) bvec.New (blen);
+	else                    bvec.Clear();
+	for (int i = 0; i < slen; i++)
+	    bvec[sol2basis[i]] = svec[i];
+    }
+}
+
+// ==========================================================================
 
 void Raster::Map_SolToBasis (const Solution &ssol, Solution &bsol,
     bool mapall) const
@@ -452,13 +261,61 @@ void Raster::Map_SolToBasis (const Solution &ssol, Solution &bsol,
 	    Map_SolToBasis (ssol.param[i], bsol.param[i]);
 }
 
-void Raster::Map_MeshToSol (const Solution &msol, Solution &ssol,
-    bool mapall) const
+// ==========================================================================
+
+void Raster::Map_SolToGrid (const RVector &svec, RVector &gvec) const
 {
-    for (int i = 0; i < msol.nParam(); i++)
-        if (mapall || msol.active[i])
-	    Map_MeshToSol (msol.param[i], ssol.param[i]);
+    RVector bvec;
+    Map_SolToBasis (svec, bvec);
+    Map_BasisToGrid (bvec, gvec);
 }
+
+// ==========================================================================
+
+void Raster::Map_SolToGrid (const CVector &svec, CVector &gvec) const
+{
+    CVector bvec;
+    Map_SolToBasis (svec, bvec);
+    Map_BasisToGrid (bvec, gvec);
+}
+
+// ==========================================================================
+
+void Raster::Map_GridToSol (const RVector &gvec, RVector &svec) const
+{
+    RVector bvec;
+    Map_GridToBasis (gvec, bvec);
+    Map_BasisToSol (bvec, svec);
+}
+
+// ==========================================================================
+
+void Raster::Map_GridToSol (const CVector &gvec, CVector &svec) const
+{
+    CVector bvec;
+    Map_GridToBasis (gvec, bvec);
+    Map_BasisToSol (bvec, svec);
+}
+
+// ==========================================================================
+
+void Raster::Map_SolToMesh (const RVector &svec, RVector &mvec) const
+{
+    RVector bvec;
+    Map_SolToBasis (svec, bvec);
+    Map_BasisToMesh (bvec, mvec);
+}
+
+// ==========================================================================
+
+void Raster::Map_SolToMesh (const CVector &svec, CVector &mvec) const
+{
+    CVector bvec;
+    Map_SolToBasis (svec, bvec);
+    Map_BasisToMesh (bvec, mvec);
+}
+
+// ==========================================================================
 
 void Raster::Map_SolToMesh (const Solution &ssol, Solution &msol,
     bool mapall) const
@@ -467,6 +324,8 @@ void Raster::Map_SolToMesh (const Solution &ssol, Solution &msol,
         if (mapall || ssol.active[i])
 	    Map_SolToMesh (ssol.param[i], msol.param[i]);
 }
+
+// ==========================================================================
 
 void Raster::Map_ActiveSolToMesh (const RVector &asol, Solution &msol) const
 {
@@ -477,6 +336,93 @@ void Raster::Map_ActiveSolToMesh (const RVector &asol, Solution &msol) const
 	    Map_SolToMesh (prm, msol.param[i]);
 	}
 }
+
+// ==========================================================================
+
+void Raster::Map_MeshToSol (const RVector &mvec, RVector &svec) const
+{
+    RVector bvec;
+    Map_MeshToBasis (mvec, bvec);
+    Map_BasisToSol (bvec, svec);
+}
+
+// ==========================================================================
+
+void Raster::Map_MeshToSol (const CVector &mvec, CVector &svec) const
+{
+    CVector bvec;
+    Map_MeshToBasis (mvec, bvec);
+    Map_BasisToSol (bvec, svec);
+}
+
+// ==========================================================================
+
+void Raster::Map_MeshToSol (const Solution &msol, Solution &ssol, bool mapall)
+    const
+{
+    for (int i = 0; i < msol.nParam(); i++)
+        if (mapall || msol.active[i])
+	    Map_MeshToSol (msol.param[i], ssol.param[i]);    
+}
+
+// ==========================================================================
+
+int Raster::GetSolIdx (int basisidx) const
+{
+    dASSERT (basisidx >= 0 && basisidx < blen, Argument 1 index out of range);
+    return basis2sol[basisidx];
+}
+
+// ==========================================================================
+
+int Raster::GetSolIdx (const IVector &crd) const
+{
+    dASSERT (crd.Dim() == dim, Argument 1 unexpected size);
+    if (dim == 2)
+	return basis2sol[crd[0] + bdim[0]*crd[1]];
+    else
+	return basis2sol[crd[0] + bdim[0]*(crd[1] + bdim[1]*crd[2])];
+}
+
+// ==========================================================================
+
+int Raster::GetBasisIdx (int solidx) const
+{
+    dASSERT (solidx >= 0 && solidx < slen, Argument 1 index out of range);
+    return sol2basis[solidx];
+}
+
+// ==========================================================================
+
+IVector &Raster::GetBasisIndices (int basisidx) const
+{
+    static IVector crd;
+    if (crd.Dim() != dim) crd.New(dim);
+    if (dim == 3) {
+	crd[2] = basisidx / (bdim[0]*bdim[1]);
+	basisidx -= crd[2]*bdim[0]*bdim[1];
+    }
+    crd[0] = basisidx % bdim[0];
+    crd[1] = basisidx / bdim[0];
+    return crd;
+}
+
+// ==========================================================================
+
+IVector &Raster::GetGridIndices (int grididx) const
+{
+    static IVector crd;
+    if (crd.Dim() != dim) crd.New(dim);
+    if (dim == 3) {
+	crd[2] = grididx / (gdim[0]*gdim[1]);
+	grididx -= crd[2]*gdim[0]*gdim[1];
+    }
+    crd[0] = grididx % gdim[0];
+    crd[1] = grididx / gdim[0];
+    return crd;
+}
+
+// ==========================================================================
 
 void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
 {
@@ -661,6 +607,8 @@ void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
 
     //cout << nzero << " entries in neighbour graph found" << endl;
 }
+
+// ==========================================================================
 
 void Raster::NeighbourGraph (ICompRowMatrix &NG) const
 {
@@ -882,6 +830,8 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
     //cout << nzero << " entries in neighbour graph found" << endl;
 }
 
+// ==========================================================================
+
 IVector Raster::NeighbourShift (const ICompRowMatrix &NG, int i, int j) const
 {
     int d;
@@ -898,6 +848,8 @@ IVector Raster::NeighbourShift (const ICompRowMatrix &NG, int i, int j) const
     return shift;
 }
 
+// ==========================================================================
+
 RVector Raster::RNeighbourShift (const ICompRowMatrix &NG, int i, int j) const
 {
     IVector ishift;
@@ -911,130 +863,7 @@ RVector Raster::RNeighbourShift (const ICompRowMatrix &NG, int i, int j) const
     return shift;
 }
 
-void Raster::MapGraph2Sol (const int *browptr, const int *bcolidx, const int bnzero, int *&srowptr, int *&scolidx, int &snzero) const
-{
-  /* convert the graph on basis map to graph on solution map
-  */
-    cout << "Setting up solution neighbour graph" << endl;
-
-    srowptr = new int[slen+1];
-    srowptr[0] = snzero = 0;
-
-    int i, r, c, row, col, i0, i1;
-
-    // step 1: build row pointer list
-    for (row = r = 0; row < blen; row++) {
-      i0 = browptr[row]; i1 = browptr[row+1];
-      if(basis2sol[row] < 0)               // pixel is not in support
-	continue;
-      for(i = i0 ; i < i1; i++)   {        // look at neighbours.
-	    col = bcolidx[i];
-	    if(basis2sol[col] < 0)         // neighbour is not in support
-	       continue;
-	    snzero++;
-      }
-      srowptr[++r] = snzero;
-    }
-    // step 2: build column index list
-    scolidx = new int[snzero];
-    for (row = r = c=0; row < blen; row++) {
-      i0 = browptr[row]; i1 = browptr[row+1];
-      if(basis2sol[row] < 0)               // pixel is not in support
-	continue;
-//      cout << "columns " << srowptr[r] << "-" << srowptr[r+1] -1<< ": ";
-      for(i = i0 ; i < i1; i++)   {        // look at neighbours.
-	    col = bcolidx[i];
-	    if(basis2sol[col] < 0)         // neighbour is not in support
-	       continue;
-//	    cout << "(" << row << "," << col << ")->("<< r << "," << basis2sol[col] << ");";
-	    scolidx[c++] = basis2sol[col];
-      }
-      r++;
-//      cout << endl;
-    }
-    cout << snzero << " entries in solution neighbour graph found" << endl;
-}
-
-void Raster::BuildRegularRestriction (const IVector &gdim, RCompRowMatrix &R)
-{
-    // Builds restriction matrix from grid gdim to gdim_1,
-    // where gdim[i] = 2 gdim_1[i] - 1
-    // thus gdim[i] = 2k-1, i=0,1[,2] for some k is required
-
-    int i, j, k, m, idx;
-    int x1 = gdim[0], y1 = gdim[1], z1 = (gdim.Dim() > 2 ? gdim[2] : 1);
-    int x2 = (x1-1)/2, y2 = (y1-1)/2, z2 = (z1 > 1 ? (z1-1)/2 : 1);
-    int len1 = x1*y1*z1, len2 = x2*y2*z2;
-    int stridex = 1;
-    int stridey = x1;
-    int stridez = x1*y1;
-
-    R.New (len2, len1);
-    RVector row(len1);
-    
-    for (k = m = 0; k < z2; k++) {
-        for (j = 0; j < y2; j++) {
-	    for (i = 0; i < x2; i++) {
-	        // build stencil
-	        row.Clear();
-	        // 1. in-plane
-	        idx = k*stridez*2 + j*stridey*2 + i*2;
-		row[idx] = 1.0; // node itself
-		if (i > 0)
-		    row[idx-stridex] = 0.5; // left neighbour
-		if (i < x2-1)
-		    row[idx+stridex] = 0.5; // right neighbour
-		if (j > 0) {
-		    row[idx-stridey] = 0.5; // bottom neighbour
-		    if (i > 0)
-		        row[idx-stridey-stridex] = 0.25; // bottom left
-		    if (i < x2-1)
-		        row[idx-stridey+stridex] = 0.25; // bottom right
-		}
-		if (j < y2-1) {
-		    row[idx+stridey] = 0.5; // top neighbour
-		    if (i > 0)
-		        row[idx+stridey-stridex] = 0.25; // top left
-		    if (i < x2-1)
-		        row[idx+stridey+stridex] = 0.25; // top right
-		}
-		// 2. plane below
-		if (k > 0) {
-		    row[idx-stridez] = 0.5;
-		    if (i > 0)    row[idx-stridez-stridex] = 0.25;
-		    if (i < x2-1) row[idx-stridez+stridex] = 0.25;
-		    if (j > 0) {
-		        row[idx-stridez-stridey] = 0.25;
-			if (i > 0)    row[idx-stridez-stridey-stridex] = 0.125;
-			if (i < x2-1) row[idx-stridez-stridey+stridex] = 0.125;
-		    }
-		    if (j < y2-1) {
-		        row[idx-stridez+stridey] = 0.25;
-			if (i > 0)    row[idx-stridez+stridey-stridex] = 0.125;
-			if (i < x2-1) row[idx-stridex+stridey+stridez] = 0.125;
-		    }
-		}
-		// 3. plane above
-		if (k < z2-1) {
-		    row[idx+stridez] = 0.5;
-		    if (i > 0)    row[idx+stridez-stridex] = 0.25;
-		    if (i < x2-1) row[idx+stridez+stridex] = 0.25;
-		    if (j > 0) {
-		        row[idx+stridez-stridey] = 0.25;
-			if (i > 0)    row[idx+stridez-stridey-stridex] = 0.125;
-			if (i < x2-1) row[idx+stridez-stridey+stridex] = 0.125;
-		    }
-		    if (j < y2-1) {
-		        row[idx+stridez+stridey] = 0.25;
-			if (i > 0)    row[idx+stridez+stridey-stridex] = 0.125;
-			if (i < x2-1) row[idx+stridez+stridey+stridex] = 0.125;
-		    }
-		}
-		R.SetRow (m++, row); // assemble into restriction matrix
-	    }
-	}
-    }
-}
+// ==========================================================================
 
 RVector Raster::ImageGradient(const RVector &x, double sd) const
 {
@@ -1056,6 +885,8 @@ RVector Raster::ImageGradient(const RVector &x, double sd) const
     delete []iflag;
     return gn;
 }
+
+// ==========================================================================
 
 
 #define RESCALE_W0

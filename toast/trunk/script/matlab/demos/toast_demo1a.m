@@ -82,7 +82,7 @@ prm.basis.bdim = [64 64];
 prm.blen = prod(prm.basis.bdim);
 prm.basis.hMesh = toastReadMesh('circle25_32.msh');
 toastReadQM(prm.basis.hMesh,'circle25_1x32.qm');
-prm.basis.hBasis = toastSetBasis(prm.basis.hMesh,prm.basis.bdim);
+prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.basis.bdim,prm.basis.bdim);
 prm.qvec = real(toastQvec(prm.basis.hMesh,'Isotropic','Gaussian',2));
 prm.mvec = real(toastMvec(prm.basis.hMesh,'Gaussian',2));
 prm.mvec = prm.mvec(:,[4,8,12,16]);   % only run with 4 detectors

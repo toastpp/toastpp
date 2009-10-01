@@ -358,9 +358,9 @@ int main (int argc, char *argv[])
     cout << "Generating intermediate pixel grid" << endl;
     
     if (blen == glen) // use single grid basis
-	raster = new Raster (gdim, &mesh);
+	raster = new Raster_Pixel (gdim, gdim, &mesh);
     else              // use intermediate basis
-	raster = new Raster (gdim, bdim, &mesh);
+	raster = new Raster_Pixel (gdim, bdim, &mesh);
 
     glen = raster->GLen();
     blen = raster->BLen();

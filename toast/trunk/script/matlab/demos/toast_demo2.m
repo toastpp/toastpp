@@ -94,7 +94,7 @@ toastSetQM(prm.basis.hMesh,Q,M);
 
 prm.qvec = toastQvec(prm.basis.hMesh,'Neumann','Gaussian',2);
 prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
-prm.basis.hBasis = toastSetBasis(prm.basis.hMesh,[prm.bx prm.by]);
+prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,[prm.bx prm.by],[prm.bx prm.by]);
 prm.smask = toastSolutionMask(prm.basis.hBasis);
 n = toastMeshNodeCount(prm.basis.hMesh);
 prm.mua = ones(n,1)*0.025;

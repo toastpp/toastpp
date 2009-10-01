@@ -723,6 +723,7 @@ public:
 class STOASTLIB Tikhonov0: public Regularisation {
 public:
     Tikhonov0 (double _tau, const RVector *_x0, const RVector *_xs);
+    ~Tikhonov0();
     PRIOR Type() const {return PRIOR_DIAG; } 
 
     const char *GetName() const { return "Tikhonov0"; }

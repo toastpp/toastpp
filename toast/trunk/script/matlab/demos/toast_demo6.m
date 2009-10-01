@@ -85,7 +85,7 @@ clear prm;
 %prm.data.phasefile = 'farg_head_vox32_3plane.fem';
 %prm.meas.qmfile = 'vox32_3plane.qm';
 prm.fwdsolver.meshfile = 'cyl2.msh';
-prm.solver.basis.bdim = [25 25 25];
+prm.solver.basis.bdim = [24 24 24];
 prm.data.lnampfile = 'fmod_cyl2_5ring_100MHz.fem';
 prm.data.phasefile = 'farg_cyl2_5ring_100MHz.fem';
 prm.data.freq = 100;
@@ -94,11 +94,11 @@ prm.meas.src = struct('type','Neumann','prof','Gaussian','width',2);
 prm.meas.det = struct('prof','Gaussian','width',2);
 prm.fwdsolver.method = 'BiCGSTAB';
 %prm.linsolver.method = 'DIRECT';
-prm.fwdsolver.tol = 1e-7;
+prm.fwdsolver.tol = 1e-10;
 prm.solver.method = 'PCG';
 prm.solver.tol = 1e-8;
-prm.solver.step0 = 50;
-prm.solver.lsearch = false;
+prm.solver.step0 = 87;
+prm.solver.lsearch = true;
 prm.regul.method = 'None';
 prm.initprm.mua = struct('reset','HOMOG','val',0.01);
 prm.initprm.mus = struct('reset','HOMOG','val',1);
@@ -110,7 +110,7 @@ prm.callback.iter = @callback_vis; % iteration callback from recon
 prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
 toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
 
-prm.basis.hBasis = toastSetBasis(prm.basis.hMesh,prm.solver.basis.bdim);
+prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.solver.basis.bdim,prm.solver.basis.bdim);
 prm.smask = toastSolutionMask(prm.basis.hBasis);
 n = toastMeshNodeCount(prm.basis.hMesh);
 %load toast_demo6.mat

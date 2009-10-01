@@ -57,7 +57,6 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
     double omega = freq * 2.0*Pi*1e-6;
     
     FWS.Allocate (*mesh);
-    cerr << "Building DOT system matrix" << endl;
     FWS.AssembleSystemMatrix (sol, omega, elbasis);
 
     // Return system matrix to MATLAB

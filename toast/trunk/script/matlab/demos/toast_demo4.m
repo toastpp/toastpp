@@ -105,7 +105,7 @@ prm.bx = prm.solver.basis.bdim(1); prm.by = prm.solver.basis.bdim(2);
 prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
 toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
 
-prm.basis.hBasis = toastSetBasis(prm.basis.hMesh,[prm.bx prm.by]);
+prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,[prm.bx prm.by],[prm.bx prm.by]);
 prm.smask = toastSolutionMask(prm.basis.hBasis);
 n = toastMeshNodeCount(prm.basis.hMesh);
 load toast_demo1.mat

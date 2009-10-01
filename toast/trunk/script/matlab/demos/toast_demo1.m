@@ -82,7 +82,7 @@ prm.bx = 64; prm.by = 64;
 prm.blen = prm.bx*prm.by;
 prm.basis.hMesh = toastReadMesh('circle25_32.msh');
 toastReadQM(prm.basis.hMesh,'circle25_1x32.qm');
-prm.basis.hBasis = toastSetBasis(prm.basis.hMesh,[prm.bx prm.by]);
+prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,[prm.bx prm.by],[prm.bx prm.by]);
 prm.qvec = toastQvec(prm.basis.hMesh,'Neumann','Gaussian',2);
 prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
 prm.smask = toastSolutionMask(prm.basis.hBasis);
