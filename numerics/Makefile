@@ -47,9 +47,11 @@ blzpack::
 	cp $(NUMERICSDIR)/blzpack/cleaner .; \
 	cp $(NUMERICSDIR)/blzpack/src/double/Makefile src/double; \
 	cp $(NUMERICSDIR)/blzpack/src/*.h src; \
-	cp -r $(NUMERICSDIR)/blzpack/sys .; \
-	cp -r $(NUMERICSDIR)/blzpack/drv .; \
-	cp -r $(NUMERICSDIR)/blzpack/etc .; \
+	pushd $(NUMERICSDIR)/blzpack; \
+	tar czvf blzpack.tar.gz sys drv etc --exclude "*svn" ; \
+	popd; \
+	tar xzvf $(NUMERICSDIR)/blzpack/blzpack.tar.gz; \
+	rm $(NUMERICSDIR)/blzpack/blzpack.tar.gz; \
 	./creator; \
 	mv lib/libblzpack$(LIB_SUFFIX) $(LIBDIR)
 
