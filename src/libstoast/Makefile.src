@@ -9,7 +9,8 @@ all:: $(LIB)
 
 SRCS = 	solution.cc mwsolution.cc source.cc fwdsolver.cc \
 	fwdsolver_mw.cc jacobian.cc of.cc regul.cc pscaler.cc pparse.cc \
-	raster.cc raster_px.cc raster_bl.cc raster_cp.cc
+	raster.cc raster_px.cc raster_bl.cc raster_cp.cc projector.cc \
+	camera.cc
 
 ifdef MAKE_MPI
 SRCS += jacobian_mpi.cc

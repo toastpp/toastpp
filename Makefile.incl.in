@@ -92,6 +92,7 @@ FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask -I$(TSRC)/libmath \
 TOASTINC  = $(FEINC) -I$(TSRC)/libtoast
 TOASTCINC = $(TOASTINC) -I$(TSRC)/libctoast
 STOASTINC = $(FEINC) -I$(TSRC)/libstoast
+FDOTINC   = $(STOASTINC) -I$(TSRC)/libfdot
 INCLUDE   = $(TOASTCINC)
 # =======================================================================
 

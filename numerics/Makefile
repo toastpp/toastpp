@@ -5,7 +5,7 @@ NUMERICSDIR = $(TOASTDIR)/numerics
 LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
 
-all:: blas fspblas lapack superlu blzpack arpack liblbfgs
+all:: blas fspblas lapack superlu blzpack arpack liblbfgs mesa
 
 blas::
 	mkdir -p $(TOASTOBJ)/BLAS; \
@@ -94,6 +94,14 @@ liblbfgs::
 	make; \
 	cp lib/.libs/*$(LIB_SUFFIX) $(LIBDIR); \
 	cp include/* $(TOASTDIR)/include
+
+mesa::
+	cd $(NUMERICSDIR)/Mesa-7.3 ; \
+	./configure --prefix=$(TOASTOBJ) ; \
+	make ; \
+	cp -r include/* $(TOASTDIR)/include ; \
+	cd lib ; tar czvf mesa_lib.tar.gz * ; \
+	cd $(TOASTDIR)/lib; tar xzvf $(NUMERICSDIR)/Mesa-7.3/lib/mesa_lib.tar.gz
 
 clean:: blas_clean fspblas_clean lapack_clean superlu_clean blzpack_clean \
 	arpack_clean liblbfgs_clean
