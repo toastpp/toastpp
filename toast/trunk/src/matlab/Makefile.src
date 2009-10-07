@@ -84,7 +84,8 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastWriteRealVector.cc \
 	construct_bem_matrix.cc \
 	toast_bem_matrix.cc \
-	surface_int.cc
+	surface_int.cc \
+	makeFMTFwd.cc
 
 OBJS = ${SRCS:.cc=.$(MEXEXT)}
 

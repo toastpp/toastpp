@@ -1,0 +1,29 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libfdot
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libfdot
+
+all:: $(LIB)
+
+SRCS = 	matrixFreeSolver.cc MLEMSolver.cc
+
+
+OBJS = ${SRCS:.cc=.o} 
+HDRS = ${SRCS:.cc=.h}
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(FDOTINC) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(OBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+clean::
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
