@@ -133,10 +133,10 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (!pel->IsBoundarySide (sd)) continue;
 		for (ii = 0; ii < pel->nSideNode(sd); ii++) {
 		    i = pel->SideNode(sd,ii);
-		    pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
+		    pr[i*nnd+i] += pel->BndIntFFSide(i,i,sd);
 		    for (jj = 0; jj < ii; jj++) {
 			j = pel->SideNode(sd,jj);
-			pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
+			pr[i*nnd+j] = pr[j*nnd+i] += pel->BndIntFFSide(i,j,sd);
 		    }
 		}
 	    }
