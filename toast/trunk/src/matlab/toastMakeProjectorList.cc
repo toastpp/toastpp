@@ -127,8 +127,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	y /= l2norm(y);
 	z /= l2norm(z);
 	cpos = cpos - y * 2.1428; // manual adjustment for optical axis offset in image
-	cout <<"Cam pos = "<<cpos<<endl;
-	cout << "x = "<<x<<" y= "<<y<<" z = "<<z<<endl;
+//	cout <<"Cam pos = "<<cpos<<endl;
+//	cout << "x = "<<x<<" y= "<<y<<" z = "<<z<<endl;
 
 	// Create camera
 	if (ctp==CAMTYPE_PINHOLE)
