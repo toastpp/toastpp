@@ -7,7 +7,7 @@ VPATH = $(TSRC)/libfdot
 
 all:: $(LIB)
 
-SRCS = 	matrixFreeSolver.cc MLEMSolver.cc
+SRCS = FDOTFwd.cc	
 
 
 OBJS = ${SRCS:.cc=.o} 

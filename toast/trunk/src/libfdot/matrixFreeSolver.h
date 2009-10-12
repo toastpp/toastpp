@@ -14,7 +14,7 @@ using namespace std;
 class MatrixFreeSolver : public FluoSolver
 {
     public:
-	MatrixFreeSolver(   RFwdSolver & _FEMSolver, QMMesh & mesh, 
+	MatrixFreeSolver(   RFwdSolver * _FEMSolver, QMMesh & mesh, 
 			    Regularisation * reg, double & tau_, Raster * rast,
 			    int numSources, const RCompRowMatrix & qVecs,
 			    Projector ** projList, IVector & dataWin);
@@ -38,7 +38,7 @@ class MatrixFreeSolver : public FluoSolver
 	void testProj(RVector & field);
 
     protected:
-	RFwdSolver & FEMSolver;
+	RFwdSolver * FEMSolver;
 	QMMesh & FEMMesh;
 	Regularisation * regul;
 	Raster * raster;

@@ -3,7 +3,7 @@
 #include "dgmatrix.h"
 #include "util.h"
 
-MatrixFreeSolver::MatrixFreeSolver( RFwdSolver & _FEMSolver, QMMesh & mesh, 
+MatrixFreeSolver::MatrixFreeSolver( RFwdSolver * _FEMSolver, QMMesh & mesh, 
 				    Regularisation * reg, double & tau_, Raster * rast,
 				    int numSources, const RCompRowMatrix & qVecs_, 
 				    Projector ** projList, IVector & dataWin)
@@ -55,13 +55,14 @@ MatrixFreeSolver::MatrixFreeSolver( RFwdSolver & _FEMSolver, QMMesh & mesh,
 MatrixFreeSolver::~MatrixFreeSolver() 
 {
     delete[] phi_e; 
+    delete FEMSolver;
 }
 
 void MatrixFreeSolver::calcExcitationData()
 {
     for (int i=0; i<nQ; ++i) phi_e[i] = 0.0; // reset for initial guess of iterative solver
 
-    FEMSolver.CalcFields(/*FEMMesh, nQ,*/ qVecs, phi_e);
+    FEMSolver->CalcFields(/*FEMMesh, nQ,*/ qVecs, phi_e);
     RVector tmpImg(nImagePts);
     excitImg.New(0);
     for (int i=0; i<nQ; ++i)
@@ -155,7 +156,7 @@ int MatrixFreeSolver::SolveNonLin(const RVector & data,
 		    RVector & result, const RPreconditioner * precon, 
 		    int maxIters, double tol)
 {
-    //FEMSolver.CalcFields(/*FEMMesh, nQ,*/ qVecs, phi_e);
+    //FEMSolver->CalcFields(/*FEMMesh, nQ,*/ qVecs, phi_e);
     calcExcitationData();
     RVector y(nNodes, 0.0), oy(nNodes);
     cout<<"Calculate adjoint field"<<endl;
@@ -289,7 +290,7 @@ void MatrixFreeSolver::fwdOperator(RVector & x)
 	else
 	{
 	    cout<<"Max pf = "<<vmax(pf)<<", min pf = "<<vmin(pf)<<endl;
-	    FEMSolver.CalcField (/*FEMMesh,*/ pf, tmpFld);
+	    FEMSolver->CalcField (/*FEMMesh,*/ pf, tmpFld);
 	    cout<<"Max tmpFld = "<<vmax(tmpFld)<<", min tmpFld = "<<vmin(tmpFld)<<endl;	
 	    projectors[i]->projectFieldToImage(tmpFld, tmpImg);
 	}
@@ -318,7 +319,7 @@ void MatrixFreeSolver::adjOperator(RVector & b)
 	cout << "adjOperator: Range of image = (" << vmin(tmpImg) << ", "<< vmax(tmpImg) << ")"<<endl;
 	projectors[i]->projectImageToField(tmpImg, tmpFld);
 	cout << "adjOperator: Range of projected data = (" << vmin(tmpFld) << ", "<< vmax(tmpFld) << ")"<<endl;
-	FEMSolver.CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
+	FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
 	cout << "adjOperator: Range of resulting field = (" << vmin(adjPhi_f) << ", "<< vmax(adjPhi_f) << ")"<<endl;
 	result += adjPhi_f*phi_e[i];
 	cout<<"Done"<<endl;
