@@ -3,6 +3,7 @@ include Makefile.incl
 SUBDIRS     = $(TSRC)
 GUIDIR      = $(TOASTDIR)/gui
 NUMERICSDIR = $(TOASTDIR)/numerics
+TOASTRELDIR = toast2009
 
 toast::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
@@ -98,32 +99,32 @@ web_distribution_static::
 
 distro_src::
 	cd ..; \
-	zip -9 -r toast_src.zip toast2008/src -x@toast2008/exclude.lst ; \
-	zip -9 -r toast_src.zip toast2008/include -x@toast2008/exclude.lst ; \
-	zip -9 -r toast_src.zip toast2008/win32/VS2005 -x@toast2008/exclude.lst ; \
-	zip -9 toast_src.zip toast2008/configure toast2008/gpl.txt toast2008/license.html toast2008/Makefile toast2008/mtoast_install.m toast2008/readme.txt toast2008/COMPILE.readme toast2008/numerics.tar.gz; \
-	find -H toast2008 -maxdepth 1 -name "*.in" -print | zip toast_src.zip -@ ; \
-	find -H toast2008 -maxdepth 1 -name "*.h" -print | zip toast_src.zip -@ ; \
-	mv toast_src.zip toast2008
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/src -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/include -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/win32/VS2005 -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 toast_src.zip $(TOASTRELDIR)/configure $(TOASTRELDIR)/gpl.txt $(TOASTRELDIR)/license.html $(TOASTRELDIR)/Makefile $(TOASTRELDIR)/mtoast_install.m $(TOASTRELDIR)/readme.txt $(TOASTRELDIR)/COMPILE.readme $(TOASTRELDIR)/numerics.tar.gz; \
+	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.in" -print | zip toast_src.zip -@ ; \
+	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.h" -print | zip toast_src.zip -@ ; \
+	mv toast_src.zip $(TOASTRELDIR)
 
 distro_common::
 	cd ..; \
-	zip -9 -r toast_common.zip toast2008/script -x@toast2008/exclude.lst ;\
-	zip -9 -r toast_common.zip toast2008/test -x@toast2008/exclude.lst ; \
-	zip -9    toast_common.zip toast2008/mtoast_install.m ; \
-	zip -9    toast_common.zip toast2008/readme.txt ; \
-	zip -9    toast_common.zip toast2008/license.html toast2008/gpl.txt; \
-	mv toast_common.zip toast2008
+	zip -9 -r toast_common.zip $(TOASTRELDIR)/script -x@$(TOASTRELDIR)/exclude.lst ;\
+	zip -9 -r toast_common.zip $(TOASTRELDIR)/test -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/readme.txt ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/license.html $(TOASTRELDIR)/gpl.txt; \
+	mv toast_common.zip $(TOASTRELDIR)
 
 distro_bin_win32::
 	cd ..; \
-	zip -9 -r toast_bin_win32.zip toast2008/win32/Release -x@toast2008/exclude.lst ; \
-	mv toast_bin_win32.zip toast2008
+	zip -9 -r toast_bin_win32.zip $(TOASTRELDIR)/win32/Release -x@$(TOASTRELDIR)/exclude.lst ; \
+	mv toast_bin_win32.zip $(TOASTRELDIR)
 
 distro_bin_linux::
 	cd ..; \
-	tar czvf toast_bin_linux.tar.gz toast2008/$(ARCHDIR)/bin \
-	toast2008/$(ARCHDIR)/lib toast2008/$(ARCHDIR)/mex \
-	toast2008/toastenv.csh toast2008/toastenv.sh; \
-	mv toast_bin_linux.tar.gz toast2008/$(ARCHDIR)
-	@echo "Linux distro tarball created in toast2008/$(ARCHDIR)/toast_bin_linux.tar.gz"
+	tar czvf toast_bin_linux.tar.gz $(TOASTRELDIR)/$(ARCHDIR)/bin \
+	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTRELDIR)/$(ARCHDIR)/mex \
+	$(TOASTRELDIR)/toastenv.csh $(TOASTRELDIR)/toastenv.sh; \
+	mv toast_bin_linux.tar.gz $(TOASTRELDIR)/$(ARCHDIR)
+	@echo "Linux distro tarball created in $(TOASTRELDIR)/$(ARCHDIR)/toast_bin_linux.tar.gz"
