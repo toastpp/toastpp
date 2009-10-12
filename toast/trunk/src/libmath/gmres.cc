@@ -2,7 +2,6 @@
 
 #include "mathlib.h"
 #include "timing.h"
-
 using namespace std;
 using namespace toast;
 
@@ -329,11 +328,13 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 #ifdef VERBOSE_GMRES
 		    cerr << "\033[1Agmres(" << cycle << ',' << j << "): res="
 			 << (norm_x/norm_b) << "    " << endl;
+		    cout << "gmres cycle "<< cycle << " iter " << j+1
+			<< ", res = " << (norm_x/norm_b) << "    " << endl;
 #endif
 		    //---------------------------------------------------------
- 
+
 		    /* w = v[j+1] */
- 
+
 		    // for (n=0; n < N; n++) ctmp1[n] = v[j][n];
 
 		    TVector<MT> &vj1 = v[j+1];

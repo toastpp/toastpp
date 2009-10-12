@@ -69,6 +69,12 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 // Solves Ax = b for given tolerance and preconditioner
 
 template<class MT>
+MATHLIB int PCG (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
+    void *context), void *context, const TVector<MT> &b, TVector<MT> &x,
+    double &tol, const TPreconditioner<MT> *precon = 0, 
+    int maxit = 0);
+
+template<class MT>
 int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0);
 // BiPCG (preconditioned bi-conjugate gradient) linear solver

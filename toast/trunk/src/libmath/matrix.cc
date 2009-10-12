@@ -136,6 +136,54 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     return niter;
 }
 
+// ==========================================================================
+// Preconditioned conjugate gradients (PCG) with callback parameter
+// ==========================================================================
+
+template<class MT>
+MATHLIB int PCG (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
+    void *context), void * context, const TVector<MT> &b, TVector<MT> &x,
+    double &tol, const TPreconditioner<MT> *precon, int maxit)
+{
+    double dnew, dold, alpha, beta;
+    double err, bnorm;
+    int niter, dim = x.Dim();
+    if (!maxit) maxit = dim+1;
+    TVector<MT> r(dim), d(dim), q(dim);
+    r = b - ((*Mv_clbk)(x, context));
+    if (precon) precon->Apply (r, d);
+    else d = r;
+    dnew = r & d;
+    bnorm = l2norm (b);
+
+    for (niter = 0; niter < maxit; niter++) {
+        q = (*Mv_clbk)(d, context);
+	//A.Ax (d, q);
+	alpha = dnew / (d & q);
+	x += d * alpha;
+	r -= q * alpha;
+	dold = dnew;
+	if (precon) {
+	    precon->Apply (r, q);
+	    dnew = r & q;
+	    beta = dnew/dold;
+	    d *= beta;
+	    d += q;
+	} else {
+	    dnew = r & r;
+	    beta = dnew/dold;
+	    d *= beta;
+	    d += r;
+	}
+	// check convergence
+	err = l2norm (r);
+	cout << "PCG: iteration " << niter << " err = " << err/bnorm << endl;
+	cerr << niter << " " << err/bnorm << endl;
+	if (err <= tol*bnorm) break;
+    }
+    tol = err/bnorm;
+    return niter;
+}
 
 // ==========================================================================
 // Preconditioned bi-conjugate gradients (BiPCG)
@@ -427,12 +475,15 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 	//	A.Ax (pd, v);
 	v = (*Mv_clbk) (pd, context); //  multiply
 	aden = rd & v;
+	cout << "BiCGSTAB: aden = " << aden << endl;
 	alpha = rho/aden;
+	cout << "BiCGSTAB: alpha = " << alpha << endl;
 	for (i = 0; i < dim; i++)
 	    s[i] = r[i] - alpha*v[i];
 
 	// check break condition 1
 	err = l2norm(s);
+	cout << "BiCGSTAB: err = " << err/bnorm << endl;
 	if (err < tol*bnorm) {
 	    for (i = 0; i < dim; i++) x[i] += alpha*pd[i];
 	    break;
@@ -450,6 +501,7 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 
 	// check convergence
 	err = l2norm (r);
+	cout << "BiCGSTAB: err 2 = " << err/bnorm <<endl;
 	if (err <= tol*bnorm) break;
 	if (omega == 0.0) {
 	    cerr << "BiCGSTAB solver fails to converge" << endl;
@@ -600,6 +652,9 @@ template MATHLIB SCVector ATA_diag (const SCMatrix &A);
 
 template MATHLIB int PCG (const RMatrix &A, const RVector &b, RVector &x, double &tol,
      const RPreconditioner *precon, int maxit);
+template MATHLIB int PCG (RVector (*Mv_clbk)( const RVector &v,
+    void *context), void * context, const RVector &b, RVector &x,
+    double &tol, const RPreconditioner *precon, int maxit);
 
 template MATHLIB int BiCGSTAB (const RMatrix &A, const RVector &b,
     RVector &x, double &tol, const RPreconditioner *precon, int maxit);
