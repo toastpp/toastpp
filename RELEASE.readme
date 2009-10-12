@@ -1,0 +1,56 @@
+Here is how to prepare a public release version of toast:
+---------------------------------------------------------
+
+1. Make sure the SVN repository is up-to-date:
+
+   - Synchronise your local checked-out copy with the repository, and
+     make sure everything compiles and works, in both linux and windows.
+
+2. Export an SVN snapshot into a temporary directory:
+
+   cd $TOASTDIR/..
+   mkdir export
+   cd export
+   svn export $TOAST_SVNREP
+
+   (assuming that TOAST_SVNREP has been set according to SVN.readme)
+
+3. Build everything in linux on a 32-bit machine:
+
+   cd trunk
+   setenv TOASTDIR $PWD
+   ./configure
+   source toast.env
+   make numerics
+   make
+   make matlab
+
+4. Collect the common files into an archive:
+
+   make doc
+   make distro_common
+
+   This will create 'toast_common.zip'.
+   (Note that 'make doc' requires doxygen.)
+
+5. Collect the linux32-specific files into an archive:
+
+   make distro-bin-linux
+
+   This will create 'toast_bin_linux32.tar.gz'
+
+6. Do the same on a 64-bit linux machine. If the export directories are shared,
+   repeat just steps 3 and 5. Otherwise, repeat steps 2, 3 and 5. (step 4 can
+   be skipped, because the common files are shared between all distros).
+
+   This will create 'toast_bin_linux64.tar.gz'
+
+7. Compile toast and matlab VS2005 solutions under windows. (after exporting
+   repository to file system accessible by windows, if required).
+
+   From linux, collect windows-specific files into archive:
+
+   make distro_bin_win32
+
+   This will create toast_bin_win32.zip.
+
