@@ -25,7 +25,7 @@ HDRS = ${SRCS:.cc=.h}
 
 $(LIB): $(OBJS)
 	@$(RM) $(LIB)
-	$(MAKE_LIB) $(GLLIB)
+	$(MAKE_LIB) -L$(TLIB) -lOSMesa -lGLU -lGL 
 	$(RANLIB) $(LIB)
 
 clean::
