@@ -95,7 +95,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	FDOTFwdOpRatio.cc \
 	FDOTAdjOpRatio.cc \
 	FDOTFwdOp.cc \
-	FDOTSysmat.cc
+	FDOTSysmat.cc 
 
 OBJS = ${SRCS:.cc=.$(MEXEXT)}
 

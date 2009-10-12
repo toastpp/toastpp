@@ -14,6 +14,7 @@
 #include "zsp_defs.h"
 
 using namespace toast;
+using namespace std;
 
 SCCompRowMatrixMixed::SCCompRowMatrixMixed ()
     : TCompRowMatrix<scomplex> ()

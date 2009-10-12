@@ -100,4 +100,4 @@ disp(['Adding search path ' mexp])
 % open path tool GUI to allow user to modify and save the toast paths
 fprintf(1,'\nPlease check that the toast paths are set correctly,\n')
 fprintf(1,'then save to store the paths permanently.\n')
-pathtool
+%pathtool
