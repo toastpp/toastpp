@@ -23,7 +23,7 @@ class FELIB QMMesh : public Mesh {
 public:
     int nQ, nM;		// number of source/measurement points
     int nQM;		// total number of measurements (not always nQ*nM !)
-    Point *Q, *M;	// lists of source/measurement points
+    Point *Q, *M, *QN, *MN;	// lists of source/measurement points and normals
 
     int *nQMref;	// nQMref[q]: number of detectors connected to q
     int **QMref;	// QMref[q][i] is the absolute detector index
@@ -47,6 +47,7 @@ public:
     bool fixed_q_pos;   // TRUE if Q contains final source positions
     bool fixed_m_pos;   // TRUE if M contains final measurement positions
     bool external_m_pos; // TRUE if M points are not in mesh
+    bool external_q_pos; // TRUE if Q points are not in mesh, they are then projected along normal onto mesh
 
     QMMesh ();
     ~QMMesh ();
