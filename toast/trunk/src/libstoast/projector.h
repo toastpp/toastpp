@@ -56,27 +56,6 @@ class Projector
 	virtual void constructMatrix()=0;
 };
 
-class GLProjector : public Projector
-{
-    public:
-	GLProjector() {}
-	GLProjector(Camera * cam, QMMesh * mesh, int nBndElems_, int * bndellist_, int * bndsdlist_);
-	GLProjector(Camera * cam, QMMesh * mesh);
-	~GLProjector();
-	void init(Camera * cam, QMMesh * mesh);
-	void setupMesaGL();
-	void constructMatrix();
-	void constructMatrix_SF();
-	RVector getImageBuffer();
-	void renderImage();
-	void renderImageElem();
-    protected:
-	OSMesaContext mesaGLContext;
-	GLubyte * imageBuffer;
-	int * bndellist, * bndsdlist;
-	int nBndElems;
-};
-
 class RayProjector : public Projector
 {
     public:

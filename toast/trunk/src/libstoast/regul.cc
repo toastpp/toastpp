@@ -361,7 +361,7 @@ RVector *GenericSigma::MakeKref (const RVector &gimgref_all, double sdr,
 {
     const IVector &gdim = raster->GDim();
 
-    int nprm = 2; // make variable!
+    int nprm = 1; // make variable!
     int i, j, sofs, gofs;
     int slen = raster->SLen();
     int glen = raster->GLen();
