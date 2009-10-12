@@ -96,11 +96,11 @@ void FDOTFwd::fwdOperator(RVector & x, bool ratio, double epsilon)
     // Run fwd solver for each source
     for (int i=0; i<nQ; ++i)
     {
-	cout<<"Calculate fwd field for source "<<i<<endl;
+	//cout<<"Calculate fwd field for source "<<i<<endl;
 	RVector pf = fld * phi_e[i];
 	if (l2norm(pf)==0.0)
 	{
-	    cout<<"pf = 0, returning zero vector"<<endl;
+	  //  cout<<"pf = 0, returning zero vector"<<endl;
 	    tmpImg.Clear();
 	}
 	else
@@ -109,7 +109,7 @@ void FDOTFwd::fwdOperator(RVector & x, bool ratio, double epsilon)
 	    projectors[i]->projectFieldToImage(tmpFld, tmpImg);
 	}
 	append(phi_f, tmpImg);
-	cout<<"Done"<<endl;
+//	cout<<"Done"<<endl;
     }
     
     // in-place operation on x
@@ -119,7 +119,7 @@ void FDOTFwd::fwdOperator(RVector & x, bool ratio, double epsilon)
     }else{
 	x = phi_f / (excitImg + epsilon) ;
     }
-    cout << "fwdOperator: Range of images = (" << vmin(x) << ", "<< vmax(x) << ")"<<endl;
+  //  cout << "fwdOperator: Range of images = (" << vmin(x) << ", "<< vmax(x) << ")"<<endl;
 }
 
 void FDOTFwd::adjOperator(RVector & b, bool ratio, double epsilon)
@@ -131,12 +131,12 @@ void FDOTFwd::adjOperator(RVector & b, bool ratio, double epsilon)
     if (ratio) b /= (excitImg + epsilon);
     for (int i=0; i<nQ; ++i)
     {
-	cout<<"Calculate adj field for source "<<i<<endl;
+//	cout<<"Calculate adj field for source "<<i<<endl;
 	tmpImg.Copy(b, 0, i*nImagePts, nImagePts);	
 	projectors[i]->projectImageToField(tmpImg, tmpFld);
 	FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
 	result += adjPhi_f*phi_e[i];
-	cout<<"Done"<<endl;
+//	cout<<"Done"<<endl;
     }
 
     raster->Map_MeshToSol(result, b);
@@ -152,12 +152,12 @@ void FDOTFwd::adjOperator(RVector &b, int q, bool ratio, double epsilon)
     if (ratio) b /= (excitImg + epsilon);
 
 
-    cout<<"Calculate adj field for source "<<q<<endl;
+  //  cout<<"Calculate adj field for source "<<q<<endl;
     tmpImg.Copy(b, 0, q*nImagePts, nImagePts);	
     projectors[q]->projectImageToField(tmpImg, tmpFld);
     FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
     result += adjPhi_f*phi_e[q];
-    cout<<"Done"<<endl;
+  //  cout<<"Done"<<endl;
     
 
     raster->Map_MeshToSol(result, b);
