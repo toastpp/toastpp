@@ -26,7 +26,7 @@ QMMesh::QMMesh (): Mesh ()
     mwidth = qwidth = 0;
     msup   = qsup = 0;
     fixed_q_pos = fixed_m_pos = false;
-    external_m_pos = false;
+    external_m_pos = external_q_pos = false;
 }
 
 QMMesh::~QMMesh ()
@@ -294,9 +294,9 @@ void QMMesh::SetupRegularQM (int nqm)
 
 void QMMesh::LoadQM (istream &is)
 {
-    char cbuf[256], flagstr[100], c;
+    char cbuf[256], flagstr[100], normflagstr[100], c;
     int i, j, dim, nitem;
-    double param1, param2, crd[3];
+    double param1, param2, crd[3], nrm[3];
     bool ok;
 
     // read header
@@ -315,10 +315,13 @@ void QMMesh::LoadQM (istream &is)
 	is.getline (cbuf, 256);
     } while ((ok = is.good ()) && strncmp (cbuf, "SourceList", 10));
     xASSERT(ok, SourceList not found.);
-    nitem = sscanf (cbuf+10, "%d%s", &nQ, flagstr);
+    nitem = sscanf (cbuf+10, "%d%s %s", &nQ, flagstr, normflagstr);
     xASSERT(nitem >= 1, Number of sources not found.);
     fixed_q_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
+    external_q_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
+    bool specified_q_normals = (nitem > 2 && strcasecmp (normflagstr, "default")!=0 );
     Q = new Point[nQ];
+    QN = new Point[nQ];
 
     // reset source profile specs
     if (qptype) delete []qptype;     qptype = new MProfileType[nQ];
@@ -332,33 +335,35 @@ void QMMesh::LoadQM (istream &is)
 
     for (i = 0; i < nQ; i++) {
 	Q[i].New(dim);
-	is.getline (cbuf, 256);
+	QN[i].New(dim);
+	nrm[0] = nrm[1] = nrm[2] = 0.0;
+	    is.getline (cbuf, 256);
 	if (dim == 2) {
-	    nitem = sscanf (cbuf, "%lf%lf%s%lf%lf", crd+0, crd+1,
-			    flagstr, &param1, &param2);
+	    nitem = sscanf (cbuf, "%lf%lf%lf%lf", crd+0, crd+1, nrm+0, nrm+1);
 	} else if (dim == 3) {
-	    nitem = sscanf (cbuf, "%lf%lf%lf%s%lf%lf", crd+0, crd+1, crd+2,
-			    flagstr, &param1, &param2);
+	    nitem = sscanf (cbuf, "%lf%lf%lf%lf%lf%lf", crd+0, crd+1, crd+2,
+		    nrm+0, nrm+1, nrm+2);
 	}
 	xASSERT(nitem >= dim, Parse error while reading source list);
-	for (j = 0; j < dim; j++) Q[i][j] = crd[j];
-	if (nitem == dim) continue; // use default profile
-	nitem -= dim;
-	if (!strcasecmp (flagstr, "POINT")) {
-	    qptype[i] = PROFILE_POINT;
-	} else if (!strcasecmp (flagstr, "COSINE")) {
-	    xASSERT(nitem >= 2, Parse error while reading source list);
-	    qptype[i] = PROFILE_COSINE;
-	    qwidth[i] = param1;
-	    if (nitem > 2) qsup[i] = param2;
-	    else qsup[i] = Pi05/param1; // default support
-	} else if (!strcasecmp (flagstr, "TOPHAT")) {
-	    xASSERT(nitem == 2, Parse error while reading source list);
-	    qptype[i] = PROFILE_TOPHAT;
-	    qwidth[i] = param1;
-	} else {
-	    xERROR(Parse error while reading source list);
-	}   
+	for (j = 0; j < dim; j++)    Q[i][j] = crd[j];
+	for (j = 0; j < dim; j++)
+	{
+	    QN[i][j] = nrm[j];
+	}
+	if (external_q_pos)
+	{
+	    // Project along normal to get source position
+	    RVector n;
+	    if (specified_q_normals)
+	    {
+		xASSERT(l2norm(QN[i]) > 0.0, No normals for sources specified);
+		n=QN[i];
+	    }else{
+		n = -Q[i];
+	    }
+	    n /= l2norm(n);
+	    Q[i] = BndIntersect (Q[i] + l2norm(Q[i])*n, Q[i]); 
+	}
     }
 
     // read measurement list
@@ -366,11 +371,13 @@ void QMMesh::LoadQM (istream &is)
 	is.getline (cbuf, 256);
     } while ((ok = is.good ()) && strncmp (cbuf, "MeasurementList", 15));
     xASSERT(ok, MeasurementList not found.);
-    nitem = sscanf (cbuf+15, "%d%s", &nM, flagstr);
+    nitem = sscanf (cbuf+15, "%d%s %s", &nM, flagstr, normflagstr);
     xASSERT(nitem >= 1, Number of measurements not found.);
     fixed_m_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
     external_m_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
+    bool specified_m_normals = (nitem > 2 && strcasecmp (normflagstr, "default"));
     M = new Point[nM];
+    MN = new Point[nM];
 
     // reset measurement profile specs
     if (mptype) delete []mptype;     mptype = new MProfileType[nM];
@@ -384,33 +391,23 @@ void QMMesh::LoadQM (istream &is)
 
     for (i = 0; i < nM; i++) {
 	M[i].New(dim);
+	MN[i].New(dim);
+	nrm[0] = nrm[1] = nrm[2] = 0.0;
 	is.getline (cbuf, 256);
 	if (dim == 2) {
-	    nitem = sscanf (cbuf, "%lf%lf%s%lf%lf", crd+0, crd+1,
-			    flagstr, &param1, &param2);
+	    nitem = sscanf (cbuf, "%lf%lf%lf%lf", crd+0, crd+1, nrm+0, nrm+1);
 	} else if (dim == 3) {
-	    nitem = sscanf (cbuf, "%lf%lf%lf%s%lf%lf", crd+0, crd+1, crd+2,
-			    flagstr, &param1, &param2);
+	    nitem = sscanf (cbuf, "%lf%lf%lf%lf%lf%lf", crd+0, crd+1, crd+2,
+		    nrm+0, nrm+1, nrm+2);
 	}
 	xASSERT(nitem >= dim, Parse error while reading measurement list);
 	for (j = 0; j < dim; j++) M[i][j] = crd[j];
-	if (nitem == dim) continue; // use default profile
-	nitem -= dim;
-	if (!strcasecmp (flagstr, "POINT")) {
-	    mptype[i] = PROFILE_POINT;
-	} else if (!strcasecmp (flagstr, "COSINE")) {
-	    xASSERT(nitem >= 2, Parse error while reading measurement list);
-	    mptype[i] = PROFILE_COSINE;
-	    mwidth[i] = param1;
-	    if (nitem > 2) msup[i] = param2;
-	    else msup[i] = Pi05/param1; // default support
-	} else if (!strcasecmp (flagstr, "TOPHAT")) {
-	    xASSERT(nitem == 2, Parse error while reading measurement list);
-	    mptype[i] = PROFILE_TOPHAT;
-	    mwidth[i] = param1;
-	} else {
-	    xERROR(Parse error while reading measurement list);
-	}   
+	// Normal vectors specified
+	for (j = 0; j < dim; j++)
+	{
+	    MN[i][j] = nrm[j];
+	}
+	if (specified_m_normals) xASSERT( l2norm(MN[i]) > 0, No normals specified for measurements );
     }
 
     // read link list
