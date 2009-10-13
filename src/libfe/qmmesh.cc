@@ -319,7 +319,7 @@ void QMMesh::LoadQM (istream &is)
     xASSERT(nitem >= 1, Number of sources not found.);
     fixed_q_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
     external_q_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
-    bool specified_q_normals = (nitem > 2 && strcasecmp (normflagstr, "default")!=0 );
+    bool specified_q_normals = (nitem > 2 && strcasecmp (normflagstr, "default")!=0 ) || (nitem<=2);
     Q = new Point[nQ];
     QN = new Point[nQ];
 
@@ -375,7 +375,7 @@ void QMMesh::LoadQM (istream &is)
     xASSERT(nitem >= 1, Number of measurements not found.);
     fixed_m_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
     external_m_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
-    bool specified_m_normals = (nitem > 2 && strcasecmp (normflagstr, "default"));
+    bool specified_m_normals = (nitem > 2 && strcasecmp (normflagstr, "default")) || (nitem<=2);
     M = new Point[nM];
     MN = new Point[nM];
 
