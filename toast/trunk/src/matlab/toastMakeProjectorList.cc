@@ -91,6 +91,24 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
     }
 
+    RVector shift(2, 0.0);
+    if (nrhs > 5)
+    {
+	mxGetString (prhs[6],str,100);
+	if (!strcasecmp(str, "shift"))
+	{
+	    nr = mxGetM(prhs[7]);
+	    nc = mxGetN(prhs[7]);
+	    if (nr*nc < 2)
+	    {
+		cerr << "Must specify both x and y camera position shift" << endl;
+	    }else{
+		dpr = mxGetPr(prhs[7]);
+		shift[0] = dpr[0];
+		shift[1] = dpr[1];
+	    }
+	}
+    }
 
     // Construct cameras and projectors
     Projector ** projPList = new Projector*[nM];
@@ -126,7 +144,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	y = cross3(x, z);  // image y-axis is perp. to x and z
 	y /= l2norm(y);
 	z /= l2norm(z);
-	cpos = cpos - y * 2.1428; // manual adjustment for optical axis offset in image
+	cpos = cpos + x*shift[0] + y*shift[1]; // - y * 2.1428; // manual adjustment for optical axis offset in image
 //	cout <<"Cam pos = "<<cpos<<endl;
 //	cout << "x = "<<x<<" y= "<<y<<" z = "<<z<<endl;
 
