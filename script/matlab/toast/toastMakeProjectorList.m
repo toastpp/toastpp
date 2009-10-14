@@ -7,3 +7,4 @@ function plist = toastMakeProjectorList
 %	camType = Type of camera model = {'ORTHO', 'PINHOLE'}
 %	'flen' = Focal length for PINHOLE model (mm)
 %	'pixelsize' = scale for ORTHO model (mm)
+%	'shift' = offset of camera position in plane of image [ix iy] in mm
