@@ -418,7 +418,7 @@ void CopyTMatrix (RDenseMatrix &mat, const mxArray *array)
     double *val = mat.valptr();
     for (j = 0; j < n; j++)
 	for (i = 0; i < m; i++)
-	    val[j*n+i] = *pr++;
+	    val[j*m+i] = *pr++;
 }
 
 // ============================================================================
