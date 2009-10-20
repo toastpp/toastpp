@@ -407,7 +407,7 @@ void QMMesh::LoadQM (istream &is)
 	{
 	    MN[i][j] = nrm[j];
 	}
-	if (specified_m_normals) xASSERT( l2norm(MN[i]) > 0, No normals specified for measurements );
+	if (external_m_pos && specified_m_normals) xASSERT( l2norm(MN[i]) > 0, No normals specified for measurements );
     }
 
     // read link list
