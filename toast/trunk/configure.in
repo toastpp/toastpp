@@ -323,27 +323,27 @@ case $system in
 esac
 
 # if we are using GNU compiler, set flags accordingly
-if test "$GXX" = "yes" ; then
-    SHLIB_CFLAGS="-fPIC"
-    SHLIB_LD_LIBS='${LIBS}'
-    SHLIB_SUFFIX=".so"
-    if test "$have_dl" = yes; then
-	SHLIB_LD="${CXX} -shared"
-	DL_LIBS="-ldl"
-    else
-	AC_CHECK_HEADER(dld.h, [
-	    SHLIB_LD="ld -shared"])
-	    DL_LIBS="-ldld"
-    fi
-    case $system in
-	SunOS-4*)
-	    SHLIB_LD="$SHLIB_LD -mimpure-text"
-	    ;;
-	SunOS-5*)
-	    SHLIB_LD="$SHLIB_LD -mimpure-text"
-	    ;;
-    esac
-fi
+#if test "$GXX" = "yes" ; then
+#    SHLIB_CFLAGS="-fPIC"
+#    SHLIB_LD_LIBS='${LIBS}'
+#    SHLIB_SUFFIX=".so"
+#    if test "$have_dl" = yes; then
+#	SHLIB_LD="${CXX} -shared"
+#	DL_LIBS="-ldl"
+#    else
+#	AC_CHECK_HEADER(dld.h, [
+#	    SHLIB_LD="ld -shared"])
+#	    DL_LIBS="-ldld"
+#    fi
+#    case $system in
+#	SunOS-4*)
+#	    SHLIB_LD="$SHLIB_LD -mimpure-text"
+#	    ;;
+#	SunOS-5*)
+#	    SHLIB_LD="$SHLIB_LD -mimpure-text"
+#	    ;;
+#    esac
+#fi
 
 # =========================================================================
 # Check whether user wants to build a debugging version
