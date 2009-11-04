@@ -286,6 +286,19 @@ case $system in
 		DL_LIBS="-ldld"
 	fi
     	;;
+    Darwin*)
+	SHLIB_CFLAGS="-fPIC"
+	SHLIB_LD_LIBS='${LIBS}'
+	SHLIB_SUFFIX=".dylib"
+	if test "$have_dl" = yes; then
+	    SHLIB_LD="${CXX} -shared"
+	    DL_LIBS="-ldl"
+	else
+	    AC_CHECK_HEADER(dld.h, [
+		SHLIB_LD="ld -shared"])
+		DL_LIBS="-ldld"
+	fi
+    	;;	
     CYGWIN*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD_LIBS='-Wl,--out-implib=lib${LIB}.dll.a -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--whole-archive ${LIBS} -Wl,--no-whole-archive ${DEP_LIBS}'
@@ -496,12 +509,17 @@ AC_SUBST(ARCHDIR)
 # =========================================================================
 
 MEXFLAGS="-v"
-if test "${ARCHDIR}" = "linux64" ; then
-   MEXFLAGS="${MEXFLAGS} -largeArrayDims"
-   MEXEXT="mexa64"
-else
-   MEXEXT="mexglx"
-fi
+MEXEXT="mexglx"
+case $ARCHDIR in
+     linux64)
+        MEXFLAGS="${MEXFLAGS} -largeArrayDims"
+	MEXEXT="mexa64"
+	;;
+     Darwin)
+        MEXFLAGS="${MEXFLAGS} -largeArrayDims"
+        MEXEXT="maci64"
+        ;;
+esac	
 if test "${TOAST_DEBUG}" = "1" ; then
    MEXFLAGS="-g ${MEXFLAGS}"
 fi
