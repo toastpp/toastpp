@@ -515,7 +515,7 @@ case $ARCHDIR in
         MEXFLAGS="${MEXFLAGS} -largeArrayDims"
 	MEXEXT="mexa64"
 	;;
-     Darwin)
+     darwin)
         MEXFLAGS="${MEXFLAGS} -largeArrayDims"
         MEXEXT="maci64"
         ;;
