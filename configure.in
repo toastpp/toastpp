@@ -476,11 +476,19 @@ else
 fi
 AC_SUBST(OBJDIR)
 
-if test "`uname -m`" = "x86_64" ; then
-    ARCHDIR="linux64"
-else
-    ARCHDIR="linux32"
-fi
+case $system in
+     Linux*)
+	if test "`uname -m`" = "x86_64" ; then
+	   ARCHDIR="linux64"
+	else
+	   ARCHDIR="linux32"
+	fi
+	;;
+     Darwin*)
+        ARCHDIR="darwin"
+	;;
+esac
+
 AC_SUBST(ARCHDIR)
 
 # =========================================================================
