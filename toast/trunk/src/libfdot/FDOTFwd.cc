@@ -11,9 +11,23 @@ FDOTFwd::FDOTFwd( RFwdSolver * _FEMSolver, QMMesh & mesh,
 	nQ(numSources), nNodes(mesh.nlen()), 
 	nBndNodes(mesh.nbnd()),
 	projectors(projList), raster(rast),
-	qVecs(qVecs_)
+	qVecs(qVecs_),
+	gridToMeshMap(transp((RCompRowMatrix&)rast->Mesh2BasisMatrix()))
 {
     nImagePts = projectors[0]->getImageSize(); 
+
+    RVector row;
+    for (int i=0; i<gridToMeshMap.nRows(); ++i)
+    {
+	row = gridToMeshMap.Row(i);
+	double l1r = l1norm(row);
+	if (l1r>0.0)
+	{
+	    row /= l1r;
+	    gridToMeshMap.SetRow(i,row);
+	}
+    }
+    meshToGridMap = transp(gridToMeshMap);
 
     phi_e = new RVector[nQ];
     for (int i=0; i<nQ; ++i)
@@ -91,7 +105,9 @@ void FDOTFwd::fwdOperator(RVector & x, bool ratio, double epsilon)
 
     // Map field from grid to node space
     //fld = *nodeMap * x;
-    raster->Map_SolToMesh(x, fld);
+    RVector xg;
+    raster->Map_SolToGrid(x, xg);
+    fld = gridToMeshMap * xg; 
     
     // Run fwd solver for each source
     for (int i=0; i<nQ; ++i)
@@ -134,12 +150,16 @@ void FDOTFwd::adjOperator(RVector & b, bool ratio, double epsilon)
 //	cout<<"Calculate adj field for source "<<i<<endl;
 	tmpImg.Copy(b, 0, i*nImagePts, nImagePts);	
 	projectors[i]->projectImageToField(tmpImg, tmpFld);
-	FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
-	result += adjPhi_f*phi_e[i];
+	if (l2norm(tmpFld) != 0.0)
+	{
+	    FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
+	    result += adjPhi_f*phi_e[i];
+	}
 //	cout<<"Done"<<endl;
     }
 
-    raster->Map_MeshToSol(result, b);
+    //raster->Map_MeshToSol(result, b);
+    raster->Map_BasisToSol(meshToGridMap * result, b);
 }
 
 // single-source version
@@ -155,12 +175,14 @@ void FDOTFwd::adjOperator(RVector &b, int q, bool ratio, double epsilon)
   //  cout<<"Calculate adj field for source "<<q<<endl;
     tmpImg.Copy(b, 0, q*nImagePts, nImagePts);	
     projectors[q]->projectImageToField(tmpImg, tmpFld);
+    if (l2norm(tmpFld)==0.0) return;
     FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
     result += adjPhi_f*phi_e[q];
   //  cout<<"Done"<<endl;
     
 
-    raster->Map_MeshToSol(result, b);
+    //raster->Map_MeshToSol(result, b);
+    raster->Map_BasisToSol(meshToGridMap * result, b);
 }
 
 void FDOTFwd::adjOperator(const RVector &x, RVector &result, int q, bool ratio, double epsilon)
