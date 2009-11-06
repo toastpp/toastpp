@@ -1,4 +1,4 @@
-TBIN = $(TOASTDIR)/bin
+TBIN = $(TOASTVER)/bin
 
 all :: fwdfem1 fwdfem2
 
