@@ -361,11 +361,11 @@ RVector *GenericSigma::MakeKref (const RVector &gimgref_all, double sdr,
 {
     const IVector &gdim = raster->GDim();
 
-    int nprm = 1; // make variable!
     int i, j, sofs, gofs;
+    int dim = raster->Dim();
     int slen = raster->SLen();
     int glen = raster->GLen();
-    int dim = raster->Dim();
+    int nprm = gimgref_all.Dim() / glen;
     xASSERT (gimgref_all.Dim() == glen*nprm, Invalid image size);
     // create a "reference kappa". Can only do 2D for now.
     RVector simgref_all(slen*nprm);
