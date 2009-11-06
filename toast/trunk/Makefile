@@ -118,9 +118,9 @@ distro_common::
 	mv toast_common.zip $(TOASTRELDIR)
 
 distro_bin_win32::
+	ln -T -s $(PWD) ../$(TOASTRELDIR); \
 	cd ..; \
-	ln -T -s trunk $(TOASTRELDIR); \
-	zip -9 -r toast_bin_win32.zip $(TOASTRELDIR)/win32/Release -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_bin_win32.zip $(TOASTRELDIR)/win32/Release/bin $(TOASTRELDIR)/win32/Release/mex -x@$(TOASTRELDIR)/exclude.lst ; \
 	mv toast_bin_win32.zip $(TOASTRELDIR)
 
 distro_bin_linux::

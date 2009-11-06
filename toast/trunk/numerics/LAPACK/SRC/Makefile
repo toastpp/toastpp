@@ -329,7 +329,7 @@ dlamch.o: dlamch.f
 
 $(LIB): $(OBJS)
 	@$(RM) $(LIB)
-	$(MAKE_LIB)
+	$(MAKE_LIB) $(FLIBS)
 	$(RANLIB) $(LIB)
 
 clean::

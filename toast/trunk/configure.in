@@ -3,6 +3,13 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/toast/toast.cc)
 
+# sanity check
+if test "x$TOASTDIR" = x ; then
+    echo "TOASTDIR environment variable not set!"
+    echo Aborting configure.
+    exit
+fi
+
 dnl LDFLAGS=-L/usr/X11R6/lib
 
 dnl Checks for programs.
@@ -609,27 +616,13 @@ echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
 rm -f toast.env
 ln -s ${TOASTENV} toast.env
 
-echo
-echo "TOAST environment (csh) stored in ${TOASTENV}"
-echo "Please type 'source toast.env' to activate."
-
-TOASTENV=toastenv.csh
-echo "#!csh" > ${TOASTENV}
-echo "# TOAST environment variables generated with configure" >> ${TOASTENV}
-echo "# for target ${ARCHDIR}" >> ${TOASTENV}
-echo "setenv TOASTDIR ${TOASTDIR}" >> ${TOASTENV}
-echo "setenv TOASTVER \$TOASTDIR/${ARCHDIR}" >> ${TOASTENV}
-echo "setenv TOAST_SCRIPT_PATH \$TOASTDIR/script" >> ${TOASTENV}
-echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
-
-TOASTENV=toastenv.sh
-echo "#!sh" > ${TOASTENV}
-echo "# TOAST environment variables generated with configure" >> ${TOASTENV}
-echo "# for target ${ARCHDIR}" >> ${TOASTENV}
-echo "export TOASTDIR=${TOASTDIR}" >> ${TOASTENV}
-echo "export TOASTVER=\$TOASTDIR/${ARCHDIR}" >> ${TOASTENV}
-echo "export TOAST_SCRIPT_PATH=\$TOASTDIR/script" >> ${TOASTENV}
-echo "export LD_LIBRARY_PATH=\$TOASTVER/lib" >> ${TOASTENV}
+# write out the distribution configuration shell scripts
+AC_SUBST(ARCHDIR)
+AC_OUTPUT(toastenv.sh toastenv.csh)
 
 # move toast-mex options file to target directory
 mv -f mexopts.incl ${TOASTDIR}/${OBJDIR}
+
+echo
+echo "TOAST environment (csh) stored in ${TOASTENV}"
+echo "Please type 'source toast.env' to activate."

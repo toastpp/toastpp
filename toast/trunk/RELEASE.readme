@@ -35,7 +35,7 @@ Here is how to prepare a public release version of toast:
 
 5. Collect the linux32-specific files into an archive:
 
-   make distro-bin-linux
+   make distro_bin_linux
 
    This will create 'toast_bin_linux32.tar.gz'
 
