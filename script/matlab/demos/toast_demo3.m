@@ -127,8 +127,7 @@ axis tight
 set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes7);
 tmp = toastMapMeshToBasis(prm.solver.basis.hbasis,ones(n,1));
-h = surface(reshape(tmp,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),...
-            'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(tmp,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)))); axis xy tight off
 hold on;
 qp = toastQPos(prm.fwdsolver.hmesh);
 for i=1:size(qp,1)

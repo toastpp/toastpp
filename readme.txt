@@ -1,5 +1,5 @@
 TOAST- Image Reconstruction in Optical Tomography
-2008 (c) Martin Schweiger and Simon Arridge, University College London
+2008-2009 (c) Martin Schweiger and Simon Arridge, University College London
 
 ========================================================================
 
@@ -35,7 +35,7 @@ You need to download two archive files from the TOAST download page:
 Installing TOAST:
 -----------------
 Unzip or untar the two files into a common directory. This will create
-a sub-directory "toast2008" containing the complete TOAST suite.
+a sub-directory "toast2009" containing the complete TOAST suite.
 
 For Linux systems, a TOASTDIR environment variable must be defined pointing
 to the TOAST root directory. The additional TOAST environment settings can
@@ -43,19 +43,19 @@ then be defined by executing the toastenv scripts.
 
 Example (csh):
 
-  setenv TOASTDIR $HOME/toast2008
+  setenv TOASTDIR $HOME/toast2009
   source $TOASTDIR/toastenv.csh
 
 Example (bash):
 
-  export TOASTDIR=$HOME/toast2008
+  export TOASTDIR=$HOME/toast2009
   source $TOASTDIR/toastenv.sh
 
 For all computer systems, the Matlab environment is set by running the
 mtoast_install script:
 
 - Start Matlab
-- Change the working directory to your toast2008 root directory.
+- Change the working directory to your toast2009 root directory.
 - Run mtoast_install.
 
 This will add the TOAST mex and script directories to your Matlab search

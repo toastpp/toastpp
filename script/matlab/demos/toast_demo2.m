@@ -105,14 +105,17 @@ prm.meas.src.freq = 100;
 prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
 prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
 axes(handles.axes1);
-h = surface(reshape(prm.bmua,prm.bx,prm.by),'EdgeColor','none'); axis tight
+%h = surface(reshape(prm.bmua,prm.bx,prm.by),'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy tight off
 set(h,'ButtonDownFcn','toast_demo2(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes2);
-h = surface(reshape(prm.bmus,prm.bx,prm.by),'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy tight off
+%h = surface(reshape(prm.bmus,prm.bx,prm.by),'EdgeColor','none'); axis tight
 set(h,'ButtonDownFcn','toast_demo2(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes7);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+%h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 hold on;
 x = prm.bx*(cos(prm.phiq)*0.45+0.5);
 y = prm.by*(sin(prm.phiq)*0.45+0.5);
@@ -181,7 +184,8 @@ prm.phim = phim;
 axes(handles.axes7);
 n = toastMeshNodeCount(prm.basis.hMesh);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-cla;h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
+cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+%cla;h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 x = prm.bx*(cos(phiq)*0.45+0.5);
 y = prm.by*(sin(phiq)*0.45+0.5);
 hold on;
@@ -221,7 +225,8 @@ bmua = prm.bmua + bpert;
 mua = toastMapBasisToMesh(prm.basis.hBasis,bmua);
 axes(handles.axes1);
 cla;
-h = surface(reshape(bmua,prm.bx,prm.by)','EdgeColor','none');axis tight
+h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy tight off
+%h = surface(reshape(bmua,prm.bx,prm.by)','EdgeColor','none');axis tight
 set(h,'ButtonDownFcn','toast_demo2(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 bpert = zeros(prm.bx,prm.by);

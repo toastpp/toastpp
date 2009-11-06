@@ -1,6 +1,7 @@
 function varargout = toast_demo1(varargin)
 % TOAST_DEMO1 M-file for toast_demo1.fig
-%      TOAST_DEMO1, by itself, creates a new TOAST_DEMO1 or raises the existing
+%      TOAST_DEMO1, by itself, creates a new TOAST_DEMO1 or raises the
+%      existing
 %      singleton*.
 %
 %      H = TOAST_DEMO1 returns the handle to a new TOAST_DEMO1 or the handle to
@@ -97,14 +98,14 @@ prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
 prm.diff_fields = false;
 prm.diff_proj = false;
 axes(handles.axes1);
-h = surface(reshape(prm.bmua,prm.bx,prm.by),'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes2);
-h = surface(reshape(prm.bmus,prm.bx,prm.by),'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes7);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
+h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
 x = prm.bx*(0.45+0.5);
 y = prm.by*(0.5);
 hold on; plot3(x, y, 1, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
@@ -188,9 +189,9 @@ prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
 axes(handles.axes7);
 n = toastMeshNodeCount(prm.basis.hMesh);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-cla;h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
-x = prm.bx*(cos(phi)*0.45+0.5);
-y = prm.by*(sin(phi)*0.45+0.5);
+cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+x = prm.bx*(0.5+cos(phi)*0.45);
+y = prm.by*(0.5-sin(phi)*0.45);
 hold on; plot3(x, y, 1, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
 set(h,'ButtonDownFcn','toast_demo1(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 clear tmp
@@ -239,23 +240,21 @@ prm = getappdata(handles.figure1,'prm');
 % perturbation parameters
 pert = getappdata(handles.figure1,'pert');
 bpert = zeros(prm.bx,prm.by);
-bpert(pert.mua.y0-pert.mua.dx:pert.mua.y0+pert.mua.dx,pert.mua.x0-pert.mua.dx:pert.mua.x0+pert.mua.dx) = pert.mua.val;
+bpert(pert.mua.x0-pert.mua.dx:pert.mua.x0+pert.mua.dx,pert.mua.y0-pert.mua.dx:pert.mua.y0+pert.mua.dx) = pert.mua.val;
 bpert = reshape(bpert,[],1);
 bmua = prm.bmua + bpert;
 mua = toastMapBasisToMesh(prm.basis.hBasis,bmua);
 axes(handles.axes1);
-cla;
-h = surface(reshape(bmua,prm.bx,prm.by)','EdgeColor','none');axis tight
+cla; h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 bpert = zeros(prm.bx,prm.by);
-bpert(pert.mus.y0-pert.mus.dx:pert.mus.y0+pert.mus.dx,pert.mus.x0-pert.mus.dx:pert.mus.x0+pert.mus.dx) = pert.mus.val;
+bpert(pert.mus.x0-pert.mus.dx:pert.mus.x0+pert.mus.dx,pert.mus.y0-pert.mus.dx:pert.mus.y0+pert.mus.dx) = pert.mus.val;
 bpert = reshape(bpert,[],1);
 bmus = prm.bmus + bpert;
 mus = toastMapBasisToMesh(prm.basis.hBasis,bmus);
 axes(handles.axes2);
-cla;
-h = surface(reshape(bmus,prm.bx,prm.by)','EdgeColor','none');axis tight
+cla; h = imagesc(rot90(reshape(bmus,prm.bx,prm.by))); axis xy tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 % calculate the fields
@@ -271,10 +270,10 @@ if prm.diff_fields == true;
 end
 axes(handles.axes3);
 bphi = toastMapMeshToBasis(prm.basis.hBasis,lnamp);
-cla;surface(reshape(bphi,prm.bx,prm.by)','EdgeColor','none'); axis tight;
+cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy tight off;
 axes(handles.axes4);
 bphi = toastMapMeshToBasis(prm.basis.hBasis,phase);
-cla;surface(reshape(bphi,prm.bx,prm.by)','EdgeColor','none'); axis tight;
+cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy tight off;
 
 % calculate projections
 lgamma = reshape (log(prm.mvec.' * phi), [], 1);
@@ -296,8 +295,8 @@ function axes1_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
 pert = getappdata(handles.figure1,'pert');
 mouse = get(gca,'currentpoint');
-x = round(mouse(1,2));
-y = round(mouse(1,1));
+x = round(mouse(1,1));
+y = prm.by-round(mouse(1,2));
 x = min(max(x,pert.mua.dx+1),prm.bx-pert.mua.dx-1);
 y = min(max(y,pert.mua.dx+1),prm.by-pert.mua.dx-1);
 if x ~= pert.mua.x0 || y ~= pert.mua.y0
@@ -312,8 +311,8 @@ function axes2_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
 pert = getappdata(handles.figure1,'pert');
 mouse = get(gca,'currentpoint');
-x = round(mouse(1,2));
-y = round(mouse(1,1));
+x = round(mouse(1,1));
+y = prm.by-round(mouse(1,2));
 x = min(max(x,pert.mus.dx+1),prm.bx-pert.mus.dx-1);
 y = min(max(y,pert.mus.dx+1),prm.by-pert.mus.dx-1);
 if x ~= pert.mus.x0 || y ~= pert.mus.y0
@@ -328,7 +327,7 @@ function axes7_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
 mouse = get(gca,'currentpoint');
 x = mouse(1,1);
-y = mouse(1,2);
+y = prm.by-mouse(1,2);
 dx = x/(prm.bx*0.5)-1.0;
 dy = y/(prm.by*0.5)-1.0;
 phi = atan2(dy,dx);
