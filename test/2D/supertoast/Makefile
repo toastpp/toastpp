@@ -1,4 +1,4 @@
-TBIN = $(TOASTDIR)/bin
+TBIN = $(TOASTVER)/bin
 RECON = $(TBIN)/supertoast
 
 MESHDIR = ../meshes
