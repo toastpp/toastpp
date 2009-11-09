@@ -39,6 +39,7 @@ class FDOTFwd
 	RVector excitImg;
 	Projector ** projectors;
 	RCompRowMatrix qVecs;
+	RCompRowMatrix meshToGridMap, gridToMeshMap;
 };
 
 // A helper function to pass into BiCGSTAB, since it cannot take member funcs
