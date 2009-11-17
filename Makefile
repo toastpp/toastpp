@@ -110,8 +110,8 @@ distro_src::
 distro_common::
 	cd ..; \
 	ln -T -s trunk $(TOASTRELDIR); \
-	zip -9 -r toast_common.zip $(TOASTRELDIR)/script -x@$(TOASTRELDIR)/exclude.lst ;\
-	zip -9 -r toast_common.zip $(TOASTRELDIR)/test -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_common.zip $(TOASTRELDIR)/script -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
+	zip -9 -r toast_common.zip $(TOASTRELDIR)/test -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/readme.txt ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/license.html $(TOASTRELDIR)/gpl.txt; \
