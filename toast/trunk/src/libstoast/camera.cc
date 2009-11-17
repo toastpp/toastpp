@@ -1,6 +1,6 @@
 #include "camera.h"
 #include <math.h>
-#include <iostream.h>
+#include <iostream>
 
 using namespace std;
 
