@@ -110,13 +110,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbem", "libbem\libbem.vcp
 		{B034B0E2-9237-4305-8C24-50CB99E9DAC3} = {B034B0E2-9237-4305-8C24-50CB99E9DAC3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testbem", "testbem\testbem.vcproj", "{871839E0-60DC-4C7A-B8BC-8B86A3E08CFD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B034B0E2-9237-4305-8C24-50CB99E9DAC3} = {B034B0E2-9237-4305-8C24-50CB99E9DAC3}
-		{2F7BEE71-0116-4104-AE66-A434447F7178} = {2F7BEE71-0116-4104-AE66-A434447F7178}
-		{C5C80C4B-5BF2-4CE0-8C2E-55878039D5AA} = {C5C80C4B-5BF2-4CE0-8C2E-55878039D5AA}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -195,10 +188,6 @@ Global
 		{C5C80C4B-5BF2-4CE0-8C2E-55878039D5AA}.Debug|Win32.Build.0 = Debug|Win32
 		{C5C80C4B-5BF2-4CE0-8C2E-55878039D5AA}.Release|Win32.ActiveCfg = Release|Win32
 		{C5C80C4B-5BF2-4CE0-8C2E-55878039D5AA}.Release|Win32.Build.0 = Release|Win32
-		{871839E0-60DC-4C7A-B8BC-8B86A3E08CFD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{871839E0-60DC-4C7A-B8BC-8B86A3E08CFD}.Debug|Win32.Build.0 = Debug|Win32
-		{871839E0-60DC-4C7A-B8BC-8B86A3E08CFD}.Release|Win32.ActiveCfg = Release|Win32
-		{871839E0-60DC-4C7A-B8BC-8B86A3E08CFD}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
