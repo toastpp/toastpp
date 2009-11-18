@@ -152,6 +152,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastRegulKappa", "matlab\t
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toast_bem_matrix", "matlab\toast_bem_matrix\toast_bem_matrix.vcproj", "{8132D118-E4A2-4ED4-A583-A0270490E14B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toast_bem_Dk_matrix", "matlab\toast_bem_Dk_matrix\toast_bem_Dk_matrix.vcproj", "{107B528A-27A0-4EBF-96A1-31E700D0EC26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -462,6 +464,10 @@ Global
 		{8132D118-E4A2-4ED4-A583-A0270490E14B}.Debug|Win32.Build.0 = Debug|Win32
 		{8132D118-E4A2-4ED4-A583-A0270490E14B}.Release|Win32.ActiveCfg = Release|Win32
 		{8132D118-E4A2-4ED4-A583-A0270490E14B}.Release|Win32.Build.0 = Release|Win32
+		{107B528A-27A0-4EBF-96A1-31E700D0EC26}.Debug|Win32.ActiveCfg = Debug|Win32
+		{107B528A-27A0-4EBF-96A1-31E700D0EC26}.Debug|Win32.Build.0 = Debug|Win32
+		{107B528A-27A0-4EBF-96A1-31E700D0EC26}.Release|Win32.ActiveCfg = Release|Win32
+		{107B528A-27A0-4EBF-96A1-31E700D0EC26}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
