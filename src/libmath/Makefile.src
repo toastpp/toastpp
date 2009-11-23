@@ -1,11 +1,11 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libmath
-LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+LIB = $(TLIB)/$(LIBNAME)
 
 VPATH = $(TSRC)/libmath
 
-all:: $(LIB)
+all:: $(LIB)$(LIB_SUFFIX)
 
 SRCS = \
 	mathdef.cc \
@@ -50,10 +50,17 @@ HDRS = ${SRCS:.cc=.h}
 #	gcc  $(FLAGS) $(SHLIB_CFLAGS) -c $?
 #
 
-$(LIB): $(OBJS) fourn.o ilupack
-	@$(RM) $(LIB)
-	$(MAKE_LIB) ${ILUPACKSTATIC}
-	$(RANLIB) $(LIB)
+# make static version of library
+$(LIB)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack
+	@$(RM) $@
+	ar cr $@ $(OBJS) $(ILUPACKSTATIC)
+	$(RANLIB) $@
+	make ilupack_clean
+
+# make shared version of library
+$(LIB)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) $(ILUPACKSTATIC)
 	make ilupack_clean
 
 ilupack::
@@ -83,4 +90,4 @@ clean::  ilupack_clean
 
 distclean:: clean
 	$(RM) Makefile
-	$(RM) $(LIB)
+	$(RM) $(LIB)$(LIB_SUFFIX)

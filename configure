@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_CFLAGS SHLIB_LD MAKE_LIB LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TASKDIR GUI_SHARED ILUPACKDIR LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TASKDIR GUI_SHARED ILUPACKDIR LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -8824,28 +8824,29 @@ fi
 
 # Step 3: set configuration options based on system name and version.
 
+# default shared and static library suffixes and flags
+SHLIB_SUFFIX=".so"
+STLIB_SUFFIX=".a"
+DL_LIBS="-ldl"
+
 case $system in
     IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD="ld -n32 -shared -rdata_shared"
 	SHLIB_LD_LIBS='${LIBS}'
-	SHLIB_SUFFIX=".so"
 	DL_LIBS=""
 	;;
     IRIX64-6.*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD="ld -32 -shared -rdata_shared -rpath /usr/local/lib"
 	SHLIB_LD_LIBS=""
-	SHLIB_SUFFIX=".so"
 	DL_LIBS=""
 	;;
     Linux*)
 	SHLIB_CFLAGS="-fPIC"
 	SHLIB_LD_LIBS='${LIBS}'
-	SHLIB_SUFFIX=".so"
 	if test "$have_dl" = yes; then
 	    SHLIB_LD="${CXX} -shared"
-	    DL_LIBS="-ldl"
 	else
 	    if test "${ac_cv_header_dld_h+set}" = set; then
   echo "$as_me:$LINENO: checking for dld.h" >&5
@@ -8999,7 +9000,6 @@ fi
 	SHLIB_SUFFIX=".dylib"
 	if test "$have_dl" = yes; then
 	    SHLIB_LD="${CXX} -shared"
-	    DL_LIBS="-ldl"
 	else
 	    if test "${ac_cv_header_dld_h+set}" = set; then
   echo "$as_me:$LINENO: checking for dld.h" >&5
@@ -9152,21 +9152,16 @@ fi
 	SHLIB_LD_LIBS='-Wl,--out-implib=lib${LIB}.dll.a -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--whole-archive ${LIBS} -Wl,--no-whole-archive ${DEP_LIBS}'
 	SHLIB_SUFFIX=".dll"
 	SHLIB_LD="${CXX} -shared"
-	DL_LIBS="-ldl"
     	;;
     SunOS-4*)
 	SHLIB_CFLAGS="-PIC"
 	SHLIB_LD="ld"
 	SHLIB_LD_LIBS=""
-	SHLIB_SUFFIX=".so"
-	DL_LIBS="-ldl"
 	;;
     SunOS-5*)
 	SHLIB_CFLAGS="-KPIC"
 	SHLIB_LD="/usr/ccs/bin/ld -G -z text"
 	SHLIB_LD_LIBS='${LIBS}'
-	SHLIB_SUFFIX=".so"
-	DL_LIBS="-ldl"
 	;;
 esac
 
@@ -9285,15 +9280,14 @@ fi;
 if test "$isok" = "no" -a "${SHLIB_SUFFIX}" != "" -a "${TOAST_DEBUG}" = 0; then
     TOAST_SHARED_BUILD=1
     LIB_SUFFIX=${SHLIB_SUFFIX}
-    MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS} \${FLIBS}"
+    MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS} \${FLIBS} -L\${TLIB}"
     RANLIB=":"
 # ranlib doesn't work on dynamic libraries
 else
     TOAST_SHARED_BUILD=0
-    LIB_SUFFIX=".a"
+    LIB_SUFFIX=${STLIB_SUFFIX}
     MAKE_LIB="ar cr \${LIB} \${OBJS}"
 #    SHLIB_CFLAGS=""
-    SHLIB_SUFFIX=""
     DL_LIBS=""
     GUI_SHARED="--disable-shared"
 fi
@@ -9568,6 +9562,9 @@ fi
 
 # =========================================================================
 # Substitute variables
+
+
+
 
 
 
@@ -10263,10 +10260,13 @@ s,@ARCHDIR@,$ARCHDIR,;t t
 s,@MEXFLAGS@,$MEXFLAGS,;t t
 s,@MEXEXT@,$MEXEXT,;t t
 s,@TOAST_SHARED_BUILD@,$TOAST_SHARED_BUILD,;t t
-s,@SHLIB_CFLAGS@,$SHLIB_CFLAGS,;t t
 s,@SHLIB_LD@,$SHLIB_LD,;t t
+s,@SHLIB_CFLAGS@,$SHLIB_CFLAGS,;t t
+s,@SHLIB_LD_LIBS@,$SHLIB_LD_LIBS,;t t
 s,@MAKE_LIB@,$MAKE_LIB,;t t
 s,@LIB_SUFFIX@,$LIB_SUFFIX,;t t
+s,@SHLIB_SUFFIX@,$SHLIB_SUFFIX,;t t
+s,@STLIB_SUFFIX@,$STLIB_SUFFIX,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
 s,@DL_LIBS@,$DL_LIBS,;t t
 s,@BLASLIB@,$BLASLIB,;t t
@@ -11265,10 +11265,13 @@ s,@ARCHDIR@,$ARCHDIR,;t t
 s,@MEXFLAGS@,$MEXFLAGS,;t t
 s,@MEXEXT@,$MEXEXT,;t t
 s,@TOAST_SHARED_BUILD@,$TOAST_SHARED_BUILD,;t t
-s,@SHLIB_CFLAGS@,$SHLIB_CFLAGS,;t t
 s,@SHLIB_LD@,$SHLIB_LD,;t t
+s,@SHLIB_CFLAGS@,$SHLIB_CFLAGS,;t t
+s,@SHLIB_LD_LIBS@,$SHLIB_LD_LIBS,;t t
 s,@MAKE_LIB@,$MAKE_LIB,;t t
 s,@LIB_SUFFIX@,$LIB_SUFFIX,;t t
+s,@SHLIB_SUFFIX@,$SHLIB_SUFFIX,;t t
+s,@STLIB_SUFFIX@,$STLIB_SUFFIX,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
 s,@DL_LIBS@,$DL_LIBS,;t t
 s,@BLASLIB@,$BLASLIB,;t t
