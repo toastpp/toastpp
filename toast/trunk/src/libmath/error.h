@@ -142,8 +142,8 @@
 #endif
 
 // version string macros and functions
-void SetVersion (char *vstr);
-MATHLIB char *Version (char *type, char *date);
+void SetVersion (const char *vstr);
+MATHLIB const char *Version (const char *type, const char *date);
 void OutputProgramInfo (std::ostream &os);
 
 #ifdef FEM_DEBUG
@@ -168,7 +168,7 @@ void Error_Abstract (const char *file, int line);
 // log file output routines
 void LogoutOn();                   // turn on output to log file
 void LogoutOff();                  // turn off output to log file
-MATHLIB void LogfileOpen (char *fname, bool rewind = false);
+MATHLIB void LogfileOpen (const char *fname, bool rewind = false);
 void LogfileClose ();              // close an open log file
 MATHLIB void LogOut (const char *msg);           // write message `msg' to log file
 void LogOut_Enter (const char *routine); // write `enter' note to log file

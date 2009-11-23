@@ -89,16 +89,16 @@ public:
     Solution &operator+= (const Solution &sol);
     Solution &operator+= (const RVector &v);
 
-    void WriteImgGeneric (int imgno, char *filename, 
+    void WriteImgGeneric (int imgno, const char *filename, 
         int prmind, bool append = true);
     // write param[prmind] to image file
 
-    static void WriteImgGeneric (int imgno, char *filename,
+    static void WriteImgGeneric (int imgno, const char *filename,
         const RVector &img, bool append = true);
     // write img to image file
 
-    void WriteImg_mua (int imgno, char *nimname, bool append = true);
-    void WriteImg_mus (int imgno, char *nimname, bool append = true);
+    void WriteImg_mua (int imgno, const char *nimname, bool append = true);
+    void WriteImg_mus (int imgno, const char *nimname, bool append = true);
 
     friend STOASTLIB double l2norm (const Solution &sol);
     friend STOASTLIB Solution exp (const Solution &sol);

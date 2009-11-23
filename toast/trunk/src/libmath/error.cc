@@ -178,12 +178,12 @@ MATHLIB void Check_Expired (int month, int year)
 static char versionstr[256] = "";
 static char fullversionstr[256] = "";
 
-void SetVersion (char *vstr)
+void SetVersion (const char *vstr)
 {
     strcpy (versionstr, vstr);
 }
 
-char *Version (char *type, char *date)
+const char *Version (const char *type, const char *date)
 {
     sprintf (fullversionstr, "TOAST%s distribution [%s] - Build %s\n(c) Martin Schweiger and Simon Arridge\n", TOAST_VERSION, type, date);
 #ifdef TOAST_PARALLEL
@@ -217,7 +217,7 @@ void LogfileClose ()
     }
 }
 
-void LogfileOpen (char *fname, bool rewind)
+void LogfileOpen (const char *fname, bool rewind)
 {
     if (logfile_isopen) {
         if (logfile_isfile && rewind)
