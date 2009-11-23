@@ -1,11 +1,11 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libstoast
-LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+LIB = $(TLIB)/$(LIBNAME)
 
 VPATH = $(TSRC)/libstoast
 
-all:: $(LIB)
+all:: $(LIB)$(LIB_SUFFIX)
 
 SRCS = 	solution.cc mwsolution.cc source.cc fwdsolver.cc \
 	fwdsolver_mw.cc jacobian.cc of.cc regul.cc pscaler.cc pparse.cc \
@@ -23,14 +23,21 @@ HDRS = ${SRCS:.cc=.h}
 %.o : %.cc $(HDRS)
 	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(FEINC) $(SHLIB_CFLAGS) -c $<
 
-$(LIB): $(OBJS)
-	@$(RM) $(LIB)
-	$(MAKE_LIB) -L$(TLIB) -lOSMesa -lGLU -lGL 
-	$(RANLIB) $(LIB)
+# make static version of library
+$(LIB)(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIB)(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
+		-L$(TLIB) -lOSMesa -lGLU -lGL
 
 clean::
 	$(RM) *.o
 
 distclean:: clean
 	$(RM) Makefile
-	$(RM) $(LIB)
+	$(RM) $(LIB)$(LIB_SUFFIX)

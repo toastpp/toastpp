@@ -265,28 +265,29 @@ AC_CHECK_LIB(dl, dlopen, have_dl=yes, have_dl=no)
 
 # Step 3: set configuration options based on system name and version.
 
+# default shared and static library suffixes and flags
+SHLIB_SUFFIX=".so"
+STLIB_SUFFIX=".a"
+DL_LIBS="-ldl"
+
 case $system in
     IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD="ld -n32 -shared -rdata_shared"
 	SHLIB_LD_LIBS='${LIBS}'
-	SHLIB_SUFFIX=".so"
 	DL_LIBS=""
 	;;
     IRIX64-6.*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD="ld -32 -shared -rdata_shared -rpath /usr/local/lib"
 	SHLIB_LD_LIBS=""
-	SHLIB_SUFFIX=".so"
 	DL_LIBS=""
 	;;
     Linux*)
 	SHLIB_CFLAGS="-fPIC"
 	SHLIB_LD_LIBS='${LIBS}'
-	SHLIB_SUFFIX=".so"
 	if test "$have_dl" = yes; then
 	    SHLIB_LD="${CXX} -shared"
-	    DL_LIBS="-ldl"
 	else
 	    AC_CHECK_HEADER(dld.h, [
 		SHLIB_LD="ld -shared"])
@@ -299,7 +300,6 @@ case $system in
 	SHLIB_SUFFIX=".dylib"
 	if test "$have_dl" = yes; then
 	    SHLIB_LD="${CXX} -shared"
-	    DL_LIBS="-ldl"
 	else
 	    AC_CHECK_HEADER(dld.h, [
 		SHLIB_LD="ld -shared"])
@@ -311,21 +311,16 @@ case $system in
 	SHLIB_LD_LIBS='-Wl,--out-implib=lib${LIB}.dll.a -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--whole-archive ${LIBS} -Wl,--no-whole-archive ${DEP_LIBS}'
 	SHLIB_SUFFIX=".dll"
 	SHLIB_LD="${CXX} -shared"
-	DL_LIBS="-ldl"
     	;;
     SunOS-4*)
 	SHLIB_CFLAGS="-PIC"
 	SHLIB_LD="ld"
 	SHLIB_LD_LIBS=""
-	SHLIB_SUFFIX=".so"
-	DL_LIBS="-ldl"
 	;;
     SunOS-5*)
 	SHLIB_CFLAGS="-KPIC"
 	SHLIB_LD="/usr/ccs/bin/ld -G -z text"
 	SHLIB_LD_LIBS='${LIBS}'
-	SHLIB_SUFFIX=".so"
-	DL_LIBS="-ldl"
 	;;
 esac
 
@@ -424,15 +419,14 @@ AC_ARG_ENABLE(shared,
 if test "$isok" = "no" -a "${SHLIB_SUFFIX}" != "" -a "${TOAST_DEBUG}" = 0; then
     TOAST_SHARED_BUILD=1
     LIB_SUFFIX=${SHLIB_SUFFIX}
-    MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS} \${FLIBS}"
+    MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS} \${FLIBS} -L\${TLIB}"
     RANLIB=":"
 # ranlib doesn't work on dynamic libraries
 else
     TOAST_SHARED_BUILD=0
-    LIB_SUFFIX=".a"
+    LIB_SUFFIX=${STLIB_SUFFIX}
     MAKE_LIB="ar cr \${LIB} \${OBJS}"
 #    SHLIB_CFLAGS=""
-    SHLIB_SUFFIX=""
     DL_LIBS=""
     GUI_SHARED="--disable-shared"
 fi
@@ -553,10 +547,13 @@ fi
 # Substitute variables
 
 AC_SUBST(TOAST_SHARED_BUILD)
-AC_SUBST(SHLIB_CFLAGS)
 AC_SUBST(SHLIB_LD)
+AC_SUBST(SHLIB_CFLAGS)
+AC_SUBST(SHLIB_LD_LIBS)
 AC_SUBST(MAKE_LIB)
 AC_SUBST(LIB_SUFFIX)
+AC_SUBST(SHLIB_SUFFIX)
+AC_SUBST(STLIB_SUFFIX)
 AC_SUBST(MATH_LIBS)
 AC_SUBST(DL_LIBS)
 AC_SUBST(BLASLIB)

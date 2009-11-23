@@ -25,7 +25,6 @@ CFLAGS   = @CFLAGS@
 CXX      = @CXX@
 CCFLAGS  = @CXXFLAGS@
 CCLIBS   = -L/usr/X11R6/lib -lm
-SHLIB_CFLAGS = @SHLIB_CFLAGS@
 
 F77      = @F77@
 FFLAGS   = @FFLAGS@
@@ -34,11 +33,18 @@ FLIBS    = @FLIBS@
 LD       = $(CXX)    # may need to be queried from configure
 LDFLAGS  = @LDFLAGS@
 
+SHLIB_LD      = @SHLIB_LD@
+SHLIB_CFLAGS  = @SHLIB_CFLAGS@
+SHLIB_LD_LIBS = @SHLIB_LD_LIBS@
+
 MAKE     = make
 RM       = rm -f
 RANLIB   = @RANLIB@
 
 LIB_SUFFIX = @LIB_SUFFIX@
+STLIB_SUFFIX = @STLIB_SUFFIX@
+SHLIB_SUFFIX = @SHLIB_SUFFIX@
+
 MAKE_LIB = @MAKE_LIB@
 
 MEX      = mex @MEXFLAGS@
