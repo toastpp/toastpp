@@ -41,9 +41,9 @@ include ../make.inc
 LIBNAME = liblapack
 
 VPATH = $(TOASTDIR)/numerics/LAPACK/SRC
-LIB = ../$(LIBNAME)$(LIB_SUFFIX)
+LIB = $(TLIB)/$(LIBNAME)
 
-all:: $(LIB)
+all:: $(LIB)$(LIB_SUFFIX)
 
 ALLAUX = ilaenv.o ieeeck.o lsame.o lsamen.o xerbla.o
 
@@ -327,11 +327,20 @@ dlamch.o: dlamch.f
 .f.o: 
 	$(FORTRAN) $(OPTS) -c $<
 
-$(LIB): $(OBJS)
-	@$(RM) $(LIB)
-	$(MAKE_LIB)
-	$(RANLIB) $(LIB)
+# make static version of library
+$(LIB)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIB)(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS)
 
 clean::
 	$(RM) *.o
-	$(RM) $(LIB)
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)$(LIB_SUFFIX)

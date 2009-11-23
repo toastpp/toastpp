@@ -24,13 +24,13 @@ HDRS = ${SRCS:.cc=.h}
 	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(FEINC) $(SHLIB_CFLAGS) -c $<
 
 # make static version of library
-$(LIB)(STLIB_SUFFIX): $(OBJS)
+$(LIB)$(STLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	ar cr $@ $^
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)(SHLIB_SUFFIX): $(OBJS)
+$(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
 		-L$(TLIB) -lOSMesa -lGLU -lGL

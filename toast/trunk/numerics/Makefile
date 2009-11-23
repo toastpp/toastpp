@@ -11,8 +11,7 @@ blas::
 	mkdir -p $(TOASTOBJ)/BLAS; \
 	cd $(TOASTOBJ)/BLAS; \
 	cp $(NUMERICSDIR)/BLAS/Makefile .; \
-	$(MAKE); \
-	mv libblas.* $(LIBDIR)
+	$(MAKE)
 
 fspblas::
 	mkdir -p $(TOASTOBJ)/fspblas; \
@@ -27,8 +26,7 @@ lapack::
 	cp $(NUMERICSDIR)/LAPACK/Makefile .; \
 	cp $(NUMERICSDIR)/LAPACK/make.inc .; \
 	cp $(NUMERICSDIR)/LAPACK/SRC/Makefile SRC; \
-	$(MAKE) lapacklib; \
-	mv liblapack.* $(LIBDIR)
+	$(MAKE) lapacklib
 
 superlu::
 	mkdir -p $(TOASTOBJ)/SuperLU/SRC; \
