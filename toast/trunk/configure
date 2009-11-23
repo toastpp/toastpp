@@ -9285,7 +9285,7 @@ fi;
 if test "$isok" = "no" -a "${SHLIB_SUFFIX}" != "" -a "${TOAST_DEBUG}" = 0; then
     TOAST_SHARED_BUILD=1
     LIB_SUFFIX=${SHLIB_SUFFIX}
-    MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS}"
+    MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS} \${FLIBS}"
     RANLIB=":"
 # ranlib doesn't work on dynamic libraries
 else
