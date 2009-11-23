@@ -3,14 +3,14 @@
 using namespace std;
 
 void WritePixmap (const RVector &img, const IVector &gdim,
-    double *scalemin, double *scalemax, char *fname, bool colour)
+    double *scalemin, double *scalemax, const char *fname, bool colour)
 {
     if (colour) WritePPM (img, gdim, scalemin, scalemax, fname);
     else        WritePGM (img, gdim, scalemin, scalemax, fname);
 }
 
 void WritePGM (const RVector &img, const IVector &gdim,
-    double *scalemin, double *scalemax, char *fname)
+    double *scalemin, double *scalemax, const char *fname)
 {
     int i, j, ii, dim = gdim[0]*gdim[1];
     double imgmin, imgmax, scale;
@@ -54,7 +54,7 @@ void WritePGM (const RVector &img, const IVector &gdim,
     delete []pixmap;
 }
 
-bool ReadPGM (RVector &img, IVector &gdim, char *fname)
+bool ReadPGM (RVector &img, IVector &gdim, const char *fname)
 {
     char cbuf[256];
     bool binary;
@@ -102,7 +102,7 @@ bool ReadPGM (RVector &img, IVector &gdim, char *fname)
 }
 
 void WritePPM (const RVector &img, const IVector &gdim,
-    double *scalemin, double *scalemax, char *fname)
+    double *scalemin, double *scalemax, const char *fname)
 {
     typedef struct {
         unsigned char r,g,b;
@@ -180,7 +180,7 @@ void WritePPM (const RVector &img, const IVector &gdim,
 }
 
 void WritePPMArray (const RVector *img, const IVector &gdim, int nimg,
-    int scalemode, double *scalemin, double *scalemax, char *rootname)
+    int scalemode, double *scalemin, double *scalemax, const char *rootname)
 {
     char fname[256];
     int i;
@@ -209,14 +209,14 @@ void WritePPMArray (const RVector *img, const IVector &gdim, int nimg,
     }
 }
 
-void WriteData (const RVector &data, char *fname)
+void WriteData (const RVector &data, const char *fname)
 {
     ofstream ofs (fname);
     ofs << data << endl;
 }
 
 void WriteData_pixmap (const RVector &data, const QMMesh &mesh, bool dolog,
-    bool doinvert, char *fname)
+    bool doinvert, const char *fname)
 {
     double vmn = (doinvert ? -vmax(data) : vmin(data));
     double vmx = (doinvert ? -vmin(data) : vmax(data));
@@ -240,7 +240,8 @@ void WriteData_pixmap (const RVector &data, const QMMesh &mesh, bool dolog,
     cerr << "Data PPM written. Range: " << vmn << " to " << vmx << endl;
 }
 
-void WriteNimHeader (char *meshname, int imgsize, char *nimname, char *type)
+void WriteNimHeader (const char *meshname, int imgsize, const char *nimname,
+    const char *type)
 {
     ofstream ofs (nimname);
     ofs << "NIM" << endl;
@@ -250,7 +251,8 @@ void WriteNimHeader (char *meshname, int imgsize, char *nimname, char *type)
     ofs << "EndHeader" << endl;
 }
 
-void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type)
+void WriteEimHeader (const char *meshname, int imgsize, const char *eimname,
+    const char *type)
 {
     ofstream ofs (eimname);
     ofs << "EIM" << endl;
@@ -260,7 +262,7 @@ void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type)
     ofs << "EndHeader" << endl;
 }
 
-void WriteRimHeader (const IVector &gdim, char *rimname)
+void WriteRimHeader (const IVector &gdim, const char *rimname)
 {
     int i, isize = 1;
     ofstream ofs (rimname);
@@ -274,7 +276,7 @@ void WriteRimHeader (const IVector &gdim, char *rimname)
     ofs << "EndHeader" << endl;
 }
 
-void WriteImage (const RVector &nim, int imgno, char *nimname)
+void WriteImage (const RVector &nim, int imgno, const char *nimname)
 {
     ofstream ofs (nimname, ios::app);
     ofs << "Image " << imgno << endl;
@@ -283,7 +285,7 @@ void WriteImage (const RVector &nim, int imgno, char *nimname)
     ofs << endl;
 }
 
-bool ReadNim (char *nimname, RVector &img)
+bool ReadNim (const char *nimname, RVector &img)
 {
     char cbuf[256];
     int i, imgsize = 0;
