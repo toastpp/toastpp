@@ -334,7 +334,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS)
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)(SHLIB_SUFFIX): $(OBJS)
+$(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS)
 
