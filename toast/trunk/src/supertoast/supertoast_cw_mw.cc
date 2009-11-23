@@ -1380,7 +1380,7 @@ PARAM_SCALE SelectParamScaling ()
 
 int SelectImageFormat ()
 {
-    static char *fmtstr[4] = {"RAW", "NIM", "PGM", "PPM"};
+    static const char *fmtstr[4] = {"RAW", "NIM", "PGM", "PPM"};
     char cbuf[256];
     int fmt = 0;
 
@@ -1407,7 +1407,8 @@ int SelectImageFormat ()
 
 int SelectSDMode ()
 {
-    static char *modestr[4] = {"NONE", "DATA", "AVG_DATA", "AVG_DIFFDATA"};
+    static const char *modestr[4] =
+        {"NONE", "DATA", "AVG_DATA", "AVG_DIFFDATA"};
     char cbuf[256];
     int mode = 0;
 
