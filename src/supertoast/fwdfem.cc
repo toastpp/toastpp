@@ -22,7 +22,7 @@ using namespace std;
 
 SourceMode srctp = SRCMODE_NEUMANN;   // source type
 double lin_tol;
-char *colormap = "../../scales/fire2.pal";
+const char *colormap = "../../scales/fire2.pal";
 
 // =========================================================================
 // local prototypes
@@ -34,8 +34,9 @@ bool ReadNim (char *nimname, RVector &img);
 void WritePGM (const RVector &img, const IVector &gdim, char *fname);
 void WritePPM (const RVector &img, const IVector &gdim,
     double *scalemin, double *scalemax, char *fname);
-void WriteData (const RVector &data, char *fname);
-void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
+void WriteData (const RVector &data, const char *fname);
+void WriteDataBlock (const QMMesh &mesh, const RVector &data,
+    const char *fname);
 void SelectMesh (ParamParser &pp, char *meshname, QMMesh &mesh);
 void SelectSourceProfile (ParamParser &pp, int &qtype, double &qwidth,
     SourceMode &srctp);
@@ -422,14 +423,15 @@ void WritePPM (const RVector &img, const IVector &gdim,
     delete []pixmap;
 }
 
-void WriteData (const RVector &data, char *fname)
+void WriteData (const RVector &data, const char *fname)
 {
     ofstream ofs (fname);
     ofs << setprecision(14);
     ofs << data << endl;
 }
 
-void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname)
+void WriteDataBlock (const QMMesh &mesh, const RVector &data,
+    const char *fname)
 {
     int q, m, i;
     ofstream ofs (fname);

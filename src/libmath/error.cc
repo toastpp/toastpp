@@ -117,7 +117,7 @@ void LogOut_Exit()
     }
 }
 
-void LogOut_InitProgressbar (char *name, int len, int maxcount)
+void LogOut_InitProgressbar (const char *name, int len, int maxcount)
 {
     int i;
     size_t j;

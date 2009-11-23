@@ -173,7 +173,7 @@ void LogfileClose ();              // close an open log file
 MATHLIB void LogOut (const char *msg);           // write message `msg' to log file
 void LogOut_Enter (const char *routine); // write `enter' note to log file
 void LogOut_Exit ();               // write `leave routine' note to log file
-MATHLIB void LogOut_InitProgressbar (char *name, int len, int maxcount);
+MATHLIB void LogOut_InitProgressbar (const char *name, int len, int maxcount);
     // initialise output of progress bar of `len' characters, to monitor
     // progress up to `maxcount'
 MATHLIB void LogOut_Progress (int count);
