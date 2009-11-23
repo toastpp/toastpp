@@ -11,9 +11,9 @@
 class STOASTLIB ParamParser {
 public:
     ParamParser ();
-    bool Open (char *fname);
-    void LogOpen (char *fname);
-    void Lineout (char *str);
+    bool Open (const char *fname);
+    void LogOpen (const char *fname);
+    void Lineout (const char *str);
     bool GetString (const char *cat, char *str);
     void PutString (const char *cat, const char *str);
     bool GetReal (const char *cat, double &val);

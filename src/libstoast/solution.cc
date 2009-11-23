@@ -229,7 +229,7 @@ Solution &Solution::operator+= (const Solution &sol)
     return *this;
 }
 
-void Solution::WriteImgGeneric (int imgno, char *filename,
+void Solution::WriteImgGeneric (int imgno, const char *filename,
     const RVector &img, bool append)
 {
     int i, n = img.Dim();
@@ -242,13 +242,13 @@ void Solution::WriteImgGeneric (int imgno, char *filename,
     ofs << endl;    
 }
 
-void Solution::WriteImgGeneric (int imgno, char *filename, 
+void Solution::WriteImgGeneric (int imgno, const char *filename, 
 				int prmind, bool append)
 {
     WriteImgGeneric (imgno, filename, param[prmind], append);
 }
 
-void Solution::WriteImg_mua (int imgno, char *nimname, bool append)
+void Solution::WriteImg_mua (int imgno, const char *nimname, bool append)
 {
     int i, n = param[0].Dim();
     ofstream ofs;
@@ -260,7 +260,7 @@ void Solution::WriteImg_mua (int imgno, char *nimname, bool append)
     ofs << endl;
 }
 
-void Solution::WriteImg_mus (int imgno, char *nimname, bool append)
+void Solution::WriteImg_mus (int imgno, const char *nimname, bool append)
 {
     int i, n = param[0].Dim();
     ofstream ofs;

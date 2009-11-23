@@ -13,13 +13,13 @@ ParamParser::ParamParser ()
     bfile = false;
 }
 
-bool ParamParser::Open (char *fname)
+bool ParamParser::Open (const char *fname)
 {
     prmf.open (fname);
     return bfile = prmf.good();
 }
 
-void ParamParser::LogOpen (char *fname)
+void ParamParser::LogOpen (const char *fname)
 {
     LogfileOpen (fname);
     LogOut ("================== TOAST LOG ==================");
@@ -50,7 +50,7 @@ char *ParamParser::trim_string (char *cbuf)
     return c;
 }
 
-void ParamParser::Lineout (char *str)
+void ParamParser::Lineout (const char *str)
 {
     LogOut (str);
 }
