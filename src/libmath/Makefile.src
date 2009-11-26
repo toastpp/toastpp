@@ -60,7 +60,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L(TLIB) -lsuperlu -lblzpack -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) $(ILUPACKSTATIC)
+	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lsuperlu -lblzpack -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) $(ILUPACKSTATIC)
 	make ilupack_clean
 
 ilupack::
