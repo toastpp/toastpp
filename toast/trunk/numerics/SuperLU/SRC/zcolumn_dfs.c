@@ -27,7 +27,7 @@
 #define T2_SUPER
 
 int
-zcolumn_dfs(
+toast_zcolumn_dfs(
 	   const int  m,         /* in - number of rows in the matrix */
 	   const int  jcol,      /* in */
 	   int        *perm_r,   /* in */
@@ -126,7 +126,7 @@ zcolumn_dfs(
    	if ( kperm == EMPTY ) {
 	    lsub[nextl++] = krow; 	/* krow is indexed into A */
 	    if ( nextl >= nzlmax ) {
-		if ( mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu) )
+		if ( mem_error = toast_zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu) )
 		    return (mem_error);
 		lsub = Glu->lsub;
 	    }
@@ -169,7 +169,7 @@ zcolumn_dfs(
 			    	lsub[nextl++] = kchild;
 				if ( nextl >= nzlmax ) {
 				    if ( mem_error =
-					 zLUMemXpand(jcol,nextl,LSUB,&nzlmax,Glu) )
+					 toast_zLUMemXpand(jcol,nextl,LSUB,&nzlmax,Glu) )
 					return (mem_error);
 				    lsub = Glu->lsub;
 				}

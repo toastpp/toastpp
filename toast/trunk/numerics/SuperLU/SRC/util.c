@@ -48,13 +48,13 @@ void superlu_free(void *addr)
 
 /* Deallocate the structure pointing to the actual storage of the matrix. */
 void
-Destroy_SuperMatrix_Store(SuperMatrix *A)
+toast_Destroy_SuperMatrix_Store(SuperMatrix *A)
 {
     SUPERLU_FREE ( A->Store );
 }
 
 void
-Destroy_CompCol_Matrix(SuperMatrix *A)
+toast_Destroy_CompCol_Matrix(SuperMatrix *A)
 {
     SUPERLU_FREE( ((NCformat *)A->Store)->rowind );
     SUPERLU_FREE( ((NCformat *)A->Store)->colptr );
@@ -64,7 +64,7 @@ Destroy_CompCol_Matrix(SuperMatrix *A)
 
 
 void
-Destroy_SuperNode_Matrix(SuperMatrix *A)
+toast_Destroy_SuperNode_Matrix(SuperMatrix *A)
 {
     SUPERLU_FREE ( ((SCformat *)A->Store)->rowind );
     SUPERLU_FREE ( ((SCformat *)A->Store)->rowind_colptr );
@@ -77,7 +77,7 @@ Destroy_SuperNode_Matrix(SuperMatrix *A)
 
 /* A is of type Stype==NCP */
 void
-Destroy_CompCol_Permuted(SuperMatrix *A)
+toast_Destroy_CompCol_Permuted(SuperMatrix *A)
 {
     SUPERLU_FREE ( ((NCPformat *)A->Store)->colbeg );
     SUPERLU_FREE ( ((NCPformat *)A->Store)->colend );
@@ -86,7 +86,7 @@ Destroy_CompCol_Permuted(SuperMatrix *A)
 
 /* A is of type Stype==DN */
 void
-Destroy_Dense_Matrix(SuperMatrix *A)
+toast_Destroy_Dense_Matrix(SuperMatrix *A)
 {
     DNformat* Astore = A->Store;
     SUPERLU_FREE (Astore->nzval);
@@ -113,7 +113,7 @@ resetrep_col (const int nseg, const int *segrep, int *repfnz)
  * symmetrically reduced L. 
  */
 void
-countnz(const int n, int *xprune, int *nnzL, int *nnzU, GlobalLU_t *Glu)
+toast_countnz(const int n, int *xprune, int *nnzL, int *nnzU, GlobalLU_t *Glu)
 {
     int          nsuper, fsupc, i, j;
     int          nnzL0, jlen, irep;
@@ -155,7 +155,7 @@ countnz(const int n, int *xprune, int *nnzL, int *nnzU, GlobalLU_t *Glu)
  * subscripts.
  */
 void
-fixupL(const int n, const int *perm_r, GlobalLU_t *Glu)
+toast_fixupL(const int n, const int *perm_r, GlobalLU_t *Glu)
 {
     register int nsuper, fsupc, nextl, i, j, k, jstrt;
     int          *xsup, *lsub, *xlsub;

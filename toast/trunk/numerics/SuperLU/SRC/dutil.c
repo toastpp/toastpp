@@ -164,7 +164,7 @@ dCompRow_to_CompCol(int m, int n, int nnz,
     int *marker;
 
     /* Allocate storage for another copy of the matrix. */
-    *at = (double *) doubleMalloc(nnz);
+    *at = (double *) toast_doubleMalloc(nnz);
     *rowind = (int *) intMalloc(nnz);
     *colptr = (int *) intMalloc(n+1);
     marker = (int *) intCalloc(n);
@@ -270,7 +270,7 @@ dPrint_Dense_Matrix(char *what, SuperMatrix *A)
  * Diagnostic print of column "jcol" in the U/L factor.
  */
 void
-dprint_lu_col(char *msg, int jcol, int pivrow, int *xprune, GlobalLU_t *Glu)
+toast_dprint_lu_col(char *msg, int jcol, int pivrow, int *xprune, GlobalLU_t *Glu)
 {
     int     i, k, fsupc;
     int     *xsup, *supno;
@@ -313,7 +313,7 @@ dprint_lu_col(char *msg, int jcol, int pivrow, int *xprune, GlobalLU_t *Glu)
  * Check whether tempv[] == 0. This should be true before and after 
  * calling any numeric routines, i.e., "panel_bmod" and "column_bmod". 
  */
-void dcheck_tempv(int n, double *tempv)
+void toast_dcheck_tempv(int n, double *tempv)
 {
     int i;
 	
@@ -404,7 +404,7 @@ void dinf_norm_error(int nrhs, SuperMatrix *X, double *xtrue)
 
 /* Print performance of the code. */
 void
-dPrintPerf(SuperMatrix *L, SuperMatrix *U, mem_usage_t *mem_usage,
+toast_dPrintPerf(SuperMatrix *L, SuperMatrix *U, mem_usage_t *mem_usage,
 	       double rpg, double rcond, double *ferr,
 	       double *berr, char *equed)
 {

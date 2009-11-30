@@ -12,7 +12,7 @@
 #include "util.h"
 
 double
-zPivotGrowth(int ncols, SuperMatrix *A, int *perm_c, 
+toast_zPivotGrowth(int ncols, SuperMatrix *A, int *perm_c, 
              SuperMatrix *L, SuperMatrix *U)
 {
 /*

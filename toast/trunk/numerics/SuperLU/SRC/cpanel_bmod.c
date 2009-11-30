@@ -30,7 +30,7 @@
  */
 void clsolve(int, int, complex *, complex *);
 void cmatvec(int, int, int, complex *, complex *, complex *);
-extern void ccheck_tempv();
+extern void toast_ccheck_tempv();
 
 void
 cpanel_bmod (

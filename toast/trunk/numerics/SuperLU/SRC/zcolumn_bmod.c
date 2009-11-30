@@ -38,7 +38,7 @@ void zmatvec(int, int, int, doublecomplex*, doublecomplex*, doublecomplex*);
  *               > 0 - number of bytes allocated when run out of space
  */
 int
-zcolumn_bmod (
+toast_zcolumn_bmod (
 	     const int  jcol,	  /* in */
 	     const int  nseg,	  /* in */
 	     doublecomplex     *dense,	  /* in */
@@ -283,7 +283,7 @@ zcolumn_bmod (
     /* Copy the SPA dense into L\U[*,j] */
     new_next = nextlu + xlsub[fsupc+1] - xlsub[fsupc];
     while ( new_next > nzlumax ) {
-	if (mem_error = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu))
+	if (mem_error = toast_zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, Glu))
 	    return (mem_error);
 	lusup = Glu->lusup;
 	lsub = Glu->lsub;

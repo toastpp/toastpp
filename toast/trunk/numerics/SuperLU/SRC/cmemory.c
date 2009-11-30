@@ -623,7 +623,7 @@ cStackCompress(GlobalLU_t *Glu)
 #ifdef DEBUG
     printf("cStackCompress: fragment %d\n", fragment);
     /* for (last = 0; last < ndim; ++last)
-	print_lu_col("After compress:", last, 0);*/
+	toast_print_lu_col("After compress:", last, 0);*/
 #endif    
     
 }

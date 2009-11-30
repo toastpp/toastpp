@@ -30,7 +30,7 @@
  */
 void dlsolve(int, int, double *, double *);
 void dmatvec(int, int, int, double *, double *, double *);
-extern void dcheck_tempv();
+extern void toast_dcheck_tempv();
 
 void
 dpanel_bmod (

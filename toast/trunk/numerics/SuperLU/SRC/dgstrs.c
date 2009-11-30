@@ -125,9 +125,9 @@ dgstrs (char *trans, SuperMatrix *L, SuperMatrix *U,
     }
 
     n = L->nrow;
-    work = doubleCalloc(n * nrhs);
+    work = toast_doubleCalloc(n * nrhs);
     if ( !work ) ABORT("Malloc fails for local work[].");
-    soln = doubleMalloc(n);
+    soln = toast_doubleMalloc(n);
     if ( !soln ) ABORT("Malloc fails for local soln[].");
 
     Bmat = Bstore->nzval;

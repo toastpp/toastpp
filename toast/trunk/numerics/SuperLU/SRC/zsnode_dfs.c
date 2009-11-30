@@ -24,7 +24,7 @@
 #include "util.h"
 
 int
-zsnode_dfs (
+toast_zsnode_dfs (
 	   const int  jcol,	    /* in - start of the supernode */
 	   const int  kcol, 	    /* in - end of the supernode */
 	   const int  *asub,        /* in */
@@ -72,7 +72,7 @@ zsnode_dfs (
 		marker[krow] = kcol;
 		lsub[nextl++] = krow;
 		if ( nextl >= nzlmax ) {
-		    if ( mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu) )
+		    if ( mem_error = toast_zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu) )
 			return (mem_error);
 		    lsub = Glu->lsub;
 		}
@@ -85,7 +85,7 @@ zsnode_dfs (
     if ( jcol < kcol ) {
 	new_next = nextl + (nextl - xlsub[jcol]);
 	while ( new_next > nzlmax ) {
-	    if ( mem_error = zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu) )
+	    if ( mem_error = toast_zLUMemXpand(jcol, nextl, LSUB, &nzlmax, Glu) )
 		return (mem_error);
 	    lsub = Glu->lsub;
 	}

@@ -116,7 +116,7 @@ sp_dtrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
     Uval = Ustore->nzval;
     solve_ops = 0;
 
-    if ( !(work = doubleCalloc(L->nrow)) )
+    if ( !(work = toast_doubleCalloc(L->nrow)) )
 	ABORT("Malloc fails for work in sp_dtrsv().");
     
     if ( lsame_(trans, "N") ) {	/* Form x := inv(A)*x. */

@@ -146,15 +146,15 @@ cCreate_SuperNode_Matrix(SuperMatrix *, int, int, int, complex *,
 extern void
 cCopy_Dense_Matrix(int, int, complex *, int, complex *, int);
 
-extern void    Destroy_SuperMatrix_Store(SuperMatrix *);
-extern void    Destroy_CompCol_Matrix(SuperMatrix *);
-extern void    Destroy_SuperNode_Matrix(SuperMatrix *);
-extern void    Destroy_CompCol_Permuted(SuperMatrix *);
-extern void    Destroy_Dense_Matrix(SuperMatrix *);
-extern void    get_perm_c(int, SuperMatrix *, int *);
-extern void    sp_preorder (char*, SuperMatrix*, int*, int*, SuperMatrix*);
-extern void    countnz (const int, int *, int *, int *, GlobalLU_t *);
-extern void    fixupL (const int, const int *, GlobalLU_t *);
+extern void    toast_Destroy_SuperMatrix_Store(SuperMatrix *);
+extern void    toast_Destroy_CompCol_Matrix(SuperMatrix *);
+extern void    toast_Destroy_SuperNode_Matrix(SuperMatrix *);
+extern void    toast_Destroy_CompCol_Permuted(SuperMatrix *);
+extern void    toast_Destroy_Dense_Matrix(SuperMatrix *);
+extern void    toast_get_perm_c(int, SuperMatrix *, int *);
+extern void    toast_sp_preorder (char*, SuperMatrix*, int*, int*, SuperMatrix*);
+extern void    toast_countnz (const int, int *, int *, int *, GlobalLU_t *);
+extern void    toast_fixupL (const int, const int *, GlobalLU_t *);
 
 extern void    callocateA (int, int, complex **, int **, int **);
 extern void    cgstrf (char*, SuperMatrix*, float, float, int, int, int*,
@@ -234,15 +234,15 @@ extern void    cCompRow_to_CompCol(int, int, int, complex*, int*, int*,
 		                   complex **, int **, int **);
 extern void    cfill (complex *, int, complex);
 extern void    cinf_norm_error (int, SuperMatrix *, complex *);
-extern void    PrintPerf (SuperMatrix *, SuperMatrix *, mem_usage_t *,
+extern void    toast_PrintPerf (SuperMatrix *, SuperMatrix *, mem_usage_t *,
 			 complex, complex, complex *, complex *, char *);
 
 /* Routines for debugging */
 extern void    cPrint_CompCol_Matrix(char *, SuperMatrix *);
 extern void    cPrint_SuperNode_Matrix(char *, SuperMatrix *);
 extern void    cPrint_Dense_Matrix(char *, SuperMatrix *);
-extern void    print_lu_col(char *, int, int, int *, GlobalLU_t *);
-extern void    check_tempv(int, complex *);
+extern void    toast_print_lu_col(char *, int, int, int *, GlobalLU_t *);
+extern void    toast_check_tempv(int, complex *);
 
 #ifdef __cplusplus
   }

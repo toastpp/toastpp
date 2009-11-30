@@ -203,7 +203,7 @@ dgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
     colequ = lsame_(equed, "C") || lsame_(equed, "B");
     
     /* Allocate working space */
-    work = doubleMalloc(2*A->nrow);
+    work = toast_doubleMalloc(2*A->nrow);
     rwork = (double *) SUPERLU_MALLOC( A->nrow * sizeof(double) );
     iwork = intMalloc(2*A->nrow);
     if ( !work || !rwork || !iwork ) 

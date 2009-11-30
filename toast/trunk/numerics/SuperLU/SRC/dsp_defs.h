@@ -145,15 +145,15 @@ dCreate_SuperNode_Matrix(SuperMatrix *, int, int, int, double *,
 extern void
 dCopy_Dense_Matrix(int, int, double *, int, double *, int);
 
-extern void    Destroy_SuperMatrix_Store(SuperMatrix *);
-extern void    Destroy_CompCol_Matrix(SuperMatrix *);
-extern void    Destroy_SuperNode_Matrix(SuperMatrix *);
-extern void    Destroy_CompCol_Permuted(SuperMatrix *);
-extern void    Destroy_Dense_Matrix(SuperMatrix *);
-extern void    get_perm_c(int, SuperMatrix *, int *);
-extern void    sp_preorder (char*, SuperMatrix*, int*, int*, SuperMatrix*);
-extern void    countnz (const int, int *, int *, int *, GlobalLU_t *);
-extern void    fixupL (const int, const int *, GlobalLU_t *);
+extern void    toast_Destroy_SuperMatrix_Store(SuperMatrix *);
+extern void    toast_Destroy_CompCol_Matrix(SuperMatrix *);
+extern void    toast_Destroy_SuperNode_Matrix(SuperMatrix *);
+extern void    toast_Destroy_CompCol_Permuted(SuperMatrix *);
+extern void    toast_Destroy_Dense_Matrix(SuperMatrix *);
+extern void    toast_get_perm_c(int, SuperMatrix *, int *);
+extern void    toast_sp_preorder (char*, SuperMatrix*, int*, int*, SuperMatrix*);
+extern void    toast_countnz (const int, int *, int *, int *, GlobalLU_t *);
+extern void    toast_fixupL (const int, const int *, GlobalLU_t *);
 
 extern void    dallocateA (int, int, double **, int **, int **);
 extern void    dgstrf (char*, SuperMatrix*, double, double, int, int, int*,
@@ -219,8 +219,8 @@ extern void    dSetRWork (int, int, double *, double **, double **);
 extern void    dLUWorkFree (int *, double *, GlobalLU_t *);
 extern int     dLUMemXpand (int, int, MemType, int *, GlobalLU_t *);
 
-extern double  *doubleMalloc(int);
-extern double  *doubleCalloc(int);
+extern double  *toast_doubleMalloc(int);
+extern double  *toast_doubleCalloc(int);
 extern int     dmemory_usage(const int, const int, const int, const int);
 extern int     dQuerySpace (SuperMatrix *, SuperMatrix *, int,
 				mem_usage_t *);
@@ -231,15 +231,15 @@ extern void    dCompRow_to_CompCol(int, int, int, double*, int*, int*,
 		                   double **, int **, int **);
 extern void    dfill (double *, int, double);
 extern void    dinf_norm_error (int, SuperMatrix *, double *);
-extern void    PrintPerf (SuperMatrix *, SuperMatrix *, mem_usage_t *,
+extern void    toast_PrintPerf (SuperMatrix *, SuperMatrix *, mem_usage_t *,
 			 double, double, double *, double *, char *);
 
 /* Routines for debugging */
 extern void    dPrint_CompCol_Matrix(char *, SuperMatrix *);
 extern void    dPrint_SuperNode_Matrix(char *, SuperMatrix *);
 extern void    dPrint_Dense_Matrix(char *, SuperMatrix *);
-extern void    print_lu_col(char *, int, int, int *, GlobalLU_t *);
-extern void    check_tempv(int, double *);
+extern void    toast_print_lu_col(char *, int, int, int *, GlobalLU_t *);
+extern void    toast_check_tempv(int, double *);
 
 #ifdef __cplusplus
   }

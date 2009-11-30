@@ -16,7 +16,7 @@
 #include "util.h"
 
 int
-sp_zgemm(char *transa, char *transb, int m, int n, int k, 
+toast_sp_zgemm(char *transa, char *transb, int m, int n, int k, 
          doublecomplex alpha, SuperMatrix *A, doublecomplex *b, int ldb, 
          doublecomplex beta, doublecomplex *c, int ldc)
 {
@@ -115,7 +115,7 @@ sp_zgemm(char *transa, char *transb, int m, int n, int k,
     int    j;
 
     for (j = 0; j < n; ++j) {
-	sp_zgemv(transa, alpha, A, &b[ldb*j], incx, beta, &c[ldc*j], incy);
+	toast_sp_zgemv(transa, alpha, A, &b[ldb*j], incx, beta, &c[ldc*j], incy);
     }
     return 0;    
 }

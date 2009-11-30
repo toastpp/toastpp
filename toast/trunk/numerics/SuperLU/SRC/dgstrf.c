@@ -309,7 +309,7 @@ dgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 		    if ( iinfo == 0 ) iinfo = *info;
 		
 #ifdef DEBUG
-		dprint_lu_col("[1]: ", icol, pivrow, xprune, &Glu);
+		toast_dprint_lu_col("[1]: ", icol, pivrow, xprune, &Glu);
 #endif
 
 	    }
@@ -371,7 +371,7 @@ dgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	    	resetrep_col (nseg, segrep, &repfnz[k]);
 		
 #ifdef DEBUG
-		dprint_lu_col("[2]: ", jj, pivrow, xprune, &Glu);
+		toast_dprint_lu_col("[2]: ", jj, pivrow, xprune, &Glu);
 #endif
 
 	    }
@@ -393,8 +393,8 @@ dgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	    }
     }
 
-    countnz(min_mn, xprune, &nnzL, &nnzU, &Glu);
-    fixupL(min_mn, perm_r, &Glu);
+    toast_countnz(min_mn, xprune, &nnzL, &nnzU, &Glu);
+    toast_fixupL(min_mn, perm_r, &Glu);
 
     dLUWorkFree(iwork, dwork, &Glu); /* Free work space and compress storage */
 
