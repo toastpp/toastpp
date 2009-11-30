@@ -1,11 +1,11 @@
 include $(TOASTDIR)/Makefile.incl
 
-LIBNAME = libblas
+LIBNAME = libtoastblas
 
 VPATH = $(TOASTDIR)/numerics/BLAS
 LIB = $(TLIB)/$(LIBNAME)
 
-all:: $(LIB)$(LIB_SUFFIX)
+all:: $(LIB)$(BLAS_LIB_SUFFIX)
 
 SSRC = isamax.f sasum.f saxpy.f scasum.f scnrm2.f scopy.f sdot.f sdsdot.f sgbmv.f sgemm.f sgemv.f sger.f snrm2.f srot.f srotg.f srotm.f srotmg.f ssbmv.f sscal.f sspmv.f sspr.f sspr2.f sswap.f ssymm.f ssymv.f ssyr.f ssyr2.f ssyr2k.f ssyrk.f stbmv.f stbsv.f stpmv.f stpsv.f strmm.f strmv.f strsm.f strsv.f
 

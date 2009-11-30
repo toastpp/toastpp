@@ -27,11 +27,15 @@ SRCS = \
 	scomplex.cc \
 	error.cc \
 	cr_cholesky.cc \
-	eigpair.cc \
 	arpack.cc \
 	gmres.cc \
 	fourn.cc \
 	ilutoast.cc
+
+ifdef USE_BLZPACK
+SRCS += \
+	eigpair.cc
+endif
 
 ifdef MAKE_MPI
 SRCS += \
@@ -60,7 +64,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lsuperlu -lblzpack -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) $(ILUPACKSTATIC)
+	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lsuperlu -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) $(ILUPACKSTATIC)
 	make ilupack_clean
 
 ilupack::

@@ -33,7 +33,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS)
 $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
-		-L$(TLIB) -lfe -lmath -lsuperlu -lblzpack -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) -lOSMesa -lGLU -lGL
+		-L$(TLIB) -lfe -lmath -lsuperlu -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) -lOSMesa -lGLU -lGL
 
 clean::
 	$(RM) *.o

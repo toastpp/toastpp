@@ -30,7 +30,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath -lsuperlu -lblzpack -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB)
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath
 
 clean:: 
 	$(RM) *.o

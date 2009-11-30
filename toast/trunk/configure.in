@@ -96,15 +96,15 @@ CXXFLAGS=$TMP_CXXFLAGS
 AC_ARG_WITH(blas,
     [  --with-blas=BLAS        Linker command to bind BLAS package, e.g.]
     [                          '-lblas' or '/usr/lib/libblas.a'],
-    BLASLIB=$withval, BLASLIB="-lblas")
+    BLASLIB=$withval, BLASLIB="-ltoastblas")
 
 # ========================================================================
 # Check for LAPACK
 
 AC_ARG_WITH(lapack,
     [  --with-lapack=LIB       Linker command to bind LAPACK package, e.g.]
-    [                          '-llapack' (default) or '/usr/lib/liblapack.a'],
-    LAPACKLIB=$withval, LAPACKLIB="-llapack")
+    [                          '-llapack' or '/usr/lib/liblapack.a'],
+    LAPACKLIB=$withval, LAPACKLIB="-ltoastlapack")
 
 # ========================================================================
 # Check for SuperLU
@@ -411,7 +411,7 @@ AC_SUBST(MAKE_MPI)
 # =========================================================================
 # Check whether user wants to disable shared libraries
 
-GUI_SHARED="--enable-shared"
+TOAST_SHARED="--enable-shared"
 
 AC_ARG_ENABLE(shared,
     [  --disable-shared        do not build shared TOAST libraries],
@@ -428,12 +428,36 @@ else
     MAKE_LIB="ar cr \${LIB} \${OBJS}"
 #    SHLIB_CFLAGS=""
     DL_LIBS=""
-    GUI_SHARED="--disable-shared"
+    TOAST_SHARED="--disable-shared"
 fi
 
 # Set static flag if user explicitly wants shared libraries disabled
 if test "$isok" = "yes"; then
     LDFLAGS="${LDFLAGS} -static"
+fi
+
+# =========================================================================
+# Check if BLAS should be built static
+
+AC_ARG_ENABLE(blas_shared,
+    [  --disable-blas-shared   do not build shared BLAS libraries],
+    [isok=yes], [isok=no])
+if test "$isok" = "no"; then
+   BLAS_LIB_SUFFIX=${LIB_SUFFIX}
+else
+   BLAS_LIB_SUFFIX=${STLIB_SUFFIX}
+fi
+
+# =========================================================================
+# Check if LAPACK should be built static
+
+AC_ARG_ENABLE(lapack_shared,
+    [  --disable-lapack-shared do not build shared LAPACK libraries],
+    [isok=yes], [isok=no])
+if test "$isok" = "no"; then
+   LAPACK_LIB_SUFFIX=${LIB_SUFFIX}
+else
+   LAPACK_LIB_SUFFIX=${STLIB_SUFFIX}
 fi
 
 # =========================================================================
@@ -554,6 +578,8 @@ AC_SUBST(MAKE_LIB)
 AC_SUBST(LIB_SUFFIX)
 AC_SUBST(SHLIB_SUFFIX)
 AC_SUBST(STLIB_SUFFIX)
+AC_SUBST(BLAS_LIB_SUFFIX)
+AC_SUBST(LAPACK_LIB_SUFFIX)
 AC_SUBST(MATH_LIBS)
 AC_SUBST(DL_LIBS)
 AC_SUBST(BLASLIB)
@@ -566,7 +592,7 @@ AC_SUBST(GUIFLAGS)
 AC_SUBST(GUILIBS)
 AC_SUBST(TASKLIB)
 AC_SUBST(TASKDIR)
-AC_SUBST(GUI_SHARED)
+AC_SUBST(TOAST_SHARED)
 AC_SUBST(ILUPACKDIR)
 
 AC_OUTPUT(Makefile.incl mexopts.incl)
