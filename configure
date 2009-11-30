@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TASKDIR GUI_SHARED ILUPACKDIR LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TASKDIR TOAST_SHARED ILUPACKDIR LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -865,6 +865,8 @@ Optional Features:
   --enable-threads        build pthreads parallel version
   --enable-mpi            build MPI distributed version
   --disable-shared        do not build shared TOAST libraries
+  --disable-blas-shared   do not build shared BLAS libraries
+  --disable-lapack-shared do not build shared LAPACK libraries
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -873,7 +875,7 @@ Optional Packages:
   --with-blas=BLAS        Linker command to bind BLAS package, e.g.
                               '-lblas' or '/usr/lib/libblas.a'
   --with-lapack=LIB       Linker command to bind LAPACK package, e.g.
-                              '-llapack' (default) or '/usr/lib/liblapack.a'
+                              '-llapack' or '/usr/lib/liblapack.a'
   --with-superlu=LIB      Linker command to bind SuperLU package, e.g.
                               '-lsuperlu' (default) or '/usr/lib/libsuperlu.a'
   --with-tcl=PATH         Path to Tcl installation directory
@@ -2764,7 +2766,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2767:" \
+echo "$as_me:2769:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -2960,7 +2962,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:2963: \"$ac_link\") >&5
+(eval echo $as_me:2965: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -3038,7 +3040,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:3041: \"$ac_link\") >&5
+(eval echo $as_me:3043: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8242,7 +8244,7 @@ if test "${with_blas+set}" = set; then
   withval="$with_blas"
   BLASLIB=$withval
 else
-  BLASLIB="-lblas"
+  BLASLIB="-ltoastblas"
 fi;
 
 # ========================================================================
@@ -8254,7 +8256,7 @@ if test "${with_lapack+set}" = set; then
   withval="$with_lapack"
   LAPACKLIB=$withval
 else
-  LAPACKLIB="-llapack"
+  LAPACKLIB="-ltoastlapack"
 fi;
 
 # ========================================================================
@@ -9268,7 +9270,7 @@ fi
 # =========================================================================
 # Check whether user wants to disable shared libraries
 
-GUI_SHARED="--enable-shared"
+TOAST_SHARED="--enable-shared"
 
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
@@ -9289,12 +9291,44 @@ else
     MAKE_LIB="ar cr \${LIB} \${OBJS}"
 #    SHLIB_CFLAGS=""
     DL_LIBS=""
-    GUI_SHARED="--disable-shared"
+    TOAST_SHARED="--disable-shared"
 fi
 
 # Set static flag if user explicitly wants shared libraries disabled
 if test "$isok" = "yes"; then
     LDFLAGS="${LDFLAGS} -static"
+fi
+
+# =========================================================================
+# Check if BLAS should be built static
+
+# Check whether --enable-blas_shared or --disable-blas_shared was given.
+if test "${enable_blas_shared+set}" = set; then
+  enableval="$enable_blas_shared"
+  isok=yes
+else
+  isok=no
+fi;
+if test "$isok" = "no"; then
+   BLAS_LIB_SUFFIX=${LIB_SUFFIX}
+else
+   BLAS_LIB_SUFFIX=${STLIB_SUFFIX}
+fi
+
+# =========================================================================
+# Check if LAPACK should be built static
+
+# Check whether --enable-lapack_shared or --disable-lapack_shared was given.
+if test "${enable_lapack_shared+set}" = set; then
+  enableval="$enable_lapack_shared"
+  isok=yes
+else
+  isok=no
+fi;
+if test "$isok" = "no"; then
+   LAPACK_LIB_SUFFIX=${LIB_SUFFIX}
+else
+   LAPACK_LIB_SUFFIX=${STLIB_SUFFIX}
 fi
 
 # =========================================================================
@@ -9562,6 +9596,8 @@ fi
 
 # =========================================================================
 # Substitute variables
+
+
 
 
 
@@ -10267,6 +10303,8 @@ s,@MAKE_LIB@,$MAKE_LIB,;t t
 s,@LIB_SUFFIX@,$LIB_SUFFIX,;t t
 s,@SHLIB_SUFFIX@,$SHLIB_SUFFIX,;t t
 s,@STLIB_SUFFIX@,$STLIB_SUFFIX,;t t
+s,@BLAS_LIB_SUFFIX@,$BLAS_LIB_SUFFIX,;t t
+s,@LAPACK_LIB_SUFFIX@,$LAPACK_LIB_SUFFIX,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
 s,@DL_LIBS@,$DL_LIBS,;t t
 s,@BLASLIB@,$BLASLIB,;t t
@@ -10278,7 +10316,7 @@ s,@GUIFLAGS@,$GUIFLAGS,;t t
 s,@GUILIBS@,$GUILIBS,;t t
 s,@TASKLIB@,$TASKLIB,;t t
 s,@TASKDIR@,$TASKDIR,;t t
-s,@GUI_SHARED@,$GUI_SHARED,;t t
+s,@TOAST_SHARED@,$TOAST_SHARED,;t t
 s,@ILUPACKDIR@,$ILUPACKDIR,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
@@ -11272,6 +11310,8 @@ s,@MAKE_LIB@,$MAKE_LIB,;t t
 s,@LIB_SUFFIX@,$LIB_SUFFIX,;t t
 s,@SHLIB_SUFFIX@,$SHLIB_SUFFIX,;t t
 s,@STLIB_SUFFIX@,$STLIB_SUFFIX,;t t
+s,@BLAS_LIB_SUFFIX@,$BLAS_LIB_SUFFIX,;t t
+s,@LAPACK_LIB_SUFFIX@,$LAPACK_LIB_SUFFIX,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
 s,@DL_LIBS@,$DL_LIBS,;t t
 s,@BLASLIB@,$BLASLIB,;t t
@@ -11283,7 +11323,7 @@ s,@GUIFLAGS@,$GUIFLAGS,;t t
 s,@GUILIBS@,$GUILIBS,;t t
 s,@TASKLIB@,$TASKLIB,;t t
 s,@TASKDIR@,$TASKDIR,;t t
-s,@GUI_SHARED@,$GUI_SHARED,;t t
+s,@TOAST_SHARED@,$TOAST_SHARED,;t t
 s,@ILUPACKDIR@,$ILUPACKDIR,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

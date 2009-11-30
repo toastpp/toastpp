@@ -141,6 +141,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 	    }
 	}
+    } else {
+	mexErrMsgTxt ("toastElmat: Integral type string not recognised");
     }
     plhs[0] = elmat;
 }

@@ -58,6 +58,6 @@ function p = toastElmat
 % where both nodes i and j belong to a boundary side, or to side
 % 'sideidx', if applicable.
 %
-% Note: 'BndIntF' currently has limited functionality:
+% Note: 'BndF' currently has limited functionality:
 % - it is only supported for 4-noded tetrahedra
 % - it does not support the syntax using a 4th parameter (sideidx)

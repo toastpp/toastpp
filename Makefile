@@ -5,6 +5,8 @@ GUIDIR      = $(TOASTDIR)/gui
 NUMERICSDIR = $(TOASTDIR)/numerics
 TOASTRELDIR = toast2009
 
+all::numerics toast matlab
+
 toast::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
 	for i in $(SUBDIRS) ;\

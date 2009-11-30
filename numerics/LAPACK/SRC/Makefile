@@ -38,12 +38,12 @@ include ../make.inc
 #
 #######################################################################
 
-LIBNAME = liblapack
+LIBNAME = libtoastlapack
 
 VPATH = $(TOASTDIR)/numerics/LAPACK/SRC
 LIB = $(TLIB)/$(LIBNAME)
 
-all:: $(LIB)$(LIB_SUFFIX)
+all:: $(LIB)$(LAPACK_LIB_SUFFIX)
 
 ALLAUX = ilaenv.o ieeeck.o lsame.o lsamen.o xerbla.o
 

@@ -1,6 +1,10 @@
 # makefile for sparse supernodal LU, implemented in ANSI C
 include ../make.inc
 
+LIBNAME = libsuperlu
+LIB = $(TLIB)/$(LIBNAME)
+VPATH = $(TOASTDIR)/numerics/SuperLU/SRC
+
 #######################################################################
 #  This is the makefile to create a library for SuperLU.
 #  The files are organized as follows:
@@ -31,8 +35,6 @@ include ../make.inc
 #       make clean
 #
 #######################################################################
-
-VPATH = $(TOASTDIR)/numerics/SuperLU/SRC
 
 ALLAUX = superlu_timer.o lsame.o util.o memory.o get_perm_c.o mmd.o \
 	 sp_coletree.o sp_preorder.o sp_ienv.o relax_snode.o \
@@ -85,12 +87,20 @@ ZLUSRC = \
 	zmemory.o zutil.o
 
 OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(ALLAUX) $(SCLAUX) $(DZLAUX)
-SUPERLULIB = libsuperlu$(LIB_SUFFIX)
-LIB = ../$(SUPERLULIB)
 
-all:    $(OBJS)
-	$(MAKE_LIB)
-	$(RANLIB) $(LIB)
+all:	$(LIB)$(LIB_SUFFIX)
+
+# make static version of library
+$(LIB)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIB)$(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
+		-L$(TLIB) $(LAPACKLIB) $(BLASLIB)
 
 single: $(SLUSRC) $(ALLAUX) $(SCLAUX)
 	$(ARCH) $(ARCHFLAGS) ../$(SUPERLULIB) $(SLUSRC) $(ALLAUX) $(SCLAUX)

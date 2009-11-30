@@ -5,7 +5,8 @@ NUMERICSDIR = $(TOASTDIR)/numerics
 LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
 
-all:: blas fspblas lapack superlu blzpack arpack liblbfgs mesa
+#all:: blas fspblas lapack superlu blzpack arpack liblbfgs mesa
+all:: blas fspblas lapack superlu arpack liblbfgs mesa
 
 blas::
 	mkdir -p $(TOASTOBJ)/BLAS; \
