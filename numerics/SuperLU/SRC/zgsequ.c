@@ -16,7 +16,7 @@
 #include "util.h"
 
 void
-zgsequ(SuperMatrix *A, double *r, double *c, double *rowcnd,
+toast_zgsequ(SuperMatrix *A, double *r, double *c, double *rowcnd,
 	double *colcnd, double *amax, int *info)
 {
 /*    

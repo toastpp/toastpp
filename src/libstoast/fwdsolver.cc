@@ -27,8 +27,8 @@ SuperLU_data::~SuperLU_data ()
 {
     Deallocate();
     if (used_LU) {
-	Destroy_SuperNode_Matrix (&L);
-	Destroy_CompCol_Matrix (&U);
+	toast_Destroy_SuperNode_Matrix (&L);
+	toast_Destroy_CompCol_Matrix (&U);
     }
 }
 
@@ -40,7 +40,7 @@ void SuperLU_data::Deallocate ()
 	delete []etree;
 	delete []R;
 	delete []C;
-	Destroy_SuperMatrix_Store (&smFW);
+	toast_Destroy_SuperMatrix_Store (&smFW);
 	allocated = false;
     }
 }
@@ -49,14 +49,14 @@ void SuperLU_data::Setup (int n, CCompRowMatrix *CF)
 {
     Deallocate();
     doublecomplex *cdat = (doublecomplex*)CF->ValPtr();
-    zCreate_CompCol_Matrix (&smFW, CF->nRows(), CF->nCols(),
+    toast_zCreate_CompCol_Matrix (&smFW, CF->nRows(), CF->nCols(),
 	    CF->nVal(), cdat, CF->colidx, CF->rowptr, NR, dtypeZ, GE);
     perm_c = new int[n];
     perm_r = new int[n];
     etree  = new int[n];
     R      = new double[n];
     C      = new double[n];
-    get_perm_c (0, &smFW, perm_c);
+    toast_get_perm_c (0, &smFW, perm_c);
     fact = refact = 'N';
     allocated = true;
 }
@@ -72,7 +72,7 @@ void SuperLU_data::Solve (SuperMatrix *B, SuperMatrix *X)
     double ferr, berr;
     double recip_pivot_growth, rcond;
 
-    zgssvx (&fact, &trans, &refact, &smFW, 0, perm_c, perm_r,
+    toast_zgssvx (&fact, &trans, &refact, &smFW, 0, perm_c, perm_r,
 	    etree, &equed, &R, &C, &L, &U, 0, 0, B, X,
 	    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
 
@@ -334,13 +334,13 @@ void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
 
 	doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
 	doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
-	zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, DN, dtypeZ, GE);
-	zCreate_Dense_Matrix (&X, n, 1, xbuf, n, DN, dtypeZ, GE);
+	toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, DN, dtypeZ, GE);
+	toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, DN, dtypeZ, GE);
 
 	lu_data.Solve (&B, &X);
 
-	Destroy_SuperMatrix_Store (&B);
-	Destroy_SuperMatrix_Store (&X);
+	toast_Destroy_SuperMatrix_Store (&B);
+	toast_Destroy_SuperMatrix_Store (&X);
     } else {
         double tol = iterative_tol;
 	IterativeSolve (*F, qvec, cphi, tol, precon);

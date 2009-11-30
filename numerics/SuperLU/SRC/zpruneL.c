@@ -24,7 +24,7 @@
 #include "util.h"
 
 void
-zpruneL(
+toast_zpruneL(
        const int  jcol,	     /* in */
        const int  *perm_r,   /* in */
        const int  pivrow,    /* in */

@@ -24,7 +24,7 @@
 #include "util.h"
 
 void
-zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh, 
+toast_zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh, 
 	double drop_tol, int relax, int panel_size, int *etree, 
 	void *work, int lwork, int *perm_r, int *perm_c, 
 	SuperMatrix *L, SuperMatrix *U, int *info)
@@ -231,7 +231,7 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
     xa_end   = Astore->colend;
 
     /* Allocate storage common to the factor routines */
-    *info = zLUMemInit(refact, work, lwork, m, n, Astore->nnz,
+    *info = toast_zLUMemInit(refact, work, lwork, m, n, Astore->nnz,
 		      panel_size, L, U, &Glu, &iwork, &zwork);
     if ( *info ) return;
     
@@ -243,7 +243,7 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
     
     SetIWork(m, n, panel_size, iwork, &segrep, &parent, &xplore,
 	     &repfnz, &panel_lsub, &xprune, &marker);
-    zSetRWork(m, panel_size, zwork, &dense, &tempv);
+    toast_zSetRWork(m, panel_size, zwork, &dense, &tempv);
     
     usepr = lsame_(refact, "Y");
     if ( usepr ) {
@@ -279,7 +279,7 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	     * Factorize the relaxed supernode(jcol:kcol) 
 	     * -------------------------------------- */
 	    /* Determine the union of the row structure of the snode */
-	    if ( (*info = zsnode_dfs(jcol, kcol, asub, xa_begin, xa_end,
+	    if ( (*info = toast_zsnode_dfs(jcol, kcol, asub, xa_begin, xa_end,
 				    xprune, marker, &Glu)) != 0 )
 		return;
 
@@ -290,7 +290,7 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	    new_next = nextlu + (xlsub[fsupc+1]-xlsub[fsupc])*(kcol-jcol+1);
 	    nzlumax = Glu.nzlumax;
 	    while ( new_next > nzlumax ) {
-		if ( *info = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, &Glu) )
+		if ( *info = toast_zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, &Glu) )
 		    return;
 	    }
     
@@ -302,14 +302,14 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
         	    dense[asub[k]] = a[k];
 
 	       	/* Numeric update within the snode */
-	        zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu);
+	        toast_zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu);
 
-		if ( *info = zpivotL(icol, diag_pivot_thresh, &usepr, perm_r,
+		if ( *info = toast_zpivotL(icol, diag_pivot_thresh, &usepr, perm_r,
 				    iperm_r, iperm_c, &pivrow, &Glu) )
 		    if ( iinfo == 0 ) iinfo = *info;
 		
 #ifdef DEBUG
-		zprint_lu_col("[1]: ", icol, pivrow, xprune, &Glu);
+		toast_zprint_lu_col("[1]: ", icol, pivrow, xprune, &Glu);
 #endif
 
 	    }
@@ -331,12 +331,12 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	    panel_histo[panel_size]++;
 
 	    /* symbolic factor on a panel of columns */
-	    zpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1,
+	    toast_zpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1,
 		      dense, panel_lsub, segrep, repfnz, xprune,
 		      marker, parent, xplore, &Glu);
 	    
 	    /* numeric sup-panel updates in topological order */
-	    zpanel_bmod(m, panel_size, jcol, nseg1, dense,
+	    toast_zpanel_bmod(m, panel_size, jcol, nseg1, dense,
 		       tempv, segrep, repfnz, &Glu);
 	    
 	    /* Sparse LU within the panel, and below panel diagonal */
@@ -345,33 +345,33 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 
 		nseg = nseg1;	/* Begin after all the panel segments */
 
-	    	if ((*info = zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k],
+	    	if ((*info = toast_zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k],
 					segrep, &repfnz[k], xprune, marker,
 					parent, xplore, &Glu)) != 0) return;
 
 	      	/* Numeric updates */
-	    	if ((*info = zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
+	    	if ((*info = toast_zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
 					 tempv, &segrep[nseg1], &repfnz[k],
 					 jcol, &Glu)) != 0) return;
 		
 	        /* Copy the U-segments to ucol[*] */
-		if ((*info = zcopy_to_ucol(jj, nseg, segrep, &repfnz[k],
+		if ((*info = toast_zcopy_to_ucol(jj, nseg, segrep, &repfnz[k],
 					  perm_r, &dense[k], &Glu)) != 0)
 		    return;
 
-	    	if ( *info = zpivotL(jj, diag_pivot_thresh, &usepr, perm_r,
+	    	if ( *info = toast_zpivotL(jj, diag_pivot_thresh, &usepr, perm_r,
 				    iperm_r, iperm_c, &pivrow, &Glu) )
 		    if ( iinfo == 0 ) iinfo = *info;
 
 		/* Prune columns (0:jj-1) using column jj */
-	    	zpruneL(jj, perm_r, pivrow, nseg, segrep,
+	    	toast_zpruneL(jj, perm_r, pivrow, nseg, segrep,
 		       &repfnz[k], xprune, &Glu);
 
 		/* Reset repfnz[] for this column */
 	    	resetrep_col (nseg, segrep, &repfnz[k]);
 		
 #ifdef DEBUG
-		zprint_lu_col("[2]: ", jj, pivrow, xprune, &Glu);
+		toast_zprint_lu_col("[2]: ", jj, pivrow, xprune, &Glu);
 #endif
 
 	    }
@@ -393,16 +393,16 @@ zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	    }
     }
 
-    countnz(min_mn, xprune, &nnzL, &nnzU, &Glu);
-    fixupL(min_mn, perm_r, &Glu);
+    toast_countnz(min_mn, xprune, &nnzL, &nnzU, &Glu);
+    toast_fixupL(min_mn, perm_r, &Glu);
 
-    zLUWorkFree(iwork, zwork, &Glu); /* Free work space and compress storage */
+    toast_zLUWorkFree(iwork, zwork, &Glu); /* Free work space and compress storage */
 
     if ( !lsame_(refact, "Y") ) {
-        zCreate_SuperNode_Matrix(L, A->nrow, A->ncol, nnzL, Glu.lusup, 
+        toast_zCreate_SuperNode_Matrix(L, A->nrow, A->ncol, nnzL, Glu.lusup, 
 	                         Glu.xlusup, Glu.lsub, Glu.xlsub, Glu.supno,
 			         Glu.xsup, SC, dtypeZ, TRLU);
-    	zCreate_CompCol_Matrix(U, A->nrow, A->ncol, nnzU, Glu.ucol, 
+    	toast_zCreate_CompCol_Matrix(U, A->nrow, A->ncol, nnzU, Glu.ucol, 
 			       Glu.usub, Glu.xusub, NC, dtypeZ, TRU);
     }
     

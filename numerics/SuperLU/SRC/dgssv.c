@@ -165,7 +165,7 @@ dgssv(SuperMatrix *A, int *perm_c, int *perm_r, SuperMatrix *L,
     etree = intMalloc(A->ncol);
 
     t1 = SuperLU_timer_();
-    sp_preorder(refact, AA, perm_c, etree, &AC);
+    toast_sp_preorder(refact, AA, perm_c, etree, &AC);
     utime[ETREE] = SuperLU_timer_() - t1;
 
     /*printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
@@ -184,9 +184,9 @@ dgssv(SuperMatrix *A, int *perm_c, int *perm_r, SuperMatrix *L,
     utime[SOLVE] = SuperLU_timer_() - t1;
 
     SUPERLU_FREE (etree);
-    Destroy_CompCol_Permuted(&AC);
+    toast_Destroy_CompCol_Permuted(&AC);
     if ( A->Stype == NR ) {
-	Destroy_SuperMatrix_Store(AA);
+	toast_Destroy_SuperMatrix_Store(AA);
 	SUPERLU_FREE(AA);
     }
 

@@ -535,7 +535,7 @@ printf("sgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     if ( nofact || equil ) {
 	
 	t0 = SuperLU_timer_();
-	sp_preorder(refact, AA, perm_c, etree, &AC);
+	toast_sp_preorder(refact, AA, perm_c, etree, &AC);
 	utime[ETREE] = SuperLU_timer_() - t0;
     
 /*	printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
@@ -613,9 +613,9 @@ printf("sgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
 
     sQuerySpace(L, U, panel_size, mem_usage);
 
-    if ( nofact || equil ) Destroy_CompCol_Permuted(&AC);
+    if ( nofact || equil ) toast_Destroy_CompCol_Permuted(&AC);
     if ( A->Stype == NR ) {
-	Destroy_SuperMatrix_Store(AA);
+	toast_Destroy_SuperMatrix_Store(AA);
 	SUPERLU_FREE(AA);
     }
 

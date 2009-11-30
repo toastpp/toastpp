@@ -106,7 +106,7 @@ int zReadValues(FILE *fp, int n, doublecomplex *destination, int perline, int pe
 
 
 void
-zreadhb(int *nrow, int *ncol, int *nonz,
+toast_zreadhb(int *nrow, int *ncol, int *nonz,
 	doublecomplex **nzval, int **rowind, int **colptr)
 {
 /* 
@@ -223,7 +223,7 @@ zreadhb(int *nrow, int *ncol, int *nonz,
     zDumpLine(fp);
 
     /* Allocate storage for the three arrays ( nzval, rowind, colptr ) */
-    zallocateA(*ncol, *nonz, nzval, rowind, colptr);
+    toast_zallocateA(*ncol, *nonz, nzval, rowind, colptr);
 
     /* Line 4: format statement */
     fscanf(fp, "%16c", buf);

@@ -28,7 +28,7 @@
  * Performs numeric block updates within the relaxed snode. 
  */
 int
-zsnode_bmod (
+toast_zsnode_bmod (
 	    const int  jcol,	  /* in */
 	    const int  jsupno,    /* in */
 	    const int  fsupc,     /* in */

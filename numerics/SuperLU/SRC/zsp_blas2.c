@@ -25,7 +25,7 @@ void zmatvec(int, int, int, doublecomplex*, doublecomplex*, doublecomplex*);
 
 
 int
-sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L, 
+toast_sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L, 
 	 SuperMatrix *U, doublecomplex *x, int *info)
 {
 /*
@@ -117,7 +117,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
     Uval = Ustore->nzval;
     solve_ops = 0;
 
-    if ( !(work = doublecomplexCalloc(L->nrow)) )
+    if ( !(work = toast_doublecomplexCalloc(L->nrow)) )
 	ABORT("Malloc fails for work in sp_ztrsv().");
     
     if ( lsame_(trans, "N") ) {	/* Form x := inv(A)*x. */
@@ -309,7 +309,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 
 
 int
-sp_zgemv(char *trans, doublecomplex alpha, SuperMatrix *A, doublecomplex *x, 
+toast_sp_zgemv(char *trans, doublecomplex alpha, SuperMatrix *A, doublecomplex *x, 
 	 int incx, doublecomplex beta, doublecomplex *y, int incy)
 {
 /*  Purpose   

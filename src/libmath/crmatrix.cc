@@ -1876,28 +1876,28 @@ void LU (TCompRowMatrix<complex> &A, const TVector<complex> &b,
     SuperMatrix smA, L, U, B, X;
 
     doublecomplex *cdat = (doublecomplex*)A.ValPtr();
-    zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
+    toast_zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
 			    cdat, A.colidx, A.rowptr, NR, dtypeZ, GE);
 
     doublecomplex *bdat = (doublecomplex*)b.data_buffer();
     doublecomplex *xdat = (doublecomplex*)x.data_buffer();
-    zCreate_Dense_Matrix (&B, n, 1, bdat, n, DN, dtypeZ, GE);
-    zCreate_Dense_Matrix (&X, n, 1, xdat, n, DN, dtypeZ, GE);
+    toast_zCreate_Dense_Matrix (&B, n, 1, bdat, n, DN, dtypeZ, GE);
+    toast_zCreate_Dense_Matrix (&X, n, 1, xdat, n, DN, dtypeZ, GE);
 
-    get_perm_c (0, &smA, perm_c);
+    toast_get_perm_c (0, &smA, perm_c);
 
-    zgssvx (&fact, &trans, &refact, &smA, 0, perm_c, perm_r, etree,
+    toast_zgssvx (&fact, &trans, &refact, &smA, 0, perm_c, perm_r, etree,
 	    &equed, &R, &C, &L, &U, 0, 0, &B, &X,
 	    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
 
-    Destroy_SuperMatrix_Store (&B);
-    Destroy_SuperMatrix_Store (&X);
+    toast_Destroy_SuperMatrix_Store (&B);
+    toast_Destroy_SuperMatrix_Store (&X);
     delete []perm_c;
     delete []perm_r;
     delete []etree;
-    Destroy_SuperMatrix_Store (&smA);
-    Destroy_SuperNode_Matrix (&L);
-    Destroy_CompCol_Matrix (&U);
+    toast_Destroy_SuperMatrix_Store (&smA);
+    toast_Destroy_SuperNode_Matrix (&L);
+    toast_Destroy_CompCol_Matrix (&U);
 }
 
 template<class MT>

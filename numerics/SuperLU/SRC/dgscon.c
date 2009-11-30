@@ -100,7 +100,7 @@ dgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
 	return;
     }
 
-    work = doubleCalloc( 3*L->nrow );
+    work = toast_doubleCalloc( 3*L->nrow );
     iwork = intMalloc( L->nrow );
 
 

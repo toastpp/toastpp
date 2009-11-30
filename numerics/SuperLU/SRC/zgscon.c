@@ -16,7 +16,7 @@
 #include "zsp_defs.h"
 
 void
-zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
+toast_zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
        double anorm, double *rcond, int *info)
 {
 /*
@@ -99,7 +99,7 @@ zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
 	return;
     }
 
-    work = doublecomplexCalloc( 3*L->nrow );
+    work = toast_doublecomplexCalloc( 3*L->nrow );
 
 
     if ( !work )
@@ -118,18 +118,18 @@ zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
 
 	if (kase == kase1) {
 	    /* Multiply by inv(L). */
-	    sp_ztrsv("Lower", "No transpose", "Unit", L, U, &work[0], info);
+	    toast_sp_ztrsv("Lower", "No transpose", "Unit", L, U, &work[0], info);
 
 	    /* Multiply by inv(U). */
-	    sp_ztrsv("Upper", "No transpose", "Non-unit", L, U, &work[0],info);
+	    toast_sp_ztrsv("Upper", "No transpose", "Non-unit", L, U, &work[0],info);
 	    
 	} else {
 
 	    /* Multiply by inv(U'). */
-	    sp_ztrsv("Upper", "Transpose", "Non-unit", L, U, &work[0], info);
+	    toast_sp_ztrsv("Upper", "Transpose", "Non-unit", L, U, &work[0], info);
 
 	    /* Multiply by inv(L'). */
-	    sp_ztrsv("Lower", "Transpose", "Unit", L, U, &work[0], info);
+	    toast_sp_ztrsv("Lower", "Transpose", "Unit", L, U, &work[0], info);
 	    
 	}
 

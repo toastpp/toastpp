@@ -24,7 +24,7 @@
 #include "util.h"
 
 int
-zcopy_to_ucol(
+toast_zcopy_to_ucol(
 	      int        jcol,	  /* in */
 	      int        nseg,	  /* in */
 	      int        *segrep,  /* in */
@@ -76,10 +76,10 @@ zcopy_to_ucol(
 
 		new_next = nextu + segsze;
 		while ( new_next > nzumax ) {
-		    if (mem_error = zLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu))
+		    if (mem_error = toast_zLUMemXpand(jcol, nextu, UCOL, &nzumax, Glu))
 			return (mem_error);
 		    ucol = Glu->ucol;
-		    if (mem_error = zLUMemXpand(jcol, nextu, USUB, &nzumax, Glu))
+		    if (mem_error = toast_zLUMemXpand(jcol, nextu, USUB, &nzumax, Glu))
 			return (mem_error);
 		    usub = Glu->usub;
 		    lsub = Glu->lsub;

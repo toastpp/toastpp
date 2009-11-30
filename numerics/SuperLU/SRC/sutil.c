@@ -270,7 +270,7 @@ sPrint_Dense_Matrix(char *what, SuperMatrix *A)
  * Diagnostic print of column "jcol" in the U/L factor.
  */
 void
-sprint_lu_col(char *msg, int jcol, int pivrow, int *xprune, GlobalLU_t *Glu)
+toast_sprint_lu_col(char *msg, int jcol, int pivrow, int *xprune, GlobalLU_t *Glu)
 {
     int     i, k, fsupc;
     int     *xsup, *supno;
@@ -313,7 +313,7 @@ sprint_lu_col(char *msg, int jcol, int pivrow, int *xprune, GlobalLU_t *Glu)
  * Check whether tempv[] == 0. This should be true before and after 
  * calling any numeric routines, i.e., "panel_bmod" and "column_bmod". 
  */
-void scheck_tempv(int n, float *tempv)
+void toast_scheck_tempv(int n, float *tempv)
 {
     int i;
 	
@@ -404,7 +404,7 @@ void sinf_norm_error(int nrhs, SuperMatrix *X, float *xtrue)
 
 /* Print performance of the code. */
 void
-sPrintPerf(SuperMatrix *L, SuperMatrix *U, mem_usage_t *mem_usage,
+toast_sPrintPerf(SuperMatrix *L, SuperMatrix *U, mem_usage_t *mem_usage,
 	       float rpg, float rcond, float *ferr,
 	       float *berr, char *equed)
 {

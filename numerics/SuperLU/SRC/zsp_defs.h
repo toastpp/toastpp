@@ -1,4 +1,5 @@
-
+// MS 091130: All exported functions have been renamed to avoid a
+// clash with Matlab's version of SuperLU
 
 /*
  * -- SuperLU routine (version 2.0) --
@@ -121,10 +122,10 @@ extern "C" {
 
 /* Driver routines */
 extern void
-zgssv(SuperMatrix *, int *, int *, SuperMatrix *, SuperMatrix *, 
+toast_zgssv(SuperMatrix *, int *, int *, SuperMatrix *, SuperMatrix *, 
 	SuperMatrix *, int *);
 extern void
-zgssvx(char *, char *, char *, SuperMatrix *, factor_param_t *,
+toast_zgssvx(char *, char *, char *, SuperMatrix *, factor_param_t *,
        int *, int *, int *, char *, double *, double *,
        SuperMatrix *, SuperMatrix *, void *, int, SuperMatrix *, 
        SuperMatrix *, double *, double *, double *,
@@ -132,117 +133,117 @@ zgssvx(char *, char *, char *, SuperMatrix *, factor_param_t *,
 
 /* Supernodal LU factor related */
 extern void
-zCreate_CompCol_Matrix(SuperMatrix *, int, int, int, doublecomplex *,
+toast_zCreate_CompCol_Matrix(SuperMatrix *, int, int, int, doublecomplex *,
 		       int *, int *, Stype_t, Dtype_t, Mtype_t);
 extern void
-zCopy_CompCol_Matrix(SuperMatrix *, SuperMatrix *);
+toast_zCopy_CompCol_Matrix(SuperMatrix *, SuperMatrix *);
 extern void
-zCreate_Dense_Matrix(SuperMatrix *, int, int, doublecomplex *, int,
+toast_zCreate_Dense_Matrix(SuperMatrix *, int, int, doublecomplex *, int,
 		     Stype_t, Dtype_t, Mtype_t);
 extern void
-zCreate_SuperNode_Matrix(SuperMatrix *, int, int, int, doublecomplex *, 
+toast_zCreate_SuperNode_Matrix(SuperMatrix *, int, int, int, doublecomplex *, 
 		         int *, int *, int *, int *, int *,
 			 Stype_t, Dtype_t, Mtype_t);
 extern void
-zCopy_Dense_Matrix(int, int, doublecomplex *, int, doublecomplex *, int);
+toast_zCopy_Dense_Matrix(int, int, doublecomplex *, int, doublecomplex *, int);
 
-extern void    Destroy_SuperMatrix_Store(SuperMatrix *);
-extern void    Destroy_CompCol_Matrix(SuperMatrix *);
-extern void    Destroy_SuperNode_Matrix(SuperMatrix *);
-extern void    Destroy_CompCol_Permuted(SuperMatrix *);
-extern void    Destroy_Dense_Matrix(SuperMatrix *);
-extern void    get_perm_c(int, SuperMatrix *, int *);
-extern void    sp_preorder (char*, SuperMatrix*, int*, int*, SuperMatrix*);
-extern void    countnz (const int, int *, int *, int *, GlobalLU_t *);
-extern void    fixupL (const int, const int *, GlobalLU_t *);
+extern void    toast_Destroy_SuperMatrix_Store(SuperMatrix *);
+extern void    toast_Destroy_CompCol_Matrix(SuperMatrix *);
+extern void    toast_Destroy_SuperNode_Matrix(SuperMatrix *);
+extern void    toast_Destroy_CompCol_Permuted(SuperMatrix *);
+extern void    toast_Destroy_Dense_Matrix(SuperMatrix *);
+extern void    toast_get_perm_c(int, SuperMatrix *, int *);
+extern void    toast_sp_preorder (char*, SuperMatrix*, int*, int*, SuperMatrix*);
+extern void    toast_countnz (const int, int *, int *, int *, GlobalLU_t *);
+extern void    toast_fixupL (const int, const int *, GlobalLU_t *);
 
-extern void    zallocateA (int, int, doublecomplex **, int **, int **);
-extern void    zgstrf (char*, SuperMatrix*, double, double, int, int, int*,
+extern void    toast_zallocateA (int, int, doublecomplex **, int **, int **);
+extern void    toast_zgstrf (char*, SuperMatrix*, double, double, int, int, int*,
 			void *, int, int *, int *, 
                         SuperMatrix *, SuperMatrix *, int *);
-extern int     zsnode_dfs (const int, const int, const int *, const int *,
+extern int     toast_zsnode_dfs (const int, const int, const int *, const int *,
 			     const int *, int *, int *, GlobalLU_t *);
-extern int     zsnode_bmod (const int, const int, const int, doublecomplex *,
+extern int     toast_zsnode_bmod (const int, const int, const int, doublecomplex *,
                               doublecomplex *, GlobalLU_t *);
-extern void    zpanel_dfs (const int, const int, const int, SuperMatrix *,
+extern void    toast_zpanel_dfs (const int, const int, const int, SuperMatrix *,
 			   int *, int *, doublecomplex *, int *, int *, int *,
 			   int *, int *, int *, int *, GlobalLU_t *);
-extern void    zpanel_bmod (const int, const int, const int, const int,
+extern void    toast_zpanel_bmod (const int, const int, const int, const int,
                            doublecomplex *, doublecomplex *, int *, int *,
 			   GlobalLU_t *);
-extern int     zcolumn_dfs (const int, const int, int *, int *, int *, int *,
+extern int     toast_zcolumn_dfs (const int, const int, int *, int *, int *, int *,
 			   int *, int *, int *, int *, int *, GlobalLU_t *);
-extern int     zcolumn_bmod (const int, const int, doublecomplex *,
+extern int     toast_zcolumn_bmod (const int, const int, doublecomplex *,
 			   doublecomplex *, int *, int *, int, GlobalLU_t *);
-extern int     zcopy_to_ucol (int, int, int *, int *, int *,
+extern int     toast_zcopy_to_ucol (int, int, int *, int *, int *,
                               doublecomplex *, GlobalLU_t *);         
-extern int     zpivotL (const int, const double, int *, int *, 
+extern int     toast_zpivotL (const int, const double, int *, int *, 
                               int *, int *, int *, GlobalLU_t *);
-extern void    zpruneL (const int, const int *, const int, const int,
+extern void    toast_zpruneL (const int, const int *, const int, const int,
 			     const int *, const int *, int *, GlobalLU_t *);
-extern void    zreadmt (int *, int *, int *, doublecomplex **, int **, int **);
-extern void    zGenXtrue (int, int, doublecomplex *, int);
-extern void    zFillRHS (char *, int, doublecomplex *, int, SuperMatrix *,
+extern void    toast_zreadmt (int *, int *, int *, doublecomplex **, int **, int **);
+extern void    toast_zGenXtrue (int, int, doublecomplex *, int);
+extern void    toast_zFillRHS (char *, int, doublecomplex *, int, SuperMatrix *,
 			SuperMatrix *);
-extern void    zgstrs (char *, SuperMatrix *, SuperMatrix *, int *, int *,
+extern void    toast_zgstrs (char *, SuperMatrix *, SuperMatrix *, int *, int *,
 			SuperMatrix *, int *);
 
 
 /* Driver related */
 
-extern void    zgsequ (SuperMatrix *, double *, double *, double *,
+extern void    toast_zgsequ (SuperMatrix *, double *, double *, double *,
 			     double *, double *, int *);
-extern void    zlaqgs (SuperMatrix *, double *, double *, double,
+extern void    toast_zlaqgs (SuperMatrix *, double *, double *, double,
                              double, double, char *);
-extern void    zgscon (char *, SuperMatrix *, SuperMatrix *,
+extern void    toast_zgscon (char *, SuperMatrix *, SuperMatrix *,
 			double, double *, int *);
-extern double  zPivotGrowth(int, SuperMatrix *, int *, 
+extern double  toast_zPivotGrowth(int, SuperMatrix *, int *, 
                             SuperMatrix *, SuperMatrix *);
-extern void    zgsrfs (char *, SuperMatrix *, SuperMatrix *, 
+extern void    toast_zgsrfs (char *, SuperMatrix *, SuperMatrix *, 
 			SuperMatrix *, int *, int *, char *, double *,
 			double *, SuperMatrix *, SuperMatrix *, 
 			double *, double *, int *);
 
-extern int     sp_ztrsv (char *, char *, char *, SuperMatrix *,
+extern int     toast_sp_ztrsv (char *, char *, char *, SuperMatrix *,
 			SuperMatrix *, doublecomplex *, int *);
-extern int     sp_zgemv (char *, doublecomplex, SuperMatrix *, doublecomplex *,
+extern int     toast_sp_zgemv (char *, doublecomplex, SuperMatrix *, doublecomplex *,
 			int, doublecomplex, doublecomplex *, int);
 
-extern int     sp_zgemm (char *, char *, int, int, int, doublecomplex,
+extern int     toast_sp_zgemm (char *, char *, int, int, int, doublecomplex,
 			SuperMatrix *, doublecomplex *, int, doublecomplex, 
 			doublecomplex *, int);
 
 /* Memory-related */
-extern int     zLUMemInit (char *, void *, int, int, int, int, int,
+extern int     toast_zLUMemInit (char *, void *, int, int, int, int, int,
 			     SuperMatrix *, SuperMatrix *,
 			     GlobalLU_t *, int **, doublecomplex **);
-extern void    zSetRWork (int, int, doublecomplex *, doublecomplex **, doublecomplex **);
-extern void    zLUWorkFree (int *, doublecomplex *, GlobalLU_t *);
-extern int     zLUMemXpand (int, int, MemType, int *, GlobalLU_t *);
+extern void    toast_zSetRWork (int, int, doublecomplex *, doublecomplex **, doublecomplex **);
+extern void    toast_zLUWorkFree (int *, doublecomplex *, GlobalLU_t *);
+extern int     toast_zLUMemXpand (int, int, MemType, int *, GlobalLU_t *);
 
-extern doublecomplex  *doublecomplexMalloc(int);
-extern doublecomplex  *doublecomplexCalloc(int);
-extern double  *doubleMalloc(int);
-extern double  *doubleCalloc(int);
-extern int     zmemory_usage(const int, const int, const int, const int);
-extern int     zQuerySpace (SuperMatrix *, SuperMatrix *, int,
+extern doublecomplex  *toast_doublecomplexMalloc(int);
+extern doublecomplex  *toast_doublecomplexCalloc(int);
+extern double  *toast_doubleMalloc(int);
+extern double  *toast_doubleCalloc(int);
+extern int     toast_zmemory_usage(const int, const int, const int, const int);
+extern int     toast_zQuerySpace (SuperMatrix *, SuperMatrix *, int,
 				mem_usage_t *);
 
 /* Auxiliary routines */
-extern void    zreadhb(int *, int *, int *, doublecomplex **, int **, int **);
-extern void    zCompRow_to_CompCol(int, int, int, doublecomplex*, int*, int*,
+extern void    toast_zreadhb(int *, int *, int *, doublecomplex **, int **, int **);
+extern void    toast_zCompRow_to_CompCol(int, int, int, doublecomplex*, int*, int*,
 		                   doublecomplex **, int **, int **);
-extern void    zfill (doublecomplex *, int, doublecomplex);
-extern void    zinf_norm_error (int, SuperMatrix *, doublecomplex *);
-extern void    PrintPerf (SuperMatrix *, SuperMatrix *, mem_usage_t *,
+extern void    toast_zfill (doublecomplex *, int, doublecomplex);
+extern void    toast_zinf_norm_error (int, SuperMatrix *, doublecomplex *);
+extern void    toast_PrintPerf (SuperMatrix *, SuperMatrix *, mem_usage_t *,
 			 doublecomplex, doublecomplex, doublecomplex *, doublecomplex *, char *);
 
 /* Routines for debugging */
-extern void    zPrint_CompCol_Matrix(char *, SuperMatrix *);
-extern void    zPrint_SuperNode_Matrix(char *, SuperMatrix *);
-extern void    zPrint_Dense_Matrix(char *, SuperMatrix *);
-extern void    print_lu_col(char *, int, int, int *, GlobalLU_t *);
-extern void    check_tempv(int, doublecomplex *);
+extern void    toast_zPrint_CompCol_Matrix(char *, SuperMatrix *);
+extern void    toast_zPrint_SuperNode_Matrix(char *, SuperMatrix *);
+extern void    toast_zPrint_Dense_Matrix(char *, SuperMatrix *);
+extern void    toast_print_lu_col(char *, int, int, int *, GlobalLU_t *);
+extern void    toast_check_tempv(int, doublecomplex *);
 
 #ifdef __cplusplus
   }

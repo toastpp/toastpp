@@ -16,7 +16,7 @@
 #include "util.h"
 
 void
-zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
+toast_zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
        int *perm_r, int *perm_c, char *equed, double *R, double *C,
        SuperMatrix *B, SuperMatrix *X, 
        double *ferr, double *berr, int *info)
@@ -203,7 +203,7 @@ zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
     colequ = lsame_(equed, "C") || lsame_(equed, "B");
     
     /* Allocate working space */
-    work = doublecomplexMalloc(2*A->nrow);
+    work = toast_doublecomplexMalloc(2*A->nrow);
     rwork = (double *) SUPERLU_MALLOC( A->nrow * sizeof(double) );
     iwork = intMalloc(A->nrow);
     if ( !work || !rwork || !iwork ) 
@@ -262,7 +262,7 @@ zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 #else
 	    zcopy_(&A->nrow, Bptr, &ione, work, &ione);
 #endif
-	    sp_zgemv(trans, ndone, A, Xptr, ione, done, work, ione);
+	    toast_sp_zgemv(trans, ndone, A, Xptr, ione, done, work, ione);
 
 	    /* Compute componentwise relative backward error from formula 
 	       max(i) ( abs(R(i)) / ( abs(op(A))*abs(X) + abs(B) )(i) )   
@@ -308,7 +308,7 @@ zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 
 	    if (berr[j] > eps && berr[j] * 2. <= lstres && count < ITMAX) {
 		/* Update solution and try again. */
-		zgstrs (trans, L, U, perm_r, perm_c, &Bjcol, info);
+		toast_zgstrs (trans, L, U, perm_r, perm_c, &Bjcol, info);
 		
 #ifdef _CRAY
 		CAXPY(&A->nrow, &done, work, &ione,
@@ -388,7 +388,7 @@ zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 		        zd_mult(&work[i], &work[i], R[i]);
                     }
 
-		zgstrs (transt, L, U, perm_r, perm_c, &Bjcol, info);
+		toast_zgstrs (transt, L, U, perm_r, perm_c, &Bjcol, info);
 		
 		for (i = 0; i < A->nrow; ++i) {
 		    zd_mult(&work[i], &work[i], rwork[i]);
@@ -399,7 +399,7 @@ zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 		    zd_mult(&work[i], &work[i], rwork[i]);
 		}
 		
-		zgstrs (trans, L, U, perm_r, perm_c, &Bjcol, info);
+		toast_zgstrs (trans, L, U, perm_r, perm_c, &Bjcol, info);
 		
 		if ( notran && colequ )
 		    for (i = 0; i < A->ncol; ++i) {

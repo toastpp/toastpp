@@ -2,7 +2,7 @@
 #include "util.h"
 
 void
-sp_preorder(char *refact,  SuperMatrix *A, int *perm_c, 
+toast_sp_preorder(char *refact,  SuperMatrix *A, int *perm_c, 
 	    int *etree, SuperMatrix *AC)
 {
 /*

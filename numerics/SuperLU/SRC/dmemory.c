@@ -623,7 +623,7 @@ dStackCompress(GlobalLU_t *Glu)
 #ifdef DEBUG
     printf("dStackCompress: fragment %d\n", fragment);
     /* for (last = 0; last < ndim; ++last)
-	print_lu_col("After compress:", last, 0);*/
+	toast_print_lu_col("After compress:", last, 0);*/
 #endif    
     
 }
@@ -634,13 +634,13 @@ dStackCompress(GlobalLU_t *Glu)
 void
 dallocateA(int n, int nnz, double **a, int **asub, int **xa)
 {
-    *a    = (double *) doubleMalloc(nnz);
+    *a    = (double *) toast_doubleMalloc(nnz);
     *asub = (int *) intMalloc(nnz);
     *xa   = (int *) intMalloc(n+1);
 }
 
 
-double *doubleMalloc(int n)
+double *toast_doubleMalloc(int n)
 {
     double *buf;
     buf = (double *) SUPERLU_MALLOC(n * sizeof(double)); 
@@ -650,7 +650,7 @@ double *doubleMalloc(int n)
     return (buf);
 }
 
-double *doubleCalloc(int n)
+double *toast_doubleCalloc(int n)
 {
     double *buf;
     register int i;

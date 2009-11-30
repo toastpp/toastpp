@@ -16,7 +16,7 @@
 #include "util.h"
 
 void
-zlaqgs(SuperMatrix *A, double *r, double *c, 
+toast_zlaqgs(SuperMatrix *A, double *r, double *c, 
 	double rowcnd, double colcnd, double amax, char *equed)
 {
 /*

@@ -33,7 +33,7 @@ void zmatvec(int, int, int, doublecomplex*, doublecomplex*, doublecomplex*);
 
 
 void
-zgstrs (char *trans, SuperMatrix *L, SuperMatrix *U,
+toast_zgstrs (char *trans, SuperMatrix *L, SuperMatrix *U,
 	int *perm_r, int *perm_c, SuperMatrix *B, int *info)
 {
 /*
@@ -126,9 +126,9 @@ zgstrs (char *trans, SuperMatrix *L, SuperMatrix *U,
     }
 
     n = L->nrow;
-    work = doublecomplexCalloc(n * nrhs);
+    work = toast_doublecomplexCalloc(n * nrhs);
     if ( !work ) ABORT("Malloc fails for local work[].");
-    soln = doublecomplexMalloc(n);
+    soln = toast_doublecomplexMalloc(n);
     if ( !soln ) ABORT("Malloc fails for local soln[].");
 
     Bmat = Bstore->nzval;
@@ -303,10 +303,10 @@ zgstrs (char *trans, SuperMatrix *L, SuperMatrix *U,
 	for (k = 0; k < nrhs; ++k) {
 	    
 	    /* Multiply by inv(U'). */
-	    sp_ztrsv("U", "T", "N", L, U, &Bmat[k*ldb], info);
+	    toast_sp_ztrsv("U", "T", "N", L, U, &Bmat[k*ldb], info);
 	    
 	    /* Multiply by inv(L'). */
-	    sp_ztrsv("L", "T", "U", L, U, &Bmat[k*ldb], info);
+	    toast_sp_ztrsv("L", "T", "U", L, U, &Bmat[k*ldb], info);
 	    
 	}
 	

@@ -121,7 +121,7 @@ void zuser_free(int bytes, int which_end)
  *    - expansions (int)
  *      Number of memory expansions during the LU factorization.
  */
-int zQuerySpace(SuperMatrix *L, SuperMatrix *U, int panel_size,
+int toast_zQuerySpace(SuperMatrix *L, SuperMatrix *U, int panel_size,
 	        mem_usage_t *mem_usage)
 {
     SCformat *Lstore;
@@ -159,7 +159,7 @@ int zQuerySpace(SuperMatrix *L, SuperMatrix *U, int panel_size,
  *     memory allocation failure occurred.
  */
 int
-zLUMemInit(char *refact, void *work, int lwork, int m, int n, int annz,
+toast_zLUMemInit(char *refact, void *work, int lwork, int m, int n, int annz,
 	  int panel_size, SuperMatrix *L, SuperMatrix *U, GlobalLU_t *Glu,
 	  int **iwork, doublecomplex **dwork)
 {
@@ -234,7 +234,7 @@ zLUMemInit(char *refact, void *work, int lwork, int m, int n, int annz,
 	    nzlmax /= 2;
 	    if ( nzlumax < annz ) {
 		printf("Not enough memory to perform factorization.\n");
-		return (zmemory_usage(nzlmax, nzumax, nzlumax, n) + n);
+		return (toast_zmemory_usage(nzlmax, nzumax, nzlumax, n) + n);
 	    }
 	    lusup = (doublecomplex *) zexpand( &nzlumax, LUSUP, 0, 0, Glu );
 	    ucol  = (doublecomplex *) zexpand( &nzumax, UCOL, 0, 0, Glu );
@@ -291,7 +291,7 @@ zLUMemInit(char *refact, void *work, int lwork, int m, int n, int annz,
     
     info = zLUWorkInit(m, n, panel_size, iwork, dwork, Glu->MemModel);
     if ( info )
-	return ( info + zmemory_usage(nzlmax, nzumax, nzlumax, n) + n);
+	return ( info + toast_zmemory_usage(nzlmax, nzumax, nzlumax, n) + n);
     
     ++no_expand;
     return 0;
@@ -351,7 +351,7 @@ zLUWorkInit(int m, int n, int panel_size, int **iworkptr,
  * Set up pointers for real working arrays.
  */
 void
-zSetRWork(int m, int panel_size, doublecomplex *dworkptr,
+toast_zSetRWork(int m, int panel_size, doublecomplex *dworkptr,
 	 doublecomplex **dense, doublecomplex **tempv)
 {
     doublecomplex zero = {0.0, 0.0};
@@ -360,14 +360,14 @@ zSetRWork(int m, int panel_size, doublecomplex *dworkptr,
         rowblk   = sp_ienv(4);
     *dense = dworkptr;
     *tempv = *dense + panel_size*m;
-    zfill (*dense, m * panel_size, zero);
-    zfill (*tempv, NUM_TEMPV(m,panel_size,maxsuper,rowblk), zero);     
+    toast_zfill (*dense, m * panel_size, zero);
+    toast_zfill (*tempv, NUM_TEMPV(m,panel_size,maxsuper,rowblk), zero);     
 }
 	
 /*
  * Free the working storage used by factor routines.
  */
-void zLUWorkFree(int *iwork, doublecomplex *dwork, GlobalLU_t *Glu)
+void toast_zLUWorkFree(int *iwork, doublecomplex *dwork, GlobalLU_t *Glu)
 {
     if ( Glu->MemModel == SYSTEM ) {
 	SUPERLU_FREE (iwork);
@@ -386,7 +386,7 @@ void zLUWorkFree(int *iwork, doublecomplex *dwork, GlobalLU_t *Glu)
  *               > 0 - number of bytes allocated when run out of space
  */
 int
-zLUMemXpand(int jcol,
+toast_zLUMemXpand(int jcol,
 	   int next,          /* number of elements currently in the factors */
 	   MemType mem_type,  /* which type of memory to expand  */
 	   int *maxlen,       /* modified - maximum length of a data structure */
@@ -410,7 +410,7 @@ zLUMemXpand(int jcol,
 	int    nzumax  = Glu->nzumax;
 	int    nzlumax = Glu->nzlumax;
     	fprintf(stderr, "Can't expand MemType %d: jcol %d\n", mem_type, jcol);
-    	return (zmemory_usage(nzlmax, nzumax, nzlumax, Glu->n) + Glu->n);
+    	return (toast_zmemory_usage(nzlmax, nzumax, nzlumax, Glu->n) + Glu->n);
     }
 
     switch ( mem_type ) {
@@ -623,7 +623,7 @@ zStackCompress(GlobalLU_t *Glu)
 #ifdef DEBUG
     printf("zStackCompress: fragment %d\n", fragment);
     /* for (last = 0; last < ndim; ++last)
-	print_lu_col("After compress:", last, 0);*/
+	toast_print_lu_col("After compress:", last, 0);*/
 #endif    
     
 }
@@ -632,15 +632,15 @@ zStackCompress(GlobalLU_t *Glu)
  * Allocate storage for original matrix A
  */
 void
-zallocateA(int n, int nnz, doublecomplex **a, int **asub, int **xa)
+toast_zallocateA(int n, int nnz, doublecomplex **a, int **asub, int **xa)
 {
-    *a    = (doublecomplex *) doublecomplexMalloc(nnz);
+    *a    = (doublecomplex *) toast_doublecomplexMalloc(nnz);
     *asub = (int *) intMalloc(nnz);
     *xa   = (int *) intMalloc(n+1);
 }
 
 
-doublecomplex *doublecomplexMalloc(int n)
+doublecomplex *toast_doublecomplexMalloc(int n)
 {
     doublecomplex *buf;
     buf = (doublecomplex *) SUPERLU_MALLOC(n * sizeof(doublecomplex)); 
@@ -650,7 +650,7 @@ doublecomplex *doublecomplexMalloc(int n)
     return (buf);
 }
 
-doublecomplex *doublecomplexCalloc(int n)
+doublecomplex *toast_doublecomplexCalloc(int n)
 {
     doublecomplex *buf;
     register int i;
@@ -664,7 +664,7 @@ doublecomplex *doublecomplexCalloc(int n)
 }
 
 
-int zmemory_usage(const int nzlmax, const int nzumax, 
+int toast_zmemory_usage(const int nzlmax, const int nzumax, 
 		  const int nzlumax, const int n)
 {
     register int iword, dword;

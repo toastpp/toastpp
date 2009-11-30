@@ -11,7 +11,7 @@
 #include "util.h"
 
 void
-zgssvx(char *fact, char *trans, char *refact,
+toast_zgssvx(char *fact, char *trans, char *refact,
        SuperMatrix *A, factor_param_t *factor_params, int *perm_c,
        int *perm_r, int *etree, char *equed, double *R, double *C,
        SuperMatrix *L, SuperMatrix *U, void *work, int lwork,
@@ -488,7 +488,7 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     if ( A->Stype == NR ) {
 	NRformat *Astore = A->Store;
 	AA = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
-	zCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, 
+	toast_zCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz, 
 			       Astore->nzval, Astore->colind, Astore->rowptr,
 			       NC, A->Dtype, A->Mtype);
 	if ( notran ) { /* Reverse the transpose argument. */
@@ -506,11 +506,11 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     if ( equil ) {
 	t0 = SuperLU_timer_();
 	/* Compute row and column scalings to equilibrate the matrix A. */
-	zgsequ(AA, R, C, &rowcnd, &colcnd, &amax, &info1);
+	toast_zgsequ(AA, R, C, &rowcnd, &colcnd, &amax, &info1);
 	
 	if ( info1 == 0 ) {
 	    /* Equilibrate matrix A. */
-	    zlaqgs(AA, R, C, rowcnd, colcnd, amax, equed);
+	    toast_zlaqgs(AA, R, C, rowcnd, colcnd, amax, equed);
 	    rowequ = lsame_(equed, "R") || lsame_(equed, "B");
 	    colequ = lsame_(equed, "C") || lsame_(equed, "B");
 	}
@@ -535,7 +535,7 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     if ( nofact || equil ) {
 	
 	t0 = SuperLU_timer_();
-	sp_preorder(refact, AA, perm_c, etree, &AC);
+	toast_sp_preorder(refact, AA, perm_c, etree, &AC);
 	utime[ETREE] = SuperLU_timer_() - t0;
     
 /*	printf("Factor PA = LU ... relax %d\tw %d\tmaxsuper %d\trowblk %d\n", 
@@ -544,7 +544,7 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
 	
 	/* Compute the LU factorization of A*Pc. */
 	t0 = SuperLU_timer_();
-	zgstrf(refact, &AC, diag_pivot_thresh, drop_tol, relax, panel_size,
+	toast_zgstrf(refact, &AC, diag_pivot_thresh, drop_tol, relax, panel_size,
 	       etree, work, lwork, perm_r, perm_c, L, U, info);
 	utime[FACT] = SuperLU_timer_() - t0;
 	
@@ -558,13 +558,13 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
 	if ( *info <= A->ncol ) {
 	    /* Compute the reciprocal pivot growth factor of the leading
 	       rank-deficient *info columns of A. */
-	    *recip_pivot_growth = zPivotGrowth(*info, AA, perm_c, L, U);
+	    *recip_pivot_growth = toast_zPivotGrowth(*info, AA, perm_c, L, U);
 	}
 	return;
     }
 
     /* Compute the reciprocal pivot growth factor *recip_pivot_growth. */
-    *recip_pivot_growth = zPivotGrowth(A->ncol, AA, perm_c, L, U);
+    *recip_pivot_growth = toast_zPivotGrowth(A->ncol, AA, perm_c, L, U);
 
     /* Estimate the reciprocal of the condition number of A. */
     t0 = SuperLU_timer_();
@@ -574,7 +574,7 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
 	*(unsigned char *)norm = 'I';
     }
     anorm = zlangs(norm, AA);
-    zgscon(norm, L, U, anorm, rcond, info);
+    toast_zgscon(norm, L, U, anorm, rcond, info);
     utime[RCOND] = SuperLU_timer_() - t0;
     
     /* Compute the solution matrix X. */
@@ -583,13 +583,13 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
 	    Xmat[i + j*ldx] = Bmat[i + j*ldb];
     
     t0 = SuperLU_timer_();
-    zgstrs (trant, L, U, perm_r, perm_c, X, info);
+    toast_zgstrs (trant, L, U, perm_r, perm_c, X, info);
     utime[SOLVE] = SuperLU_timer_() - t0;
     
     /* Use iterative refinement to improve the computed solution and compute
        error bounds and backward error estimates for it. */
     t0 = SuperLU_timer_();
-    zgsrfs(trant, AA, L, U, perm_r, perm_c, equed, R, C, B,
+    toast_zgsrfs(trant, AA, L, U, perm_r, perm_c, equed, R, C, B,
 	      X, ferr, berr, info);
     utime[REFINE] = SuperLU_timer_() - t0;
 
@@ -611,11 +611,11 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     /* Set INFO = A->ncol+1 if the matrix is singular to working precision. */
     if ( *rcond < dlamch_("E") ) *info = A->ncol + 1;
 
-    zQuerySpace(L, U, panel_size, mem_usage);
+    toast_zQuerySpace(L, U, panel_size, mem_usage);
 
-    if ( nofact || equil ) Destroy_CompCol_Permuted(&AC);
+    if ( nofact || equil ) toast_Destroy_CompCol_Permuted(&AC);
     if ( A->Stype == NR ) {
-	Destroy_SuperMatrix_Store(AA);
+	toast_Destroy_SuperMatrix_Store(AA);
 	SUPERLU_FREE(AA);
     }
 

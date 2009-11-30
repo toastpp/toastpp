@@ -30,7 +30,7 @@
  */
 void slsolve(int, int, float *, float *);
 void smatvec(int, int, int, float *, float *, float *);
-extern void scheck_tempv();
+extern void toast_scheck_tempv();
 
 void
 spanel_bmod (

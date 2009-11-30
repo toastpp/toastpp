@@ -326,7 +326,7 @@ a_plus_at(
 }
 
 void
-get_perm_c(int ispec, SuperMatrix *A, int *perm_c)
+toast_get_perm_c(int ispec, SuperMatrix *A, int *perm_c)
 /*
  * Purpose
  * =======
