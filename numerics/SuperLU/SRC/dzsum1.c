@@ -1,6 +1,6 @@
 #include "dcomplex.h"
 
-double dzsum1_(int *n, doublecomplex *cx, int *incx)
+double toast_dzsum1_(int *n, doublecomplex *cx, int *incx)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   

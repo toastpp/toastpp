@@ -163,7 +163,8 @@ toast_zgssvx(char *fact, char *trans, char *refact,
  *           equed = 'C':  A := A * diag(C)
  *           equed = 'B':  A := diag(R) * A * diag(C).
  *         If A->Stype = NR:
- *           equed = 'R':  transpose(A) := diag(R) * transpose(A)
+ *           equed = 'R':  transp>>>>>>> .r95
+ose(A) := diag(R) * transpose(A)
  *           equed = 'C':  transpose(A) := transpose(A) * diag(C)
  *           equed = 'B':  transpose(A) := diag(R) * transpose(A) * diag(C).
  *
@@ -237,7 +238,8 @@ toast_zgssvx(char *fact, char *trans, char *refact,
  *         = 'B': Both row and column equilibration, i.e., A was replaced 
  *                by diag(R)*A*diag(C).
  *         If fact = 'F', equed is an input argument, otherwise it is
- *         an output argument.
+ *         an output argument.>>>>>>> .r95
+
  *
  * R       (input/output) double*, dimension (A->nrow)
  *         The row scale factors for A or transpose(A).
@@ -383,7 +385,7 @@ toast_zgssvx(char *fact, char *trans, char *refact,
 
     /* External functions */
     extern double zlangs(char *, SuperMatrix *);
-    extern double dlamch_(char *);
+    extern double toast_dlamch_(char *);
 
     Bstore = B->Store;
     Xstore = X->Store;
@@ -409,7 +411,7 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     } else {
 	rowequ = lsame_(equed, "R") || lsame_(equed, "B");
 	colequ = lsame_(equed, "C") || lsame_(equed, "B");
-	smlnum = dlamch_("Safe minimum");
+	smlnum = toast_dlamch_("Safe minimum");
 	bignum = 1. / smlnum;
     }
 
@@ -609,7 +611,7 @@ printf("zgssvx: fact=%c, trans=%c, refact=%c, equed=%c\n",
     }
 
     /* Set INFO = A->ncol+1 if the matrix is singular to working precision. */
-    if ( *rcond < dlamch_("E") ) *info = A->ncol + 1;
+    if ( *rcond < toast_dlamch_("E") ) *info = A->ncol + 1;
 
     toast_zQuerySpace(L, U, panel_size, mem_usage);
 

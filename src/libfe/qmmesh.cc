@@ -152,6 +152,7 @@ void QMMesh::InitM ()
 	for (is = 0; is < gder.Dim(ROW); is++)
 	    for (in = 0; in < gder.Dim(COL); in++)
 		Mcosingder[i](is,in) = cosin[is] * gder(is,in);
+
     }
 
     for (nQM = 0, i = 0; i < nQ; i++) nQM += nQMref[i];

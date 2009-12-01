@@ -103,8 +103,13 @@ AC_ARG_WITH(blas,
 
 AC_ARG_WITH(lapack,
     [  --with-lapack=LIB       Linker command to bind LAPACK package, e.g.]
+<<<<<<< .mine
+    [                          '-llapack' (default) or '/usr/lib/liblapack.a'],
+    LAPACKLIB=$withval, LAPACKLIB="-ltoastlapack")
+=======
     [                          '-llapack' or '/usr/lib/liblapack.a'],
     LAPACKLIB=$withval, LAPACKLIB="-ltoastlapack")
+>>>>>>> .r93
 
 # ========================================================================
 # Check for SuperLU

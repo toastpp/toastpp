@@ -17,7 +17,7 @@ using namespace toast;
 // member definitions
 
 template<class MT>
-TSymMatrix<MT>::TSymMatrix (int n, char *valstr): TMatrix<MT> (n, n)
+TSymMatrix<MT>::TSymMatrix (int n, const char *valstr): TMatrix<MT> (n, n)
 {
     Alloc (n);
     std::istringstream iss (valstr);

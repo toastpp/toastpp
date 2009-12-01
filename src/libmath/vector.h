@@ -230,7 +230,7 @@ public:
      *   stream-in operator ('>>') for the appropriate template type.
      * \note Elements must be separated by whitespace.
      */
-    inline TVector (int dim, char *init);
+    inline TVector (int dim, const char *init);
 
     /**
      * \brief Copy constructor. Create vector as copy of another vector.
@@ -1047,7 +1047,7 @@ TVector<VT>::TVector (int dim, VT *values)
 // constructor (element assignment from string)
 
 template<class VT>
-TVector<VT>::TVector (int dim, char *init)
+TVector<VT>::TVector (int dim, const char *init)
 {
     dASSERT(dim >= 0, Parameter 1 must be >= 0);
     base_nref = 0;

@@ -184,6 +184,7 @@ toast_zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
  *	The size of this array is defined by NUM_TEMPV() in zsp_defs.h.
  *
  */
+
     /* Local working arrays */
     NCPformat *Astore;
     int       *iperm_r; /* inverse of perm_r; not used if refact = 'N' */
@@ -317,7 +318,7 @@ toast_zgstrf (char *refact, SuperMatrix *A, double diag_pivot_thresh,
 	    jcol = icol;
 
 	} else { /* Work on one panel of panel_size columns */
-	    
+	
 	    /* Adjust panel_size so that a panel won't overlap with the next 
 	     * relaxed snode.
 	     */

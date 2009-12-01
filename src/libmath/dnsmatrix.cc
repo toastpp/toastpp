@@ -43,7 +43,7 @@ TDenseMatrix<MT>::TDenseMatrix (const TDenseMatrix<MT> &m,
 }
 
 template<class MT>
-TDenseMatrix<MT>::TDenseMatrix (int r, int c, char *valstr)
+TDenseMatrix<MT>::TDenseMatrix (int r, int c, const char *valstr)
 : TMatrix<MT> (r, c)
 {
     Alloc (r, c);

@@ -118,7 +118,7 @@ public:
     // Create r x c matrix and initialise from 'values' array, which
     // contains row vectors and must be at least of dimension r*c
 
-    TDenseMatrix (int r, int c, char *valstr);
+    TDenseMatrix (int r, int c, const char *valstr);
     // Create r x c matrix and initialise from a string which contains
     // at least r*c MT values in row order
 

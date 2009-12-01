@@ -145,8 +145,8 @@ toast_zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
     doublecomplex   *work;
     double   *rwork;
     int      *iwork;
-    extern double dlamch_(char *);
-    extern int zlacon_(int *, doublecomplex *, doublecomplex *, double *, int *);
+    extern double toast_dlamch_(char *);
+    extern int toast_zlacon_(int *, doublecomplex *, doublecomplex *, double *, int *);
 #ifdef _CRAY
     extern int CCOPY(int *, doublecomplex *, int *, doublecomplex *, int *);
     extern int CSAXPY(int *, doublecomplex *, doublecomplex *, int *, doublecomplex *, int *);
@@ -217,8 +217,8 @@ toast_zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 
     /* NZ = maximum number of nonzero elements in each row of A, plus 1 */
     nz     = A->ncol + 1;
-    eps    = dlamch_("Epsilon");
-    safmin = dlamch_("Safe minimum");
+    eps    = toast_dlamch_("Epsilon");
+    safmin = toast_dlamch_("Safe minimum");
     safe1  = nz * safmin;
     safe2  = safe1 / eps;
 
@@ -373,7 +373,7 @@ toast_zgsrfs(char *trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 	kase = 0;
 
 	do {
-	    zlacon_(&A->nrow, &work[A->nrow], work,
+	    toast_zlacon_(&A->nrow, &work[A->nrow], work,
 		    &ferr[j], &kase);
 	    if (kase == 0) break;
 

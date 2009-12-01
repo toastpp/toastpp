@@ -64,7 +64,7 @@ public:
     { Alloc (m.rows); memcpy (val, m.val, nz*sizeof(MT)); }
     // Create a copy of m
 
-    TSymMatrix (int n, char *valstr);
+    TSymMatrix (int n, const char *valstr);
     // Create n x n symmetric matrix and initialise from string which contains
     // values for lower triangle in row order
 

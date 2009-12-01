@@ -128,7 +128,7 @@ dlamch.o: dlamch.c ; $(CC) $(SHLIB_CFLAGS) -c $<
 superlu_timer.o:  superlu_timer.c ; $(CC) $(SHLIB_CFLAGS) -c $<
 
 .c.o:
-	$(CC) $(CINC) $(CFLAGS) $(CDEFS) $(BLASDEF) $(SHLIB_CFLAGS) -c $<
+	$(CC) $(CINC) -I$(TINC) $(CFLAGS) $(CDEFS) $(BLASDEF) $(SHLIB_CFLAGS) -c $<
 
 clean:
 	rm -f *.o $(LIB)
