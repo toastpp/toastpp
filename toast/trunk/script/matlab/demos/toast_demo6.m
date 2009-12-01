@@ -268,6 +268,7 @@ function showiso(handles,bmua,thres_mua,bmus,thres_mus,fignum)
 prm = getappdata(handles.figure1,'prm');
 nx = prm.solver.basis.bdim(1); ny = prm.solver.basis.bdim(2); nz = prm.solver.basis.bdim(3);
 eval(['axes(handles.axes' num2str(fignum) ')']);
+set(gcf,'Renderer','OpenGL');
 cla;
 
 [vtx,idx,perm] = toastSurfData(prm.basis.hMesh);

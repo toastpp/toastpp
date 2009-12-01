@@ -119,15 +119,15 @@ prm.mus = toastMapBasisToMesh(prm.solver.basis.hbasis,prm.bmus);
 prm.ref = ones(n,1)*1.4;
 axes(handles.axes1);
 imagesc(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.005 0.05]);
-axis tight
-set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+axis xy equal tight off
+%set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes2);
 imagesc(reshape(prm.bmus,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.5 4]);
-axis tight
-set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+axis xy equal tight off
+%set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes7);
 tmp = toastMapMeshToBasis(prm.solver.basis.hbasis,ones(n,1));
-h = imagesc(rot90(reshape(tmp,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)))); axis xy tight off
+h = imagesc(rot90(reshape(tmp,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)))); axis xy equal tight off
 hold on;
 qp = toastQPos(prm.fwdsolver.hmesh);
 for i=1:size(qp,1)
@@ -172,11 +172,11 @@ end
 function callback_vis(handles,res)
 prm = getappdata(handles.figure1,'prm');
 axes(handles.axes3);
-imagesc(reshape(res.bmua,res.bdim(1),res.bdim(2)),[0.005 0.05]); axis tight
-set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(reshape(res.bmua,res.bdim(1),res.bdim(2)),[0.005 0.05]); axis xy equal tight off
+%set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes4);
-imagesc(reshape(res.bmus,res.bdim(1),res.bdim(2)),[0.5 4]); axis tight
-set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(reshape(res.bmus,res.bdim(1),res.bdim(2)),[0.5 4]); axis xy equal tight off
+%set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes5);
 semilogy(res.of); axis tight
 set(handles.axes5,'FontSize',7);
