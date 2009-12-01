@@ -116,11 +116,11 @@ prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
 prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
 prm.ref = ones(n,1)*1.4;
 axes(handles.axes1);
-imagesc(reshape(prm.bmua,prm.bx,prm.by),[0.005 0.05]); axis tight
-set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by)),[0.005 0.05]); axis xy equal tight off
+%set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes2);
-imagesc(reshape(prm.bmus,prm.bx,prm.by),[0.5 4]); axis tight
-set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by)),[0.5 4]); axis xy equal tight off
+%set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 setappdata(handles.figure1,'prm',prm);
 disp_detectors(handles,prm);
@@ -135,7 +135,8 @@ function disp_detectors(handles,prm)
 n = toastMeshNodeCount(prm.basis.hMesh);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
 axes(handles.axes7);
-cla;surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
+cla;imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
+%cla;surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 hold on;
 
 qp = toastQPos(prm.basis.hMesh);
@@ -179,11 +180,11 @@ end
 function callback_vis(handles,res)
 prm = getappdata(handles.figure1,'prm');
 axes(handles.axes3);
-imagesc(reshape(res.bmua,res.bdim(1),res.bdim(2)),[0.005 0.05]); axis tight
-set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(res.bmua,res.bdim(1),res.bdim(2))),[0.005 0.05]); axis xy equal tight off
+%set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes4);
-imagesc(reshape(res.bmus,res.bdim(1),res.bdim(2)),[0.5 4]); axis tight
-set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(res.bmus,res.bdim(1),res.bdim(2))),[0.5 4]); axis xy equal tight off
+%set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes5);
 semilogy(res.of); axis tight
 set(handles.axes5,'FontSize',7);

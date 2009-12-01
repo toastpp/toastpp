@@ -106,23 +106,23 @@ prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
 prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
 axes(handles.axes1);
 %h = surface(reshape(prm.bmua,prm.bx,prm.by),'EdgeColor','none'); axis tight
-h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo2(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes2);
-h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy equal tight off
 %h = surface(reshape(prm.bmus,prm.bx,prm.by),'EdgeColor','none'); axis tight
 set(h,'ButtonDownFcn','toast_demo2(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes7);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 %h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 hold on;
-x = prm.bx*(cos(prm.phiq)*0.45+0.5);
-y = prm.by*(sin(prm.phiq)*0.45+0.5);
-plot3(x, y, 1, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
-x = prm.bx*(cos(prm.phim)*0.45+0.5);
-y = prm.by*(sin(prm.phim)*0.45+0.5);
-plot3(x, y, 1, 'oy', 'MarkerSize',7, 'MarkerFaceColor','yellow');
+x = prm.bx*(0.5+cos(prm.phiq)*0.45);
+y = prm.by*(0.5-sin(prm.phiq)*0.45);
+plot(x, y, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
+x = prm.bx*(0.5+cos(prm.phim)*0.45);
+y = prm.by*(0.5-sin(prm.phim)*0.45);
+plot(x, y, 'oy', 'MarkerSize',7, 'MarkerFaceColor','yellow');
 set(h,'ButtonDownFcn','toast_demo2(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 clear tmp
 
@@ -184,15 +184,15 @@ prm.phim = phim;
 axes(handles.axes7);
 n = toastMeshNodeCount(prm.basis.hMesh);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 %cla;h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
-x = prm.bx*(cos(phiq)*0.45+0.5);
-y = prm.by*(sin(phiq)*0.45+0.5);
+x = prm.bx*(0.5+cos(phiq)*0.45);
+y = prm.by*(0.5-sin(phiq)*0.45);
 hold on;
-plot3(x, y, 1, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
-x = prm.bx*(cos(phim)*0.45+0.5);
-y = prm.by*(sin(phim)*0.45+0.5);
-plot3(x, y, 1, 'oy', 'MarkerSize',7, 'MarkerFaceColor','yellow');
+plot(x, y, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
+x = prm.bx*(0.5+cos(phim)*0.45);
+y = prm.by*(0.5-sin(phim)*0.45);
+plot(x, y, 'oy', 'MarkerSize',7, 'MarkerFaceColor','yellow');
 set(h,'ButtonDownFcn','toast_demo2(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 clear tmp
 
@@ -219,24 +219,25 @@ prm = getappdata(handles.figure1,'prm');
 % perturbation parameters
 pert = getappdata(handles.figure1,'pert');
 bpert = zeros(prm.bx,prm.by);
-bpert(pert.mua.y0-pert.mua.dx:pert.mua.y0+pert.mua.dx,pert.mua.x0-pert.mua.dx:pert.mua.x0+pert.mua.dx) = pert.mua.val;
+bpert(pert.mua.x0-pert.mua.dx:pert.mua.x0+pert.mua.dx,pert.mua.y0-pert.mua.dx:pert.mua.y0+pert.mua.dx) = pert.mua.val;
 bpert = reshape(bpert,[],1);
 bmua = prm.bmua + bpert;
 mua = toastMapBasisToMesh(prm.basis.hBasis,bmua);
 axes(handles.axes1);
 cla;
-h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy equal tight off
 %h = surface(reshape(bmua,prm.bx,prm.by)','EdgeColor','none');axis tight
 set(h,'ButtonDownFcn','toast_demo2(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 bpert = zeros(prm.bx,prm.by);
-bpert(pert.mus.y0-pert.mus.dx:pert.mus.y0+pert.mus.dx,pert.mus.x0-pert.mus.dx:pert.mus.x0+pert.mus.dx) = pert.mus.val;
+bpert(pert.mus.x0-pert.mus.dx:pert.mus.x0+pert.mus.dx,pert.mus.y0-pert.mus.dx:pert.mus.y0+pert.mus.dx) = pert.mus.val;
 bpert = reshape(bpert,[],1);
 bmus = prm.bmus + bpert;
 mus = toastMapBasisToMesh(prm.basis.hBasis,bmus);
 axes(handles.axes2);
 cla;
-h = surface(reshape(bmus,prm.bx,prm.by)','EdgeColor','none');axis tight
+h = imagesc(rot90(reshape(bmus,prm.bx,prm.by))); axis xy equal tight off
+%h = surface(reshape(bmus,prm.bx,prm.by)','EdgeColor','none');axis tight
 set(h,'ButtonDownFcn','toast_demo2(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 % calculate the PMDFs
@@ -248,20 +249,24 @@ Jk_lnamp = toastMapSolToBasis(prm.basis.hBasis, J(1,slen+1:slen*2));
 Ja_phase = toastMapSolToBasis(prm.basis.hBasis, J(2,1:slen));
 Jk_phase = toastMapSolToBasis(prm.basis.hBasis, J(2,slen+1:slen*2));
 axes(handles.axes3);
-cla;surface(reshape(Ja_lnamp,prm.bx,prm.by)','EdgeColor','none'); axis tight;
+cla;imagesc(rot90(reshape(Ja_lnamp,prm.bx,prm.by))); axis xy equal tight off
+%cla;surface(reshape(Ja_lnamp,prm.bx,prm.by)','EdgeColor','none'); axis tight;
 axes(handles.axes4);
-cla;surface(reshape(Jk_lnamp,prm.bx,prm.by)','EdgeColor','none'); axis tight;
+cla;imagesc(rot90(reshape(Jk_lnamp,prm.bx,prm.by))); axis xy equal tight off
+%cla;surface(reshape(Jk_lnamp,prm.bx,prm.by)','EdgeColor','none'); axis tight;
 axes(handles.axes5);
-cla;surface(reshape(Ja_phase,prm.bx,prm.by)','EdgeColor','none'); axis tight;
+cla;imagesc(rot90(reshape(Ja_phase,prm.bx,prm.by))); axis xy equal tight off
+%cla;surface(reshape(Ja_phase,prm.bx,prm.by)','EdgeColor','none'); axis tight;
 axes(handles.axes6);
-cla;surface(reshape(Jk_phase,prm.bx,prm.by)','EdgeColor','none'); axis tight;
+cla;imagesc(rot90(reshape(Jk_phase,prm.bx,prm.by))); axis xy equal tight off
+%cla;surface(reshape(Jk_phase,prm.bx,prm.by)','EdgeColor','none'); axis tight;
 
 function axes1_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
 pert = getappdata(handles.figure1,'pert');
 mouse = get(gca,'currentpoint');
-x = round(mouse(1,2));
-y = round(mouse(1,1));
+x = round(mouse(1,1));
+y = prm.by-round(mouse(1,2));
 x = min(max(x,pert.mua.dx+1),prm.bx-pert.mua.dx-1);
 y = min(max(y,pert.mua.dx+1),prm.by-pert.mua.dx-1);
 if x ~= pert.mua.x0 || y ~= pert.mua.y0
@@ -276,8 +281,8 @@ function axes2_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
 pert = getappdata(handles.figure1,'pert');
 mouse = get(gca,'currentpoint');
-x = round(mouse(1,2));
-y = round(mouse(1,1));
+x = round(mouse(1,1));
+y = prm.by-round(mouse(1,2));
 x = min(max(x,pert.mus.dx+1),prm.bx-pert.mus.dx-1);
 y = min(max(y,pert.mus.dx+1),prm.by-pert.mus.dx-1);
 if x ~= pert.mus.x0 || y ~= pert.mus.y0
@@ -292,7 +297,7 @@ function axes7_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
 mouse = get(gca,'currentpoint');
 x = mouse(1,1);
-y = mouse(1,2);
+y = prm.by-mouse(1,2);
 dx = x/(prm.bx*0.5)-1.0;
 dy = y/(prm.by*0.5)-1.0;
 qx = cos(prm.phiq); qy = sin(prm.phiq);
