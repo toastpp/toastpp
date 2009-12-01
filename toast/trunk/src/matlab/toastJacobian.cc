@@ -45,6 +45,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     nprm = slen * 2;
 
     RDenseMatrix J(ndat,nprm);
+
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
 
     CopyMatrix (res, J);
@@ -109,7 +110,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 	*proj = FWS.ProjectAll (mvec, dphi, DATA_LIN);
     	//ProjectAll (*mesh, FWS, mvec, dphi, *proj);
     }
-    
+
     // Calculate Jacobian
     CalcJacobian (mesh, raster, dphi, aphi, proj, dscale, res);
 

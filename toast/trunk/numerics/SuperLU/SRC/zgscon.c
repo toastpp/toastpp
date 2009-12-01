@@ -73,7 +73,7 @@ toast_zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
     doublecomplex *work;
     extern int zrscl_(int *, doublecomplex *, doublecomplex *, int *);
 
-    extern int zlacon_(int *, doublecomplex *, doublecomplex *, double *, int *);
+    extern int toast_zlacon_(int *, doublecomplex *, doublecomplex *, double *, int *);
 
     
     /* Test the input parameters. */
@@ -112,7 +112,8 @@ toast_zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
     kase = 0;
 
     do {
-	zlacon_(&L->nrow, &work[L->nrow], &work[0], &ainvnm, &kase);
+
+	toast_zlacon_(&L->nrow, &work[L->nrow], &work[0], &ainvnm, &kase);
 
 	if (kase == 0) break;
 

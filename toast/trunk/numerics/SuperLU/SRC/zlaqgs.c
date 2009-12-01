@@ -83,7 +83,7 @@ toast_zlaqgs(SuperMatrix *A, double *r, double *c,
     doublecomplex   *Aval;
     int i, j, irow;
     double large, small, cj;
-    extern double dlamch_(char *);
+    extern double toast_dlamch_(char *);
     double temp;
 
 
@@ -97,7 +97,7 @@ toast_zlaqgs(SuperMatrix *A, double *r, double *c,
     Aval = Astore->nzval;
     
     /* Initialize LARGE and SMALL. */
-    small = dlamch_("Safe minimum") / dlamch_("Precision");
+    small = toast_dlamch_("Safe minimum") / toast_dlamch_("Precision");
     large = 1. / small;
 
     if (rowcnd >= THRESH && amax >= small && amax <= large) {

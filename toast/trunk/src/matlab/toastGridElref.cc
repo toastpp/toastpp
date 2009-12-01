@@ -25,10 +25,10 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int i, n = raster->GLen();
     int *elref = raster->Elref();
 
-    plhs[0] = mxCreateNumericMatrix (n,1,mxUINT32_CLASS, mxREAL);
-    unsigned short *pr = (unsigned short*)mxGetData(plhs[0]);
+    plhs[0] = mxCreateDoubleMatrix (n,1,mxREAL);
+    double *pr = mxGetPr(plhs[0]);
     for (i = 0; i < n; i++) {
-	pr[i] = elref[i]++;
+      pr[i] = elref[i] + 1;
         // make 1-based. Gridpoints outside mesh support are set to zero
     }
 }

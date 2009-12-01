@@ -53,12 +53,12 @@ dPivotGrowth(int ncols, SuperMatrix *A, int *perm_c,
     int      i, j, k, oldcol;
     int      *inv_perm_c;
     double   rpg, maxaj, maxuj;
-    extern   double dlamch_(char *);
+    extern   double toast_dlamch_(char *);
     double   smlnum;
     double   *luval;
    
     /* Get machine constants. */
-    smlnum = dlamch_("S");
+    smlnum = toast_dlamch_("S");
     rpg = 1. / smlnum;
 
     Astore = A->Store;

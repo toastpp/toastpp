@@ -35,7 +35,7 @@ struct ART_DATA {
 void BlockART_loop (const RVector &b, RVector &x, double lambda,
     void *context)
 {
-    const int blocksize = 50;
+    const int blocksize = 20;
     int i, i0, i1, mb, m = b.Dim(), n = x.Dim();
 
     RDenseMatrix *J = ((ART_DATA*)context)->J;

@@ -8,7 +8,7 @@
 #include "dcomplex.h"
 
 int
-izmax1_(int *n, doublecomplex *cx, int *incx)
+toast_izmax1_(int *n, doublecomplex *cx, int *incx)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   

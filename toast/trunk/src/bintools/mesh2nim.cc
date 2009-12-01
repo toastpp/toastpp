@@ -3,7 +3,7 @@
 
 #include <mathlib.h>
 #include <felib.h>
-#include <fstream.h>
+#include <fstream>
 
 using namespace std;
 

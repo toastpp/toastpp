@@ -194,4 +194,7 @@
 #define c_bridge_dgssv_ c_bridge_dgssv
 #endif
 
+// TOAST BLAS naming conventions
+#include "blasnames.h"
+
 #endif /* __SUPERLU_CNAMES */

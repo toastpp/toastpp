@@ -1,9 +1,11 @@
+#include <stdio.h>
+
 #define TRUE_ (1)
 #define FALSE_ (0)
 #define min(a,b) ((a) <= (b) ? (a) : (b))
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 
-double dlamch_(char *cmach)
+double toast_dlamch_(char *cmach)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
@@ -63,14 +65,14 @@ double dlamch_(char *cmach)
     static double rmin, rmax, t, rmach;
 /*    extern int lsame_(char *, char *);*/
     static double small, sfmin;
-    extern /* Subroutine */ int dlamc2_(int *, int *, int *, 
+    extern /* Subroutine */ int toast_dlamc2_(int *, int *, int *, 
 	    double *, int *, double *, int *, double *);
     static int it;
     static double rnd, eps;
 
     if (first) {
 	first = FALSE_;
-	dlamc2_(&beta, &it, &lrnd, &eps, &imin, &rmin, &imax, &rmax);
+	toast_dlamc2_(&beta, &it, &lrnd, &eps, &imin, &rmin, &imax, &rmax);
 	base = (double) beta;
 	t = (double) it;
 	if (lrnd) {
@@ -125,7 +127,7 @@ double dlamch_(char *cmach)
 } /* dlamch_ */
 
 
-/* Subroutine */ int dlamc1_(int *beta, int *t, int *rnd, int 
+/* Subroutine */ int toast_dlamc1_(int *beta, int *t, int *rnd, int 
 	*ieee1)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
@@ -185,7 +187,7 @@ double dlamch_(char *cmach)
     static double a, b, c, f;
     static int lbeta;
     static double savec;
-    extern double dlamc3_(double *, double *);
+    extern double toast_dlamc3_(double *, double *);
     static int lieee1;
     static double t1, t2;
     static int lt;
@@ -218,9 +220,9 @@ uch
 L10:
 	if (c == one) {
 	    a *= 2;
-	    c = dlamc3_(&a, &one);
+	    c = toast_dlamc3_(&a, &one);
 	    d__1 = -a;
-	    c = dlamc3_(&c, &d__1);
+	    c = toast_dlamc3_(&c, &d__1);
 	    goto L10;
 	}
 /* +       END WHILE   
@@ -232,13 +234,13 @@ m
              fl( a + b ) .gt. a. */
 
 	b = 1.;
-	c = dlamc3_(&a, &b);
+	c = toast_dlamc3_(&a, &b);
 
 /* +       WHILE( C.EQ.A )LOOP */
 L20:
 	if (c == a) {
 	    b *= 2;
-	    c = dlamc3_(&a, &b);
+	    c = toast_dlamc3_(&a, &b);
 	    goto L20;
 	}
 /* +       END WHILE   
@@ -254,7 +256,7 @@ int
 	qtr = one / 4;
 	savec = c;
 	d__1 = -a;
-	c = dlamc3_(&c, &d__1);
+	c = toast_dlamc3_(&c, &d__1);
 	lbeta = (int) (c + qtr);
 
 /*        Now determine whether rounding or chopping occurs,  by addin
@@ -265,8 +267,8 @@ g a
 	b = (double) lbeta;
 	d__1 = b / 2;
 	d__2 = -b / 100;
-	f = dlamc3_(&d__1, &d__2);
-	c = dlamc3_(&f, &a);
+	f = toast_dlamc3_(&d__1, &d__2);
+	c = toast_dlamc3_(&f, &a);
 	if (c == a) {
 	    lrnd = TRUE_;
 	} else {
@@ -274,8 +276,8 @@ g a
 	}
 	d__1 = b / 2;
 	d__2 = b / 100;
-	f = dlamc3_(&d__1, &d__2);
-	c = dlamc3_(&f, &a);
+	f = toast_dlamc3_(&d__1, &d__2);
+	c = toast_dlamc3_(&f, &a);
 	if (lrnd && c == a) {
 	    lrnd = FALSE_;
 	}
@@ -291,9 +293,9 @@ nge
           A, but adding B/2 to SAVEC should change SAVEC. */
 
 	d__1 = b / 2;
-	t1 = dlamc3_(&d__1, &a);
+	t1 = toast_dlamc3_(&d__1, &a);
 	d__1 = b / 2;
-	t2 = dlamc3_(&d__1, &savec);
+	t2 = toast_dlamc3_(&d__1, &savec);
 	lieee1 = t1 == a && t2 > savec && lrnd;
 
 /*        Now find  the  mantissa, t.  It should  be the  integer part
@@ -315,9 +317,9 @@ L30:
 	if (c == one) {
 	    ++lt;
 	    a *= lbeta;
-	    c = dlamc3_(&a, &one);
+	    c = toast_dlamc3_(&a, &one);
 	    d__1 = -a;
-	    c = dlamc3_(&c, &d__1);
+	    c = toast_dlamc3_(&c, &d__1);
 	    goto L30;
 	}
 /* +       END WHILE */
@@ -335,7 +337,7 @@ L30:
 } /* dlamc1_ */
 
 
-/* Subroutine */ int dlamc2_(int *beta, int *t, int *rnd, 
+/* Subroutine */ int toast_dlamc2_(int *beta, int *t, int *rnd, 
 	double *eps, int *emin, double *rmin, int *emax, 
 	double *rmax)
 {
@@ -423,12 +425,12 @@ L30:
     static double small;
     static int gpmin;
     static double third, lrmin, lrmax, sixth;
-    extern /* Subroutine */ int dlamc1_(int *, int *, int *, 
+    extern /* Subroutine */ int toast_dlamc1_(int *, int *, int *, 
 	    int *);
-    extern double dlamc3_(double *, double *);
+    extern double toast_dlamc3_(double *, double *);
     static int lieee1;
-    extern /* Subroutine */ int dlamc4_(int *, double *, int *), 
-	    dlamc5_(int *, int *, int *, int *, int *, 
+    extern /* Subroutine */ int toast_dlamc4_(int *, double *, int *), 
+	    toast_dlamc5_(int *, int *, int *, int *, int *, 
 	    double *);
     static int lt, ngnmin, ngpmin;
     static double one, two;
@@ -452,7 +454,7 @@ ure
           DLAMC1 returns the parameters  LBETA, LT, LRND and LIEEE1. 
 */
 
-	dlamc1_(&lbeta, &lt, &lrnd, &lieee1);
+	toast_dlamc1_(&lbeta, &lt, &lrnd, &lieee1);
 
 /*        Start to find EPS. */
 
@@ -467,11 +469,11 @@ PS. */
 	b = two / 3;
 	half = one / 2;
 	d__1 = -half;
-	sixth = dlamc3_(&b, &d__1);
-	third = dlamc3_(&sixth, &sixth);
+	sixth = toast_dlamc3_(&b, &d__1);
+	third = toast_dlamc3_(&sixth, &sixth);
 	d__1 = -half;
-	b = dlamc3_(&third, &d__1);
-	b = dlamc3_(&b, &sixth);
+	b = toast_dlamc3_(&third, &d__1);
+	b = toast_dlamc3_(&b, &sixth);
 	b = abs(b);
 	if (b < leps) {
 	    b = leps;
@@ -489,13 +491,13 @@ L10:
 /* Computing 2nd power */
 	    d__5 = leps;
 	    d__2 = d__4 * (d__3 * d__3) * (d__5 * d__5);
-	    c = dlamc3_(&d__1, &d__2);
+	    c = toast_dlamc3_(&d__1, &d__2);
 	    d__1 = -c;
-	    c = dlamc3_(&half, &d__1);
-	    b = dlamc3_(&half, &c);
+	    c = toast_dlamc3_(&half, &d__1);
+	    b = toast_dlamc3_(&half, &c);
 	    d__1 = -b;
-	    c = dlamc3_(&half, &d__1);
-	    b = dlamc3_(&half, &c);
+	    c = toast_dlamc3_(&half, &d__1);
+	    b = toast_dlamc3_(&half, &c);
 	    goto L10;
 	}
 /* +       END WHILE */
@@ -516,16 +518,16 @@ his
 	small = one;
 	for (i = 1; i <= 3; ++i) {
 	    d__1 = small * rbase;
-	    small = dlamc3_(&d__1, &zero);
+	    small = toast_dlamc3_(&d__1, &zero);
 /* L20: */
 	}
-	a = dlamc3_(&one, &small);
-	dlamc4_(&ngpmin, &one, &lbeta);
+	a = toast_dlamc3_(&one, &small);
+	toast_dlamc4_(&ngpmin, &one, &lbeta);
 	d__1 = -one;
-	dlamc4_(&ngnmin, &d__1, &lbeta);
-	dlamc4_(&gpmin, &a, &lbeta);
+	toast_dlamc4_(&ngnmin, &d__1, &lbeta);
+	toast_dlamc4_(&gpmin, &a, &lbeta);
 	d__1 = -a;
-	dlamc4_(&gnmin, &d__1, &lbeta);
+	toast_dlamc4_(&gnmin, &d__1, &lbeta);
 	ieee = FALSE_;
 
 	if (ngpmin == ngnmin && gpmin == gnmin) {
@@ -611,13 +613,13 @@ ing
 	i__1 = 1 - lemin;
 	for (i = 1; i <= 1-lemin; ++i) {
 	    d__1 = lrmin * rbase;
-	    lrmin = dlamc3_(&d__1, &zero);
+	    lrmin = toast_dlamc3_(&d__1, &zero);
 /* L30: */
 	}
 
 /*        Finally, call DLAMC5 to compute EMAX and RMAX. */
 
-	dlamc5_(&lbeta, &lt, &lemin, &ieee, &lemax, &lrmax);
+	toast_dlamc5_(&lbeta, &lt, &lemin, &ieee, &lemax, &lrmax);
     }
 
     *beta = lbeta;
@@ -637,7 +639,7 @@ ing
 } /* dlamc2_ */
 
 
-double dlamc3_(double *a, double *b)
+double toast_dlamc3_(double *a, double *b)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
@@ -675,7 +677,7 @@ double dlamc3_(double *a, double *b)
 } /* dlamc3_ */
 
 
-/* Subroutine */ int dlamc4_(int *emin, double *start, int *base)
+/* Subroutine */ int toast_dlamc4_(int *emin, double *start, int *base)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
@@ -712,7 +714,7 @@ double dlamc3_(double *a, double *b)
     static double zero, a;
     static int i;
     static double rbase, b1, b2, c1, c2, d1, d2;
-    extern double dlamc3_(double *, double *);
+    extern double toast_dlamc3_(double *, double *);
     static double one;
 
     a = *start;
@@ -721,7 +723,7 @@ double dlamc3_(double *a, double *b)
     zero = 0.;
     *emin = 1;
     d__1 = a * rbase;
-    b1 = dlamc3_(&d__1, &zero);
+    b1 = toast_dlamc3_(&d__1, &zero);
     c1 = a;
     c2 = a;
     d1 = a;
@@ -733,9 +735,9 @@ L10:
 	--(*emin);
 	a = b1;
 	d__1 = a / *base;
-	b1 = dlamc3_(&d__1, &zero);
+	b1 = toast_dlamc3_(&d__1, &zero);
 	d__1 = b1 * *base;
-	c1 = dlamc3_(&d__1, &zero);
+	c1 = toast_dlamc3_(&d__1, &zero);
 	d1 = zero;
 	i__1 = *base;
 	for (i = 1; i <= *base; ++i) {
@@ -743,9 +745,9 @@ L10:
 /* L20: */
 	}
 	d__1 = a * rbase;
-	b2 = dlamc3_(&d__1, &zero);
+	b2 = toast_dlamc3_(&d__1, &zero);
 	d__1 = b2 / rbase;
-	c2 = dlamc3_(&d__1, &zero);
+	c2 = toast_dlamc3_(&d__1, &zero);
 	d2 = zero;
 	i__1 = *base;
 	for (i = 1; i <= *base; ++i) {
@@ -763,7 +765,7 @@ L10:
 } /* dlamc4_ */
 
 
-/* Subroutine */ int dlamc5_(int *beta, int *p, int *emin, 
+/* Subroutine */ int toast_dlamc5_(int *beta, int *p, int *emin, 
 	int *ieee, int *emax, double *rmax)
 {
 /*  -- LAPACK auxiliary routine (version 2.0) --   
@@ -826,7 +828,7 @@ L10:
     static int uexp, i;
     static double y, z;
     static int nbits;
-    extern double dlamc3_(double *, double *);
+    extern double toast_dlamc3_(double *, double *);
     static double recbas;
     static int exbits, expsum, try__;
 
@@ -913,7 +915,7 @@ it
 	if (y < 1.) {
 	    oldy = y;
 	}
-	y = dlamc3_(&y, &z);
+	y = toast_dlamc3_(&y, &z);
 /* L20: */
     }
     if (y >= 1.) {
@@ -925,7 +927,7 @@ it
     i__1 = *emax;
     for (i = 1; i <= *emax; ++i) {
 	d__1 = y * *beta;
-	y = dlamc3_(&d__1, &c_b5);
+	y = toast_dlamc3_(&d__1, &c_b5);
 /* L30: */
     }
 
