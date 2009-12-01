@@ -120,13 +120,13 @@ prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
 prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
 prm.ref = ones(n,1)*1.4;
 axes(handles.axes1);
-imagesc(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.005 0.05]);
-axis tight
-set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0.005 0.05]);
+axis xy equal tight off
+%set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes2);
-imagesc(reshape(prm.bmus,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.5 4]);
-axis tight
-set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(prm.bmus,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0.5 4]);
+axis xy equal tight off
+%set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 setappdata(handles.figure1,'prm',prm);
 showref(handles,prm);
@@ -174,12 +174,12 @@ function callback_vis(handles,res)
 prm = getappdata(handles.figure1,'prm');
 
 axes(handles.axes3);
-imagesc(reshape(res.bmua,res.bdim(1),res.bdim(2)),[0.005 0.05]); axis tight
-set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(res.bmua,res.bdim(1),res.bdim(2))),[0.005 0.05]); axis xy equal tight off
+%set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes4);
-imagesc(reshape(res.bmus,res.bdim(1),res.bdim(2)),[0.5 4]); axis tight
-set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(res.bmus,res.bdim(1),res.bdim(2))),[0.5 4]); axis xy equal tight off
+%set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes5);
 semilogy(res.of); axis tight
@@ -194,13 +194,13 @@ slen = length(res.kapref)/2;
 
 axes(handles.axes7);
 kref = toastMapSolToBasis(prm.basis.hBasis,res.kapref(1:slen));
-imagesc(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0 1.2]); axis tight
-set(handles.axes7,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0 1.2]); axis xy equal tight off
+%set(handles.axes7,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes8);
 kref = toastMapSolToBasis(prm.basis.hBasis,res.kapref(slen+1:slen*2));
-imagesc(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0 1.2]); axis tight
-set(handles.axes8,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(rot90(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0 1.2]); axis xy equal tight off
+%set(handles.axes8,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 
 % --- Executes on selection change in popupmenu1.

@@ -98,17 +98,17 @@ prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
 prm.diff_fields = false;
 prm.diff_proj = false;
 axes(handles.axes1);
-h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes2);
-h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes7);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 x = prm.bx*(0.45+0.5);
 y = prm.by*(0.5);
-hold on; plot3(x, y, 1, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
+hold on; plot(x, y, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
 set(h,'ButtonDownFcn','toast_demo1(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 clear tmp
 
@@ -189,10 +189,10 @@ prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
 axes(handles.axes7);
 n = toastMeshNodeCount(prm.basis.hMesh);
 tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
-cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy tight off
+cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 x = prm.bx*(0.5+cos(phi)*0.45);
 y = prm.by*(0.5-sin(phi)*0.45);
-hold on; plot3(x, y, 1, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
+hold on; plot(x, y, 'og', 'MarkerSize',7, 'MarkerFaceColor','green');
 set(h,'ButtonDownFcn','toast_demo1(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 clear tmp
 
@@ -245,7 +245,7 @@ bpert = reshape(bpert,[],1);
 bmua = prm.bmua + bpert;
 mua = toastMapBasisToMesh(prm.basis.hBasis,bmua);
 axes(handles.axes1);
-cla; h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy tight off
+cla; h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 bpert = zeros(prm.bx,prm.by);
@@ -254,7 +254,7 @@ bpert = reshape(bpert,[],1);
 bmus = prm.bmus + bpert;
 mus = toastMapBasisToMesh(prm.basis.hBasis,bmus);
 axes(handles.axes2);
-cla; h = imagesc(rot90(reshape(bmus,prm.bx,prm.by))); axis xy tight off
+cla; h = imagesc(rot90(reshape(bmus,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 % calculate the fields
@@ -270,10 +270,10 @@ if prm.diff_fields == true;
 end
 axes(handles.axes3);
 bphi = toastMapMeshToBasis(prm.basis.hBasis,lnamp);
-cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy tight off;
+cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy equal tight off;
 axes(handles.axes4);
 bphi = toastMapMeshToBasis(prm.basis.hBasis,phase);
-cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy tight off;
+cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy equal tight off;
 
 % calculate projections
 lgamma = reshape (log(prm.mvec.' * phi), [], 1);
