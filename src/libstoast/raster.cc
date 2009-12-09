@@ -50,9 +50,13 @@ Raster::Raster (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
     belref = GenerateElementPixelRef (*meshptr, bdim, &bbmin, &bbmax);
     gelref = GenerateElementPixelRef (*meshptr, gdim, &bbmin, &bbmax);
 
+    RVector s(glen);
     bsupport.New (blen);
-    for (i = 0; i < blen; i++)
-	if (belref[i] >= 0) bsupport[i] = 1.0; // for now, only binary mask
+    for (i = 0; i < glen; i++)
+	if (gelref[i] >= 0) s[i] = 1.0;
+
+    // map mask into user basis
+    SubsampleLinPixel (s, bsupport, gdim, bdim, 0);
 
     // calculate default basis->solution mapping index list
     // (default is to use the basis voxel support array)
