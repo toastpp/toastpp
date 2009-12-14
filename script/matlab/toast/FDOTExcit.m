@@ -1,5 +1,5 @@
 function p = FDOTExcit
-% FDOTExcit - Excitation data images
+%FDOTExcit            - Excitation data images
 %
 %   Syntax: y = FDOTExcitData (hSolver)
 %     hSolver: solver handle

@@ -1,5 +1,5 @@
 function p = FDOTFwdOpRatio
-% FDOTFwdOPRatio - Fluorescence forward operator, returns Born ratio
+%FDOTFwdOpRatio       - Fluorescence forward operator, returns Born ratio
 %
 %   Syntax: y = FDOTFwdOpRatio (hSolver, x)
 %     hSolver: solver handle

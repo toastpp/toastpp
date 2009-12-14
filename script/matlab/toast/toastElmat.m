@@ -1,5 +1,5 @@
 function p = toastElmat
-% toastElmat    - Return an element matrix for a single element of a mesh
+%toastElmat           - Return an element matrix for a single element of a mesh
 %
 % The returned matrix contains the integrals of products of a user-
 % specified combination of nodal shape functions and shape function

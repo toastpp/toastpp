@@ -1,5 +1,5 @@
 function toastWriteParam (prmfile, prm)
-%toastWriteParam    - Write parameters to a TOAST parameter file.
+%toastWriteParam      - Write parameters to a TOAST parameter file.
 %
 % Synopsis: toastWriteParam(prmfile,prm)
 %    prmfile: parameter file name (string)

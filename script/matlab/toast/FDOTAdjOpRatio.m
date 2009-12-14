@@ -1,5 +1,5 @@
 function p = FDOTAdjOpRatio
-% FDOTAdjOp - Fluorescence adjoint operator, with Born normalisation
+%FDOTAdjOpRatio       - Fluorescence adjoint operator, with Born normalisation
 %
 %   Syntax: x = FDOTAdjOpRatio (hSolver, y [,q])
 %     hSolver: solver handle
