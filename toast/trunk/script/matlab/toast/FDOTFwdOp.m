@@ -1,5 +1,5 @@
 function p = FDOTFwdOp
-% FDOTFwdOPRatio - Fluorescence forward operator
+%FDOTFwdOp            - Fluorescence forward operator
 %
 %   Syntax: y = FDOTFwdOp
 %     hSolver: solver handle

@@ -1,5 +1,17 @@
 function toastSolverLBFGS (prm, lprm, ref, x0)
-% Limited-bandwidth BFGS iterative solver
+%toastSolverLBFGS     - Limited-bandwidth BFGS iterative solver
+%
+%   Syntax: toastSolverLBFGS(prm, lprm, ref, x0)
+%     prm:   parameter structure
+%     lprm:  local function parameter structure
+%     ref:   global refractive index
+%     x0:    initial parameter vector
+%
+%   This function should normally not be called directly. Instead, it is
+%   called by toastRecon when the solver.method field of the prm
+%   structure is set to 'LBFGS'.
+%
+%   See also: toastRecon
 
 global ITR_TERM;        % termination flag
 

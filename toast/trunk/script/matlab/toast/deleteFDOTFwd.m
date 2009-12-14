@@ -1,5 +1,5 @@
 function p = deleteFDOTFwd
-% deleteFDOTFwd - Delete a fluorescence forward solver instance
+%deleteFDOTFwd        - Delete a fluorescence forward solver instance
 %
 %  Syntax: deleteFDOTFwd (hFDOT)
 %    hFDOT: solver handle

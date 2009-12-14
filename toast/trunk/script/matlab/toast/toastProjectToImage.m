@@ -1,5 +1,5 @@
 function p = toastProjectToImage
-% toastProjectToImage - Map a volume field to a projection
+%toastProjectToImage  - Map a volume field to a projection
 %
 %   Syntax: proj = toastProjectToImage(hProj, field)
 %     hProj: projector handle

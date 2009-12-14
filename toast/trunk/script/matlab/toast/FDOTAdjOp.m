@@ -1,5 +1,5 @@
 function p = FDOTAdjOp
-% FDOTAdjOp - Fluorescence adjoint operator
+%FDOTAdjOp            - Fluorescence adjoint operator
 %
 %   Syntax: x = FDOTAdjOp (hSolver, y [,q])
 %     hSolver: solver handle

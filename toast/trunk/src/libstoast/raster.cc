@@ -56,7 +56,11 @@ Raster::Raster (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
 	if (gelref[i] >= 0) s[i] = 1.0;
 
     // map mask into user basis
-    SubsampleLinPixel (s, bsupport, gdim, bdim, 0);
+    if (glen == blen) {
+	bsupport = s;
+    } else {
+	SubsampleLinPixel (s, bsupport, gdim, bdim, 0);
+    }
 
     // calculate default basis->solution mapping index list
     // (default is to use the basis voxel support array)

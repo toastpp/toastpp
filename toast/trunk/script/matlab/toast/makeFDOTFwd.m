@@ -1,5 +1,5 @@
 function p = makeFDOTFwd
-% makeFDOTFwd - Create a fluorescence forward solver instance
+%makeFDOTFwd          - Create a fluorescence forward solver instance
 %
 %  Syntax: hSolver = makeFMTFwd (hMesh, hBasis, qvec, hProjList, solverType, solverTol, Mua, Mus, Ref, Freq)
 %    hMesh:   mesh handle
