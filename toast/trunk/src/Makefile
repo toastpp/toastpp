@@ -54,7 +54,7 @@ distclean::
 	do \
 	if test -d $$i ;\
 	then \
-		(cd $$i ; echo "making" distclean "in $$i..."; \
+		(cd $(TOASTOBJ)/$$i ; echo "making" distclean "in $$i..."; \
 			$(MAKE) $(MFLAGS) distclean); \
 	fi; \
 	done

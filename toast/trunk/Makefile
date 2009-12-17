@@ -5,6 +5,9 @@ GUIDIR      = $(TOASTDIR)/gui
 NUMERICSDIR = $(TOASTDIR)/numerics
 TOASTRELDIR = toast2009
 
+# ========================================================
+# Making
+
 all::numerics toast matlab
 
 toast::
@@ -36,7 +39,12 @@ doc::
 test::
 	@cd test; $(MAKE)
 
-clean::
+# ========================================================
+# Cleaning
+
+clean::matlab_clean toast_clean numerics_clean
+
+toast_clean::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
 	for i in  $(SUBDIRS);\
 	do \
@@ -45,37 +53,9 @@ clean::
 	done
 	$(RM) *~ script/*~ toastrc.d/*~
 
-distclean::
-	for i in $(SUBDIRS); \
-	do \
-		(cd $$i ; echo "making" distclean "in $$i..."; \
-			$(MAKE) $(MFLAGS) distclean); \
-	done
-	$(RM) -f Makefile.incl config.status config.cache config.log
-	$(RM) -f *~ script/*~ toastrc.d/*~
-
-uninstall::
-	for i in $(SUBDIRS); \
-	do \
-		(cd $$i ; echo "making" uninstall "in $$i..."; \
-			$(MAKE) $(MFLAGS) uninstall); \
-	done
-
-gui_clean::
-	cd $(GUIDIR); \
-	$(MAKE) $(MFLAGS) gui_clean
-
-gui_distclean::
-	cd $(GUIDIR); \
-	$(MAKE) $(MFLAGS) gui_distclean
-
 numerics_clean::
 	cd $(NUMERICSDIR); \
 	$(MAKE) $(MFLAGS) clean
-
-numerics_distclean::
-	cd $(NUMERICSDIR); \
-	$(MAKE) $(MFLAGS) distclean
 
 matlab_clean:
 	cd $(TOASTVER)/mex; \
@@ -84,6 +64,46 @@ matlab_clean:
 doc_clean::
 	cd src; \
 	$(MAKE) doc_clean
+
+gui_clean::
+	cd $(GUIDIR); \
+	$(MAKE) $(MFLAGS) gui_clean
+
+# ========================================================
+# Dist-cleaning
+
+distclean::matlab_distclean toast_distclean numerics_distclean
+	$(RM) -f Makefile.incl config.status config.cache config.log
+	$(RM) -f *~ script/*~ toastrc.d/*~
+
+toast_distclean::
+	for i in $(SUBDIRS); \
+	do \
+		(cd $$i ; echo "making" distclean "in $$i..."; \
+			$(MAKE) $(MFLAGS) distclean); \
+	done
+
+numerics_distclean::
+	cd $(NUMERICSDIR); \
+	$(MAKE) $(MFLAGS) distclean
+
+matlab_distclean:
+	$(RM) -rf $(TOASTVER)/mex
+	$(RM) -f $(TOASTVER)mexopts.incl
+
+gui_distclean::
+	cd $(GUIDIR); \
+	$(MAKE) $(MFLAGS) gui_distclean
+
+# ========================================================
+# ???
+
+uninstall::
+	for i in $(SUBDIRS); \
+	do \
+		(cd $$i ; echo "making" uninstall "in $$i..."; \
+			$(MAKE) $(MFLAGS) uninstall); \
+	done
 
 web_distribution_shared::
 	rm -f lib
@@ -108,6 +128,9 @@ distro_src::
 	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.in" -print | zip toast_src.zip -@ ; \
 	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.h" -print | zip toast_src.zip -@ ; \
 	mv toast_src.zip $(TOASTRELDIR)
+
+# ========================================================
+# Distribution packages
 
 distro_common::
 	cd ..; \
