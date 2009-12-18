@@ -3,7 +3,7 @@ include $(TOASTDIR)/Makefile.incl
 LIBNAME = libtoastblas
 
 VPATH = $(TOASTDIR)/numerics/BLAS
-LIB = $(TLIB)/$(LIBNAME)
+LIB = $(LIBNAME)
 
 all:: $(LIB)$(BLAS_LIB_SUFFIX)
 
@@ -55,7 +55,7 @@ $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 
 clean::
 	$(RM) *.o
+	$(RM) $(LIB)$(LIB_SUFFIX)
 
 distclean:: clean
 	$(RM) Makefile
-	$(RM) $(LIB)$(LIB_SUFFIX)
