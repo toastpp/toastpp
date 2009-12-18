@@ -108,6 +108,6 @@ INCLUDE   = $(TOASTCINC)
 
 # =======================================================================
 FEFLAGS   = $(CCFLAGS) $(ILUFLAGS) $(FEINC)
-STOASTFLAGS = $(CCFLAGS) $(ILUFLAGS) $(STOASTINC)
+STOASTFLAGS = $(CCFLAGS) $(ILUFLAGS) $(STOASTINC) $(RPATH)
 FLAGS = $(CCFLAGS) $(ILUFLAGS) $(INCLUDE)
 # =======================================================================
