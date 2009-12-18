@@ -2,7 +2,7 @@
 include ../make.inc
 
 LIBNAME = libsuperlu
-LIB = $(TLIB)/$(LIBNAME)
+LIB = $(LIBNAME)
 VPATH = $(TOASTDIR)/numerics/SuperLU/SRC
 
 #######################################################################
