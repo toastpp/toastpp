@@ -53,8 +53,8 @@ DIRS         = $(UTILdir) $(SRCdir)
 # %---------------------------------------------------%
 #
 ARPACKLIB  = $(TOASTDIR)/lib/libarpack.a
-LAPACKLIB = $(TOASTDIR)/lib/liblapack.a
-BLASLIB = $(TOASTDIR)/lib/libblas.a
+#LAPACKLIB = $(TOASTDIR)/lib/liblapack.a
+#BLASLIB = $(TOASTDIR)/lib/libblas.a
 #
 ALIBS =  $(ARPACKLIB) $(LAPACKLIB) $(BLASLIB) 
 #
