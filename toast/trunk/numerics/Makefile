@@ -20,7 +20,7 @@ fspblas::
 	cd $(TOASTOBJ)/fspblas; \
 	cp $(NUMERICSDIR)/fspblas/Makefile .; \
 	$(MAKE); \
-	mv *$(LIB_SUFFIX) $(LIBDIR)
+	cp *$(LIB_SUFFIX) $(LIBDIR)
 
 lapack::
 	mkdir -p $(TOASTOBJ)/LAPACK/SRC; \
@@ -54,7 +54,7 @@ blzpack::
 	tar xzvf $(NUMERICSDIR)/blzpack/blzpack.tar.gz; \
 	rm $(NUMERICSDIR)/blzpack/blzpack.tar.gz; \
 	./creator; \
-	mv lib/libblzpack$(LIB_SUFFIX) $(LIBDIR)
+	cp lib/libblzpack$(LIB_SUFFIX) $(LIBDIR)
 
 arpack::
 	mkdir -p $(TOASTOBJ)/ARPACK/SRC; \
@@ -66,7 +66,7 @@ arpack::
 	cp $(NUMERICSDIR)/ARPACK/SRC/Makefile SRC; \
 	cp $(NUMERICSDIR)/ARPACK/UTIL/Makefile UTIL; \
 	$(MAKE) lib; \
-	mv OBJS/libarpack* $(LIBDIR)
+	cp OBJS/libarpack* $(LIBDIR)
 
 liblbfgs::
 	mkdir -p $(TOASTOBJ)/liblbfgs/lib; \
