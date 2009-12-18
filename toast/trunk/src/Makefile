@@ -16,6 +16,9 @@ all::
 			cp $(TOASTDIR)/src/$$i/Makefile.src ./Makefile; \
 			echo "making" all "in $$i..."; \
 			$(MAKE) $(MFLAGS) all); \
+			if test -e $(TOASTOBJ)/$$i/$$i$(LIB_SUFFIX); then \
+				(cp $(TOASTOBJ)/$$i/$$i$(LIB_SUFFIX) $(TLIB)); \
+			fi; \
 	fi; \
 	done
 

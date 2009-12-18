@@ -1,7 +1,7 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libstoast
-LIB = $(TLIB)/$(LIBNAME)
+LIB = $(LIBNAME)
 
 VPATH = $(TSRC)/libstoast
 
@@ -32,8 +32,13 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
-		-L$(TLIB) -lfe -lmath -lsuperlu -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) -lOSMesa -lGLU -lGL
+	if test "$(ARCHDIR)" == "darwin"; then \
+		$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
+			-L$(TLIB) -lfe -lmath -lOSMesa -lGLU -lGL $(MATHLIB) -framework GLUT -framework OPENGL ; \
+	else \
+		$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
+			-L$(TLIB) -lfe -lmath -lOSMesa -lGLU -lGL $(MATHLIB); \
+	fi
 
 clean::
 	$(RM) *.o
