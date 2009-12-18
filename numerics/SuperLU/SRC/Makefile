@@ -2,7 +2,7 @@
 include ../make.inc
 
 LIBNAME = libsuperlu
-LIB = $(LIBNAME)
+LIB = $(LIBNAME)$(LIB_SUFFIX)
 VPATH = $(TOASTDIR)/numerics/SuperLU/SRC
 
 #######################################################################
@@ -88,16 +88,16 @@ ZLUSRC = \
 
 OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(ALLAUX) $(SCLAUX) $(DZLAUX)
 
-all:	$(LIB)$(LIB_SUFFIX)
+all:	$(LIB)
 
 # make static version of library
-$(LIB)$(STLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	ar cr $@ $^
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)$(SHLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
 		-L$(TLIB) $(LAPACKLIB) $(BLASLIB)

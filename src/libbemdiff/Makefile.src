@@ -2,11 +2,11 @@ include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libbemdiff
 
-LIB = $(LIBNAME)
+LIB = $(LIBNAME)$(LIB_SUFFIX)
 
 VPATH = $(TSRC)/libbemdiff
 
-all:: $(LIB)$(LIB_SUFFIX)
+all:: $(LIB)
 
 SRCS =  bemdiff.cc 
 
@@ -20,13 +20,13 @@ HDRS = ${SRCS:.cc=.h}
 	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
 
 # make static version of library
-$(LIB)$(STLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	ar cr $@ $^
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)$(SHLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) $(MATHLIB) -lmath
 
@@ -35,4 +35,4 @@ clean::
 
 distclean:: clean
 	$(RM) Makefile
-	$(RM) $(LIB)$(LIB_SUFFIX)
+	$(RM) $(LIB)
