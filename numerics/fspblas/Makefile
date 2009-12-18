@@ -29,7 +29,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) $(BLASLIB)
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(BLASLIB)
 
 clean::
 	$(RM) $(OBJS)
