@@ -103,13 +103,8 @@ AC_ARG_WITH(blas,
 
 AC_ARG_WITH(lapack,
     [  --with-lapack=LIB       Linker command to bind LAPACK package, e.g.]
-<<<<<<< .mine
-    [                          '-llapack' (default) or '/usr/lib/liblapack.a'],
-    LAPACKLIB=$withval, LAPACKLIB="-ltoastlapack")
-=======
     [                          '-llapack' or '/usr/lib/liblapack.a'],
     LAPACKLIB=$withval, LAPACKLIB="-ltoastlapack")
->>>>>>> .r93
 
 # ========================================================================
 # Check for SuperLU
@@ -274,6 +269,7 @@ AC_CHECK_LIB(dl, dlopen, have_dl=yes, have_dl=no)
 SHLIB_SUFFIX=".so"
 STLIB_SUFFIX=".a"
 DL_LIBS="-ldl"
+RPATH=""
 
 case $system in
     IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
@@ -300,9 +296,12 @@ case $system in
 	fi
     	;;
     Darwin*)
-	SHLIB_CFLAGS="-fPIC"
+	SHLIB_CFLAGS="-fPIC -m32"
 	SHLIB_LD_LIBS='${LIBS}'
 	SHLIB_SUFFIX=".dylib"
+	CFLAGS="${CFLAGS} -m32"
+	CXXFLAGS="${CXXFLAGS} -m32"
+	RPATH="-Wl,-rpath,$(TLIB)"
 	if test "$have_dl" = yes; then
 	    SHLIB_LD="${CXX} -shared"
 	else
@@ -599,6 +598,7 @@ AC_SUBST(TASKLIB)
 AC_SUBST(TASKDIR)
 AC_SUBST(TOAST_SHARED)
 AC_SUBST(ILUPACKDIR)
+AC_SUBST(RPATH)
 
 AC_OUTPUT(Makefile.incl mexopts.incl)
 #AC_OUTPUT(Makefile.incl mexopts.incl gui/Makefile gui/Togl/Makefile)
