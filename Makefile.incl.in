@@ -50,7 +50,11 @@ LAPACK_LIB_SUFFIX = @LAPACK_LIB_SUFFIX@
 
 MAKE_LIB = @MAKE_LIB@
 
-MEX      = mex @MEXFLAGS@
+ifndef MEXBIN
+MEXBIN = mex
+endif
+
+MEX      = $(MEXBIN) @MEXFLAGS@
 MEXEXT   = @MEXEXT@
 
 # =======================================================================
