@@ -16,6 +16,7 @@ TDOC = $(TOASTDIR)/doc
 TOASTOBJ = $(TOASTVER)/obj
 TBIN = $(TOASTVER)/bin
 TLIB = $(TOASTVER)/lib
+RPATH = @RPATH@
 
 # =======================================================================
 # Compilers and binutils
