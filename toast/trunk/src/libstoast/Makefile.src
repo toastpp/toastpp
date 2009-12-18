@@ -34,7 +34,7 @@ $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	if test "$(ARCHDIR)" == "darwin"; then \
 		$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
-			-L$(TLIB) -lfe -lmath -lOSMesa -lGLU -lGL $(MATHLIB) -framework GLUT -framework OPENGL ; \
+			-L$(TLIB) -lfe -lmath -lOSMesa $(MATHLIB) -framework GLUT -framework OPENGL ; \
 	else \
 		$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
 			-L$(TLIB) -lfe -lmath -lOSMesa -lGLU -lGL $(MATHLIB); \
