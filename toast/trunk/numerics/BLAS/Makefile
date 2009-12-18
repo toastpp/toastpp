@@ -3,9 +3,9 @@ include $(TOASTDIR)/Makefile.incl
 LIBNAME = libtoastblas
 
 VPATH = $(TOASTDIR)/numerics/BLAS
-LIB = $(LIBNAME)
+LIB = $(LIBNAME)$(BLAS_LIB_SUFFIX)
 
-all:: $(LIB)$(BLAS_LIB_SUFFIX)
+all:: $(LIB)
 
 SSRC = isamax.f sasum.f saxpy.f scasum.f scnrm2.f scopy.f sdot.f sdsdot.f sgbmv.f sgemm.f sgemv.f sger.f snrm2.f srot.f srotg.f srotm.f srotmg.f ssbmv.f sscal.f sspmv.f sspr.f sspr2.f sswap.f ssymm.f ssymv.f ssyr.f ssyr2.f ssyr2k.f ssyrk.f stbmv.f stbsv.f stpmv.f stpsv.f strmm.f strmv.f strsm.f strsv.f
 
@@ -43,19 +43,19 @@ OBJS = $(SOBJ) $(DOBJ) $(COBJ) $(ZOBJ) $(UOBJ) $(TOAST_SOBJ) $(TOAST_DOBJ) $(TOA
 	$(F77) $(FFLAGS) $(SHLIB_CFLAGS) -c $<
 
 # make static version of library
-$(LIB)$(STLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	ar cr $@ $^
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)$(SHLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS)
 
 clean::
 	$(RM) *.o
-	$(RM) $(LIB)$(LIB_SUFFIX)
+	$(RM) $(LIB)
 
 distclean:: clean
 	$(RM) Makefile

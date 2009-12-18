@@ -3,9 +3,9 @@ include $(TOASTDIR)/Makefile.incl
 LIBNAME = libfsbtk
 
 VPATH = $(TOASTDIR)/numerics/fspblas
-LIB = $(LIBNAME)
+LIB = $(LIBNAME)$(LIB_SUFFIX)
 
-all:: $(LIB)$(LIB_SUFFIX)
+all:: $(LIB)
 
 SRC = \
 	doubblas.f \
@@ -21,13 +21,13 @@ OBJS = ${SRC:.f=.o}
 	$(F77) $(FFLAGS) $(SHLIB_CFLAGS) -c $<
 
 # make static version of library
-$(LIB)$(STLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	ar cr $@ $^
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)$(SHLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(BLASLIB)
 

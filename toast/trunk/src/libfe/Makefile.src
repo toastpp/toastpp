@@ -1,11 +1,11 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libfe
-LIB = $(LIBNAME)
+LIB = $(LIBNAME)$(LIB_SUFFIX)
 
 VPATH = $(TSRC)/libfe
 
-all:: $(LIB)$(LIB_SUFFIX)
+all:: $(LIB)
 
 SRCS = 	point.cc node.cc ndlist.cc element.cc ellist.cc surface.cc \
 	ptsource.cc timespec.cc mesh.cc param.cc qmmesh.cc \
@@ -22,13 +22,13 @@ HDRS = ${SRCS:.cc=.h}
 	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
 
 # make static version of library
-$(LIB)$(STLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	ar cr $@ $^
 	$(RANLIB) $@
 
 # make shared version of library
-$(LIB)$(SHLIB_SUFFIX): $(OBJS)
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath $(MATHLIB)
 
@@ -37,4 +37,4 @@ clean::
 
 distclean:: clean
 	$(RM) Makefile
-	$(RM) $(LIB)$(LIB_SUFFIX)
+	$(RM) $(LIB)
