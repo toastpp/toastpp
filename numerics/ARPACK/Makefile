@@ -67,7 +67,7 @@ arpacklib:
 		$(CD) ..; \
 	done );
 	$(CD) OBJS; \
-	$(MAKE_LIB); \
+	$(MAKE_LIB) -L$(TLIB) $(BLASLIB) $(LAPACKLIB) $(FLIBS); \
 	$(RANLIB) $(LIB); \
 	$(CD) ..
 
