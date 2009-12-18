@@ -22,9 +22,7 @@ TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC
 TOAST_LIB="-L$TOASTDIR/@OBJDIR@/lib -lbemdiff -lbem -lfdot -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs -lOSMesa @FLIBS@"
 TOAST_FLAG="-Wno-deprecated $TOAST_INC"
 
-ARCHDIR=`uname -s`
-
-if test "$(ARCHDIR)" = "darwin"; then
+if test "$Arch" = "maci"; then
 	TOAST_LIB="$TOAST_LIB -framework GLUT -framework OPENGL"
 	TOAST_FLAG="$TOAST_FLAG -Wl,-rpath,$TOASTVER/lib"
 else
