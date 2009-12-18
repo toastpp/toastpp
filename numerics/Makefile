@@ -29,7 +29,7 @@ lapack::
 	cp $(NUMERICSDIR)/LAPACK/make.inc .; \
 	cp $(NUMERICSDIR)/LAPACK/SRC/Makefile SRC; \
 	$(MAKE) lapacklib; \
-	cp libtoastlapack$(LAPACK_LIB_SUFFIX) $(TLIB)
+	cp $(SRC)/libtoastlapack$(LAPACK_LIB_SUFFIX) $(TLIB)
 
 superlu::
 	mkdir -p $(TOASTOBJ)/SuperLU/SRC; \
