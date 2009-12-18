@@ -1,7 +1,7 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libmath
-LIB = $(TLIB)/$(LIBNAME)
+LIB = $(LIBNAME)
 
 VPATH = $(TSRC)/libmath
 
@@ -64,7 +64,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lsuperlu -larpack $(LAPACKLIB) $(BLASLIB) $(SPBLASLIB) $(ILUPACKSTATIC)
+	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(MATHLIB) $(ILUPACKSTATIC)
 	make ilupack_clean
 
 ilupack::

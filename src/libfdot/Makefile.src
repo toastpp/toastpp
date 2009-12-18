@@ -1,7 +1,7 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libfdot
-LIB = $(TLIB)/$(LIBNAME)
+LIB = $(LIBNAME)
 
 VPATH = $(TSRC)/libfdot
 
@@ -25,7 +25,7 @@ $(LIB)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIB)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS)
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) $(MATHLIB) -lmath -lstoast
 
 clean::
 	$(RM) *.o
