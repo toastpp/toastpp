@@ -12,7 +12,8 @@ blas::
 	mkdir -p $(TOASTOBJ)/BLAS; \
 	cd $(TOASTOBJ)/BLAS; \
 	cp $(NUMERICSDIR)/BLAS/Makefile .; \
-	$(MAKE)
+	$(MAKE); \
+	cp libtoastblas$(BLAS_LIB_SUFFIX) $(TLIB)
 
 fspblas::
 	mkdir -p $(TOASTOBJ)/fspblas; \
@@ -20,6 +21,7 @@ fspblas::
 	cp $(NUMERICSDIR)/fspblas/Makefile .; \
 	$(MAKE); \
 	mv *$(LIB_SUFFIX) $(LIBDIR)
+	cp libtoastlapack$(LAPACK_LIB_SUFFIX) $(TLIB)
 
 lapack::
 	mkdir -p $(TOASTOBJ)/LAPACK/SRC; \

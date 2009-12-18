@@ -41,7 +41,7 @@ include ../make.inc
 LIBNAME = libtoastlapack
 
 VPATH = $(TOASTDIR)/numerics/LAPACK/SRC
-LIB = $(TLIB)/$(LIBNAME)
+LIB = $(LIBNAME)
 
 all:: $(LIB)$(LAPACK_LIB_SUFFIX)
 
