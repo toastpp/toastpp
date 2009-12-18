@@ -21,7 +21,6 @@ fspblas::
 	cp $(NUMERICSDIR)/fspblas/Makefile .; \
 	$(MAKE); \
 	mv *$(LIB_SUFFIX) $(LIBDIR)
-	cp libtoastlapack$(LAPACK_LIB_SUFFIX) $(TLIB)
 
 lapack::
 	mkdir -p $(TOASTOBJ)/LAPACK/SRC; \
@@ -29,7 +28,8 @@ lapack::
 	cp $(NUMERICSDIR)/LAPACK/Makefile .; \
 	cp $(NUMERICSDIR)/LAPACK/make.inc .; \
 	cp $(NUMERICSDIR)/LAPACK/SRC/Makefile SRC; \
-	$(MAKE) lapacklib
+	$(MAKE) lapacklib; \
+	cp libtoastlapack$(LAPACK_LIB_SUFFIX) $(TLIB)
 
 superlu::
 	mkdir -p $(TOASTOBJ)/SuperLU/SRC; \
