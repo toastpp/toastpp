@@ -38,7 +38,7 @@ superlu::
 	cp $(NUMERICSDIR)/SuperLU/make.inc .; \
 	cp $(NUMERICSDIR)/SuperLU/SRC/Makefile SRC; \
 	$(MAKE) superlulib; \
-	cp libsuperlu$(LIB_SUFFIX) $(LIBDIR); \
+	cp SRC/libsuperlu$(LIB_SUFFIX) $(LIBDIR); \
 	cp $(NUMERICSDIR)/SuperLU/SRC/*.h $(INCDIR)
 
 blzpack::
