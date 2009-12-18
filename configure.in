@@ -301,7 +301,7 @@ case $system in
 	SHLIB_SUFFIX=".dylib"
 	CFLAGS="${CFLAGS} -m32"
 	CXXFLAGS="${CXXFLAGS} -m32"
-	RPATH="-Wl,-rpath,$(TLIB)"
+	RPATH="-Wl,-rpath,\$(TLIB)"
 	if test "$have_dl" = yes; then
 	    SHLIB_LD="${CXX} -shared"
 	else
