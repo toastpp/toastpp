@@ -270,6 +270,7 @@ SHLIB_SUFFIX=".so"
 STLIB_SUFFIX=".a"
 DL_LIBS="-ldl"
 RPATH=""
+VERSIONFLAG=""
 
 case $system in
     IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
@@ -548,7 +549,10 @@ case $ARCHDIR in
 	;;
      darwin)
         MEXFLAGS="${MEXFLAGS} -largeArrayDims"
-        MEXEXT="maci64"
+        MEXEXT="mexmaci64"
+	if test "$VERSIONFLAG" = "-m32"; then
+	   MEXEXT="mexmaci"
+	fi
         ;;
 esac	
 if test "${TOAST_DEBUG}" = "1" ; then
