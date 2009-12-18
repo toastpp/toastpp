@@ -93,10 +93,18 @@ liblbfgs::
 	mkdir sample; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/Makefile.in ./sample; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/sample.c ./sample;\
-	./configure; \
+	if test "$ARCHDIR" = "darwin"; then \
+		./configure CC=$(CC) CXX=$(CXX) F77=$(F77) FFLAGS=-m32 --exec-prefix=/Thisisaveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeryloooooooooooooooooooooooooooooooongstring; \
+	else \
+		./configure; \
+	fi; \
 	make; \
 	cp lib/.libs/*$(LIB_SUFFIX) $(LIBDIR); \
-	cp include/* $(TOASTDIR)/include
+	cp include/* $(TOASTDIR)/include; \
+	if test "$ARCHDIR" = "darwin"; then \
+		install_name_tool -id @rpath/liblbfgs-1.6$(LIB_SUFFIX) $(LIBDIR)/liblbfgs-1.6$(LIB_SUFFIX); \
+		install_name_tool -id @rpath/liblbfgs$(LIB_SUFFIX) $(LIBDIR)/liblbfgs$(LIB_SUFFIX); \
+	fi
 
 mesa::
 	cd $(NUMERICSDIR)/Mesa-7.3 ; \
