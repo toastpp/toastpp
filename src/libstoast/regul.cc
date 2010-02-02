@@ -1090,7 +1090,7 @@ void GenericSigma::SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int 
 #endif
 RVector GenericSigma::GetHess1f(const RVector &x,const RVector &f) const
 {
-    //LOGOUT("Entering GenericSigma::GetHess1f");
+    LOGOUT("Entering GenericSigma::GetHess1f");
     dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
     dASSERT (f.Dim() == x0->Dim(), Invalid coefficient vector dimension);
     
