@@ -169,7 +169,13 @@ public:
 
     double GetValue (const RVector &x) const;
     RVector GetGradient (const RVector &x) const {
-      return GetHess1f(x,x);
+	// MS: modified 100201
+	// the second parameter of GetHess1f doesn't get x0 subtracted
+	// inside GetHess1f, which can lead to a nonzero gradient even
+	// if x = x0
+
+	//return GetHess1f(x,x);
+	return GetHess1f (x, x - *x0);
     }
     RVector GetKappa (const RVector &x) const;
     void SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p);
@@ -652,7 +658,14 @@ public:
 
     double GetValue (const RVector &x) const;
     RVector GetGradient (const RVector &x) const {
-      return GetHess1f(x,x);
+	// MS: modified 100201
+	// the second parameter of GetHess1f doesn't get x0 subtracted
+	// inside GetHess1f, which can lead to a nonzero gradient even
+	// if x = x0
+
+	//return GetHess1f(x,x);
+	return GetHess1f (x, x - *x0);
+	//return GetHess1f(x,x);
     }
     RVector GetKappa (const RVector &x) const;
     void SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p);
