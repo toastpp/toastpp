@@ -56,6 +56,8 @@ FELIB RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh,
 FELIB int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax);
 
+FELIB Mesh *Lin2Quad (const Mesh &linmesh);
+
 // ==========================================================================
 // class Mesh
 // ==========================================================================
@@ -228,7 +230,7 @@ public:
     // sets up a list of edge-adjacent elements for each element in the mesh
     // and stores it in nbhrs
 
-    void NodeNeighbourList (int **_nnbhrs, int ***_nbhrs);
+    void NodeNeighbourList (int **_nnbhrs, int ***_nbhrs) const;
     // generates a list of neighbour nodes for each node in the mesh, and
     // returns it in the 2D array `_nbhrs'. The number of neighbours for each
     // node is returned in the 1D array `_nnbhrs'. Both arrays should be

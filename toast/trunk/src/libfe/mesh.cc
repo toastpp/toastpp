@@ -993,7 +993,7 @@ void Mesh::SetupNeighbourList ()
     }
 }
 
-void Mesh::NodeNeighbourList (int **_nnbhrs, int ***_nbhrs)
+void Mesh::NodeNeighbourList (int **_nnbhrs, int ***_nbhrs) const
 {
     const int chunksize = 64;
     int i, j, k, el, nodel, ni, nj, nn = nlen();
@@ -1767,7 +1767,7 @@ void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
 // Generate a sparse matrix which allows mapping of a solution from
 // mesh nodal base to a regular pixel grid
 
-RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
+RGenericSparseMatrix *GridMapMatrix_old (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax, const int *elref)
 {
     const double EPS = 1e-8;
@@ -1892,85 +1892,137 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     return B;
 }
 
-#ifdef UNDEF // not finished yet!
 RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
-    const Point *bbmin, const Point *bbmax)
+    const Point *bbmin, const Point *bbmax, const int *elref)
 {
-    const double EPS = 1e-8;
-    const int nsub = 10; // sub-sampling density
+    const int nsub = 8; // subsampling level
 
-    int i, j, ix, iy, iz, idx, d, dim = mesh.Dimension();
-    int nx = gdim[0], ny = gdim[1], nz = (dim > 2 ? gdim[2]:1);
-    int rlen = nx*ny*nz;
-    Point p(dim), loc(dim);
+    int ix, iy, iz, i, j, k, g, el, m, n, nd;
+    int dim = mesh.Dimension();
+    int nlen = mesh.nlen();
+    int glen = 1; for (j = 0; j < dim; j++) glen *= gdim[j];
+    int nidx = (dim == 2 ? 4:8);
+    int idx[8];
+    double v;
 
-    dASSERT(gdim.Dim() == dim, Parameter 3 wrong dimension);
-
-    // bounding box of grid region  
-    Point mesh_bbmin, mesh_bbmax;
-    if (!bbmin || !bbmax) {
-        mesh.BoundingBox (mesh_bbmin, mesh_bbmax);
-	if (!bbmin) bbmin = &mesh_bbmin;
-	if (!bbmax) bbmax = &mesh_bbmax;
+    IVector sdim (gdim*nsub-1); // subsampled grid
+    int *selref = GenerateElementPixelRef (mesh, sdim, bbmin, bbmax);
+    int sx = sdim[0];
+    int sy = sdim[1];
+    int sz = (dim == 3 ? sdim[2]:1);
+    RVector ds(dim), dss(dim);
+    IVector id(dim);
+    RDenseMatrix f(dim,2);
+    for (j = 0; j < dim; j++) {
+	ds[j]  = ((*bbmax)[j]-(*bbmin)[j])/(double)(gdim[j]-1);
+	dss[j] = ((*bbmax)[j]-(*bbmin)[j])/(double)(sdim[j]-1);
     }
-    dASSERT(bbmin->Dim() == dim, Parameter 4 wrong dimension);
-    dASSERT(bbmax->Dim() == dim, Parameter 5 wrong dimension);
 
-    IVector gsdim(dim); // subsampled grid
-    for (i = 0; i < dim; i++) gsdim[i] = gdim[i]*nsub-1;
-    int nsx = gsdim[0], nsy = gsdim[1], nsz = (dim > 2 ? gsdim[2]:1);
-    int rslen = nsx*nsy*nsz;
+    double **rowval = new double*[glen];
+    int **rowidx = new int*[glen];
+    int *rowbuf = new int[glen];
+    int *rowlen = new int[glen];
+    for (i = 0; i < glen; i++) {
+	rowlen[i] = 0;
+	rowbuf[i] = 16;
+	rowidx[i] = new int[16];
+	rowval[i] = new double[16];
+    }
 
-    // grid size and spacing
-    RVector W(dim), dW(dim);
-    for (d = 0; d < dim; d++)
-        dW[d] = (W[d] = ((*bbmax)[d]-(*bbmin)[d]))/(double)(gsdim[d]-1);
-
-    // allocate element index list
-    int *elref = GenerateElementPixelRef (mesh, gsdim, bbmin, bbmax);
-
-    // get map matrix structure
-    int nzero = 0;
-    for (i = 0; i < rslen; i++)
-        if (elref[i] >= 0) nzero += mesh.elist[elref[i]]->nNode();
-    int *rowptr = new int[rlen+1];
-    int *colidx = new int[nzero];
-    double *data = new double[nzero];
-    rowptr[0] = 0;
-
-    // populate the mapping matrix
-    for (iz = i = idx = 0; iz < nsz; iz++) {
-        if (dim > 2) p[2] = iz*dW[2] + (*bbmin)[2];
-	for (iy = 0; iy < nsy; iy++) {
-	    p[1] = iy*dW[1] + (*bbmin)[1];
-	    for (ix = 0; ix < nsx; ix++) {
-	        if (elref[i] >= 0) {
-		    p[0] = ix*dW[0] + (*bbmin)[0];
-		    Element *pel = mesh.elist[elref[i]];
-		    RVector fun = pel->GlobalShapeF (mesh.nlist, p);
-		    RVector gfun = GridShapeF (ix,nsx,nsub, iy,nsy,nsub, iz,nsz,nsub);
-
-		    for (j = 0; j < fun.Dim(); j++) {
-		        colidx[idx] = pel->Node[j];
-			data[idx] = fun[j];
-			idx++;
+    Point p(dim);
+    for (iz = i = 0; iz < sz; iz++) {
+	if (dim == 3) p[2] = (*bbmin)[2] + iz*dss[2];
+	for (iy = 0; iy < sy; iy++) {
+	    p[1] = (*bbmin)[1] + iy*dss[1];
+	    for (ix = 0; ix < sx; ix++) {
+		p[0] = (*bbmin)[1] + ix*dss[0];
+		el = selref[i];
+		if (el >= 0) {
+		    Element *pel = mesh.elist[el];
+		    for (j = 0; j < dim; j++) {
+			id[j] = (int)((p[j]-(*bbmin)[j])/ds[j]);
+			// shape function components of regular grid at p
+			f(j,1) = (p[j]-(*bbmin)[j]-id[j]*ds[j])/ds[j];
+			f(j,0) = 1.0 - f(j,1);
 		    }
+		    // shape functions of mesh element at p
+		    RVector nf = pel->GlobalShapeF (mesh.nlist, p);
+
+		    if (dim == 2) {
+			idx[0] = id[0] + id[1]*gdim[0];
+			idx[1] = idx[0] + 1;
+			idx[2] = idx[0] + gdim[0];
+			idx[3] = idx[2] + 1;
+		    } else {
+			idx[0] = id[0] + id[1]*gdim[0] + id[2]*gdim[0]*gdim[1];
+			idx[1] = idx[0] + 1;
+			idx[2] = idx[0] + gdim[0];
+			idx[3] = idx[2] + 1;
+			idx[4] = idx[0] + gdim[0]*gdim[1];
+			idx[5] = idx[4] + 1;
+			idx[6] = idx[4] + gdim[0];
+			idx[7] = idx[6] + 1;
+		    }
+		    for (k = 0; k < nidx; k++) {
+			g = idx[k];
+			if (g < glen) {
+			    v = 1.0;
+			    for (j = 0, m = 1; j < dim; j++, m*=2)
+				v *= f(j,(k/m)%2); // grid shape function at p
+			    for (n = 0; n < pel->nNode(); n++) {
+				nd = pel->Node[n];
+				for (m = 0; m < rowlen[g]; m++)
+				    if (rowidx[g][m] == nd) break;
+				if (m == rowlen[g]) {
+				    int *itmp = new int[rowbuf[g]+16];
+				    memcpy (itmp, rowidx[g],
+					    sizeof(int)*rowlen[g]);
+				    delete []rowidx[g];
+				    rowidx[g] = itmp;
+				    double *dtmp = new double[rowbuf[g]+16];
+				    memcpy (dtmp, rowval[g],
+					    sizeof(double)*rowlen[g]);
+				    delete []rowval[g];
+				    rowval[g] = dtmp;
+				    rowbuf[g] += 16;
+				    rowidx[g][m] = nd;
+				    rowval[g][m] = 0.0;
+				    rowlen[g]++;
+				}
+				rowval[g][m] += v*nf[n];
+			    }
+			}
+		    }
+
 		}
-		rowptr[++i] = idx;
+		i++;
 	    }
 	}
     }
-    delete []elref;
 
-    RCompRowMatrix *B = new RCompRowMatrix (rlen, mesh.nlen(),
-        rowptr, colidx, data);
-    delete []rowptr;
-    delete []colidx;
-    delete []data;
+    RCompRowMatrix *B = new RCompRowMatrix (glen, nlen);
+    RVector row(nlen);
+    for (i = 0; i < glen; i++) {
+	row.Clear();
+	double sum = 0.0;
+	for (j = 0; j < rowlen[i]; j++) {
+	    row[rowidx[i][j]] = rowval[i][j];
+	    sum += rowval[i][j];
+	}
+	if (sum)
+	    B->SetRow (i, row/sum);
+
+	delete []rowidx[i];
+	delete []rowval[i];
+    }
+    delete []rowidx;
+    delete []rowval;
+    delete []rowlen;
+    delete []rowbuf;
+
     return B;
 }
-#endif
-   
+
 RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax, const int *elref)
 {
@@ -2532,7 +2584,7 @@ RGenericSparseMatrix *Grid2LinPixMatrix (const IVector &gdim,
 	}
     }
     nzero = rowptr[blen];
-    cerr << "Grid2LinPixMatrix: found " << nzero << " nonzeros" << endl;
+    //cerr << "Grid2LinPixMatrix: found " << nzero << " nonzeros" << endl;
 
     // pass 2: construct map matrix
     int *colidx = new int[nzero];
@@ -2933,7 +2985,7 @@ RGenericSparseMatrix *LinPix2GridMatrix (const IVector &gdim,
     for (i = 0; i < glen; i++)
         rowptr[i+1] = rowptr[i] + rowlen[i];
     nzero = rowptr[glen];
-    cerr << "LinPix2GridMatrix: found " << nzero << " nonzeros" << endl;
+    //cerr << "LinPix2GridMatrix: found " << nzero << " nonzeros" << endl;
 
     // pass 2: construct map matrix
     int *colidx = new int[nzero];
@@ -3314,4 +3366,194 @@ void CreateVoxelMesh (int ex, int ey, int ez, bool *egrid,
 
     // cleanup
     delete []ngrid;
+}
+
+// ==========================================================================
+
+FELIB Mesh *Lin2Quad (const Mesh &linmesh)
+{
+    const int chunksize = 64;
+    int el, elen, nlen, i, j, k;
+    int nn, nbj, *nb, *nd;
+    int nnlen = 0, maxnew = 0;
+    int **elref, *nelref, *bufsize;
+    int dim = linmesh.Dimension();
+
+    elen = linmesh.elen();
+    nlen = linmesh.nlen();
+
+    // find max number of new nodes
+    for (el = 0; el < elen; el++) {
+        switch (linmesh.elist[el]->Type()) {
+	case ELID_TRI3OLD:
+	    maxnew += 3;
+	    break;
+	case ELID_TRI3:
+	    maxnew += 3;
+	    break;
+	case ELID_TET4:
+	    maxnew += 6;
+	    break;
+	default:
+	    xERROR("lin2quadmesh: Unsupported element type detected");
+	    exit (1);
+	}
+    }
+
+    // allocate lists for new nodes
+    Mesh *quadmesh = new Mesh;
+    NodeList nnlist (maxnew);
+    ParameterList nplist (maxnew);
+
+    // find neighbour nodes for each node in the mesh
+    cout << "Setting up node neighbour list\n";
+    int *nd_nnbhr, **nd_nbhr;
+    linmesh.NodeNeighbourList (&nd_nnbhr, &nd_nbhr);
+
+    // build node->element reference list
+    cout << "Building node->element reference list\n";
+    elref   = new int*[nlen];
+    nelref  = new int[nlen];
+    bufsize = new int[nlen];
+    for (i = 0; i < nlen; i++) {
+        elref[i] = new int[bufsize[i]=chunksize];
+	nelref[i] = 0;
+    }
+    for (el = 0; el < elen; el++) {
+        nn = linmesh.elist[el]->nNode();
+        nd = linmesh.elist[el]->Node;
+	for (i = 0; i < nn; i++) {
+	    int n = nd[i];
+	    if (nelref[n] == bufsize[n]) { // reallocate
+	        int *tmp = new int[bufsize[n]+chunksize];
+		memcpy (tmp, elref[n], bufsize[n]*sizeof(int));
+		delete []elref[n];
+		elref[n] = tmp;
+		bufsize[n] += chunksize;
+		cout<< "Increasing elref buffer to " << bufsize[n] << endl;
+	    }
+	    elref[n][nelref[n]++] = el;
+	}
+    }
+    delete []bufsize;
+    
+    // copy element list
+    cout << "Copying element list\n";
+    ElementList elist;
+    quadmesh->elist.New (elen);
+
+    for (el = 0; el < elen; el++) {
+        Element *nel;
+	nn = linmesh.elist[el]->nNode();
+	switch (linmesh.elist[el]->Type()) {
+	case ELID_TRI3OLD:
+	    nel = new Triangle6;
+	    // node order in TRI3OLD is inconsistent
+	    // the following hack accounts for this
+	    nel->Node[0] = linmesh.elist[el]->Node[0];
+	    nel->Node[1] = linmesh.elist[el]->Node[2];
+	    nel->Node[2] = linmesh.elist[el]->Node[1];
+	    break;
+	case ELID_TRI3:
+	    nel = new Triangle6;
+	    for (i = 0; i < nn; i++)
+		nel->Node[i] = linmesh.elist[el]->Node[i];
+	    break;
+	case ELID_TET4:
+	    nel = new Tetrahedron10;
+	    for (i = 0; i < nn; i++)
+		nel->Node[i] = linmesh.elist[el]->Node[i];
+	    break;
+	}
+	quadmesh->elist[el] = nel;
+    }
+
+    for (i = 0; i < nlen; i++) {
+        if (!(i%1000)) cout << "Processing node " << i
+			    << " of " << nlen << endl;
+        nn = nd_nnbhr[i];
+	nb = nd_nbhr[i];
+	Node &ni = linmesh.nlist[i];
+	Parameter &pi = linmesh.plist[i];
+	for (j = 0; j < nn; j++) {
+	    if ((nbj = nb[j]) <= i) continue; // to avoid counting twice
+	    Node &nj = linmesh.nlist[nbj];
+	    Parameter &pj = linmesh.plist[nbj];
+	    // create a new node between i and its jth neighbour
+	    nnlist[nnlen].New(dim);
+	    for (k = 0; k < dim; k++)
+	        nnlist[nnlen][k] = 0.5*(ni[k]+nj[k]);
+	    if (ni.BndTp() == nj.BndTp()) nnlist[nnlen].SetBndTp (ni.BndTp());
+	    else                          nnlist[nnlen].SetBndTp (BND_NONE);
+
+	    nplist[nnlen].SetMua ((pi.Mua()+pj.Mua())*0.5);
+	    nplist[nnlen].SetKappa ((pi.Kappa()+pj.Kappa())*0.5);
+	    nplist[nnlen].SetN ((pi.N()+pj.N())*0.5);
+	    nplist[nnlen].SetA ((pi.A()+pj.A())*0.5);
+
+	    // now find all elements sharing the new node
+	    for (k = 0; k < nelref[i]; k++) {
+	        el = elref[i][k];
+	        int *node = quadmesh->elist[el]->Node;
+		switch (quadmesh->elist[el]->Type()) {
+		case ELID_TRI6:
+		    if (i == node[0]) {
+		        if      (nbj == node[1]) node[3] = nlen+nnlen;
+			else if (nbj == node[2]) node[5] = nlen+nnlen;
+		    } else if (i == node[1]) {
+		        if      (nbj == node[0]) node[3] = nlen+nnlen;
+			else if (nbj == node[2]) node[4] = nlen+nnlen;
+		    } else if (i == node[2]) {
+		        if      (nbj == node[0]) node[5] = nlen+nnlen;
+			else if (nbj == node[1]) node[4] = nlen+nnlen;
+		    } else
+		        cerr << "Panic!\n";
+		    break;
+		case ELID_TET10:
+		    if (i == node[0]) {
+		        if      (nbj == node[1]) node[4] = nlen+nnlen;
+			else if (nbj == node[2]) node[5] = nlen+nnlen;
+			else if (nbj == node[3]) node[6] = nlen+nnlen;
+		    } else if (i == node[1]) {
+		        if      (nbj == node[0]) node[4] = nlen+nnlen;
+			else if (nbj == node[2]) node[7] = nlen+nnlen;
+			else if (nbj == node[3]) node[8] = nlen+nnlen;
+		    } else if (i == node[2]) {
+		        if      (nbj == node[0]) node[5] = nlen+nnlen;
+			else if (nbj == node[1]) node[7] = nlen+nnlen;
+			else if (nbj == node[3]) node[9] = nlen+nnlen;
+		    } else if (i == node[3]) {
+		        if      (nbj == node[0]) node[6] = nlen+nnlen;
+			else if (nbj == node[1]) node[8] = nlen+nnlen;
+			else if (nbj == node[2]) node[9] = nlen+nnlen;
+		    } else
+		        cerr << "Panic!\n";
+		    break;
+		}
+	    }
+	    nnlen++;
+	}
+    }
+
+
+    cout << "Finalising mesh\n";
+    quadmesh->nlist.New (nlen+nnlen);
+    quadmesh->plist.New (nlen+nnlen);
+    for (i = 0; i < nlen; i++) {
+	quadmesh->nlist[i].Copy(linmesh.nlist[i]);
+	quadmesh->plist[i] = linmesh.plist[i];
+    }
+    for (i = 0; i < nnlen; i++) {
+	quadmesh->nlist[nlen+i].Copy (nnlist[i]);
+	quadmesh->plist[nlen+i] = nplist[i];
+    }
+    quadmesh->MarkBoundary();
+    quadmesh->Setup();
+
+    // cleanup
+    for (i = 0; i < nlen; i++) delete elref[i];
+    delete []elref;
+    delete []nelref;
+
+    return quadmesh;
 }

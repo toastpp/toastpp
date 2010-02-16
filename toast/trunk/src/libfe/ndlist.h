@@ -16,6 +16,7 @@ public:
     // constructors, destructor
     NodeList ();
     NodeList (int length);
+    NodeList (const NodeList &nl);
     ~NodeList ();
 
     void New (int length);
