@@ -30,6 +30,15 @@ NodeList::NodeList (int length)
     New (length);
 }
 
+NodeList::NodeList (const NodeList &nl)
+{
+    size = 0;
+    dofnod = nl.dofnod;
+    New (nl.Len());
+    for (int i = 0; i < size; i++)
+	list[i].Copy (nl.list[i]);
+}
+
 NodeList::~NodeList ()
 {
     New (0);
