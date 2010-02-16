@@ -26,8 +26,8 @@ logx = log(x);          % parameter transformation
 logx0 = logx;
 
 % Initialise starting parameters
-proj = privProject (lprm.hMesh, lprm.hBasis, logx, ref, prm.meas.src.freq, ...
-    lprm.qvec, lprm.mvec, prm.linsolver.method, prm.linsolver.tol);
+proj = privProject (lprm.hMesh, lprm.hBasis, logx, ref, prm.data.freq, ...
+    lprm.qvec, lprm.mvec, prm.fwdsolver.method, prm.fwdsolver.tol);
 err0 = privObjective (proj, lprm.data, lprm.sd, lprm.hReg, logx); %initial error
 err  = err0;
 errp = inf;
@@ -113,8 +113,8 @@ while  (itr <= prm.solver.itmax) && ...
     % update gradient
     g1 = gradient(x);
 
-    proj = privProject (lprm.hMesh, lprm.hBasis, logx, ref, prm.meas.src.freq, ...
-        lprm.qvec, lprm.mvec, prm.linsolver.method, prm.linsolver.tol);
+    proj = privProject (lprm.hMesh, lprm.hBasis, logx, ref, prm.data.freq, ...
+        lprm.qvec, lprm.mvec, prm.fwdsolver.method, prm.fwdsolver.tol);
     err = privObjective (proj, lprm.data, lprm.sd, lprm.hReg, logx);
 
     % update S and Y
@@ -196,7 +196,7 @@ end
     mus = 1./(3*kap) - mua;
 
     g = toastGradient (lprm.hMesh, lprm.hBasis, lprm.qvec, lprm.mvec, mua, mus, ref, ...
-        prm.meas.src.freq, lprm.data, lprm.sd, prm.linsolver.method, prm.linsolver.tol);
+        prm.data.freq, lprm.data, lprm.sd, prm.fwdsolver.method, prm.fwdsolver.tol);
     g = g .* x; % parameter scaling
     g = g + toastRegulGradient (lprm.hReg, logx);
     end
@@ -207,8 +207,8 @@ end
     function p = objective(x)
 
     proj = privProject (lprm.hMesh, lprm.hBasis, x, ref, ...
-        prm.meas.src.freq, lprm.qvec, lprm.mvec, prm.linsolver.method, ...
-        prm.linsolver.tol);
+        prm.data.freq, lprm.qvec, lprm.mvec, prm.fwdsolver.method, ...
+        prm.fwdsolver.tol);
     [p, p_data, p_prior] = privObjective (proj, lprm.data, lprm.sd, ...
         lprm.hReg, x);
     fprintf (1, '    [LH: %f, PR: %f]\n', p_data, p_prior);

@@ -20,6 +20,24 @@ function [s, pmin] = toastLineSearch (x0, d, s0, p0, func, varargin)
 %   is of no importance to toastLineSearch, because it simply passes the
 %   trial step x0+s*d on to the callback function func.
 %
+%   Function 'func' is called by toastLineSearch to evaluate the objective
+%   function at a given parameter vector x. It has the format
+%
+%               p = func(x,...)
+%
+%   where first argument x is a parameter vector, and any subsequent
+%   arguments are the optional arguments passed to toastLineSearch. The
+%   return value p can have one of two formats:
+%
+%   - a real number: this is the value of the objective function at x.
+%   - a structure: in this case, the value of the objective function must
+%     be returned in field 'of', and an optional boolean field 'valid'
+%     can be used to indicate if the parameter distribution x is within
+%     the valid range. If field 'valid' is not present, or if p is a
+%     number, then valid=true is assumed.
+%
+%   If p0 is empty ([]), it is evaluated by a call to p0 = func(x0,..)
+%
 %   toastLineSearch is independent of the actual realisation of Q. The
 %   calling function must provide a pointer to a function which evaluates
 %   Q for given x.  
@@ -28,55 +46,84 @@ function [s, pmin] = toastLineSearch (x0, d, s0, p0, func, varargin)
 %   performing a quadratic interpolation step. d is required to be a
 %   downhill direction in the vicinity of x0.
   
+if isempty(p0)
+    p0 = func (x0, varargin{:});
+end
+
 sl = 0;
 pl = p0;
 sh = s0;
 x = x0 + d*sh;
-ph = func (x, varargin{:});
+[ph,valid] = get_of (x, varargin{:});
 fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
 
 % bracket the minimum
 
-if ph < pl  % increase step size
+if ph < pl && valid  % increase step size
     sm = sh;
     pm = ph;
     sh = sh*2;
     x = x0 + d*sh;
-    ph = func (x, varargin{:});
+    [ph,valid] = get_of (x, varargin{:});
     fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
 
-    while ph < pm
+    while ph < pm && valid
         sl = sm; pl = pm;
         sm = sh; pm = ph;
         sh = sh*2;
         x = x0 + d*sh;
-        ph = func (x, varargin{:});
+        [ph,valid] = get_of (x, varargin{:});
         fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
     end
 else        % decrease step size
     sm = sh/2;
     x = x0 + d*sm;
-    pm = func (x, varargin{:});
+    [pm,valid] = get_of (x, varargin{:});
     fprintf (1, '--> Step: %f, objective: %f\n', sm, pm);
 
-    while pm > pl && sh > 1e-8*s0
+    while (pm > pl || ~valid) && sh > 1e-8*s0
         sh = sm; ph = pm;
         sm = sm/2;
         x = x0 + d*sm;
-        pm = func (x, varargin{:});
+        [pm,valid] = get_of (x, varargin{:});
         fprintf (1, '--> Step: %f, objective: %f\n', sm, pm);
     end
 end
 
-% quadratic interpolation
-
-a = ((pl-ph)/(sl-sh) - (pl-pm)/(sl-sm)) / (sh-sm);
-b = (pl-ph)/(sl-sh) - a*(sl+sh);
-s = -b/(2*a);
-x = x0 + d*s;
-pmin = func (x, varargin{:});
-if pmin > pm   % no improvement
-    s = sm;
+if ph < pm
+    
+    % minimum is beyond furthest sample (i.e outside valid range)
+    % so we take the last known valid sample instead
     pmin = pm;
+    s = sm;
+    
+else
+    % quadratic interpolation
+
+    a = ((pl-ph)/(sl-sh) - (pl-pm)/(sl-sm)) / (sh-sm);
+    b = (pl-ph)/(sl-sh) - a*(sl+sh);
+    s = -b/(2*a);
+    x = x0 + d*s;
+    [pmin,valid] = get_of (x, varargin{:});
+    if pmin > pm || ~valid   % no improvement
+        s = sm;
+        pmin = pm;
+    end
 end
+
 fprintf (1, '==> Step: %f, objective: %f [final]\n', s, pmin);
+
+    % ===================================================
+    function [p,valid] = get_of(x,varargin)
+        p = func(x,varargin{:});
+        valid = true;
+        if isstruct(p)
+            if isfield(p,'valid')
+                valid = p.valid;
+            end
+            p = p.of;
+        end
+    end
+    % ===================================================
+
+end
