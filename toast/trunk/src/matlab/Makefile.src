@@ -48,6 +48,8 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastMeshElementCount.cc \
 	toastMeshLin2Quad.cc \
 	toastMeshNodeCount.cc \
+	toastMeshOpt.cc \
+	toastMeshReorder.cc \
 	toastMeshSize.cc \
 	toastMeshToBasisMatrix.cc \
 	toastMPos.cc \
