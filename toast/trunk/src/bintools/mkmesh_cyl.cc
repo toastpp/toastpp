@@ -43,6 +43,8 @@ int main (void)
     cout << "Layer thickness" << endl;
     cout << "(1) fixed" << endl;
     cout << "(2) linear from centre to top/bottom planes" << endl;
+    cout << "(3) linear from top to bottom plane" << endl;
+    cout << "(4) linear from top to bottom plane with fixed top layer" << endl;
     cin  >> cmd;
     switch (cmd) {
     case 1:
@@ -85,6 +87,47 @@ int main (void)
 	    }
 	}
 	break;
+    case 3: {
+	cout << "Ratio bottom/top layer thickness: ";
+	cin >> r;
+	double sum = 1.0;
+	double fac = fac2 = pow (r, 1.0/(double)(dimz-1));
+	for (i = 1; i <= dimz-1; i++) {
+	    sum += fac2;
+	    fac2 *= fac;
+	}
+	d0 = (zmax-zmin)/sum;
+	z = 0.0;
+	layerz[0] = z;
+	for (i = 1; i <= dimz; i++) {
+	    z += d0;
+	    layerz[i] = z;
+	    d0 *= fac;
+	}
+        } break;
+    case 4: {
+	cout << "Top layer thickness: ";
+	double z0;
+	cin >> z0;
+	cout << "Ratio bottom/top layer thickness: ";
+	cin >> r;
+	double sum = 1.0;
+	double fac = fac2 = pow (r, 1.0/(double)(dimz-2));
+	for (i = 1; i <= dimz-2; i++) {
+	    sum += fac2;
+	    fac2 *= fac;
+	}
+	d0 = (zmax-zmin-z0)/sum;
+	z = 0.0;
+	layerz[0] = z;
+	z = z0;
+	layerz[1] = z;
+	for (i = 2; i <= dimz; i++) {
+	    z += d0;
+	    layerz[i] = z;
+	    d0 *= fac;
+	}
+        } break;
     }
     cout << "Created node layers at z =" << endl;
     for (i = 0; i <= dimz; i++) cout << layerz[i] << ' ';
