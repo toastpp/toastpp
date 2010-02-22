@@ -94,6 +94,7 @@ void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
 	    Element *pel = mesh->elist[el];
 	    nside = pel->nSide();
 	    for (sd = 0; sd < nside; sd++) {
+		if (!pel->IsBoundarySide(sd)) continue;
 		nnode = pel->nSideNode(sd);
 		for (i = 0; i < nnode; i++) {
 		    ir = pel->SideNode(sd,i);
@@ -103,7 +104,7 @@ void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
 			jr = pel->SideNode(sd,j);
 			js = pel->Node[jr];
 			if (subreg && !Inside (mesh, js, dim, rel,v)) continue;
-			val = pel->BndIntFF (ir, jr);
+			val = pel->BndIntFFSide (ir, jr, sd);
 			F.Add (is, js, val);
 		    }
 		}
@@ -139,6 +140,7 @@ void CalcBndmat (Mesh *mesh, char *intstr, const IVector &vtxlist,
 	    Element *pel = mesh->elist[el];
 	    nside = pel->nSide();
 	    for (sd = 0; sd < nside; sd++) {
+		if (!pel->IsBoundarySide(sd)) continue;
 		nnode = pel->nSideNode(sd);
 		for (i = 0; i < nnode; i++) {
 		    ir = pel->SideNode(sd,i);
@@ -148,7 +150,7 @@ void CalcBndmat (Mesh *mesh, char *intstr, const IVector &vtxlist,
 			jr = pel->SideNode(sd,j);
 			js = pel->Node[jr];
 			if (!Contained (js,vtxlist)) continue;
-			val = pel->BndIntFF (ir, jr);
+			val = pel->BndIntFFSide (ir, jr, sd);
 			F.Add (is, js, val);
 		    }
 		}
