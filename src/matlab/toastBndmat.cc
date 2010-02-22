@@ -66,12 +66,19 @@ bool Inside (Mesh *mesh, int nd, int dim, int rel, double v)
     }
 }
 
+bool Contained (int idx, const IVector &vtxlist)
+{
+    int i, len = vtxlist.Dim();
+    for (i = 0; i < len; i++)
+	if (vtxlist[i] == idx) return true;
+    return false;
+}
 
 void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
     mxArray **res)
 {
     // sysmatrix structure
-    int el, i, j, is, js, nside, nnode;
+    int el, sd, i, j, is, js, ir, jr, nside, nnode;
     int n = mesh->nlen();
     int nel = mesh->elen();
     int *rowptr, *colidx, nzero;
@@ -86,15 +93,19 @@ void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
 	for (el = 0; el < nel; el++) {
 	    Element *pel = mesh->elist[el];
 	    nside = pel->nSide();
-	    nnode = pel->nNode();
-	    for (i = 0; i < nnode; i++) {
-		is = pel->Node[i];
-		if (subreg && !Inside (mesh, is, dim, rel, v)) continue;
-		for (j = 0; j < nnode; j++) {
-		    js = pel->Node[j];
-		    if (subreg && !Inside (mesh, js, dim, rel, v)) continue;
-		    val = pel->BndIntFF (i, j);
-		    F.Add (is, js, val);
+	    for (sd = 0; sd < nside; sd++) {
+		nnode = pel->nSideNode(sd);
+		for (i = 0; i < nnode; i++) {
+		    ir = pel->SideNode(sd,i);
+		    is = pel->Node[ir];
+		    if (subreg && !Inside (mesh, is, dim, rel, v)) continue;
+		    for (j = 0; j < nnode; j++) {
+			jr = pel->SideNode(sd,j);
+			js = pel->Node[jr];
+			if (subreg && !Inside (mesh, js, dim, rel,v)) continue;
+			val = pel->BndIntFF (ir, jr);
+			F.Add (is, js, val);
+		    }
 		}
 	    }
 	}
@@ -105,6 +116,44 @@ void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
 	dummy = 1.0;
 	AddToSysMatrix (*mesh, F, &dummy, ASSEMBLE_BNDPFF);
 #endif
+    }
+    CopyMatrix (res, F);
+}
+
+void CalcBndmat (Mesh *mesh, char *intstr, const IVector &vtxlist,
+    mxArray **res)
+{
+    // sysmatrix structure
+    int el, sd, i, j, is, js, ir, jr, nside, nnode;
+    int n = mesh->nlen();
+    int nel = mesh->elen();
+    int *rowptr, *colidx, nzero;
+    double val;
+    mesh->SparseRowStructure (rowptr, colidx, nzero);
+    RCompRowMatrix F (n, n, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    if (!strcasecmp (intstr, "FF")) {
+	for (el = 0; el < nel; el++) {
+	    Element *pel = mesh->elist[el];
+	    nside = pel->nSide();
+	    for (sd = 0; sd < nside; sd++) {
+		nnode = pel->nSideNode(sd);
+		for (i = 0; i < nnode; i++) {
+		    ir = pel->SideNode(sd,i);
+		    is = pel->Node[ir];
+		    if (!Contained (is,vtxlist)) continue;
+		    for (j = 0; j < nnode; j++) {
+			jr = pel->SideNode(sd,j);
+			js = pel->Node[jr];
+			if (!Contained (js,vtxlist)) continue;
+			val = pel->BndIntFF (ir, jr);
+			F.Add (is, js, val);
+		    }
+		}
+	    }
+	}
     }
     CopyMatrix (res, F);
 }
@@ -127,27 +176,34 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxGetString (prhs[1], intstr, 256);
     
     if (nrhs > 2) {
-	char regionstr[256];
-	char dimstr[32], relstr[32];
-	mxGetString (prhs[2], regionstr, 256);
-	sscanf (regionstr, "%s %s %lf", dimstr, relstr, &val);
-    cerr << relstr << endl;
-	switch (toupper(dimstr[0])) {
-	case 'X': dim = 0; break;
-	case 'Y': dim = 1; break;
-	case 'Z': dim = 2; break;
-	case 'R': dim = 3; break;
-	}
-	for (i = 0; i <= 4; i++) {
-	    if (!strcasecmp (relstr, Relstr[i])) {
-		rel = i; break;
+	if (mxIsChar (prhs[2])) {
+	    char regionstr[256];
+	    char dimstr[32], relstr[32];
+	    mxGetString (prhs[2], regionstr, 256);
+	    sscanf (regionstr, "%s %s %lf", dimstr, relstr, &val);
+
+	    switch (toupper(dimstr[0])) {
+	    case 'X': dim = 0; break;
+	    case 'Y': dim = 1; break;
+	    case 'Z': dim = 2; break;
+	    case 'R': dim = 3; break;
 	    }
+	    for (i = 0; i <= 4; i++) {
+		if (!strcasecmp (relstr, Relstr[i])) {
+		    rel = i; break;
+		}
+	    }
+	    CalcBndmat (mesh, intstr, dim, rel, val, &plhs[0]);
+	} else {
+	    RVector tmp;
+	    CopyVector(tmp,prhs[2]);
+	    IVector vtxlist (tmp.Dim());
+	    for (i = 0; i < tmp.Dim(); i++)
+		vtxlist[i] = (int)(tmp[i]-0.5); // switch to 0-based
+	    CalcBndmat (mesh, intstr, vtxlist, &plhs[0]);
 	}
+    } else {
+	CalcBndmat (mesh, intstr, -1, rel, val, &plhs[0]);
     }
 
-    if (dim >= 0)
-	cerr << "toastBndmat: region limit: " << Dimstr[dim] << ' '
-	     << Relstr[rel] << ' ' << val << endl;
-
-    CalcBndmat (mesh, intstr, dim, rel, val, &plhs[0]);
 }

@@ -43,7 +43,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int *perm = new int[len];
 
     for (i = 0; i < len; i++)
-	perm[i] = (int)(fperm[i]+0.5);
+	perm[i] = (int)(fperm[i]-0.5); // switch to 0-based
 
     Reorder (*mesh, perm);
 

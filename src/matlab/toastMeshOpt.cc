@@ -13,9 +13,7 @@ using namespace std;
 typedef int integer;
 typedef bool logical;
 typedef double doublereal;
-// predclaration of functions
 
-void Reorder (Mesh &mesh, int *perm);
 int SortBndToEnd (Mesh &mesh, int *perm);
 int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len);
 int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len);
@@ -3621,7 +3619,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     plhs[0] = mxCreateDoubleMatrix (len,1,mxREAL);
     double *pr = mxGetPr(plhs[0]);
     for (i = 0; i < len; i++)
-	*pr++ = perm[i];
+	*pr++ = perm[i]+1; // switch to 1-based
 
     delete []perm;
 }
