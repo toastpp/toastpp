@@ -86,6 +86,8 @@ int main (void)
 		d0 *= fac;
 	    }
 	}
+	for (i = 0; i <= dimz; i++)
+	    layerz[i] += zmin;
 	break;
     case 3: {
 	cout << "Ratio bottom/top layer thickness: ";
@@ -97,7 +99,7 @@ int main (void)
 	    fac2 *= fac;
 	}
 	d0 = (zmax-zmin)/sum;
-	z = 0.0;
+	z = zmin;
 	layerz[0] = z;
 	for (i = 1; i <= dimz; i++) {
 	    z += d0;
@@ -118,9 +120,9 @@ int main (void)
 	    fac2 *= fac;
 	}
 	d0 = (zmax-zmin-z0)/sum;
-	z = 0.0;
+	z = zmin;
 	layerz[0] = z;
-	z = z0;
+	z += z0;
 	layerz[1] = z;
 	for (i = 2; i <= dimz; i++) {
 	    z += d0;
