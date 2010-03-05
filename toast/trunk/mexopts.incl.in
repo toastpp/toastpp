@@ -19,14 +19,11 @@ TOAST_SRC="$TOASTDIR/src"
 
 TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libfdot -I $TOAST_SRC/libbemdiff -I $TOAST_SRC/libbem"
 
-TOAST_LIB="-L$TOASTDIR/@OBJDIR@/lib -lbemdiff -lbem -lfdot -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs -lOSMesa @FLIBS@"
+TOAST_LIB="-L$TOASTDIR/@OBJDIR@/lib -lbemdiff -lbem -lfdot -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs @OGLLIB@ @FLIBS@"
 TOAST_FLAG="-Wno-deprecated $TOAST_INC"
 
-if test "$Arch" = "maci"; then
-	TOAST_LIB="$TOAST_LIB -framework GLUT -framework OPENGL"
+if test "$Arch" = "maci" -o "$Arch" = "maci64"; then
 	TOAST_FLAG="$TOAST_FLAG -Wl,-rpath,$TOASTVER/lib"
-else
-	TOAST_LIB="$TOAST_LIB -lGLU -lGL"
 fi
 
 
