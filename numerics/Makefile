@@ -6,7 +6,7 @@ LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
 
 COMPONENT = blas fspblas lapack superlu arpack liblbfgs
-ifeq($(BUILD_FDOT),1)
+ifeq ($(BUILD_FDOT),1)
 	COMPONENT += mesa
 endif
 
