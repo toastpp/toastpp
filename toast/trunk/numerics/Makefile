@@ -5,8 +5,12 @@ NUMERICSDIR = $(TOASTDIR)/numerics
 LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
 
-#all:: blas fspblas lapack superlu blzpack arpack liblbfgs mesa
-all:: blas fspblas lapack superlu arpack liblbfgs mesa
+COMPONENT = blas fspblas lapack superlu arpack liblbfgs
+ifeq($(BUILD_FDOT),1)
+	COMPONENT += mesa
+endif
+
+all:: $(COMPONENT)
 
 blas::
 	mkdir -p $(TOASTOBJ)/BLAS; \
@@ -57,16 +61,21 @@ blzpack::
 	cp lib/libblzpack$(LIB_SUFFIX) $(LIBDIR)
 
 arpack::
-	mkdir -p $(TOASTOBJ)/ARPACK/SRC; \
-	mkdir -p $(TOASTOBJ)/ARPACK/UTIL; \
-	mkdir -p $(TOASTOBJ)/ARPACK/OBJS; \
+	mkdir -p $(TOASTOBJ)/ARPACK; \
 	cd $(TOASTOBJ)/ARPACK; \
-	cp $(NUMERICSDIR)/ARPACK/Makefile .; \
-	cp $(NUMERICSDIR)/ARPACK/ARmake.inc .; \
-	cp $(NUMERICSDIR)/ARPACK/SRC/Makefile SRC; \
-	cp $(NUMERICSDIR)/ARPACK/UTIL/Makefile UTIL; \
-	$(MAKE) lib; \
-	cp OBJS/libarpack* $(LIBDIR)
+	$(MAKE) -f $(NUMERICSDIR)/ARPACK/Makefile.src lib; \
+	cp libarpack$(LIB_SUFFIX) $(LIBDIR)
+
+#	mkdir -p $(TOASTOBJ)/ARPACK/SRC; \
+#	mkdir -p $(TOASTOBJ)/ARPACK/UTIL; \
+#	mkdir -p $(TOASTOBJ)/ARPACK/OBJS; \
+#	cd $(TOASTOBJ)/ARPACK; \
+#	cp $(NUMERICSDIR)/ARPACK/Makefile .; \
+#	cp $(NUMERICSDIR)/ARPACK/ARmake.inc .; \
+#	cp $(NUMERICSDIR)/ARPACK/SRC/Makefile SRC; \
+#	cp $(NUMERICSDIR)/ARPACK/UTIL/Makefile UTIL; \
+#	$(MAKE) lib; \
+#	cp OBJS/libarpack* $(LIBDIR)
 
 liblbfgs::
 	mkdir -p $(TOASTOBJ)/liblbfgs/lib; \
