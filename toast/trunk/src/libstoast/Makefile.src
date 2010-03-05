@@ -36,13 +36,8 @@ $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	if test "$(ARCHDIR)" == "darwin"; then \
-		$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
-			-L$(TLIB) -lfe -lmath -lOSMesa $(MATHLIB) -framework GLUT -framework OPENGL ; \
-	else \
-		$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
-			-L$(TLIB) -lfe -lmath -lOSMesa -lGLU -lGL $(MATHLIB); \
-	fi
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) \
+		-L$(TLIB) -lfe -lmath $(OGLLIB) $(MATHLIB)
 
 clean::
 	$(RM) *.o
