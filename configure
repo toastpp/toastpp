@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TASKDIR TOAST_SHARED ILUPACKDIR RPATH LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TASKDIR TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -860,6 +860,7 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-fdot           Include FMT library support
   --enable-debug          build debug version
   --enable-prof           build profiling version
   --enable-threads        build pthreads parallel version
@@ -2766,7 +2767,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2769:" \
+echo "$as_me:2770:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -2962,7 +2963,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:2965: \"$ac_link\") >&5
+(eval echo $as_me:2966: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -3040,7 +3041,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:3043: \"$ac_link\") >&5
+(eval echo $as_me:3044: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -8718,6 +8719,22 @@ else
 fi;
 
 # ========================================================================
+# Check if FMT support is requested
+
+# Check whether --enable-fdot or --disable-fdot was given.
+if test "${enable_fdot+set}" = set; then
+  enableval="$enable_fdot"
+  isok=$enableval
+else
+  isok=no
+fi;
+if test "$isok" = "yes" ; then
+    TOAST_FDOT=1
+else
+    TOAST_FDOT=0
+fi
+
+# ========================================================================
 # Below are some explicit definitions for system-dependent variables
 # mainly concerned with generating shared libraries
 
@@ -9633,6 +9650,7 @@ fi
 
 
 
+
                     ac_config_files="$ac_config_files Makefile.incl mexopts.incl"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -10330,6 +10348,7 @@ s,@TASKDIR@,$TASKDIR,;t t
 s,@TOAST_SHARED@,$TOAST_SHARED,;t t
 s,@ILUPACKDIR@,$ILUPACKDIR,;t t
 s,@RPATH@,$RPATH,;t t
+s,@TOAST_FDOT@,$TOAST_FDOT,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 
@@ -11338,6 +11357,7 @@ s,@TASKDIR@,$TASKDIR,;t t
 s,@TOAST_SHARED@,$TOAST_SHARED,;t t
 s,@ILUPACKDIR@,$ILUPACKDIR,;t t
 s,@RPATH@,$RPATH,;t t
+s,@TOAST_FDOT@,$TOAST_FDOT,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 

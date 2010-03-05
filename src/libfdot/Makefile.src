@@ -1,7 +1,11 @@
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libfdot
-LIB = $(LIBNAME)$(LIB_SUFFIX)
+if test "$BUILD_FDOT" = 1 ; then
+    LIB = $(LIBNAME)$(LIB_SUFFIX)
+else
+    LIB =
+fi
 
 VPATH = $(TSRC)/libfdot
 
