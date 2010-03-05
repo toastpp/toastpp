@@ -336,7 +336,7 @@ $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS)
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(BLASLIB)
 
 clean::
 	$(RM) *.o

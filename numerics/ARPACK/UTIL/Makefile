@@ -16,7 +16,8 @@
 #\SCCS Information: @(#)
 # FILE: Makefile   SID: 2.1   DATE OF SID: 9/9/96   RELEASE: 2
  
-include ../ARmake.inc
+ARPACKDIR = $(TOASTDIR)/numerics/ARPACK
+include $(ARPACKDIR)/ARmake.inc
  
 ############################################################################
 #  To create or add to the library, enter make followed by one or
@@ -53,16 +54,16 @@ VPATH = $(TOASTDIR)/numerics/ARPACK/UTIL
 all: single double complex complex16
 
 single : $(SOBJ) $(OBJS)
-	$(CP) $(SOBJ) $(OBJS) ../OBJS
+#	$(CP) $(SOBJ) $(OBJS) ../OBJS
 
 double : $(DOBJ) $(OBJS) $(ZOBJ)
-	$(CP) $(DOBJ) $(OBJS) $(ZOBJ) ../OBJS
+#	$(CP) $(DOBJ) $(OBJS) $(ZOBJ) ../OBJS
 
 complex : $(SOBJ) $(OBJS) $(COBJ)
-	$(CP) $(SOBJ) $(OBJS) $(COBJ) ../OBJS
+#	$(CP) $(SOBJ) $(OBJS) $(COBJ) ../OBJS
 
 complex16: $(DOBJ) $(OBJS) $(ZOBJ)
-	$(CP) $(DOBJ) $(OBJS) $(ZOBJ) ../OBJS
+#	$(CP) $(DOBJ) $(OBJS) $(ZOBJ) ../OBJS
 
 #single: $(SOBJ) $(OBJS)
 #	$(AR) $(ARFLAGS) $(ARPACKLIB) $(SOBJ) $(OBJS)

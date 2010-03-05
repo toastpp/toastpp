@@ -14,7 +14,8 @@
 #
 ############################################################################
 
-include ARmake.inc
+ARPACKDIR = $(TOASTDIR)/numerics/ARPACK
+include $(ARPACKDIR)/ARmake.inc
 
 PRECISIONS = single double complex complex16
 #PRECISIONS = double ddrv
@@ -50,26 +51,35 @@ PRECISIONS = single double complex complex16
 LIBNAME = libarpack
 LIB = $(LIBNAME)$(LIB_SUFFIX)
 OBJS = *.o
+ARPACKDIR = $(TOASTDIR)/numerics/ARPACK
 
 all: lib 
 
-lib: arpacklib
+lib: $(LIB)
 
 clean: cleanlib
 
-arpacklib:
-	@( \
-	for f in $(DIRS); \
-	do \
-		$(CD) $$f; \
-		$(ECHO) Making lib in $$f; \
-		$(MAKE) $(PRECISIONS); \
-		$(CD) ..; \
-	done );
-	$(CD) OBJS; \
-	$(MAKE_LIB) -L$(TLIB) $(BLASLIB) $(LAPACKLIB) $(FLIBS); \
-	$(RANLIB) $(LIB); \
-	$(CD) ..
+
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): arpack_src arpack_util
+	@$(RM) $@
+	ar cr $@ *.o
+	$(RANLIB) $@
+
+
+# make shared version of library
+$(LIBNAME)$(SHLIB_SUFFIX): arpack_src arpack_util
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ *.o $(SHLIB_LD_LIBS) $(FLIBS)
+
+
+arpack_src :
+	$(MAKE) -f $(ARPACKDIR)/SRC/Makefile all
+
+
+arpack_util :
+	$(MAKE) -f $(ARPACKDIR)/UTIL/Makefile all
+
 
 cleantest:
 
