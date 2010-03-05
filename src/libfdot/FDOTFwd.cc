@@ -12,22 +12,28 @@ FDOTFwd::FDOTFwd( RFwdSolver * _FEMSolver, QMMesh & mesh,
 	nBndNodes(mesh.nbnd()),
 	projectors(projList), raster(rast),
 	qVecs(qVecs_),
-	gridToMeshMap(transp((RCompRowMatrix&)rast->Mesh2BasisMatrix()))
+	meshToGridMap((RCompRowMatrix&)rast->Mesh2GridMatrix()),
+	meshToGridMapT(transp(meshToGridMap))
 {
     nImagePts = projectors[0]->getImageSize(); 
 
-    RVector row;
-    for (int i=0; i<gridToMeshMap.nRows(); ++i)
+    // Calculate voxel size for scaling
+    RVector gsize = raster->GSize();
+    IVector gdim = raster->GDim();
+    voxelSize = gsize[0] * gsize[1] * gsize[2] / ((double)(gdim[0] * gdim[1] * gdim[2]));
+
+/*    RVector row;
+    for (int i=0; i<meshToGridMapT.nRows(); ++i)
     {
-	row = gridToMeshMap.Row(i);
+	row = meshToGridMapT.Row(i);
 	double l1r = l1norm(row);
 	if (l1r>0.0)
 	{
 	    row /= l1r;
-	    gridToMeshMap.SetRow(i,row);
+	    meshToGridMapT.SetRow(i,row);
 	}
     }
-    meshToGridMap = transp(gridToMeshMap);
+    meshToGridMap = transp(meshToGridMapT);*/
 
     phi_e = new RVector[nQ];
     for (int i=0; i<nQ; ++i)
@@ -107,13 +113,13 @@ void FDOTFwd::fwdOperator(RVector & x, bool ratio, double epsilon)
     //fld = *nodeMap * x;
     RVector xg;
     raster->Map_SolToGrid(x, xg);
-    fld = gridToMeshMap * xg; 
+    //fld = meshToGridMapT * xg; 
     
     // Run fwd solver for each source
     for (int i=0; i<nQ; ++i)
     {
 	//cout<<"Calculate fwd field for source "<<i<<endl;
-	RVector pf = fld * phi_e[i];
+	RVector pf = meshToGridMapT * (xg * (meshToGridMap*phi_e[i])); //QVec_Nim(FEMMesh, meshToGridMapT * x * meshToGridMap * phi_e[i]);
 	if (l2norm(pf)==0.0)
 	{
 	  //  cout<<"pf = 0, returning zero vector"<<endl;
@@ -142,8 +148,9 @@ void FDOTFwd::adjOperator(RVector & b, bool ratio, double epsilon)
 {
     RVector tmpImg(nImagePts),
 	    tmpFld(nNodes),
+	    src(nNodes),
 	    adjPhi_f(nNodes), 
-	    result(nNodes);
+	    result(raster->GLen());
     if (ratio) b /= (excitImg + epsilon);
     for (int i=0; i<nQ; ++i)
     {
@@ -152,14 +159,17 @@ void FDOTFwd::adjOperator(RVector & b, bool ratio, double epsilon)
 	projectors[i]->projectImageToField(tmpImg, tmpFld);
 	if (l2norm(tmpFld) != 0.0)
 	{
-	    FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
-	    result += adjPhi_f*phi_e[i];
+	    src = tmpFld; // QVec_NimTP( FEMMesh, tmpFld );
+	    FEMSolver->CalcField (/*FEMMesh,*/ src, adjPhi_f);
+	    result += (meshToGridMap * adjPhi_f) * (meshToGridMap * phi_e[i]);
 	}
 //	cout<<"Done"<<endl;
     }
 
     //raster->Map_MeshToSol(result, b);
-    raster->Map_BasisToSol(meshToGridMap * result, b);
+    //raster->Map_BasisToSol(meshToGridMap * result, b);
+    double scale = ((double)raster->GLen()) / ((double)raster->BLen());	// This is because its the integral over the basis - not the point values of a function
+    raster->Map_GridToSol(result * scale, b);
 }
 
 // single-source version
@@ -168,21 +178,27 @@ void FDOTFwd::adjOperator(RVector &b, int q, bool ratio, double epsilon)
     RVector tmpImg(nImagePts),
 	    tmpFld(nNodes),
 	    adjPhi_f(nNodes), 
-	    result(nNodes, 0.0);
+	    src(nNodes),
+	    result(raster->GLen(), 0.0);
     if (ratio) b /= (excitImg + epsilon);
 
 
   //  cout<<"Calculate adj field for source "<<q<<endl;
     tmpImg.Copy(b, 0, q*nImagePts, nImagePts);	
     projectors[q]->projectImageToField(tmpImg, tmpFld);
-    if (l2norm(tmpFld)==0.0) return;
-    FEMSolver->CalcField (/*FEMMesh,*/ tmpFld, adjPhi_f);
-    result += adjPhi_f*phi_e[q];
+    if (l2norm(tmpFld)>0.0)
+    {
+	src = tmpFld; //QVec_NimTP( FEMMesh, tmpFld );
+	FEMSolver->CalcField (/*FEMMesh,*/ src, adjPhi_f);
+	result += (meshToGridMap * adjPhi_f) * (meshToGridMap * phi_e[q]);
+    }
   //  cout<<"Done"<<endl;
     
 
     //raster->Map_MeshToSol(result, b);
-    raster->Map_BasisToSol(meshToGridMap * result, b);
+    //raster->Map_BasisToSol(meshToGridMap * result, b);
+    double scale = ((double)raster->GLen()) / ((double)raster->BLen());	// This is because its the integral over the basis - not the point values of a function
+    raster->Map_GridToSol(result * scale, b);
 }
 
 void FDOTFwd::adjOperator(const RVector &x, RVector &result, int q, bool ratio, double epsilon)

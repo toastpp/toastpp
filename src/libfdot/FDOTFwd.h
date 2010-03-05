@@ -34,12 +34,13 @@ class FDOTFwd
 	RFwdSolver * FEMSolver;
 	QMMesh & FEMMesh;
 	Raster * raster;
+	double voxelSize;
 	int nQ, nNodes, nBndNodes, * bndNodes, nImagePts;
 	RVector * phi_e;
 	RVector excitImg;
 	Projector ** projectors;
 	RCompRowMatrix qVecs;
-	RCompRowMatrix meshToGridMap, gridToMeshMap;
+	RCompRowMatrix meshToGridMap, meshToGridMapT;
 };
 
 // A helper function to pass into BiCGSTAB, since it cannot take member funcs
