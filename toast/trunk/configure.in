@@ -229,6 +229,18 @@ AC_ARG_WITH(ilu,
        ILUPACKDIR=$withval, ILUPACKDIR="")
 
 # ========================================================================
+# Check if FMT support is requested
+
+AC_ARG_ENABLE(fdot,
+    [  --enable-fdot           Include FMT library support],
+    [isok=$enableval], [isok=no])
+if test "$isok" = "yes" ; then
+    TOAST_FDOT=1
+else
+    TOAST_FDOT=0
+fi
+
+# ========================================================================
 # Below are some explicit definitions for system-dependent variables
 # mainly concerned with generating shared libraries
 
@@ -605,6 +617,7 @@ AC_SUBST(TASKDIR)
 AC_SUBST(TOAST_SHARED)
 AC_SUBST(ILUPACKDIR)
 AC_SUBST(RPATH)
+AC_SUBST(TOAST_FDOT)
 
 AC_OUTPUT(Makefile.incl mexopts.incl)
 #AC_OUTPUT(Makefile.incl mexopts.incl gui/Makefile gui/Togl/Makefile)
