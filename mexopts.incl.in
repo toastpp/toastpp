@@ -17,16 +17,20 @@
 
 TOAST_SRC="$TOASTDIR/src"
 
-TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libfdot -I $TOAST_SRC/libbemdiff -I $TOAST_SRC/libbem"
+TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libbemdiff -I $TOAST_SRC/libbem"
 
-TOAST_LIB="-L$TOASTDIR/@OBJDIR@/lib -lbemdiff -lbem -lfdot -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs @OGLLIB@ @FLIBS@"
+TOAST_LIB="-L$TOASTDIR/@OBJDIR@/lib -lbemdiff -lbem -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs @FLIBS@"
+
+if test "@TOAST_FDOT@" = "1" ; then
+	TOAST_INC="$TOAST_INC -I $TOAST_SRC/libfdot"
+	TOAST_LIB="$TOAST_LIB -lfdot @OGLLIB@"
+fi
+
 TOAST_FLAG="-Wno-deprecated $TOAST_INC"
 
 if test "$Arch" = "maci" -o "$Arch" = "maci64"; then
 	TOAST_FLAG="$TOAST_FLAG -Wl,-rpath,$TOASTVER/lib"
 fi
-
-
 
 
 # ===========================================================================
