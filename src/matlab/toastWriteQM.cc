@@ -58,10 +58,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     for (i = 0; i < nq; i++) {
 	int nz = lnk.SparseRow (i, ci, idx);
 	ofs << nz << ':';
-	for (j = 0; j < nz; j++) {
-	    if (ci[j])
-		ofs << ' ' << ci[j];
-	}
+	for (j = 0; j < nz; j++)
+	    if (idx[j]) ofs << ' ' << ci[j];
 	ofs << endl;
     }
 }
