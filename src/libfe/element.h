@@ -76,6 +76,7 @@ class Surface;
 class FELIB Element {
 
     friend class ElementList;
+    friend class Mesh;
 
 public:
 
