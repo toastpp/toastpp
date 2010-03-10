@@ -10,7 +10,6 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastDeleteBasis.cc \
 	toastDeleteMesh.cc \
 	toastDeleteRegul.cc \
-	toastDeleteProjectorList.cc \
 	toastElementData.cc \
 	toastElementSize.cc \
 	toastElmat.cc \
@@ -29,7 +28,6 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastLabelRegion.cc \
 	toastLBFGS.cc \
 	toastMakeMesh.cc \
-	toastMakeProjectorList.cc \
 	toastMapBasisToMesh.cc \
 	toastMapGridToBasis.cc \
 	toastMapGridToMesh.cc \
@@ -55,8 +53,6 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastMPos.cc \
 	toastMvec.cc \
 	toastPointCloud.cc \
-	toastProjectToField.cc \
-	toastProjectToImage.cc \
 	toastQPos.cc \
 	toastQvec.cc \
 	toastReadComplexMatrix.cc \
@@ -95,6 +91,10 @@ SRCS =  toastBasisToMeshMatrix.cc \
 
 ifeq ($(BUILD_FDOT),1)
 SRCS += makeFDOTFwd.cc \
+	toastMakeProjectorList.cc \
+	toastDeleteProjectorList.cc \
+	toastProjectToField.cc \
+	toastProjectToImage.cc \
 	deleteFDOTFwd.cc \
 	FDOTAdjOp.cc \
 	FDOTExcit.cc \
