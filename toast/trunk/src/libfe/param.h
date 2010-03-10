@@ -89,8 +89,8 @@ void SetReflectionFunction (ReflectionType rt, double A = 1.0);
 
 // some algorithms for reflection term calculations
 FELIB double A_Keijzer (double n);
-double A_Contini (double n);
-double A_Const (double /*n*/);
+FELIB double A_Contini (double n);
+FELIB double A_Const (double /*n*/);
 
 // ==========================================================================
 

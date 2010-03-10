@@ -99,6 +99,8 @@ void Mesh::Setup()
 
     fullsize = CalcFullSize ();
 
+    MarkBoundary();
+
     // Node <-> Boundary mapping indices
     if (IndexBnd2Node) delete []IndexBnd2Node;
     IndexBnd2Node = new int[priv_nbnd];
@@ -727,6 +729,36 @@ void Mesh::SetBoundary (const Surface &_boundary)
 
 int Mesh::BoundaryList (int **bndellist, int **bndsdlist) const
 {
+    int i, j, ns, nel = elen();
+    int nsd = 0;
+    Element *pel;
+
+    // pass 1: find number of boundary sides
+    for (i = 0; i < nel; i++) {
+	pel = elist[i];
+	ns = pel->nSide();
+	for (j = 0; j < ns; j++)
+	    if (elist[i]->bndside[j]) nsd++;
+    }
+    int *bellist = new int[nsd];
+    int *bsdlist = new int[nsd];
+
+    // pass 2: populate element and side lists
+    for (i = nsd = 0; i < nel; i++) {
+	pel = elist[i];
+	ns = pel->nSide();
+	for (j = 0; j < ns; j++)
+	    if (elist[i]->bndside[j]) {
+		bellist[nsd] = i;
+		bsdlist[nsd] = j;
+		nsd++;
+	    }
+    }
+    *bndellist = bellist;
+    *bndsdlist = bsdlist;
+    return nsd;
+    
+#ifdef UNDEF
     const int MAXSDND = 10;
     int i, j, el, sd, n, nnd, nsd, ndi, found, listsize = 0;
     int *nsdnd, **sdnd, nnsdnd = 0, nsdndi, *sdndi;
@@ -825,6 +857,7 @@ int Mesh::BoundaryList (int **bndellist, int **bndsdlist) const
 	delete pptr;
     }
     return listsize;
+#endif
 }
 
 bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,
@@ -1267,6 +1300,8 @@ int Mesh::CheckConsistency () const
 // ***********************************************
 
 typedef struct {
+    int el;
+    int sd;
     int n;
     int *nd;
 } SideRec;
@@ -1300,6 +1335,8 @@ void Mesh::MarkBoundary ()
     for (i = slen = 0; i < nel; i++) {
         pel = elist[i];
 	for (j = 0; j < pel->nSide(); j++) {
+	    sd[slen].el = i;
+	    sd[slen].sd = j;
 	    sd[slen].n  = pel->nSideNode(j);
 	    sd[slen].nd = new int[sd[slen].n];
 	    for (k = 0; k < sd[slen].n; k++)
@@ -1322,12 +1359,19 @@ void Mesh::MarkBoundary ()
     // order side list
     qsort (sd, slen, sizeof(SideRec), MarkBoundary_qsort_comp);
 		
+    // reset node and side boundary flags
+    for (i = 0; i < nlen(); i++)
+        nlist[i].SetBndTp (BND_NONE);
+    for (i = 0; i < nel; i++) {
+	pel = elist[i];
+	for (j = 0; j < pel->nSide(); j++)
+	    pel->bndside[j] = false;
+    }
+	
     // now all non-boundary sides should be listed as consecutive pairs,
     // so go through the list and look for duplicates
 
     int bndsd = 0, bndnd = 0;
-    for (i = 0; i < nlen(); i++)
-        nlist[i].SetBndTp (BND_NONE); // reset boundary flags
 
     for (i = 0; i < slen; i++) {
         bool isbnd = true;
@@ -1348,6 +1392,7 @@ void Mesh::MarkBoundary ()
 	}
 	if (isbnd) {
 	    bndsd++;
+	    elist[sd[i].el]->bndside[sd[i].sd] = true;
 	    for (j = 0; j < n; j++)
 	        nlist[sd[i].nd[j]].SetBndTp (BND_DIRICHLET);
 	}
@@ -1918,18 +1963,16 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
 	dss[j] = ((*bbmax)[j]-(*bbmin)[j])/(double)(sdim[j]-1);
     }
 
-    double **rowval = new double*[glen];
-    int **rowidx = new int*[glen];
-    int *rowbuf = new int[glen];
+    int rowbuf = 16, *ri;
+    double *rowval = new double[glen*rowbuf], *rv;
+    int *rowidx = new int[glen*rowbuf];
     int *rowlen = new int[glen];
-    for (i = 0; i < glen; i++) {
-	rowlen[i] = 0;
-	rowbuf[i] = 16;
-	rowidx[i] = new int[16];
-	rowval[i] = new double[16];
-    }
+    for (i = 0; i < glen; i++) rowlen[i] = 0;
+    memset (rowval, 0, glen*rowbuf*sizeof(double));
+    memset (rowidx, 0, glen*rowbuf*sizeof(int));
 
     Point p(dim);
+
     for (iz = i = 0; iz < sz; iz++) {
 	if (dim == 3) p[2] = (*bbmin)[2] + iz*dss[2];
 	for (iy = 0; iy < sy; iy++) {
@@ -1966,30 +2009,40 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
 		    for (k = 0; k < nidx; k++) {
 			g = idx[k];
 			if (g < glen) {
-			    v = 1.0;
-			    for (j = 0, m = 1; j < dim; j++, m*=2)
+			    ri = rowidx + g*rowbuf;
+			    rv = rowval + g*rowbuf;
+			    for (j = 0, m = 1, v = 1.0; j < dim; j++, m*=2)
 				v *= f(j,(k/m)%2); // grid shape function at p
 			    for (n = 0; n < pel->nNode(); n++) {
 				nd = pel->Node[n];
 				for (m = 0; m < rowlen[g]; m++)
-				    if (rowidx[g][m] == nd) break;
+				    if (ri[m] == nd) break;
 				if (m == rowlen[g]) {
-				    int *itmp = new int[rowbuf[g]+16];
-				    memcpy (itmp, rowidx[g],
-					    sizeof(int)*rowlen[g]);
-				    delete []rowidx[g];
-				    rowidx[g] = itmp;
-				    double *dtmp = new double[rowbuf[g]+16];
-				    memcpy (dtmp, rowval[g],
-					    sizeof(double)*rowlen[g]);
-				    delete []rowval[g];
-				    rowval[g] = dtmp;
-				    rowbuf[g] += 16;
-				    rowidx[g][m] = nd;
-				    rowval[g][m] = 0.0;
+				    if (rowlen[g] == rowbuf) { // re-allocate
+					int rb = rowbuf+16;
+					int *ritmp = new int[glen*rb];
+					memset (ritmp, 0, glen*rb*sizeof(int));
+					for (j = 0; j < glen; j++)
+					    memcpy (ritmp+j*rb,rowidx+j*rowbuf,
+						    rowbuf*sizeof(int));
+					delete []rowidx;
+					rowidx = ritmp;
+					double *rvtmp = new double[glen*rb];
+					memset(rvtmp,0,glen*rb*sizeof(double));
+					for (j = 0; j < glen; j++)
+					    memcpy (rvtmp+j*rb,rowval+j*rowbuf,
+						    rowbuf*sizeof(double));
+					delete []rowval;
+					rowval = rvtmp;
+					rowbuf = rb;
+					ri = rowidx + g*rowbuf;
+					rv = rowval + g*rowbuf;
+				    }
+				    ri[m] = nd;
+				    rv[m] = 0.0;
 				    rowlen[g]++;
 				}
-				rowval[g][m] += v*nf[n];
+				rv[m] += v*nf[n];
 			    }
 			}
 		    }
@@ -2001,24 +2054,21 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     }
 
     RCompRowMatrix *B = new RCompRowMatrix (glen, nlen);
+
     RVector row(nlen);
     for (i = 0; i < glen; i++) {
 	row.Clear();
 	double sum = 0.0;
 	for (j = 0; j < rowlen[i]; j++) {
-	    row[rowidx[i][j]] = rowval[i][j];
-	    sum += rowval[i][j];
+	    row[rowidx[i*rowbuf+j]] = rowval[i*rowbuf+j];
+	    sum += rowval[i*rowbuf+j];
 	}
 	if (sum)
 	    B->SetRow (i, row/sum);
-
-	delete []rowidx[i];
-	delete []rowval[i];
     }
     delete []rowidx;
     delete []rowval;
     delete []rowlen;
-    delete []rowbuf;
 
     return B;
 }
@@ -3359,7 +3409,7 @@ void CreateVoxelMesh (int ex, int ey, int ez, bool *egrid,
     mesh.plist.New (nnd);
     
     // label boundary nodes
-    mesh.MarkBoundary ();
+    //mesh.MarkBoundary ();
 
     // mesh setup
     mesh.Setup ();
@@ -3547,7 +3597,7 @@ FELIB Mesh *Lin2Quad (const Mesh &linmesh)
 	quadmesh->nlist[nlen+i].Copy (nnlist[i]);
 	quadmesh->plist[nlen+i] = nplist[i];
     }
-    quadmesh->MarkBoundary();
+    //quadmesh->MarkBoundary();
     quadmesh->Setup();
 
     // cleanup
