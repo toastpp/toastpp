@@ -81,9 +81,11 @@ void Mesh::Setup()
 {
     int i, j, el;
     priv_ilen = 0;
+
     for (i = 0; i < nlist.Len(); i++)
 	if (nlist[i].BndTp() != BND_DIRICHLET) priv_ilen++;
     priv_nbnd = nlist.NumberOf (BND_ANY);
+    cerr << "found " << priv_nbnd << "boundary nodes" << endl;
 
 #ifndef TOAST_PARALLEL
     for (el = 0; el < elist.Len(); el++)
@@ -97,9 +99,9 @@ void Mesh::Setup()
 			      grain);
 #endif // TOAST_PARALLEL
 
-    fullsize = CalcFullSize ();
-
     MarkBoundary();
+
+    fullsize = CalcFullSize ();
 
     // Node <-> Boundary mapping indices
     if (IndexBnd2Node) delete []IndexBnd2Node;
