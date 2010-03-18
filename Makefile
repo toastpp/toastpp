@@ -3,7 +3,7 @@ include Makefile.incl
 SUBDIRS     = $(TSRC)
 GUIDIR      = $(TOASTDIR)/gui
 NUMERICSDIR = $(TOASTDIR)/numerics
-TOASTRELDIR = toast2009
+TOASTRELDIR = toast2010
 
 # ========================================================
 # Making
