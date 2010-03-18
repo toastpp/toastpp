@@ -48,26 +48,30 @@ void Element::Initialise (const NodeList& nlist)
     bndel   = false;
     interfaceel = false;
     for (int side = 0; side < nSide(); side++) {
+	bndside[side] = false;
+	sdnbhr[side] = -2;
+#ifdef UNDEF
         bool internal = false;
 	bool boundary = false;
         bndside[side] = true;
 	sdnbhr[side] = -2; // invalidate
         for (int n = 0; n < nSideNode (side); n++) {
-	  int nd = Node[SideNode (side, n)]; 
-
-	  bool thisboundary = (nlist[nd].isBnd() ? true : false);
-          bool thisinternal = (nlist[nd].isInternalInterface() ? true : false);
-	  // the following logic is terrible! should be exclusive or
-	  if (!( thisboundary || thisinternal)){bndside[side] = false; break; }
-	  if (boundary && thisinternal || internal && thisboundary)
-	    {bndside[side] = false; break; }
-	  boundary = thisboundary;
-	  internal = thisinternal;
+	    int nd = Node[SideNode (side, n)]; 
+	    
+	    bool thisboundary = (nlist[nd].isBnd() ? true : false);
+	    bool thisinternal = (nlist[nd].isInternalInterface() ? true:false);
+	    // the following logic is terrible! should be exclusive or
+	    if (!(thisboundary || thisinternal)){bndside[side] = false; break;}
+	    if (boundary && thisinternal || internal && thisboundary)
+		{bndside[side] = false; break; }
+	    boundary = thisboundary;
+	    internal = thisinternal;
 	}
 	if (bndside[side]) 
-	  if(internal) {interfaceel = true;}
-	  else  {bndel = true;}
-	}
+	    if(internal) {interfaceel = true;}
+	    else  {bndel = true;}
+#endif
+    }
 }
 
 void Element::operator= (const Element& el)

@@ -49,6 +49,7 @@ QMMesh::~QMMesh ()
 	if (Mel) delete []Mel;
 	if (Mcosingder) delete []Mcosingder;
     }
+
     if (meas_profile) delete []meas_profile;
     if (mptype) delete []mptype;
     if (mwidth) delete []mwidth;
