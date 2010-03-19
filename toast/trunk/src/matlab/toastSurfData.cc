@@ -23,8 +23,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double *pr;
 
     // mesh handle
-    //int hMesh = (int)mxGetScalar (prhs[0]);
-    //Mesh *mesh = (Mesh*)hMesh;
     Mesh *mesh = (Mesh*)Handle2Ptr (mxGetScalar (prhs[0]));
 
     int nlen = mesh->nlen();
