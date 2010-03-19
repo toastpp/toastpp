@@ -70,7 +70,9 @@ void ElementList::Delete (int rec)
 void ElementList::SetList (int no, PElement *ppel)
 {
     Clear(); // clear previous list
-    List = ppel;
+    List = new PElement[no];
+    memcpy (List, ppel, no*sizeof(PElement));
+    //List = ppel;
     Length = no;
 }
 
