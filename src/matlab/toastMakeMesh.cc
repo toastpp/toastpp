@@ -20,13 +20,15 @@
 #include "felib.h"
 #include "util.h"
 
+using namespace std;
+
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     int i, j, k;
-    size_t nvtx = mxGetM(prhs[0]);
-    size_t nel  = mxGetM(prhs[1]);
-    size_t dim  = mxGetN(prhs[0]);
-    size_t nnd0 = mxGetN(prhs[1]);
+    int nvtx = (int)mxGetM(prhs[0]);
+    int nel  = (int)mxGetM(prhs[1]);
+    int dim  = (int)mxGetN(prhs[0]);
+    int nnd0 = (int)mxGetN(prhs[1]);
     double *vtx = mxGetPr (prhs[0]);
     double *idx = mxGetPr (prhs[1]);
     double *etp = mxGetPr (prhs[2]);
@@ -34,20 +36,20 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     Mesh *mesh = new QMMesh;;
 
     // create node list
-    mesh->nlist.New ((int)nvtx);
-    for (i = 0; i < (int)nvtx; i++) {
-	mesh->nlist[i].New((int)dim);
+    mesh->nlist.New (nvtx);
+    for (i = 0; i < nvtx; i++) {
+	mesh->nlist[i].New(dim);
 	mesh->nlist[i].SetBndTp (BND_NONE); // don't know
     }
-    for (j = k = 0; j < (int)dim; j++) {
-	for (i = 0; i < (int)nvtx; i++) {
+    for (j = k = 0; j < dim; j++) {
+	for (i = 0; i < nvtx; i++) {
 	    mesh->nlist[i][j] = vtx[k++];
 	}
     }
 
     // create element list
     Element *el, **list = new Element*[nel];
-    for (i = 0; i < (int)nel; i++) {
+    for (i = 0; i < nel; i++) {
 	int eltp = (int)(etp[i]+0.5);
 	switch (eltp) {
 	case ELID_TRI3OLD:
@@ -98,8 +100,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    break;
 	}
     }
-    mesh->elist.Clear();
-    mesh->elist.AppendList ((int)nel, list);
+    mesh->elist.SetList (nel, list);
     delete []list;
 
     for (j = k = 0; j < nnd0; j++) {
@@ -112,9 +113,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
     }
 
-    
     // create dummy parameter list
-    mesh->plist.New ((int)nvtx);
+    mesh->plist.New (nvtx);
     mesh->plist.SetMua (0.01);
     mesh->plist.SetMus (1);
     mesh->plist.SetN (1);
@@ -139,10 +139,10 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     // set up mesh
-    //mesh->MarkBoundary();  // now done in setup
     mesh->Setup();
 
     plhs[0] = mxCreateScalarDouble (Ptr2Handle (mesh));
 
     mexPrintf ("Mesh: %d nodes, %d elements, dimension %d\n", nvtx, nel, dim);
+    mexPrintf ("      %d boundary nodes\n", mesh->nbnd());
 }
