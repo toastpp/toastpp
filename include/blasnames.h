@@ -1,7 +1,9 @@
 #ifndef __BLASNAMES_H
 #define __BLASNAMES_H
 
+#if (!defined(WIN32))&&(!defined(WIN64))
 #define TOASTLOCAL_BLAS_NAMES
+#endif
 
 #ifdef TOASTLOCAL_BLAS_NAMES
 #define sasum_  toast_sasum_
