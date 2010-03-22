@@ -136,7 +136,7 @@ STOASTLIB void GenerateJacobian_cw (const Raster *raster,
 /// @}
 
 template<class T>
-void ImageGradient (const IVector &dim, const RVector &size,
+STOASTLIB void ImageGradient (const IVector &dim, const RVector &size,
     const TVector<T> &im, TVector<T> *grad, const int *mask = 0);
 
 #endif // !__JACOBIAN_H
