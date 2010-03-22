@@ -1290,6 +1290,7 @@ void AssembleComplexSystemMatrix (const Mesh &mesh, CGenericSparseMatrix &CF,
     AddToSysMatrix (mesh, CF, omega,   ASSEMBLE_iCFF);
 }
 
+#ifdef UNDEF
 template<class T>
 void ImageGradient (const IVector &gdim, const RVector &gsize,
     const TVector<T> &im, TVector<T> *grad, const int *mask)
@@ -1402,6 +1403,7 @@ template void ImageGradient (const IVector &gdim, const RVector &gsize,
     const RVector &im, RVector *grad, const int *mask);
 template void ImageGradient (const IVector &gdim, const RVector &gsize,
     const CVector &im, CVector *grad, const int *mask);
+#endif
 
 // calculate intensity field for source vector qvec
 // using iterative solver
