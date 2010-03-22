@@ -642,7 +642,7 @@ TVector<T> IntGradFGradG (const Mesh &mesh,
 // ============================================================================
 
 template<class T>
-void ImageGradient (const IVector &gdim, const RVector &gsize,
+STOASTLIB void ImageGradient (const IVector &gdim, const RVector &gsize,
     const TVector<T> &im, TVector<T> *grad, const int *mask)
 {
     // this should be done by Fourier transform
@@ -765,12 +765,12 @@ template STOASTLIB void ImageGradient (const IVector &gdim,
 template STOASTLIB void ImageGradient (const IVector &gdim,
     const RVector &gsize, const CVector &im, CVector *grad, const int *mask);
 
-template STOASTLIB RVector IntFG (const Mesh &mesh,
+template RVector IntFG (const Mesh &mesh,
     const RVector &f, const RVector &g);
-template STOASTLIB CVector IntFG (const Mesh &mesh,
+template CVector IntFG (const Mesh &mesh,
     const CVector &f, const CVector &g);
 
-template STOASTLIB RVector IntGradFGradG (const Mesh &mesh,
+template RVector IntGradFGradG (const Mesh &mesh,
     const RVector &f, const RVector &g);
-template STOASTLIB CVector IntGradFGradG (const Mesh &mesh,
+template CVector IntGradFGradG (const Mesh &mesh,
     const CVector &f, const CVector &g);
