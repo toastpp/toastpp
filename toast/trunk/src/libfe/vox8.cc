@@ -43,9 +43,10 @@ void Voxel8::Initialise (const NodeList &nlist)
     Element_Structured_3D::Initialise (nlist);
 }
 
-void Voxel8::PostInitialisation ()
+void Voxel8::PostInitialisation (const NodeList &nlist)
 {
     need_setup = true;
+    Element_Structured_3D::PostInitialisation (nlist);
 }
 
 int Voxel8::SideNode (int side, int node) const

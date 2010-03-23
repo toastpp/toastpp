@@ -45,7 +45,7 @@ public:
     ~Voxel8 () { delete []Node; }
 
     void Initialise (const NodeList &nlist);
-    void PostInitialisation ();
+    void PostInitialisation (const NodeList &nlist);
 
     inline BYTE Type() const { return ELID_VOX8; }
     inline unsigned long GetCaps() const { return 0; }
