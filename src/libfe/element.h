@@ -113,7 +113,7 @@ public:
      * It can be used to perform any element initialisation steps that require
      * the rest of the mesh to be initialised.
      */
-    virtual void PostInitialisation () {}
+    virtual void PostInitialisation (const NodeList& nlist) {}
 
     /**
      * \brief %Element assignment.
@@ -992,6 +992,7 @@ public:
     Element_Unstructured (const Element_Unstructured &el): Element (el) {}
     virtual ~Element_Unstructured () {}
     virtual void Initialise (const NodeList& nlist);
+    virtual void PostInitialisation (const NodeList& nlist);
     inline double Size() const { return size; }
     void operator= (const Element_Unstructured& el);
 

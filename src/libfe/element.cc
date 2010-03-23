@@ -340,8 +340,8 @@ void Element_Unstructured::Initialise (const NodeList &nlist)
 {
     Element::Initialise (nlist);
     size = ComputeSize (nlist);
-    intdd.Zero (nNode());  intdd = ComputeIntDD (nlist);
-    intbff.Zero (nNode()); intbff = ComputeBndIntFF (nlist);
+    intdd.Zero (nNode());
+    intbff.Zero (nNode());
 
     // set element bounding box
     bbmin.New (Dimension());
@@ -355,6 +355,13 @@ void Element_Unstructured::Initialise (const NodeList &nlist)
 	}
     }
 }    
+
+void Element_Unstructured::PostInitialisation (const NodeList &nlist)
+{
+    intdd = ComputeIntDD (nlist);
+    intbff = ComputeBndIntFF (nlist);
+    Element::PostInitialisation (nlist);
+}
 
 void Element_Unstructured::operator= (const Element_Unstructured &el)
 {

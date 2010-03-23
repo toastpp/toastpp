@@ -73,7 +73,7 @@ void Mesh::PostSetup_engine (void *arg, int el0, int el1) {
     ElementList &elist = mesh->elist;
     NodeList &nlist = mesh->nlist;
     for (int el = el0; el < el1; el++)
-        elist[el]->PostInitialisation ();
+        elist[el]->PostInitialisation (nlist);
 }
 #endif
 
@@ -84,13 +84,9 @@ void Mesh::Setup()
 #ifndef TOAST_PARALLEL
     for (el = 0; el < elist.Len(); el++)
 	elist[el]->Initialise (nlist);
-    for (el = 0; el < elist.Len(); el++)
-	elist[el]->PostInitialisation ();
 #else
     int grain = elist.Len()/(8*Task::GetThreadCount());
     g_tpool->ProcessSequence (Mesh::Setup_engine, this, 0, elist.Len(), grain);
-    g_tpool->ProcessSequence (Mesh::PostSetup_engine, this, 0, elist.Len(),
-			      grain);
 #endif // TOAST_PARALLEL
 
     MarkBoundary();
@@ -100,6 +96,15 @@ void Mesh::Setup()
 	if (nlist[i].BndTp() != BND_DIRICHLET) priv_ilen++;
     priv_nbnd = nlist.NumberOf (BND_ANY);
     cerr << "found " << priv_nbnd << " boundary nodes" << endl;
+
+#ifndef TOAST_PARALLEL
+    for (el = 0; el < elist.Len(); el++)
+	elist[el]->PostInitialisation (nlist);
+#else
+    int grain = elist.Len()/(8*Task::GetThreadCount());
+    g_tpool->ProcessSequence (Mesh::PostSetup_engine, this, 0, elist.Len(),
+			      grain);
+#endif // TOAST_PARALLEL
 
     fullsize = CalcFullSize ();
 
@@ -1395,6 +1400,7 @@ void Mesh::MarkBoundary ()
 	if (isbnd) {
 	    bndsd++;
 	    elist[sd[i].el]->bndside[sd[i].sd] = true;
+	    elist[sd[i].el]->bndel = true;
 	    for (j = 0; j < n; j++)
 	        nlist[sd[i].nd[j]].SetBndTp (BND_DIRICHLET);
 	}
