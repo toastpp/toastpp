@@ -30,7 +30,7 @@ RVector QVec_Gaussian (const Mesh &mesh, const Point &cnt, double w,
 	    for (j = 0; j < nnode; j++) {
 		if ((js = node[j]) >= n) continue;
 		if (mode == SRCMODE_NEUMANN) {
-		    if (mesh.nlist[is].isBnd()) {
+		    if (mesh.nlist[js].isBnd()) {
 		        qvec[js] += q * pel->BndIntFF (i,j);
 		    }
 		} else
