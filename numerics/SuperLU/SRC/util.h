@@ -94,7 +94,7 @@ extern void    SetIWork (int, int, int, int *, int **, int **, int **,
 extern void    StatInit(int, int);
 extern void    StatFree();
 extern int     sp_coletree (int *, int *, int *, int, int, int *);
-extern void    relax_snode  (int, int *, int, int *, int *);
+extern void    relax_snode  (const int, int *, const int, int *, int *);
 extern void    resetrep_col (const int, const int *, int *);
 extern int     spcoletree (int *, int *, int *, int, int, int *);
 extern int     *TreePostorder (int, int *);
