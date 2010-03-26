@@ -6,6 +6,7 @@
 // ==========================================================================
 
 #define MATHLIB_IMPLEMENTATION
+#define __CDMATRIX_CC
 
 #include "mathlib.h"
 #include <iostream>
@@ -330,7 +331,7 @@ int TCoordMatrix<MT>::Insert (int r, int c, MT v)
 }
 
 template<class MT>
-TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
+MATHLIB TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
 		       const TCoordMatrix<MT> &B)
 {
     // Concatenates matrices A and B horizontally
@@ -373,7 +374,7 @@ TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
 }
 
 template<class MT>
-TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
+MATHLIB TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
 		       const TCoordMatrix<MT> &B)
 {
     // Concatenates matrices A and B vertically
@@ -417,7 +418,7 @@ TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
 }
 
 template<class MT>
-istream &operator>> (istream &is, TCoordMatrix<MT> &m)
+MATHLIB istream &operator>> (istream &is, TCoordMatrix<MT> &m)
 {
     char cbuf[256], idstr[100];
     int i, j, k, nr, nc, nz;
@@ -442,7 +443,7 @@ istream &operator>> (istream &is, TCoordMatrix<MT> &m)
 }
 
 template<class MT>
-ostream &operator<< (ostream &os, const TCoordMatrix<MT> &m)
+MATHLIB ostream &operator<< (ostream &os, const TCoordMatrix<MT> &m)
 {
     os << "CoordMat " << m.rows << ' ' << m.cols << ' ' << m.nval << endl;
     for (int k = 0; k < m.nval; k++)
@@ -455,30 +456,30 @@ ostream &operator<< (ostream &os, const TCoordMatrix<MT> &m)
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
-template class TCoordMatrix<double>;
-template class TCoordMatrix<float>;
-template class TCoordMatrix<complex>;
-template class TCoordMatrix<scomplex>;
-template class TCoordMatrix<int>;
+template class MATHLIB TCoordMatrix<double>;
+template class MATHLIB TCoordMatrix<float>;
+template class MATHLIB TCoordMatrix<complex>;
+template class MATHLIB TCoordMatrix<scomplex>;
+template class MATHLIB TCoordMatrix<int>;
 
-template TCoordMatrix<double> cath (const TCoordMatrix<double> &A,
-				    const TCoordMatrix<double> &B);
-template TCoordMatrix<complex> cath (const TCoordMatrix<complex> &A,
-				     const TCoordMatrix<complex> &B);
+template MATHLIB TCoordMatrix<double> cath (const TCoordMatrix<double> &A,
+    const TCoordMatrix<double> &B);
+template MATHLIB TCoordMatrix<complex> cath (const TCoordMatrix<complex> &A,
+    const TCoordMatrix<complex> &B);
 
-template TCoordMatrix<double> catv (const TCoordMatrix<double> &A,
-				    const TCoordMatrix<double> &B);
-template TCoordMatrix<complex> catv (const TCoordMatrix<complex> &A,
-				     const TCoordMatrix<complex> &B);
+template MATHLIB TCoordMatrix<double> catv (const TCoordMatrix<double> &A,
+	const TCoordMatrix<double> &B);
+template MATHLIB TCoordMatrix<complex> catv (const TCoordMatrix<complex> &A,
+	const TCoordMatrix<complex> &B);
 
-template istream &operator>> (istream &is, RCoordMatrix &m);
-template istream &operator>> (istream &is, FCoordMatrix &m);
-template istream &operator>> (istream &is, CCoordMatrix &m);
-template istream &operator>> (istream &is, ICoordMatrix &m);
+template MATHLIB istream &operator>> (istream &is, RCoordMatrix &m);
+template MATHLIB istream &operator>> (istream &is, FCoordMatrix &m);
+template MATHLIB istream &operator>> (istream &is, CCoordMatrix &m);
+template MATHLIB istream &operator>> (istream &is, ICoordMatrix &m);
 
-template ostream &operator<< (ostream &os, const RCoordMatrix &m);
-template ostream &operator<< (ostream &os, const FCoordMatrix &m);
-template ostream &operator<< (ostream &os, const CCoordMatrix &m);
-template ostream &operator<< (ostream &os, const ICoordMatrix &m);
+template MATHLIB ostream &operator<< (ostream &os, const RCoordMatrix &m);
+template MATHLIB ostream &operator<< (ostream &os, const FCoordMatrix &m);
+template MATHLIB ostream &operator<< (ostream &os, const CCoordMatrix &m);
+template MATHLIB ostream &operator<< (ostream &os, const ICoordMatrix &m);
 
 #endif // NEED_EXPLICIT_INSTANTIATION

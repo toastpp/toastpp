@@ -93,11 +93,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="..\resources\toastlib.vsprops"
-			CharacterSet="1"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -166,6 +164,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;"
 			/>
 		</Configuration>
 	</Configurations>

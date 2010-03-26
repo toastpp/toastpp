@@ -1,11 +1,11 @@
 function [err,varargout] = privObjective (proj, data, sd, hReg, x)
 
-err_data = sum(((data-proj)./sd).^2);
+err_data = full(sum(((data-proj)./sd).^2));
 err_prior = 0;
 
 if nargin >= 5
      % Add regularisation component
-     err_prior = toastRegulValue (hReg, x);
+     err_prior = full(toastRegulValue (hReg, x));
 end
 
 err = err_data + err_prior;
