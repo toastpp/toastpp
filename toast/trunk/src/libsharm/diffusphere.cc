@@ -12,7 +12,7 @@
 #include "sharmlib.h"
 #include "diffusphere.h"
 using namespace toast;
-
+using namespace std;
 
 
 diffusphere::diffusphere()
@@ -39,7 +39,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
   A(0,0)=1;//South Pole
   A(NoVRT-1,NoVRT-1)=1;//North Pole
 
-  
+  cerr<<'01'<<endl;
 
  
   // From the faces find the direct neighbours
@@ -47,6 +47,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 
   for(int v=1;v< NoVRT-1;v++)
     {
+		
       for(int j=0;j<NoFac;j++)
 	{
 	
@@ -76,7 +77,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	}
     }
 
-
+  cerr<<'02'<<endl;
 
   RCompRowMatrix A1(A);
 
@@ -96,7 +97,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
       A(nn,nn)=diag;
     }
 
-
+  cerr<<'03'<<endl;
 
   //Printing the A matrix for debuging
   /* for(int n=0;n<NoVRT;n++)
@@ -122,14 +123,14 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	  zerv.New(ReduceA.nRows());
   ReduceA.SetRow (0, zerv);
 
- 
+   cerr<<'04'<<endl;
   //ReduceA.RemoveRow(NoVRT-2);
  // RVector zerv(ReduceA.nRows());
 	  zerv.New(ReduceA.nRows());
   ReduceA.SetRow (NoVRT-2, zerv);
  
   ReduceA. Transpone();
-  
+    cerr<<'05'<<endl;
   //ReduceA.RemoveRow(0);
   //RVector zerv(ReduceA.nRows());
 	  zerv.New(ReduceA.nRows());
@@ -142,7 +143,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
  
   ReduceA. Transpone();
   
-
+  cerr<<'06'<<endl;
 
 
 
@@ -173,7 +174,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
        if (A(d,NoVRT-1)== -1)BConVeCTR[d-1]=M_PI;
      } 
 
- 
+   cerr<<'07'<<endl;
 
    double tol=1.0e-16;
 //   cout<<"  Calculating Thita  "<<endl;
@@ -181,7 +182,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
  //  cout<<"   Thita Done  "<<endl;
    // delete B;
 
-  
+    cerr<<'08'<<endl;
 
  // Create  the vector Thita
 
@@ -194,7 +195,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
      }
 
  
-  
+    cerr<<'09'<<endl;
 
  
    //##########################################################################
@@ -229,7 +230,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 
 
 
-  
+    cerr<<'10'<<endl;
 
 
 
@@ -262,7 +263,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	 RVector RedBlong(NoVRT-2);
 
   
-   
+     cerr<<'11'<<endl;
 
 
   //  Find the direct neighbours anticlockwise from the faces 
@@ -286,7 +287,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 
 
    
-
+  cerr<<'12'<<endl;
   
    //initialise DirNBR an DirNBRClock
 
@@ -305,7 +306,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	 }
      }
 
-  
+    cerr<<'13'<<endl;
 
    for(int v=0;v<NoVRT;v++)// For all the vertices
      {
@@ -336,7 +337,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	     }
 	 }
 
-
+  cerr<<'14'<<endl;
  
 
        for(int n=0;n<4;n++) //The First Two Neighbours
@@ -359,7 +360,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	   s=1;
 
 
-
+  cerr<<'15'<<endl;
 
 	   while(ThisNGBR != NextNGBR)//loops until it returns to the first one
 	     {
@@ -395,7 +396,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
      }
  
   
-  
+    cerr<<'16'<<endl;
 
  //Direct Neighbours clockwise
    
@@ -414,7 +415,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
      }
 
   
- 
+   cerr<<'17'<<endl;
  
    //Printing the matrix 
    /*
@@ -547,7 +548,7 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	    VectorBLong[s]=RedBlong[s];
 	    
 	  }
-       
+         cerr<<'19'<<endl;
 
 
 	//The solution with congugate gradiant
@@ -561,5 +562,5 @@ void diffusphere::DoDif (IDenseMatrix &Faces, RDenseMatrix &Vertices, RVector &T
 	    Fi[s+1]=RedFi[s];
 	  }
 
-
+  cerr<<'20'<<endl;
 }//end of Function 
