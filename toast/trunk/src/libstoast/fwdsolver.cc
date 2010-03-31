@@ -272,6 +272,8 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
 	int *rowptr, *colidx, nzero, n = mesh->nlen();
 	mesh->SparseRowStructure (rowptr, colidx, nzero);
 	B = new RCompRowMatrix (n, n, rowptr, colidx);
+	delete []rowptr;
+	delete []colidx;
     } else {
 	B->Zero();
     }
