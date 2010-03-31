@@ -27,7 +27,7 @@ void CalcMassmat (QMMesh *mesh, mxArray **res)
     int n = mesh->nlen();
 
     // Create forward solver to initialise system matrix
-    RFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
+    RFwdSolver FWS (LSOLVER_ITERATIVE, 1e-10);
     FWS.AssembleMassMatrix (mesh);
 
     // Return system matrix to MATLAB

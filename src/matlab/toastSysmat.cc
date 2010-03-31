@@ -52,7 +52,7 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
     sol.SetParam (OT_C2A, c2a);
 
     // Create forward solver to initialise system matrix
-    CFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
+    CFwdSolver FWS (LSOLVER_ITERATIVE, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
     double omega = freq * 2.0*Pi*1e-6;
     
@@ -66,7 +66,7 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
 {
     int n = mesh->nlen();
-    CFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
+    CFwdSolver FWS (LSOLVER_ITERATIVE, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
     FWS.Allocate (*mesh);
     RVector prm(n);
