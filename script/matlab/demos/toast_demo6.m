@@ -264,21 +264,22 @@ end
 
 
 function showiso(handles,bmua,thres_mua,bmus,thres_mus,fignum)
-
+  
 prm = getappdata(handles.figure1,'prm');
 nx = prm.solver.basis.bdim(1); ny = prm.solver.basis.bdim(2); nz = prm.solver.basis.bdim(3);
 eval(['axes(handles.axes' num2str(fignum) ')']);
-set(gcf,'Renderer','OpenGL');
+%set(gcf,'Renderer','OpenGL');
 cla;
 
 [vtx,idx,perm] = toastSurfData(prm.basis.hMesh);
-[pmin pmax] = toastMeshBB(prm.basis.hMesh);
+bb = toastMeshBB(prm.basis.hMesh);
+pmax = bb(1,:);
+pmin = bb(2,:);
 nvtx = size(vtx,1);
 msize=pmax-pmin;
 col = zeros(nvtx,3); col(:,2)=1;
 patch('Vertices',vtx,'Faces',idx,'FaceVertexCData',col,'FaceColor', ...
         'interp','EdgeColor','none','FaceAlpha',0.3);
-
 bmua = reshape(bmua,nx,ny,nz);
 [f,v] = isosurface(bmua,thres_mua);
 if length(v) > 0
@@ -328,8 +329,8 @@ img = squeeze(img(:,:,plane));
 
 imagesc(img',[imin,imax]);
 axis('xy');
-axis equal tight
-set(hax,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+axis equal tight off
+%set(hax,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 
 % --- Executes on slider movement.

@@ -57,7 +57,3 @@ function p = toastElmat
 % nodes in the element. Nonzero entries are located at positions (i,j)
 % where both nodes i and j belong to a boundary side, or to side
 % 'sideidx', if applicable.
-%
-% Note: 'BndF' currently has limited functionality:
-% - it is only supported for 4-noded tetrahedra
-% - it does not support the syntax using a 4th parameter (sideidx)
