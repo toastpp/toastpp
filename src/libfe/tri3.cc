@@ -520,6 +520,29 @@ RSymMatrix Triangle3::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
+double Triangle3::BndIntFSide (int i, int sd)
+{
+    double d;
+    switch (sd) {
+    case 0:
+	if (i == 2) return 0.0;
+	else d = hypot (c2, b2);
+	break;
+    case 1:
+	if (i == 0) return 0.0;
+	else d = hypot (c0, b0);
+	break;
+    case 2:
+	if (i == 1) return 0.0;
+	else d = hypot (c1, b1);
+	break;
+    default:
+	xERROR(Invalid side index);
+	break;
+    }
+    return d * 0.5;
+}
+
 double Triangle3::BndIntFFSide (int i, int j, int sd)
 {
     double d;
@@ -535,6 +558,9 @@ double Triangle3::BndIntFFSide (int i, int j, int sd)
     case 2:
 	if (i == 1 || j == 1) return 0.0; // u_1=0 along side 2
 	else d = hypot (c1, b1);          // 2->0 node distance
+	break;
+    default:
+	xERROR(Invalid side index);
 	break;
     }
     return d / (i == j ? 3.0 : 6.0);

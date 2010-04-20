@@ -119,7 +119,9 @@ public:
 
     RVector BndIntF () const;
 
-    double BndIntFFSide (int i, int j,int sd);
+    double BndIntFSide (int i, int sd);
+
+    double BndIntFFSide (int i, int j, int sd);
 
     RSymMatrix BndIntPFF (const RVector &P) const
     { xERROR(Not implemented); return RSymMatrix(); }

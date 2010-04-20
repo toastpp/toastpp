@@ -141,6 +141,12 @@ static const RSymMatrix sym_intf5ff = RSymMatrix (6,
     -128 -128    0  512  768 \
        0 -256    0  768  768 2304") * (2.0/40320.0);
 
+// BndIntF over each side
+static const RDenseMatrix bndintf = RDenseMatrix (3, 6,
+   "1 1 0 4 0 0 \
+    0 1 1 0 4 0 \
+    1 0 1 0 0 4") * (1.0/6.0);
+
 // BndIntFF over side 0
 static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (6,
    " 4 \
@@ -167,6 +173,7 @@ static const RSymMatrix sym_bndintff_sd2 = RSymMatrix (6,
      0 0 0 0 \
      0 0 0 0 0 \
      2 0 2 0 0 16") * (1.0/30.0);
+
 
 Triangle6::Triangle6 (const Triangle6 &el): Element_Unstructured_2D (el)
 {
@@ -1106,6 +1113,36 @@ RSymMatrix Triangle6::ComputeIntDD (const NodeList &nlist) const
     dd(5,5) =  scale8 * (bc00 + bc02 + bc22);
 
     return dd;
+}
+
+double Triangle6::BndIntFSide (int i, int sd)
+{
+    dASSERT(sd >= 0 && sd < 3, Side index out of range);
+    dASSERT(i >= 0 && i < 6, Node index out of range);
+
+    double f = bndintf(sd,i);
+    if (!f) return f;
+    switch (sd) {
+    case 0: return f * hypot (c2, b2);
+    case 1: return f * hypot (c0, b0);
+    case 2: return f * hypot (c1, b1);
+    }
+    return 0.0;
+}
+
+double Triangle6::BndIntFFSide (int i, int sd)
+{
+    switch (sd) {
+    case 0:
+	return hypot (c2, b2) * sym_bndintff_sd0(i,j);
+    case 1:
+	return hypot (c0, b0) * sym_bndintff_sd1(i,j);
+    case 2:
+	return hypot (c1, b1) * sym_bndintff_sd2(i,j);
+    default:
+	xERROR(Invalid side index);
+	return 0.0;
+    }
 }
 
 RSymMatrix Triangle6::ComputeBndIntFF (const NodeList &nlist) const

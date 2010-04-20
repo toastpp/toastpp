@@ -290,6 +290,11 @@ static const RSymMatrix sym_intf9ff = RSymMatrix (10,
      -1620 1458 972 12636 -6318 -3402 -6318 -7290 18954 \
      1296 1296 1296 8748 8748 8748 8748 8748 8748 157464") * (1.0/739200.0);
 
+static const RDenseMatrix bndintf = RDenseMatrix (3, 10,
+   "1 1 0 3 3 0 0 0 0 0 \
+    0 1 1 0 0 3 3 0 0 0 \
+    1 0 1 0 0 0 0 3 3 0") * (1.0/8.0);
+
 // BndIntFF over side 0
 static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (10,
    "128 \
@@ -563,8 +568,8 @@ RVector Triangle10::GlobalShapeF (const NodeList& nlist, const Point& glob)
 
 double Triangle10::IntF (int i) const
 {
-    static const double third = 1.0/3.0;
-    return size*third;
+    static const double fac = 1.0/120.0;
+    return size*fac * (i<3 ? 4.0 : i<9 ? 9.0 : 54.0);
 }
 
 RSymMatrix Triangle10::IntFF () const
@@ -2191,6 +2196,36 @@ RSymMatrix Triangle10::ComputeIntDD (const NodeList &nlist) const
     dd(9,9) = 648.0 * scale * (bc00 + bc01 + bc11 + bc02 + bc12 + bc22);
 
     return dd;
+}
+
+double Triangle10::BndIntFSide (int i, int sd)
+{
+    dASSERT(sd >= 0 && sd < 3, Side index out of range);
+    dASSERT(i >= 0 && i < 10, Node index out of range);
+
+    double f = bndintf(sd,i);
+    if (!f) return f;
+    switch (sd) {
+    case 0: return f * hypot (c2, b2);
+    case 1: return f * hypot (c0, b0);
+    case 2: return f * hypot (c1, b1);
+    }
+    return 0.0;    
+}
+
+double Triangle10::BndIntFFSide (int i, int j, int sd)
+{
+    switch (sd) {
+    case 0:
+	return hypot (c2, b2) * sym_bndintff_sd0(i,j);
+    case 1:
+	return hypot (c0, b0) * sym_bndintff_sd1(i,j);
+    case 2:
+	return hypot (c1, b1) * sym_bndintff_sd2(i,j);
+    default:
+	xERROR(Invalid side index);
+	return 0.0;
+    }
 }
 
 RSymMatrix Triangle10::ComputeBndIntFF (const NodeList &nlist) const

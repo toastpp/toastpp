@@ -93,6 +93,10 @@ public:
     RSymMatrix IntPDD (const RVector& P) const
     { xERROR(Not implemented); return RSymMatrix(); }
     double IntPDD (int i, int j, const RVector &P) const;
+
+    double BndIntFSide (int i, int sd);
+    double BndIntFFSide (int i, int j, int sd);
+
     RSymMatrix BndIntPFF (const RVector &P) const
     { xERROR(Not implemented); return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
