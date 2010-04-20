@@ -146,7 +146,7 @@ sckap = ones(slen,1)*(1/(3*2.025))*cm;
 logx = log([scmua;sckap]);
 hReg = toastRegul (prm.regul, prm.basis.hBasis, logx);
 res.kapref = toastRegulKappa (hReg,logx);
-toastDeleteRegul (hReg);
+toastClearRegul (hReg);
 disp_kapref (handles,res,prm);
 
 

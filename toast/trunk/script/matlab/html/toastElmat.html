@@ -67,12 +67,6 @@ E = toastElmat(hMesh, elidx, 'BndFF', sideidx)
 </div>
 where sideidx is the local side index (>= 1).
 <p>The returned matrix is of dimension n x n, where n is the number of nodes in the element. Nonzero entries are located at positions (i,j) where both nodes i and j belong to a boundary side, or to side 'sideidx', if applicable.</p>
-<p>Note: 'BndF' currently has limited functionality:
-<ul>
-<li>it is only supported for 4-noded tetrahedra</li>
-<li>it does not support the syntax using a 4th parameter (sideidx)</li>
-</ul>
-</p>
 
 <h2>See also</h2>
   <a href="toastSysmat.html">toastSysmat</a>,
