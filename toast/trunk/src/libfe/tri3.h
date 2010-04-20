@@ -208,6 +208,8 @@ public:
     RSymMatrix Intdd() const;
     // returns matrix of mixed derivatives
 
+    double BndIntFSide (int i, int sd);
+
     double BndIntFFSide (int i, int j, int sd);
     // Int [u_i u_j] dr along side sd
 

@@ -1024,7 +1024,13 @@ RVector Tetrahedron4::BndIntF () const
 }
 
 
-double Tetrahedron4::BndIntFFSide (int i, int j,int sd)
+double Tetrahedron4::BndIntFSide (int i, int sd)
+{
+    return bndintf(sd,i) * side_size[sd];
+}
+
+
+double Tetrahedron4::BndIntFFSide (int i, int j, int sd)
 {
   RSymMatrix bff;
   bff= *sym_bndintff[sd];

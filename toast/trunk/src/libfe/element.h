@@ -626,9 +626,22 @@ public:
      *   node i is a boundary node.
      * \note If the element does not contain boundary sides, the returned
      *   vector is zero.
-     * \sa BndIntFF, BndIntFFSide
+     * \sa BndIntFSide, BndIntFF, BndIntFFSide
      */
     virtual RVector BndIntF () const
+    { xERROR(Not implemented); return 0; }
+
+    /**
+     * \brief Surface integral of a shape function over one of the sides of
+     *   the element.
+     * \param i node index (range 0 .. \ref nNode-1)
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \sa BndIntF, BndIntFF, BndIntFFSide
+     */
+    virtual double BndIntFSide (int i, int sd)
     { xERROR(Not implemented); return 0; }
 
     /**

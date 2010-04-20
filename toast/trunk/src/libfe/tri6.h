@@ -77,18 +77,32 @@ public:
     RDenseMatrix GlobalShapeD (const NodeList& nlist, const Point& glob) const;
 
     double IntF (int i) const;
+
     RSymMatrix IntFF() const;
+
     double IntFF (int i, int j) const;
+
     double IntFFF (int i, int j, int k) const;
+
     RSymMatrix IntPFF (const RVector& P) const;
+
     double IntPFF (int i, int j, const RVector& P) const;
+
     RVector IntFD (int i, int j) const;
+
     double IntFDD (int i, int j, int k) const;
+
     RSymMatrix IntPDD (const RVector& P) const
     { xERROR(Not implemented); return RSymMatrix(); }
+
     double IntPDD (int i, int j, const RVector &P) const;
+
+    double BndIntFSide (int i, int sd);
+    double BndIntFFSide (int i, int j, int sd);
+
     RSymMatrix BndIntPFF (const RVector &P) const
     { xERROR(Not implemented); return RSymMatrix(); }
+
     double BndIntPFF (int i, int j, const RVector &P) const;
 
     double IntFd (int i, int j, int k) const;
