@@ -1130,7 +1130,7 @@ double Triangle6::BndIntFSide (int i, int sd)
     return 0.0;
 }
 
-double Triangle6::BndIntFFSide (int i, int sd)
+double Triangle6::BndIntFFSide (int i, int j, int sd)
 {
     switch (sd) {
     case 0:
