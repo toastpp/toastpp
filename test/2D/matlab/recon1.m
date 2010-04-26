@@ -27,7 +27,8 @@ Himplicit = true;                       % Implicit/explicit Hessian matrix
 % ======================================================================
 
 % Initialisations
-toastCatchErrors();
+%toastCatchErrors();
+toastSetVerbosity(1);
 
 % Set up some variables
 blen = bx*by;
@@ -47,8 +48,8 @@ ref = ones(n,1) * refind;
 kap = 1./(3*(mua+mus));
 
 % Read the data
-mdata = toastReadRealVector(fmod_name);
-pdata = toastReadRealVector(farg_name);
+mdata = toastReadVector(fmod_name);
+pdata = toastReadVector(farg_name);
 
 mdata = mdata + mdata.*0.01.*randn(size(mdata));
 pdata = pdata + pdata.*0.01.*randn(size(pdata));
@@ -106,8 +107,8 @@ hMesh2 = toastReadMesh('../meshes/ellips_tri10.msh');
 hBasis2 = toastSetBasis ('LINEAR',hMesh2,[bx by]);
 btgtmua=toastMapMeshToGrid (hBasis2, tgtmua);
 btgtkap=toastMapMeshToGrid (hBasis2, tgtkap);
-toastDeleteBasis(hBasis2);
-toastDeleteMesh(hMesh2);
+toastClearBasis(hBasis2);
+toastClearMesh(hMesh2);
 btgt = [btgtmua; btgtkap];
 hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta, 'KapRefImage', ...
                    btgt, 'KapRefScale', 1, 'KapRefPMThreshold', 0.1);

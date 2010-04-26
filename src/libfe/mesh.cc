@@ -1820,7 +1820,7 @@ void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
 // Generate a sparse matrix which allows mapping of a solution from
 // mesh nodal base to a regular pixel grid
 
-RGenericSparseMatrix *GridMapMatrix_old (const Mesh &mesh, const IVector &gdim,
+RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax, const int *elref)
 {
     const double EPS = 1e-8;
@@ -1945,9 +1945,12 @@ RGenericSparseMatrix *GridMapMatrix_old (const Mesh &mesh, const IVector &gdim,
     return B;
 }
 
-RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
+RGenericSparseMatrix *GridMapMatrix_new (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax, const int *elref)
 {
+    // NEEDS SOME MORE WORK!
+    // TOO TIME-CONSUMING!
+
     const int nsub = 8; // subsampling level
 
     int ix, iy, iz, i, j, k, g, el, m, n, nd;

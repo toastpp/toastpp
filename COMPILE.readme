@@ -89,7 +89,7 @@ Make the numerics libraries:
 
 Make the toast libararies and applications:
 
-	make
+	make toast
 
 The run-time libraries are installed in $TOASTDIR/lib. Make sure that your
 LD_LIBRARY_PATH variable points to this directory (this is done automatically
