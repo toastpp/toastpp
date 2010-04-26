@@ -30,6 +30,11 @@ matlab::
 			cp $(TOASTDIR)/src/matlab/Makefile.src ./Makefile; \
 			echo "making" all "in matlab..."; \
 			$(MAKE) $(MFLAGS) all); \
+		(mkdir -p $(TOASTVER)/mex2; \
+			cd $(TOASTVER)/mex2; \
+			cp $(TOASTDIR)/src/matlab/Makefile2.src ./Makefile; \
+			echo "making" all "in matlab..."; \
+			$(MAKE) $(MFLAGS) all); \
 	fi; \
 
 doc::
