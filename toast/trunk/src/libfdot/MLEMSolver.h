@@ -11,7 +11,7 @@
 
 using namespace std;
 
-class MLEMSolver : public FluoSolver
+class FDOTLIB MLEMSolver : public FluoSolver
 {
     public:
 	MLEMSolver(   RFwdSolver & _FEMSolver, QMMesh & mesh, 
@@ -27,6 +27,7 @@ class MLEMSolver : public FluoSolver
 		    int maxIters, double tol)
 	{
 	    Solve(data, result, precon, maxIters, tol);
+		return 0; // MS100428: added
 	}
 	void fwdOperator(RVector & x);
 	void adjOperator(RVector & x);

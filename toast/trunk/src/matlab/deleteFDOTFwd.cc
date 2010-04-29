@@ -2,11 +2,12 @@
 // RH-1: hFDOTFwd handle 
 
 #include "mex.h"
-#include "felib.h"
+#include "fdotlib.h"
+//#include "felib.h"
 #include "toastmex.h"
-#include "stoastlib.h"
+//#include "stoastlib.h"
 #include "util.h"
-#include "FDOTFwd.h"
+//#include "FDOTFwd.h"
 
 // =========================================================================
 

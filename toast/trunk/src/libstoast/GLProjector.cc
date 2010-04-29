@@ -1,3 +1,4 @@
+#define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
 #include "GLProjector.h"
 #include "GL/gl.h"

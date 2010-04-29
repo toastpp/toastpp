@@ -12,13 +12,14 @@
 // LH-1: FDOT solver handle
 
 #include "mex.h"
-#include "felib.h"
-#include "stoastlib.h"
+#include "fdotlib.h"
+//#include "felib.h"
+//#include "stoastlib.h"
 #include "util.h"
-#include "projector.h"
-#include "muaSolver.h"
-#include "FDOTFwd.h"
-#include "MLEMSolver.h"
+//#include "projector.h"
+//#include "muaSolver.h"
+//#include "FDOTFwd.h"
+//#include "MLEMSolver.h"
 #include "toastmex.h"
 
 #define MAXREGION 100

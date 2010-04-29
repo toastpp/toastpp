@@ -1,7 +1,10 @@
-#include "FDOTFwd.h"
-#include "matrix.h"
-#include "dgmatrix.h"
-#include "util.h"
+#define FDOTLIB_IMPLEMENTATION
+#include "fdotlib.h"
+
+//#include "FDOTFwd.h"
+//#include "matrix.h"
+//#include "dgmatrix.h"
+//#include "util.h"
 
 FDOTFwd::FDOTFwd( RFwdSolver * _FEMSolver, QMMesh & mesh, 
 				    Raster * rast,

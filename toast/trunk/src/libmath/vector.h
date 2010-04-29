@@ -125,19 +125,19 @@ template<class VT>
 VT stdv (const TVector<VT> &v);
 
 template<class VT>
-double l1norm (const TVector<VT> &v);
+MATHLIB double l1norm (const TVector<VT> &v);
 
 template<class VT>
-double l2norm (const TVector<VT> &v);
+MATHLIB double l2norm (const TVector<VT> &v);
 
 template<class VT>
-double linfnorm (const TVector<VT> &v);
+MATHLIB double linfnorm (const TVector<VT> &v);
 
 template<class VT>
 MATHLIB double l2normsq (const TVector<VT> &v);
 
 template<class VT>
-TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2);
+MATHLIB TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
 MATHLIB TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2);
@@ -729,21 +729,21 @@ public:
      * \return \f$ \sum_i^{v.Dim()} | v_i | \f$
      * \sa l2norm(), linfnorm()
      */
-    friend double l1norm<> (const TVector<VT> &v);
+    friend MATHLIB double l1norm<> (const TVector<VT> &v);
 
     /**
      * \brief L2 norm of vector elements
      * \return \f$ \sqrt{\sum_i^{v.Dim()} v_i^2} \f$
      * \sa length(), l2normsq(), l1norm(), linfnorm()
      */
-    friend double l2norm<> (const TVector<VT> &v);
+    friend MATHLIB double l2norm<> (const TVector<VT> &v);
 
     /**
      * \brief L-infinity norm of vector elements
      * \return \f$ \max_i | v_i | \f$
      * \sa l1norm(), l2norm()
      */
-    friend double linfnorm<> (const TVector<VT> &v);
+    friend MATHLIB double linfnorm<> (const TVector<VT> &v);
 
     /**
      * \brief Square of L2 norm of vector elements
@@ -768,7 +768,7 @@ public:
      * \return Result of the concatenation (the modified v1 argument)
      * \remarks Argument v2 unchanged.
      */
-    friend TVector<VT> &append<> (TVector<VT> &v1, const TVector<VT> &v2);
+    friend MATHLIB TVector<VT> &append<> (TVector<VT> &v1, const TVector<VT> &v2);
 
     /**
      * \brief Concatenate two vectors
@@ -1370,7 +1370,7 @@ inline toast::complex doth (const TVector<toast::complex> &v1,
 #endif // !MATH_DEBUG
 
 template<class VT>
-inline double l2norm (const TVector<VT> &v)
+inline MATHLIB double l2norm (const TVector<VT> &v)
 {
     return sqrt (l2normsq (v));
 }

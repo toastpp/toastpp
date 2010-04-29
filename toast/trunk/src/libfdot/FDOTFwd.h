@@ -1,16 +1,17 @@
-#ifndef MATRIX_FREE_SOLVER_H
-#define MATRIX_FREE_SOLVER_H
+#ifndef FDOTFWD_H
+#define FDOTFWD_H
 
-#include "stoastlib.h"
-#include "supermatrix.h"
-#include "fwdsolver.h"
-#include "qmmesh.h"
+#include "fdotlib.h"
+//#include "stoastlib.h"
+//#include "supermatrix.h"
+//#include "fwdsolver.h"
+//#include "qmmesh.h"
 #include "projector.h"
 #include <vector>
 
 using namespace std;
 
-class FDOTFwd 
+class FDOTLIB FDOTFwd 
 {
     public:
 	FDOTFwd(   RFwdSolver * _FEMSolver, QMMesh & mesh, 
@@ -46,4 +47,4 @@ class FDOTFwd
 // A helper function to pass into BiCGSTAB, since it cannot take member funcs
 RVector fdot_adjFwdCaller(const RVector& x, void * context);
 
-#endif
+#endif // !FDOTFWD_H

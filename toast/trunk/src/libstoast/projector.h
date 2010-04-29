@@ -1,13 +1,18 @@
 #ifndef PROJECTOR_H
 #define PROJECTOR_H
 
+
 #include "stoastlib.h"
 #include "supermatrix.h"
 #include "camera.h"
+
+#if (defined(WIN32)||defined(WIN64))
+#include <windows.h>
+#endif
 #include "GL/gl.h"
 #include "GL/osmesa.h"
 
-class Projector  
+class STOASTLIB Projector  
 {
     public:
 	Projector() {}

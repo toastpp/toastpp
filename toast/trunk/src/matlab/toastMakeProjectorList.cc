@@ -10,9 +10,10 @@
 #include "mex.h"
 #include "util.h"
 #include "toastmex.h"
-#include "felib.h"
-#include "stoastlib.h"
-#include "camera.h"
+#include "fdotlib.h"
+//#include "felib.h"
+//#include "stoastlib.h"
+//#include "camera.h"
 #include "GLProjector.h"
 
 

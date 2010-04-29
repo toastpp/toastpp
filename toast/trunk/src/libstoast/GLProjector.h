@@ -3,7 +3,7 @@
 
 #include "projector.h"
 
-class GLProjector : public Projector
+class STOASTLIB GLProjector : public Projector
 {
     public:
 	GLProjector() {}

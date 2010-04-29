@@ -11,7 +11,7 @@
 
 using namespace std;
 
-class MatrixFreeSolver : public FluoSolver
+class FDOTLIB MatrixFreeSolver : public FluoSolver
 {
     public:
 	MatrixFreeSolver(   RFwdSolver * _FEMSolver, QMMesh & mesh, 

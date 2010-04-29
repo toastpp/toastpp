@@ -1,6 +1,9 @@
-#include "MLEMSolver.h"
-#include "matrix.h"
-#include "util.h"
+#define FDOTLIB_IMPLEMENTATION
+#include "fdotlib.h"
+
+//#include "MLEMSolver.h"
+//#include "matrix.h"
+//#include "util.h"
 
 
 MLEMSolver::MLEMSolver( RFwdSolver & _FEMSolver, QMMesh & mesh, 
@@ -104,6 +107,8 @@ int MLEMSolver::Solve(const RVector & data,
     WriteBinaryData(ATr, "ATr.dat");
     raster->Map_SolToGrid(zz, ATr_over_alpha);
     WriteBinaryData(ATr_over_alpha, "ATr_over_alpha.dat");
+
+	return 0; // MS100428: added
 }
 
 void MLEMSolver::adjFwdOperator(RVector & x)
