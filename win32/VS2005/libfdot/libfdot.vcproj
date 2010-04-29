@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="toastSysmat"
-	ProjectGUID="{6FAD835E-0A7A-42C5-AF1D-6FC3CBA90B22}"
-	RootNamespace="toastSysmat"
+	Name="libfdot"
+	ProjectGUID="{D6625AC5-9324-4EB4-9D83-36527E72AB9D}"
+	RootNamespace="libfdot"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,10 +17,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,8 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\MATLAB\R2006b\extern\include&quot;;&quot;$(SolutionDir)..\..\..&quot;;&quot;$(SolutionDir)..\..\..\include&quot;;&quot;$(SolutionDir)..\..\..\src\libmath&quot;;&quot;$(SolutionDir)..\..\..\src\libfe&quot;;&quot;$(SolutionDir)..\..\..\src\libstoast&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTSYSMAT_EXPORTS;_CRT_SECURE_NO_WARNINGS;MATLAB_MEX_FILE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBFDOT_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,11 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmx.lib libmex.lib libmat.lib libstoast.lib libfe.lib libmath.lib SuperLU.lib blas_win32.lib"
-				OutputFile="$(OutDir)\$(ProjectName).mexw32"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\MATLAB\R2006b\extern\lib\win32\microsoft&quot;;&quot;$(SolutionDir)..\..\lib32&quot;;&quot;$(SolutionDir)..\$(IntDir)&quot;"
-				ModuleDefinitionFile="$(SolutionDir)resources\mexfunc.def"
+				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -93,14 +87,13 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(OutDir)\$(ProjectName).mexw32&quot; &quot;$(SolutionDir)..\..\$(ConfigurationName)\mex&quot;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -120,9 +113,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTSYSMAT_EXPORTS"
-				RuntimeLibrary="2"
+				WholeProgramOptimization="false"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBFDOT_EXPORTS"
+				UsePrecompiledHeader="0"
+				Detect64BitPortabilityProblems="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -135,7 +129,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories=""
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -163,16 +159,15 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release_fdot|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -192,9 +187,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTSYSMAT_EXPORTS"
-				RuntimeLibrary="2"
+				WholeProgramOptimization="false"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBFDOT_EXPORTS"
+				UsePrecompiledHeader="0"
+				Detect64BitPortabilityProblems="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -207,7 +203,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories=""
+				AdditionalDependencies="libmath.lib libfe.lib libstoast.lib"
+				LinkIncremental="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -235,7 +233,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
+				CommandLine="if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastBinDir)&quot; mkdir &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -248,16 +246,64 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\src\matlab\toastmex.cc"
+				RelativePath="..\..\..\src\libfdot\FDOTFwd.cc"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\matlab\toastSysmat.cc"
+				RelativePath="..\..\..\src\libfdot\matrixFreeSolver.cc"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\matlab\util.cc"
+				RelativePath="..\..\..\src\libfdot\MLEMSolver.cc"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\muaSolver.cc"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\util.cc"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -266,12 +312,80 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\src\matlab\toastmex.h"
+				RelativePath="..\..\..\src\libfdot\FDOTFwd.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\fdotlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\matlab\util.h"
+				RelativePath="..\..\..\src\libfdot\fluoSolver.h"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\matrixFreeSolver.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\MLEMSolver.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\muaSolver.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfdot\util.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -279,10 +393,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath="..\resources\mexversion_R2006b.rc"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
