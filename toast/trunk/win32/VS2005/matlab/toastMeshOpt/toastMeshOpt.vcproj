@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="toastSysmat"
-	ProjectGUID="{6FAD835E-0A7A-42C5-AF1D-6FC3CBA90B22}"
-	RootNamespace="toastSysmat"
+	Name="toastMeshOpt"
+	ProjectGUID="{EB442509-61E9-4AA0-9A11-A8E9E5717DB9}"
+	RootNamespace="toastMeshOpt"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,10 +17,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;C:\Program Files\MATLAB\R2006b\extern\include&quot;;&quot;$(SolutionDir)..\..\..&quot;;&quot;$(SolutionDir)..\..\..\include&quot;;&quot;$(SolutionDir)..\..\..\src\libmath&quot;;&quot;$(SolutionDir)..\..\..\src\libfe&quot;;&quot;$(SolutionDir)..\..\..\src\libstoast&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTSYSMAT_EXPORTS;_CRT_SECURE_NO_WARNINGS;MATLAB_MEX_FILE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTMESHOPT_EXPORTS;_CRT_SECURE_NO_WARNINGS;MATLAB_MEX_FILE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -99,8 +99,8 @@
 		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			InheritedPropertySheets="..\..\resources\toastmex.vsprops"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -120,9 +120,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTSYSMAT_EXPORTS"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTMESHOPT_EXPORTS"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -171,8 +171,8 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			InheritedPropertySheets="..\..\resources\toastmex.vsprops"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -192,9 +192,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTSYSMAT_EXPORTS"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTMESHOPT_EXPORTS"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -248,11 +248,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\src\matlab\toastmex.cc"
+				RelativePath="..\resources\mexfunc.def"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\matlab\toastSysmat.cc"
+				RelativePath="..\..\..\..\src\matlab\toastMeshOpt.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\matlab\toastmex.cc"
 				>
 			</File>
 			<File
@@ -267,6 +271,10 @@
 			>
 			<File
 				RelativePath="..\..\..\..\src\matlab\toastmex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\matlab\toasttype.h"
 				>
 			</File>
 			<File
