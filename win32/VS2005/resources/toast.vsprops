@@ -51,6 +51,11 @@
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
+		Name="ToastMex2Dir"
+		Value="$(ToastWinDir)$(ConfigurationName)\mex2\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
 		Name="ToastObjDir"
 		Value="$(ToastWinDir)$(ConfigurationName)\obj\$(ProjectName)\"
 		PerformEnvironmentSet="true"

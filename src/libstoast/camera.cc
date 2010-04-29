@@ -1,3 +1,6 @@
+#define STOASTLIB_IMPLEMENTATION
+#include "stoastlib.h"
+
 #include "camera.h"
 #include <math.h>
 #include <iostream>
@@ -20,7 +23,7 @@ void PinholeCamera::getRayVector(const double ix, const double iy, RVector & ray
 
 double PinholeCamera::getFoVy() const 
 { 
-    double fovy = atan2((double)(h)*0.5, f) * 360.0 / M_PI;
+    double fovy = atan2((double)(h)*0.5, f) * 360.0 / Pi;
     return fovy;
 }
 

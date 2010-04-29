@@ -19,7 +19,7 @@ using namespace std;
 
 //#define DEBUG_TRI3D3
 /* utility for crossproducts */
-RVector cross3(RVector& a, RVector& b){
+FELIB RVector cross3(RVector& a, RVector& b){
     RVector c(3); 
     c[0]  = (a[1]*b[2] - a[2]*b[1]);
     c[1]  = (a[2]*b[0] - a[0]*b[2]);

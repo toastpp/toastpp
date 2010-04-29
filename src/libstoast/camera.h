@@ -3,7 +3,7 @@
 
 #include "mathlib.h"
 
-class Camera
+class STOASTLIB Camera
 {
     public:
 	Camera(){}
@@ -35,7 +35,7 @@ class Camera
 	RVector pos, x, y, z;
 };
 
-class PinholeCamera : public Camera
+class STOASTLIB PinholeCamera : public Camera
 {
     public:
 	PinholeCamera(){}
@@ -54,7 +54,7 @@ class PinholeCamera : public Camera
 	double f;	
 };
 
-class OrthoCamera : public Camera
+class STOASTLIB OrthoCamera : public Camera
 {
     public:
 	OrthoCamera(){}

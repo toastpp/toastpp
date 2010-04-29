@@ -790,7 +790,7 @@ VT stdv (const TVector<VT> &v)
 // ==========================================================================
 
 template<class VT>
-double l1norm (const TVector<VT> &v)
+MATHLIB double l1norm (const TVector<VT> &v)
 {
     double sum = 0.0;
     for (int i = 0; i < v.size; i++) sum += norm (v[i]);
@@ -821,7 +821,7 @@ MATHLIB double l2normsq (const TVector<VT> &v)
 }
 
 template<class VT>
-double linfnorm (const TVector<VT> &v)
+MATHLIB double linfnorm (const TVector<VT> &v)
 {
     double nm, mx = 0.0;
     for (int i = 0; i < v.size; i++)
@@ -841,7 +841,7 @@ MATHLIB TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2)
 
 // Append v2 to v1 and return resulting v1
 template<class VT>
-TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2)
+MATHLIB TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2)
 {
     if (v2.size) {
         TVector<VT> tmp(v1);
@@ -1129,26 +1129,26 @@ template complex  stdv (const CVector &v);
 template scomplex stdv (const SCVector &v);
 
 #ifndef USE_CBLAS
-template double   l1norm (const RVector &v);
-template double   l1norm (const FVector &v);
+template MATHLIB double   l1norm (const RVector &v);
+template MATHLIB double   l1norm (const FVector &v);
 #endif // !USE_CBLAS
-template double   l1norm (const CVector &v);
-template double   l1norm (const SCVector &v);
-template double   l1norm (const IVector &v);
+template MATHLIB double   l1norm (const CVector &v);
+template MATHLIB double   l1norm (const SCVector &v);
+template MATHLIB double   l1norm (const IVector &v);
 
 #ifndef USE_BLAS_LEVEL1
-template double   l2norm (const RVector &v);
-template double   l2norm (const FVector &v);
-template double   l2norm (const CVector &v);
+template MATHLIB double   l2norm (const RVector &v);
+template MATHLIB double   l2norm (const FVector &v);
+template MATHLIB double   l2norm (const CVector &v);
 #endif // !USE_BLAS_LEVEL1
-template double   l2norm (const SCVector &v);
-template double   l2norm (const IVector &v);
+template MATHLIB double   l2norm (const SCVector &v);
+template MATHLIB double   l2norm (const IVector &v);
 
-template double   linfnorm (const RVector &v);
-template double   linfnorm (const FVector &v);
-template double   linfnorm (const CVector &v);
-template double   linfnorm (const SCVector &v);
-template double   linfnorm (const IVector &v);
+template MATHLIB double   linfnorm (const RVector &v);
+template MATHLIB double   linfnorm (const FVector &v);
+template MATHLIB double   linfnorm (const CVector &v);
+template MATHLIB double   linfnorm (const SCVector &v);
+template MATHLIB double   linfnorm (const IVector &v);
 
 double length (const RVector &vec);
 double length (const FVector &vec);
@@ -1162,11 +1162,11 @@ template MATHLIB double   l2normsq (const CVector &vec);
 template MATHLIB double   l2normsq (const SCVector &vec);
 template MATHLIB double   l2normsq (const IVector &vec);
 
-template RVector  &append (RVector &v1, const RVector &v2);
-template FVector  &append (FVector &v1, const FVector &v2);
-template CVector  &append (CVector &v1, const CVector &v2);
-template SCVector &append (SCVector &v1, const SCVector &v2);
-template IVector  &append (IVector &v1, const IVector &v2);
+template MATHLIB RVector  &append (RVector &v1, const RVector &v2);
+template MATHLIB FVector  &append (FVector &v1, const FVector &v2);
+template MATHLIB CVector  &append (CVector &v1, const CVector &v2);
+template MATHLIB SCVector &append (SCVector &v1, const SCVector &v2);
+template MATHLIB IVector  &append (IVector &v1, const IVector &v2);
 
 template MATHLIB RVector  cat (const RVector &v1, const RVector &v2);
 template MATHLIB FVector  cat (const FVector &v1, const FVector &v2);

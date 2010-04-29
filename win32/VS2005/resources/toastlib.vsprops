@@ -7,7 +7,7 @@
 	>
 	<Tool
 		Name="VCLinkerTool"
-		OutputFile="$(ToastBinDir)$(ProjectName).dll"
+		OutputFile="$(ToastLibDir)$(ProjectName).dll"
 		AdditionalLibraryDirectories=""
 		ImportLibrary="$(ToastLibDir)$(ProjectName).lib"
 	/>

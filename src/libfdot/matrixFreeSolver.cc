@@ -1,7 +1,10 @@
-#include "matrixFreeSolver.h"
-#include "matrix.h"
-#include "dgmatrix.h"
-#include "util.h"
+#define FDOTLIB_IMPLEMENTATION
+#include "fdotlib.h"
+
+//#include "matrixFreeSolver.h"
+//#include "matrix.h"
+//#include "dgmatrix.h"
+//#include "util.h"
 
 MatrixFreeSolver::MatrixFreeSolver( RFwdSolver * _FEMSolver, QMMesh & mesh, 
 				    Regularisation * reg, double & tau_, Raster * rast,
@@ -150,6 +153,8 @@ int MatrixFreeSolver::Solve(const RVector & data,
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,
     const TPreconditioner<MT> *precon, int restart, int *iter, double *res)*/
     //    return GMRES (&mf_adjFwdCaller, this, y, result, tol, precon, 10, &iters, &tol);
+
+	return 0; // MS100428: added
 }
 
 int MatrixFreeSolver::SolveNonLin(const RVector & data, 

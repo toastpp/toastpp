@@ -1,3 +1,6 @@
+#define STOASTLIB_IMPLEMENTATION
+#include "stoastlib.h"
+
 #include "projector.h"
 
 void Projector::getBoundaryNodes()    

@@ -10,6 +10,7 @@ from file or console input
 #include <iostream>
 #include <iomanip>
 #include "projector.h"
+#include "GLProjector.h"
 #include "camera.h"
 
 using namespace std;
@@ -378,7 +379,7 @@ void SelectGrid (ParamParser &pp, QMMesh &mesh,
     {
 	cout << "No grid bounding box specified, using full mesh bounding box" << endl;
     }
-    *rast = new Raster(gDim,(Mesh*) &mesh, bbp);
+    *rast = new Raster_Pixel(gDim, gDim, (Mesh*) &mesh, bbp);
 
 }
 			    

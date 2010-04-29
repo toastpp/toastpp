@@ -1,6 +1,9 @@
-#include "muaSolver.h"
-#include "matrix.h"
-#include "util.h"
+#define FDOTLIB_IMPLEMENTATION
+#include "fdotlib.h"
+
+//#include "muaSolver.h"
+//#include "matrix.h"
+//#include "util.h"
 
 
 MuaSolver::MuaSolver( RFwdSolver & _FEMSolver, QMMesh & mesh, 
@@ -140,6 +143,7 @@ int MuaSolver::Solve(const RVector & data,
 	WriteBinaryData(soln, fname);
     }
 
+	return 0; // MS100428: added
 }
 
 

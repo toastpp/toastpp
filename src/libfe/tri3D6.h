@@ -47,7 +47,7 @@ const double wg[7]={0.225/2.,0.13239415278850619/2.,0.13239415278850619/2.,
 		          0.12593918054482713/2.};
 
 class Surface;
-RVector cross3(RVector& a, RVector& b);
+RVector FELIB cross3 (RVector& a, RVector& b);
 
 class FELIB Triangle3D6: public Triangle6 {
 public:

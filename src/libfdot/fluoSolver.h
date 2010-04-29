@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class FluoSolver
+class FDOTLIB FluoSolver
 {
     public:
 	FluoSolver()

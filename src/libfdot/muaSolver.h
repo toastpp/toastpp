@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class MuaSolver
+class FDOTLIB MuaSolver
 {
     public:
 	MuaSolver(   RFwdSolver & _FEMSolver, QMMesh & mesh, 
