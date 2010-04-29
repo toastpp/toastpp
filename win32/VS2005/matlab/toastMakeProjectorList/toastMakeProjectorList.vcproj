@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="toastReadMesh"
-	ProjectGUID="{BD4EA1EF-AC15-4769-A0E9-4E753F8FFC5F}"
-	RootNamespace="toastReadMesh"
+	Name="toastMakeProjectorList"
+	ProjectGUID="{E6BCD57D-F343-4A59-B8BB-B3F9BCA5A0D5}"
+	RootNamespace="toastMakeProjectorList"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -17,11 +17,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)..\$(ConfigurationName)\obj\$(ProjectName)"
-			IntermediateDirectory="$(SolutionDir)..\$(ConfigurationName)\obj\$(ProjectName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,8 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\MATLAB\R2006b\extern\include&quot;;&quot;$(SolutionDir)..\..\..&quot;;&quot;$(SolutionDir)..\..\..\include&quot;;&quot;$(SolutionDir)..\..\..\src\libmath&quot;;&quot;$(SolutionDir)..\..\..\src\libfe&quot;;&quot;$(SolutionDir)..\..\..\src\libstoast&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTREADMESH_EXPORTS;_CRT_SECURE_NO_WARNINGS;MATLAB_MEX_FILE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTMAKEPROJECTORLIST_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,11 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmx.lib libmex.lib libmat.lib libstoast.lib libfe.lib libmath.lib SuperLU.lib blas_win32.lib"
-				OutputFile="$(OutDir)\$(ProjectName).mexw32"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\MATLAB\R2006b\extern\lib\win32\microsoft&quot;;&quot;$(SolutionDir)..\..\lib32&quot;;&quot;$(SolutionDir)..\$(IntDir)&quot;"
-				ModuleDefinitionFile="$(SolutionDir)resources\mexfunc.def"
+				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -94,86 +88,13 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(OutDir)\$(ProjectName).mexw32&quot; &quot;$(SolutionDir)..\..\$(ConfigurationName)\mex&quot;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTREADMESH_EXPORTS"
-				RuntimeLibrary="2"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalLibraryDirectories=""
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release_fdot|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(SolutionDir)resources\toastmex.vsprops"
-			CharacterSet="0"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -193,9 +114,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTREADMESH_EXPORTS"
+				AdditionalIncludeDirectories="&quot;$(ToastSrcDir)libfdot&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTMAKEPROJECTORLIST_EXPORTS"
 				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -208,7 +130,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalLibraryDirectories=""
+				AdditionalDependencies="libfdot.lib"
+				LinkIncremental="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -236,7 +160,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -249,15 +172,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\resources\mexfunc.def"
+				RelativePath="..\..\..\..\src\matlab\toastMakeProjectorList.cc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\matlab\toastReadMesh.cc"
+				RelativePath="..\..\..\..\src\matlab\toastmex.cc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\matlab\util.cc"
+				RelativePath="..\..\..\..\src\matlab\util.cc"
 				>
 			</File>
 		</Filter>
@@ -267,7 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\src\matlab\toasttype.h"
+				RelativePath="..\..\..\..\src\matlab\toastmex.h"
 				>
 			</File>
 			<File
@@ -281,7 +204,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\resources\mexversion_R2006b.rc"
+				RelativePath="..\resources\mexversion_R2006b.rc"
 				>
 			</File>
 		</Filter>

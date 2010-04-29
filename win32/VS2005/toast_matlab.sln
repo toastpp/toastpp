@@ -116,39 +116,39 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "construct_bem_matrix", "mat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "surface_int", "matlab\surface_int\surface_int.vcproj", "{3A7EE0C0-A2D1-4BDE-8466-45B6165EFA3E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastReadMesh", "matlab\toastReadMesh.vcproj", "{BD4EA1EF-AC15-4769-A0E9-4E753F8FFC5F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastReadMesh", "matlab\toastReadMesh\toastReadMesh.vcproj", "{BD4EA1EF-AC15-4769-A0E9-4E753F8FFC5F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteRealVector", "matlab\toastWriteRealVector.vcproj", "{595960D7-03C5-4375-BEE0-26007959F27C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteRealVector", "matlab\toastWriteRealVector\toastWriteRealVector.vcproj", "{595960D7-03C5-4375-BEE0-26007959F27C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteRealHBMatrix", "matlab\toastWriteRealHBMatrix.vcproj", "{EF9F816A-3043-478B-9191-E0F3C1EC312B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteRealHBMatrix", "matlab\toastWriteRealHBMatrix\toastWriteRealHBMatrix.vcproj", "{EF9F816A-3043-478B-9191-E0F3C1EC312B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteQM", "matlab\toastWriteQM.vcproj", "{599E91BF-27B3-462F-B730-642C56F10C04}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteQM", "matlab\toastWriteQM\toastWriteQM.vcproj", "{599E91BF-27B3-462F-B730-642C56F10C04}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteNIM", "matlab\toastWriteNIM.vcproj", "{B102C181-E5D7-433C-B3E0-06A3257612AC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteNIM", "matlab\toastWriteNIM\toastWriteNIM.vcproj", "{B102C181-E5D7-433C-B3E0-06A3257612AC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteMesh", "matlab\toastWriteMesh.vcproj", "{DFF58266-AD33-4C8F-A8B9-C4AF3985832D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteMesh", "matlab\toastWriteMesh\toastWriteMesh.vcproj", "{DFF58266-AD33-4C8F-A8B9-C4AF3985832D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteComplexHBMatrix", "matlab\toastWriteComplexHBMatrix.vcproj", "{8C21105A-FDE9-4CF4-BDE2-2D8D8D035ED7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastWriteComplexHBMatrix", "matlab\toastWriteComplexHBMatrix\toastWriteComplexHBMatrix.vcproj", "{8C21105A-FDE9-4CF4-BDE2-2D8D8D035ED7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSysmat", "matlab\toastSysmat.vcproj", "{6FAD835E-0A7A-42C5-AF1D-6FC3CBA90B22}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSysmat", "matlab\toastSysmat\toastSysmat.vcproj", "{6FAD835E-0A7A-42C5-AF1D-6FC3CBA90B22}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSurfData", "matlab\toastSurfData.vcproj", "{F1580126-A498-45E3-890D-EF5A15084E54}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSurfData", "matlab\toastSurfData\toastSurfData.vcproj", "{F1580126-A498-45E3-890D-EF5A15084E54}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSolutionMask", "matlab\toastSolutionMask.vcproj", "{BC4D5734-3138-4A61-9039-7250C7507C79}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSolutionMask", "matlab\toastSolutionMask\toastSolutionMask.vcproj", "{BC4D5734-3138-4A61-9039-7250C7507C79}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastShapeFunctionGrad", "matlab\toastShapeFunctionGrad.vcproj", "{6C228359-8D05-4C27-A2D5-FB79F9DD137C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastShapeFunctionGrad", "matlab\toastShapeFunctionGrad\toastShapeFunctionGrad.vcproj", "{6C228359-8D05-4C27-A2D5-FB79F9DD137C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastShapeFunction", "matlab\toastShapeFunction.vcproj", "{F9E668B0-8F74-4EB6-9B2B-1C0437CEA186}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastShapeFunction", "matlab\toastShapeFunction\toastShapeFunction.vcproj", "{F9E668B0-8F74-4EB6-9B2B-1C0437CEA186}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSetQM", "matlab\toastSetQM.vcproj", "{941C4200-70BB-4BFC-BFC7-DBA296C3339C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSetQM", "matlab\toastSetQM\toastSetQM.vcproj", "{941C4200-70BB-4BFC-BFC7-DBA296C3339C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSetBasis", "matlab\toastSetBasis.vcproj", "{02AA77DF-F628-4587-8455-2920E08B5350}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSetBasis", "matlab\toastSetBasis\toastSetBasis.vcproj", "{02AA77DF-F628-4587-8455-2920E08B5350}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSampleField", "matlab\toastSampleField.vcproj", "{BD8B3D21-605D-4F09-B3C8-A96E68933B2C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSampleField", "matlab\toastSampleField\toastSampleField.vcproj", "{BD8B3D21-605D-4F09-B3C8-A96E68933B2C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastRegulValue", "matlab\toastRegulValue.vcproj", "{22EEF060-1A8C-4F0A-B202-F56F15B765DA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastRegulValue", "matlab\toastRegulValue\toastRegulValue.vcproj", "{22EEF060-1A8C-4F0A-B202-F56F15B765DA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastRegulKappa", "matlab\toastRegulKappa.vcproj", "{BC4A52E1-E819-4069-A74F-48F467B4D87C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastRegulKappa", "matlab\toastRegulKappa\toastRegulKappa.vcproj", "{BC4A52E1-E819-4069-A74F-48F467B4D87C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toast_bem_matrix", "matlab\toast_bem_matrix\toast_bem_matrix.vcproj", "{8132D118-E4A2-4ED4-A583-A0270490E14B}"
 EndProject
