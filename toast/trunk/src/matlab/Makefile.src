@@ -41,6 +41,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastMarkMeshBoundary.cc \
 	toastMassmat.cc \
 	toastMeshBB.cc \
+	toastMeshBndIntersect.cc \
 	toastMeshData.cc \
 	toastMeshDimension.cc \
 	toastMeshElementCount.cc \
