@@ -715,7 +715,7 @@ TVector<VT> vsort (const TVector<VT> &v)
 {
 	TVector<VT> tmp(v.size);
 	VT mx= (VT) 0;
-    for (int i = 1; i < v.size; i++) tmp[i] = v[i] ;
+    for (int i = 0; i < v.size; i++) tmp[i] = v[i] ;
 	if (!tmp.size) return tmp;
 	for (int i=0; i < tmp.size; ++i)
 	{
