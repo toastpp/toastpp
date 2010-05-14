@@ -30,7 +30,7 @@ all:: $(BINS)
 % : %.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
-opt2 : opt2.o meshopt.o ordmmd.o rcm.o
+opt2 : opt2.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 clean:: 
