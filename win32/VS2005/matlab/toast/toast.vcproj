@@ -99,6 +99,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -128,6 +129,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(ToastMex2Dir)$(ProjectName).mexw32"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -155,6 +157,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(ToastWinDir)dll\*.dll $(ToastMex2Dir)&#x0D;&#x0A;copy $(ToastLibDir)libmath.dll $(ToastMex2Dir)&#x0D;&#x0A;copy $(ToastLibDir)libfe.dll $(ToastMex2Dir)&#x0D;&#x0A;copy $(ToastLibDir)libstoast.dll $(ToastMex2Dir)"
 			/>
 		</Configuration>
 	</Configurations>
