@@ -53,6 +53,7 @@
 #include "surface.h"
 #include "param.h"
 #include "mesh.h"
+#include "meshopt.h"
 #include "qmmesh.h"
 #include "timespec.h"
 

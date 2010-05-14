@@ -3,8 +3,9 @@
 // Mesh optimisation routines
 // ============================================================================
 
-#include <mathlib.h>
-#include <felib.h>
+#define FELIB_IMPLEMENTATION
+
+#include "felib.h"
 #include "ordmmd.h"
 #include "rcm.h"
 
@@ -21,7 +22,7 @@ int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
 // Reorder node and parameter lists, and node indices in the element list
 // according to permutation vector `perm'
 
-void Reorder (Mesh &mesh, int *perm)
+FELIB void Reorder (Mesh &mesh, int *perm)
 {
     int i, j, ii, ij, nds = mesh.nlen(), els = mesh.elen();
     int *iperm = new int[nds];
@@ -54,7 +55,7 @@ void Reorder (Mesh &mesh, int *perm)
 // This only reorders the permutation vector `perm', not the node list itself
 // Returns the number of boundary nodes found
 
-int SortBndToEnd (Mesh &mesh, int *perm)
+FELIB int SortBndToEnd (Mesh &mesh, int *perm)
 {
     int src, dst, tmp, nbnd = 0;
     NodeList &nlist = mesh.nlist;
@@ -73,7 +74,7 @@ int SortBndToEnd (Mesh &mesh, int *perm)
 // return value is error flag
 //   0 = success
 
-int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len)
+FELIB int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len)
 {
     int i, *rowptr, *colidx, nzero, nfirst, maskval, nds = mesh.nlen();
     int iperm0 = 0;
@@ -119,7 +120,7 @@ int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len)
 //   0 = success
 //  -1 = insufficient working space (should never happen)
 
-int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
+FELIB int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
 {
     int i, j, k, idx, iflag, nofsub, nds = mesh.nlen();
     int iwsiz = 4*nds, *iwork = new int[iwsiz]; // work space
@@ -160,7 +161,7 @@ int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
 //   1 = mesh contains elements with different number of nodes
 //   2 = fatal error in tinney subroutine
 
-int Optimise_Tinney2 (Mesh &mesh, int *perm, int ofs, int len)
+FELIB int Optimise_Tinney2 (Mesh &mesh, int *perm, int ofs, int len)
 {
     int nds = mesh.nlen();
     int els = mesh.elen();
