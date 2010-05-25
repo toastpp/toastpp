@@ -256,19 +256,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\src\bintools\meshopt.cc"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\bintools\opt2.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\bintools\ordmmd.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\bintools\rcm.cc"
 				>
 			</File>
 		</Filter>
@@ -277,18 +265,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\src\bintools\meshopt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\bintools\ordmmd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\bintools\rcm.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
