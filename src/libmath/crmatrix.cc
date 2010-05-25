@@ -904,6 +904,40 @@ void TCompRowMatrix<MT>::SetRow (int r, const TVector<MT> &row)
 }
 
 template<class MT>
+void TCompRowMatrix<MT>::RemoveRow (int nR)
+{
+ SetColAccess (false);
+
+ int lm, j, k, g, s, f, r;
+
+   lm = rowptr[nR+1]-rowptr[nR];
+   //cerr<<"lm "<<lm<<endl;
+   
+   int *lrowptr = new int[this->rows];
+   int *lcolidx = new int[this->nval-lm];
+   MT  *lval    = new MT[this->nval-lm];
+
+   
+   for(j = 0; j < nR; j++)lrowptr[j] = rowptr[j];
+   for(g = 0; g < rowptr[nR]; g++)lcolidx[g] = colidx[g];
+   for(f = 0; f <  rowptr[nR]; f++)lval[f] = this->val[f];
+   for(s = rowptr[nR]; s < this->nval-lm; s++) lcolidx[s] = colidx[s+lm];
+   for(k = nR; k < this->rows; k++)  lrowptr[k] = rowptr[k+1] - lm;
+   for(r = rowptr[nR]; r < this->nval-lm; r++) lval[r] = this->val[r+lm];
+
+   delete []rowptr;
+   delete []colidx;
+   delete []this->val;
+   rowptr = lrowptr;
+   colidx = lcolidx;
+   this->val    = lval;
+   this->rows=this->rows-1;
+   this->nval=this->nval-lm;
+
+   //cerr<<"-row "<<nR<<" Removed"<<endl;
+}
+
+template<class MT>
 void TCompRowMatrix<MT>::ColScale (const TVector<MT> &scale)
 {
     dASSERT (scale.Dim() == this->cols, Argument 1: wrong size);
