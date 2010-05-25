@@ -12,8 +12,9 @@ SRCS = 	surfacenet.cc diffusphere.cc optimizzz.cc usefulfan.cc  legendre.cc
 OBJS = ${SRCS:.cc=.o}
 HDRS = ${SRCS:.cc=.h}
 
-%.cc: %.h
-	touch $@
+
+#%.cc: %.h
+#	touch $@
 
 %.o : %.cc $(HDRS)
 	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
