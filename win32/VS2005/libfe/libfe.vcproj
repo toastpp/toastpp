@@ -287,11 +287,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\libfe\meshopt.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\libfe\ndlist.cc"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\libfe\node.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfe\ordmmd.cc"
 				>
 			</File>
 			<File
@@ -316,6 +324,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\libfe\quad4.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfe\rcm.cc"
 				>
 			</File>
 			<File
@@ -456,11 +468,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\libfe\meshopt.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\libfe\ndlist.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\libfe\node.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfe\ordmmd.h"
 				>
 			</File>
 			<File
@@ -485,6 +505,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\libfe\quad4.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libfe\rcm.h"
 				>
 			</File>
 			<File
