@@ -325,6 +325,9 @@ public:
 
     void SetRow (int r, const TVector<MT> &row);
 
+    void RemoveRow(int c);
+    //Remove row c;
+
     void ColScale (const TVector<MT> &scale);
     // scales the columns with 'scale'
 
