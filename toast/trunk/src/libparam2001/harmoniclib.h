@@ -22,6 +22,6 @@
 
 //#endif // !NO_HARMONIC_HEADERS
 
-const double M_PI=3.141592653589793;
+//const double M_PI=3.141592653589793;
 
 #endif // !__HARMONICLIB_H

@@ -17,7 +17,7 @@
 
 using namespace toast;
 using namespace std;
-const double M_PI=3.141592653589793;
+//const double M_PI=3.141592653589793;
 int factorial(int i)
 {
   if (i==2) return 2;
@@ -92,7 +92,7 @@ complex SphericalHarmonic(int l,int m, double thi, double fi)// calculates the s
   
     
 
-      d1 = sqrt ( ( 2 * ll + 1 ) / ( 4 * M_PI ) );
+      d1 = sqrt ( ( 2 * ll + 1 ) / ( 4 * Pi ) );
      
       d2 = sqrt ( ((double)factorial ( l - m )) / ((double)factorial ( l + m )) );
      
@@ -114,7 +114,7 @@ complex SphericalHarmonic(int l,int m, double thi, double fi)// calculates the s
       m = (-1) * m;
       mm = (-1.0) * mm;
 
-      d1 = sqrt ( ( 2 * ll + 1 ) / ( 4 * M_PI ) );
+      d1 = sqrt ( ( 2 * ll + 1 ) / ( 4 * Pi ) );
      
       d2 = sqrt ( ((double)factorial ( l - m )) / ((double)factorial ( l + m )) );
       
