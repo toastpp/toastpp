@@ -247,7 +247,7 @@ void DiffuSphere::DoDifussion(char *name)
    for(int d=1;d<NoVRT-1;d++)
      {
        if (A(d,0)== -1)BConVeCTR[d-1]=0;
-       if (A(d,NoVRT-1)== -1)BConVeCTR[d-1]=M_PI;
+       if (A(d,NoVRT-1)== -1)BConVeCTR[d-1]=Pi;
      } 
 
  
@@ -263,7 +263,7 @@ void DiffuSphere::DoDifussion(char *name)
  // Create  the vector Thita
 
   Thita[0]=0;
-  Thita[NoVRT-1]=M_PI;
+  Thita[NoVRT-1]=Pi;
 
    for(int k=1;k<NoVRT-1;k++)
      {
@@ -577,8 +577,8 @@ void DiffuSphere::DoDifussion(char *name)
 		   //ii=ii%4;
 		   //cerr <<" sto prwto ii2 =  "<<ii<<endl; 
 
-		   RedBlong[DirNBR[here][ii]-1 ] += 2* M_PI;// add 2 Pi to b[neighbour]
-		   RedBlong[here-1] -= 2 * M_PI ;//Subtrack2Pi from b[here]
+		   RedBlong[DirNBR[here][ii]-1 ] += 2* Pi;// add 2 Pi to b[neighbour]
+		   RedBlong[here-1] -= 2 * Pi ;//Subtrack2Pi from b[here]
 		 }
 	       
 	     }  
@@ -599,8 +599,8 @@ void DiffuSphere::DoDifussion(char *name)
 
 		   t=iii% (NoDNBR[here]+1);
 		   // cerr <<" sto deutero  t=  "<<t<<" <DirNBRClock[here][t]=   "<<DirNBR[here][t]<<"here   "<<here<<endl; 
-		   RedBlong[(DirNBR[here][t]-1)] += 2 * M_PI;// add 2 Pi to b[neighbour]
-		   RedBlong[here-1] -= 2 *  M_PI;//Subtrack2Pi from b[here]
+		   RedBlong[(DirNBR[here][t]-1)] += 2 * Pi;// add 2 Pi to b[neighbour]
+		   RedBlong[here-1] -= 2 *  Pi;//Subtrack2Pi from b[here]
 		 }
 	     }
 	  

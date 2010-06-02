@@ -300,7 +300,7 @@ double OptimiZZZ::CVecConstruction (RVector *Vec1,int Len)
   if(Len==0)
     {      
       int NoIneq=NofIneq((RVector*)0,0);
-      double Final_Area= (4 * M_PI)/(NoFac);
+      double Final_Area= (4 * Pi)/(NoFac);
      
       LoC= NoFac+NoIneq;
       ConVec.New(LoC);
@@ -349,7 +349,7 @@ double OptimiZZZ::CVecConstruction (RVector *Vec1,int Len)
     {
     
       int NoIneq=NofIneq(Vec1,NoVRT);
-      double Final_Area= (4 * M_PI)/(NoFac);
+      double Final_Area= (4 * Pi)/(NoFac);
       LoC= NoFac+NoIneq;
       ConVec.New((LoC));
       
@@ -581,7 +581,7 @@ void OptimiZZZ::CVecJacobian (void)
   
    
   int NoIneq=NofIneq((RVector*)0,0);
-  double Final_Area= (4 * M_PI)/(NoFac);
+  double Final_Area= (4 * Pi)/(NoFac);
   LoC= NoFac+NoIneq;
   RCoordMatrix ConJConVec(LoC,3*NoVRT);
   JConVec.New(LoC,3*NoVRT);

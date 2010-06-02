@@ -26,12 +26,12 @@ double gwnia;
 int mhden=0;
 if(syn==0 && hmit==1)
 { 
-  gwnia =M_PI/2;
+  gwnia =Pi/2;
   mhden=1;
 }
 if(syn==0 && hmit==-1)
 {
-  gwnia =3 * M_PI / 2 ;
+  gwnia =3 * Pi / 2 ;
   mhden=1;
 }
 if (mhden==0)
@@ -39,7 +39,7 @@ if (mhden==0)
   double efa =atan2(hmit, syn);
   if(efa <0)
     {
-      gwnia= efa + 2 * M_PI;
+      gwnia= efa + 2 * Pi;
     }
   else
     {
@@ -138,7 +138,7 @@ double SinLDAB(RVector VecD, RVector VecA, RVector VecB)
 double Area( RVector VecA, RVector VecB, RVector  VecC, RVector VecD)
 {
   double area ;
-  area= ( LDAB (VecB, VecC, VecD)+ LDAB (VecC, VecD, VecA) +LDAB (VecD, VecA, VecB)+ LDAB (VecA, VecB, VecC) )- 2* M_PI;
+  area= ( LDAB (VecB, VecC, VecD)+ LDAB (VecC, VecD, VecA) +LDAB (VecD, VecA, VecB)+ LDAB (VecA, VecB, VecC) )- 2* Pi;
   return area;
 }
 
