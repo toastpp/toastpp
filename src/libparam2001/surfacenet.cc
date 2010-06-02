@@ -1,4 +1,4 @@
-
+#define HARMONICLIB_IMPLEMENTATION
 //============================================================//
 
 #include <iostream>
@@ -11,6 +11,7 @@
 #include "surfacenet.h" 
 
 using namespace toast;
+using namespace std;
 
 //============================================================//
 
@@ -119,10 +120,12 @@ void SurfaceNet::WriteFaces(char *ofname)
 
 void SurfaceNet::ReadVoxels(char *fname)
 {
-   std::ifstream is(fname);
-  int NoVoxels;// number of voxels
-  is >> NoVoxels;
-  Point voxels[NoVoxels];
+  std::ifstream is(fname);
+  int   NoVoxels ;// number of voxels
+  is >> NoVoxels ;
+  //const int NoVoxels = static_cast<const int>(NoVoxels1);
+  Point *voxels = new Point [NoVoxels];
+  //Point voxels[NoVoxels];
   
   for (int i=0;i<NoVoxels;i++)// reads the voxel data from a file 
     {
@@ -152,9 +155,18 @@ void SurfaceNet::ReadVoxels(char *fname)
   
   
   std::  cout<<NoVoxels<<"  "<<maxX<<" "<<maxY<<" "<<maxZ<< std:: endl;
-  
-  int bitmap[maxX][maxY][maxZ];
-  int bitmap2[maxX][maxY][maxZ];
+  int ***bitmap = new int**[maxX];
+  int ***bitmap2 = new int**[maxX];
+  for (int i = 0; i < maxX; i++) {
+	  bitmap[i] = new int*[maxY];
+	  bitmap2[i] = new int*[maxY];
+	  for (int j = 0; j < maxY; j++) {
+		  bitmap[i][j] = new int[maxZ];
+		  bitmap2[i][j] = new int[maxZ];
+	  }
+  }
+  //int bitmap[maxX][maxY][maxZ];
+  //int bitmap2[maxX][maxY][maxZ];
   
   
   for(int i=0;i<maxX;i++)
@@ -248,7 +260,7 @@ void SurfaceNet::ReadVoxels(char *fname)
   // ....................................................................
   
   
-  Point verts1[NoVoxels*8];
+  Point *verts1 = new Point[NoVoxels*8];
   for(int rr=0;rr<NoVoxels*8;rr++)
     { 
       Point np(3);//Sets verts to 3d point
@@ -276,7 +288,7 @@ void SurfaceNet::ReadVoxels(char *fname)
 	    }
 	}
     }
-  Point verts[kk];
+  Point *verts = new Point[kk];
   
   //cerr<<" kkfinal = "<<kk<<endl;
   
@@ -296,10 +308,10 @@ void SurfaceNet::ReadVoxels(char *fname)
   
   int NoVRT=kk;
   
-  int ver1[NoVoxels];
-  int ver2[NoVoxels];
-  int ver3[NoVoxels];
-  int ver4[NoVoxels];
+  int *ver1 = new int[NoVoxels];
+  int *ver2 = new int[NoVoxels];
+  int *ver3 = new int[NoVoxels];
+  int *ver4 = new int[NoVoxels];
   
   for(int jj=0;jj<NoVoxels;jj++)
     {
@@ -356,8 +368,11 @@ void SurfaceNet::ReadVoxels(char *fname)
   //(*Stores all the faces of the shape Inner and outer*)
   // ....................................................................
   
-  
-  int InitialFaces[6*NoVoxels][4];
+  int **InitialFaces = new int*[6*NoVoxels];
+  for (int i = 0; i < 6*NoVoxels; i++)
+	  InitialFaces[i] = new int[4];
+
+  //int InitialFaces[6*NoVoxels][4];
   
   
   for ( int f=0;f<NoVoxels;f++)
@@ -408,7 +423,10 @@ void SurfaceNet::ReadVoxels(char *fname)
   //Copy initialFaces to Surfaces
   // ....................................................................
   
-  int Surfaces[6*NoVoxels][4];
+  int **Surfaces = new int*[6*NoVoxels];
+  for (int i = 0; i < 6*NoVoxels; i++)
+	  Surfaces[i] = new int[4];
+  //int Surfaces[6*NoVoxels][4];
   
   
   
@@ -525,8 +543,8 @@ void SurfaceNet::ReadVoxels(char *fname)
   // ....................................................................
   
   
-  int TobeRemov[NoVRT];
-  int map0[NoVRT];
+  int *TobeRemov = new int [NoVRT];
+  int *map0 = new int [NoVRT];
   int li=0;
   int la=0;
   
@@ -628,6 +646,35 @@ void SurfaceNet::ReadVoxels(char *fname)
   
   
   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> EDW <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+delete [] voxels;
+delete [] verts1;
+delete [] verts;
+delete [] ver1;
+delete [] ver2;
+delete [] ver3;
+delete [] ver4;
+
+delete [] TobeRemov;
+delete [] map0; 
+
+for (int i = 0; i < maxX; i++) {
+	for (int j = 0; j < maxY; j++) {
+		delete []bitmap[i][j];
+		delete []bitmap2[i][j];
+	}
+	delete []bitmap[i];
+	delete []bitmap2[i];
+}
+delete []bitmap;
+delete []bitmap2;
+
+for (int i = 0; i < 6*NoVoxels; i++)
+	delete []InitialFaces[i];
+delete []InitialFaces;
+
+for (int i = 0; i < 6*NoVoxels; i++)
+	delete []Surfaces[i];
+delete []Surfaces;
 
 }//End of function 
 

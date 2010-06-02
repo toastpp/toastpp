@@ -62,18 +62,18 @@ MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     int maxit = 0);
 
 template<class MT>
-int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+MATHLIB int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-int ComplexBiCGSolve (const TGenericSparseMatrix<MT> &Are,
+MATHLIB int ComplexBiCGSolve (const TGenericSparseMatrix<MT> &Are,
     const TGenericSparseMatrix<MT> &Aim, const TVector<MT> &bre,
     const TVector<MT> &bim, TVector<MT> &xre, TVector<MT> &xim,
     double &tol, int maxit = 0);
 
 template<class MT>
-int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+MATHLIB int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, int maxit = 0);
 
 // ==========================================================================
@@ -269,19 +269,19 @@ public:
         int maxit);
     // preconditioned conjugate gradient method.
 
-    friend int BiCG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+    friend MATHLIB int BiCG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon,
         int maxit);
     // biconjugate gradient method.
 
-    friend int ComplexBiCGSolve<> (const TGenericSparseMatrix<MT> &Are,
+    friend MATHLIB int ComplexBiCGSolve<> (const TGenericSparseMatrix<MT> &Are,
         const TGenericSparseMatrix<MT> &Aim, const TVector<MT> &bre,
 	const TVector<MT> &bim, TVector<MT> &xre, TVector<MT> &xim,
 	double &tol, int maxit);
     // Solves Ax = b for complex case using biconjugate gradient solver
     // obsolete
 
-    friend int GaussSeidel<> (const TGenericSparseMatrix<MT> &A,
+    friend MATHLIB int GaussSeidel<> (const TGenericSparseMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol, int maxit);
     // Solves Ax = b using Gauss-Seidel iteration
 

@@ -16,12 +16,12 @@
 #include "diffusphere.h"
 #include "optimizzz.h"
 #include "usefulfan.h"
-#include "legendre.h"
-#include "pplot3d.h"
+//#include "legendre.h"
+//#include "pplot3d.h"
 
 
 //#endif // !NO_HARMONIC_HEADERS
 
-
+const double M_PI=3.141592653589793;
 
 #endif // !__HARMONICLIB_H

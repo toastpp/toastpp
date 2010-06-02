@@ -1,13 +1,13 @@
-
+#define HARMONICLIB_IMPLEMENTATION
+//============================================================//
+#include "mathlib.h"
+#include "felib.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mathlib.h"
-#include "felib.h"
 #include "harmoniclib.h"
-#include "surfacenet.h" 
 #include "diffusphere.h"
-
+#include "surfacenet.h" 
 using namespace toast;
 
 void DiffuSphere::read_net(char *name)
@@ -335,7 +335,7 @@ void DiffuSphere::DoDifussion(char *name)
 
    RVector RedFi(NoVRT-2);
    Fi.New(NoVRT);
-   double RedBlong[NoVRT-2];
+   double *RedBlong = new double [NoVRT-2];
 
 
 
@@ -354,7 +354,7 @@ void DiffuSphere::DoDifussion(char *name)
    NoDNBR= new int[NoVRT];
    int l,CurFace[6][4],ThisNGBR, NextNGBR,s;
   
-   double  Th1[NoVRT];
+   double  *Th1 = new double [NoVRT];
    int NorthPole=0;
    int SouthPole=NoVRT-1;
    int PrevNode,t, neighbors_ID;
@@ -638,5 +638,6 @@ void DiffuSphere::DoDifussion(char *name)
 	    Fi[s+1]=RedFi[s];
 	  }
 
-
+delete [] RedBlong;
+delete [] Th1;
 }//end of Function 

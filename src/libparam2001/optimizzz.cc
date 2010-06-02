@@ -1,3 +1,5 @@
+#define HARMONICLIB_IMPLEMENTATION
+//============================================================//
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +10,6 @@
 #include "diffusphere.h"
 #include "optimizzz.h"
 #include "usefulfan.h"
-
 using namespace toast;
 
 //        Constructor Definition

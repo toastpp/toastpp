@@ -1,6 +1,12 @@
 #ifndef __USEFULFAN_H
 #define __USEFULFAN_H
 
+// Symbol import/export direction
+#ifdef HARMONICLIB_IMPLEMENTATION
+#define HARMONICLIB DLLEXPORT
+#else
+#define HARMONICLIB DLLIMPORT
+#endif
 
 //***************************************************************************
 //***************************************************************************

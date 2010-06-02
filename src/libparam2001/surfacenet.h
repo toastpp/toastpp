@@ -1,10 +1,18 @@
-// some goo
-
 #ifndef __SURFACENET_H
 #define __SURFACENET_H
+
+// Symbol import/export direction
+#ifdef HARMONICLIB_IMPLEMENTATION
+#define HARMONICLIB DLLEXPORT
+#else
+#define HARMONICLIB DLLIMPORT
+#endif
+
+
+
 class Point;
 
-class SurfaceNet {
+class HARMONICLIB SurfaceNet {
  public:
   SurfaceNet();        //        Constructor
   ~SurfaceNet();      //         Destructor
