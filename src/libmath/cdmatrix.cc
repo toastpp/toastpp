@@ -122,7 +122,8 @@ MT &TCoordMatrix<MT>::operator() (int r, int c)
     // assumes unsorted lists
     for (int i = 0; i < this->nval; i++)
         if (rowidx[i] == r && colidx[i] == c) return this->val[i];
-    return this->val[Insert (r, c)]; // create new entry
+    int idx = Insert(r,c);
+    return this->val[idx];
 }
 
 template<class MT>
