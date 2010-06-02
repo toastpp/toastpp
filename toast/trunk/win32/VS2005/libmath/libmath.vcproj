@@ -173,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;"
+				CommandLine="if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
