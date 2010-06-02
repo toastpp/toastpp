@@ -1,3 +1,4 @@
+#define HARMONICLIB_IMPLEMENTATION
 #include "mathlib.h"
 #include "felib.h"
 #include <stdio.h>
@@ -5,18 +6,18 @@
 #include <string.h>
 #include <math.h>
 #include <signal.h>
-#include <iostream.h>
-#include "harmoniclib.h"
-#include "surfacenet.h" 
-#include "diffusphere.h"
-#include "optimizzz.h"
-#include "usefulfan.h"
+
+//#include "harmoniclib.h"
+//#include "surfacenet.h" 
+//#include "diffusphere.h"
+//#include "optimizzz.h"
+//#include "usefulfan.h"
 //#include "complex.h"
 
 
 using namespace toast;
-
-
+using namespace std;
+const double M_PI=3.141592653589793;
 int factorial(int i)
 {
   if (i==2) return 2;

@@ -1,19 +1,18 @@
- #ifdef __BORLANDC__
-#include <strstrea.h>
-#else
-#include <sstream>
-#endif
+#define HARMONICLIB_IMPLEMENTATION
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mathlib.h>
-#include <felib.h>
+#include "mathlib.h"
+#include "felib.h"
 #include "harmoniclib.h"
 #include "surfacenet.h" 
 #include "diffusphere.h"
 #include "optimizzz.h"
 #include "usefulfan.h"
  
+
+using namespace toast;
+using namespace std;
 //******************************************************************************
 //*                          useful functions                                  *
 //******************************************************************************

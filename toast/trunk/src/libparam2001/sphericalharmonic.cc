@@ -6,7 +6,9 @@
 #include <signal.h>
 #include <iostream>
 
-
+ 
+using namespace std;
+const double M_PI=3.141592653589793;
 double factorial(double i)
 {
   if (i==2) return 2.0;

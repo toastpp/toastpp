@@ -316,7 +316,7 @@ MATHLIB int CG<scomplex> (const SCGenericSparseMatrix &A, const SCVector &b,
 // ==========================================================================
 
 template<class MT>
-int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+MATHLIB int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
@@ -370,7 +370,7 @@ int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
 }
 
 template<> // specialisation: complex
-int BiCG<complex> (const CGenericSparseMatrix &A, const CVector &b,
+MATHLIB int BiCG<complex> (const CGenericSparseMatrix &A, const CVector &b,
     CVector &x, double &tol, const CPreconditioner *cprecon, int maxit)
 {
     int i, niter, dim = x.Dim();
@@ -432,7 +432,7 @@ int BiCG<complex> (const CGenericSparseMatrix &A, const CVector &b,
 }
 
 template<class MT>
-int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+MATHLIB int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, int maxit)
 {
     int i, j, k, nz, niter;
@@ -609,13 +609,13 @@ template MATHLIB int IterativeSolve (const RGenericSparseMatrix &A, const RVecto
     RVector &x, double &tol, const RPreconditioner *precon, int maxit);
 template MATHLIB int CG (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, const RPreconditioner *precon, int maxit);
-template int BiCG (const RGenericSparseMatrix &A, const RVector &b,
+template MATHLIB int BiCG (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, const RPreconditioner *precon, int maxit);
-template int GaussSeidel (const RGenericSparseMatrix &A, const RVector &b,
+template MATHLIB int GaussSeidel (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, int maxit);
-template int GaussSeidel (const CGenericSparseMatrix &A, const CVector &b,
+template MATHLIB int GaussSeidel (const CGenericSparseMatrix &A, const CVector &b,
     CVector &x, double &tol, int maxit);
-template int GaussSeidel (const SCGenericSparseMatrix &A, const SCVector &b,
+template MATHLIB int GaussSeidel (const SCGenericSparseMatrix &A, const SCVector &b,
     SCVector &x, double &tol, int maxit);
 // Note that specialisations are not explicitly instantiated
 

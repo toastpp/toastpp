@@ -1,9 +1,15 @@
 #ifndef __OPTIMIZZZ_H
 #define __OPTIMIZZZ_H
 
+// Symbol import/export direction
+#ifdef HARMONICLIB_IMPLEMENTATION
+#define HARMONICLIB DLLEXPORT
+#else
+#define HARMONICLIB DLLIMPORT
+#endif
 
 
-class OptimiZZZ {
+class HARMONICLIB OptimiZZZ {
  public:
   
   OptimiZZZ();  //  Constructor

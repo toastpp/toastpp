@@ -1,9 +1,15 @@
 #ifndef __DIFFUSPHERE_H
 #define __DIFFUSPHERE_H
 
+// Symbol import/export direction
+#ifdef HARMONICLIB_IMPLEMENTATION
+#define HARMONICLIB DLLEXPORT
+#else
+#define HARMONICLIB DLLIMPORT
+#endif
 
 
-class DiffuSphere {
+class HARMONICLIB DiffuSphere {
  public:
 
   DiffuSphere();  //  Constructor
