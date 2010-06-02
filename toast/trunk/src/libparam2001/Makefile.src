@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libparam2001
@@ -29,7 +28,9 @@ $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath $(MATHLIB)
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) $(MATHLIB) -lmath   
+#	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath $(MATHLIB)
+
 
 clean:: 
 	$(RM) *.o
