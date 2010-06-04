@@ -643,6 +643,7 @@ int main (int argc, char *argv[])
 	    proj_i = FWS.ProjectAll (mvec, dphi);
 	}
 	sd = (data - proj);
+
 	double avd1 = 0.0, avd2 = 0.0;
 	for (i = 0; i < sd.Dim(); i++) {
 	    avd1 += sd[i]*sd[i];
