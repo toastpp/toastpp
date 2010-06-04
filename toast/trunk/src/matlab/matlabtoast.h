@@ -36,13 +36,6 @@ public:
 	// Methods defined in matlabtoast.cc
     void SetVerbosity (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
-    void SurfData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void MeshBB (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void MeshSize (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
     void MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void ReadQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
@@ -50,10 +43,6 @@ public:
     void GetQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void WriteQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void ElementSize (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void ElementData (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void FindElement (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
@@ -158,6 +147,17 @@ public:
         const mxArray *prhs[]);
     void ClearMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MeshData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void SurfData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void MeshBB (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void MeshSize (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void ElementSize (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void ElementData (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
 
 private:
     static void ErrorHandler (char *msg);

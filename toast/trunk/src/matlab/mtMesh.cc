@@ -333,3 +333,198 @@ void MatlabToast::MeshData (int nlhs, mxArray *plhs[], int nrhs,
 	plhs[2] = eltp;
     }
 }
+
+// =========================================================================
+
+void MatlabToast::SurfData (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    int i, j, k;
+    double *pr;
+
+    int nlen = mesh->nlen();
+    int elen = mesh->elen();
+    int dim  = mesh->Dimension();
+    int nbnd = mesh->nlist.NumberOf (BND_ANY);
+
+    // vertex coordinate list
+    mxArray *vtx = mxCreateDoubleMatrix (nbnd, dim, mxREAL);
+    pr = mxGetPr (vtx);
+
+    for (i = 0; i < dim; i++)
+	for (j = 0; j < nlen; j++)
+	    if (mesh->nlist[j].isBnd())
+		*pr++ = mesh->nlist[j][i];
+
+	if (nlhs >= 2) {
+	    int *bndidx = new int[nlen];
+
+		for (j = k = 0; j < nlen; j++)
+			bndidx[j] = (mesh->nlist[j].isBnd() ? k++ : -1);
+    
+		// boundary element index list
+		// note: this currently assumes that all elements contain the
+		// same number of vertices!
+
+		int nnd = 0, nface, sd, nn, nd, bn, *bndellist, *bndsdlist;
+		nface = mesh->BoundaryList (&bndellist, &bndsdlist);
+		for (j = 0; j < nface; j++)
+			nnd = ::max (nnd, mesh->elist[bndellist[j]]->nSideNode(bndsdlist[j]));
+		mxArray *idx = mxCreateDoubleMatrix (nface, nnd, mxREAL);
+		pr = mxGetPr (idx);
+    
+		for (i = 0; i < nnd; i++)
+			for (j = 0; j < nface; j++) {
+				Element *pel = mesh->elist[bndellist[j]];
+				sd = bndsdlist[j];
+				nn = pel->nSideNode (sd);
+				if (i < nn) {
+				nd = pel->Node[pel->SideNode (sd, i)];
+				bn = bndidx[nd]+1;
+			} else bn = 0;
+			*pr++ = bn;
+		}
+
+		plhs[0] = vtx;
+		plhs[1] = idx;
+
+		if (nlhs >= 3) {
+			// generate nodal permutation index list
+			mxArray *perm = mxCreateDoubleMatrix (nbnd, 1, mxREAL);
+			pr = mxGetPr (perm);
+			for (i = 0; i < nlen; i++) {
+				if (bndidx[i] >= 0)
+				*pr++ = i+1;
+			}
+			plhs[2] = perm;
+		}
+
+		// cleanup
+		delete []bndidx;
+	}
+}
+
+// =========================================================================
+
+void MatlabToast::MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    const char id[3] = {0,3,2};
+    const double rid[4] = {0,-1,2,1};
+
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    int i, n = mesh->nlen();
+    RVector bnd(n);
+    if (nrhs > 1) {
+	CopyVector (bnd,prhs[1]);
+	for (i = 0; i < n; i++)
+	    mesh->nlist[i].SetBndTp (id[(int)(bnd[i]+0.5)]);
+    } else {
+	mesh->MarkBoundary();
+    }
+    if (nlhs > 0) {
+	for (i = 0; i < n; i++)
+	    bnd[i] = rid[mesh->nlist[i].BndTp()];
+	CopyVector (&plhs[0], bnd);
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::MeshBB (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    int i;
+
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    int dim = mesh->Dimension();
+    Point pmin(dim), pmax(dim);
+    mesh->BoundingBox (pmin, pmax);
+
+    plhs[0] = mxCreateDoubleMatrix (2, dim, mxREAL);
+    double *pr = mxGetPr(plhs[0]);
+    for (i = 0; i < dim; i++) {
+	*pr++ = pmin[i];
+	*pr++ = pmax[i];
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::MeshSize (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+    plhs[0] = mxCreateScalarDouble (mesh->FullSize());
+}
+
+// =========================================================================
+
+void MatlabToast::MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+    plhs[0] = mxCreateScalarDouble (mesh->Dimension()); 
+}
+
+// =========================================================================
+
+void MatlabToast::ElementSize (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    int n = mesh->elen();
+    plhs[0] = mxCreateDoubleMatrix (n, 1, mxREAL);
+    double *pr = mxGetPr (plhs[0]);
+    for (int i = 0; i < n; i++)
+	pr[i] = mesh->ElSize(i);
+}
+
+// =========================================================================
+
+void MatlabToast::ElementData (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    int i, j;
+    double *pr;
+
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    // element index
+    int el = (int)mxGetScalar (prhs[1]) - 1;
+    if (el < 0 || el >= mesh->elen()) { // invalid index
+	plhs[0] = mxCreateDoubleMatrix (0, 0, mxREAL);
+	return;
+    }
+
+    Element *pel = mesh->elist[el];
+    int dim = pel->Dimension();
+    int nnd = pel->nNode();
+    int nsd = pel->nSide();
+    int nsn = pel->nSideNode(0);
+    for (i = 1; i < nsd; i++)
+	nsn = ::max (nsn, pel->nSideNode(i));
+
+    mxArray *vtx = mxCreateDoubleMatrix (nnd, dim, mxREAL);
+    pr = mxGetPr (vtx);
+    for (i = 0; i < dim; i++)
+	for (j = 0; j < nnd; j++)
+	    *pr++ = mesh->nlist[pel->Node[j]][i];
+
+    mxArray *idx = mxCreateDoubleMatrix (nsd, nsn, mxREAL);
+    pr = mxGetPr (idx);
+    for (i = 0; i < nsn; i++)
+	for (j = 0; j < nsd; j++)
+	    if (i < pel->nSideNode(j))
+		*pr++ = pel->Node[pel->SideNode(j,i)]+1;
+	    else
+		*pr++ = 0;
+    
+    plhs[0] = vtx;
+    plhs[1] = idx;
+}
