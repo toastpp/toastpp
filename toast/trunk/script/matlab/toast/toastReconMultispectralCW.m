@@ -37,7 +37,7 @@ extinct = prm.extinct;                  % extinction coefficients
 if isfield(prm,'basis') && isfield(prm.basis,'hMesh')
     hMesh = prm.basis.hMesh;
 else
-    hMesh = toastReadMesh (prm.basis.meshfile);
+    hMesh = toastReadMesh (prm.fwdsolver.meshfile);
     toastReadQM (hMesh, prm.meas.qmfile);
 end
 n = toastMeshNodeCount (hMesh);
@@ -56,7 +56,11 @@ if isfield(prm,'basis') && isfield(prm.basis,'hBasis')
 else
     hBasis = toastSetBasis (hMesh, prm.basis.bdim);
 end
-solmask = prm.smask;
+if isfield(prm,'smask')
+    solmask = prm.smask;
+else
+    solmask = toastSolutionMask(hBasis);
+end
 slen = length(solmask);
 
 % ----------------------------------------------------------------------
@@ -74,7 +78,11 @@ m = length(data);
 % ----------------------------------------------------------------------
 % Set up homogeneous initial parameter estimates - generalise!
 for i=1:prm.nch
-    C(i,:) = ones(n,1) * 0.5;
+    if isfield(prm,'chinit')
+        C(i,:) = ones(n,1) * prm.chinit(i);
+    else
+        C(i,:) = ones(n,1) * 0.5;
+    end
 end
 
 % ----------------------------------------------------------------------
@@ -85,6 +93,7 @@ for i=1:prm.nch
     sC(i,:) = bC(i,solmask);
     x = [x; sC(i,:)'];
 end
+logx = log(max(x,1e-20));
 p = length(x);
 
 % ----------------------------------------------------------------------
@@ -94,9 +103,9 @@ proj = ProjectAll(C);
 % ----------------------------------------------------------------------
 % data scaling
 for i=1:nlambda
-    p = proj((i-1)*nqm+1:i*nqm);
-    d = data((i-1)*nqm+1:i*nqm);
-    nm = norm(p-d);
+    pr = proj((i-1)*nqm+1:i*nqm);
+    dt = data((i-1)*nqm+1:i*nqm);
+    nm = norm(pr-dt);
     sd((i-1)*nqm+1:i*nqm,1) = ones(nqm,1)*nm;
 end
 
@@ -109,6 +118,8 @@ fprintf (1, '\n**** INITIAL ERROR %f\n\n', err);
 
 hReg = 0; % for now
 step = prm.solver.step0; % initial step length for line search
+step = 1e5;
+
 itr = 0; % iteration counter
 
 res.of(itr+1) = err0;
@@ -138,6 +149,9 @@ while (itr < itrmax) && ...
     % data normalisation
     for i = 1:m, J(i,:) = J(i,:) / sd(i); end
     
+    % parameter normalisation
+    for i = 1:p, J(:,i) = J(:,i) * x(i); end;
+
     % Normalisation of Hessian
     for i = 1:size(J,2)
         M(i) = 1 ./ sqrt(sum(J(:,i) .* J(:,i)));
@@ -159,10 +173,11 @@ while (itr < itrmax) && ...
     
     % Line search
     fprintf (1, 'Entering line search\n');
-    [step, err] = toastLineSearch (x, dx, step, err, @objective2);
+    [step, err] = toastLineSearch (logx, dx, step, err, @objective2);
     
     % Add update to solution
-    x = x + dx*step;
+    logx = logx + dx*step;
+    x = exp(logx);
     
     % Map parameters back to mesh
     for i=1:prm.nch
@@ -238,15 +253,12 @@ end
     % returns objective function, given model parameters (used as callback
     % function by toastLineSearch)
     
-    function of_ = objective2(x)
-    if min(x) < 0    
-        of_ = 1e8;                               % discourage negative solutions
-    else
+    function of_ = objective2(logx)
+        x = exp(logx);
         for i_ = 1:prm.nch
             C_(i_,:) = toastMapSolToMesh(hBasis,x((i_-1)*slen+1:i_*slen));
         end
         of_ = objective(ProjectAll(C_));        % calc objective function
-    end
     end
     
 

@@ -122,6 +122,9 @@ flutoast6 : flutoast6.o util.o pparse.o tparse.o fwdsolver.o raster2.o \
         source.o solution.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
 
+test : test.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
 test1 : test1.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
 

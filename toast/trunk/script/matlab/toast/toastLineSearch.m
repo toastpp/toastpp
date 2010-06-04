@@ -47,7 +47,7 @@ function [s, pmin] = toastLineSearch (x0, d, s0, p0, func, varargin)
 %   downhill direction in the vicinity of x0.
   
 if isempty(p0)
-    p0 = func (x0, varargin{:});
+    [p0,valid] =  get_of (x0, varargin{:});
 end
 
 sl = 0;
@@ -103,6 +103,7 @@ else
     a = ((pl-ph)/(sl-sh) - (pl-pm)/(sl-sm)) / (sh-sm);
     b = (pl-ph)/(sl-sh) - a*(sl+sh);
     s = -b/(2*a);
+    fprintf (1, '==> Quadratic interpolation in LS, step: %f\n', s);
     x = x0 + d*s;
     [pmin,valid] = get_of (x, varargin{:});
     if pmin > pm || ~valid   % no improvement
@@ -116,7 +117,11 @@ fprintf (1, '==> Step: %f, objective: %f [final]\n', s, pmin);
     % ===================================================
     function [p,valid] = get_of(x,varargin)
         p = func(x,varargin{:});
-        valid = true;
+        if isnan(p)
+            valid = false;
+        else
+            valid = true;
+        end
         if isstruct(p)
             if isfield(p,'valid')
                 valid = p.valid;

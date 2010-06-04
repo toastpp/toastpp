@@ -59,10 +59,12 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // QVec
     size_t nr = mxGetM(prhs[2]);
     size_t nc = mxGetN(prhs[2]);
-    if ((nc != nQ) || (nr != n))
-    {
-	cerr << "qVec is wrong size!" << endl;
+    if ((nc != nQ) || (nr != n)) {
+	cerr << "nc=" << nc << ", nQ=" << nQ
+	     << ", nr=" << nr << ", n=" << n << endl;
+	mexErrMsgTxt("qVec is wrong size!");
     }
+
     RCompRowMatrix qvec(n, nQ);
     RDenseMatrix qvdense(n, nQ);
     CopyTMatrix(qvec, prhs[2]);
@@ -72,6 +74,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxGetString(prhs[4], solverType, 256);
     double lin_tol = mxGetScalar(prhs[5]);    
     cout << "Creating forward solver: " << solverType << ", tolerance = " << lin_tol << endl;
+
     RFwdSolver *FWS = new RFwdSolver (solverType, lin_tol);
     cout << endl << "Allocating system matrix" << endl;
     FWS->Allocate (*mesh);

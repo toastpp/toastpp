@@ -9,7 +9,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastDataLinkList.cc \
 	toastDeleteBasis.cc \
 	toastDeleteMesh.cc \
-	toastDeleteRegul.cc \
+	toastClearRegul.cc \
 	toastElementData.cc \
 	toastElementSize.cc \
 	toastElmat.cc \

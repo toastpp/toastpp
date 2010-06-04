@@ -637,7 +637,7 @@ public:
      * \param i node index (range 0 .. \ref nNode-1)
      * \param sd side index (range 0 .. \ref nSide-1)
      * \return Value of the integral
-     *   \f[ \int_{\partial\Omega u_i(\vec{r}) d\vec{r} \f]
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
      *   where the integration is performed over side \e sd.
      * \sa BndIntF, BndIntFF, BndIntFFSide
      */
@@ -736,22 +736,45 @@ public:
     virtual double IntFd (int i, int j, int k) const
     { xERROR(Not implemented); return 0.0; }
 
+    /**
+     * \brief Integral of the product of a nodal function and a partial shape
+     *   function derivative over the element.
+     * \param P array of nodal coefficients defining the function
+     * \param j node index for shape function derivative
+     *   (range 0 .. \ref nNode-1)
+     * \param k coordinate index for derivative (range 0 .. \ref Dimension-1)
+     * \return Value of the integral
+     *   \f[ \sum_i P_i \int_\Omega u_i(\vec{r}) \frac{\partial u_j(\vec{r})}{\partial x_k} d\vec{r} \f]
+     */
     virtual double IntPd (const RVector &P, int j, int k) const
     { xERROR(Not implemented); return 0.0; }
-    // Returns Int [p(r) du_j/dx_k] dr where p(r) is defined by its nodal
-    // basis coefficients P
 
+    /**
+     * \brief Integral of the product of two partial shape function
+     *   derivatives over the element.
+     * \return Matrix of integrals for all element nodes in each dimension.
+     *   \f[ \int_\Omega \frac{\partial u_i(\vec{r})}{\partial x_j} \frac{partial u_k(\vec{r})}{\partial x_l} d\vec{r} \f]
+     *   The dimension of the returned matrix is nd x nd, where n is the
+     *   number of nodes, and d is the dimension of the element (2 or 3).
+     *   The matrix contains n x n blocks, where each block is of
+     *   dimension d x d.
+     */
     virtual RSymMatrix Intdd() const
     { xERROR(Not implemented); return RSymMatrix(); }
-    // returns integral over element of mixed shape function derivatives
-    // Int [du_i/dx_j du_k/dx_l] dr
-    // The dimension of the returned matrix is nd x nd where n is the number
-    // of nodes, and d is the dimension of the element (2 or 3). The matrix
-    // contains n x n blocks, with each block of dimension d x d
 
+    /**
+     * \brief Integral of the product of a shape function and two partial
+     *   shape function derivatives over the element.
+     * \param i node index for shape function (range 0 .. \ref nNode-1)
+     * \param j node index for shape function derivative  (range 0 .. \ref nNode-1)
+     * \param k node index for shape function derivative  (range 0 .. \ref nNode-1)
+     * \param l coordinate index for derivative (range 0 .. \ref Dimension-1)
+     * \param m coordinate index for derivative (range 0 .. \ref Dimension-1)
+     * \return Value of the integral
+     *   \f[ \int_\Omega u_i(\vec{r}) \frac{\partial u_j(\vec{r})}{\partial x_l} \frac{\partial u_k(\vec{r})}{\partial x_m} \f]
+     */
     virtual double IntFdd (int i, int j, int k, int l, int m) const
     { xERROR(Not implemented); return 0; }
-    // Int [u_i du_j/dx_l du_k/dx_m] dr
 
     virtual double IntPdd (const RVector &p, int j, int k, int l, int m) const
     { xERROR(Not implemented); return 0; }
