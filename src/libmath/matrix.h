@@ -15,9 +15,6 @@
 
 #include "vector.h"
 
-enum RC { ROW, COL };  // row/column identifier
-
-
 /// \defgroup matrix_storage matrix storage type
 //@{
 enum MatrixStorage {
@@ -146,6 +143,8 @@ MATHLIB std::ostream &operator<< (std::ostream &os, const TMatrix<MT> &mat);
  */
 template<class MT> class TMatrix {
 public:
+    enum RC { ROW, COL };  // row/column identifier
+
     /**
      * \brief Create a matrix of size 0 x 0.
      */

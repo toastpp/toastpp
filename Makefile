@@ -121,12 +121,17 @@ web_distribution_static::
 
 distro_src::
 	cd ..; \
-	zip -9 -r toast_src.zip $(TOASTRELDIR)/src -x@$(TOASTRELDIR)/exclude.lst ; \
+	ln -T -s trunk $(TOASTRELDIR); \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/doc -x@$(TOASTRELDIR)/exclude.lst ; \
 	zip -9 -r toast_src.zip $(TOASTRELDIR)/include -x@$(TOASTRELDIR)/exclude.lst ; \
-	zip -9 -r toast_src.zip $(TOASTRELDIR)/win32/VS2005 -x@$(TOASTRELDIR)/exclude.lst ; \
-	zip -9 toast_src.zip $(TOASTRELDIR)/configure $(TOASTRELDIR)/gpl.txt $(TOASTRELDIR)/license.html $(TOASTRELDIR)/Makefile $(TOASTRELDIR)/mtoast_install.m $(TOASTRELDIR)/readme.txt $(TOASTRELDIR)/COMPILE.readme $(TOASTRELDIR)/numerics.tar.gz; \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/numerics -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/script -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/src -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_src.zip $(TOASTRELDIR)/win32 -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 toast_src.zip $(TOASTRELDIR)/configure $(TOASTRELDIR)/gpl.txt $(TOASTRELDIR)/license.html $(TOASTRELDIR)/Makefile $(TOASTRELDIR)/mtoast_install.m $(TOASTRELDIR)/readme.txt; \
 	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.in" -print | zip toast_src.zip -@ ; \
 	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.h" -print | zip toast_src.zip -@ ; \
+	find -H $(TOASTRELDIR) -maxdepth 1 -name "*.readme" -print | zip toast_src.zip -@ ; \
 	mv toast_src.zip $(TOASTRELDIR)
 
 # ========================================================

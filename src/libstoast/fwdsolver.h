@@ -6,8 +6,9 @@
 #ifndef __FWDSOLVER_H
 #define __FWDSOLVER_H
 
+#include "slu_zdefs.h"
 #include "supermatrix.h"
-#include "zsp_defs.h"
+//#include "zsp_defs.h"
 #include "toasttype.h"
 #include "mathlib.h"
 
@@ -56,13 +57,15 @@ public:
     void Setup (int n, CCompRowMatrix *CF);
     void Solve (SuperMatrix *B, SuperMatrix *X);
     SuperMatrix smFW, L, U;
-    char fact;
-    char refact;
-    char equed;
+    //char fact;
+    //char refact;
+    //char equed;
     int *perm_c;
     int *perm_r;
     int *etree;
     double *R, *C;
+    superlu_options_t options;
+    
 private:
     void Deallocate ();
     bool allocated;
