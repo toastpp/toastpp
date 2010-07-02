@@ -149,9 +149,9 @@ void QMMesh::InitM ()
 	RVector cosin = elist[el]->DirectionCosine (bndsd, jacin);
 	RDenseMatrix gder = jacin * lder;
 	Mel[i] = el;
-	Mcosingder[i].New (gder.Dim(ROW), gder.Dim(COL));
-	for (is = 0; is < gder.Dim(ROW); is++)
-	    for (in = 0; in < gder.Dim(COL); in++)
+	Mcosingder[i].New (gder.nRows(), gder.nCols());
+	for (is = 0; is < gder.nRows(); is++)
+	    for (in = 0; in < gder.nCols(); in++)
 		Mcosingder[i](is,in) = cosin[is] * gder(is,in);
 
     }

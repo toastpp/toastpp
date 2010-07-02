@@ -4,6 +4,7 @@ include ../Makefile.incl
 NUMERICSDIR = $(TOASTDIR)/numerics
 LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
+SUPERLUDIR = SuperLU_4.0
 
 COMPONENT = blas fspblas lapack superlu arpack liblbfgs
 ifeq ($(BUILD_FDOT),1)
@@ -36,14 +37,14 @@ lapack::
 	cp SRC/libtoastlapack$(LAPACK_LIB_SUFFIX) $(TLIB)
 
 superlu::
-	mkdir -p $(TOASTOBJ)/SuperLU/SRC; \
-	cd $(TOASTOBJ)/SuperLU; \
-	cp $(NUMERICSDIR)/SuperLU/Makefile .; \
-	cp $(NUMERICSDIR)/SuperLU/make.inc .; \
-	cp $(NUMERICSDIR)/SuperLU/SRC/Makefile SRC; \
+	mkdir -p $(TOASTOBJ)/$(SUPERLUDIR)/SRC; \
+	cd $(TOASTOBJ)/$(SUPERLUDIR); \
+	cp $(NUMERICSDIR)/$(SUPERLUDIR)/Makefile .; \
+	cp $(NUMERICSDIR)/$(SUPERLUDIR)/make.inc .; \
+	cp $(NUMERICSDIR)/$(SUPERLUDIR)/SRC/Makefile SRC; \
 	$(MAKE) superlulib; \
 	cp SRC/libsuperlu$(LIB_SUFFIX) $(LIBDIR); \
-	cp $(NUMERICSDIR)/SuperLU/SRC/*.h $(INCDIR)
+	cp $(NUMERICSDIR)/$(SUPERLUDIR)/SRC/*.h $(INCDIR)
 
 blzpack::
 	mkdir -p $(TOASTOBJ)/blzpack/src/double; \
@@ -136,7 +137,7 @@ lapack_clean::
 	$(RM) -r $(TOASTOBJ)/LAPACK
 
 superlu_clean::
-	$(RM) -r $(TOASTOBJ)/SuperLU
+	$(RM) -r $(TOASTOBJ)/$(SUPERLUDIR)
 
 arpack_clean::
 	$(RM) -r $(TOASTOBJ)/ARPACK

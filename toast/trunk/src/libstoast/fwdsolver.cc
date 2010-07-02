@@ -12,8 +12,8 @@ using namespace toast;
 
 SuperLU_data::SuperLU_data ()
 {
-    fact = 'N';
-    refact = equed = 'N';
+    //fact = 'N';
+    //refact = equed = 'N';
     perm_c = 0;
     perm_r = 0;
     etree  = 0;
@@ -21,7 +21,14 @@ SuperLU_data::SuperLU_data ()
     C      = 0;
     allocated = false;
     used_LU = false;
-}
+    
+    toast_set_default_options(&options);
+    options.Fact = DOFACT;
+    options.Equil = NO;
+    options.ColPerm = NATURAL;
+    options.Trans = NOTRANS;
+    options.IterRefine = NOREFINE;
+    }
 
 SuperLU_data::~SuperLU_data ()
 {
@@ -50,14 +57,15 @@ void SuperLU_data::Setup (int n, CCompRowMatrix *CF)
     Deallocate();
     doublecomplex *cdat = (doublecomplex*)CF->ValPtr();
     toast_zCreate_CompCol_Matrix (&smFW, CF->nRows(), CF->nCols(),
-	    CF->nVal(), cdat, CF->colidx, CF->rowptr, NR, dtypeZ, GE);
+        CF->nVal(), cdat, CF->colidx, CF->rowptr, SLU_NR, SLU_Z, SLU_GE);
     perm_c = new int[n];
     perm_r = new int[n];
     etree  = new int[n];
     R      = new double[n];
     C      = new double[n];
     toast_get_perm_c (0, &smFW, perm_c);
-    fact = refact = 'N';
+    //fact = refact = 'N';
+    options.Fact = DOFACT;
     allocated = true;
 }
 
@@ -66,18 +74,24 @@ void SuperLU_data::Solve (SuperMatrix *B, SuperMatrix *X)
     int info;
     mem_usage_t mem_usage;
     char equed = 'N';
-    char trans = 'N';
+    //char trans = 'N';
     double R = 0.0;
     double C = 0.0;
     double ferr, berr;
     double recip_pivot_growth, rcond;
+    SuperLUStat_t stat;
+    StatInit (&stat);
 
-    toast_zgssvx (&fact, &trans, &refact, &smFW, 0, perm_c, perm_r,
-	    etree, &equed, &R, &C, &L, &U, 0, 0, B, X,
-	    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
+    toast_zgssvx (&options, &smFW, perm_c, perm_r, etree, &equed, &R, &C,
+		  &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
+		  &ferr, &berr, &mem_usage, &stat, &info);
+    //toast_zgssvx (&fact, &trans, &refact, &smFW, 0, perm_c, perm_r,
+    //	    etree, &equed, &R, &C, &L, &U, 0, 0, B, X,
+    //	    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
 
-    fact = 'F';
-    refact = 'Y';
+    options.Fact = SamePattern_SameRowPerm;
+    //fact = 'F';
+    //refact = 'Y';
     used_LU = true;
 }
 
@@ -299,7 +313,8 @@ void TFwdSolver<complex>::Reset (const Solution &sol, double omega)
     // complex version
     AssembleSystemMatrix (sol, omega);
     if (solvertp == LSOLVER_DIRECT)
-	lu_data.fact = 'N';
+	lu_data.options.Fact = DOFACT;
+	//lu_data.fact = 'N';
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -336,8 +351,8 @@ void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
 
 	doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
 	doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
-	toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, DN, dtypeZ, GE);
-	toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, DN, dtypeZ, GE);
+	toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
+	toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
 	lu_data.Solve (&B, &X);
 

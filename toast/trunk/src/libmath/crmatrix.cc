@@ -15,8 +15,9 @@
 #include <string.h>
 
 #include "mathlib.h"
+#include "slu_zdefs.h"  // SuperLU 4
 #include "supermatrix.h"
-#include "zsp_defs.h"
+//#include "zsp_defs.h" // SuperLU 2
 #include "ilutoast.h"
 
 #ifdef ML_INTERFACE
@@ -1908,21 +1909,35 @@ void LU (TCompRowMatrix<complex> &A, const TVector<complex> &b,
     int info;
     mem_usage_t mem_usage;
     SuperMatrix smA, L, U, B, X;
+    superlu_options_t options;
+    SuperLUStat_t stat;
 
     doublecomplex *cdat = (doublecomplex*)A.ValPtr();
     toast_zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
-			    cdat, A.colidx, A.rowptr, NR, dtypeZ, GE);
+			    cdat, A.colidx, A.rowptr, SLU_NR, SLU_Z, SLU_GE);
 
     doublecomplex *bdat = (doublecomplex*)b.data_buffer();
     doublecomplex *xdat = (doublecomplex*)x.data_buffer();
-    toast_zCreate_Dense_Matrix (&B, n, 1, bdat, n, DN, dtypeZ, GE);
-    toast_zCreate_Dense_Matrix (&X, n, 1, xdat, n, DN, dtypeZ, GE);
+    toast_zCreate_Dense_Matrix (&B, n, 1, bdat, n, SLU_DN, SLU_Z, SLU_GE);
+    toast_zCreate_Dense_Matrix (&X, n, 1, xdat, n, SLU_DN, SLU_Z, SLU_GE);
 
     toast_get_perm_c (0, &smA, perm_c);
 
-    toast_zgssvx (&fact, &trans, &refact, &smA, 0, perm_c, perm_r, etree,
-	    &equed, &R, &C, &L, &U, 0, 0, &B, &X,
-	    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
+    toast_set_default_options(&options);
+    options.Fact = DOFACT;
+    options.Equil = NO;
+    options.ColPerm = NATURAL;
+    options.Trans = NOTRANS;
+    options.IterRefine = NOREFINE;
+    
+
+    toast_zgssvx (&options, &smA, perm_c, perm_r, etree, &equed, &R, &C,
+		  &L, &U, 0, 0, &B, &X, &recip_pivot_growth, &rcond,
+		  &ferr, &berr, &mem_usage, &stat, &info);
+
+    //toast_zgssvx (&fact, &trans, &refact, &smA, 0, perm_c, perm_r, etree,
+    //    &equed, &R, &C, &L, &U, 0, 0, &B, &X,
+    //    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
 
     toast_Destroy_SuperMatrix_Store (&B);
     toast_Destroy_SuperMatrix_Store (&X);

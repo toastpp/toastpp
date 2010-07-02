@@ -259,7 +259,7 @@ MATHLIB bool CHdecomp<double> (TSymMatrix<double> &a, bool recover)
 template<class MT>
 MATHLIB TVector<MT> CHsubst (const TSymMatrix<MT> &a, const TVector<MT> &b)
 {
-    int i, k, n = a.Dim(ROW);
+    int i, k, n = a.Dim(TMatrix<MT>::ROW);
     MT sum, *Ai, *Ak;
     TVector<MT> x(n);
 
