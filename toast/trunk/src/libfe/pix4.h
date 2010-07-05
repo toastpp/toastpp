@@ -76,26 +76,12 @@ public:
     inline double IntF (int i) const
     { return 0.25*dx*dy; }
     inline double IntFF (int i, int j) const
-    { return dx*dy/9.0; }
+    { return intff(i,j); }
     inline RSymMatrix IntFF() const
-    { RSymMatrix ff(4);
-      ff = dx*dy/9.0;
-      return ff;
-    }
-    inline double IntFFF (int i, int j, int k) const
-    { return dx*dy*0.0625; }
-    inline double IntPFF (int i, int j, const RVector &P) const
-    { double sump = 0.0;
-      for (int k = 0; k < 4; k++) sump += P[Node[k]];
-      return sump * dx*dy*0.0625;
-    }
-    inline RSymMatrix IntPFF (const RVector& P) const
-    { double sump = 0.0;
-      for (int k = 0; k < 4; k++) sump += P[Node[k]];
-      RSymMatrix pff(4);
-      pff = sump *dx*dy*0.0625;
-      return pff;
-    }
+    { return intff; }
+    double IntFFF (int i, int j, int k) const;
+    double IntPFF (int i, int j, const RVector &P) const;
+    RSymMatrix IntPFF (const RVector& P) const;
     inline RSymMatrix IntDD () const { return intdd; }
     inline double IntDD (int i, int j) const { return intdd(i,j); }
     inline double IntFDD (int i, int j, int k) const { return intfdd[i](j,k); }
@@ -142,6 +128,7 @@ public:
     { xERROR(Not implemented); return 0; }
 
 protected:
+    void ComputeIntFF () const;
     void ComputeIntDD () const;
     void ComputeIntFDD () const;
     void ComputeBndIntFF () const;
@@ -154,6 +141,7 @@ private:
     static double dx;
     static double dy; // pixel edge lengths
     static double size;   // pixel area
+    static RSymMatrix intff;
     static RSymMatrix intdd;
     static RSymMatrix intfdd[4];
     static RSymMatrix *bndintff;
