@@ -130,6 +130,96 @@ RDenseMatrix Pixel4::LocalShapeD (const Point &loc) const
     return der;
 }
 
+void Pixel4::ComputeIntFF () const
+{
+    double scale = size/36.0;
+    intff.New(4,4);
+    intff(0,0) = 4*scale;
+    intff(0,1) = 2*scale;
+    intff(0,2) = 2*scale;
+    intff(0,3) = scale;
+    intff(1,1) = 4*scale;
+    intff(1,2) = scale;
+    intff(1,3) = 2*scale;
+    intff(2,2) = 4*scale;
+    intff(2,3) = 2*scale;
+    intff(3,3) = 4*scale;
+}
+
+double Pixel4::IntFFF(int i, int j, int k) const
+{
+    // index set for retrieving IntFFF(i,j,k)
+    static const int intfff_index[4][4][4] = {
+	{{0,1,1,2},{1,1,2,2},{1,2,1,2},{2,2,2,2}},
+	{{1,1,2,2},{1,0,2,1},{2,2,2,2},{2,1,2,1}},
+	{{1,2,1,2},{2,2,2,2},{1,2,0,1},{2,2,1,1}},
+	{{2,2,2,2},{2,1,2,1},{2,2,1,1},{2,1,1,0}}
+    };
+    // scaling factors for IntFFF entries
+    static const double intfff_scale[3] = {9.0/144.0, 3.0/144.0, 1.0/144.0};
+
+    RANGE_CHECK(i >= 0 && i < 4 && j >= 0 && j < 4 && k >= 0 && k < 4);
+    return size * intfff_scale[intfff_index[i][j][k]];
+}
+
+RSymMatrix Pixel4::IntPFF (const RVector &P) const
+{
+    static RSymMatrix pff(4);
+    static const double f0 = 1.0/16.0, f1 = 1.0/48.0, f2 = 1.0/144.0;
+    double p0 = P[Node[0]], p1 = P[Node[1]], p2 = P[Node[2]], p3 = P[Node[3]];
+    double fac = size/144.0;
+
+    pff(0,0) = fac * (9*p0 + 3*p1 + 3*p2 +   p3);
+    pff(1,0) = fac * (3*p0 + 3*p1 +   p2 +   p3);
+    pff(2,0) = fac * (3*p0 +   p1 + 3*p2 +   p3);
+    pff(3,0) = fac * (  p0 +   p1 +   p2 +   p3);
+    pff(1,1) = fac * (3*p0 + 9*p1 +   p2 + 3*p3);
+    pff(2,1) = fac * (  p0 +   p1 +   p2 +   p3);
+    pff(3,1) = fac * (  p0 + 3*p1 +   p2 + 3*p3);
+    pff(2,2) = fac * (3*p0 +   p1 + 9*p2 + 3*p3);
+    pff(3,2) = fac * (  p0 +   p1 + 3*p2 + 3*p3);
+    pff(3,3) = fac * (  p0 + 3*p1 + 3*p2 + 9*p3);
+    return pff;
+}
+
+double Pixel4::IntPFF (int i, int j, const RVector &P) const
+{
+    RANGE_CHECK(i >= 0 && i < 4 && j >= 0 && j < 4);
+    if (i < j) { int tmp = i; i = j; j = tmp; }
+    double fac = size/144.0;
+    switch (i) {
+    case 0:
+	return fac * (9*P[Node[0]]+3*P[Node[1]]+3*P[Node[2]]+P[Node[3]]);
+    case 1:
+	switch (j) {
+	case 0:
+	    return fac * (3*P[Node[0]]+3*P[Node[1]]+P[Node[2]]+P[Node[3]]);
+	case 1:
+	    return fac * (3*P[Node[0]]+9*P[Node[1]]+P[Node[2]]+3*P[Node[3]]);
+	}
+    case 2:
+	switch (j) {
+	case 0:
+	    return fac * (3*P[Node[0]]+P[Node[1]]+3*P[Node[2]]+P[Node[3]]);
+	case 1:
+	    return fac * (P[Node[0]]+P[Node[1]]+P[Node[2]]+P[Node[3]]);
+	case 2:
+	    return fac * (3*P[Node[0]]+P[Node[1]]+9*P[Node[2]]+3*P[Node[3]]);
+	}
+    case 3:
+	switch (j) {
+	case 0:
+	    return fac * (P[Node[0]]+P[Node[1]]+P[Node[2]]+P[Node[3]]);
+	case 1:
+	    return fac * (P[Node[0]]+3*P[Node[1]]+P[Node[2]]+3*P[Node[3]]);
+	case 2:
+	    return fac * (P[Node[0]]+P[Node[1]]+3*P[Node[2]]+3*P[Node[3]]);
+	case 3:
+	    return fac * (P[Node[0]]+3*P[Node[1]]+3*P[Node[2]]+9*P[Node[3]]);
+	}
+    }
+}
+
 void Pixel4::ComputeIntDD () const
 {
     double dx2 = dx*dx, dy2 = dy*dy;
@@ -491,6 +581,7 @@ double Pixel4::BndIntPFF (int i, int j, const RVector &P) const
 double Pixel4::dx = 0.0;
 double Pixel4::dy = 0.0;
 double Pixel4::size = 0.0;
+RSymMatrix Pixel4::intff;
 RSymMatrix Pixel4::intdd;
 RSymMatrix Pixel4::intfdd[4];
 RSymMatrix *Pixel4::bndintff = 0;
