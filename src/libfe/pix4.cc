@@ -26,6 +26,7 @@ void Pixel4::Initialise (const NodeList &nlist)
         dx   = nlist[Node[1]][0] - x0;
 	dy   = nlist[Node[2]][1] - y0;
 	size = dx*dy;
+	ComputeIntFF();
 	ComputeIntDD();
 	ComputeIntFDD();
 	ComputeBndIntFFF();
