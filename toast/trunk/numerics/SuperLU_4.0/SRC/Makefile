@@ -162,16 +162,17 @@ complex16: $(ZLUSRC) $(ALLAUX) $(LAAUX) $(ZLASRC) $(DZLAUX)
 ##################################
 # Do not optimize these routines #
 ##################################
-slamch.o: slamch.c ; $(CC) -c $(NOOPTS) $(CDEFS) $<
-dlamch.o: dlamch.c ; $(CC) -c $(NOOPTS) $(CDEFS) $<
-superlu_timer.o:  superlu_timer.c ; $(CC) -c $(NOOPTS) $<
+slamch.o: slamch.c ; $(CC) -c $(NOOPTS) $(CDEFS) $(SHLIB_CFLAGS) $<
+dlamch.o: dlamch.c ; $(CC) -c $(NOOPTS) $(CDEFS) $(SHLIB_CFLAGS) $<
+superlu_timer.o:  superlu_timer.c ; $(CC) $(SHLIB_CFLAGS) -c $(NOOPTS) $<
 ##################################
 
 .c.o:
-	$(CC) $(CFLAGS) $(CDEFS) $(BLASDEF) -c $< $(VERBOSE)
+	$(CC) $(CINC) -I$(TINC) $(CFLAGS) $(CDEFS) $(BLASDEF) $(SHLIB_CFLAGS) -c $<
+#	$(CC) $(CFLAGS) $(CDEFS) $(BLASDEF) -c $< $(VERBOSE)
 
 .f.o:
-	$(FORTRAN) $(FFLAGS) -c $<
+	$(FORTRAN) $(FFLAGS) $(SHLIB_CFLAGS) -c $<
 
 clean:	
 	rm -f *.o $(SUPERLULIB)
