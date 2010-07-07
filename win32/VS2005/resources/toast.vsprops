@@ -13,7 +13,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="$(BlasLib) superlu.lib"
+		AdditionalDependencies="$(BlasLib) SuperLU_40.lib"
 		AdditionalLibraryDirectories="&quot;$(ToastLibDir)&quot;;&quot;$(ToastAuxLibDir)&quot;"
 	/>
 	<Tool
@@ -33,6 +33,11 @@
 	<UserMacro
 		Name="ToastWinDir"
 		Value="$(ToastRootDir)win32\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="ToastIncDir"
+		Value="$(ToastRootDir)include\"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro

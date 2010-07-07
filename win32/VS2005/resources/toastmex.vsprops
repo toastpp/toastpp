@@ -5,7 +5,7 @@
 	Name="toastmex"
 	OutputDirectory="$(SolutionDir)..\$(ConfigurationName)\obj\$(ProjectName)"
 	IntermediateDirectory="$(SolutionDir)..\$(ConfigurationName)\obj\$(ProjectName)"
-	InheritedPropertySheets=".\toast.vsprops;.\matlab_R2009a.vsprops"
+	InheritedPropertySheets=".\toast.vsprops;.\matlab_R2006b.vsprops"
 	>
 	<Tool
 		Name="VCCLCompilerTool"
