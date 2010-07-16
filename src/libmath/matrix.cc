@@ -675,5 +675,8 @@ template MATHLIB int GMRES (const SCMatrix &A, const SCVector &b, SCVector &x,
 template MATHLIB int GMRES (RVector (*Av_clbk)(const RVector &v, void *context),
     void *context, const RVector &b, RVector &x, double tol,
     const RPreconditioner *precon, int restart, int *iter, double *res);
+template MATHLIB int GMRES (CVector (*Av_clbk)(const CVector &v, void *context),
+    void *context, const CVector &b, CVector &x, double tol,
+    const CPreconditioner *precon, int restart, int *iter, double *res);
 
 #endif // NEED_EXPLICIT_INSTANTIATION
