@@ -167,8 +167,8 @@ template<class VT>
 MATHLIB std::istream &operator>> (std::istream &is, TVector<VT> &v);
 
 template<class VT>
-VT SparseDotp (const TVector<VT> &v1, int *idx1, int nidx1,
-	       const TVector<VT> &v2, int *idx2, int nidx2,
+VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
+	       const TVector<VT> &v2, idxtype *idx2, int nidx2,
 	       int from, int to);
 
 template<class VT>
@@ -921,8 +921,8 @@ public:
      * \return sparse dot product
      * \note idx1 and idx2 are assumed sorted (ascending)
      */
-    friend VT SparseDotp<> (const TVector<VT> &v1, int *idx1, int nidx1,
-			    const TVector<VT> &v2, int *idx2, int nidx2,
+    friend VT SparseDotp<> (const TVector<VT> &v1, idxtype *idx1, int nidx1,
+			    const TVector<VT> &v2, idxtype *idx2, int nidx2,
 			    int from, int to);
 
     /**

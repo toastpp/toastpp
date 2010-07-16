@@ -923,8 +923,8 @@ MATHLIB istream &operator>> (istream &is, TVector<VT> &v)
 }
 
 template<class VT>
-VT SparseDotp (const TVector<VT> &v1, int *idx1, int nidx1,
-	       const TVector<VT> &v2, int *idx2, int nidx2,
+VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
+	       const TVector<VT> &v2, idxtype *idx2, int nidx2,
 	       int from, int to)
 {
     VT sum = 0;
@@ -1222,8 +1222,8 @@ template MATHLIB istream  &operator>> (istream &os, CVector &v);
 template MATHLIB istream  &operator>> (istream &os, SCVector &v);
 template MATHLIB istream  &operator>> (istream &os, IVector &v);
 
-template double SparseDotp (const RVector &v1, int *idx1, int nidx1,
-			    const RVector &v2, int *idx2, int nidx2,
+template double SparseDotp (const RVector &v1, idxtype *idx1, int nidx1,
+			    const RVector &v2, idxtype *idx2, int nidx2,
 			    int from, int to);
 
 #endif // NEED_EXPLICIT_INSTANTIATION

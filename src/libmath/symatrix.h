@@ -136,7 +136,7 @@ public:
     inline TVector<MT> Col (int c) const { return Row(c); }
     // Retrieve a column. Identical to Row(c) since symmetric
 
-    int SparseRow (int r, int *ci, MT *rv) const;
+    int SparseRow (int r, idxtype *ci, MT *rv) const;
     // See TMatrix
 
     void ColScale (const TVector<MT> &scale);

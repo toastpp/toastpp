@@ -181,7 +181,7 @@ public:
      *   initialised to zero.
      */
     TCompRowMatrix (int rows, int cols,
-        const int *_rowptr, const int *_colidx,
+        const idxtype *_rowptr, const idxtype *_colidx,
 	const MT *data = 0);
 
     /**
@@ -232,12 +232,12 @@ public:
 
     void Unlink ();
 
-    void Initialise (const int *_rowptr, const int *_colidx,
+    void Initialise (const idxtype *_rowptr, const idxtype *_colidx,
         const MT *data = 0);
     // Redefine sparse structure and assign data
     // If data are not provided, all entries are set to zero
 
-    int GetSparseStructure (const int **_rowptr, const int **_colidx) const
+    int GetSparseStructure (const idxtype **_rowptr, const idxtype **_colidx) const
     { *_rowptr = rowptr, *_colidx = colidx;
       return TGenericSparseMatrix<MT>::nval; }
 
@@ -320,7 +320,7 @@ public:
     TVector<MT> Col (int c) const;
     // Returns column c as a vector
 
-    int SparseRow (int r, int *ci, MT *rv) const;
+    int SparseRow (int r, idxtype *ci, MT *rv) const;
     // See TMatrix
 
     void SetRow (int r, const TVector<MT> &row);
@@ -390,12 +390,12 @@ public:
     // Returns magnitude of the largest entry in column c, starting from the
     // column's i-th entry
 
-    void SymbolicCholeskyFactorize (int *&frowptr, int *&fcolidx) const;
+    void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx) const;
     // Calculate the sparse fill-in structure of the lower triangle of
     // the Cholesky factorisation of the matrix (excluding diagonal)
     // and return in index lists `frowptr' and 'fcolidx'
 
-    void CalculateIncompleteCholeskyFillin (int *&frowptr, int *&fcolidx)
+    void CalculateIncompleteCholeskyFillin (idxtype *&frowptr, idxtype *&fcolidx)
         const;
     // Calculate sparse structure for the lower triangle of the the
     // incomplete Cholesky factorisation of the matrix. This is simply the
@@ -499,8 +499,9 @@ protected:
     // REQUIRES ROWS TO BE SORTED WITH ASCENDING COLUMN INDEX
 
 public:
-    int *rowptr; 
-    int *colidx;
+    idxtype *rowptr; 
+    idxtype *colidx;
+
 private:
     int Get_index (int r, int c) const;
     // returns offset into data array of element at row r and column c
@@ -526,11 +527,11 @@ private:
 
     mutable bool col_access; // true if column access has been initialised
     // the following lists are only valid if col_access == true
-    mutable int *colptr;
+    mutable idxtype *colptr;
     // offset to the first entry for column i in rowidx
-    mutable int *rowidx;
+    mutable idxtype *rowidx;
     // rowidx[colptr[i]+j] contains the row number of the j-th entry of col i
-    mutable int *vofs;
+    mutable idxtype *vofs;
     // vofs[colptr[i]+j] contains the offset into data array val of the j-th
     // entry of column i
 

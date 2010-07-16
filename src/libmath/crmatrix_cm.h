@@ -39,11 +39,11 @@ public:
     SCCompRowMatrixMixed ();
     SCCompRowMatrixMixed (int rows, int cols);
     SCCompRowMatrixMixed (int rows, int cols,
-        const int *_rowptr, const int *_colidx, const scomplex *data = 0);
+        const idxtype *_rowptr, const idxtype *_colidx, const scomplex *data = 0);
     SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m);
     ~SCCompRowMatrixMixed ();
 
-    int SparseRow (int r, int *ci, toast::complex *rv) const;
+    int SparseRow (int r, idxtype *ci, toast::complex *rv) const;
 
     // matrix x vector methods using double precision vectors
     void Ax (const CVector &x, CVector &b) const;

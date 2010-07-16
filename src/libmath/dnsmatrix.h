@@ -188,7 +188,7 @@ public:
     TVector<MT> Col (int c) const;
     // Retrieve a column
 
-    int SparseRow (int r, int *ci, MT *rv) const;
+    int SparseRow (int r, idxtype *ci, MT *rv) const;
 
     void SetRow (int r, const TVector<MT> &rval);
     // replace row 'r' of *this with 'rval'

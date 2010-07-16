@@ -74,7 +74,7 @@ public:
      */
     TCoordMatrix (int rows, int cols);
 
-    TCoordMatrix (int rows, int cols, int vals, int *_rowidx, int *_colidx,
+    TCoordMatrix (int rows, int cols, int vals, idxtype *_rowidx, idxtype *_colidx,
 		  MT *_data = 0);
     TCoordMatrix (const TCoordMatrix<MT> &m);
     ~TCoordMatrix ();
@@ -87,7 +87,7 @@ public:
 
     void Unlink ();
 
-    void Initialise (int nv, int *_rowidx, int *_colidx, MT *data = 0);
+    void Initialise (int nv, idxtype *_rowidx, idxtype *_colidx, MT *data = 0);
     // reallocate data block to size nv, and assign data and index lists
 
     TCoordMatrix &operator= (const TCoordMatrix<MT> &m);
@@ -107,7 +107,7 @@ public:
     TVector<MT> Col (int c) const;
     // Returns column c as a vector
 
-    int SparseRow (int r, int *ci, MT *rv) const;
+    int SparseRow (int r, idxtype *ci, MT *rv) const;
     // See TRootMatrix
     // Note: 1. returned column indices may be unsorted
     //       2. This is expensive since complete matrix must be traversed
@@ -133,11 +133,11 @@ public:
 
     void Sort (bool roworder=true) const;
 
-    inline const int *RowIndex () const { return rowidx; }
-    inline const int *ColIndex () const { return colidx; }
+    inline const idxtype *RowIndex () const { return rowidx; }
+    inline const idxtype *ColIndex () const { return colidx; }
 
-    inline int RowIndex (int i) const { return rowidx[i]; }
-    inline int ColIndex (int i) const { return colidx[i]; }
+    inline idxtype RowIndex (int i) const { return rowidx[i]; }
+    inline idxtype ColIndex (int i) const { return colidx[i]; }
     // Index list entries. These should probably not be public, but
     // can't be avoided now
 
@@ -178,8 +178,8 @@ private:
     // and return the index into the data array
     // Assumes that an entry for (r,c) does not exist yet!
 
-    int *rowidx;
-    int *colidx;
+    idxtype *rowidx;
+    idxtype *colidx;
     mutable int iterator_pos;
 };
 

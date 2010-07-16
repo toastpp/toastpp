@@ -281,7 +281,7 @@ public:
      *   size.
      * \sa Row, SetRow
      */
-    virtual int SparseRow (int r, int *colidx, MT *val) const = 0;
+    virtual int SparseRow (int r, idxtype *colidx, MT *val) const = 0;
 
     /**
      * \brief Returns a vector containing a copy of column 'c'

@@ -70,8 +70,8 @@ int merge_cols (int *rowidx1, int len1, int *rowidx2, int len2,
 // generate the structure of the Cholesky factor and return it in
 // frowptr and fcolidx. Return value is the number of entries in the factor.
 
-int symbolic_cholesky_factor (int dim, int *rowptr, int *colidx,
-    int *&frowptr, int *&fcolidx)
+int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
+    idxtype *&frowptr, idxtype *&fcolidx)
 {
     const int fill_factor = 10; // expected fill-in
     int nval = rowptr[dim];
@@ -192,13 +192,13 @@ int symbolic_cholesky_factor (int dim, int *rowptr, int *colidx,
     }
 
     // init row pointer array
-    frowptr = new int[dim+1];
+    frowptr = new idxtype[dim+1];
     for (r = 0, frowptr[0] = 0; r < dim; r++)
         frowptr[r+1] = frowptr[r] + nval_row[r];
 
     if (swap) rewind (swap);
     // init column index array
-    fcolidx = new int[nval];
+    fcolidx = new idxtype[nval];
     for (r = 0; r < dim; r++) nval_row[r] = 0;
     for (c = 0; c < dim; c++) {
         int *colp;

@@ -26,7 +26,7 @@ void TSymCompRowMatrix<MT>::New (int nrows, int ncols)
     if (this->nval) delete []colidx;
     if (this->rows != nrows) {
         delete []rowptr;
-	rowptr = new int[nrows+1];
+	rowptr = new idxtype[nrows+1];
     }
     for (int i = 0; i <= nrows; i++) rowptr[i] = 0;
     TGenericSparseMatrix<MT>::New (nrows, ncols);
@@ -36,7 +36,7 @@ template<class MT>
 TSymCompRowMatrix<MT>::TSymCompRowMatrix ()
     : TGenericSparseMatrix<MT> ()
 {
-    rowptr = new int[1];
+    rowptr = new idxtype[1];
     rowptr[0] = 0;
 
     // column access is off on startup
@@ -52,7 +52,7 @@ TSymCompRowMatrix<MT>::TSymCompRowMatrix (int rows, int cols)
     : TGenericSparseMatrix<MT> (rows, cols)
 {
     xASSERT(rows == cols, Invalid arguments);
-    rowptr = new int[rows+1];
+    rowptr = new idxtype[rows+1];
     for (int i = 0; i <= rows; i++) rowptr[i] = 0;
 
     // column access is off on startup
@@ -69,7 +69,7 @@ TSymCompRowMatrix<MT>::TSymCompRowMatrix (int rows, int cols,
     : TGenericSparseMatrix<MT> (rows, cols)
 {
     xASSERT(rows == cols, Invalid arguments);
-    rowptr = new int[rows+1];
+    rowptr = new idxtype[rows+1];
 
     // column access is off on startup
     allow_col_indexing = false;
@@ -115,7 +115,7 @@ void TSymCompRowMatrix<MT>::Initialise (const int *_rowptr, const int *_colidx,
     nz = rowptr[this->rows];
     if (nz != this->nval) {
 	if (this->nval) delete []colidx;
-	if (nz) colidx = new int[nz];
+	if (nz) colidx = new idxtype[nz];
     }
     TGenericSparseMatrix<MT>::Initialise (nz);
 
@@ -215,7 +215,7 @@ TVector<MT> TSymCompRowMatrix<MT>::Row (int r) const
 }
 
 template<class MT>
-int TSymCompRowMatrix<MT>::SparseRow (int r, int *ci, MT *rv) const
+int TSymCompRowMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 {
     TVector<MT> row = Row(r);
     int i, nz;
@@ -261,13 +261,13 @@ void TSymCompRowMatrix<MT>::SetColAccess (bool yes) const
 	for (i = 0; i < this->nval; i++) nval_col[colidx[i]]++;
 
 	// init column pointer array
-	colptr = new int[this->cols+1];
+	colptr = new idxtype[this->cols+1];
 	for (c = 0, colptr[0] = 0; c < this->cols; c++)
 	    colptr[c+1] = colptr[c] + nval_col[c];
 	
 	// init row index offset arrays
-	rowidx = new int[this->nval];
-	vofs = new int[this->nval];
+	rowidx = new idxtype[this->nval];
+	vofs = new idxtype[this->nval];
 	for (c = 0; c < this->cols; c++) nval_col[c] = 0;
 	for (r = 0; r < this->rows; r++) {
 	    for (ri = rowptr[r]; ri < rowptr[r+1]; ri++) {
@@ -360,12 +360,13 @@ void TSymCompRowMatrix<complex>::ATx (const TVector<complex> &x,
 template<class MT>
 int TSymCompRowMatrix<MT>::Shrink ()
 {
-    int i, r, idx, *rp, *ci, nz = 0;
+    int i, r, idx, nz = 0;
+	idxtype *rp, *ci;
     MT *v;
     for (i = 0; i < this->nval; i++)
         if (this->val[i] != (MT)0) nz++;
-    rp = new int[this->rows+1];
-    ci = new int[nz];
+    rp = new idxtype[this->rows+1];
+    ci = new idxtype[nz];
     v  = new MT[nz];
     rp[0] = 0;
     for (r = idx = 0; r < this->rows; r++) {
@@ -390,8 +391,8 @@ int TSymCompRowMatrix<MT>::Shrink ()
 }
 
 template<class MT>
-void TSymCompRowMatrix<MT>::SymbolicCholeskyFactorize (int *&frowptr,
-    int *&fcolidx) const
+void TSymCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
+    idxtype *&fcolidx) const
 {
     symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
     // implemented in cr_cholesky.cc

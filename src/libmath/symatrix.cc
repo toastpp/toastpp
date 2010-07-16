@@ -61,7 +61,7 @@ TVector<MT> TSymMatrix<MT>::Row (int r) const
 }
 
 template<class MT>
-int TSymMatrix<MT>::SparseRow (int r, int *ci, MT *rv) const
+int TSymMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 {
     int i;
     MT *v = val + Idx(r,0);

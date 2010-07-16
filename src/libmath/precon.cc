@@ -86,7 +86,7 @@ void TPrecon_IC<MT>::Reset (const TMatrix<MT> *A)
     if (L.nRows() != nrows || L.nCols() != ncols) {
         L.New (nrows, ncols);
 	d.New (nrows);
-	int *rowptr, *colidx;
+	idxtype *rowptr, *colidx;
 	spA->CalculateIncompleteCholeskyFillin (rowptr, colidx);
 	L.Initialise (rowptr, colidx);
 	delete []rowptr;
@@ -114,7 +114,7 @@ void TPrecon_DILU<MT>::Reset (const TMatrix<MT> *_A)
     int i, r, c, nz;
     dim = (A->nRows() < A->nCols() ? A->nRows() : A->nCols());
     TVector<MT> Ar(A->nCols());
-    int *ci = new int[dim];
+    idxtype *ci = new idxtype[dim];
     MT *rv = new MT[dim];
     if (ipivot.Dim() != dim) ipivot.New (dim);
     ipivot = A->Diag();
@@ -135,7 +135,7 @@ void TPrecon_DILU<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
     MT sum;
     TVector<MT> row(dim);
     TVector<MT> z(dim);
-    int *ci = new int[dim];
+    idxtype *ci = new idxtype[dim];
     MT  *rv = new MT[dim];
     for (i = 0; i < dim; i++) {
         nz = A->SparseRow (i, ci, rv);
@@ -267,7 +267,7 @@ void SCPreconMixed_DILU::Reset (const SCCompRowMatrixMixed *_A)
     int i, r, c, nz;
     dim = (A->nRows() < A->nCols() ? A->nRows() : A->nCols());
     CVector Ar(A->nCols());
-    int *ci = new int[dim];
+    idxtype *ci = new idxtype[dim];
     complex *rv = new complex[dim];
     if (ipivot.Dim() != dim) ipivot.New (dim);
     ipivot = MakeCVector (A->Diag());
@@ -287,7 +287,7 @@ void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s) const
     complex sum;
     CVector row(dim);
     CVector z(dim);
-    int *ci = new int[dim];
+    idxtype *ci = new idxtype[dim];
     complex *rv = new complex[dim];
     for (i = 0; i < dim; i++) {
         nz = A->SparseRow (i, ci, rv);

@@ -84,7 +84,7 @@ public:
     { xERROR(Not implemented); return TVector<MT>(); }
     // Returns column c as a vector
 
-    int SparseRow (int r, int *ci, MT *rv) const;
+    int SparseRow (int r, idxtype *ci, MT *rv) const;
 
     void RowScale (const TVector<MT> &scale)
     { xERROR(Not implemented); }
@@ -106,7 +106,7 @@ public:
     // Remove all entries with zero value. Return value is the number of
     // eliminated entries.
 
-    void SymbolicCholeskyFactorize (int *&frowptr, int *&fcolidx) const;
+    void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx) const;
     // Calculate the sparse fill-in structure of the lower triangle of
     // the Cholesky factorisation of the matrix (excluding diagonal)
     // and return in index lists `frowptr' and 'fcolidx'
@@ -118,10 +118,10 @@ public:
     // L must have been initialised with the index lists returned from
     // A.CalculateCholeskyFillin()
 
-    int *rowptr;
-    int *colidx;
+    idxtype *rowptr;
+    idxtype *colidx;
 
-    mutable int *colptr, *rowidx, *vofs;
+    mutable idxtype *colptr, *rowidx, *vofs;
     mutable bool col_access;
     // index arrays and flag for column access
 

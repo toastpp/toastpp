@@ -120,7 +120,7 @@ public:
      *   element of row r, if it exists)
      * \note colidx and val can therefore be pointers instead of arrays.
      */
-    int SparseRow (int r, int *colidx, MT *val) const;
+    int SparseRow (int r, idxtype *colidx, MT *val) const;
 
     /**
      * \brief Scales the matrix columns.
