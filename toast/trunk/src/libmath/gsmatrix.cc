@@ -436,7 +436,7 @@ MATHLIB int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b
     TVector<MT> &x, double &tol, int maxit)
 {
     int i, j, k, nz, niter;
-    int *colidx = new int[A.nCols()];
+    idxtype *colidx = new idxtype[A.nCols()];
     MT *val = new MT[A.nCols()];
     MT aii;
     double bnorm = l2norm(b);

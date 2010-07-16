@@ -70,7 +70,7 @@ TVector<MT> TDiagMatrix<MT>::Col (int c) const
 }
 
 template<class MT>
-int TDiagMatrix<MT>::SparseRow (int r, int *colidx, MT *v) const
+int TDiagMatrix<MT>::SparseRow (int r, idxtype *colidx, MT *v) const
 {
     if (r < this->nval) {
 	colidx[0] = r;

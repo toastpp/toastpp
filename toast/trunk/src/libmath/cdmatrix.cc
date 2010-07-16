@@ -30,14 +30,14 @@ TCoordMatrix<MT>::TCoordMatrix (int rows, int cols)
 
 template<class MT>
 TCoordMatrix<MT>::TCoordMatrix (int rows, int cols, int vals,
-    int *_rowidx, int *_colidx, MT *_data)
+    idxtype *_rowidx, idxtype *_colidx, MT *_data)
   : TGenericSparseMatrix<MT> (rows, cols, vals, _data)
 {
     int i;
 
     if (vals) {
-        rowidx = new int[vals];
-	colidx = new int[vals];
+        rowidx = new idxtype[vals];
+	colidx = new idxtype[vals];
 	for (i = 0; i < vals; i++) rowidx[i] = _rowidx[i];
 	for (i = 0; i < vals; i++) colidx[i] = _colidx[i];
     }
@@ -50,8 +50,8 @@ TCoordMatrix<MT>::TCoordMatrix (const TCoordMatrix<MT> &m)
     int i;
 
     if (this->nbuf) {
-        rowidx = new int[this->nbuf];
-	colidx = new int[this->nbuf];
+        rowidx = new idxtype[this->nbuf];
+	colidx = new idxtype[this->nbuf];
 	for (i = 0; i < this->nval; i++) rowidx[i] = m.rowidx[i];
 	for (i = 0; i < this->nval; i++) colidx[i] = m.colidx[i];
     }
@@ -84,7 +84,7 @@ void TCoordMatrix<MT>::Unlink ()
 }
 
 template<class MT>
-void TCoordMatrix<MT>::Initialise (int nv, int *_rowidx, int *_colidx,
+void TCoordMatrix<MT>::Initialise (int nv, idxtype *_rowidx, idxtype *_colidx,
     MT *data)
 {
     int i;
@@ -95,8 +95,8 @@ void TCoordMatrix<MT>::Initialise (int nv, int *_rowidx, int *_colidx,
 	    delete []colidx;
 	}
 	if (nv) {
-	    rowidx = new int[nv];
-	    colidx = new int[nv];
+	    rowidx = new idxtype[nv];
+	    colidx = new idxtype[nv];
 	}
     }
     for (i = 0; i < nv; i++) rowidx[i] = _rowidx[i];
@@ -165,7 +165,7 @@ TVector<MT> TCoordMatrix<MT>::Col (int c) const
 }
 
 template<class MT>
-int TCoordMatrix<MT>::SparseRow (int r, int *ci, MT *rv) const
+int TCoordMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 {
     int i, j = 0;
     for (i = 0; i < this->nval; i++) {
@@ -258,7 +258,7 @@ template<class MT>
 void TCoordMatrix<MT>::Transpone ()
 {
     // all we have to do is swap the row and column index lists
-    int *tmp_idx = rowidx;
+    idxtype *tmp_idx = rowidx;
     rowidx = colidx;
     colidx = tmp_idx;
     int tmp = this->rows;
@@ -269,7 +269,8 @@ void TCoordMatrix<MT>::Transpone ()
 template<class MT>
 void TCoordMatrix<MT>::Sort (bool roworder) const
 {
-    int i, ir, j, l, rr1, rr2, *r1, *r2;
+    int i, ir, j, l, rr1, rr2;
+	idxtype *r1, *r2;
     int n = this->nval;
     MT v, *vl = this->val-1;
     if (roworder) r1 = rowidx-1, r2 = colidx-1;
@@ -312,8 +313,8 @@ int TCoordMatrix<MT>::Insert (int r, int c, MT v)
     int i;
 
     if (this->nval == this->nbuf) { // no space left - reallocation required
-        int *tmp_rowidx = new int[this->nbuf+BUFFER_CHUNK_SIZE];
-	int *tmp_colidx = new int[this->nbuf+BUFFER_CHUNK_SIZE];
+        idxtype *tmp_rowidx = new idxtype[this->nbuf+BUFFER_CHUNK_SIZE];
+	idxtype *tmp_colidx = new idxtype[this->nbuf+BUFFER_CHUNK_SIZE];
 	for (i = 0; i < this->nval; i++) tmp_rowidx[i] = rowidx[i];
 	for (i = 0; i < this->nval; i++) tmp_colidx[i] = colidx[i];
 	if (this->nbuf) {
@@ -351,8 +352,8 @@ MATHLIB TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
     nzB = B.nVal();
     nz  = nzA+nzB;
 
-    int *ri = new int[nz];
-    int *ci = new int[nz];
+    idxtype *ri = new idxtype[nz];
+    idxtype *ci = new idxtype[nz];
     MT  *v  = new MT[nz];
 
     // copy A
@@ -395,8 +396,8 @@ MATHLIB TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
     nzB = B.nVal();
     nz  = nzA+nzB;
 
-    int *ri = new int[nz];
-    int *ci = new int[nz];
+    idxtype *ri = new idxtype[nz];
+    idxtype *ci = new idxtype[nz];
     MT  *v  = new MT[nz];
 
     // copy A
@@ -428,8 +429,8 @@ MATHLIB istream &operator>> (istream &is, TCoordMatrix<MT> &m)
     if (!is.getline(cbuf, 256)) return is;
     if (sscanf (cbuf, "%s%d%d%d", idstr, &nr, &nc, &nz) != 4 ||
 	strcmp (idstr, "CoordMat")) return is;
-    int *tmp_rowidx = new int[nz];
-    int *tmp_colidx = new int[nz];
+    idxtype *tmp_rowidx = new idxtype[nz];
+    idxtype *tmp_colidx = new idxtype[nz];
     MT  *tmp_data   = new MT[nz];
     for (k = 0; k < nz; k++) {
         is >> i >> j >> v;

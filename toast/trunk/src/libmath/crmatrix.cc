@@ -40,7 +40,7 @@ template<class MT>
 TCompRowMatrix<MT>::TCompRowMatrix ()
   : TGenericSparseMatrix<MT> ()
 {
-    rowptr = new int[1];
+    rowptr = new idxtype[1];
     rowptr[0] = 0;
 
     // diagonal access is off on startup
@@ -61,7 +61,7 @@ template<class MT>
 TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols)
   : TGenericSparseMatrix<MT> (rows, cols)
 {
-    rowptr = new int[rows+1];
+    rowptr = new idxtype[rows+1];
     for (int i = 0; i <= rows; i++)
         rowptr[i] = 0;
 
@@ -80,15 +80,15 @@ TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols)
 
 template<class MT>
 TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols,
-    const int *_rowptr, const int *_colidx, const MT *data)
+    const idxtype *_rowptr, const idxtype *_colidx, const MT *data)
   : TGenericSparseMatrix<MT> (rows, cols, _rowptr[rows], data)
 {
     int i;
 
-    rowptr = new int[rows+1];
+    rowptr = new idxtype[rows+1];
     for (i = 0; i <= rows; i++) rowptr[i] = _rowptr[i];
     if (this->nval) {
-        colidx = new int[this->nval];
+        colidx = new idxtype[this->nval];
 	for (i = 0; i < this->nval; i++) colidx[i] = _colidx[i];
     }
 
@@ -111,10 +111,10 @@ TCompRowMatrix<MT>::TCompRowMatrix (const TCompRowMatrix<MT> &m)
 {
     int i;
 
-    rowptr = new int[this->rows+1];
+    rowptr = new idxtype[this->rows+1];
     for (i = 0; i <= this->rows; i++) rowptr[i] = m.rowptr[i];
     if (this->nval) {
-        colidx = new int[this->nval];
+        colidx = new idxtype[this->nval];
 	for (i = 0; i < this->nval; i++) colidx[i] = m.colidx[i];
     }
 
@@ -126,10 +126,10 @@ TCompRowMatrix<MT>::TCompRowMatrix (const TCompRowMatrix<MT> &m)
     }
 
     if (col_access = m.col_access) {
-        colptr = new int[this->cols+1];
+        colptr = new idxtype[this->cols+1];
 	for (i = 0; i <= this->cols; i++) colptr[i] = m.colptr[i];
-	rowidx = new int[this->nval];
-	vofs   = new int[this->nval];
+	rowidx = new idxtype[this->nval];
+	vofs   = new idxtype[this->nval];
 	for (i = 0; i < this->nval; i++) rowidx[i] = m.rowidx[i];
 	for (i = 0; i < this->nval; i++) vofs[i]   = m.vofs[i];
     } else {
@@ -148,8 +148,8 @@ TCompRowMatrix<MT>::TCompRowMatrix (const TCoordMatrix<MT> &m)
     for (r = 0; r < this->rows; r++) row_nval[r] = 0;
     for (i = 0; i < this->nval; i++) row_nval[m.RowIndex(i)]++;
 
-    rowptr = new int[this->rows+1];
-    colidx = new int[this->nval];
+    rowptr = new idxtype[this->rows+1];
+    colidx = new idxtype[this->nval];
 
     for (r = 0, rowptr[0] = 0; r < this->rows; r++)
         rowptr[r+1] = rowptr[r] + row_nval[r];
@@ -182,8 +182,8 @@ TCompRowMatrix<MT>::TCompRowMatrix (const TDenseMatrix<MT> &m)
 {
     int i, j;
     this->nval = this->rows*this->cols;
-    rowptr = new int[this->rows+1];
-    colidx = new int[this->nval];
+    rowptr = new idxtype[this->rows+1];
+    colidx = new idxtype[this->nval];
     this->val = new MT[this->nval];
     rowptr[0] = 0;
     for (i = 0; i < this->rows; i++) {
@@ -221,7 +221,7 @@ void TCompRowMatrix<MT>::New (int nrows, int ncols)
     if (this->nval) delete []colidx;
     if (this->rows != nrows) {
         delete []rowptr;
-	rowptr = new int[nrows+1];
+	rowptr = new idxtype[nrows+1];
     }
     for (int i = 0; i <= nrows; i++) rowptr[i] = 0;
     TGenericSparseMatrix<MT>::New (nrows, ncols);
@@ -232,8 +232,8 @@ template<class MT>
 void TCompRowMatrix<MT>::Identity (int n)
 {
     int i;
-    int *rp = new int[n+1];
-    int *ci = new int[n];
+    idxtype *rp = new idxtype[n+1];
+    idxtype *ci = new idxtype[n];
     MT  *v  = new MT[n];
     for (i = 0; i <= n; i++)
 	rp[i] = i;
@@ -252,8 +252,8 @@ template<class MT>
 void TCompRowMatrix<MT>::DiagV (const TVector<MT> &x)
 {
     int i,n = x.Dim();
-    int *rp = new int[n+1];
-    int *ci = new int[n];
+    idxtype *rp = new idxtype[n+1];
+    idxtype *ci = new idxtype[n];
     MT  *v  = new MT[n];
     for (i = 0; i <= n; i++)
 	rp[i] = i;
@@ -272,8 +272,8 @@ template<class MT>
 TCoordMatrix<MT> TCompRowMatrix<MT>::MakeCoordMatrix () const
 {
     int i, j;
-    int *cd_rowidx = new int[this->nval];
-    int *cd_colidx = new int[this->nval];
+    idxtype *cd_rowidx = new idxtype[this->nval];
+    idxtype *cd_colidx = new idxtype[this->nval];
     MT  *cd_val    = new MT[this->nval];
     for (i = 0; i < this->nval; i++) {
         cd_colidx[i] = colidx[i];
@@ -305,7 +305,7 @@ TCompRowMatrix<complex> cplx (const TCompRowMatrix<double> &A)
 }
 
 template<class MT>
-void TCompRowMatrix<MT>::Initialise (const int *_rowptr, const int *_colidx,
+void TCompRowMatrix<MT>::Initialise (const idxtype *_rowptr, const idxtype *_colidx,
     const MT *data)
 {
     int i, nv = _rowptr[this->rows];
@@ -313,7 +313,7 @@ void TCompRowMatrix<MT>::Initialise (const int *_rowptr, const int *_colidx,
     SetColAccess (false);
     if (nv != this->nval) {
         if (this->nval) delete []colidx;
-	if (nv) colidx = new int[nv];
+	if (nv) colidx = new idxtype[nv];
     }
     for (i = 0; i < nv; i++) colidx[i] = _colidx[i];
     for (i = 0; i <= this->rows; i++) rowptr[i] = _rowptr[i];
@@ -331,8 +331,8 @@ TCompRowMatrix<MT> TCompRowMatrix<MT>::Submatrix (int r1, int r2,
 	if (colidx[i] >= c1 && colidx[i] < c2) nv++;
 
     // pass 2: create index and value lists
-    int *rp = new int[r2-r1+1];
-    int *ci = new int[nv];
+    idxtype *rp = new idxtype[r2-r1+1];
+    idxtype *ci = new idxtype[nv];
     MT *v = new MT[nv];
     rp[0] = 0;
     for (r = r1, nv = 0; r < r2; r++) {
@@ -376,8 +376,8 @@ MATHLIB TCompRowMatrix<MT> cath (const TCompRowMatrix<MT> &A,
     const MT *Aval = A.ValPtr();
     const MT *Bval = B.ValPtr();
 
-    int *rp = new int[nr+1];
-    int *ci = new int[nz];
+    idxtype *rp = new idxtype[nr+1];
+    idxtype *ci = new idxtype[nz];
     MT  *v  = new MT[nz];
 
     rp[0] = 0;
@@ -423,8 +423,8 @@ MATHLIB TCompRowMatrix<MT> catv (const TCompRowMatrix<MT> &A,
     const MT *Aval = A.ValPtr();
     const MT *Bval = B.ValPtr();
 
-    int *rp = new int[nr+1];
-    int *ci = new int[nz];
+    idxtype *rp = new idxtype[nr+1];
+    idxtype *ci = new idxtype[nz];
     MT  *v  = new MT[nz];
 
     for (r = 0; r <= nrA; r++)
@@ -459,8 +459,8 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::merge (const TCompRowMatrix<MT> &m)
     int max_nval = this->nval + m.nval; // max length of merged data array
     int tmp_rows = this->rows;
     if (m.rows > tmp_rows) tmp_rows = m.rows;
-    int *tmp_rowptr = new int[tmp_rows+1];
-    int *tmp_colidx = new int[max_nval];
+    idxtype *tmp_rowptr = new idxtype[tmp_rows+1];
+    idxtype *tmp_colidx = new idxtype[max_nval];
     int tmp_nval = 0;
     MT *tmp_val = new MT[max_nval];
     tmp_rowptr[0] = 0;
@@ -509,7 +509,7 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator= (const TCompRowMatrix<MT> &m)
     this->cols = m.cols;
     if (this->rows != m.rows) {
         delete []rowptr;
-	rowptr = new int[(this->rows=m.rows)+1];
+	rowptr = new idxtype[(this->rows=m.rows)+1];
     }
     Initialise (m.rowptr, m.colidx, m.val);
     sorted = m.sorted;
@@ -525,7 +525,7 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator= (const TCoordMatrix<MT> &m)
     this->cols = m.cols;
     if (this->rows != m.rows) {
         delete []rowptr;
-	rowptr = new int[(this->rows=m.rows)+1];
+	rowptr = new idxtype[(this->rows=m.rows)+1];
     }
     rowptr[0] = 0;
     for (r = i = 0; r < m.rows; r++) {
@@ -580,10 +580,10 @@ TCompRowMatrix<MT> TCompRowMatrix<MT>::operator+ (const TCompRowMatrix<MT> &m)
 	     Incompatible operators);
 
     // create the index lists of the result
-    int *rrowptr = new int[this->rows+1];
-    int **rrow = new int*[this->rows];
+    idxtype *rrowptr = new idxtype[this->rows+1];
+    idxtype **rrow = new idxtype*[this->rows];
     MT  **rval = new MT*[this->rows];
-    int *r = new int[this->cols];
+    idxtype *r = new idxtype[this->cols];
     MT *v = new MT[this->cols];
     int *nzi = new int[this->rows];
     int i, j, idx, idxm, nz, rnz, col, colm;
@@ -608,7 +608,7 @@ TCompRowMatrix<MT> TCompRowMatrix<MT>::operator+ (const TCompRowMatrix<MT> &m)
 	    }
 	}
 	rrowptr[i+1] = rrowptr[i]+nz;
-	rrow[i] = new int[nz];
+	rrow[i] = new idxtype[nz];
 	rval[i] = new MT[nz];
 	for (j = 0; j < nz; j++) {
 	    rrow[i][j] = r[j];
@@ -618,7 +618,7 @@ TCompRowMatrix<MT> TCompRowMatrix<MT>::operator+ (const TCompRowMatrix<MT> &m)
     }
 
     // now copy column indices and values into linear arrays
-    int *rcolidx = new int[rnz];
+    idxtype *rcolidx = new idxtype[rnz];
     MT *rdata = new MT[rnz];
     for (i = idx = 0; i < this->rows; i++) {
 	for (j = 0; j < nzi[i]; j++) {
@@ -653,12 +653,12 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator+= (
 	     Incompatible operators);
 
     // create the index lists of the result
-    int *rrowptr = new int[this->rows+1];
-    int **rrow = new int*[this->rows];
+    idxtype *rrowptr = new idxtype[this->rows+1];
+    idxtype **rrow = new idxtype*[this->rows];
     MT  **rval = new MT*[this->rows];
-    int *r = new int[this->cols];
+    idxtype *r = new idxtype[this->cols];
     MT *v = new MT[this->cols];
-    int *nzi = new int[this->rows];
+    idxtype *nzi = new idxtype[this->rows];
     int i, j, idx, idxm, nz, rnz, col, colm;
     rrowptr[0] = 0;
     rnz = 0;
@@ -681,7 +681,7 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator+= (
 	    }
 	}
 	rrowptr[i+1] = rrowptr[i]+nz;
-	rrow[i] = new int[nz];
+	rrow[i] = new idxtype[nz];
 	rval[i] = new MT[nz];
 	for (j = 0; j < nz; j++) {
 	    rrow[i][j] = r[j];
@@ -691,7 +691,7 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator+= (
     }
 
     // now copy column indices and values into linear arrays
-    int *rcolidx = new int[rnz];
+    idxtype *rcolidx = new idxtype[rnz];
     MT *rdata = new MT[rnz];
     for (i = idx = 0; i < this->rows; i++) {
 	for (j = 0; j < nzi[i]; j++) {
@@ -838,7 +838,7 @@ TVector<MT> TCompRowMatrix<MT>::Col (int c) const
 }
 
 template<class MT>
-int TCompRowMatrix<MT>::SparseRow (int r, int *ci, MT *rv) const
+int TCompRowMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 {
     int i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
     for (i = 0; i < nz; i++) {
@@ -856,7 +856,7 @@ void TCompRowMatrix<MT>::SetRow (int r, const TVector<MT> &row)
 
     // deflate row
     MT *rval = new MT[this->cols];
-    int *rcolidx = new int[this->cols];
+    idxtype *rcolidx = new idxtype[this->cols];
     int i, j, rnz = 0;
 
     for (i = 0; i < this->cols; i++) {
@@ -871,12 +871,12 @@ void TCompRowMatrix<MT>::SetRow (int r, const TVector<MT> &row)
     int prnz = rowptr[r+1] - rowptr[r];
     int nzero = this->nval-prnz+rnz;
     if (nzero != this->nval) {
-        int *tmp_colidx = new int[nzero];
+        idxtype *tmp_colidx = new idxtype[nzero];
 	MT  *tmp_val    = new MT[nzero];
 	if (this->nval) {
-	    memcpy (tmp_colidx, colidx, rowptr[r]*sizeof(int));
+	    memcpy (tmp_colidx, colidx, rowptr[r]*sizeof(idxtype));
 	    memcpy (tmp_colidx+rowptr[r]+rnz, colidx+rowptr[r+1],
-		    (this->nval-rowptr[r+1])*sizeof(int));
+		    (this->nval-rowptr[r+1])*sizeof(idxtype));
 	    delete []colidx;
 	    memcpy (tmp_val, this->val, rowptr[r]*sizeof(MT));
 	    memcpy (tmp_val+rowptr[r]+rnz, this->val+rowptr[r+1],
@@ -914,14 +914,14 @@ void TCompRowMatrix<MT>::RemoveRow (int nR)
    lm = rowptr[nR+1]-rowptr[nR];
    //cerr<<"lm "<<lm<<endl;
    
-   int *lrowptr = new int[this->rows];
-   int *lcolidx = new int[this->nval-lm];
+   idxtype *lrowptr = new idxtype[this->rows];
+   idxtype *lcolidx = new idxtype[this->nval-lm];
    MT  *lval    = new MT[this->nval-lm];
 
    
    for(j = 0; j < nR; j++)lrowptr[j] = rowptr[j];
-   for(g = 0; g < rowptr[nR]; g++)lcolidx[g] = colidx[g];
-   for(f = 0; f <  rowptr[nR]; f++)lval[f] = this->val[f];
+   for(g = 0; g < rowptr[nR]; g++) lcolidx[g] = colidx[g];
+   for(f = 0; f <  rowptr[nR]; f++) lval[f] = this->val[f];
    for(s = rowptr[nR]; s < this->nval-lm; s++) lcolidx[s] = colidx[s+lm];
    for(k = nR; k < this->rows; k++)  lrowptr[k] = rowptr[k+1] - lm;
    for(r = rowptr[nR]; r < this->nval-lm; r++) lval[r] = this->val[r+lm];
@@ -1030,7 +1030,7 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
 
     int r, i2;
     register int i = rowptr[r1];
-    register int *pcolidx = colidx+i;
+    register idxtype *pcolidx = colidx+i;
     register MT br, *pval = this->val+i;
 
     if (b.Dim() != this->rows) b.New (this->rows);
@@ -1060,7 +1060,8 @@ MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<complex> &x,
     if (b.Dim() != rows) b.New (rows);
 
     int r, i2;
-    register int i, *pcolidx = colidx;
+    register int i;
+	register idxtype *pcolidx = colidx;
     register double *pval = val;
     register double b_re, b_im;
 
@@ -1150,8 +1151,8 @@ void TCompRowMatrix<MT>::AB (const TCompRowMatrix<MT> &B,
     int nc = B.cols;
 
     bool *fillrow = new bool[nc];
-    int *Crowptr  = new int[nr+1];
-    int *Crowptr1 = Crowptr+1; // for faster access
+    idxtype *Crowptr  = new idxtype[nr+1];
+    idxtype *Crowptr1 = Crowptr+1; // for faster access
     for (i = 0; i <= nr; i++) Crowptr[i] = 0;
 
     // pass 1: determine sparsity pattern of product matrix C
@@ -1175,7 +1176,7 @@ void TCompRowMatrix<MT>::AB (const TCompRowMatrix<MT> &B,
     for (i = 1; i <= nr; i++) Crowptr[i] += Crowptr[i-1];
 
     nzero = Crowptr[nr];
-    int *Ccolidx = new int[nzero];
+    idxtype *Ccolidx = new idxtype[nzero];
     MT *Cval     = new MT[nzero];
     MT *rowval   = new MT[nc];
 
@@ -1320,8 +1321,8 @@ void TCompRowMatrix<MT>::Transpone ()
     int *rcount = new int[this->cols];
     for (i = 0; i < this->cols; i++) rcount[i] = 0;
     for (i = 0; i < this->nval; i++) rcount[colidx[i]]++;
-    int *trowptr = new int[this->cols+1];
-    int *tcolidx = new int[this->nval];
+    idxtype *trowptr = new idxtype[this->cols+1];
+    idxtype *tcolidx = new idxtype[this->nval];
     MT  *tval    = new MT[this->nval];
     trowptr[0] = 0;
     for (i = 0; i < this->cols; i++)
@@ -1377,8 +1378,8 @@ MATHLIB TCompRowMatrix<MT> kron (const TCompRowMatrix<MT> &A,
     const MT *Aval = A.ValPtr();
     const MT *Bval = B.ValPtr();
 
-    int *rowptr = new int[n+1];
-    int *colidx = new int[v];
+    idxtype *rowptr = new idxtype[n+1];
+    idxtype *colidx = new idxtype[v];
     MT *val = new MT[v];
 
     rowptr[0] = 0;
@@ -1462,12 +1463,13 @@ void TCompRowMatrix<MT>::Sort () const
 template<class MT>
 int TCompRowMatrix<MT>::Shrink ()
 {
-    int i, r, idx, *rp, *ci, nz = 0;
+    int i, r, idx, nz = 0;
+	idxtype *rp, *ci;
     MT *v;
     for (i = 0; i < this->nval; i++)
         if (this->val[i] != (MT)0) nz++;
-    rp = new int[this->rows+1];
-    ci = new int[nz];
+    rp = new idxtype[this->rows+1];
+    ci = new idxtype[nz];
     v  = new MT[nz];
     rp[0] = 0;
     for (r = idx = 0; r < this->rows; r++) {
@@ -1505,13 +1507,13 @@ void TCompRowMatrix<MT>::SetColAccess (bool yes) const
 	for (i = 0; i < this->nval; i++) nval_col[colidx[i]]++;
 	
 	// init column pointer array
-	colptr = new int[this->cols+1];
+	colptr = new idxtype[this->cols+1];
 	for (c = 0, colptr[0] = 0; c < this->cols; c++)
 	    colptr[c+1] = colptr[c] + nval_col[c];
 
 	// init row index offset arrays
-	rowidx = new int[this->nval];
-	vofs = new int[this->nval];
+	rowidx = new idxtype[this->nval];
+	vofs = new idxtype[this->nval];
 	for (c = 0; c < this->cols; c++) nval_col[c] = 0;
 	for (r = 0; r < this->rows; r++) {
 	    for (ri = rowptr[r]; ri < rowptr[r+1]; ri++) {
@@ -1587,9 +1589,9 @@ void TCompRowMatrix<MT>::ReplaceRow (int row, int nz, int *rcolidx, MT *rval)
     if (dnz) { // reallocation required
         int nval_new = this->nval + dnz;
 	// new column index list
-	int *colidx_new = new int[nval_new];
-	memcpy (colidx_new, colidx, rp0 * sizeof(int));
-	memcpy (colidx_new+rp0+nz, colidx+rp1, (this->nval-rp1) * sizeof(int));
+	idxtype *colidx_new = new idxtype[nval_new];
+	memcpy (colidx_new, colidx, rp0 * sizeof(idxtype));
+	memcpy (colidx_new+rp0+nz, colidx+rp1, (this->nval-rp1) * sizeof(idxtype));
 	if (this->nval) delete []colidx;
 	colidx = colidx_new;
 	// new data block
@@ -1754,8 +1756,8 @@ bool overlap (int i, int j, int *col, int *next)
 #endif
 
 template<class MT>
-void TCompRowMatrix<MT>::SymbolicCholeskyFactorize (int *&frowptr,
-    int *&fcolidx) const
+void TCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
+    idxtype *&fcolidx) const
 {
     dASSERT(this->rows == this->cols, Requires square matrix);
     symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
@@ -1763,14 +1765,14 @@ void TCompRowMatrix<MT>::SymbolicCholeskyFactorize (int *&frowptr,
 }
 
 template<class MT>
-void TCompRowMatrix<MT>::CalculateIncompleteCholeskyFillin (int *&frowptr,
-    int *&fcolidx) const
+void TCompRowMatrix<MT>::CalculateIncompleteCholeskyFillin (idxtype *&frowptr,
+    idxtype *&fcolidx) const
 {
     int i, j, nc;
     if (!sorted) Sort();
 
     // pass 1: construct row pointer list
-    frowptr = new int[this->rows+1];
+    frowptr = new idxtype[this->rows+1];
     frowptr[0] = 0;
     for (i = 0; i < this->rows; i++) {
         for (nc = 0, j = rowptr[i]; j < rowptr[i+1]; j++) {
@@ -1780,7 +1782,7 @@ void TCompRowMatrix<MT>::CalculateIncompleteCholeskyFillin (int *&frowptr,
 	frowptr[i+1] = frowptr[i]+nc;
     }
     // pass 2: construct column index list
-    fcolidx = new int[frowptr[this->rows]];
+    fcolidx = new idxtype[frowptr[this->rows]];
     for (i = nc = 0; i < this->rows; i++) {
         for (j = rowptr[i]; j < rowptr[i+1]; j++) {
 	    if (colidx[j] < i) fcolidx[nc++] = colidx[j];
@@ -1804,8 +1806,8 @@ MATHLIB bool CholeskyFactorize (const TCompRowMatrix<MT> &A, TCompRowMatrix<MT> 
     if (!A.col_access) A.SetColAccess();
     if (!L.col_access) L.SetColAccess();
     // some shortcuts to improve performance in the inner loops
-    int    *Lrowidx = L.rowidx;
-    int    *Lvofs   = L.vofs;
+    idxtype *Lrowidx = L.rowidx;
+    idxtype *Lvofs   = L.vofs;
     MT     *Lval    = L.val;
     for (c = 0; c < n; c++) {
 	// expand current column
@@ -2021,7 +2023,7 @@ void TCompRowMatrix<MT>::CholeskySubst (const TVector<MT> &d,
 
     k = rowptr[0];
     Lval = this->val;
-    int *Lcolidx = colidx;
+    idxtype *Lcolidx = colidx;
     for (i = 0; i < n; i++) {
 	k1 = rowptr[i+1];
         for (sum = b[i]; k < k1; k++)
@@ -2030,8 +2032,8 @@ void TCompRowMatrix<MT>::CholeskySubst (const TVector<MT> &d,
     }
     k = colptr[n]-1;
     Lval = this->val;
-    int *Lrowidx = rowidx+k;
-    int *Lvofs   = vofs+k;
+    idxtype *Lrowidx = rowidx+k;
+    idxtype *Lvofs   = vofs+k;
     for (i = n-1; i >= 0; i--) {
         k0 = colptr[i];
         for (sum = x[i]; k >= k0; k--)
@@ -2291,8 +2293,8 @@ MATHLIB istream &operator>> (istream &is, TCompRowMatrix<MT> &m)
 	for (i = 0; i < nz; i++)
 	    is >> m.val[i];
     } else {
-        int *rowptr = new int[nr+1];
-	int *colidx = new int[nz];
+        idxtype *rowptr = new idxtype[nr+1];
+	idxtype *colidx = new idxtype[nz];
 	MT  *val    = new MT[nz];
         for (i = 0; i <= nr; i++)
 	    is >> rowptr[i];

@@ -22,6 +22,9 @@
 //#define COMPUTE_FLOPS         // record floating point operations for
                                 // selected calculations
 
+// matrix/vector index types
+typedef int idxtype;
+
 // some constants ===========================================================
 
 const double Pi   = 3.1415926535897932384626433832795;

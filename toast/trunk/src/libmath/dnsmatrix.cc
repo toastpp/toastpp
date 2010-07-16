@@ -82,7 +82,7 @@ TVector<MT> TDenseMatrix<MT>::Col (int c) const
 }
 
 template<class MT>
-int TDenseMatrix<MT>::SparseRow (int r, int *ci, MT *rv) const
+int TDenseMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 {
     MT *rv0 = val+r*this->cols;
     for (int i = 0; i < this->cols; i++) {

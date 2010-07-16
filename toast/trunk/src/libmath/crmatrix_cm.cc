@@ -26,7 +26,7 @@ SCCompRowMatrixMixed::SCCompRowMatrixMixed (int rows, int cols)
 {}
 
 SCCompRowMatrixMixed::SCCompRowMatrixMixed (int rows, int cols,
-    const int *_rowptr, const int *_colidx, const scomplex *data)
+    const idxtype *_rowptr, const idxtype *_colidx, const scomplex *data)
     : TCompRowMatrix<scomplex> (rows, cols, _rowptr, _colidx, data)
 {}
 
@@ -37,7 +37,7 @@ SCCompRowMatrixMixed::SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m)
 SCCompRowMatrixMixed::~SCCompRowMatrixMixed ()
 {}
 
-int SCCompRowMatrixMixed::SparseRow (int r, int *ci, complex *rv) const
+int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci, complex *rv) const
 {
     int i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
     for (i = 0; i < nz; i++) {
@@ -70,9 +70,9 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b,
     dASSERT_2PRM(x.Dim() == cols,
         "Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
 
-    int r, i2;
-    int i = rowptr[r1];
-    int *pcolidx = colidx+i;
+    idxtype r, i2;
+    idxtype i = rowptr[r1];
+    idxtype *pcolidx = colidx+i;
     complex br;
     scomplex *pval = val+i;
 
