@@ -589,4 +589,9 @@ template int gmres (int restart,
     const TVector<double> &b, TVector<double> &x,
     const TPreconditioner<double> *precon, double &elim, void *context);
 
+template int gmres (int restart,
+    TVector<complex> (*Av_clbk)(const TVector<complex> &v, void *context),
+    const TVector<complex> &b, TVector<complex> &x,
+    const TPreconditioner<complex> *precon, double &elim, void *context);
+
 #endif // NEED_EXPLICIT_INSTANTIATION
