@@ -105,7 +105,7 @@ prm.edit_extinct.lambda = 1;
 prm.callback.context = handles;
 prm.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.basis.hMesh = toastReadMesh(prm.basis.meshfile);
+prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
 toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
 
 prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.basis.bdim,prm.basis.bdim);

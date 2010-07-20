@@ -118,7 +118,7 @@ fprintf (1, '\n**** INITIAL ERROR %f\n\n', err);
 
 hReg = 0; % for now
 step = prm.solver.step0; % initial step length for line search
-step = 1e5;
+step = 1e2;
 
 itr = 0; % iteration counter
 
@@ -268,7 +268,7 @@ end
     function dx_ = krylov(r)
     switch prm.solver.krylov.method
         case 'bicgstab'
-            dx = bicgstab(@jtjx, r, prm.solver.krylov.tol, prm.solver.krylov.maxit);
+            dx_ = bicgstab(@jtjx, r, prm.solver.krylov.tol, prm.solver.krylov.maxit);
         otherwise
             dx_ = gmres (@jtjx, r, 30, prm.solver.krylov.tol, prm.solver.krylov.maxit);
     end
