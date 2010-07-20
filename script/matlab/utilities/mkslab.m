@@ -1,15 +1,17 @@
-function hMesh = mkslab(bb,gdim,varargin)
+function [vtx idx eltp] = mkslab(bb,gdim,varargin)
 
 % Create a toast mesh for a slab geometry consisting of regular
 % voxel elements.
 %
-% Synopsis: hMesh = mkslab (bb,gdim[,p])
+% Synopsis: [vtx idx eltp] = mkslab (bb,gdim[,p])
 %
 % bb:    bounding box (mm): 2x3 real matrix containing min and
 %        max coordinates of the slab
 % gdim:  1x3 integer vector: contains element grid dimensions
 % p:     optional matrix of nodal plane positions
-% hMesh: mesh handle
+% vtx:   per-vertex coodinate list
+% idx:   per-element vertex index list
+% eltp:  element type list
 %
 % Note: The grid dimensions refer to the element grid. Node
 %     dimensions are element dimensions+1 in each direction.
@@ -21,8 +23,16 @@ function hMesh = mkslab(bb,gdim,varargin)
 %     p(1,:) contains the x-coordinates, p(2,:) the y-coordinates, and
 %     p(3,:) the z-coordinates.
 %
+%     Use the toastMakeMesh function to convert the vtx, idx and eltp
+%     lists to a toast mesh.
+%
 % Usage example:
-%     hMesh = mkslab ([[0 0 0];[10 10 10]], [10 10 10]);
+%     [vtx idx eltp] = mkslab ([[0 0 0];[10 10 10]], [10 10 10]);
+%     n = size(vtx,1);
+%     mua = ones(n,1)*0.01;
+%     kap = ones(n,1)*0.3;
+%     ref = ones(n,1)*1.4;
+%     hmesh = toastMakeMesh(vtx,idx,eltp,[mua,kap,ref]);
 %     toastWriteMesh (hMesh,'slab.msh');
 
 dim = 3;
@@ -36,7 +46,7 @@ if nargin < 3
                   zeros(1,max(gdim)-gdim(d))];
     end
 else
-    p = varargin{1};
+    p = varargin{1};hmesh = toastMakeMesh(vtx,idx,eltp,[mua,kap,ref]);
 end
 
 vdim = gdim+1;
@@ -54,7 +64,7 @@ vtx_z = reshape(vtx_z,[],1);
 
 vtx = [vtx_x vtx_y vtx_z];
 
-% Build element index matrix
+% Build element index matrixhmesh = toastMakeMesh(vtx,idx,eltp,[mua,kap,ref]);
 
 idx = zeros(prod(gdim),8);
 dy = vdim(1);
@@ -84,16 +94,16 @@ eltp = ones(prod(gdim),1) * 5;
 
 % Build parameter matrix
 
-mua = 0.025;
-mus = 2;
-kap = 1./(3*(mua+mus));
-ref = 1.4;
+%mua = 0.025;
+%mus = 2;
+%kap = 1./(3*(mua+mus));
+%ref = 1.4;
 
-prm = ones(prod(vdim),3);
-prm(:,1) = mua;
-prm(:,2) = kap;
-prm(:,3) = ref;
+%prm = ones(prod(vdim),3);
+%prm(:,1) = mua;
+%prm(:,2) = kap;
+%prm(:,3) = ref;
 
 % Make mesh
 
-hMesh = toastMakeMesh(vtx,idx,eltp,prm);
+%hMesh = toastMakeMesh(vtx,idx,eltp,prm);

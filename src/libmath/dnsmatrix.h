@@ -16,6 +16,7 @@
 
 template<class MT> class TSymMatrix;
 template<class MT> class TDenseMatrix;
+template<class MT> class TCompRowMatrix;
 
 template<class MT>
 MATHLIB TDenseMatrix<MT> transpose (const TDenseMatrix<MT> &A);
@@ -124,6 +125,9 @@ public:
 
     TDenseMatrix (const TSymMatrix<MT> &A);
     // Create a dense matrix from a symmetric matrix
+
+    TDenseMatrix (const TCompRowMatrix<MT> &A);
+    // Create a dense matrix from a compressed row matrix
 
     ~TDenseMatrix () { Unlink(); }
     // Destructor

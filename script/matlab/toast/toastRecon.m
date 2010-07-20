@@ -181,7 +181,7 @@ end
         
 % ----------------------------------------------------------------------
 % Cleanup
-toastDeleteRegul(LPRM.hReg);
+toastClearRegul(LPRM.hReg);
 if isfield(prm.solver.basis,'hbasis') == false
     toastDeleteBasis(LPRM.hBasis);
 end

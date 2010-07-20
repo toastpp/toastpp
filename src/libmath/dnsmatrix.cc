@@ -63,6 +63,23 @@ TDenseMatrix<MT>::TDenseMatrix (const TSymMatrix<MT> &A)
 }
 
 template<class MT>
+TDenseMatrix<MT>::TDenseMatrix (const TCompRowMatrix<MT> &A)
+{
+    int r, c, i;
+    int m = A.nRows();
+    int n = A.nCols();
+    Alloc (m, n);
+    const MT *Aval = A.ValPtr();
+
+    for (r = 0; r < m; r++) {
+	for (i = A.rowptr[r]; i < A.rowptr[r+1]; i++) {
+	    c = A.colidx[i];
+	    val[r*n+c] = Aval[i];
+	}
+    }
+}
+
+template<class MT>
 void TDenseMatrix<MT>::New_dirty (int r, int c)
 {
     TMatrix<MT>::New (r, c); // set nrows and ncols
