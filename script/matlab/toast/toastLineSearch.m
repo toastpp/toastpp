@@ -117,16 +117,17 @@ fprintf (1, '==> Step: %f, objective: %f [final]\n', s, pmin);
     % ===================================================
     function [p,valid] = get_of(x,varargin)
         p = func(x,varargin{:});
-        if isnan(p)
-            valid = false;
-        else
-            valid = true;
-        end
         if isstruct(p)
             if isfield(p,'valid')
                 valid = p.valid;
+            else
+                valid = true;
             end
             p = p.of;
+        elseif isnan(p)
+            valid = false;
+        else
+            valid = true;
         end
     end
     % ===================================================

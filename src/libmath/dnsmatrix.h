@@ -78,25 +78,38 @@ MATHLIB std::ostream &operator<< (std::ostream &os, const TDenseMatrix<MT> &m);
  * such as row and column norms, row and column scaling, matrix x vector
  * operations, and various direct and iterative linear solvers.
  */
-
 template<class MT> class TDenseMatrix: public TMatrix<MT> {
 
 public:
+    /**
+     * \brief Create a dense matrix of size 0 x 0.
+     */
     TDenseMatrix (): TMatrix<MT> ()
     { rc = 0; }
-    // Create 0 x 0 matrix
 
+    /**
+     * \brief Create a dense matrix of size r x c
+     * \param r number of rows (>= 0)
+     * \param c number of columns (>= 0)
+     * \note All elements are initialised to zero.
+     */
     TDenseMatrix (int r, int c): TMatrix<MT> (r, c)
     { Alloc (r,c); Zero(); }
-    // Create r x c matrix filled with 0's
 
+    /**
+     * \brief Create a dense square matrix of size n x n
+     * \param n number of rows and columns (>= 0)
+     * \note All elements are initialised to zero.
+     */
     TDenseMatrix (int n): TMatrix<MT> (n, n)
     { Alloc (n,n); Zero(); }
-    // Create a square n x n matrix filled with 0's
 
+    /**
+     * \brief Create a dense matrix as a copy of another dense matrix.
+     * \param m source matrix
+     */
     TDenseMatrix (const TDenseMatrix<MT> &m): TMatrix<MT> (m)
     { Alloc (m.rows, m.cols); memcpy (val, m.val, rc*sizeof(MT)); }
-    // Create copy of matrix m
 
     /**
      * \brief Construct a matrix by copying a sub-block of another matrix.
@@ -114,23 +127,50 @@ public:
      */
     TDenseMatrix (const TDenseMatrix<MT> &m, int i0, int j0, int i1, int j1);
 
+    /**
+     * \brief Create a dense r x c matrix with a list of values.
+     * \param r number of rows (>= 0)
+     * \param c number of columns (>= 0)
+     * \param values array of matrix values
+     * \note The entries in the array are applied in row-order:
+     *   values[0] -> m(0,0), values[1] -> m(0,1), ...
+     * \note The length of the array must be at least r*c
+     * \note The values are deep-copied, so the array can be deallocated by
+     *   the caller after use.
+     */
     TDenseMatrix (int r, int c, MT *values): TMatrix<MT> (r, c)
     { Alloc (r,c); memcpy (val, values, rc*sizeof(MT)); }
-    // Create r x c matrix and initialise from 'values' array, which
-    // contains row vectors and must be at least of dimension r*c
 
+    /**
+     * \brief Create a dense r x c matrix with a string of values.
+     * \param r number of rows (>= 0)
+     * \param c number of columns (>= 0)
+     * \param valstr ASCII string of values
+     * \note The entries in the string must be in a format recognisable by
+     *   the stream-in operator (>>). They must be separated by whitespace.
+     * \note The entries in the array are applied in row-order.
+     */
     TDenseMatrix (int r, int c, const char *valstr);
-    // Create r x c matrix and initialise from a string which contains
-    // at least r*c MT values in row order
 
+    /**
+     * \brief Create a dense square matrix from a symmetric matrix.
+     * \param A symmetric source matrix
+     * \note The matrix requires more storage space in dense format than in
+     *   symmetric format, because both the upper and lower triangles are
+     *   represented explicitly.
+     */
     TDenseMatrix (const TSymMatrix<MT> &A);
-    // Create a dense matrix from a symmetric matrix
 
+    /**
+     * \brief Create a dense matrix from a compressed row matrix.
+     * \param A compressed row source matrix
+     */
     TDenseMatrix (const TCompRowMatrix<MT> &A);
-    // Create a dense matrix from a compressed row matrix
 
+    /**
+     * \brief Destructor. De-allocates the matrix.
+     */
     ~TDenseMatrix () { Unlink(); }
-    // Destructor
 
     inline MatrixStorage StorageType () const { return MATRIX_DENSE; }
     // Matrix element storage method
