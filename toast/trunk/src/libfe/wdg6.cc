@@ -105,7 +105,7 @@ Point Wedge6::NodeLocal (int node) const
 
 RVector Wedge6::DirectionCosine (int side, RDenseMatrix& jacin)
 {
-    dASSERT(jacin.Dim(COL) == 3 && jacin.Dim(ROW) == 3,
+    dASSERT(jacin.nCols() == 3 && jacin.nRows() == 3,
 	Invalid dimension of matrix jacin.);
 
     double amod;
