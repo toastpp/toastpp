@@ -528,11 +528,11 @@ int ComplexBiCGSolve (const TGenericSparseMatrix<MT>& Are,
     const TVector<MT>& bim, TVector<MT>& xre, TVector<MT>& xim,
     double &tol, int maxit)
 {
-    dASSERT(Are.Dim(ROW) == Aim.Dim(ROW) && Are.Dim(COL) == Aim.Dim(COL),
+    dASSERT(Are.nRows() == Aim.nRows() && Are.nCols() == Aim.nCols(),
 	   Matrix dimensions differ.);
     dASSERT(bre.Dim() == bim.Dim() && xre.Dim() == xim.Dim(),
 	   Vector dimensions differ.);
-    dASSERT(Are.Dim(ROW) == bre.Dim(), Matrix and vector incompatible.);
+    dASSERT(Are.nRows() == bre.Dim(), Matrix and vector incompatible.);
 
     const double EPS = 1e-10;
     int i, k = 0, dim = bre.Dim();
