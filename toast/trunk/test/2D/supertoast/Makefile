@@ -66,22 +66,22 @@ test1_ref ::
 	@$(RECON) supertoast1.prm >& /dev/null
 	@grep Iteration gridbasis.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > test1.dat
-	@rm gradient*.nim update*.nim recon*.nim iter.dat gridbasis.out
+	@rm gradient*.nim update*.nim recon*.nim gridbasis.out
 
 test2_ref ::
 	@$(RECON) supertoast2.prm >& /dev/null
 	@grep Iteration gridbasis.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > test2.dat
-	@rm gradient*.nim update*.nim recon*.nim iter.dat gridbasis.out
+	@rm gradient*.nim update*.nim recon*.nim gridbasis.out
 
 test3_ref ::
 	@$(RECON) supertoast3.prm >& /dev/null
 	@grep Iteration gridbasis.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > test3.dat
-	@rm gradient*.nim update*.nim recon*.nim iter.dat gridbasis.out
+	@rm gradient*.nim update*.nim recon*.nim gridbasis.out
 
 test4_ref ::
 	@$(RECON) supertoast4.prm >& /dev/null
 	@grep Iteration gridbasis.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > test4.dat
-	@rm gradient*.nim update*.nim recon*.nim iter.dat gridbasis.out
+	@rm gradient*.nim update*.nim recon*.nim gridbasis.out
