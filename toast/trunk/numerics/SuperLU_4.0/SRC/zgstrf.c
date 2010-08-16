@@ -176,7 +176,7 @@
  */
 
 void
-zgstrf (superlu_options_t *options, SuperMatrix *A,
+toast_zgstrf (superlu_options_t *options, SuperMatrix *A,
         int relax, int panel_size, int *etree, void *work, int lwork,
         int *perm_c, int *perm_r, SuperMatrix *L, SuperMatrix *U,
         SuperLUStat_t *stat, int *info)
@@ -307,7 +307,7 @@ zgstrf (superlu_options_t *options, SuperMatrix *A,
         	    dense[asub[k]] = a[k];
 
 	       	/* Numeric update within the snode */
-	        zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu, stat);
+	        toast_zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu, stat);
 
 		if ( (*info = zpivotL(icol, diag_pivot_thresh, &usepr, perm_r,
 				      iperm_r, iperm_c, &pivrow, &Glu, stat)) )

@@ -206,7 +206,7 @@ zgssv(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
 	  relax, panel_size, sp_ienv(3), sp_ienv(4));*/
     t = SuperLU_timer_(); 
     /* Compute the LU factorization of A. */
-    zgstrf(options, &AC, relax, panel_size, etree,
+    toast_zgstrf(options, &AC, relax, panel_size, etree,
             NULL, lwork, perm_c, perm_r, L, U, stat, info);
     utime[FACT] = SuperLU_timer_() - t;
 
