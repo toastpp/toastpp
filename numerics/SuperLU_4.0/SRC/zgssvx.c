@@ -528,7 +528,7 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 	
 	/* Compute the LU factorization of A*Pc. */
 	t0 = SuperLU_timer_();
-	zgstrf(options, &AC, relax, panel_size, etree,
+	toast_zgstrf(options, &AC, relax, panel_size, etree,
                 work, lwork, perm_c, perm_r, L, U, stat, info);
 	utime[FACT] = SuperLU_timer_() - t0;
 	

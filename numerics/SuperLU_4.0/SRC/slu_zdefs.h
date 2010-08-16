@@ -72,6 +72,9 @@
  * History:
  */
 
+#include "blasnames.h"
+/* MS 100816: replace names of BLAS functions */
+
 #ifdef _CRAY
 #include <fortran.h>
 #include <string.h>

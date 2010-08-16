@@ -389,7 +389,7 @@ zgsitrf(superlu_options_t *options, SuperMatrix *A, int relax, int panel_size,
 		}
 
 		/* Numeric update within the snode */
-		zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu, stat);
+		toast_zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu, stat);
 
 		if (usepr) pivrow = iperm_r[icol];
 		fill_tol = pow(fill_ini, 1.0 - (double)icol / (double)min_mn);
