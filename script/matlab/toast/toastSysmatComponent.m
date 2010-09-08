@@ -20,9 +20,13 @@ function p = toastSysmatComponent
 %
 % int_tp      Integral
 % --------------------------------------------
+% 'FF'        \int Fi(r) Fj(r) dr
+% 'DD'        \int Di(r) Dj(r) dr
+% 'PFF'       \int prm(r) Fi(r) Fj(r) dr
 % 'PDD'       \int prm(r) Di(r) Dj(r) dr
+% 'BNDPFF'    \int prm(r) Fi(r) Fj(r) dr (over boundary)
 %
-% where Di: shape function derivative for node i
+% where Fi, Di: shape function/shape function derivative for node i
 %
 % If the 'EL' flag is present, the system matrix is calculated on an
 % element basis, rather than a node basis. Length 'n' of all parameter

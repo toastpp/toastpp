@@ -4,8 +4,9 @@
 //
 // RH parameters:
 //     1: mesh handle (double)
-//     2: prm NIM (double array
-//     6: (optional) 'EL' flag to indicate element basis
+//     2: prm NIM (double array)
+//     3: integral type (string). Currently supported: FF,DD,PFF,PDD,BNDPFF
+//     4: (optional) 'EL' flag to indicate element basis
 // LH parameters:
 //     1: system matrix (sparse double matrix)
 // =========================================================================
@@ -34,21 +35,31 @@ void Assert (bool cond, const char *msg)
 void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
     bool elbasis, mxArray **res)
 {
-    int n = (elbasis ? mesh->elen() : mesh->nlen());
+    int n = mesh->nlen();
+    int *rowptr, *colidx, nzero;
 
-    // Create forward solver to initialise system matrix
-    CFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
-    FWS.SetDataScaling (DATA_LOG);
-    
-    FWS.Allocate (*mesh);
-    if (!strcasecmp (integral_type, "PDD")) {
-	cerr << "Assembling PDD system matrix component" << endl;
-	FWS.AssembleSystemMatrixComponent (prm,
-	    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    mesh->SparseRowStructure (rowptr, colidx, nzero);
+    RCompRowMatrix F(n, n, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    if (!strcasecmp (integral_type, "FF")) {
+	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
+    } else if (!strcasecmp (integral_type, "DD")) {
+	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_DD);
+    } else if (!strcasecmp (integral_type, "PFF")) {
+	AddToSysMatrix (*mesh, F, &prm,
+            elbasis ? ASSEMBLE_PFF_EL : ASSEMBLE_PFF);
+    } else if (!strcasecmp (integral_type, "PDD")) {
+	AddToSysMatrix (*mesh, F, &prm,
+            elbasis ? ASSEMBLE_PDD_EL : ASSEMBLE_PDD);
+    } else if (!strcasecmp (integral_type, "BNDPFF")) {
+	AddToSysMatrix (*mesh, F, &prm,
+            elbasis ? ASSEMBLE_BNDPFF_EL : ASSEMBLE_BNDPFF);
     }
 
     // Return system matrix to MATLAB
-    CopyMatrix (res, *FWS.F);
+    CopyMatrix (res, F);
 }
 
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
@@ -86,9 +97,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     CopyVector (prm, prhs[1]);
 
-    if (mxIsChar(prhs[2]))
+    if (nrhs >= 3 && mxIsChar(prhs[2])) {
 	mxGetString (prhs[2], integral_type, 32);
-
+    } else {
+	mexErrMsgTxt ("Parameter 2: string expected");
+    }
 
     if (nrhs >= 4 && mxIsChar(prhs[3])) {
 	char cbuf[32];
