@@ -723,6 +723,18 @@ public:
     // Integrals including mixed derivatives
 
     /**
+     * \brief Integral of partial shape function derivative over the element
+     * \param i node index (range 0 .. \ref nNode-1)
+     * \param k coordinate index for the derivative  (range 0 .. \ref
+     *   Dimension-1)
+     * \return Value of the integral
+     *   \f[ \int_\Omega \frac{\partial u_i(\vec{r})}{\partial x_k} d\vec{r}
+     *   \f]
+     */
+    virtual double Intd (int i, int k) const
+    { xERROR(Not implemented); return 0.0; }
+
+    /**
      * \brief Integral of the product of a shape function and a partial shape
      *   function derivative over the element.
      * \param i node index for shape function (range 0 .. \ref nNode-1)
