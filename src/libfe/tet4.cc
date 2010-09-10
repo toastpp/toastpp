@@ -619,6 +619,42 @@ RSymMatrix Tetrahedron4::Intdd () const
     return MDD;
 }
 
+double Tetrahedron4::Intd (int i, int k) const
+{
+    const double fac = 1.0/6.0;
+    switch(i) {
+    case 0:
+	switch(k) {
+	case 0: return b0*fac;
+	case 1: return c0*fac;
+	case 2: return d0*fac;
+	default: xERROR(Invalid index); return 0;
+	}
+    case 1:
+	switch(k) {
+	case 0: return b1*fac;
+	case 1: return c1*fac;
+	case 2: return d1*fac;
+	default: xERROR(Invalid index); return 0;
+	}
+    case 2:
+	switch(k) {
+	case 0: return b2*fac;
+	case 1: return c2*fac;
+	case 2: return d2*fac;
+	default: xERROR(Invalid index); return 0;
+	}
+    case 3:
+	switch(k) {
+	case 0: return b3*fac;
+	case 1: return c3*fac;
+	case 2: return d3*fac;
+	default: xERROR(Invalid index); return 0;
+	}
+    default: xERROR(Invalid index); return 0;
+    }
+}
+
 double Tetrahedron4::IntFfd (int i, int j, int k, int l) const
 {
     //Coefficient

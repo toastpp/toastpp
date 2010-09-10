@@ -112,6 +112,8 @@ public:
     RSymMatrix Intdd() const;
     // returns matrix of mixed derivatives
 
+    double Intd (int i, int k) const;
+
     double IntFfd (int i, int j, int k, int l) const;
     // Int u_i u_j du_k/dx_l dr
     double IntPfd(const RVector &p,int j,int k,int l) const;
