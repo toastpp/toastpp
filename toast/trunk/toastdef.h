@@ -34,15 +34,16 @@
 #define VERBOSE_LEVEL 1
 // Log file verbosity level
 
-#if (!defined(WIN32))&&(!defined(WIN64))
-
 #include "blasnames.h"
+
+#if (!defined(WIN32))&&(!defined(WIN64))
 
 #define USE_BLAS_LEVEL1
 // Use external BLAS level 1 routines (vector-vector operations)
 // instead of local C++ implementations where possible.
 // This is not guaranteed to improve performance, since the function
 // call overhead may outweigh any savings from optimised BLAS.
+
 #endif
 
 #define USE_BLAS_LEVEL2

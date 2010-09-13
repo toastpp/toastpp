@@ -319,6 +319,16 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double tol = 1e-10;
     mxGetString (prhs[10], solver, 128);
     if (nrhs >= 12) tol = mxGetScalar (prhs[11]);
+
+#ifdef WIN64
+	// for now, direct solver doesn't work in WIN64
+	if (!stricmp(solver,"direct")) {
+		mexWarnMsgTxt("toastGradient: direct solver not supported. Switching to BiCGSTAB(tol=1e-14)");
+		strcpy (solver,"bicgstab");
+		tol = 1e-14;
+	}
+#endif
+
     CFwdSolver FWS (solver, tol);
     FWS.SetDataScaling (DATA_LOG);
 
