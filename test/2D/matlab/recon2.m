@@ -131,7 +131,7 @@ while (itr <= itrmax) & (err > tolCG*err0) & (errp-err > tolCG)
     
     % Gradient of cost function
     r = -toastGradient (hMesh, hBasis, qvec, mvec, mua, mus, ref, freq, ...
-                       data, sd, 'DIRECT', 1e-16);
+                       data, sd, 'bicgstab', 1e-16);
     r = r .* x; % parameter scaling
     
     rr = toastRegulGradient (hReg, logx);

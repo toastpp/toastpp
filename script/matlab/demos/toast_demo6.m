@@ -268,13 +268,13 @@ function showiso(handles,bmua,thres_mua,bmus,thres_mus,fignum)
 prm = getappdata(handles.figure1,'prm');
 nx = prm.solver.basis.bdim(1); ny = prm.solver.basis.bdim(2); nz = prm.solver.basis.bdim(3);
 eval(['axes(handles.axes' num2str(fignum) ')']);
-%set(gcf,'Renderer','OpenGL');
 cla;
+set(gcf,'Renderer','OpenGL');
 
 [vtx,idx,perm] = toastSurfData(prm.basis.hMesh);
-bb = toastMeshBB(prm.basis.hMesh);
-pmax = bb(1,:);
-pmin = bb(2,:);
+[pmin pmax] = toastMeshBB(prm.basis.hMesh);
+%pmax = bb(1,:);
+%pmin = bb(2,:);
 nvtx = size(vtx,1);
 msize=pmax-pmin;
 col = zeros(nvtx,3); col(:,2)=1;

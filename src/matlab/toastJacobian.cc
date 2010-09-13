@@ -167,6 +167,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		v++;
 	    }
 	}
+
 	// copy adjoint fields
 	const mxArray *mx_aphi = prhs[3];
 	Assert (mxGetM(mx_aphi) == n, 4, "Unexpected number of rows");
@@ -184,6 +185,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		v++;
 	    }
 	}
+
 	// copy projections
 	const mxArray *mx_proj = prhs[4];
 	Assert (mxGetM(mx_proj)*mxGetN(mx_proj) == nqm, 5, "Unexpected size");
@@ -227,6 +229,15 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mxGetString (prhs[8], solver, 128);
 	if (nrhs >= 10) tol = mxGetScalar (prhs[9]);
 	
+#ifdef WIN64
+	// for now, direct solver doesn't work in WIN64
+	if (!stricmp(solver,"direct")) {
+		mexWarnMsgTxt("toastJacobian: direct solver not supported. Switching to BiCGSTAB(tol=1e-14)");
+		strcpy (solver,"bicgstab");
+		tol = 1e-14;
+	}
+#endif
+
 	CalcJacobian (mesh, raster, qvec, mvec, mua, mus, ref, freq,
 		      solver, tol, &plhs[0]);
     }

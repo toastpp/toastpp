@@ -153,6 +153,12 @@ distro_bin_win32::
 	zip -9 -r toast_bin_win32.zip $(TOASTRELDIR)/win32/Release/bin $(TOASTRELDIR)/win32/Release/mex -x@$(TOASTRELDIR)/exclude.lst ; \
 	mv toast_bin_win32.zip $(TOASTRELDIR)
 
+distro_bin_win64::
+	ln -T -s $(PWD) ../$(TOASTRELDIR); \
+	cd ..; \
+	zip -9 -r toast_bin_win64.zip $(TOASTRELDIR)/win64/release/bin $(TOASTRELDIR)/win64/release/mex -x@$(TOASTRELDIR)/exclude.lst ; \
+	mv toast_bin_win64.zip $(TOASTRELDIR)
+
 distro_bin_linux::
 	cd ..; \
 	ln -T -s trunk $(TOASTRELDIR); \

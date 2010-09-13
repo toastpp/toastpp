@@ -242,7 +242,7 @@ set(h,'ButtonDownFcn','toast_demo2(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo)
 
 % calculate the PMDFs
 J = toastJacobian(prm.basis.hMesh, prm.basis.hBasis, prm.qvec, prm.mvec, ...
-    mua, mus, prm.ref, prm.meas.src.freq, 'DIRECT');
+    mua, mus, prm.ref, prm.meas.src.freq, 'direct');
 slen = size(J,2)/2;
 Ja_lnamp = toastMapSolToBasis(prm.basis.hBasis, J(1,1:slen));
 Jk_lnamp = toastMapSolToBasis(prm.basis.hBasis, J(1,slen+1:slen*2));

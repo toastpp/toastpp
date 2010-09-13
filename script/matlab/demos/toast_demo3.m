@@ -90,8 +90,8 @@ prm.meas.qmfile = 'circle25_16x16.qm';
 
 prm.meas.src = struct('type','Neumann','prof','Gaussian','width',2);
 prm.meas.det = struct('prof','Gaussian','width',2);
-prm.fwdsolver.method = 'Direct';
-prm.fwdsolver.tol = 1e-10;
+prm.fwdsolver.method = 'direct';
+prm.fwdsolver.tol = 1e-14;
 prm.solver.basis.bdim = [64 64];
 prm.solver.method = 'PCG';
 prm.solver.tol = 1e-8;

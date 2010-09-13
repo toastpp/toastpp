@@ -8,7 +8,7 @@ disp('-------------------------------------------------------')
 % ======================================================================
 % User-defined parameters
 % ======================================================================
-meshname  = '../meshes/circle25_32.msh';              % mesh file
+meshname  = '../meshes/ellips_tri10.msh';              % mesh file
 qmname    = '../meshes/circle25_32x32.qm';            % source-detector file
 fmod_name = '../fwdfem/fmod_ellips_32x32_100MHz.fem'; % data file: log amplitude
 farg_name = '../fwdfem/farg_ellips_32x32_100MHz.fem'; % data file: phase
@@ -27,8 +27,8 @@ Himplicit = true;                       % Implicit/explicit Hessian matrix
 % ======================================================================
 
 % Initialisations
-%toastCatchErrors();
-toastSetVerbosity(1);
+toastCatchErrors();
+%toastSetVerbosity(1);
 
 % Set up some variables
 blen = bx*by;
@@ -48,8 +48,8 @@ ref = ones(n,1) * refind;
 kap = 1./(3*(mua+mus));
 
 % Read the data
-mdata = toastReadVector(fmod_name);
-pdata = toastReadVector(farg_name);
+mdata = toastReadRealVector(fmod_name);
+pdata = toastReadRealVector(farg_name);
 
 mdata = mdata + mdata.*0.01.*randn(size(mdata));
 pdata = pdata + pdata.*0.01.*randn(size(pdata));
@@ -107,8 +107,8 @@ hMesh2 = toastReadMesh('../meshes/ellips_tri10.msh');
 hBasis2 = toastSetBasis ('LINEAR',hMesh2,[bx by]);
 btgtmua=toastMapMeshToGrid (hBasis2, tgtmua);
 btgtkap=toastMapMeshToGrid (hBasis2, tgtkap);
-toastClearBasis(hBasis2);
-toastClearMesh(hMesh2);
+toastDeleteBasis(hBasis2);
+toastDeleteMesh(hMesh2);
 btgt = [btgtmua; btgtkap];
 hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta, 'KapRefImage', ...
                    btgt, 'KapRefScale', 1, 'KapRefPMThreshold', 0.1);
@@ -128,7 +128,7 @@ while (itr <= itrmax) & (err > tolGN*err0) & (errp-err > tolGN)
     
     % Construct the Jacobian
     fprintf (1,'Calculating Jacobian\n');
-    J = toastJacobian (hMesh, hBasis, qvec, mvec, mua, mus, ref, freq, 'direct');
+    J = toastJacobian (hMesh, hBasis, qvec, mvec, mua, mus, ref, freq, 'bicgstab', 1e-16);
     
     % data normalisation
     for i = 1:m

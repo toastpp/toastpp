@@ -139,6 +139,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     // set up mesh
+
     mesh->Setup();
 
     plhs[0] = mxCreateScalarDouble (Ptr2Handle (mesh));
