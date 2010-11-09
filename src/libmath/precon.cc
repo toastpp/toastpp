@@ -71,6 +71,19 @@ void TPrecon_Diag<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
     s = r * idiag;
 }
 
+template<class MT>
+void TPrecon_Diag<MT>::Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
+{
+    dASSERT(r.Dim() == idiag.Dim(), Dimension mismatch);
+    dASSERT(s.Dim() == idiag.Dim(), Dimension mismatch);
+    int nr = r.nRows();
+    int nc = r.nCols();
+    for(int i=0; i < nr; i++)
+	for(int j=0; j < nc; j++)
+	    s.Set(i, j, idiag[i]*r.Get(i, j));
+}
+
+
 // ==========================================================================
 // class TPrecon_IC
 
@@ -86,7 +99,7 @@ void TPrecon_IC<MT>::Reset (const TMatrix<MT> *A)
     if (L.nRows() != nrows || L.nCols() != ncols) {
         L.New (nrows, ncols);
 	d.New (nrows);
-	idxtype *rowptr, *colidx;
+	int *rowptr, *colidx;
 	spA->CalculateIncompleteCholeskyFillin (rowptr, colidx);
 	L.Initialise (rowptr, colidx);
 	delete []rowptr;
@@ -114,7 +127,7 @@ void TPrecon_DILU<MT>::Reset (const TMatrix<MT> *_A)
     int i, r, c, nz;
     dim = (A->nRows() < A->nCols() ? A->nRows() : A->nCols());
     TVector<MT> Ar(A->nCols());
-    idxtype *ci = new idxtype[dim];
+    int *ci = new int[dim];
     MT *rv = new MT[dim];
     if (ipivot.Dim() != dim) ipivot.New (dim);
     ipivot = A->Diag();
@@ -135,7 +148,7 @@ void TPrecon_DILU<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
     MT sum;
     TVector<MT> row(dim);
     TVector<MT> z(dim);
-    idxtype *ci = new idxtype[dim];
+    int *ci = new int[dim];
     MT  *rv = new MT[dim];
     for (i = 0; i < dim; i++) {
         nz = A->SparseRow (i, ci, rv);
@@ -267,7 +280,7 @@ void SCPreconMixed_DILU::Reset (const SCCompRowMatrixMixed *_A)
     int i, r, c, nz;
     dim = (A->nRows() < A->nCols() ? A->nRows() : A->nCols());
     CVector Ar(A->nCols());
-    idxtype *ci = new idxtype[dim];
+    int *ci = new int[dim];
     complex *rv = new complex[dim];
     if (ipivot.Dim() != dim) ipivot.New (dim);
     ipivot = MakeCVector (A->Diag());
@@ -287,7 +300,7 @@ void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s) const
     complex sum;
     CVector row(dim);
     CVector z(dim);
-    idxtype *ci = new idxtype[dim];
+    int *ci = new int[dim];
     complex *rv = new complex[dim];
     for (i = 0; i < dim; i++) {
         nz = A->SparseRow (i, ci, rv);

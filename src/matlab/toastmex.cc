@@ -165,18 +165,29 @@ void CopyMatrix (mxArray **array, CCompRowMatrix &mat)
     mwIndex idx;
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
+   // mexPrintf("malloced the mex sparse matrix ..\n");
+    //getchar();
 
     for (i = 0; i < n; i++) rcount[i] = 0;
     for (i = 0; i < nz; i++) rcount[colidx[i]]++;
+    //mexPrintf("updated rcount \n");
+    //getchar();
 
     double  *pr = mxGetPr(tmp);
     double  *pi = mxGetPi(tmp);
     mwIndex *ir = mxGetIr(tmp);
     mwIndex *jc = mxGetJc(tmp);
 
+    //mexPrintf("obtained pointers pr, pi, ir, jc \n");
+    //getchar();
     jc[0] = 0;
     for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
+    //mexPrintf("Updated jc \n");
+    //getchar();
     for (i = 0; i < n; i++) rcount[i] = 0;
+     //mexPrintf("Updated rcount again ... \n");
+    //getchar();
+
     for (i = 0; i < m; i++)
 	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
 	    j = colidx[k];
@@ -185,9 +196,18 @@ void CopyMatrix (mxArray **array, CCompRowMatrix &mat)
 	    pr[idx] = pval[k].re;
 	    pi[idx] = pval[k].im;
 	    rcount[j]++;
+	    //mexPrintf("inside for loops %d %d %d %f %f %d\n", j, idx, i, pr[idx], pi[idx], rcount[j]);
+    	    //getchar();
+	
 	}
     delete []rcount;
+    //mexPrintf("deleted rcount \n");
+    //		getchar();
+
     *array = tmp;
+     //mexPrintf("tmp assigned ... exiting copymatrix routine ... \n");
+    //		getchar();
+
 }
 
 // ============================================================================

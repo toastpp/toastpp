@@ -448,7 +448,8 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
     double &tol, const TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
-    double rho=0, alpha, aden, beta, bden, omega, err, bnorm;
+    MT rho = (MT)0, aden, bden, alpha, beta, omega;
+    double err, bnorm;
     TVector<MT> r(dim), rd(dim), p(dim), pd(dim), s(dim), sd(dim), t(dim), v(dim);
     if (!maxit) maxit = dim+1;
     //    r = rd = b - (A*x);
@@ -475,15 +476,12 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 	//	A.Ax (pd, v);
 	v = (*Mv_clbk) (pd, context); //  multiply
 	aden = rd & v;
-	cout << "BiCGSTAB: aden = " << aden << endl;
 	alpha = rho/aden;
-	cout << "BiCGSTAB: alpha = " << alpha << endl;
 	for (i = 0; i < dim; i++)
 	    s[i] = r[i] - alpha*v[i];
 
 	// check break condition 1
 	err = l2norm(s);
-	cout << "BiCGSTAB: err = " << err/bnorm << endl;
 	if (err < tol*bnorm) {
 	    for (i = 0; i < dim; i++) x[i] += alpha*pd[i];
 	    break;
@@ -501,7 +499,6 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 
 	// check convergence
 	err = l2norm (r);
-	cout << "BiCGSTAB: err 2 = " << err/bnorm <<endl;
 	if (err <= tol*bnorm) break;
 	if (omega == 0.0) {
 	    cerr << "BiCGSTAB solver fails to converge" << endl;
@@ -661,6 +658,9 @@ template MATHLIB int BiCGSTAB (const RMatrix &A, const RVector &b,
 template MATHLIB int BiCGSTAB (RVector(*Mv_clbk)(const RVector &v,
     void *context), void *context, const RVector &b, RVector &x,
     double &tol, const RPreconditioner *precon, int maxit);
+template MATHLIB int BiCGSTAB (CVector(*Mv_clbk)(const CVector &v,
+    void *context), void *context, const CVector &b, CVector &x,
+    double &tol, const CPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (void (* MVM)(RVector &),  const RVector &b, 
     RVector &x, double &tol, const RPreconditioner *precon, int maxit);
 

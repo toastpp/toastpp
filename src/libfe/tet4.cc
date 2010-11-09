@@ -611,11 +611,11 @@ RSymMatrix Tetrahedron4::Intdd () const
 	    MDD(i,j) = dd[i]*dd[j] * scale;
 
 
-    for (i = 0; i < 12; i++)
+    /*for (i = 0; i < 12; i++)
 	std::cout << dd[i] << "\t";
     std::cout << std::endl;
     std::cout << 36*size << std::endl;
-
+*/
     return MDD;
 }
 

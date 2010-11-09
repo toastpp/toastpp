@@ -110,6 +110,9 @@ template<class VT>
 TVector<VT> vsort (const TVector<VT> &v);
 
 template<class VT>
+void vsort (const TVector<VT> &v, TVector<VT> &sorted_v, TVector<int> &sort_order);
+
+template<class VT>
 VT sum (const TVector<VT> &v);
 
 template<class VT>
@@ -682,6 +685,18 @@ public:
      *   operator <.
      */
     friend TVector<VT> vsort<> (const TVector<VT> &v);
+
+    /**
+     * \brief Sort vector
+     * \return Vector with elements of v sorted in ascending order.
+     * \return Sort order vector.
+     * \remarks Uses a simple bubble sort algorithm
+     * \remarks Input argument unchanged.
+     * \remarks Only works with template types that define relational
+     *   operator <.
+     */
+	
+    friend void vsort<> (const TVector<VT> &v, TVector<VT> &sorted_v, TVector<int> &sort_order);
 
     /**
      * \brief Sum of elements

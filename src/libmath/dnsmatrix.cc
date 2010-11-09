@@ -917,14 +917,14 @@ MATHLIB int QRFactorize (TDenseMatrix<MT> &A, TVector<MT> &c, TVector<MT> &d)
         for (sum = 0, i = k; i < n; i++)
 	    sum += A(i,k)*A(i,k);
 	d[k] = (A(k,k) < 0 ? -sqrt(sum) : sqrt(sum));
-	b = sqrt(2.0*d[k]*(A(k,k) + d[k]));
+	b = sqrt((MT)2.0*d[k]*(A(k,k) + d[k]));
 	A(k,k) = (A(k,k) + d[k])/b;
 	for (i = k+1; i < n; i++)
 	    A(i,k) /= b;
 	for (j = k+1; j < m; j++) {
 	    for (sum = 0, i = k; i < n; i++)
 	        sum += A(i,k)*A(i,j);
-	    f = 2.0*sum;
+	    f = (MT)2.0*sum;
 	    for (i = k; i < n; i++)
 	        A(i,j) -= f*A(i,k);
 	}
@@ -938,11 +938,11 @@ MATHLIB void RSolve (const TDenseMatrix<MT> &A, const TVector<MT> &d, TVector<MT
     int i, j;
     int n = A.nRows();
     int m = A.nCols();
-    double sum;
+    MT sum;
     b[m-1] /= -d[m-1];
     for (i = m-2; i >= 0; i--) {
         for (sum = 0.0, j = i+1; j < m; j++)
-	    sum += A(i,j) * b[j];
+	    sum = sum + A(i,j) * b[j];
 	b[i] = (b[i]-sum) / -d[i];
     }
 }
@@ -961,7 +961,7 @@ MATHLIB void QRSolve (const TDenseMatrix<MT> &A, const TVector<MT> &c,
     for (k = 0; k < m; k++) {
         for (sum = 0, i = k; i < n; i++)
 	    sum += A(i,k)*x[i];
-	f = 2.0*sum;
+	f = sum*2.0;
 	for (i = k; i < n; i++)
 	    x[i] -= f*A(i,k);
     }
@@ -1159,10 +1159,19 @@ template MATHLIB TDenseMatrix<complex> transpose (const TDenseMatrix<complex> &A
 
 template MATHLIB int QRFactorize (TDenseMatrix<double> &A, TVector<double> &c,
     TVector<double> &d);
+template MATHLIB int QRFactorize (TDenseMatrix<complex> &A, TVector<complex> &c,
+    TVector<complex> &d);
+
 template MATHLIB void RSolve (const TDenseMatrix<double> &A, const TVector<double> &d,
     TVector<double> &b);
+template MATHLIB void RSolve (const TDenseMatrix<complex> &A, const TVector<complex> &d,
+    TVector<complex> &b);
+
 template MATHLIB void QRSolve (const TDenseMatrix<double> &A, const TVector<double> &c,
     const TVector<double> &d, const TVector<double> &b, TVector<double> &x);
+template MATHLIB void QRSolve (const TDenseMatrix<complex> &A, const TVector<complex> &c,
+    const TVector<complex> &d, const TVector<complex> &b, TVector<complex> &x);
+
 
 template MATHLIB void LUFactorize (TDenseMatrix<double> &a, IVector &indx, double &d);
 template MATHLIB void LUSolve (const TDenseMatrix<double> &a, const IVector &indx,

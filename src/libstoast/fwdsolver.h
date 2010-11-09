@@ -100,7 +100,7 @@ private:
  * \ref Project and \ref ProjectAll.
  */
 
-template<class T> class TFwdSolver {
+template<typename T> class TFwdSolver {
 public:
     /**
      * \brief Constructor. Creates a forward solver instance.
