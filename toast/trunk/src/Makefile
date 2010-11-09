@@ -3,7 +3,8 @@ include ../Makefile.incl
 
 #SUBDIRS = libtask libtcl libtoast libctoast libdiffreg libbem displace \
 #	toast ctoast fwdfem cfwdfem meshgen viewer tools supertoast
-SUBDIRS = libmath libfe libstoast libbemdiff libbem libparam2001 libfdot supertoast bintools
+SUBDIRS = libmath libfe libdgfe libstoast libbemdiff libbem supertoast bintools libvarPN3D
+#SUBDIRS = libdgfe 
 
 all::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \

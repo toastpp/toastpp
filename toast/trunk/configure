@@ -9195,7 +9195,7 @@ esac
 if test "x$OGLLIB" != "x" ; then
     case $system in
 	Darwin*)
-	    OGLLIB="$OGLLIB  -framework GLUT -framework OPENGL"
+	    OGLLIB="$OGLLIB -framework GLUT -framework OPENGL"
 	    ;;
 	*)
 	    OGLLIB="$OGLLIB -lGLU -lGL"

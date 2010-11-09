@@ -729,6 +729,36 @@ TVector<VT> vsort (const TVector<VT> &v)
     return tmp;
 }
 
+template<class VT>
+void vsort (const TVector<VT> &v, TVector<VT> &sorted_v, IVector &sort_order)
+{
+    sorted_v.New(v.Dim());
+    sort_order.New(v.Dim());
+    
+    for(int i=0; i < v.Dim(); i++)
+	sort_order[i] = i;
+
+    int mi = 0;
+    VT mx= (VT) 0;
+    for (int i = 0; i < v.Dim(); i++) sorted_v[i] = v[i] ;
+    if (!sorted_v.Dim()) return;
+    for (int i=0; i < sorted_v.Dim(); ++i)
+    {
+      for (int j=i-1; j>=0 && (sorted_v[j+1] < sorted_v[j]); --j)
+      {
+            mx = sorted_v[j];         /* swap a[j] and a[j+1] */
+	    mi = sort_order[j];
+
+            sorted_v[j] = sorted_v[j+1];
+	    sort_order[j] = sort_order[j+1];
+
+            sorted_v[j+1] = mx;
+	    sort_order[j+1] = mi;
+        }
+    }
+    return;
+}
+
 // ==========================================================================
 
 template<class VT>
@@ -1099,6 +1129,12 @@ template RVector vsort (const RVector &v);
 template FVector vsort (const FVector &v);
 template CVector vsort (const CVector &v);
 template IVector vsort (const IVector &v);
+
+template void vsort (const RVector &v, RVector &sorted_v, IVector &sort_order);
+template void vsort (const FVector &v, FVector &sorted_v, IVector &sort_order);
+template void vsort (const CVector &v, CVector &sorted_v, IVector &sort_order);
+template void vsort (const IVector &v, IVector &sorted_v, IVector &sort_order);
+
 
 template double   sum  (const RVector &v);
 template float    sum  (const FVector &v);

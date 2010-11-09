@@ -1,0 +1,31 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libdgfe
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libdgfe
+
+all:: $(LIB)
+
+SRCS = 	nonconformingMesh.cc dgfwdsolver.cc 
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = ${SRCS:.cc=.h}
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(DGFLAGS) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): nonconformingMesh.cc dgfwdsolver.cc dgSource.cc 
+	g++ -Wno-deprecated -I/cs/research/medim/projects2/projects/sprerapa/trunk -I/cs/research/medim/projects2/projects/sprerapa/trunk/include -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libmath -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libfe -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libdgfe -fPIC -c /cs/research/medim/projects2/projects/sprerapa/trunk/src/libdgfe/nonconformingMesh.cc 
+	g++ -Wno-deprecated -I/cs/research/medim/projects2/projects/sprerapa/trunk -I/cs/research/medim/projects2/projects/sprerapa/trunk/include -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libmath -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libfe -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libdgfe  -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libstoast  -fPIC -c /cs/research/medim/projects2/projects/sprerapa/trunk/src/libdgfe/dgfwdsolver.cc
+	g++ -Wno-deprecated -I/cs/research/medim/projects2/projects/sprerapa/trunk -I/cs/research/medim/projects2/projects/sprerapa/trunk/include -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libmath -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libfe -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libdgfe  -I/cs/research/medim/projects2/projects/sprerapa/trunk/src/libstoast  -fPIC -c /cs/research/medim/projects2/projects/sprerapa/trunk/src/libdgfe/dgSource.cc
+	@$(RM) $(LIB)
+	g++ -shared -o /cs/research/medim/projects2/projects/sprerapa/trunk/gcc4.1.2_shared/lib/libdgfe.so nonconformingMesh.o dgfwdsolver.o dgSource.o
+	$(RM) $(OBJS)
+	
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

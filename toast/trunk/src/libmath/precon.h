@@ -38,6 +38,8 @@ public:
     virtual void Apply (const TVector<MT> &r, TVector<MT> &s) const = 0;
     // Apply preconditioner to r and return the result in s
     // e.g. s = M^-1 r for a preconditioner matrix M
+    virtual void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const =0;
+       
 
     static TPreconditioner *Create (PreconType type);
     // create a new preconditioner of type 'type' and return pointer to it
@@ -53,6 +55,8 @@ public:
     PreconType Type() { return PRECON_NULL; }
     void Reset (const TMatrix<MT>*) {}
     void Apply (const TVector<MT> &r, TVector<MT> &s) const { s = r; }
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
+
 };
 
 // ==========================================================================
@@ -66,6 +70,7 @@ public:
     void Reset (const TMatrix<MT> *A);
     void ResetFromDiagonal (const TVector<MT> &diag);
     void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const;
 
 private:
     TVector<MT> idiag;
@@ -81,6 +86,7 @@ public:
     PreconType Type() { return PRECON_ICH; }
     void Reset (const TMatrix<MT> *A);
     void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
 
 private:
     TCompRowMatrix<MT> L;
@@ -98,6 +104,7 @@ public:
     PreconType Type() { return PRECON_DILU; }
     void Reset (const TMatrix<MT> *);
     void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
 
 private:
     int dim;                   // problem dimension
@@ -125,6 +132,8 @@ public:
     // coarsest grid
 
     void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
+
 
 private:
     const TCompRowMatrix<MT> *A; // pointer to system matrix array

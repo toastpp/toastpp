@@ -37,7 +37,6 @@
 #include "blasnames.h"
 
 #if (!defined(WIN32))&&(!defined(WIN64))
-
 #define USE_BLAS_LEVEL1
 // Use external BLAS level 1 routines (vector-vector operations)
 // instead of local C++ implementations where possible.
@@ -46,11 +45,11 @@
 
 #endif
 
-#define USE_BLAS_LEVEL2
+//#define USE_BLAS_LEVEL2
 // Use external BLAS level 2 routines (matrix-vector operations)
 // instead of local C++ implementations where possible
 
-#define USE_BLAS_LEVEL3
+//#define USE_BLAS_LEVEL3
 // Use external BLAS level 3 routines (matrix-matrix operations)
 // instead of local C++ implementations where possible
 

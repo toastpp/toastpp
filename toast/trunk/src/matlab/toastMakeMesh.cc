@@ -110,7 +110,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		    el->Node[j] = (int)(idx[k]-0.5);
 	    }
 	    k++;
-	}
+	   }
     }
 
     // create dummy parameter list
@@ -118,6 +118,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mesh->plist.SetMua (0.01);
     mesh->plist.SetMus (1);
     mesh->plist.SetN (1);
+
 
     // copy user-provided list if available
     if (nrhs >= 4) {
@@ -139,7 +140,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     // set up mesh
-
     mesh->Setup();
 
     plhs[0] = mxCreateScalarDouble (Ptr2Handle (mesh));

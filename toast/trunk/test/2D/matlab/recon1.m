@@ -129,7 +129,8 @@ while (itr <= itrmax) & (err > tolGN*err0) & (errp-err > tolGN)
     % Construct the Jacobian
     fprintf (1,'Calculating Jacobian\n');
     J = toastJacobian (hMesh, hBasis, qvec, mvec, mua, mus, ref, freq, 'bicgstab', 1e-16);
-    
+    size(J)
+    pause 
     % data normalisation
     for i = 1:m
         J(i,:) = J(i,:) / sd(i);
