@@ -7,19 +7,18 @@ VPATH = $(TSRC)/libdgfe
 
 all:: $(LIB)
 
-LIBSRCS = nonconformingMesh.cc dgfwdsolver.cc 
-HDRSRCS = nonconformingMesh.h dgfwdsolver.h dgSource.h
+SRCS = 	nonconformingMesh.cc dgfwdsolver.cc dgSource.cc
 
-OBJS = ${LIBSRCS:.cc=.o}
-HDRS = ${HDRSRCS:.cc=.h}
+OBJS = ${SRCS:.cc=.o}
+HDRS = nonconformingMesh.h dgfwdsolver.h dgSource.h
 
 %.o : %.cc $(HDRS)
-	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) $(STOASTINC) -c $<
+	$(CXX) -fPIC $(STOASTINC) -c $<
 
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath $(MATHLIB)
-		
+	$(SHLIB_LD) -o $@ $^
+	
 clean:: 
 	$(RM) *.o
 
