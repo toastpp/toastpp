@@ -295,13 +295,13 @@ void TDGFwdSolver<complex>::CalcField (const TVector<complex> &qvec, TVector<com
 
 	doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
 	doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
-	zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, DN, dtypeZ, GE);
-	zCreate_Dense_Matrix (&X, n, 1, xbuf, n, DN, dtypeZ, GE);
+	toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
+	toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
 	lu_data.Solve (&B, &X);
 
-	Destroy_SuperMatrix_Store (&B);
-	Destroy_SuperMatrix_Store (&X);
+	toast_Destroy_SuperMatrix_Store (&B);
+	toast_Destroy_SuperMatrix_Store (&X);
     } else {
         double tol = iterative_tol;
 	IterativeSolve (*F, qvec, cphi, tol, precon);

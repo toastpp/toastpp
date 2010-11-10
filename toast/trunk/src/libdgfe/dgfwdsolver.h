@@ -4,9 +4,9 @@
 // ==========================================================================
 #ifndef __DGFWDSOLVER_H
 #define __DGFWDSOLVER_H
-#include "supermatrix.h"
-#include "zsp_defs.h"
-#include "toasttype.h"
+//#include "supermatrix.h"
+//#include "zsp_defs.h"
+//#include "toasttype.h"
 #include "stoastlib.h"
 #include "nonconformingMesh.h"
 #include <iostream>
