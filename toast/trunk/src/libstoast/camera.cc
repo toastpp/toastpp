@@ -29,6 +29,7 @@ double PinholeCamera::getFoVy() const
 
 void PinholeCamera::getPixelCoords(const RVector & p, double & ix, double & iy) const
 {
+    xERROR(Not implemented);
 }
 
 void OrthoCamera::getRayVector(const double ix, const double iy, RVector & rayStart, RVector & rayDir) const
