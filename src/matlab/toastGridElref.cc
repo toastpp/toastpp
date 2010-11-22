@@ -23,7 +23,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     Raster *raster = (Raster*)Handle2Ptr (mxGetScalar (prhs[0]));
     int i, n = raster->GLen();
-    int *elref = raster->Elref();
+    const int *elref = raster->Elref();
 
     plhs[0] = mxCreateDoubleMatrix (n,1,mxREAL);
     double *pr = mxGetPr(plhs[0]);

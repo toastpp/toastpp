@@ -14,7 +14,7 @@ fmod_name = '../fwdfem/fmod_ellips_32x32_100MHz.fem'; % data file: log amplitude
 farg_name = '../fwdfem/farg_ellips_32x32_100MHz.fem'; % data file: phase
 
 refind = 1.4;                           % refractive index
-bx = 100; by = 100;                     % solution basis: grid dimension
+grd = [100 100];                        % solution basis: grid dimension
 freq = 100;                             % modulation frequency [MHz]
 tau = 1e-4;                             % regularisation parameter
 beta = 0.01;                            % TV regularisation parameter
@@ -31,7 +31,7 @@ toastCatchErrors();
 %toastSetVerbosity(1);
 
 % Set up some variables
-blen = bx*by;
+blen = prod(grd);
 c0 = 0.3;
 cm = c0/refind;
 
@@ -51,14 +51,14 @@ kap = 1./(3*(mua+mus));
 mdata = toastReadRealVector(fmod_name);
 pdata = toastReadRealVector(farg_name);
 
-mdata = mdata + mdata.*0.01.*randn(size(mdata));
-pdata = pdata + pdata.*0.01.*randn(size(pdata));
+%mdata = mdata + mdata.*0.01.*randn(size(mdata));
+%pdata = pdata + pdata.*0.01.*randn(size(pdata));
 
 data = [mdata;pdata];
 m = length(data);
 
 % Set up the mapper between FEM and solution bases
-hBasis = toastSetBasis ('LINEAR', hMesh, [bx by]);
+hBasis = toastSetBasis ('LINEAR', hMesh, grd);
 solmask = toastSolutionMask (hBasis);
 solmask2 = [solmask solmask+blen];
 
@@ -104,7 +104,7 @@ tgtmua=toastReadNIM('../meshes/tgt_mua_ellips_tri10.nim');
 tgtmus=toastReadNIM('../meshes/tgt_mus_ellips_tri10.nim');
 tgtkap=1./(3*(tgtmua+tgtmus));
 hMesh2 = toastReadMesh('../meshes/ellips_tri10.msh');
-hBasis2 = toastSetBasis ('LINEAR',hMesh2,[bx by]);
+hBasis2 = toastSetBasis ('LINEAR',hMesh2,grd);
 btgtmua=toastMapMeshToGrid (hBasis2, tgtmua);
 btgtkap=toastMapMeshToGrid (hBasis2, tgtkap);
 toastDeleteBasis(hBasis2);
@@ -176,8 +176,13 @@ while (itr <= itrmax) & (err > tolGN*err0) & (errp-err > tolGN)
     
     % Line search
     fprintf (1, 'Entering line search\n');
-    [step, err] = toastLineSearch (logx, dx, step, err, @objective);
-    
+    step0 = step;
+    [step, err] = toastLineSearch (logx, dx, step0, err, @objective);
+    if errp-err <= tolGN
+        dx = r; % try steepest descent
+        [step, err] = toastLineSearch (logx, dx, step0, err, @objective);
+    end
+
     % Add update to solution
     logx = logx + dx*step;
     x = exp(logx);
@@ -193,8 +198,8 @@ while (itr <= itrmax) & (err > tolGN*err0) & (errp-err > tolGN)
     bmua(solmask) = smua;
     bmus(solmask) = smus;
 
-    subplot(1,2,1), imagesc(reshape(bmua,bx,by),[min(mua) max(mua)]), axis equal, axis tight, colorbar('horiz'); colormap(gray);
-    subplot(1,2,2), imagesc(reshape(bmus,bx,by),[min(mus) max(mus)]), axis equal, axis tight, colorbar('horiz'); colormap(gray);
+    subplot(1,2,1), imagesc(reshape(bmua,grd),[min(mua) max(mua)]), axis equal, axis tight, colorbar('horiz'); colormap(gray);
+    subplot(1,2,2), imagesc(reshape(bmus,grd),[min(mus) max(mus)]), axis equal, axis tight, colorbar('horiz'); colormap(gray);
     drawnow
     
     proj = toastProject (hMesh, mua, mus, ref, freq, qvec, mvec);
