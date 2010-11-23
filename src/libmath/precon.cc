@@ -74,8 +74,9 @@ void TPrecon_Diag<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
 template<class MT>
 void TPrecon_Diag<MT>::Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
 {
-    dASSERT(r.Dim() == idiag.Dim(), Dimension mismatch);
-    dASSERT(s.Dim() == idiag.Dim(), Dimension mismatch);
+    dASSERT(r.nRows() == idiag.Dim(), Dimension mismatch);
+    dASSERT(s.nRows() == r.nRows(), Dimension mismatch);
+    dASSERT(s.nCols() == r.nCols(), Dimension mismatch);
     int nr = r.nRows();
     int nc = r.nCols();
     for(int i=0; i < nr; i++)
