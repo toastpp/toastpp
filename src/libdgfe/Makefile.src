@@ -15,6 +15,13 @@ HDRS = nonconformingMesh.h dgfwdsolver.h dgSource.h
 %.o : %.cc $(HDRS)
 	$(CXX) -fPIC $(STOASTINC) -c $<
 
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $^
