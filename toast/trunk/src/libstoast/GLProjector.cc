@@ -14,8 +14,6 @@ GLProjector::GLProjector(Camera * cam, QMMesh * mesh, int nBndElems_, int * bnde
     setupMesaGL();
     renderImageElem();
     constructMatrix_SF();
-
-    cerr << "glprojector" << endl;
     return;
 
 }
@@ -186,7 +184,6 @@ void GLProjector::renderImageElem()
 	glOrtho(-iw*0.5, iw*0.5, -ih*0.5, ih*0.5, 5.0, zFar);
 	//glOrtho(-18.3084, 18.3084, -18.3084, 18.3084, 10.0, zFar);
     } else {
-	cerr << "fovy = " << fovy << endl;
 	double aspect = camera->getAspect();
 	gluPerspective( fovy, aspect, 5.0, zFar );
     }
