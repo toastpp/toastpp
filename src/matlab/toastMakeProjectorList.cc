@@ -63,48 +63,53 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     axis /= gantryR;
 
     // Get camera type
+    int pidx = 3;
     CameraType ctp;
     char str[100];
     double pixSize, f;
-    mxGetString(prhs[3], str, 100);
+    mxGetString(prhs[pidx++], str, 100);
     if (!strcasecmp (str, "PINHOLE")) {
 	ctp = CAMTYPE_PINHOLE;
 	// Get focal length
-	mxGetString (prhs[4],str,100);
+	mxGetString (prhs[pidx++],str,100);
 	if (!strcmp(str, "flen"))
-	    f = mxGetScalar (prhs[5]);
+	    f = mxGetScalar (prhs[pidx++]);
 	else {
-	    cerr << "Warning: toastMakeProjectorList: missing required field: flen\n";
+	    mexErrMsgTxt
+		("toastMakeProjectorList: missing required field: flen");
 	}
-    }else{
-	if (!strcasecmp (str, "ORTHO")) {
-	    ctp = CAMTYPE_ORTHO;
-	    mxGetString (prhs[4],str,100);
-	    if (!strcmp(str, "pixelsize"))
-		pixSize = mxGetScalar (prhs[5]);
-	    else {
-		cerr << "Warning: toastMakeProjectorList: missing required field: pixelsize\n";
-	    }
-	}
-	else{
-	    cout<<"Camera type "<<str<<" not supported";
-	    return;
-	}
+    } else if (!strcasecmp (str, "ORTHO")) {
+	ctp = CAMTYPE_ORTHO;
+    } else {
+	char cbuf[256];
+	sprintf (cbuf, "Camera type %s not supported", str);
+	mexErrMsgTxt (cbuf);
+    }
+
+    // pixel size
+    mxGetString (prhs[pidx++],str,100);
+    if (!strcmp(str, "pixelsize"))
+	pixSize = mxGetScalar (prhs[pidx++]);
+    else {
+	mexWarnMsgTxt
+	    ("Warning: toastMakeProjectorList: missing required field: pixelsize set to 1");
+	pixSize = 1.0;
     }
 
     RVector shift(2, 0.0);
-    if (nrhs > 5)
+    if (nrhs > pidx-1)
     {
-	mxGetString (prhs[6],str,100);
+	mxGetString (prhs[pidx++],str,100);
 	if (!strcasecmp(str, "shift"))
 	{
-	    nr = mxGetM(prhs[7]);
-	    nc = mxGetN(prhs[7]);
+	    nr = mxGetM(prhs[pidx]);
+	    nc = mxGetN(prhs[pidx]);
 	    if (nr*nc < 2)
 	    {
-		cerr << "Must specify both x and y camera position shift" << endl;
-	    }else{
-		dpr = mxGetPr(prhs[7]);
+		mexErrMsgTxt
+		    ("Must specify both x and y camera position shift");
+	    } else{
+		dpr = mxGetPr(prhs[pidx]);
 		shift[0] = dpr[0];
 		shift[1] = dpr[1];
 	    }
@@ -152,13 +157,15 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Create camera
 	if (ctp==CAMTYPE_PINHOLE)
 	{
-	    camPList[m] = new PinholeCamera(w, h, f, cpos, x, y, z);
+	    camPList[m] = new PinholeCamera(w, h, f, cpos, x, y, z, pixSize);
+
 	}else{
 	    if (ctp==CAMTYPE_ORTHO)
 	    {
 		camPList[m] = new OrthoCamera(w, h, pixSize, cpos, x, y, z);
 	    }
 	}
+
 	if (projtp==PROJTYPE_MESAGL)
 	{
 	    projPList[m] = new GLProjector(camPList[m], mesh, nBndElems, bndellist, bndsdlist);
@@ -166,7 +173,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	dpr[m] = Ptr2Handle (projPList[m]);
 
-    }
+    } 
 
     delete []camPList;
     delete []projPList;
