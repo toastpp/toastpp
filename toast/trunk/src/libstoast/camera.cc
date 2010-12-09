@@ -16,14 +16,14 @@ void PinholeCamera::getRayVector(const double ix, const double iy, RVector & ray
 {
     double dx = ( (double)(ix) - (double)(w-1)*0.5 );
     double dy = ( (double)(iy) - (double)(h-1)*0.5 );
-    rayDir = z*f + dx*x + dy*y;
+    rayDir = z*f + dx*pixelSize*x + dy*pixelSize*y;
     rayDir /= l2norm(rayDir);
     rayStart = pos;
 }
 
 double PinholeCamera::getFoVy() const 
 { 
-    double fovy = atan2((double)(h)*0.5, f) * 360.0 / Pi;
+    double fovy = atan2((double)(h)*pixelSize*0.5, f) * 360.0 / Pi;
     return fovy;
 }
 

@@ -14,6 +14,10 @@ GLProjector::GLProjector(Camera * cam, QMMesh * mesh, int nBndElems_, int * bnde
     setupMesaGL();
     renderImageElem();
     constructMatrix_SF();
+
+    cerr << "glprojector" << endl;
+    return;
+
 }
 
 GLProjector::GLProjector(Camera * cam, QMMesh * mesh)
@@ -89,9 +93,15 @@ void GLProjector::renderImage()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     GLdouble zFar = l2norm(camera->getPos())*2.0;
-    //glScalef(2.5, 2.5, 2.5);
-    //gluPerspective( fovy, aspect, 10.0, zFar );
-    glOrtho(-50.0, 50.0, -50.0, 50.0/*-18.3084, 18.3084, -18.3084, 18.3084*/, 10.0, zFar);
+    double fovy = camera->getFoVy();
+    if (!fovy) { // assume ortho projection
+	glOrtho(-50.0, 50.0, -50.0, 50.0
+		/*-18.3084, 18.3084, -18.3084, 18.3084*/, 10.0, zFar);
+	//glScalef(2.5, 2.5, 2.5);
+    } else {
+	double aspect = camera->getAspect();
+	gluPerspective( fovy, aspect, 5.0, zFar );
+    }
 
     // Viewing angle, viewport
     glMatrixMode(GL_MODELVIEW);
@@ -169,12 +179,17 @@ void GLProjector::renderImageElem()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     GLdouble zFar = l2norm(camera->getPos())*2.0;
-  //  gluPerspective( fovy, aspect, 10.0, zFar );
-    double iw = camera->getImageWidth() * ((OrthoCamera*) camera)->getPixelSize();
-    double ih = camera->getImageHeight() * ((OrthoCamera*) camera)->getPixelSize();
-    glOrtho(-iw*0.5, iw*0.5, -ih*0.5, ih*0.5, 10.0, zFar);
-    //glOrtho(-18.3084, 18.3084, -18.3084, 18.3084, 10.0, zFar);
-
+    double fovy = camera->getFoVy();
+    double iw = camera->getImageWidth() * camera->getPixelSize();
+    double ih = camera->getImageHeight() * camera->getPixelSize();
+    if (!fovy) { // assume ortho projection
+	glOrtho(-iw*0.5, iw*0.5, -ih*0.5, ih*0.5, 5.0, zFar);
+	//glOrtho(-18.3084, 18.3084, -18.3084, 18.3084, 10.0, zFar);
+    } else {
+	cerr << "fovy = " << fovy << endl;
+	double aspect = camera->getAspect();
+	gluPerspective( fovy, aspect, 5.0, zFar );
+    }
     // Viewing angle, viewport
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
