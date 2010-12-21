@@ -1,5 +1,5 @@
 
-function quad2linmesh(QNoV, QNoF, Filein, Fileout)
+function [QVertex,LTri] = quad2linmesh(QNoV, QNoF, Filein, Fileout)
 %
 % read quadratic BEM mesh and convert to lin by splitting into 4.
 %

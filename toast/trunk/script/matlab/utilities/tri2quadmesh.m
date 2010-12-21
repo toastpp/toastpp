@@ -1,4 +1,4 @@
-function tri2quadmesh(LNoV, LVertex, LNoF, node, Fileout)
+function [new_nodes,new_elem] = tri2quadmesh(LNoV, LVertex, LNoF, node, Fileout)
 %
 % read triangular BEM mesh and convert to quadratic.
 %

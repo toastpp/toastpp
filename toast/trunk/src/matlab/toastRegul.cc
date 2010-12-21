@@ -348,7 +348,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (brefimg) {
 	    reg = new QPM (tau, T, &x0, raster, kaprefimg, sdr, fT, istensor);
 	} else {
-	    reg = new PM (tau, T, &x0, raster, kapref, istensor);
+	    reg = new QPM (tau, T, &x0, raster, kapref, istensor);
 	}
 	
     } else if (!strcasecmp (rtype, "Tukey")) {
