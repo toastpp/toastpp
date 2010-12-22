@@ -1,0 +1,39 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libvarPN3D
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+EXE = rte3D_varOrd test_genPN_integrals
+
+VPATH = $(TSRC)/libvarPN3D
+
+all:: $(EXE)
+
+LIBSRCS = rte3D_math.cc genmat_angint_3D_PN.cc genmat_angint_sdm_3D_PN.cc phaseFunc.cc source.cc pparse.cc spints.cc
+EXESRCS = rte3D_varOrd.cc test_genPN_integrals.cc
+
+LIBOBJS = ${LIBSRCS:.cc=.o}
+EXEOBJS = ${EXESRCS:.cc=.o}
+
+HDRS = phaseFunc.h pparse.h rte3D.h rte3D_math.h source.h sphints.h toast_2007.h toast.h
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(LIBOBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+rte3D_varOrd : rte3D_varOrd.o rte3D_math.o phaseFunc.o source.o pparse.o
+	$(CXX) $(PNTOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(PNTOASTLIB) 
+
+test_genPN_integrals : test_genPN_integrals.o genmat_angint_3D_PN.o genmat_angint_sdm_3D_PN.o spints.o
+	$(CXX) $(PNTOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(PNTOASTLIB)
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
+
