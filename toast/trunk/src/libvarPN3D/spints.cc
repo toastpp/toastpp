@@ -18,9 +18,9 @@ typedef unsigned pid_t;
 #include <string.h>
 #include <mathlib.h>
 #include <felib.h>
-#include <toast.h>
+#include "toast.h"
 
-#include <sphints.h>
+#include "sphints.h"
 RDenseMatrix Chop(const RDenseMatrix& A) {
       int n = A.nRows();
       int m = A.nCols();
