@@ -23,9 +23,9 @@ typedef unsigned pid_t;
 #include <string.h>
 #include <mathlib.h>
 #include <felib.h>
-#include <toast.h>
-#include <rte3D.h>
-#include <sphints.h>
+#include "toast.h"
+#include "rte3D.h"
+#include "sphints.h"
 
 #define USE_INTONSPHERE
     using namespace toast;
