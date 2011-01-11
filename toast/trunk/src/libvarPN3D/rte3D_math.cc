@@ -80,12 +80,15 @@ complex wigCoeff(const int l1, const int l2, const int l3, const int m1, const i
 	else return(complex(0, 0));
 	
 }
+/* evaluates \int_{S^{2}} Y_{\ell_{1}, m_{1}} Y_{\ell_{2}, m_{2}} where both Y's are complex spherical harmonics
+*/
 complex kronD(const IVector &a, const IVector &b)
 {
         int l1 = a[0], l2 = b[0], m1 = a[1], m2 = b[1];
 	if(l1 >= 0 && l2>=0 && abs(m1) <= l1 && abs(m2) <= l2 && l1==l2 && m1 == -1*m2) return(complex(sign(m2), 0.0));
 	else return(complex(0.0, 0.0));
 }
+
 /*double plm(const int l, const int m, const double x)
 {	
 	xASSERT(l>=0 && m >= 0 && l >= m , plm is defined only for non-negative l and m and l>=m );
@@ -120,7 +123,7 @@ RDenseMatrix LegendreTable(const int l, const int numpts, const RDenseMatrix &pt
 	return(LT);
 }
 */
-RVector plm(const int l, const int m, const RVector& vec)
+/*RVector plm(const int l, const int m, const RVector& vec)
 {
 	xASSERT(l>=0 && m >= 0 && l >= m , plm is defined only for non-negative l and m and l>=m );
 	if(l==m){
@@ -164,12 +167,127 @@ RDenseMatrix LegendreTable(const int l, const int numpts, const RDenseMatrix &pt
 	}
 	return(LT);
 }
+*/
+void LegendreTable(const int l, const int numpts, const RDenseMatrix &pt, RDenseMatrix* &LT){
+	int j, k, r, s;
+    
+	RVector x = pt.Col(2);
+        RVector ons(x.Dim(), 1.0);
+	for(int i=0; i <= l; i++)
+	{
+		LT[i].SetRow(2*i, pow(ons- x*x, i/2.0)*sign(i)*doublefactorial(2*i-1)); //m= l
+	 	if(i>0)
+			LT[i].SetRow(2*i-1, x*pow(ons - x*x, (i-1)/2.0)*(2*i-1)*sign(i-1)*doublefactorial(2*i-3)); //m=l-1
+		
+		k = 2*i-2;r = 2*(i-1)-1; s = 2*(i-2);
+		for(int m = i-2; m >= 0; m--)
+		{
+			LT[i].SetRow(k, (x*(2*i-1)*LT[i-1].Row(r) - LT[i-2].Row(s)*(i+m-1))/(double)(i-m));
+	  		k--; r--; s--;
+		}
+		j=0; k = 2*i;
+		for(int m = -1*i; m < 0; m++)
+		{
+			LT[i].SetRow(j, LT[i].Row(k)*sign(m)*factorial(i-abs(m))/(double)factorial(i+abs(m)));
+			j++; k--; 
+		}
+	}
+	//return(LT);
+}
 
-
-CDenseMatrix sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& pt){
+void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& pt, RDenseMatrix* &sphHarm){
 	int m, sgm;
 	double dtmp1, dtmp2, normfac;
-	CDenseMatrix sphHarm, cplxSphHarm;
+	CDenseMatrix *cplxSphHarm;
+	cplxSphHarm = new CDenseMatrix[order+1];
+	//sphHarm = new sphHarm[order+1];
+	for(int l=0; l<=order; l++)
+	{
+		cplxSphHarm[l].New(2*l+1, numpts);
+	//	sphHarm[l].New(2*l+1, numpts);
+	}
+	complex ctmp;
+        RDenseMatrix *LT;
+	LT = new RDenseMatrix[order+1];
+	for(int l=0; l<=order; l++)
+		LT[l].New(2*l+1, numpts);
+
+	LegendreTable(order, numpts, pt, LT);
+	for(int l=0; l<=order; l++)
+	{
+		int k = 0;
+		for(m = -1*l; m <= l; m++){
+	        	sgm = signum(m);
+			dtmp1 =  sqrt((2*l+1)*factorial(l - m)/(double)(4*M_PI*factorial(l+m)));
+			for(int i=0; i<numpts; i++){
+				dtmp2 = dtmp1*LT[l].Get(k, i);
+				normfac = sqrt(1-pt.Get(i, 2)*pt.Get(i, 2));
+				switch(sgm){
+					case 0: 
+						cplxSphHarm[l](k, i).re = dtmp2; cplxSphHarm[l](k, i).im = 0.0;
+						break;
+					case 1:
+						if(normfac!=0){
+							ctmp.re = pt.Get(i, 0)/normfac; ctmp.im = -1*pt.Get(i, 1)/normfac;
+							ctmp = cpowi(ctmp, abs(m));
+							cplxSphHarm[l](k, i) = ctmp*complex(dtmp2, 0);
+						}
+						break;
+	       				case 2:
+						if(normfac!=0){
+							ctmp.re = pt.Get(i, 0)/normfac; ctmp.im = pt.Get(i, 1)/normfac;
+							ctmp = cpowi(ctmp, abs(m));
+							cplxSphHarm[l](k, i) = ctmp*complex(dtmp2, 0);
+						}
+						break;
+				}
+	    		}	
+		k++;	
+		}
+	}
+	complex temp; 
+        int indm;
+	for(int l=0; l<=order; l++)
+	{
+		for(m=-1*l; m<= l; m++){
+			indm = l + m;
+			if(m>0)
+			{
+				for(int i=0; i<numpts; i++)
+				{
+					temp = (cplxSphHarm[l](m+l, i) + complex(sign(m), 0)*cplxSphHarm[l](l-m, i))/complex(sqrt(2), 0);
+					sphHarm[l](indm, i) = temp.re; 
+				}
+			}
+			else if(m<0)
+			{
+				for(int i=0; i<numpts; i++)
+				{
+					temp = (cplxSphHarm[l](l+abs(m), i) - complex(sign(m), 0)*cplxSphHarm[l](l-abs(m), i))/complex(0, sqrt(2));
+					sphHarm[l](indm, i) = temp.re;	 
+				}
+			}
+			else
+			{
+				for(int i=0; i<numpts; i++)
+				{
+					temp = cplxSphHarm[l](indm, i);
+					sphHarm[l](indm, i) = temp.re;
+				}
+			}
+		}
+	}
+
+	delete []cplxSphHarm;
+	delete []LT;
+	//cout<<"nRows: "<<sphHarm.nRows()<<" nCols:" << sphHarm.nCols()<<endl;
+	//return(sphHarm);	
+}
+/*RDenseMatrix sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& pt){
+	int m, sgm;
+	double dtmp1, dtmp2, normfac;
+	RDenseMatrix sphHarm;
+	CDenseMatrix cplxSphHarm;
 	complex ctmp;
         RDenseMatrix LT;
 	LT = LegendreTable(order, numpts, pt);
@@ -205,28 +323,39 @@ CDenseMatrix sphericalHarmonics(const int order, const int numpts, const RDenseM
 	    	}	
 		k++;	
 	}
+	complex temp; 
         int indm;
 	for(m=-1*order; m<= order; m++){
 		indm = order + m;
 		if(m>0)
 		{
 			for(int i=0; i<numpts; i++)
-				sphHarm(indm, i) = (cplxSphHarm(m+order, i) + complex(sign(m), 0)*cplxSphHarm(order-m, i))/complex(sqrt(2), 0); 
+			{
+				temp = (cplxSphHarm(m+order, i) + complex(sign(m), 0)*cplxSphHarm(order-m, i))/complex(sqrt(2), 0);
+				sphHarm(indm, i) = temp.re; 
+			}
 		}
 		else if(m<0)
 		{
 			for(int i=0; i<numpts; i++)
-				sphHarm(indm, i) = (cplxSphHarm(order-m, i) - complex(sign(m), 0)*cplxSphHarm(order+m, i))/complex(0, sqrt(2));	 
+			{
+				temp = (cplxSphHarm(order-m, i) - complex(sign(m), 0)*cplxSphHarm(order+m, i))/complex(0, sqrt(2));
+				sphHarm(indm, i) = temp.re;	 
+			}
 		}
 		else
 		{
 			for(int i=0; i<numpts; i++)
-				sphHarm(indm, i) = cplxSphHarm(indm, i);
+			{
+				temp = cplxSphHarm(indm, i);
+				sphHarm(indm, i) = temp.re;
+			}
 		}
 	}
 	//cout<<"nRows: "<<sphHarm.nRows()<<" nCols:" << sphHarm.nCols()<<endl;
 	return(sphHarm);	
 }
+*/
 /*CDenseMatrix sphericalHarmonicsConj(const int order, const int numpts, const RDenseMatrix& pt)
 {
    CDenseMatrix Ylm;
@@ -293,13 +422,13 @@ CCompRowMatrix kronsd(const CCompRowMatrix &A, const CDenseMatrix &B)
     return C;
 }
 
-void kronplus(const int spatrow, const int spatcol, const IVector& node_angN, const IVector& offset, const double a_ij, const CCompRowMatrix &B, CCompRowMatrix& C)
+void kronplus(const int spatrow, const int spatcol, const IVector& node_angN, const IVector& offset, const double a_ij, const RCompRowMatrix &B, RCompRowMatrix& C)
 {
-    complex *Cval = C.ValPtr();
+    double *Cval = C.ValPtr();
     int row_offset = 0, col_offset = 0;
     const int *rowptr, *colidx;
     B.GetSparseStructure(&rowptr, &colidx);
-    const complex *bval = B.ValPtr(); 
+    const double *bval = B.ValPtr(); 
     int nr = B.nRows();
     int nc = B.nCols();
  
@@ -324,18 +453,18 @@ void kronplus(const int spatrow, const int spatcol, const IVector& node_angN, co
 		int jb = colidx[j];
 		if(ib<node_angN[spatrow] && jb <node_angN[spatcol]){
 	        //cout<<"ib: "<<ib<<" jb: "<<jb<<endl;
-		C(row_offset+ib , col_offset+jb) = C.Get(row_offset+ib , col_offset+jb) + complex(a_ij, 0)*bval[j]; 
+		C(row_offset+ib , col_offset+jb) = C.Get(row_offset+ib , col_offset+jb) + a_ij*bval[j]; 
 		}
 	}
     }
     
 }
 
-CCompRowMatrix shrink(const CDenseMatrix &dnsmat)
+RCompRowMatrix shrink(const RDenseMatrix &dnsmat)
 {
     int i, j;
     int *rowptr, *colidx;
-    complex *val;
+    double *val;
     int m =  dnsmat.nRows(), n= dnsmat.nCols();
 
     rowptr = new int[m+1];
@@ -343,51 +472,29 @@ CCompRowMatrix shrink(const CDenseMatrix &dnsmat)
     for (i = 0; i < m; i++) {
 	int nz=0;
 	for (j = 0; j < n; j++)
-		if(!(mod(dnsmat.Get(i, j)) < 1e-15))
+		if(!(fabs(dnsmat.Get(i, j)) < 1e-15))
 			nz++;
 	rowptr[i+1] = rowptr[i] + nz;
     }
     
     colidx = new int[rowptr[m]];
-    val = new complex[rowptr[m]];
+    val = new double[rowptr[m]];
     int k=0;
     for(i=0; i < m; i++){
 	for(j=0; j<n; j++){
-		if(!(mod(dnsmat.Get(i, j)) < 1e-15)){
+		if(!(fabs(dnsmat.Get(i, j)) < 1e-15)){
 			colidx[k] = j; 
 			val[k] = dnsmat.Get(i, j);
 			k++;
 		}
 	}
     }
-    CCompRowMatrix C (m, n, rowptr, colidx, val);
+    RCompRowMatrix C (m, n, rowptr, colidx, val);
 
     delete []rowptr;
     delete []colidx;
     delete []val;	
     return C;
-}
-
-inline CCompRowMatrix dotspdns(const CCompRowMatrix& A, const CDenseMatrix&B)
-{
-    dASSERT(A.nRows() == B.nCols(), Invalid sizes of matrices in dotspdns);
-    int i, j, k, m, ra, ra1, ra2;
-    int ma = A.nRows(), mb = B.nRows();
-    int na = A.nCols(), nb = B.nCols();
-    
-    CDenseMatrix C(mb, nb);
-    const complex *val = A.ValPtr();
-    complex *valc = C.data_buffer();
-    for (i = 0; i < ma; i++) {
-	ra1 = A.rowptr[i];
-	ra2 = A.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++)
-            k = A.colidx[ra]; 
-	    for(int j = 0; j < mb; j++)
-	    		valc[j*nb + k] = val[ra]*B.Get(j, k);
-    }
-    CCompRowMatrix spC = shrink(C);
-    return spC;	
 }
 
 inline CDenseMatrix sdmatmult(const CCompRowMatrix &A, const CDenseMatrix &B)
@@ -412,7 +519,7 @@ inline CDenseMatrix sdmatmult(const CCompRowMatrix &A, const CDenseMatrix &B)
   return C;	
 }
 
-void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const int sphOrder2,  const RDenseMatrix& pts, const CVector& wts, const RVector& bnormal, CDenseMatrix* &Ystarl1m1, CDenseMatrix* &Yl2m2, CCompRowMatrix& bintplus, CCompRowMatrix& bintminus)
+void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const int sphOrder2,  const RDenseMatrix& pts, const RVector& wts, const RVector& bnormal, RDenseMatrix* &Ylm, RCompRowMatrix& bintplus, RCompRowMatrix& bintminus)
 {
 	/*Computes the integral on the sphere of the form 
 	 * \int_{S^{n-1}} (s.n)_{plusminus} \psi_{i} \psi_{j}
@@ -426,26 +533,26 @@ void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const
 	 * 	bint -> boundary integral*/
 
    int numpts = pts.nRows(); 
-    CDenseMatrix dnssdotnplus(1, numpts), dnssdotnminus(1, numpts);
+    RDenseMatrix dnssdotnplus(1, numpts), dnssdotnminus(1, numpts);
 //     CVector sdotnplus(numpts);
      for(int i=0; i < numpts; i++){
 	     double tmp = bnormal[0]*pts.Get(i, 0) + bnormal[1]*pts.Get(i, 1) + bnormal[2]*pts.Get(i, 2);
 	     if(tmp>0){
-	     	dnssdotnplus(0, i) = complex(tmp, 0); 
+	     	dnssdotnplus(0, i) = tmp; 
 		//sdotnplus[i] = tmp;
 	     }
 	     else if(tmp<0){
-		dnssdotnminus(0, i) = complex(-tmp, 0);
+		dnssdotnminus(0, i) = -tmp;
 		}
      }
-    CCompRowMatrix sdotnplus = shrink(dnssdotnplus);
-    CCompRowMatrix sdotnminus = shrink(dnssdotnminus);
+    RCompRowMatrix sdotnplus = shrink(dnssdotnplus);
+    RCompRowMatrix sdotnminus = shrink(dnssdotnminus);
     const int *rowptr1, *colidx1, *rowptr2, *colidx2;
     sdotnplus.GetSparseStructure(&rowptr1, &colidx1);
     sdotnminus.GetSparseStructure(&rowptr2, &colidx2);
        
      int is, js, indl1, indm1, indl2, indm2;
-     CDenseMatrix dnsbintplus(size1, size2), dnsbintminus(size1, size2);
+     RDenseMatrix dnsbintplus(size1, size2), dnsbintminus(size1, size2);
      for(int l1 = 0; l1 <= sphOrder1; l1++){
 	indl1 = getPos(l1, -1*l1);
 	for(int m1 = -1*l1; m1 <= l1; m1++){
@@ -459,12 +566,12 @@ void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const
 				for(int i=0; i<sdotnplus.nRows(); i++)
 				{
 					for(int j=rowptr1[i]; j < rowptr1[i+1]; j++)
-						dnsbintplus(is, js) += sdotnplus(i, colidx1[j])*Ystarl1m1[l1](indm1, colidx1[j])*Yl2m2[l2](indm2, colidx1[j])*wts[colidx1[j]]*4*M_PI;
+						dnsbintplus(is, js) += sdotnplus(i, colidx1[j])*Ylm[l1](indm1, colidx1[j])*Ylm[l2](indm2, colidx1[j])*wts[colidx1[j]]*4*M_PI;
 				}
 				for(int i=0; i<sdotnminus.nRows(); i++)
 				{
 					for(int j=rowptr2[i]; j < rowptr2[i+1]; j++)
-						dnsbintminus(is, js) += sdotnminus(i, colidx2[j])*Ystarl1m1[l1](indm1, colidx2[j])*Yl2m2[l2](indm2, colidx2[j])*wts[colidx2[j]]*4*M_PI;
+						dnsbintminus(is, js) += sdotnminus(i, colidx2[j])*Ylm[l1](indm1, colidx2[j])*Ylm[l2](indm2, colidx2[j])*wts[colidx2[j]]*4*M_PI;
 				}
 				//if (((dnsbintplus.Get(is, js)-dnsbintminus.Get(is, js)) -(Aintsc.Get(is, js)*bnormal[0] + Aintss.Get(is, js)*bnormal[1] + Aintc.Get(is, js)*bnormal[2])).re > 1e-12 && ((dnsbintplus.Get(is, js)-dnsbintminus.Get(is, js)) -(Aintsc.Get(is, js)*bnormal[0] + Aintss.Get(is, js)*bnormal[1] + Aintc.Get(is, js)*bnormal[2])).im > 1e-12)
 			     //cout<<l1<<" "<<m1<<" "<<l2<<" "<<m2<<" "<<dnsbintplus.Get(is, js)<<endl;//<<" "<<dnsbintminus.Get(is, js)+Aintss.Get(is, js)<<endl;					
@@ -784,7 +891,7 @@ int getPos(const int l, const int m){
 	return(l*l + (l+m));
 }
 
-void tabulatePtsWtsForSphere()
+/*void tabulatePtsWtsForSphere()
 {
 
 
@@ -833,7 +940,7 @@ void tabulatePtsWtsForSphere()
 	int k=0;
 	for(int l=0; l<= 25; l++)
 	{
-		CDenseMatrix Ylm = sphericalHarmonics(l, numpts, pts); 
+		RDenseMatrix Ylm = sphericalHarmonics(l, numpts, pts); 
 		for(int m = -l; m <= l; m++)
 		{
 			int indm = l+m;
@@ -873,7 +980,7 @@ void tabulatePtsWtsForSphere()
 	fprintf(fid, "];");
 	fclose(fid);
 }
-
+*/
 /*void testPtsWtsForSphere(const int sphOrder, const int angN, const RDenseMatrix& pts, const CVector &wts, CDenseMatrix* &Yl2m2, CDenseMatrix* &Yl1m1)
 {
 

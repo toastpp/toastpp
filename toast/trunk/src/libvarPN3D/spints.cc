@@ -112,6 +112,7 @@ RCompRowMatrix RealMat( CCompRowMatrix& A) {
 	valAA[i] = valA[i].re;
       //delete [] rowptr;
       //delete [] colidx;
+      AA.Shrink();
       return AA;
 }
 RCompRowMatrix ImagMat( CCompRowMatrix& A) {
