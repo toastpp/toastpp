@@ -1,5 +1,5 @@
 /***************************************************************************
- * forward_rte1_3D.cc             Surya Mohan           05/05/2010         *
+ * rte3D_varOrd.cc             Surya Mohan           11/01/2011         *
  *                                                                         *
  ***************************************************************************/
 
@@ -32,8 +32,6 @@ typedef unsigned pid_t;
 #include "pparse.h"
 #include "rte3D_math.h"
 #include "phaseFunc.h"
-#define USE_INTONSPHERE
-#define USE_SUBSAMPLING
 #define VARYDELTA
 
 using namespace toast;
@@ -43,7 +41,7 @@ using namespace toast;
 #define Alm(l, m) (sqrt(complex((((l)+(m))*((l)-(m)))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
 #define Blm(l, m) (sqrt(complex((((l)+(m))*((l)+(m)-1))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
 
-
+/*Data context class containing necessary objects required by GMRES implicit solver*/
 class MyDataContext{
 public:
 RCompRowMatrix Sint, Sdx, Sdy, Sdz;
@@ -79,30 +77,16 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	this->nodal_sphOrder = nodal_sphOrder;
 	sphOrder = vmax(nodal_sphOrder);
 
+	/*Precomputing spherical harmonics over the quadarture points 
+	which are required by the boundary integrals*/
 	Ylm = new RDenseMatrix[sphOrder +1];
-        	
 	for(int l=0; l<=sphOrder; l++)
 		Ylm[l].New(2*l+1, pts.nRows());
 	sphericalHarmonics(sphOrder, pts.nRows(), pts, Ylm);
 
-
-	/*RDenseMatrix *temp;
-        RDenseMatrix tempMat(1, 3);
-	tempMat(0, 0) = 0; tempMat(0, 1) = 1; tempMat(0, 2) = 0;
-	cout<<"******Input**********"<<endl;
-	cout<<tempMat<<endl;
-	temp =  new RDenseMatrix[4];
-        for(int l=0; l<=3; l++)
-		temp[l].New(2*l+1, 1);
-	sphericalHarmonics(3, 1, tempMat, temp);
-	for(int l=0; l<=3; l++)
-	{
-		cout<<"***********Order "<<l<<"****************"<<endl;
-		cout<<temp[l]<<endl;
-	}*/
-	  	
 	spatN = spatMesh.nlen();
-	        	
+
+	/*Computing the angular degrees of freedom at each spatial node*/
 	node_angN.New(spatN);
 	for(int i=0; i < spatN; i++)
 	{
@@ -112,60 +96,46 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	}
 	maxAngN = vmax(node_angN);
 
+	/*Computes the start location for a given spatial node 
+	in the system matrix or solution vector*/
 	offset.New(spatN);
 	offset[0] = 0;
 	for(int i=1; i < spatN; i++)
-		offset[i] = offset[i-1] + node_angN[i-1]; 
+		offset[i] = offset[i-1] + node_angN[i-1];
 
+ 
+	/*Allocating memory for Ax where A is an angular matrix and x is the solution vector*/
 	Aintx.New(spatN, maxAngN); Aintscx.New(spatN, maxAngN); Aintssx.New(spatN, maxAngN); Aintcx.New(spatN, maxAngN);
 	apu1x.New(spatN, maxAngN); apu1scx.New(spatN, maxAngN); apu1ssx.New(spatN, maxAngN); apu1cx.New(spatN, maxAngN);
 	Aintscscx.New(spatN, maxAngN); Aintscssx.New(spatN, maxAngN); Aintssssx.New(spatN, maxAngN); Aintsccx.New(spatN, maxAngN);
 	Aintsscx.New(spatN, maxAngN); Aintccx.New(spatN, maxAngN);
 	
-	cout<<"Generating boundary integrals ..."<<endl;
-       // genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Aintsc, Aintss, Aintc, A2, b1);
+	cout<<"Generating boundary integrals ..."<<endl;//slow process
 	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
-	cout<<"Done computing boundary integrals ..."<<endl;	
-
+	
+	cout<<"Generating spatial Integrals ..."<<endl;
 	gen_spatint_3D(spatMesh, mua, mus, ref, delta, w, c, Sint, Sdx, Sdy, Sdz, Sx, Sy, Sz, Sdxx, Sdxy, Sdyx, Sdyy, Sdxz, Sdzx, Sdyz, Sdzy, Sdzz, spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz, SPS, SPSdx, SPSdy, SPSdz);
-	cout<<"Generated Spatial Integrals ..."<<endl;
+	
 	int angN = vmax(node_angN);
+	cout<<"Generating angular Integrals ..."<<endl;
       	genmat_angint_3D(sphOrder, angN, Aint, Aintsc, Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc);
-	cout<<"Generated angular integrals ..."<<endl;
+	
 	cout<<"Generating phase integrals ..."<<endl;	
 	genmat_apu(phaseFunc, g, angN, sphOrder, apu1, apu1sc, apu1ss, apu1c);
-	
-	//fwrite(sphOrder, angN, Aint, Aintsc,  Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc, apu1, apu1sc, apu1ss, apu1c);
 
-	/*cout<<"A: "<<Aint.rowptr[angN]<<" Ax: "<<Aintsc.rowptr[angN]<<" Ay: "<<Aintss.rowptr[angN]<<" Az: "<<Aintc.rowptr[angN]<<endl;
-	cout<<"Axx: "<<Aintscsc.rowptr[angN]<<" Axy: "<<Aintscss.rowptr[angN]<<" Axz: "<<Aintscc.rowptr[angN]<<" Ayy: "<<Aintssss.rowptr[angN]<<endl;
-	cout<<"Ayz: "<<Aintssc.rowptr[angN]<<" Azz: "<<Aintcc.rowptr[angN]<<endl;
-
-	cout<<"B: "<<apu1.rowptr[angN]<<" Bx: "<<apu1sc.rowptr[angN]<<" By: "<<apu1ss.rowptr[angN]<<" Bz: "<<apu1c.rowptr[angN]<<endl;*/
-
-
-	
-	//cout<<apu1<<"\n******************\n"<<apu1sc<<"\n******************\n"<<apu1ss<<"\n******************\n"<<apu1c<<endl;
-
-/*	CCompRowMatrix apu1_test, apu1sc_test, apu1ss_test, apu1c_test;	
-	genmat_apu_test(phaseFunc, g, angN, sphOrder, pts, wts, apu1_test, apu1sc_test, apu1ss_test, apu1c_test);
-
-	cout<<apu1<<"\n******************\n"<<apu1_test<<"\n******************\n"<<apu1sc<<"\n******************\n"<<apu1sc_test<<endl;
-	cout<<apu1ss<<"\n******************\n"<<apu1ss_test<<"\n******************\n"<<apu1c<<"\n******************\n"<<apu1c_test<<endl;
-*/
-
+	/*Preparing angular integrals for computing Kronecker products implicitly*/	
         apu1.Transpone(); apu1sc.Transpone(); apu1ss.Transpone(); apu1c.Transpone(); 	
 	Aint.Transpone(); Aintsc.Transpone(); Aintss.Transpone(); Aintc.Transpone();   
 	Aintscsc.Transpone(); Aintscss.Transpone(); Aintscc.Transpone(); Aintssc.Transpone(); 
 	Aintcc.Transpone(); Aintssss.Transpone();
 
-        
+        /*Dereferencing the val pointers of angular matrices*/ 
 	aintval = Aint.ValPtr(); aintscval = Aintsc.ValPtr(); aintssval = Aintss.ValPtr(); aintcval = Aintc.ValPtr();
 	apu1val = apu1.ValPtr(); apu1scval = apu1sc.ValPtr(); apu1ssval = apu1ss.ValPtr(); apu1cval = apu1c.ValPtr();
 	aintscscval = Aintscsc.ValPtr(); aintscssval = Aintscss.ValPtr(); aintssssval = Aintssss.ValPtr(); aintsccval = Aintscc.ValPtr();
 	aintsscval = Aintssc.ValPtr(); aintccval = Aintcc.ValPtr();
 
-
+	/*Dereferencing the val pointers of spatial matrices*/
 	sintval = Sint.ValPtr(); sdxval = Sdx.ValPtr(); sdyval = Sdy.ValPtr();
 	sdzval = Sdz.ValPtr(); sxval = Sx.ValPtr(); syval = Sy.ValPtr(); 
 	szval = Sz.ValPtr(); sdxxval = Sdxx.ValPtr(); sdxyval = Sdxy.ValPtr(); 
@@ -177,9 +147,11 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	spata3_sdmzval = spatA3_sdmz.ValPtr();      
 	
 
-
+	/*Allocating memory for A2x where A2 is the matrix corresponding to boundary*/
 	A2x.New(sum(node_angN));
 
+
+        /*The solution vector is stored in a matrix form for which memory is being allocated*/
 	Xmat.New(spatN, maxAngN);
 	int *xrowptr = new int[spatN + 1];
 	
@@ -208,39 +180,7 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
   delete []Ylm;
 };
 
-/*void fwrite(const int sphOrder, const int angN, CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatrix& Aintss, CCompRowMatrix& Aintc, CCompRowMatrix& Aintscsc, CCompRowMatrix& Aintscss, CCompRowMatrix& Aintscc, CCompRowMatrix& Aintssss, CCompRowMatrix& Aintssc, CCompRowMatrix& Aintcc, CCompRowMatrix& apu1, CCompRowMatrix& apu1sc, CCompRowMatrix& apu1ss, CCompRowMatrix& apu1c)
-{
-
- writeOneFile(angN, "Aint.dat", Aint); writeOneFile(angN, "Aintsc.dat", Aintsc); writeOneFile(angN, "Aintss.dat", Aintss); 
- writeOneFile(angN, "Aintc.dat", Aintc); writeOneFile(angN, "Aintscsc.dat", Aintscsc); writeOneFile(angN, "Aintscss.dat", Aintscss); 
- writeOneFile(angN, "Aintssss.dat", Aintssss); writeOneFile(angN, "Aintscc.dat", Aintscc); writeOneFile(angN, "Aintssc.dat", Aintssc);
- writeOneFile(angN, "Aintcc.dat", Aintcc); writeOneFile(angN, "apu1.dat", apu1); writeOneFile(angN, "apu1sc.dat", apu1sc);
- writeOneFile(angN, "apu1ss.dat", apu1ss); writeOneFile(angN, "apu1c.dat", apu1c); 
- 
- 
-
-
-
-  cout<<"FILES WRITTEN"<<endl;
-}
-
-void writeOneFile(const int angN, const char *fname, CCompRowMatrix& A)
-{
-	FILE *fid;
-	fid = fopen(fname, "w");
-	complex *aval = A.ValPtr();
-  	for(int i=0; i<angN; i++)
-  	{
-		for(int na = A.rowptr[i]; na < A.rowptr[i+1]; na++)
-		{	
-			int col = A.colidx[na];
-			double re = aval[na].re;
-			fprintf(fid, "%d %d %f\n", i+1, col+1, re);
-		}
-  	}  
-  	fclose(fid);
-
-}*/
+/*Generating all the spatial matrices required by variable order PN method*/
 void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& muscat, const RVector& ref, const RVector& delta, double w, double c, RCompRowMatrix& Sint, RCompRowMatrix& Sdx, RCompRowMatrix& Sdy, RCompRowMatrix& Sdz, RCompRowMatrix& Sx, RCompRowMatrix& Sy, RCompRowMatrix& Sz, RCompRowMatrix& Sdxx, RCompRowMatrix& Sdxy, RCompRowMatrix& Sdyx, RCompRowMatrix& Sdyy, RCompRowMatrix& Sdxz, RCompRowMatrix& Sdzx, RCompRowMatrix& Sdyz, RCompRowMatrix& Sdzy, RCompRowMatrix& Sdzz, RCompRowMatrix& spatA3_rte, RCompRowMatrix& spatA3_sdmx, RCompRowMatrix& spatA3_sdmy, RCompRowMatrix& spatA3_sdmz, RCompRowMatrix& SPS, RCompRowMatrix& SPSdx, RCompRowMatrix& SPSdy, RCompRowMatrix& SPSdz)
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -355,6 +295,15 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
   delete []rowptr;
   delete []colidx;
 }
+/* Sin(\theta)Cos(\phi)Y_{l, m}^{R} = Sin(\theta)Cos(\phi)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
+real-valued spherical harmonics.
+a_{m} = 1, b_{m} = 0, if m=0
+a_{m} = b_{m} = 1/\sqrt{2}, if m>0
+a_{m} = (-1)^{m+1}/\sqrt{-2}, b_{m} = (-1)^{m}/\sqrt{-2}, otherwise
+
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
+Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+*/
 void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
 
@@ -363,13 +312,13 @@ void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 		a[0] = Blm(l, 0)/complex(2.0, 0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(2.0, 0); 
 		c[0] = complex(-1, 0)*Blm(l, 0)/complex(2.0, 0); d[0] = Blm(l+1, 1)/complex(2.0, 0);
 		
-		a[1] = 0; b[1] = 0; 
+		a[1] = 0; b[1] = 0; //error values which are never used
 		c[1] = 0; d[1] = 0;
 		
 		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
 		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
 		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;
+		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;//error values which are never used
 		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
 	}
 	else if(m>0)
@@ -403,7 +352,15 @@ void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 
 }
 
+/* Sin(\theta)Sin(\phi)Y_{l, m}^{R} = Sin(\theta)Sin(\phi)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
+real-valued spherical harmonics.
+a_{m} = 1, b_{m} = 0, if m=0
+a_{m} = b_{m} = 1/\sqrt{2}, if m>0
+a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
 
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
+Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+*/
 void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
 
@@ -412,13 +369,13 @@ void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 		a[0] = Blm(l, 0)/complex(0, 2.0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0); 
 		c[0] = Blm(l, 0)/complex(0, 2.0); d[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0);
 		
-		a[1] = 0; b[1] = 0; 
+		a[1] = 0; b[1] = 0;//error values which are never used 
 		c[1] = 0; d[1] = 0;
 		
 		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
 		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
 		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;
+		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;//error values which are never used 
 		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
 	}
 	else if(m>0)
@@ -451,17 +408,26 @@ void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 	}
 }
 
+/* Cos(\theta)Y_{l, m}^{R} = Cos(\theta)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
+real-valued spherical harmonics.
+a_{m} = 1, b_{m} = 0, if m=0
+a_{m} = b_{m} = 1/\sqrt{2}, if m>0
+a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
+Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+*/
 void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, IDenseMatrix& f1c)
 {
 	if(m==0)
 	{
 		e[0] = Alm(l, 0); f[0] = Alm(l+1, 0);
-		e[1] = 0; f[1] = 0;
+		e[1] = 0; f[1] = 0;//error values
 		
 		e1c(0, 0) = l-1; e1c(0, 1) = 0;
 		f1c(0, 0) = l+1; f1c(0, 1) = 0;
 		
-		e1c(1, 0) = -1; e1c(1, 1) = -1;
+		e1c(1, 0) = -1; e1c(1, 1) = -1;//error values
 		f1c(1, 0) = -1; f1c(1, 1) = -1;
 
 	}	
@@ -491,14 +457,24 @@ void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, I
 
 }
 
+/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
+real-valued spherical harmonics.
+a_{m} = 1, b_{m} = 0, if m=0
+a_{m} = b_{m} = 1/\sqrt{2}, if m>0
+a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
+Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+*/
 void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
 {
 	if(m==0)
 	{
-		p[0] = 1.0; p[1] = 0;
+		p[0] = 1.0; 
+		p[1] = 0;//error value
 		
 		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = -1; p1c(1, 1) = -3;
+		p1c(1, 0) = -1; p1c(1, 1) = -3;//error value
 		
 	}	
 	else if(m>0)
@@ -519,6 +495,10 @@ void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
 	}
 }
 
+/*
+Computes integral of the form
+\int (a_{0}Y_{l1, m1} + a_{1}Y_{l2, m2})(b_{0}Y_{l3, m3} + b_{1}Y_{l4, m4})
+*/
 double Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
 {
    complex temp;
@@ -526,6 +506,9 @@ double Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
    return(temp.re);
 }
 
+/**
+Computes all the angular integrals required by variable order PN approximation
+**/
 void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowMatrix& Aintss, RCompRowMatrix& Aintc, RCompRowMatrix& Aintscsc, RCompRowMatrix& Aintscss, RCompRowMatrix& Aintscc, RCompRowMatrix& Aintssss, RCompRowMatrix& Aintssc, RCompRowMatrix& Aintcc)
 {
 	RDenseMatrix dnsAint(angN, angN), dnsAintsc(angN, angN), dnsAintss(angN, angN), dnsAintc(angN, angN);
@@ -541,7 +524,6 @@ void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, 
 
 	for(int l1 = 0; l1 <= sphOrder; l1++){
 		indl1 = getPos(l1, -1*l1);
-		cout<<"angint: order: "<<l1<<endl;
 		for(int m1 = -1*l1; m1 <= l1; m1++){
 		        			
 			is = indl1 + l1 + m1;    	
@@ -622,25 +604,26 @@ void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, 
 	Aintscsc = shrink(dnsAintscsc);Aintscss = shrink(dnsAintscss);Aintscc = shrink(dnsAintscc); Aintssc = shrink(dnsAintssc);
 	Aintssss = shrink(dnsAintssss);Aintcc = shrink(dnsAintcc);
 }
-
+/**
+Phase function discretization
+NOTE!! Only Henyey-Greenstein phase function has been implemented currently
+**/
 RVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const double costheta), const double g)
 {
  RVector phaseFn(sphOrder+1);
- /*int numpts = pts.nRows();
- RDenseMatrix LT;
- RVector vec;
- for(int l=0; l <= sphOrder; l++)
- {	
-	LT = LegendreTable(l, numpts, pts);
-	//vec = LT.ColSum();
-	for(int i = 0; i < numpts; i++)
-		phaseFn[l] += wts[i]*complex(LT.Get(l, i), 0.0)*phaseFunc(g, pts.Get(i, 2));
-  }
-	return(phaseFn); 	*/
  for(int l=0; l <= sphOrder; l++)
 		phaseFn[l] = pow(g, (double)l);
  return(phaseFn);	
 }
+
+/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
+real-valued spherical harmonics.
+a_{m} = 1, b_{m} = 0, if m=0
+a_{m} = b_{m} = 1/\sqrt{2}, if m>0
+a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+
+This routine gives a_{m} 
+*/
 
 complex am(int m)
 {
@@ -649,6 +632,14 @@ complex am(int m)
 	else return(complex(0.0, sign(m)/sqrt(2.0))); 
 }
 
+/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
+real-valued spherical harmonics.
+a_{m} = 1, b_{m} = 0, if m=0
+a_{m} = b_{m} = 1/\sqrt{2}, if m>0
+a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+
+This routine gives b_{m} 
+*/
 complex bm(int m)
 {
 	if(m==0) return(complex(0.0, 0.0));
@@ -661,69 +652,8 @@ complex delta(int a, int b)
 	return(a == b ? complex(1.0, 0.0) : complex(0.0, 0.0)); 
 }
 
-/*void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
-{
-    RDenseMatrix dnsapu1(angN, angN), dnsapu1sc(angN, angN), dnsapu1ss(angN, angN), dnsapu1c(angN, angN);
-    RVector phaseFn;
-    phaseFn = phaseFuncDisc(sphOrder, phaseFunc, g);
-    cout<<"****************** Discretized phase function ****************"<<endl;
-    cout<<phaseFn<<endl;
-    cout<<"**************************************************************"<<endl;
-    int indl, indm;
-    int indl1, indm1, indl2, indm2, is, js;
-    complex temp;
-
-    for(int l1=0; l1 <= sphOrder; l1++){
-    	indl1 =  getPos(l1, -1*l1);
-        cout<<"apu: order: "<<l1<<endl;
-	for(int m1 = -1*l1; m1 <= l1; m1++){
-		indm1 = l1 + m1;
-		is = indl1 + indm1;
-	        for(int l2=0; l2<= sphOrder; l2++){
-			indl2 = getPos(l2, -1*l2);
-
-			for(int m2 = -1*l2; m2<=l2; m2++){
-				indm2 = l2 + m2;
-				js = indl2 + indm2;
-				
-				
-				for(int l=0; l <= sphOrder; l++)
-    				{
-					for(int m=-1*l; m <=l; m++)
-					{
-						complex I1 = (am(m1)*delta(-m, m1)*sign(m) + bm(m1)*delta(m, m1));
-						complex I2 = delta(l, l2)*(am(m2)*delta(m, m2) + bm(m2)*sign(m)*delta(-m, m2));
-						 
-					 	temp = I2*delta(l, l1)*I1*phaseFn[l];
-						dnsapu1(is, js) += temp.re;
-
-						complex sincosyy = (Blm(l1, -m1)*delta(l, l1-1) - Blm(l1+1, m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1+1)*sign(m) + bm(m1)*delta(m, m1+1));
-						sincosyy += (-Blm(l1, m1)*delta(l, l1-1) + Blm(l1+1, -m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1-1)*sign(m) + bm(m1)*delta(m, m1-1));
-						temp = I2*0.5*sincosyy*phaseFn[l]; 
-						dnsapu1sc(is, js) += temp.re;
-
-						complex sinsinyy = (Blm(l1, -m1)*delta(l, l1-1) - Blm(l1+1, m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1+1)*sign(m) - bm(m1)*delta(m, m1+1));
-						sinsinyy += (Blm(l1, m1)*delta(l, l1-1) - Blm(l1+1, -m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1-1)*sign(m) - bm(m1)*delta(m, m1-1));
-						temp = complex(0, -0.5)*phaseFn[l]*I2*sinsinyy;
-						dnsapu1ss(is, js) += temp.re;
-
-						complex cosyy = (Alm(l1, m1)*delta(l, l1-1) + Alm(l1+1, m1)*delta(l, l1+1))*I1;
-						
-						temp = I2*cosyy*phaseFn[l];
-						dnsapu1c(is, js) += temp.re; 
-					}
-				}
-				//cout<<l1<<" "<<m1<<" "<<l2<<" "<<m2<<" "<<dnsapu1c(is, js)<<endl;
-			}
-		}
-	}
-   }
-
-   
-   apu1 = shrink(dnsapu1); apu1sc = shrink(dnsapu1sc); apu1ss = shrink(dnsapu1ss); apu1c = shrink(dnsapu1c); 	
-
-}*/
-
+/** Phase integrals 
+**/
 void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
 {
  RDenseMatrix dnsapu1(angN, angN), dnsapu1sc(angN, angN), dnsapu1ss(angN, angN), dnsapu1c(angN, angN);
@@ -739,7 +669,6 @@ void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), con
  
     for(int l1=0; l1 <= sphOrder; l1++){
     	indl1 =  getPos(l1, -1*l1);
-	cout<<"apu: order: "<<l1<<endl;
 	for(int m1 = -1*l1; m1 <= l1; m1++){
 		indm1 = l1 + m1;
 		is = indl1 + indm1;
@@ -750,26 +679,6 @@ void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), con
 				indm2 = l2 + m2;
 				js = indl2 + indm2;
 				
-
-				//for(int l=0; l <= sphOrder; l++)
-    				//{
-				//	for(int m=-1*l; m <=l; m++)
-				//	{
-				//		sphY(l, m, p, pc);
-				//		sphY(l1, m1, p1, p1c);
-				//		sphY(l2, m2, p2, p2c);
-				//		dnsapu1(is, js) += phaseFn[l]*Integrate2(p, p1, pc, p1c)*Integrate2(p, p2, pc, p2c);
-				//		sincosY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
-				//		dnsapu1sc(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(a1, p, a1c, pc) + Integrate2(b1, p, b1c, pc) + Integrate2(c1, p, c1c, pc) + Integrate2(d1, p, d1c, pc));
-				//		sinsinY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
-				//		dnsapu1ss(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(a1, p, a1c, pc) + Integrate2(b1, p, b1c, pc) + Integrate2(c1, p, c1c, pc) + Integrate2(d1, p, d1c, pc));
-
-				//		cosY(l1, m1, e1, f1, e1c, f1c);
-				//		dnsapu1c(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(e1, p, e1c, pc) + Integrate2(f1, p, f1c, pc));
-
-				//	}
-				//}
-
 				sphY(l1, m1, p1, p1c);
 				sphY(l2, m2, p2, p2c);
 				dnsapu1(is, js) += phaseFn[l2]*Integrate2(p2, p1, p2c, p1c);
@@ -793,7 +702,10 @@ void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), con
   apu1c = shrink(dnsapu1c);
 }
 
-
+/** Preallocating memory for boundary integral terms.
+The matrix is considered to be spatially sparse and dense angularly(since the angular sparsity pattern is not known)
+which is eventually shrunk after computation.
+**/
 void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &offset, RCompRowMatrix& A2, RCompRowMatrix& b1)
 {
    int el, nodel, i, j, k,is, js;
@@ -804,7 +716,8 @@ void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &o
    int *status = new int[crrowptr[sysdim]];
    for(i=0; i<nzero; i++)
 	status[i] = 0; // 1 implies nonzero 0 denotes zero;
-   
+
+   /*Computing the spatial sparsity pattern corresponding to the boundary*/
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->HasBoundarySide ()) continue;
 	nodel = mesh.elist[el]->nNode();
@@ -821,20 +734,10 @@ void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &o
 	    }
 	  } 
 	 }
-	  /*for(int nd1 = 0; nd1 < mesh.elist[el]->nSideNode(sd); nd1++) {
-	    i = mesh.elist[el]->SideNode(sd,nd1);
-	    is = mesh.elist[el]->Node[i];
-	    for(int nd2 = 0; nd2 < mesh.elist[el]->nSideNode(sd); nd2++){
-		j = mesh.elist[el]->SideNode(sd, nd2);
-		js = mesh.elist[el]->Node[j];
-		for (int rp = crrowptr[is]; rp < crrowptr[is+1]; rp++){
-        		if (crcolidx[rp] == js) status[rp] = 1;
-		}
-	    }
-	  }*/
-         }
+	}
     }
-    
+   
+   /*Computing the new spatial sparsity pattern corresponding to the boundary based on 'status' flag*/ 
     int tnzero=0;
     for(i=0; i < nzero; i++)
 	if(status[i]) tnzero++; 
@@ -859,6 +762,8 @@ void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &o
 	spatrowptr[i+1] = spatrowptr[i] + k;
    } 
    delete []status;
+
+    /*Computing the overall sparsity pattern where angular degrees of freedom are considered dense*/
     int ia, ib, ka, kb, ja, jb, idx;
     int va_i, vb_i, v_i;
     int na = sysdim, ma = sysdim, va = spatrowptr[sysdim], col;
@@ -921,6 +826,8 @@ void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &o
 
 }
 
+/**Computes the maximum spherical harmonic order used in a given element
+**/
 void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVector& node_angN, const int el, int &maxSphOrder, int &maxAngN)
 {
   int nodel = mesh.elist[el]->nNode();
@@ -935,15 +842,11 @@ void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVect
 
 }
 
-//void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVector& node_angN, const IVector& offset, const RDenseMatrix& ptsPlus, const CVector& wtsPlus, CCompRowMatrix &Aintsc, CCompRowMatrix &Aintss, CCompRowMatrix &Aintc, CCompRowMatrix& A2, CCompRowMatrix& b1)
+/**Compute the boundary integral terms using quadrature
+**/
 void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVector& node_angN, const IVector& offset, const RDenseMatrix& ptsPlus, const RVector& wtsPlus, RDenseMatrix* &Ylm, RCompRowMatrix& A2, RCompRowMatrix& b1)
-
-  /*      
-     produces complete matrix of integrals in space and angle for boundary term
-  */
 {
-  // S2Mesh must be 3D - should check for that...
-
+  
    const int sysdim = mesh.nlen();       // dimensions are size of nodes.
    const int fullsysdim = sum(node_angN);     // full size of angles X space nodes
    
@@ -954,29 +857,22 @@ void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVecto
       
    double ela_ij;
    int el, nodel, is, js;
-   // now create matrix, by looping over elements that have a boundary
    for (el = 0; el < mesh.elen(); el++) {
-	//cout<<"el: "<<el<<endl;
 	if(!(el*100%mesh.elen()))
-		cout<<el*100/mesh.elen() <<"% work done ..."<<endl;
+		cout<<el*100/mesh.elen() <<"% progress"<<endl;
         if(!mesh.elist[el]->HasBoundarySide ()) continue;
 
 	nodel = mesh.elist[el]->nNode();
        
-	// now determine the element integrals
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++)  {
-	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
             
-	  // get boundary normal...
 	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  
 	  RCompRowMatrix  Angbintplus, Angbintminus;
 	  int lmaxAngN, lmaxSphOrder;
           findMaxLocalSphOrder(mesh, sphOrder, node_angN, el, lmaxSphOrder, lmaxAngN);
-	  //cout<<"maxes: "<<lmaxSphOrder<<"  "<<lmaxAngN<<endl;
 	  BIntUnitSphere(lmaxAngN, lmaxAngN, lmaxSphOrder, lmaxSphOrder, ptsPlus, wtsPlus, nhat, Ylm, Angbintplus, Angbintminus);
-          //cout<<"rmatsize: "<<Angbintminus.nRows()<<"  "<<Angbintminus.nCols()<<"   "<<Angbintplus.nRows()<<"  "<<Angbintplus.nCols()<<endl;
 
 	  for (int i = 0; i < nodel; i++) {
 	    if ((is = mesh.elist[el]->Node[i]) >= sysdim) continue;
@@ -992,6 +888,8 @@ void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVecto
    	
     
    } // end loop on elements
+
+   //Shrinking the matrices 
    A2.Shrink();
    b1.Shrink();
 }
@@ -1006,11 +904,12 @@ ParamParser pp;
 QMMesh qmmesh;
 NodeList &nlist=qmmesh.nlist;
 ElementList &elist=qmmesh.elist;
-//double wts17[] = {-14.776315, 4.131531, 3.053487, -4.592317, 4.131531, 3.053487, 0.436314, -1.996058, -0.292499, -1.939062, -1.210250, 0.379318, -1.267245, -0.349494, 7.892854, 1.489065, 6.799725, 6.420396, 7.513526, 2.961523, 2.582194, 1.868393, 1.534250, -4.590531, 0.441119, -3.644677, -2.551546, 0.588395, -3.497401, -0.504735, 0.166289, -2.252024, -0.926841, -1.306169, -0.213039, -0.779565, -1.158893, -1.872696, -2.679047, 1.500590, -1.576812, -0.155850, -1.258085, -1.022607, 0.398355, 0.079628, -1.829717, 3.526964, -0.727481, 2.736109, 1.633874, -1.038863, 2.424728, 0.063373, -0.920597, 2.393454, 0.181638, 1.602599, 0.500364, -0.129743, 1.291218, 0.972493, 1.106781, -1.442977, 0.522757, -0.895899, -0.311875, 0.559702, -0.858954, -0.024322, 2.447745, 0.171931, 1.863723, 1.920962, 2.504984, 0.698714, 0.755953, 0.114692, 3.070372, -0.681341, 2.486350, 1.067690, 1.651712, 1.321340, -0.097319, 0.737318, -3.722966, -1.578274, -4.327823, -0.973417, -0.973235, -0.080292, -1.578086, 0.524559, -1.020065, 0.477729, -1.020065, 0.477729, -3.949549, -1.200000, -3.949549, -1.200000, 0.625000, 0.625000, 0.625000, 0.625000, 0.445251, 0.445251, 0.445251, 0.445251};
+/* Weights for the quadrature scheme required for boundary integrals
+*/
 double wts17[] = {.0038282704949371616, .0038282704949371616, .0038282704949371616, .0038282704949371616, .0038282704949371616, .0038282704949371616, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283}; 
 
-
-
+/* Points for the quadrature scheme required for boundary integrals
+*/
 double pts17[110][3] = {{0, 0, 1.0}, {0, 1.0, 0}, {1.0, 0, 0}, {0, 0, -1.0}, {0, -1.0, 0}, {-1.0, 0, 0}, 
 
 {.57735026918962576, .57735026918962576, .57735026918962576}, {.57735026918962576, .57735026918962576, -0.57735026918962576}, {.57735026918962576, -0.57735026918962576, .57735026918962576}, {-0.57735026918962576, .57735026918962576, .57735026918962576}, {-0.57735026918962576, -0.57735026918962576, .57735026918962576}, {-0.57735026918962576, .57735026918962576, -0.57735026918962576}, {.57735026918962576, -0.57735026918962576, -0.57735026918962576}, {-0.57735026918962576, -0.57735026918962576, -0.57735026918962576}, 
@@ -1039,16 +938,13 @@ double pts17[110][3] = {{0, 0, 1.0}, {0, 1.0, 0}, {1.0, 0, 0}, {0, 0, -1.0}, {0,
 
 {0.47836902881215020, 0.8781589106040662, 0}, {0.47836902881215020, -0.8781589106040662, 0}, {-0.47836902881215020, 0.8781589106040662, 0}, {-0.47836902881215020, -0.8781589106040662, 0}, {0.8781589106040662, 0.47836902881215020, 0}, {0.8781589106040662, -0.47836902881215020, 0}, {-0.8781589106040662, 0.47836902881215020, 0}, {-0.8781589106040662, -0.47836902881215020, 0}};
 
-// =========================================================================
-// local prototypes
-
 inline CVector matrixFreeCaller(const CVector& x, void * context);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
-void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
-void genmat_toastsource3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
+void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
+void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsource3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
 void WriteData (const RVector &data, char *fname);
 void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
 void OpenNIM (const char *nimname, const char *meshname, int size);
@@ -1068,34 +964,28 @@ void LocalErrorhandler (char *msg)
     exit (1);
 }
 
-void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
-   /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+/* Computes the source vectors for all the boundary sources when a QM file has been specified
+*/
+void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
 {
-   int sysdim = mesh.nlen();       // dimensions are size of nodes.
-   int fullsysdim = sum(node_angN);   // full size of angles X space nodes
+   int sysdim = mesh.nlen();       
+   int fullsysdim = sum(node_angN);   
    RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_toastsourcevalvector3D_cos(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_isotropic,  pts, wts, Ylm);
+     genmat_toastsourcevalvector3D_cos(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_cosine,  pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
-     cout<<"Prepared source number "<<i<<endl;
+     cout<<"Prepared source: "<<i<<endl;
    }
 }
 
-
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+/* Computes the source vector per a boundary source when a QM file has been specified
+*/
+void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
-   int sysdim = mesh.nlen();       // dimensions are size of nodes.
-   int fullsysdim = sum(node_angN);   // full size of angles X space nodes
-   
+   int sysdim = mesh.nlen();       
+   int fullsysdim = sum(node_angN);      
    int *rowptr, *colidx;
    rowptr = new int[fullsysdim+1];
    colidx = new int[fullsysdim];
@@ -1111,7 +1001,6 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
    RDenseMatrix Ystarlm;
    RDenseMatrix dirMat(1, 3);
 
-   // now create vector, by looping over elements that have a boundary
    for (int jq = qvec.rowptr[iq]; jq < qvec.rowptr[iq+1]; jq++) {
    	int Nsource = qvec.colidx[jq];
    	double sweight = norm(qvec.Get(iq,Nsource)); 
@@ -1127,12 +1016,11 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 	    			is = mesh.elist[el]->SideNode(sd,nd);
 	    			js = mesh.elist[el]->Node[is];
 				double ela_i =  mesh.elist[el]->IntF(is);
-	    			if(is_isotropic)
+	    			if(is_cosine)
 				{
 					RDenseMatrix Angsvec(node_angN[js], 1);
 					for(int l=0; l<= sphOrder[js]; l++){
 						int indl = getPos(l, -1*l);
-						//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							for(int i=0; i < pts.nRows(); i++)
@@ -1156,10 +1044,9 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 					sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 					for(int l=0; l<= sphOrder[js]; l++){
 						int indl = getPos(l, -1*l);
-						//Ystarlm = sphericalHarmonics(l, 1, dirMat);
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
-							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0);
+							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
 						}
 					}
 					for(int i = 0; i < node_angN[js]; i++)
@@ -1177,12 +1064,9 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
    delete []colidx;
 }  
 
-
-void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int* Nsource, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+/** Computes source vectors for point sources on the boundary 
+**/
+void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int* Nsource, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
 {
    int sysdim = mesh.nlen();         // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);       // full size of angles X space nodes
@@ -1190,15 +1074,14 @@ void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const I
    RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_sourcevalvector_cos_3D(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, is_isotropic, pts, wts, Ylm);
+     genmat_sourcevalvector_cos_3D(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, is_cosine, pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
    }
 }
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+
+/**Computes source vector for a single point source on the boundary
+**/
+void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -1219,7 +1102,6 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
    RDenseMatrix dirMat(1, 3);
    RDenseMatrix Ystarlm;
 
-   // now create vector, by looping over elements that have a boundary
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
         if(!mesh.elist[el]->HasBoundarySide()) continue;
@@ -1235,12 +1117,11 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 	    js = mesh.elist[el]->Node[is];
 	   if(js != Nsource) continue;
 	    double ela_i =  mesh.elist[el]->IntF(is);
-	    if(is_isotropic)
+	    if(is_cosine)
 	    {
 			RDenseMatrix Angsvec(node_angN[js], 1);
 			for(int l=0; l<= sphOrder[js]; l++){
 				int indl = getPos(l, -1*l);
-				//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					for(int i=0; i < pts.nRows(); i++)
@@ -1264,35 +1145,14 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 			sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 			for(int l=0; l<= sphOrder[js]; l++){
 				int indl = getPos(l, -1*l);
-				//Ystarlm = sphericalHarmonics(l, 1, dirMat);
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
-					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0);
-					cout<<"l: "<<l<<" m: "<<m<<" "<<Angsvec(indl+indm, 0)<<endl;
+					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
 				}
 			}
 			for(int i = 0; i < node_angN[js]; i++)
 				Svec(offset[js] + i, 0) = Angsvec(i, 0)*ela_i;
 			delete []Ystarlm;
-
-			/*RDenseMatrix Angsvec(node_angN[js], 1);
-			for(int l=0; l<= sphOrder[js]; l++){
-				int indl = getPos(l, -1*l);
-				//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
-				for(int m=-l; m<=l; m++){
-					int indm = l + m;
-					for(int i=0; i < pts.nRows(); i++)
-					{
-						double sdotn = dirVec[0]*pts.Get(i, 0) + dirVec[1]*pts.Get(i, 1) + dirVec[2]*pts.Get(i, 2);
-						Angsvec(indl+indm, 0) += Ylm[l](indm, i)*exp(-(1-sdotn)*(1-sdotn)/(2*0.01*0.01))*wts[i]*4*M_PI;
-					}
-					cout<<"l: "<<l<<" m: "<<m<<" "<<Angsvec(indl+indm, 0)<<endl;
-				}
-			}
-				
-			for(int i = 0; i < node_angN[js]; i++)
-				Svec(offset[js] + i, 0) += Angsvec(i, 0)*ela_i;*/
-
 		}
 	}
     } 
@@ -1302,11 +1162,10 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
    delete []rowptr;
    delete []colidx;
 }
-void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+
+/**Computes source vector for a single source in the interior of the domain where the source profile is defined in a QM file
+**/
+void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -1329,12 +1188,11 @@ void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVecto
 	    			is = mesh.elist[el]->SideNode(sd,nd);
 	    			js = mesh.elist[el]->Node[is];
 				double ela_i =  mesh.elist[el]->IntF(is);
-	    			if(is_isotropic)
+	    			if(is_cosine)
 				{
 					RDenseMatrix Angsvec(node_angN[js], 1);
 					for(int l=0; l<= sphOrder[js]; l++){
 						int indl = getPos(l, -1*l);
-						//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							for(int i=0; i < pts.nRows(); i++)
@@ -1358,10 +1216,9 @@ void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVecto
 					sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 					for(int l=0; l<= sphOrder[js]; l++){
 						int indl = getPos(l, -1*l);
-						//Ystarlm = sphericalHarmonics(l, 1, dirMat);
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
-							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0);
+							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
 						}
 					}
 					for(int i = 0; i < node_angN[js]; i++)
@@ -1377,11 +1234,9 @@ void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVecto
   }
 }  
 
-void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+/**Computes source vector for a single point source in the interior of the domain
+**/
+void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -1403,12 +1258,11 @@ void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& no
 	    js = mesh.elist[el]->Node[is];
 	   if(js != Nsource) continue;
 	    double ela_i =  mesh.elist[el]->IntF(is);
-	    if(is_isotropic)
+	    if(is_cosine)
 	    {
 			RDenseMatrix Angsvec(node_angN[js], 1);
 			for(int l=0; l<= sphOrder[js]; l++){
 				int indl = getPos(l, -1*l);
-				//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					for(int i=0; i < pts.nRows(); i++)
@@ -1432,12 +1286,9 @@ void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& no
 			sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 			for(int l=0; l<= sphOrder[js]; l++){
 				int indl = getPos(l, -1*l);
-				//Ystarlm = sphericalHarmonics(l, 1, dirMat);
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
-					cout<<"l: "<<l<<" m: "<<m<<" "<<Angsvec(indl+indm, 0)<<endl;
-
 				}
 			}
 			for(int i = 0; i < node_angN[js]; i++)
@@ -1460,8 +1311,7 @@ int main (int argc, char *argv[])
 {
     char cbuf[200];
     int el;
-    //xASSERT(argc >= 3, Current implementation only when QM file is specified);
-    //    logfile << "Reading mesh" << endl;
+    
     cout << "Reading mesh " << argv[1] << endl;
     ifstream ifs;
     ifs.open (argv[1]);
@@ -1474,15 +1324,9 @@ int main (int argc, char *argv[])
     int dimension = nlist[0].Dim();
     for (int i = 1; i < nlist.Len(); i++)
 	xASSERT(nlist[i].Dim() == dimension, Inconsistent node dimensions.);
-    xASSERT(dimension >= 2 && dimension <= 3, Mesh dimension must be 2 or 3.);
+    xASSERT(dimension == 3, Mesh dimension must be  3.);
     qmmesh.Setup();
 
-    // set up angular "mesh"
-
-    //******** optical parameters
-
-    //****** sources.
-    //****** should read in QM file, but just set something for now.
     cout << "Forming the source\n";
     int ns = 1, nM;
     int *Nsource = new int [ns];
@@ -1492,9 +1336,8 @@ int main (int argc, char *argv[])
     char file_extn[200];
 
     cin>>file_extn;
-    cout<<"File name prefix: "<<file_extn<<endl;
-    //    Measurement datatype;
-    if(argc < 3) {
+    cout<<"File name prefix: "<<file_extn<<endl;// prefix for the output files
+    if(argc < 3) { // point source 
          cin >> ns;
 	 cout<< "Number of sources: "<<ns<<endl;
          Nsource = new int[ns];
@@ -1503,7 +1346,7 @@ int main (int argc, char *argv[])
 		cin >>Nsource[i];
      	 cout<<nlist[Nsource[i]]<<"   "<<endl;}
     }
-    else {
+    else { //distributed source to be read from a QM file
     cout << "QM file " << argv[2] << endl;
     ifs.open (argv[2]);
     xASSERT (ifs.is_open(), QM file not found.);
@@ -1515,43 +1358,35 @@ int main (int argc, char *argv[])
     cout << ns << " sources\n";
     SelectSourceProfile (qprof, qwidth, srctp);
     SelectMeasurementProfile (pp, mprof, mwidth);
-    // build the source vectors
     qvec.New (ns, qmmesh.nlen());
     for (int i = 0; i < ns; i++) {
 	RVector q(qmmesh.nlen());
 	switch (qprof) {
 	case 0:
-	    //SetReal (q, QVec_Point (qmmesh, qmmesh.Q[i], srctp));
 	    q = QVec_Point (qmmesh, qmmesh.Q[i], srctp);
 	    break;
 	case 1:
-	    //SetReal (q, QVec_Gaussian (qmmesh, qmmesh.Q[i], qwidth, srctp));
 	    q = QVec_Gaussian (qmmesh, qmmesh.Q[i], qwidth, srctp);
 	    break;
 	case 2:
-	    //SetReal (q, QVec_Cosine (qmmesh, qmmesh.Q[i], qwidth, srctp));
 	    q = QVec_Cosine (qmmesh, qmmesh.Q[i], qwidth, srctp);
 	    break;
 	}
 	qvec.SetRow (i, q);
     }
     cout << "Sources set "<<endl;
-    // build the measurement vectors
     mvec.New (nM, qmmesh.nlen());
     LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (int i = 0; i < nM; i++) {
 	RVector m(qmmesh.nlen());
 	switch (mprof) {
 	case 0:
-	    //SetReal (m, QVec_Point (qmmesh, qmmesh.M[i], SRCMODE_NEUMANN));
 	    m = QVec_Point (qmmesh, qmmesh.M[i], SRCMODE_NEUMANN);
 	    break;
 	case 1:
-	    //SetReal (m, QVec_Gaussian (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN));
 	    m = QVec_Gaussian (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	case 2:
-	    //SetReal (m, QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN));
 	    m = QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
@@ -1562,73 +1397,64 @@ int main (int argc, char *argv[])
     }
     //***** parameters 
     double freq = 0, g;
-    int phaseExpOrder, is_iso;
-    bool is_isotropic;
+    int phaseExpOrder, is_cos;
+    bool is_cosine;
     RVector dirVec(3);
     cin>>g;
     cout<< "value of g (WARNING !! This g is considered constant throughout the domain): "<< g<<endl;
     cin >> freq;
     cout << "value for frequency (MHz) : "<<freq<<endl;
-    cin>> is_iso;
-    is_isotropic = is_iso>0 ? true : false;
-    cout << "The source is isotropic ? "<<is_isotropic<<endl;
+    cin>> is_cos;
+    is_cosine = is_cos>0 ? true : false;
+    cout << "The source is cosine or directed (1. Cosine 0. Directed): "<<is_cosine<<endl;
     cin>> dirVec[0]; cin>> dirVec[1]; cin>>dirVec[2];
-    dirVec = dirVec*1/(double)length(dirVec); // normalize it just in case
-    cout<< "The direction vector for the source (if not isotropic) is "<<dirVec<<endl; 
+    dirVec = dirVec*1/(double)length(dirVec); // normalize the direction vector just in case
+    cout<< "The direction vector for the source (if it is directed): "<<dirVec<<endl; 
 
     double w = freq * 2.0*M_PI*1e-6;
     double c = 0.3;
-     int numpts;
-     numpts = 110;
-     RDenseMatrix pts(numpts, 3); 
-     RVector wts(numpts);
-     for(int i=0; i < numpts; i++){
+    int numpts;
+    numpts = 110;
+    RDenseMatrix pts(numpts, 3); 
+    RVector wts(numpts);
+    for(int i=0; i < numpts; i++){
 	wts[i] = wts17[i]; 
 	for(int j=0; j < 3; j++)
 		pts(i, j) = pts17[i][j];
-	}	
+    }	
 
     RVector muscat(qmmesh.elen());
     RVector muabs(qmmesh.elen());
     RVector ref(qmmesh.elen());
-
     cout<< "Reading mua, mus and refractive index values for all the elements from file: "<<endl;
     for(el = 0; el <  qmmesh.elen(); el++){ // assign something to parameters
       cin >> muabs[el];
       cin >> muscat[el]; 
       cin >> ref[el]; 
     }
-    cout << "mua " << muabs[0] << " mus " << muscat[0] <<" ref "<<ref[0]<<endl;
-    // "smoothing parameter delta of streamline diffusion modification.
-    // Just set to constant for now.
+    
     IVector sphOrder(qmmesh.nlen());
     cout<<"Reading spherical harmonic expansion order for each node: "<<endl;
     for(int i=0; i < qmmesh.nlen(); i++)
 	cin >> sphOrder[i]; 
 
+    //smoothing parameter for the streamline diffusion modification
     RVector delta(qmmesh.elen());
     double min = 1e20, max = -1e20;
     cout << "delta " ;
-    for(el = 0; el <  qmmesh.elen(); el++){ // assign something to delta 
+    for(el = 0; el <  qmmesh.elen(); el++){ 
 #ifdef VARYDELTA 
-	 // this requires Nsource to be set...
          Point centre = Point3D(0, 0, 0);
 	 int nNode =  elist[el]->nNode();
 	 for(int i=0; i < nNode; i++) 
 		centre += nlist[elist[el]->Node[i]];
 	 centre = centre/nNode;
 	 double sval =  elist[el]->Size()/((muscat[el]));
-	  // double sval = 1/(5.0*(muabs[el] + muscat[el]));
-	  // double dist = l2norm(centre - nlist[1669]);
-	 //  double rval = 5.0*sval/dist; 
-          // delta[el] = MIN(sval,rval);
 	 delta[el] = sval;
 #else
 	 min = max = delta[0];
 #endif 
-	 //	 cout << delta[el] << " ";
     }
-    cout << "min : " << vmin(delta) << "max : " << vmax(delta) << endl;
    MyDataContext ctxt(qmmesh, sphOrder, delta, muabs, muscat, ref, g, &phaseFunc, w, c, pts, wts);
 
      
@@ -1640,13 +1466,13 @@ int main (int argc, char *argv[])
     cout<<"calling computing the source vector ..."<<endl;
    if(argc<3)	
      {
-      genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_isotropic, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_intsourcevalvector_cos_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_isotropic, pts, wts, ctxt.Ylm);
+      genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_intsourcevalvector_cos_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);
      }
     else 
     {
-      genmat_toastsource3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_isotropic, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_toastintsourcevalvector_cos_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_isotropic, pts, wts, ctxt.Ylm);
+      genmat_toastsource3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_toastintsourcevalvector_cos_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_cosine, pts, wts, ctxt.Ylm);
     }
 
     cout << "calculating the radiance\n";
@@ -1667,7 +1493,7 @@ int main (int argc, char *argv[])
     clock_t start = clock();
     int row_offset = 0;
     for (int j = 0; j < ns ; j++) {   
-      cout << "start source " << j << endl;
+      cout << "Radiance with the source number:  " << j << endl;
 
       Phi[j].New(fullsysdim);
       Phisum[j].New(sysdim);
@@ -1676,7 +1502,6 @@ int main (int argc, char *argv[])
 
       GMRES(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
       osRHS << RHS << endl;
-      cout << "finished source " << j << endl;
       osPhi << "Phi " << j << "\n" << Phi[j] << endl;
       for (int k = 0; k < sysdim; k++)
       {
@@ -1705,32 +1530,23 @@ int main (int argc, char *argv[])
     cout << "  Log Mod field written to "<< flnmod << endl;
     cout << "  Arg field written to "<<farg << endl;
 
-
-    // output data files
-
-
-	WriteData (LogMod(proj), "fmod_hr.fem");
-	cout<<"fmod_hr.fem written ..."<<endl;
-        WriteData (Arg(proj), "farg_hr.fem");
-	cout<<"farg_hr.fem written ..."<<endl;
-        WriteDataBlock (qmmesh, LogMod(proj), "fmod_hr.dat");
-	cout<<"fmod_hr.dat written ..."<<endl;
-	WriteDataBlock (qmmesh, Arg(proj), "farg_hr.dat");
-	cout<<"farg_hr.dat written ..."<<endl;
-
     FILE *fid;
     fid = fopen(ftime, "w");
     fprintf(fid, "Time taken by solver: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
     fclose(fid);
     cout<<"The solver took "<<(double)(end-start)/CLOCKS_PER_SEC<<" seconds"<<endl;
 
-	delete []Phi;
-	delete []Phisum;
-	delete []Nsource;
-	delete []Source;
+    delete []Phi;
+    delete []Phisum;
+    delete []Nsource;
+    delete []Source;
 
 }
-
+/** Computes Ax 
+	A -> Real sparse matrix
+	x -> Complex vector
+     NOTE!! It's rightful place in crmatrix class using templates
+**/
 inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
 {
     dASSERT_2PRM(x.Dim() == A.nCols(),
@@ -1752,6 +1568,10 @@ inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
 
 }
 
+/** Computes Sx required by the GMRES solver
+*	S -> System matrix
+*	x -> current guess of the solution
+**/
 inline CVector matrixFreeCaller(const CVector& x, void * context)
 {
 	MyDataContext *ctxt = (MyDataContext*) context;
@@ -1760,17 +1580,25 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	int spatN = ctxt->spatN;
 	int maxAngN = ctxt->maxAngN;
 
+	/*Implict Kronecker product implementation
+	*	(S \circplus A)x = Sx_{r}A^{T}
+	* where 'x_{r}' is a matrix resulting form reshaping of 'x'. 
+	*/
+
+	/*Reshaping 'x' to 'x_{r}'*/
 	memcpy (ctxt->xmatval, x.data_buffer(), dof*sizeof(complex));
 
 	int i, j, k, m, ra, ra1, ra2, rb, rb1, rb2;
     	int nr = ctxt->Xmat.nRows();
     	int nc = ctxt->Aint.nCols();
-    	
+    
+	/*Intialize Ax's to zero where A is the angular matrix*/	
 	ctxt->Aintx.Zero(); ctxt->Aintscx.Zero(); ctxt->Aintssx.Zero(); ctxt->Aintcx.Zero();
 	ctxt->apu1x.Zero(); ctxt->apu1scx.Zero(); ctxt->apu1ssx.Zero(); ctxt->apu1cx.Zero();
 	ctxt->Aintscscx.Zero(); ctxt->Aintscssx.Zero(); ctxt->Aintssssx.Zero(); ctxt->Aintsccx.Zero();
 	ctxt->Aintsscx.Zero(); ctxt->Aintccx.Zero();
-	
+
+	/*Dereference the val pointers of Ax's*/	
 	complex *aintxval = ctxt->Aintx.data_buffer(); complex *aintscxval = ctxt->Aintscx.data_buffer(); complex *aintssxval = ctxt->Aintssx.data_buffer();
 	complex *aintcxval = ctxt->Aintcx.data_buffer(); complex *apu1xval = ctxt->apu1x.data_buffer(); complex *apu1scxval = ctxt->apu1scx.data_buffer();  
 	complex *apu1ssxval = ctxt->apu1ssx.data_buffer(); complex *apu1cxval = ctxt->apu1cx.data_buffer(); 
@@ -1778,7 +1606,7 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	complex *aintssssxval = ctxt->Aintssssx.data_buffer(); complex *aintsccxval = ctxt->Aintsccx.data_buffer();  
 	complex *aintsscxval = ctxt->Aintsscx.data_buffer();  complex *aintccxval = ctxt->Aintccx.data_buffer();  
 
-
+	/*Computing x_{r}A^{T}*/
 	complex xval;
     	for (i = 0; i < nr; i++) {
     		ra1 = ctxt->Xmat.rowptr[i];
@@ -1889,6 +1717,7 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 		}
     }
 
+    /*Computing S(x_{r}A^{T})*/
     int scol;
     for(int is = 0; is < spatN; is++)
     {
@@ -1921,8 +1750,10 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	} 
 	}
 
-
+	/*Computing A_{2}x explicitly where A_{2} is the matrix resulting from boundary*/
  	RCAx(ctxt->A2, x, ctxt->A2x);
+
+	/*Computing and returning the result*/
     	complex *res  = result.data_buffer();
     	complex *arg1 = ctxt->A2x.data_buffer();
     	for (int i=0; i < dof; i++)
@@ -1930,7 +1761,8 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 
     	return result;
 }
-
+/** Computes the diagonal of the system matrix which is required for preconditioning
+**/
 CVector getDiag(void * context)
 {
     MyDataContext *ctxt = (MyDataContext*) context;
