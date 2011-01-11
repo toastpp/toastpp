@@ -36,11 +36,6 @@ typedef unsigned pid_t;
 
 using namespace toast;
 
-#define MIN(A,B) ( (A) < (B) ? (A) : (B))
-#define MAX(A,B) ( (A) > (B) ? (A) : (B))
-#define Alm(l, m) (sqrt(complex((((l)+(m))*((l)-(m)))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
-#define Blm(l, m) (sqrt(complex((((l)+(m))*((l)+(m)-1))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
-
 /*Data context class containing necessary objects required by GMRES implicit solver*/
 class MyDataContext{
 public:
@@ -295,217 +290,6 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
   delete []rowptr;
   delete []colidx;
 }
-/* Sin(\theta)Cos(\phi)Y_{l, m}^{R} = Sin(\theta)Cos(\phi)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m+1}/\sqrt{-2}, b_{m} = (-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
-*/
-void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
-{
-
-	if(m==0)
-	{
-		a[0] = Blm(l, 0)/complex(2.0, 0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(2.0, 0); 
-		c[0] = complex(-1, 0)*Blm(l, 0)/complex(2.0, 0); d[0] = Blm(l+1, 1)/complex(2.0, 0);
-		
-		a[1] = 0; b[1] = 0; //error values which are never used
-		c[1] = 0; d[1] = 0;
-		
-		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
-		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
-		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;//error values which are never used
-		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
-	}
-	else if(m>0)
-	{
-	    	a[0] = Blm(l, -m)/(complex(2.0*sqrt(2), 0)); b[0] =  complex(-1, 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0)); 
-	    	c[0] = complex(-1, 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); d[0] = Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-	    	a[1] = complex(sign(m), 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); b[1] = complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-		c[1] =  complex(-1*sign(m), 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); d[1] = complex(sign(m), 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
- 
-	}
-	else
-	{
-	   	a[0] =  Blm(l, m)/(complex(0, 2.0*sqrt(2))); b[0] =  complex(-1, 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2))); 
-	    	c[0] =   complex(-1, 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); d[0] = Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-	    	a[1] = complex(sign(m+1), 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); b[1] = complex(-1*sign(m+1), 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-		c[1] =  complex(-1*sign(m+1), 0)*Blm(l, m)/(complex(0, 2.0*sqrt(2))); d[1] =  complex(sign(m+1), 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = -m+1; b1c(0, 0) = l+1; b1c(0, 1) = -m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = -m-1; d1c(0, 0) = l+1; d1c(0, 1) = -m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = m+1; b1c(1, 0) = l+1; b1c(1, 1) = m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = m-1; d1c(1, 0) = l+1; d1c(1, 1) = m-1; 
-	}
-
-}
-
-/* Sin(\theta)Sin(\phi)Y_{l, m}^{R} = Sin(\theta)Sin(\phi)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
-*/
-void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
-{
-
-	if(m==0)
-	{
-		a[0] = Blm(l, 0)/complex(0, 2.0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0); 
-		c[0] = Blm(l, 0)/complex(0, 2.0); d[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0);
-		
-		a[1] = 0; b[1] = 0;//error values which are never used 
-		c[1] = 0; d[1] = 0;
-		
-		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
-		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
-		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;//error values which are never used 
-		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
-	}
-	else if(m>0)
-	{
-	    	a[0] = Blm(l, -m)/(complex(0, 2.0*sqrt(2))); b[0] =  complex(-1, 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2))); 
-	    	c[0] = Blm(l, m)/(complex(0, 2.0*sqrt(2))); d[0] = complex(-1, 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-	    	a[1] = complex(sign(m), 0)*Blm(l, m)/(complex(0, 2.0*sqrt(2))); b[1] = complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-		c[1] =  complex(sign(m), 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); d[1] = complex(-1*sign(m), 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
- 
-	}
-	else
-	{
-	   	a[0] =  complex(-1, 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); b[0] =  Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0)); 
-	    	c[0] =   complex(-1, 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); d[0] = Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-	    	a[1] = complex(sign(m), 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); b[1] = complex(-1*sign(m), 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-		c[1] =  complex(sign(m), 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); d[1] =  complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = -m+1; b1c(0, 0) = l+1; b1c(0, 1) = -m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = -m-1; d1c(0, 0) = l+1; d1c(0, 1) = -m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = m+1; b1c(1, 0) = l+1; b1c(1, 1) = m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = m-1; d1c(1, 0) = l+1; d1c(1, 1) = m-1; 
-	}
-}
-
-/* Cos(\theta)Y_{l, m}^{R} = Cos(\theta)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
-*/
-void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, IDenseMatrix& f1c)
-{
-	if(m==0)
-	{
-		e[0] = Alm(l, 0); f[0] = Alm(l+1, 0);
-		e[1] = 0; f[1] = 0;//error values
-		
-		e1c(0, 0) = l-1; e1c(0, 1) = 0;
-		f1c(0, 0) = l+1; f1c(0, 1) = 0;
-		
-		e1c(1, 0) = -1; e1c(1, 1) = -1;//error values
-		f1c(1, 0) = -1; f1c(1, 1) = -1;
-
-	}	
-	else if(m>0)
-	{
-		e[0] = Alm(l, m)/complex(sqrt(2), 0); f[0] = Alm(l+1, m)/complex(sqrt(2), 0);
-		e[1] = complex(sign(m), 0)*Alm(l, -m)/complex(sqrt(2), 0); f[1] = complex(sign(m), 0)*Alm(l+1, -m)/complex(sqrt(2), 0);
-	
-		e1c(0, 0) = l-1; e1c(0, 1) = m;
-		f1c(0, 0) = l+1; f1c(0, 1) = m;
-
-		e1c(1, 0) = l-1; e1c(1, 1) = -m;
-		f1c(1, 0) = l+1; f1c(1, 1) = -m;
-	}
-	else
-	{
-		e[0] = Alm(l, -m)/complex(0, sqrt(2)); f[0] = Alm(l+1, -m)/complex(0, sqrt(2));
-		e[1] = complex(-1*sign(m), 0)*Alm(l, m)/complex(0, sqrt(2)); f[1] = complex(-1*sign(m), 0)*Alm(l+1, m)/complex(0, sqrt(2));
-	
-		e1c(0, 0) = l-1; e1c(0, 1) = -m;
-		f1c(0, 0) = l+1; f1c(0, 1) = -m;
-
-		e1c(1, 0) = l-1; e1c(1, 1) = m;
-		f1c(1, 0) = l+1; f1c(1, 1) = m;
-
-	}
-
-}
-
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
-*/
-void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
-{
-	if(m==0)
-	{
-		p[0] = 1.0; 
-		p[1] = 0;//error value
-		
-		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = -1; p1c(1, 1) = -3;//error value
-		
-	}	
-	else if(m>0)
-	{
-		p[0] = complex(1.0, 0)/complex(sqrt(2), 0); p[1] = complex(sign(m), 0)/complex(sqrt(2), 0);
-	
-		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = l; p1c(1, 1) = -m;
-
-	}
-	else
-	{
-		p[0] = complex(1.0, 0)/complex(0, sqrt(2)); p[1] = complex(-1*sign(m), 0)/complex(0, sqrt(2));
-	
-		p1c(0, 0) = l; p1c(0, 1) = -m;
-		p1c(1, 0) = l; p1c(1, 1) = m;
-
-	}
-}
-
-/*
-Computes integral of the form
-\int (a_{0}Y_{l1, m1} + a_{1}Y_{l2, m2})(b_{0}Y_{l3, m3} + b_{1}Y_{l4, m4})
-*/
-double Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
-{
-   complex temp;
-   temp =  a[0]*b[0]*kronD(a1c.Row(0), b1c.Row(0)) + a[0]*b[1]*kronD(a1c.Row(0), b1c.Row(1)) + a[1]*b[0]*kronD(a1c.Row(1), b1c.Row(0)) + a[1]*b[1]*kronD(a1c.Row(1), b1c.Row(1));
-   return(temp.re);
-}
-
 /**
 Computes all the angular integrals required by variable order PN approximation
 **/
@@ -523,12 +307,11 @@ void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, 
 	int is, js, indl1, indl2;
 
 	for(int l1 = 0; l1 <= sphOrder; l1++){
-		indl1 = getPos(l1, -1*l1);
+		indl1 = l1*l1;
 		for(int m1 = -1*l1; m1 <= l1; m1++){
-		        			
 			is = indl1 + l1 + m1;    	
 			for(int l2 = 0; l2 <= sphOrder; l2++){
-				indl2 = getPos(l2, -1*l2);
+				indl2 = l2*l2;
 				for(int m2 = -1*l2; m2 <= l2; m2++){
 					
 					js = indl2 + l2 + m2;
@@ -616,42 +399,6 @@ RVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const d
  return(phaseFn);	
 }
 
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives a_{m} 
-*/
-
-complex am(int m)
-{
-	if(m==0) return(complex(1.0, 0.0));
-	else if (m > 0) return(complex(1/sqrt(2.0), 0.0));
-	else return(complex(0.0, sign(m)/sqrt(2.0))); 
-}
-
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives b_{m} 
-*/
-complex bm(int m)
-{
-	if(m==0) return(complex(0.0, 0.0));
-	else if (m > 0) return(complex(1/sqrt(2.0), 0.0));
-	else return(complex(0.0, -1*sign(m)/sqrt(2.0))); 
-}
-
-complex delta(int a, int b)
-{
-	return(a == b ? complex(1.0, 0.0) : complex(0.0, 0.0)); 
-}
-
 /** Phase integrals 
 **/
 void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
@@ -668,13 +415,12 @@ void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), con
     IDenseMatrix a1c(2, 2), b1c(2, 2), c1c(2, 2), d1c(2, 2), e1c(2, 2), f1c(2, 2), p1c(2, 2), p2c(2, 2), pc(2, 2);
  
     for(int l1=0; l1 <= sphOrder; l1++){
-    	indl1 =  getPos(l1, -1*l1);
+    	indl1 =  l1*l1;
 	for(int m1 = -1*l1; m1 <= l1; m1++){
 		indm1 = l1 + m1;
 		is = indl1 + indm1;
 	        for(int l2=0; l2<= sphOrder; l2++){
-			indl2 = getPos(l2, -1*l2);
-
+			indl2 = l2*l2;
 			for(int m2 = -1*l2; m2<=l2; m2++){
 				indm2 = l2 + m2;
 				js = indl2 + indm2;
@@ -826,22 +572,6 @@ void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &o
 
 }
 
-/**Computes the maximum spherical harmonic order used in a given element
-**/
-void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVector& node_angN, const int el, int &maxSphOrder, int &maxAngN)
-{
-  int nodel = mesh.elist[el]->nNode();
-  maxAngN = 0; maxSphOrder =0; 
-  for(int i=0; i<nodel; i++)
-  {
-	int is = mesh.elist[el]->Node[i];
-	maxSphOrder = MAX(sphOrder[is], maxSphOrder);
-	maxAngN = MAX(node_angN[is], maxAngN);
-
-  }
-
-}
-
 /**Compute the boundary integral terms using quadrature
 **/
 void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVector& node_angN, const IVector& offset, const RDenseMatrix& ptsPlus, const RVector& wtsPlus, RDenseMatrix* &Ylm, RCompRowMatrix& A2, RCompRowMatrix& b1)
@@ -904,11 +634,28 @@ ParamParser pp;
 QMMesh qmmesh;
 NodeList &nlist=qmmesh.nlist;
 ElementList &elist=qmmesh.elist;
-/* Weights for the quadrature scheme required for boundary integrals
+inline CVector matrixFreeCaller(const CVector& x, void * context);
+void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
+void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
+void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
+void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsource3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
+void WriteData (const RVector &data, char *fname);
+void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
+void OpenNIM (const char *nimname, const char *meshname, int size);
+void WriteNIM (const char *nimname, const RVector &img, int size, int no);
+bool ReadNim (char *nimname, RVector &img);
+void WritePGM (const RVector &img, const IVector &gdim, char *fname);
+void WritePPM (const RVector &img, const IVector &gdim,
+double *scalemin, double *scalemax, char *fname);
+CVector getDiag(void * context);
+
+/* Weights for the quadrature scheme (which is accurate till 17th order) required for boundary integrals
 */
 double wts17[] = {.0038282704949371616, .0038282704949371616, .0038282704949371616, .0038282704949371616, .0038282704949371616, .0038282704949371616, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0097937375124875125, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0082117372831911110, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0095954713360709628, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0099428148911781033, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283, .0096949963616630283}; 
 
-/* Points for the quadrature scheme required for boundary integrals
+/* Points for the quadrature scheme (which is accurate till 17th order) required for boundary integrals
 */
 double pts17[110][3] = {{0, 0, 1.0}, {0, 1.0, 0}, {1.0, 0, 0}, {0, 0, -1.0}, {0, -1.0, 0}, {-1.0, 0, 0}, 
 
@@ -938,32 +685,6 @@ double pts17[110][3] = {{0, 0, 1.0}, {0, 1.0, 0}, {1.0, 0, 0}, {0, 0, -1.0}, {0,
 
 {0.47836902881215020, 0.8781589106040662, 0}, {0.47836902881215020, -0.8781589106040662, 0}, {-0.47836902881215020, 0.8781589106040662, 0}, {-0.47836902881215020, -0.8781589106040662, 0}, {0.8781589106040662, 0.47836902881215020, 0}, {0.8781589106040662, -0.47836902881215020, 0}, {-0.8781589106040662, 0.47836902881215020, 0}, {-0.8781589106040662, -0.47836902881215020, 0}};
 
-inline CVector matrixFreeCaller(const CVector& x, void * context);
-void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
-void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
-void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
-void genmat_toastsource3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
-void WriteData (const RVector &data, char *fname);
-void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
-void OpenNIM (const char *nimname, const char *meshname, int size);
-void WriteNIM (const char *nimname, const RVector &img, int size, int no);
-bool ReadNim (char *nimname, RVector &img);
-void WritePGM (const RVector &img, const IVector &gdim, char *fname);
-void WritePPM (const RVector &img, const IVector &gdim,
-double *scalemin, double *scalemax, char *fname);
-CVector getDiag(void * context);
-
-// error handler for FE library routines *************************************
-void LocalErrorhandler (char *msg)
-{
-    cerr << "\nread_toastbemmesh (PID " << getpid() << ")\n" << msg << endl << flush;
-    cerr << "Aborted.\n";
-    //    logfile << msg << endl << "Aborted." << endl;
-    exit (1);
-}
-
 /* Computes the source vectors for all the boundary sources when a QM file has been specified
 */
 void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
@@ -975,7 +696,6 @@ void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, con
      Source[i].New(fullsysdim,1);
      genmat_toastsourcevalvector3D_cos(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_cosine,  pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
-     cout<<"Prepared source: "<<i<<endl;
    }
 }
 
@@ -1020,7 +740,7 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 				{
 					RDenseMatrix Angsvec(node_angN[js], 1);
 					for(int l=0; l<= sphOrder[js]; l++){
-						int indl = getPos(l, -1*l);
+						int indl = l*l;
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							for(int i=0; i < pts.nRows(); i++)
@@ -1043,7 +763,7 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 						Ystarlm[l].New(2*l+1, 1);
 					sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 					for(int l=0; l<= sphOrder[js]; l++){
-						int indl = getPos(l, -1*l);
+						int indl = l*l;
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
@@ -1121,7 +841,7 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 	    {
 			RDenseMatrix Angsvec(node_angN[js], 1);
 			for(int l=0; l<= sphOrder[js]; l++){
-				int indl = getPos(l, -1*l);
+				int indl = l*l;
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					for(int i=0; i < pts.nRows(); i++)
@@ -1144,7 +864,7 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 			 Ystarlm[l].New(2*l+1, 1);
 			sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 			for(int l=0; l<= sphOrder[js]; l++){
-				int indl = getPos(l, -1*l);
+				int indl = l*l;
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
@@ -1192,7 +912,7 @@ void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVecto
 				{
 					RDenseMatrix Angsvec(node_angN[js], 1);
 					for(int l=0; l<= sphOrder[js]; l++){
-						int indl = getPos(l, -1*l);
+						int indl = l*l;
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							for(int i=0; i < pts.nRows(); i++)
@@ -1215,7 +935,7 @@ void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVecto
 						Ystarlm[l].New(2*l+1, 1);
 					sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 					for(int l=0; l<= sphOrder[js]; l++){
-						int indl = getPos(l, -1*l);
+						int indl = l*l;
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
@@ -1262,7 +982,7 @@ void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& no
 	    {
 			RDenseMatrix Angsvec(node_angN[js], 1);
 			for(int l=0; l<= sphOrder[js]; l++){
-				int indl = getPos(l, -1*l);
+				int indl = l*l;
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					for(int i=0; i < pts.nRows(); i++)
@@ -1285,7 +1005,7 @@ void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& no
 			 Ystarlm[l].New(2*l+1, 1);
 			sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 			for(int l=0; l<= sphOrder[js]; l++){
-				int indl = getPos(l, -1*l);
+				int indl = l*l;
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);

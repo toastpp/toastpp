@@ -1,0 +1,12 @@
+Variable order PN approximation 
+
+Usage
+
+If not using a QM file
+$TOASTVER/rte3D_varOrd <mesh file name>  <    <input file name>
+
+If using a QM file
+$TOASTVER/rte3D_varOrd <mesh file name > <QM file name> < <input file name>
+
+Input files can be generated using the MATLAB script 'generateInputFile.m' script contained in this folder
+
