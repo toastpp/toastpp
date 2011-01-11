@@ -50,176 +50,6 @@ void LocalErrorhandler (char *msg)
     exit (1);
 }
 
-void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
-{
-
-	if(m==0)
-	{
-		a[0] = Blm(l, 0)/complex(2.0, 0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(2.0, 0); 
-		c[0] = complex(-1, 0)*Blm(l, 0)/complex(2.0, 0); d[0] = Blm(l+1, 1)/complex(2.0, 0);
-		
-		a[1] = 0; b[1] = 0; 
-		c[1] = 0; d[1] = 0;
-		
-		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
-		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
-		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;
-		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
-	}
-	else if(m>0)
-	{
-	    	a[0] = Blm(l, -m)/(complex(2.0*sqrt(2), 0)); b[0] =  complex(-1, 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0)); 
-	    	c[0] = complex(-1, 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); d[0] = Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-	    	a[1] = complex(sign(m), 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); b[1] = complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-		c[1] =  complex(-1*sign(m), 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); d[1] = complex(sign(m), 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
- 
-	}
-	else
-	{
-	   	a[0] =  Blm(l, m)/(complex(0, 2.0*sqrt(2))); b[0] =  complex(-1, 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2))); 
-	    	c[0] =   complex(-1, 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); d[0] = Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-	    	a[1] = complex(sign(m+1), 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); b[1] = complex(-1*sign(m+1), 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-		c[1] =  complex(-1*sign(m+1), 0)*Blm(l, m)/(complex(0, 2.0*sqrt(2))); d[1] =  complex(sign(m+1), 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = -m+1; b1c(0, 0) = l+1; b1c(0, 1) = -m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = -m-1; d1c(0, 0) = l+1; d1c(0, 1) = -m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = m+1; b1c(1, 0) = l+1; b1c(1, 1) = m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = m-1; d1c(1, 0) = l+1; d1c(1, 1) = m-1; 
-	}
-
-}
-
-
-void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
-{
-
-	if(m==0)
-	{
-		a[0] = Blm(l, 0)/complex(0, 2.0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0); 
-		c[0] = Blm(l, 0)/complex(0, 2.0); d[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0);
-		
-		a[1] = 0; b[1] = 0; 
-		c[1] = 0; d[1] = 0;
-		
-		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
-		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
-		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;
-		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
-	}
-	else if(m>0)
-	{
-	    	a[0] = Blm(l, -m)/(complex(0, 2.0*sqrt(2))); b[0] =  complex(-1, 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2))); 
-	    	c[0] = Blm(l, m)/(complex(0, 2.0*sqrt(2))); d[0] = complex(-1, 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-	    	a[1] = complex(sign(m), 0)*Blm(l, m)/(complex(0, 2.0*sqrt(2))); b[1] = complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-		c[1] =  complex(sign(m), 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); d[1] = complex(-1*sign(m), 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
- 
-	}
-	else
-	{
-	   	a[0] =  complex(-1, 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); b[0] =  Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0)); 
-	    	c[0] =   complex(-1, 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); d[0] = Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-	    	a[1] = complex(sign(m), 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); b[1] = complex(-1*sign(m), 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-		c[1] =  complex(sign(m), 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); d[1] =  complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = -m+1; b1c(0, 0) = l+1; b1c(0, 1) = -m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = -m-1; d1c(0, 0) = l+1; d1c(0, 1) = -m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = m+1; b1c(1, 0) = l+1; b1c(1, 1) = m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = m-1; d1c(1, 0) = l+1; d1c(1, 1) = m-1; 
-	}
-}
-
-void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, IDenseMatrix& f1c)
-{
-	if(m==0)
-	{
-		e[0] = Alm(l, 0); f[0] = Alm(l+1, 0);
-		e[1] = 0; f[1] = 0;
-		
-		e1c(0, 0) = l-1; e1c(0, 1) = 0;
-		f1c(0, 0) = l+1; f1c(0, 1) = 0;
-		
-		e1c(1, 0) = -1; e1c(1, 1) = -1;
-		f1c(1, 0) = -1; f1c(1, 1) = -1;
-
-	}	
-	else if(m>0)
-	{
-		e[0] = Alm(l, m)/complex(sqrt(2), 0); f[0] = Alm(l+1, m)/complex(sqrt(2), 0);
-		e[1] = complex(sign(m), 0)*Alm(l, -m)/complex(sqrt(2), 0); f[1] = complex(sign(m), 0)*Alm(l+1, -m)/complex(sqrt(2), 0);
-	
-		e1c(0, 0) = l-1; e1c(0, 1) = m;
-		f1c(0, 0) = l+1; f1c(0, 1) = m;
-
-		e1c(1, 0) = l-1; e1c(1, 1) = -m;
-		f1c(1, 0) = l+1; f1c(1, 1) = -m;
-	}
-	else
-	{
-		e[0] = Alm(l, -m)/complex(0, sqrt(2)); f[0] = Alm(l+1, -m)/complex(0, sqrt(2));
-		e[1] = complex(-1*sign(m), 0)*Alm(l, m)/complex(0, sqrt(2)); f[1] = complex(-1*sign(m), 0)*Alm(l+1, m)/complex(0, sqrt(2));
-	
-		e1c(0, 0) = l-1; e1c(0, 1) = -m;
-		f1c(0, 0) = l+1; f1c(0, 1) = -m;
-
-		e1c(1, 0) = l-1; e1c(1, 1) = m;
-		f1c(1, 0) = l+1; f1c(1, 1) = m;
-
-	}
-
-}
-
-void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
-{
-	if(m==0)
-	{
-		p[0] = 1.0; p[1] = 0;
-		
-		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = -1; p1c(1, 1) = -3;
-		
-	}	
-	else if(m>0)
-	{
-		p[0] = complex(1.0, 0)/complex(sqrt(2), 0); p[1] = complex(sign(m), 0)/complex(sqrt(2), 0);
-	
-		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = l; p1c(1, 1) = -m;
-
-	}
-	else
-	{
-		p[0] = complex(1.0, 0)/complex(0, sqrt(2)); p[1] = complex(-1*sign(m), 0)/complex(0, sqrt(2));
-	
-		p1c(0, 0) = l; p1c(0, 1) = -m;
-		p1c(1, 0) = l; p1c(1, 1) = m;
-
-	}
-}
-
-double Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
-{
-   complex temp;
-   temp =  a[0]*b[0]*kronD(a1c.Row(0), b1c.Row(0)) + a[0]*b[1]*kronD(a1c.Row(0), b1c.Row(1)) + a[1]*b[0]*kronD(a1c.Row(1), b1c.Row(0)) + a[1]*b[1]*kronD(a1c.Row(1), b1c.Row(1));
-   return(temp.re);
-}
 
 void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowMatrix& Aintss, RCompRowMatrix& Aintc, RCompRowMatrix& Aintscsc, RCompRowMatrix& Aintscss, RCompRowMatrix& Aintscc, RCompRowMatrix& Aintssss, RCompRowMatrix& Aintssc, RCompRowMatrix& Aintcc)
 {
@@ -235,13 +65,13 @@ void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, 
 	int is, js, indl1, indl2;
 
 	for(int l1 = 0; l1 <= sphOrder; l1++){
-		indl1 = getPos(l1, -1*l1);
+		indl1 = l1*l1;
 		cout<<"angint: order: "<<l1<<endl;
 		for(int m1 = -1*l1; m1 <= l1; m1++){
 		        			
 			is = indl1 + l1 + m1;    	
 			for(int l2 = 0; l2 <= sphOrder; l2++){
-				indl2 = getPos(l2, -1*l2);
+				indl2 = l2*l2;
 				for(int m2 = -1*l2; m2 <= l2; m2++){
 					
 					js = indl2 + l2 + m2;
