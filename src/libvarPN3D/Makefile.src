@@ -28,7 +28,7 @@ $(LIB): $(LIBOBJS)
 rte3D_varOrd : rte3D_varOrd.o rte3D_math.o phaseFunc.o source.o pparse.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
-test_genPN_integrals : test_genPN_integrals.o genmat_angint_3D_PN.o genmat_angint_sdm_3D_PN.o spints.o
+test_genPN_integrals : test_genPN_integrals.o rte3D_math.o genmat_angint_3D_PN.o genmat_angint_sdm_3D_PN.o spints.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 clean:: 

@@ -131,7 +131,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
       for(j = 0; j < nsp; j++)
 	if(RY.Exists(i,j))
 	  RYT(i,j) = conj(RYT(i,j));
-    //    cerr << "conjg transp rotation \n" << Sparse2Dense(RYT) << endl;
+       //cout << "conjg transp rotation test \n" << Sparse2Dense(RYT*RY) << endl;
     
 
     /*---------------------------- z YY integral --------------------------*/

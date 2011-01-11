@@ -1,9 +1,4 @@
 #include<mathlib.h>
-#define PHI_COEFF(l) (complex(1.0, 0))
-#define INV_PHI_COEFF(l) (complex(1.0, 0))
-//#define PHI_COEFF(l) (complex(sqrt((2*(l) +1)/(4*M_PI)), 0))
-//#define INV_PHI_COEFF(l) (complex(sqrt((4*M_PI)/(2*(l) + 1)), 0))
-
 double factorial(int n);
 
 double doublefactorial(int n);
@@ -21,16 +16,16 @@ toast::complex kronD(const IVector &a, const IVector &b);
 //double plm(const int l, const int m, const double x);
 RVector plm(const int l, const int m, const RVector& vec);
 
-RDenseMatrix LegendreTable(const int l, const int numpts, const RDenseMatrix &pt);
+void LegendreTable(const int l, const int numpts, const RDenseMatrix &pt, RDenseMatrix* &LT);
 
-CDenseMatrix sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& pt);
+void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& pt, RDenseMatrix* &Ylm);
 
 //CDenseMatrix sphericalHarmonicsConj(const int order, const int numpts, const RDenseMatrix& pt);
 
 CCompRowMatrix kronsd(const CCompRowMatrix &A, const CDenseMatrix &B);
-void kronplus(const int spatrow, const int spatcol, const IVector& node_angN, const IVector& offset, const double Aval, const CCompRowMatrix &B, CCompRowMatrix& C);
+void kronplus(const int spatrow, const int spatcol, const IVector& node_angN, const IVector& offset, const double Aval, const RCompRowMatrix &B, RCompRowMatrix& C);
 //void BIntUnitSphere(const int sphOrder1, const int size, const RDenseMatrix& ptsPlus, const CVector& wtsPlus, const RVector& bnormal, CCompRowMatrix &Aintsc, CCompRowMatrix &Aintss, CCompRowMatrix &Aintc, CCompRowMatrix& intSdotnPlusHemisphere, CCompRowMatrix& intSdotnMinusHemisphere);
-void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const int sphOrder1, const RDenseMatrix& ptsPlus, const CVector& wtsPlus, const RVector& bnormal, CDenseMatrix* &Ystarl1m1, CDenseMatrix* &Yl2m2, CCompRowMatrix& intSdotnPlusHemisphere, CCompRowMatrix& intSdotnMinusHemisphere);
+void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const int sphOrder1, const RDenseMatrix& ptsPlus, const RVector& wtsPlus, const RVector& bnormal, RDenseMatrix* &Ylm, RCompRowMatrix& intSdotnPlusHemisphere, RCompRowMatrix& intSdotnMinusHemisphere);
 
 
 /*void BIntUnitSphere(const int sphOrder1, const RDenseMatrix& ptsPlus, const CVector& wtsPlus, const RVector& bnormal, CDenseMatrix& bintplus, CDenseMatrix& bintminus);
@@ -45,7 +40,7 @@ void getQuadPointsWts(const int order, RDenseMatrix& pts, CVector& wts);
 */
 int getPos(const int l, const int m);
 
-CCompRowMatrix shrink(const CDenseMatrix &dnsmat);
+RCompRowMatrix shrink(const RDenseMatrix &dnsmat);
 
 void tabulatePtsWtsForSphere();
 void testPtsWtsForSphere(const int sphOrder, const  int angN, const RDenseMatrix& pts, const CVector &wts, CDenseMatrix* &Yl2m2, CDenseMatrix* &Yl1m1);

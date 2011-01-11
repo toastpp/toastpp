@@ -46,49 +46,61 @@ using namespace toast;
 
 class MyDataContext{
 public:
-CCompRowMatrix Sint, Sdx, Sdy, Sdz;
-CCompRowMatrix Sgrad, Sx, Sy, Sz;
-CCompRowMatrix Sdxx, Sdxy, Sdyx, Sdyy,  Sdxz, Sdzx,  Sdyz, Sdzy, Sdzz;
-CCompRowMatrix Aint, Aintsc, Aintss, Aintc;
-CCompRowMatrix Aintscsc,  Aintscss, Aintscc, Aintssss,  Aintssc, Aintcc;
-CCompRowMatrix SPS, SPSdx, SPSdy, SPSdz;
-CCompRowMatrix spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz;
-CCompRowMatrix apu1, apu1sc, apu1ss, apu1c;
-CCompRowMatrix A2, b1;
+RCompRowMatrix Sint, Sdx, Sdy, Sdz;
+RCompRowMatrix Sgrad, Sx, Sy, Sz;
+RCompRowMatrix Sdxx, Sdxy, Sdyx, Sdyy,  Sdxz, Sdzx,  Sdyz, Sdzy, Sdzz;
+RCompRowMatrix Aint, Aintsc, Aintss, Aintc;
+RCompRowMatrix Aintscsc,  Aintscss, Aintscc, Aintssss,  Aintssc, Aintcc;
+RCompRowMatrix SPS, SPSdx, SPSdy, SPSdz;
+RCompRowMatrix spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz;
+RCompRowMatrix apu1, apu1sc, apu1ss, apu1c;
+RCompRowMatrix A2, b1;
 CVector A2x;
 CDenseMatrix Aintx, Aintscx, Aintssx, Aintcx;
 CDenseMatrix apu1x, apu1scx, apu1ssx, apu1cx;
 CDenseMatrix Aintscscx, Aintscssx, Aintssssx, Aintsccx, Aintsscx, Aintccx;
-CDenseMatrix Yl1m1, Yl2m2_modi;
 int mfc_count;
 int spatN, sphOrder, maxAngN;
 IVector nodal_sphOrder, node_angN, offset;
-const complex *sintval, *sdxval, *sdyval, *sdzval, *sxval, *syval, *szval; 
-const complex *sdxxval, *sdxyval, *sdyxval, *sdyyval, *sdxzval, *sdzxval, *sdyzval, *sdzyval, *sdzzval; 
-const complex *spsval, *spsdxval, *spsdyval, *spsdzval, *spata3_rteval, *spata3_sdmxval, *spata3_sdmyval, *spata3_sdmzval; 
+const double *sintval, *sdxval, *sdyval, *sdzval, *sxval, *syval, *szval; 
+const double *sdxxval, *sdxyval, *sdyxval, *sdyyval, *sdxzval, *sdzxval, *sdyzval, *sdzyval, *sdzzval; 
+const double *spsval, *spsdxval, *spsdyval, *spsdzval, *spata3_rteval, *spata3_sdmxval, *spata3_sdmyval, *spata3_sdmzval; 
 
-const complex *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, *apu1ssval, *apu1cval;
-const complex *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
+const double *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, *apu1ssval, *apu1cval;
+const double *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
 CCompRowMatrix Xmat;
+RDenseMatrix *Ylm;
 complex *xmatval;
 double w, c;
-MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, RVector &mua, RVector &mus, RVector &ref, const double g, complex (*phaseFunc)(const double g, const double costheta), double w, double c, const RDenseMatrix& pts, const CVector &wts)
+MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, RVector &mua, RVector &mus, RVector &ref, const double g, complex (*phaseFunc)(const double g, const double costheta), double w, double c, const RDenseMatrix& pts, const RVector &wts)
 { 
 	this->w = w;
 	this->c = c;
 	this->nodal_sphOrder = nodal_sphOrder;
 	sphOrder = vmax(nodal_sphOrder);
-	CDenseMatrix *Ystarl1m1, *Yl2m2;
+
+	Ylm = new RDenseMatrix[sphOrder +1];
+        	
+	for(int l=0; l<=sphOrder; l++)
+		Ylm[l].New(2*l+1, pts.nRows());
+	sphericalHarmonics(sphOrder, pts.nRows(), pts, Ylm);
 
 
-	Ystarl1m1 = new CDenseMatrix[sphOrder+1];
-	Yl2m2 = new CDenseMatrix[sphOrder +1];
-	
-	for(int l2=0; l2<=sphOrder; l2++)
-		Yl2m2[l2] = sphericalHarmonics(l2, pts.nRows(), pts);
-    	for(int l1=0; l1 <= sphOrder; l1++)
-		Ystarl1m1[l1] = sphericalHarmonics(l1, pts.nRows(), pts);
-	//tabulatePtsWtsForSphere();
+	/*RDenseMatrix *temp;
+        RDenseMatrix tempMat(1, 3);
+	tempMat(0, 0) = 0; tempMat(0, 1) = 1; tempMat(0, 2) = 0;
+	cout<<"******Input**********"<<endl;
+	cout<<tempMat<<endl;
+	temp =  new RDenseMatrix[4];
+        for(int l=0; l<=3; l++)
+		temp[l].New(2*l+1, 1);
+	sphericalHarmonics(3, 1, tempMat, temp);
+	for(int l=0; l<=3; l++)
+	{
+		cout<<"***********Order "<<l<<"****************"<<endl;
+		cout<<temp[l]<<endl;
+	}*/
+	  	
 	spatN = spatMesh.nlen();
 	        	
 	node_angN.New(spatN);
@@ -99,40 +111,40 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 			node_angN[i] += (2*l+1);
 	}
 	maxAngN = vmax(node_angN);
-	//testPtsWtsForSphere(sphOrder, maxAngN, pts, wts, Yl2m2, Ystarl1m1);
 
 	offset.New(spatN);
 	offset[0] = 0;
 	for(int i=1; i < spatN; i++)
 		offset[i] = offset[i-1] + node_angN[i-1]; 
+
+	Aintx.New(spatN, maxAngN); Aintscx.New(spatN, maxAngN); Aintssx.New(spatN, maxAngN); Aintcx.New(spatN, maxAngN);
+	apu1x.New(spatN, maxAngN); apu1scx.New(spatN, maxAngN); apu1ssx.New(spatN, maxAngN); apu1cx.New(spatN, maxAngN);
+	Aintscscx.New(spatN, maxAngN); Aintscssx.New(spatN, maxAngN); Aintssssx.New(spatN, maxAngN); Aintsccx.New(spatN, maxAngN);
+	Aintsscx.New(spatN, maxAngN); Aintccx.New(spatN, maxAngN);
 	
-	
-	//tabulatePtsWtsForHemisphere();
-	//testQuadHemisphere2();
-	//BIntUnitSphere_test(16, 3);
+	cout<<"Generating boundary integrals ..."<<endl;
+       // genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Aintsc, Aintss, Aintc, A2, b1);
+	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
+	cout<<"Done computing boundary integrals ..."<<endl;	
 
 	gen_spatint_3D(spatMesh, mua, mus, ref, delta, w, c, Sint, Sdx, Sdy, Sdz, Sx, Sy, Sz, Sdxx, Sdxy, Sdyx, Sdyy, Sdxz, Sdzx, Sdyz, Sdzy, Sdzz, spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz, SPS, SPSdx, SPSdy, SPSdz);
-
+	cout<<"Generated Spatial Integrals ..."<<endl;
 	int angN = vmax(node_angN);
       	genmat_angint_3D(sphOrder, angN, Aint, Aintsc, Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc);
-	/*CDenseMatrix dnsAint, dnsAintsc, dnsAintss, dnsAintc;
-	genmat_angint_3D_test(angN, sphOrder,  pts, wts, dnsAint, dnsAintsc, dnsAintss, dnsAintc);
-	cout<<"################################"<<endl;
-	cout<<Aint<<"\n*****************\n"<<shrink(dnsAint)<<endl;
-	cout<<"################################"<<endl;
-	cout<<Aintsc<<"\n*****************\n"<<shrink(dnsAintsc)<<endl;
-	cout<<"################################"<<endl;
-	cout<<Aintss<<"\n*****************\n"<<shrink(dnsAintss)<<endl;
-	cout<<"################################"<<endl;
-	cout<<Aintc<<"\n*****************\n"<<shrink(dnsAintc)<<endl;
-*/
-	
+	cout<<"Generated angular integrals ..."<<endl;
+	cout<<"Generating phase integrals ..."<<endl;	
 	genmat_apu(phaseFunc, g, angN, sphOrder, apu1, apu1sc, apu1ss, apu1c);
-	cout<<"Generating boundary integral terms ..."<<endl;
-       // genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Aintsc, Aintss, Aintc, A2, b1);
-	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ystarl1m1, Yl2m2, A2, b1);
+	
+	//fwrite(sphOrder, angN, Aint, Aintsc,  Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc, apu1, apu1sc, apu1ss, apu1c);
+
+	/*cout<<"A: "<<Aint.rowptr[angN]<<" Ax: "<<Aintsc.rowptr[angN]<<" Ay: "<<Aintss.rowptr[angN]<<" Az: "<<Aintc.rowptr[angN]<<endl;
+	cout<<"Axx: "<<Aintscsc.rowptr[angN]<<" Axy: "<<Aintscss.rowptr[angN]<<" Axz: "<<Aintscc.rowptr[angN]<<" Ayy: "<<Aintssss.rowptr[angN]<<endl;
+	cout<<"Ayz: "<<Aintssc.rowptr[angN]<<" Azz: "<<Aintcc.rowptr[angN]<<endl;
+
+	cout<<"B: "<<apu1.rowptr[angN]<<" Bx: "<<apu1sc.rowptr[angN]<<" By: "<<apu1ss.rowptr[angN]<<" Bz: "<<apu1c.rowptr[angN]<<endl;*/
 
 
+	
 	//cout<<apu1<<"\n******************\n"<<apu1sc<<"\n******************\n"<<apu1ss<<"\n******************\n"<<apu1c<<endl;
 
 /*	CCompRowMatrix apu1_test, apu1sc_test, apu1ss_test, apu1c_test;	
@@ -153,11 +165,6 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	aintscscval = Aintscsc.ValPtr(); aintscssval = Aintscss.ValPtr(); aintssssval = Aintssss.ValPtr(); aintsccval = Aintscc.ValPtr();
 	aintsscval = Aintssc.ValPtr(); aintccval = Aintcc.ValPtr();
 
-
-	Aintx.New(spatN, maxAngN); Aintscx.New(spatN, maxAngN); Aintssx.New(spatN, maxAngN); Aintcx.New(spatN, maxAngN);
-	apu1x.New(spatN, maxAngN); apu1scx.New(spatN, maxAngN); apu1ssx.New(spatN, maxAngN); apu1cx.New(spatN, maxAngN);
-	Aintscscx.New(spatN, maxAngN); Aintscssx.New(spatN, maxAngN); Aintssssx.New(spatN, maxAngN); Aintsccx.New(spatN, maxAngN);
-	Aintsscx.New(spatN, maxAngN); Aintccx.New(spatN, maxAngN);
 
 	sintval = Sint.ValPtr(); sdxval = Sdx.ValPtr(); sdyval = Sdy.ValPtr();
 	sdzval = Sdz.ValPtr(); sxval = Sx.ValPtr(); syval = Sy.ValPtr(); 
@@ -194,17 +201,47 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	Xmat.Initialise(xrowptr, xcolidx);
 	xmatval = Xmat.ValPtr();
 
-//	delete []Ystarl1m1;
-//	delete []Yl2m2;
-
-
 }
 
 ~MyDataContext()
 {
+  delete []Ylm;
 };
 
-void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& muscat, const RVector& ref, const RVector& delta, double w, double c, CCompRowMatrix& Sint, CCompRowMatrix& Sdx, CCompRowMatrix& Sdy, CCompRowMatrix& Sdz, CCompRowMatrix& Sx, CCompRowMatrix& Sy, CCompRowMatrix& Sz, CCompRowMatrix& Sdxx, CCompRowMatrix& Sdxy, CCompRowMatrix& Sdyx, CCompRowMatrix& Sdyy, CCompRowMatrix& Sdxz, CCompRowMatrix& Sdzx, CCompRowMatrix& Sdyz, CCompRowMatrix& Sdzy, CCompRowMatrix& Sdzz, CCompRowMatrix& spatA3_rte, CCompRowMatrix& spatA3_sdmx, CCompRowMatrix& spatA3_sdmy, CCompRowMatrix& spatA3_sdmz, CCompRowMatrix& SPS, CCompRowMatrix& SPSdx, CCompRowMatrix& SPSdy, CCompRowMatrix& SPSdz)
+/*void fwrite(const int sphOrder, const int angN, CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatrix& Aintss, CCompRowMatrix& Aintc, CCompRowMatrix& Aintscsc, CCompRowMatrix& Aintscss, CCompRowMatrix& Aintscc, CCompRowMatrix& Aintssss, CCompRowMatrix& Aintssc, CCompRowMatrix& Aintcc, CCompRowMatrix& apu1, CCompRowMatrix& apu1sc, CCompRowMatrix& apu1ss, CCompRowMatrix& apu1c)
+{
+
+ writeOneFile(angN, "Aint.dat", Aint); writeOneFile(angN, "Aintsc.dat", Aintsc); writeOneFile(angN, "Aintss.dat", Aintss); 
+ writeOneFile(angN, "Aintc.dat", Aintc); writeOneFile(angN, "Aintscsc.dat", Aintscsc); writeOneFile(angN, "Aintscss.dat", Aintscss); 
+ writeOneFile(angN, "Aintssss.dat", Aintssss); writeOneFile(angN, "Aintscc.dat", Aintscc); writeOneFile(angN, "Aintssc.dat", Aintssc);
+ writeOneFile(angN, "Aintcc.dat", Aintcc); writeOneFile(angN, "apu1.dat", apu1); writeOneFile(angN, "apu1sc.dat", apu1sc);
+ writeOneFile(angN, "apu1ss.dat", apu1ss); writeOneFile(angN, "apu1c.dat", apu1c); 
+ 
+ 
+
+
+
+  cout<<"FILES WRITTEN"<<endl;
+}
+
+void writeOneFile(const int angN, const char *fname, CCompRowMatrix& A)
+{
+	FILE *fid;
+	fid = fopen(fname, "w");
+	complex *aval = A.ValPtr();
+  	for(int i=0; i<angN; i++)
+  	{
+		for(int na = A.rowptr[i]; na < A.rowptr[i+1]; na++)
+		{	
+			int col = A.colidx[na];
+			double re = aval[na].re;
+			fprintf(fid, "%d %d %f\n", i+1, col+1, re);
+		}
+  	}  
+  	fclose(fid);
+
+}*/
+void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& muscat, const RVector& ref, const RVector& delta, double w, double c, RCompRowMatrix& Sint, RCompRowMatrix& Sdx, RCompRowMatrix& Sdy, RCompRowMatrix& Sdz, RCompRowMatrix& Sx, RCompRowMatrix& Sy, RCompRowMatrix& Sz, RCompRowMatrix& Sdxx, RCompRowMatrix& Sdxy, RCompRowMatrix& Sdyx, RCompRowMatrix& Sdyy, RCompRowMatrix& Sdxz, RCompRowMatrix& Sdzx, RCompRowMatrix& Sdyz, RCompRowMatrix& Sdzy, RCompRowMatrix& Sdzz, RCompRowMatrix& spatA3_rte, RCompRowMatrix& spatA3_sdmx, RCompRowMatrix& spatA3_sdmy, RCompRowMatrix& spatA3_sdmz, RCompRowMatrix& SPS, RCompRowMatrix& SPSdx, RCompRowMatrix& SPSdy, RCompRowMatrix& SPSdz)
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
 
@@ -279,38 +316,38 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 		if ((js = mesh.elist[el]->Node[j]) >= sysdim) continue;
 		
 		elb_ij = mesh.elist[el]->IntFF (i, j);
-		Sint(is,js) += complex(elb_ij, 0)*complex(0, w/c); 
-		SPS(is, js) += complex(elb_ij*muscat[el], 0);
-		spatA3_rte(is, js) += complex(elb_ij*sigmatot, 0);
+		Sint(is,js) +=elb_ij*w/c; 
+		SPS(is, js) += elb_ij*muscat[el];
+		spatA3_rte(is, js) += elb_ij*sigmatot;
 
 
 		elsx_ij = mesh.elist[el]->IntFd (j,i,0);
-		Sx(is,js) += complex(elsx_ij, 0);
-		Sdx(is,js) += complex(dss*elsx_ij, 0)*complex(0, w/c);
-		SPSdx(is, js) += complex(dss*elsx_ij*muscat[el], 0);
-		spatA3_sdmx(is, js) += complex(dss*elsx_ij*sigmatot, 0);
+		Sx(is,js) += elsx_ij;
+		Sdx(is,js) += dss*elsx_ij*w/c;
+		SPSdx(is, js) += dss*elsx_ij*muscat[el];
+		spatA3_sdmx(is, js) += dss*elsx_ij*sigmatot;
 
 		elsy_ij = mesh.elist[el]->IntFd (j,i,1);
-		Sy(is,js) += complex(elsy_ij, 0);
-		Sdy(is,js) += complex(dss*elsy_ij, 0)*complex(0, w/c);
-		SPSdy(is, js) += complex(dss*elsy_ij*muscat[el],0);
-		spatA3_sdmy(is, js) += complex(dss*elsy_ij*sigmatot, 0);
+		Sy(is,js) += elsy_ij;
+		Sdy(is,js) += dss*elsy_ij*w/c;
+		SPSdy(is, js) += dss*elsy_ij*muscat[el];
+		spatA3_sdmy(is, js) += dss*elsy_ij*sigmatot;
 
 		elsz_ij = mesh.elist[el]->IntFd (j,i,2);
-		Sz(is,js) += complex(elsz_ij, 0);
-  		Sdz(is,js) += complex(dss*elsz_ij, 0)*complex(0, w/c);
-		SPSdz(is, js) += complex(dss*elsz_ij*muscat[el], 0);
-		spatA3_sdmz(is, js) += complex(dss*elsz_ij*sigmatot, 0);
+		Sz(is,js) += elsz_ij;
+  		Sdz(is,js) += dss*elsz_ij*w/c;
+		SPSdz(is, js) += dss*elsz_ij*muscat[el];
+		spatA3_sdmz(is, js) += dss*elsz_ij*sigmatot;
 
-		Sdxx(is,js) += complex(dss * eldd(i*3,j*3), 0);
-	       	Sdxy(is,js) += complex(dss * eldd(i*3,j*3+1), 0);
-     		Sdyx(is,js) += complex(dss * eldd(i*3+1,j*3), 0);
-       		Sdyy(is,js) += complex(dss * eldd(i*3+1,j*3+1), 0);	
-	       	Sdxz(is,js) += complex(dss * eldd(i*3,j*3+2), 0);
-     		Sdzx(is,js) += complex(dss * eldd(i*3+2,j*3), 0);
-	       	Sdyz(is,js) += complex(dss * eldd(i*3+1,j*3+2), 0);
-     		Sdzy(is,js) += complex(dss * eldd(i*3+2,j*3+1), 0);
-       		Sdzz(is,js) += complex(dss * eldd(i*3+2,j*3+2), 0);	
+		Sdxx(is,js) += dss * eldd(i*3,j*3);
+	       	Sdxy(is,js) += dss * eldd(i*3,j*3+1);
+     		Sdyx(is,js) += dss * eldd(i*3+1,j*3);
+       		Sdyy(is,js) += dss * eldd(i*3+1,j*3+1);	
+	       	Sdxz(is,js) += dss * eldd(i*3,j*3+2);
+     		Sdzx(is,js) += dss * eldd(i*3+2,j*3);
+	       	Sdyz(is,js) += dss * eldd(i*3+1,j*3+2);
+     		Sdzy(is,js) += dss * eldd(i*3+2,j*3+1);
+       		Sdzz(is,js) += dss * eldd(i*3+2,j*3+2);	
 	    }
 	}
    }
@@ -482,17 +519,18 @@ void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
 	}
 }
 
-complex Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
+double Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
 {
-   
-   return(a[0]*b[0]*kronD(a1c.Row(0), b1c.Row(0)) + a[0]*b[1]*kronD(a1c.Row(0), b1c.Row(1)) + a[1]*b[0]*kronD(a1c.Row(1), b1c.Row(0)) + a[1]*b[1]*kronD(a1c.Row(1), b1c.Row(1)));
+   complex temp;
+   temp =  a[0]*b[0]*kronD(a1c.Row(0), b1c.Row(0)) + a[0]*b[1]*kronD(a1c.Row(0), b1c.Row(1)) + a[1]*b[0]*kronD(a1c.Row(1), b1c.Row(0)) + a[1]*b[1]*kronD(a1c.Row(1), b1c.Row(1));
+   return(temp.re);
 }
 
-void genmat_angint_3D(const int sphOrder, const int angN, CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatrix& Aintss, CCompRowMatrix& Aintc, CCompRowMatrix& Aintscsc, CCompRowMatrix& Aintscss, CCompRowMatrix& Aintscc, CCompRowMatrix& Aintssss, CCompRowMatrix& Aintssc, CCompRowMatrix& Aintcc)
+void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowMatrix& Aintss, RCompRowMatrix& Aintc, RCompRowMatrix& Aintscsc, RCompRowMatrix& Aintscss, RCompRowMatrix& Aintscc, RCompRowMatrix& Aintssss, RCompRowMatrix& Aintssc, RCompRowMatrix& Aintcc)
 {
-	CDenseMatrix dnsAint(angN, angN), dnsAintsc(angN, angN), dnsAintss(angN, angN), dnsAintc(angN, angN);
-	CDenseMatrix dnsAintscsc(angN, angN), dnsAintscss(angN, angN), dnsAintcc(angN, angN);
-	CDenseMatrix dnsAintscc(angN, angN), dnsAintssss(angN, angN), dnsAintssc(angN, angN);
+	RDenseMatrix dnsAint(angN, angN), dnsAintsc(angN, angN), dnsAintss(angN, angN), dnsAintc(angN, angN);
+	RDenseMatrix dnsAintscsc(angN, angN), dnsAintscss(angN, angN), dnsAintcc(angN, angN);
+	RDenseMatrix dnsAintscc(angN, angN), dnsAintssss(angN, angN), dnsAintssc(angN, angN);
 
 	CVector a1(2), b1(2), c1(2), d1(2), e1(2), f1(2), p1(2), a2(2), b2(2), c2(2), d2(2), e2(2), f2(2), p2(2);
         IDenseMatrix a1c(2, 2), b1c(2, 2), c1c(2, 2), d1c(2, 2), e1c(2, 2), f1c(2, 2), p1c(2, 2);
@@ -503,6 +541,7 @@ void genmat_angint_3D(const int sphOrder, const int angN, CCompRowMatrix& Aint, 
 
 	for(int l1 = 0; l1 <= sphOrder; l1++){
 		indl1 = getPos(l1, -1*l1);
+		cout<<"angint: order: "<<l1<<endl;
 		for(int m1 = -1*l1; m1 <= l1; m1++){
 		        			
 			is = indl1 + l1 + m1;    	
@@ -575,7 +614,6 @@ void genmat_angint_3D(const int sphOrder, const int angN, CCompRowMatrix& Aint, 
 					dnsAintssss(is, js) += Integrate2(c1, c2, c1c, c2c) + Integrate2(c1, d2, c1c, d2c);
 					dnsAintssss(is, js) += Integrate2(d1, a2, d1c, a2c) + Integrate2(d1, b2, d1c, b2c);
 					dnsAintssss(is, js) += Integrate2(d1, c2, d1c, c2c) + Integrate2(d1, d2, d1c, d2c);
-	
 					}
 			}
 		}
@@ -583,24 +621,11 @@ void genmat_angint_3D(const int sphOrder, const int angN, CCompRowMatrix& Aint, 
 	Aint = shrink(dnsAint);Aintsc = shrink(dnsAintsc); Aintss = shrink(dnsAintss);Aintc = shrink(dnsAintc);
 	Aintscsc = shrink(dnsAintscsc);Aintscss = shrink(dnsAintscss);Aintscc = shrink(dnsAintscc); Aintssc = shrink(dnsAintssc);
 	Aintssss = shrink(dnsAintssss);Aintcc = shrink(dnsAintcc);
-
-	//Aint = CCompRowMatrix(dnsAint); Aint.Shrink(); 
-	//Aintsc = CCompRowMatrix(dnsAintsc); Aintsc.Shrink(); 
-	//Aintss = CCompRowMatrix(dnsAintss); Aintss.Shrink(); 
-	//Aintc = CCompRowMatrix(dnsAintc); Aintc.Shrink();
-	//Aintscsc = CCompRowMatrix(dnsAintscsc); Aintscsc.Shrink(); 
-	//Aintscss = CCompRowMatrix(dnsAintscss); Aintscss.Shrink(); 
-	//Aintscc = CCompRowMatrix(dnsAintscc); Aintscc.Shrink(); 
-	//Aintssc = CCompRowMatrix(dnsAintssc); Aintssc.Shrink(); 
-	//Aintssss = CCompRowMatrix(dnsAintssss); Aintssss.Shrink(); 
-      	//Aintcc = CCompRowMatrix(dnsAintcc); Aintcc.Shrink();
-         
-
 }
 
-CVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const double costheta), const double g)
+RVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const double costheta), const double g)
 {
- CVector phaseFn(sphOrder+1);
+ RVector phaseFn(sphOrder+1);
  /*int numpts = pts.nRows();
  RDenseMatrix LT;
  RVector vec;
@@ -613,14 +638,96 @@ CVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const d
   }
 	return(phaseFn); 	*/
  for(int l=0; l <= sphOrder; l++)
-		phaseFn[l] = complex(pow(g, (double)l), 0);
+		phaseFn[l] = pow(g, (double)l);
  return(phaseFn);	
 }
 
-void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, CCompRowMatrix& apu1, CCompRowMatrix& apu1sc, CCompRowMatrix& apu1ss, CCompRowMatrix& apu1c)
+complex am(int m)
 {
- CDenseMatrix dnsapu1(angN, angN), dnsapu1sc(angN, angN), dnsapu1ss(angN, angN), dnsapu1c(angN, angN);
-     CVector phaseFn;
+	if(m==0) return(complex(1.0, 0.0));
+	else if (m > 0) return(complex(1/sqrt(2.0), 0.0));
+	else return(complex(0.0, sign(m)/sqrt(2.0))); 
+}
+
+complex bm(int m)
+{
+	if(m==0) return(complex(0.0, 0.0));
+	else if (m > 0) return(complex(1/sqrt(2.0), 0.0));
+	else return(complex(0.0, -1*sign(m)/sqrt(2.0))); 
+}
+
+complex delta(int a, int b)
+{
+	return(a == b ? complex(1.0, 0.0) : complex(0.0, 0.0)); 
+}
+
+/*void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
+{
+    RDenseMatrix dnsapu1(angN, angN), dnsapu1sc(angN, angN), dnsapu1ss(angN, angN), dnsapu1c(angN, angN);
+    RVector phaseFn;
+    phaseFn = phaseFuncDisc(sphOrder, phaseFunc, g);
+    cout<<"****************** Discretized phase function ****************"<<endl;
+    cout<<phaseFn<<endl;
+    cout<<"**************************************************************"<<endl;
+    int indl, indm;
+    int indl1, indm1, indl2, indm2, is, js;
+    complex temp;
+
+    for(int l1=0; l1 <= sphOrder; l1++){
+    	indl1 =  getPos(l1, -1*l1);
+        cout<<"apu: order: "<<l1<<endl;
+	for(int m1 = -1*l1; m1 <= l1; m1++){
+		indm1 = l1 + m1;
+		is = indl1 + indm1;
+	        for(int l2=0; l2<= sphOrder; l2++){
+			indl2 = getPos(l2, -1*l2);
+
+			for(int m2 = -1*l2; m2<=l2; m2++){
+				indm2 = l2 + m2;
+				js = indl2 + indm2;
+				
+				
+				for(int l=0; l <= sphOrder; l++)
+    				{
+					for(int m=-1*l; m <=l; m++)
+					{
+						complex I1 = (am(m1)*delta(-m, m1)*sign(m) + bm(m1)*delta(m, m1));
+						complex I2 = delta(l, l2)*(am(m2)*delta(m, m2) + bm(m2)*sign(m)*delta(-m, m2));
+						 
+					 	temp = I2*delta(l, l1)*I1*phaseFn[l];
+						dnsapu1(is, js) += temp.re;
+
+						complex sincosyy = (Blm(l1, -m1)*delta(l, l1-1) - Blm(l1+1, m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1+1)*sign(m) + bm(m1)*delta(m, m1+1));
+						sincosyy += (-Blm(l1, m1)*delta(l, l1-1) + Blm(l1+1, -m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1-1)*sign(m) + bm(m1)*delta(m, m1-1));
+						temp = I2*0.5*sincosyy*phaseFn[l]; 
+						dnsapu1sc(is, js) += temp.re;
+
+						complex sinsinyy = (Blm(l1, -m1)*delta(l, l1-1) - Blm(l1+1, m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1+1)*sign(m) - bm(m1)*delta(m, m1+1));
+						sinsinyy += (Blm(l1, m1)*delta(l, l1-1) - Blm(l1+1, -m1+1)*delta(l, l1+1))*(am(m1)*delta(-m, m1-1)*sign(m) - bm(m1)*delta(m, m1-1));
+						temp = complex(0, -0.5)*phaseFn[l]*I2*sinsinyy;
+						dnsapu1ss(is, js) += temp.re;
+
+						complex cosyy = (Alm(l1, m1)*delta(l, l1-1) + Alm(l1+1, m1)*delta(l, l1+1))*I1;
+						
+						temp = I2*cosyy*phaseFn[l];
+						dnsapu1c(is, js) += temp.re; 
+					}
+				}
+				//cout<<l1<<" "<<m1<<" "<<l2<<" "<<m2<<" "<<dnsapu1c(is, js)<<endl;
+			}
+		}
+	}
+   }
+
+   
+   apu1 = shrink(dnsapu1); apu1sc = shrink(dnsapu1sc); apu1ss = shrink(dnsapu1ss); apu1c = shrink(dnsapu1c); 	
+
+}*/
+
+void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
+{
+ RDenseMatrix dnsapu1(angN, angN), dnsapu1sc(angN, angN), dnsapu1ss(angN, angN), dnsapu1c(angN, angN);
+     RVector phaseFn;
     phaseFn = phaseFuncDisc(sphOrder, phaseFunc, g);
     cout<<"****************** Discretized phase function ****************"<<endl;
     cout<<phaseFn<<endl;
@@ -632,6 +739,7 @@ void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), con
  
     for(int l1=0; l1 <= sphOrder; l1++){
     	indl1 =  getPos(l1, -1*l1);
+	cout<<"apu: order: "<<l1<<endl;
 	for(int m1 = -1*l1; m1 <= l1; m1++){
 		indm1 = l1 + m1;
 		is = indl1 + indm1;
@@ -643,37 +751,50 @@ void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), con
 				js = indl2 + indm2;
 				
 
-				for(int l=0; l <= sphOrder; l++)
-    				{
-					for(int m=-1*l; m <=l; m++)
-					{
-						sphY(l, m, p, pc);
-						sphY(l1, m1, p1, p1c);
-						sphY(l2, m2, p2, p2c);
-						dnsapu1(is, js) += phaseFn[l]*Integrate2(p, p1, pc, p1c)*Integrate2(p, p2, pc, p2c);
-						sincosY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
-						dnsapu1sc(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(a1, p, a1c, pc) + Integrate2(b1, p, b1c, pc) + Integrate2(c1, p, c1c, pc) + Integrate2(d1, p, d1c, pc));
-						sinsinY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
-						dnsapu1ss(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(a1, p, a1c, pc) + Integrate2(b1, p, b1c, pc) + Integrate2(c1, p, c1c, pc) + Integrate2(d1, p, d1c, pc));
+				//for(int l=0; l <= sphOrder; l++)
+    				//{
+				//	for(int m=-1*l; m <=l; m++)
+				//	{
+				//		sphY(l, m, p, pc);
+				//		sphY(l1, m1, p1, p1c);
+				//		sphY(l2, m2, p2, p2c);
+				//		dnsapu1(is, js) += phaseFn[l]*Integrate2(p, p1, pc, p1c)*Integrate2(p, p2, pc, p2c);
+				//		sincosY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
+				//		dnsapu1sc(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(a1, p, a1c, pc) + Integrate2(b1, p, b1c, pc) + Integrate2(c1, p, c1c, pc) + Integrate2(d1, p, d1c, pc));
+				//		sinsinY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
+				//		dnsapu1ss(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(a1, p, a1c, pc) + Integrate2(b1, p, b1c, pc) + Integrate2(c1, p, c1c, pc) + Integrate2(d1, p, d1c, pc));
 
-						cosY(l1, m1, e1, f1, e1c, f1c);
-						dnsapu1c(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(e1, p, e1c, pc) + Integrate2(f1, p, f1c, pc));
+				//		cosY(l1, m1, e1, f1, e1c, f1c);
+				//		dnsapu1c(is, js) += phaseFn[l]*Integrate2(p, p2, pc, p2c)*(Integrate2(e1, p, e1c, pc) + Integrate2(f1, p, f1c, pc));
 
-					}
-				}
+				//	}
+				//}
+
+				sphY(l1, m1, p1, p1c);
+				sphY(l2, m2, p2, p2c);
+				dnsapu1(is, js) += phaseFn[l2]*Integrate2(p2, p1, p2c, p1c);
+				
+				sincosY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
+				dnsapu1sc(is, js) += phaseFn[l2]*(Integrate2(a1, p2, a1c, p2c) + Integrate2(b1, p2, b1c, p2c) + Integrate2(c1, p2, c1c, p2c) + Integrate2(d1, p2, d1c, p2c));
+				
+				sinsinY(l1, m1, a1, b1, c1, d1, a1c, b1c, c1c, d1c);
+				dnsapu1ss(is, js) += phaseFn[l2]*(Integrate2(a1, p2, a1c, p2c) + Integrate2(b1, p2, b1c, p2c) + Integrate2(c1, p2, c1c, p2c) + Integrate2(d1, p2, d1c, p2c));
+
+				cosY(l1, m1, e1, f1, e1c, f1c);
+				dnsapu1c(is, js) += phaseFn[l2]*(Integrate2(e1, p2, e1c, p2c) + Integrate2(f1, p2, f1c, p2c));
+
 			
 			}
 		}
 	}
    }
-   apu1 = CCompRowMatrix(dnsapu1); apu1.Shrink(); 
-   apu1sc = CCompRowMatrix(dnsapu1sc); apu1sc.Shrink(); 
-   apu1ss = CCompRowMatrix(dnsapu1ss); apu1ss.Shrink(); 
-   apu1c = CCompRowMatrix(dnsapu1c); apu1c.Shrink();
+
+  apu1 = shrink(dnsapu1); apu1sc = shrink(dnsapu1sc); apu1ss = shrink(dnsapu1ss);
+  apu1c = shrink(dnsapu1c);
 }
 
 
-void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &offset, CCompRowMatrix& A2, CCompRowMatrix& b1)
+void initialiseA2b1(const Mesh &mesh, const IVector &node_angN, const IVector &offset, RCompRowMatrix& A2, RCompRowMatrix& b1)
 {
    int el, nodel, i, j, k,is, js;
    int *crrowptr, *crcolidx, nzero;
@@ -815,7 +936,7 @@ void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVect
 }
 
 //void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVector& node_angN, const IVector& offset, const RDenseMatrix& ptsPlus, const CVector& wtsPlus, CCompRowMatrix &Aintsc, CCompRowMatrix &Aintss, CCompRowMatrix &Aintc, CCompRowMatrix& A2, CCompRowMatrix& b1)
-void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVector& node_angN, const IVector& offset, const RDenseMatrix& ptsPlus, const CVector& wtsPlus, CDenseMatrix* &Ystarl1m1, CDenseMatrix* &Yl2m2, CCompRowMatrix& A2, CCompRowMatrix& b1)
+void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVector& node_angN, const IVector& offset, const RDenseMatrix& ptsPlus, const RVector& wtsPlus, RDenseMatrix* &Ylm, RCompRowMatrix& A2, RCompRowMatrix& b1)
 
   /*      
      produces complete matrix of integrals in space and angle for boundary term
@@ -850,11 +971,11 @@ void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVecto
 	  // get boundary normal...
 	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  
-	  CCompRowMatrix  Angbintplus, Angbintminus;
+	  RCompRowMatrix  Angbintplus, Angbintminus;
 	  int lmaxAngN, lmaxSphOrder;
           findMaxLocalSphOrder(mesh, sphOrder, node_angN, el, lmaxSphOrder, lmaxAngN);
 	  //cout<<"maxes: "<<lmaxSphOrder<<"  "<<lmaxAngN<<endl;
-	  BIntUnitSphere(lmaxAngN, lmaxAngN, lmaxSphOrder, lmaxSphOrder, ptsPlus, wtsPlus, nhat, Ystarl1m1, Yl2m2, Angbintplus, Angbintminus);
+	  BIntUnitSphere(lmaxAngN, lmaxAngN, lmaxSphOrder, lmaxSphOrder, ptsPlus, wtsPlus, nhat, Ylm, Angbintplus, Angbintminus);
           //cout<<"rmatsize: "<<Angbintminus.nRows()<<"  "<<Angbintminus.nCols()<<"   "<<Angbintplus.nRows()<<"  "<<Angbintplus.nCols()<<endl;
 
 	  for (int i = 0; i < nodel; i++) {
@@ -924,10 +1045,10 @@ double pts17[110][3] = {{0, 0, 1.0}, {0, 1.0, 0}, {1.0, 0, 0}, {0, 0, -1.0}, {0,
 inline CVector matrixFreeCaller(const CVector& x, void * context);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
-void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts, const CCompRowMatrix& b1);
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts);
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix& Svec, const Mesh& mesh, const CCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts);
-void genmat_toastsource3D(const IVector& sphOrder, CCompRowMatrix* & Source, const Mesh& mesh, const CCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts, const CCompRowMatrix& b1);
+void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
+void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsource3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
 void WriteData (const RVector &data, char *fname);
 void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
 void OpenNIM (const char *nimname, const char *meshname, int size);
@@ -947,7 +1068,7 @@ void LocalErrorhandler (char *msg)
     exit (1);
 }
 
-void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix* & Source, const Mesh& mesh, const CCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts, const CCompRowMatrix& b1)
+void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
    /*      
     Function generates the source values vector for FEM of the radiative 
     transfer equation
@@ -955,17 +1076,17 @@ void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, con
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);   // full size of angles X space nodes
-   CCompRowMatrix Svec;
+   RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_toastsourcevalvector3D_cos(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_isotropic,  pts, wts);
+     genmat_toastsourcevalvector3D_cos(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_isotropic,  pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
      cout<<"Prepared source number "<<i<<endl;
    }
 }
 
 
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix& Svec, const Mesh& mesh, const CCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic,  const RDenseMatrix& pts, const CVector& wts)
+void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
   /*      
     Function generates the source values vector for FEM of the radiative 
     transfer equation
@@ -987,7 +1108,7 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
    Svec.Initialise(rowptr, colidx);
 
    int row_offset = 0;
-   CDenseMatrix Ystarlm;
+   RDenseMatrix Ystarlm;
    RDenseMatrix dirMat(1, 3);
 
    // now create vector, by looping over elements that have a boundary
@@ -1001,24 +1122,24 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 	  		// if sd is not a boundary side. skip 
 	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
  			RVector nhat = mesh.ElDirectionCosine(el,sd);
-			dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
+			dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
 	    			js = mesh.elist[el]->Node[is];
 				double ela_i =  mesh.elist[el]->IntF(is);
 	    			if(is_isotropic)
 				{
-					CDenseMatrix Angsvec(node_angN[js], 1);
+					RDenseMatrix Angsvec(node_angN[js], 1);
 					for(int l=0; l<= sphOrder[js]; l++){
 						int indl = getPos(l, -1*l);
-						Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
+						//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
 						for(int m=-l; m<=l; m++){
 							int indm = l + m;
 							for(int i=0; i < pts.nRows(); i++)
 							{
 								double sdotn = nhat[0]*pts.Get(i, 0) + nhat[1]*pts.Get(i, 1) + nhat[2]*pts.Get(i, 2);
 								if(sdotn<0)
-									Angsvec(indl+indm, 0) += Ystarlm(indm, i)*(-sdotn)*wts[i]*4*M_PI;
+									Angsvec(indl+indm, 0) += Ylm[l](indm, i)*(-sdotn)*wts[i]*4*M_PI;
 							}
 						}
 					}
@@ -1027,20 +1148,24 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 
 				}
 				else{
-					CDenseMatrix Angsvec(node_angN[js], 1);
+					RDenseMatrix Angsvec(node_angN[js], 1);
+					RDenseMatrix *Ystarlm;
+					Ystarlm = new RDenseMatrix[sphOrder[js]+1];
+					for(int l=0; l<= sphOrder[js]; l++)
+						Ystarlm[l].New(2*l+1, 1);
+					sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 					for(int l=0; l<= sphOrder[js]; l++){
 						int indl = getPos(l, -1*l);
-						Ystarlm = sphericalHarmonics(l, 1, dirMat);
+						//Ystarlm = sphericalHarmonics(l, 1, dirMat);
 						for(int m=-l; m<=l; m++){
-							if(INV_PHI_COEFF(l) != complex(1.0, 0))
-								cout<<INV_PHI_COEFF(l) <<endl;
-
 							int indm = l + m;
-							Angsvec(indl+indm, 0) = INV_PHI_COEFF(l)*Ystarlm(indm, 0);
+							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0);
 						}
 					}
 					for(int i = 0; i < node_angN[js]; i++)
 						Svec(offset[js] + i, 0) += Angsvec(i, 0)*sweight;
+
+					delete []Ystarlm;
 				}
 	    		}
 
@@ -1053,7 +1178,7 @@ void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& n
 }  
 
 
-void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix* & Source, const Mesh& mesh,  const int* Nsource, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts, const CCompRowMatrix& b1)
+void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int* Nsource, const int ns, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
   /*      
     Function generates the source values vector for FEM of the radiative 
     transfer equation
@@ -1062,14 +1187,14 @@ void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const I
    int sysdim = mesh.nlen();         // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);       // full size of angles X space nodes
 
-   CCompRowMatrix Svec;
+   RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_sourcevalvector_cos_3D(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, is_isotropic, pts, wts);
+     genmat_sourcevalvector_cos_3D(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, is_isotropic, pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
    }
 }
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, CCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const CVector& wts)
+void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
   /*      
     Function generates the source values vector for FEM of the radiative 
     transfer equation
@@ -1092,7 +1217,7 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 
    int row_offset = 0;
    RDenseMatrix dirMat(1, 3);
-   CDenseMatrix Ystarlm;
+   RDenseMatrix Ystarlm;
 
    // now create vector, by looping over elements that have a boundary
    for (el = 0; el < mesh.elen(); el++) {
@@ -1103,57 +1228,231 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 	  
 	  RVector nhat = mesh.ElDirectionCosine(el,sd);
-	  dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
-
+	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
+	 //cout<<"direction vector: "<<dirMat<<endl;
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
 	    js = mesh.elist[el]->Node[is];
+	   if(js != Nsource) continue;
 	    double ela_i =  mesh.elist[el]->IntF(is);
 	    if(is_isotropic)
 	    {
-			CDenseMatrix Angsvec(node_angN[js], 1);
+			RDenseMatrix Angsvec(node_angN[js], 1);
 			for(int l=0; l<= sphOrder[js]; l++){
 				int indl = getPos(l, -1*l);
-				Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
+				//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
 					for(int i=0; i < pts.nRows(); i++)
 					{
 						double sdotn = nhat[0]*pts.Get(i, 0) + nhat[1]*pts.Get(i, 1) + nhat[2]*pts.Get(i, 2);
 						if(sdotn<0)
-							Angsvec(indl+indm, 0) += Ystarlm(indm, i)*(-sdotn)*wts[i]*4*M_PI;
+							Angsvec(indl+indm, 0) += Ylm[l](indm, i)*(-sdotn)*wts[i]*4*M_PI;
 					}
 				}
 			}
 			for(int i = 0; i < node_angN[js]; i++)
-				Svec(offset[js] + i, 0) += Angsvec(i, 0)*ela_i;
+				Svec(offset[js] + i, 0) = Angsvec(i, 0)*ela_i;
 			
 		}
 	    	else{
-			CDenseMatrix Angsvec(node_angN[js], 1);
-			
+			RDenseMatrix Angsvec(node_angN[js], 1);
+			RDenseMatrix *Ystarlm;
+			Ystarlm = new RDenseMatrix[sphOrder[js]+1];
+			for(int l=0; l<= sphOrder[js]; l++)
+			 Ystarlm[l].New(2*l+1, 1);
+			sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
 			for(int l=0; l<= sphOrder[js]; l++){
 				int indl = getPos(l, -1*l);
-				Ystarlm = sphericalHarmonics(l, 1, dirMat);
+				//Ystarlm = sphericalHarmonics(l, 1, dirMat);
 				for(int m=-l; m<=l; m++){
 					int indm = l + m;
-					Angsvec(indl+indm, 0) = INV_PHI_COEFF(l)*Ystarlm(indm, 0);
-					if(INV_PHI_COEFF(l) != complex(1.0, 0))
-						cout<<INV_PHI_COEFF(l) <<endl;
-
+					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0);
+					cout<<"l: "<<l<<" m: "<<m<<" "<<Angsvec(indl+indm, 0)<<endl;
 				}
 			}
 			for(int i = 0; i < node_angN[js]; i++)
-				Svec(offset[js] + i, 0) += Angsvec(i, 0);
-		}
-	    }
+				Svec(offset[js] + i, 0) = Angsvec(i, 0)*ela_i;
+			delete []Ystarlm;
 
-	} // end loop on element sides
+			/*RDenseMatrix Angsvec(node_angN[js], 1);
+			for(int l=0; l<= sphOrder[js]; l++){
+				int indl = getPos(l, -1*l);
+				//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
+				for(int m=-l; m<=l; m++){
+					int indm = l + m;
+					for(int i=0; i < pts.nRows(); i++)
+					{
+						double sdotn = dirVec[0]*pts.Get(i, 0) + dirVec[1]*pts.Get(i, 1) + dirVec[2]*pts.Get(i, 2);
+						Angsvec(indl+indm, 0) += Ylm[l](indm, i)*exp(-(1-sdotn)*(1-sdotn)/(2*0.01*0.01))*wts[i]*4*M_PI;
+					}
+					cout<<"l: "<<l<<" m: "<<m<<" "<<Angsvec(indl+indm, 0)<<endl;
+				}
+			}
+				
+			for(int i = 0; i < node_angN[js]; i++)
+				Svec(offset[js] + i, 0) += Angsvec(i, 0)*ela_i;*/
+
+		}
+	}
+    } 
 
 
    } // end loop on elements
    delete []rowptr;
    delete []colidx;
+}
+void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_isotropic,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+  /*      
+    Function generates the source values vector for FEM of the radiative 
+    transfer equation
+  */
+{
+   int el, nodel, i, j, k,is, js;
+   int sysdim = mesh.nlen();       // dimensions are size of nodes.
+   int fullsysdim = sum(node_angN);   // full size of angles X space nodes
+   
+   int row_offset = 0;
+   RDenseMatrix Ystarlm;
+   RDenseMatrix dirMat(1, 3);
+
+   // now create vector, by looping over elements that have a boundary
+   for (int jq = qvec.rowptr[iq]; jq < qvec.rowptr[iq+1]; jq++) {
+   	int Nsource = qvec.colidx[jq];
+   	double sweight = norm(qvec.Get(iq,Nsource)); 
+   	for (el = 0; el < mesh.elen(); el++) {
+		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
+	  		// if sd is not a boundary side. skip 
+ 			RVector nhat = mesh.ElDirectionCosine(el,sd);
+			dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
+	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
+	    			is = mesh.elist[el]->SideNode(sd,nd);
+	    			js = mesh.elist[el]->Node[is];
+				double ela_i =  mesh.elist[el]->IntF(is);
+	    			if(is_isotropic)
+				{
+					RDenseMatrix Angsvec(node_angN[js], 1);
+					for(int l=0; l<= sphOrder[js]; l++){
+						int indl = getPos(l, -1*l);
+						//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
+						for(int m=-l; m<=l; m++){
+							int indm = l + m;
+							for(int i=0; i < pts.nRows(); i++)
+							{
+								double sdotn = nhat[0]*pts.Get(i, 0) + nhat[1]*pts.Get(i, 1) + nhat[2]*pts.Get(i, 2);
+								if(sdotn<0)
+									Angsvec(indl+indm, 0) += Ylm[l](indm, i)*(-sdotn)*wts[i]*4*M_PI;
+							}
+						}
+					}
+					for(int i = 0; i < node_angN[js]; i++)
+						Svec[offset[js] + i] += Angsvec(i, 0)*sweight*ela_i;
+
+				}
+				else{
+					RDenseMatrix Angsvec(node_angN[js], 1);
+					RDenseMatrix *Ystarlm;
+					Ystarlm = new RDenseMatrix[sphOrder[js]+1];
+					for(int l=0; l<= sphOrder[js]; l++)
+						Ystarlm[l].New(2*l+1, 1);
+					sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
+					for(int l=0; l<= sphOrder[js]; l++){
+						int indl = getPos(l, -1*l);
+						//Ystarlm = sphericalHarmonics(l, 1, dirMat);
+						for(int m=-l; m<=l; m++){
+							int indm = l + m;
+							Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0);
+						}
+					}
+					for(int i = 0; i < node_angN[js]; i++)
+						Svec[offset[js] + i] += Angsvec(i, 0)*sweight;
+
+					delete []Ystarlm;
+				}
+	    		}
+
+		} // end loop on element sides
+
+   	} // end loop on elements
+  }
+}  
+
+void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_isotropic, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+  /*      
+    Function generates the source values vector for FEM of the radiative 
+    transfer equation
+  */
+{
+   int el, nodel, i, j, k,is, js;
+   int sysdim = mesh.nlen();       // dimensions are size of nodes.
+   int fullsysdim = sum(node_angN);   // full size of angles X space nodes
+   
+   int row_offset = 0;
+   RDenseMatrix dirMat(1, 3);
+   RDenseMatrix Ystarlm;
+
+   // now create vector, by looping over elements that have a boundary
+   for (el = 0; el < mesh.elen(); el++) {
+        if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
+	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
+	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
+	  //cout<<"direction vector: "<<dirMat<<endl;
+	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
+	    is = mesh.elist[el]->SideNode(sd,nd);
+	    js = mesh.elist[el]->Node[is];
+	   if(js != Nsource) continue;
+	    double ela_i =  mesh.elist[el]->IntF(is);
+	    if(is_isotropic)
+	    {
+			RDenseMatrix Angsvec(node_angN[js], 1);
+			for(int l=0; l<= sphOrder[js]; l++){
+				int indl = getPos(l, -1*l);
+				//Ystarlm = sphericalHarmonics(l, pts.nRows(), pts);
+				for(int m=-l; m<=l; m++){
+					int indm = l + m;
+					for(int i=0; i < pts.nRows(); i++)
+					{
+						double sdotn = nhat[0]*pts.Get(i, 0) + nhat[1]*pts.Get(i, 1) + nhat[2]*pts.Get(i, 2);
+						if(sdotn<0)
+							Angsvec(indl+indm, 0) += Ylm[l](indm, i)*(-sdotn)*wts[i]*4*M_PI;
+					}
+				}
+			}
+			for(int i = 0; i < node_angN[js]; i++)
+				Svec[offset[js] + i] += Angsvec(i, 0)*ela_i;
+			
+		}
+	    	else{
+			RDenseMatrix Angsvec(node_angN[js], 1);
+			RDenseMatrix *Ystarlm;
+			Ystarlm = new RDenseMatrix[sphOrder[js]+1];
+			for(int l=0; l<= sphOrder[js]; l++)
+			 Ystarlm[l].New(2*l+1, 1);
+			sphericalHarmonics(sphOrder[js], 1, dirMat, Ystarlm);
+			for(int l=0; l<= sphOrder[js]; l++){
+				int indl = getPos(l, -1*l);
+				//Ystarlm = sphericalHarmonics(l, 1, dirMat);
+				for(int m=-l; m<=l; m++){
+					int indm = l + m;
+					Angsvec(indl+indm, 0) = Ystarlm[l](indm, 0)*(4*M_PI)/(2*l+1);
+					cout<<"l: "<<l<<" m: "<<m<<" "<<Angsvec(indl+indm, 0)<<endl;
+
+				}
+			}
+			for(int i = 0; i < node_angN[js]; i++)
+				Svec[offset[js] + i] += Angsvec(i, 0);
+			delete []Ystarlm;
+
+		
+		}
+
+		}
+	    }
+
+
+
+   } // end loop on elements
 }
 // main routine **************************************************************
 
@@ -1189,15 +1488,20 @@ int main (int argc, char *argv[])
     int *Nsource = new int [ns];
     int    qprof, mprof;   // source/measurement profile (0=Gaussian, 1=Cosine)
     double qwidth, mwidth; // source/measurement support radius [mm]
-    CCompRowMatrix qvec, mvec;
+    RCompRowMatrix qvec, mvec;
     char file_extn[200];
 
     cin>>file_extn;
     cout<<"File name prefix: "<<file_extn<<endl;
     //    Measurement datatype;
     if(argc < 3) {
-         cin >> Nsource[0];
-     	 cout << "source node coords: "<<nlist[Nsource[0]]<<endl;
+         cin >> ns;
+	 cout<< "Number of sources: "<<ns<<endl;
+         Nsource = new int[ns];
+	 cout << "source node coords: "<<endl;
+	 for(int i=0; i<ns; i++){
+		cin >>Nsource[i];
+     	 cout<<nlist[Nsource[i]]<<"   "<<endl;}
     }
     else {
     cout << "QM file " << argv[2] << endl;
@@ -1214,16 +1518,19 @@ int main (int argc, char *argv[])
     // build the source vectors
     qvec.New (ns, qmmesh.nlen());
     for (int i = 0; i < ns; i++) {
-	CVector q(qmmesh.nlen());
+	RVector q(qmmesh.nlen());
 	switch (qprof) {
 	case 0:
-	    SetReal (q, QVec_Point (qmmesh, qmmesh.Q[i], srctp));
+	    //SetReal (q, QVec_Point (qmmesh, qmmesh.Q[i], srctp));
+	    q = QVec_Point (qmmesh, qmmesh.Q[i], srctp);
 	    break;
 	case 1:
-	    SetReal (q, QVec_Gaussian (qmmesh, qmmesh.Q[i], qwidth, srctp));
+	    //SetReal (q, QVec_Gaussian (qmmesh, qmmesh.Q[i], qwidth, srctp));
+	    q = QVec_Gaussian (qmmesh, qmmesh.Q[i], qwidth, srctp);
 	    break;
 	case 2:
-	    SetReal (q, QVec_Cosine (qmmesh, qmmesh.Q[i], qwidth, srctp));
+	    //SetReal (q, QVec_Cosine (qmmesh, qmmesh.Q[i], qwidth, srctp));
+	    q = QVec_Cosine (qmmesh, qmmesh.Q[i], qwidth, srctp);
 	    break;
 	}
 	qvec.SetRow (i, q);
@@ -1233,18 +1540,19 @@ int main (int argc, char *argv[])
     mvec.New (nM, qmmesh.nlen());
     LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (int i = 0; i < nM; i++) {
-	CVector m(qmmesh.nlen());
+	RVector m(qmmesh.nlen());
 	switch (mprof) {
 	case 0:
-	    SetReal (m, QVec_Point (qmmesh, qmmesh.M[i], SRCMODE_NEUMANN));
+	    //SetReal (m, QVec_Point (qmmesh, qmmesh.M[i], SRCMODE_NEUMANN));
+	    m = QVec_Point (qmmesh, qmmesh.M[i], SRCMODE_NEUMANN);
 	    break;
 	case 1:
-	    SetReal (m, QVec_Gaussian (qmmesh, qmmesh.M[i], mwidth,
-				       SRCMODE_NEUMANN));
+	    //SetReal (m, QVec_Gaussian (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN));
+	    m = QVec_Gaussian (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	case 2:
-	    SetReal (m, QVec_Cosine (qmmesh, qmmesh.M[i], mwidth,
-				     SRCMODE_NEUMANN));
+	    //SetReal (m, QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN));
+	    m = QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
 	for (int j = 0; j < qmmesh.nlen(); j++) 
@@ -1273,9 +1581,9 @@ int main (int argc, char *argv[])
      int numpts;
      numpts = 110;
      RDenseMatrix pts(numpts, 3); 
-     CVector wts(numpts);
+     RVector wts(numpts);
      for(int i=0; i < numpts; i++){
-	wts[i] = complex(wts17[i], 0); 
+	wts[i] = wts17[i]; 
 	for(int j=0; j < 3; j++)
 		pts(i, j) = pts17[i][j];
 	}	
@@ -1298,7 +1606,6 @@ int main (int argc, char *argv[])
     for(int i=0; i < qmmesh.nlen(); i++)
 	cin >> sphOrder[i]; 
 
-    cout<<"Source Node: "<<nlist[1669]<<endl;
     RVector delta(qmmesh.elen());
     double min = 1e20, max = -1e20;
     cout << "delta " ;
@@ -1324,15 +1631,23 @@ int main (int argc, char *argv[])
     cout << "min : " << vmin(delta) << "max : " << vmax(delta) << endl;
    MyDataContext ctxt(qmmesh, sphOrder, delta, muabs, muscat, ref, g, &phaseFunc, w, c, pts, wts);
 
-
      
     CVector proj(ns*nM); // projection data
-    CCompRowMatrix* Source;
-    if( !(Source = new  CCompRowMatrix [ns]))
+    RCompRowMatrix* Source;
+    RVector b2(sum(ctxt.node_angN));
+    if( !(Source = new  RCompRowMatrix [ns]))
           cerr << "Memory Allocation error Source = new  RCompRowMatrix\n";
     cout<<"calling computing the source vector ..."<<endl;
-    if(argc<3)	genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_isotropic, pts, wts, ctxt.b1);
-    else genmat_toastsource3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_isotropic, pts, wts, ctxt.b1);
+   if(argc<3)	
+     {
+      genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_isotropic, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_intsourcevalvector_cos_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_isotropic, pts, wts, ctxt.Ylm);
+     }
+    else 
+    {
+      genmat_toastsource3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_isotropic, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_toastintsourcevalvector_cos_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_isotropic, pts, wts, ctxt.Ylm);
+    }
 
     cout << "calculating the radiance\n";
     int sysdim = qmmesh.nlen();
@@ -1356,9 +1671,9 @@ int main (int argc, char *argv[])
 
       Phi[j].New(fullsysdim);
       Phisum[j].New(sysdim);
-      for(int i = 0; i < fullsysdim; i++)
-	RHS[i] = Source[j].Get(i,0);
-	
+       for(int i = 0; i < fullsysdim; i++)
+	RHS[i] = Source[j].Get(i,0) + b2[i];
+
       GMRES(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
       osRHS << RHS << endl;
       cout << "finished source " << j << endl;
@@ -1371,7 +1686,7 @@ int main (int argc, char *argv[])
       osPhisum << "Phisum " << j << "\n" << Phisum[j] << endl;
       for (int im = 0; im < nM; im++) {
 	for(int in = 0; in < sysdim; in++)
-	  proj[j*nM + im] += mvec.Get(im,in) * Phisum[j][in];
+	  proj[j*nM + im] += Phisum[j][in]*mvec.Get(im,in) ;
       }
     }
     clock_t end = clock();
@@ -1416,6 +1731,26 @@ int main (int argc, char *argv[])
 
 }
 
+inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
+{
+    dASSERT_2PRM(x.Dim() == A.nCols(),
+    "Parameter 1 invalid size (expected %d, actual %d)",
+    A.nCols(), x.Dim());
+    if (res.Dim() != A.nRows()) res.New(A.nRows());
+
+    int r, i, i2;
+    complex br;
+    const double *aval;
+    aval = A.ValPtr();
+
+    for (r = i = 0; r < A.nRows();) {
+	i2 = A.rowptr[r+1];
+	for (br = complex(0, 0); i < i2; i++)
+	    br += x[A.colidx[i]]*aval[i];
+	res[r++] = br;
+    }
+
+}
 
 inline CVector matrixFreeCaller(const CVector& x, void * context)
 {
@@ -1563,28 +1898,31 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 		for(int js = ctxt->Sint.rowptr[is]; js < ctxt->Sint.rowptr[is+1]; js++)
 		{
 			scol = ctxt->Sint.colidx[js];
-			temp += (ctxt->sintval[js] + ctxt->spata3_rteval[js])*aintxval[scol*maxAngN +  ia];
-			temp += (ctxt->sdxval[js] + ctxt->spata3_sdmxval[js] - ctxt->sxval[js])*aintscxval[scol*maxAngN +  ia];
-			temp += (ctxt->sdyval[js] + ctxt->spata3_sdmyval[js] - ctxt->syval[js])*aintssxval[scol*maxAngN +  ia];
-			temp += (ctxt->sdzval[js] + ctxt->spata3_sdmzval[js] - ctxt->szval[js])*aintcxval[scol*maxAngN +  ia];
-			temp += ctxt->sdxxval[js]*aintscscxval[scol*maxAngN +  ia];
-			temp += (ctxt->sdxyval[js] + ctxt->sdyxval[js])*aintscssxval[scol*maxAngN +  ia];
-			temp += ctxt->sdyyval[js]*aintssssxval[scol*maxAngN +  ia];
-			temp += (ctxt->sdxzval[js] + ctxt->sdzxval[js])*aintsccxval[scol*maxAngN +  ia];
-			temp += (ctxt->sdyzval[js] + ctxt->sdzyval[js])*aintsscxval[scol*maxAngN +  ia];
-			temp += ctxt->sdzzval[js]*aintccxval[scol*maxAngN +  ia];
-			temp -= ctxt->spsval[js]*apu1xval[scol*maxAngN +  ia];
-			temp -= ctxt->spsdxval[js]*apu1scxval[scol*maxAngN +  ia];
-			temp -= ctxt->spsdyval[js]*apu1ssxval[scol*maxAngN +  ia];
-			temp -= ctxt->spsdzval[js]*apu1cxval[scol*maxAngN +  ia];
+			temp += complex(0, ctxt->sintval[js])*aintxval[scol*maxAngN + ia];
+			temp += complex(0, ctxt->sdxval[js])*aintscxval[scol*maxAngN + ia];
+			temp += complex(0, ctxt->sdyval[js])*aintssxval[scol*maxAngN + ia];
+			temp += complex(0, ctxt->sdzval[js])*aintcxval[scol*maxAngN +  ia];
+			temp += aintxval[scol*maxAngN + ia]*ctxt->spata3_rteval[js];
+			temp += aintscxval[scol*maxAngN + ia]*(ctxt->spata3_sdmxval[js] - ctxt->sxval[js]);
+			temp += aintssxval[scol*maxAngN + ia]*(ctxt->spata3_sdmyval[js] - ctxt->syval[js]);
+			temp += aintcxval[scol*maxAngN +  ia]*(ctxt->spata3_sdmzval[js] - ctxt->szval[js]);
+			temp += aintscscxval[scol*maxAngN + ia]*ctxt->sdxxval[js];
+			temp += aintscssxval[scol*maxAngN + ia]*(ctxt->sdxyval[js] + ctxt->sdyxval[js]);
+			temp += aintssssxval[scol*maxAngN + ia]*ctxt->sdyyval[js];
+			temp += aintsccxval[scol*maxAngN + ia]*(ctxt->sdxzval[js] + ctxt->sdzxval[js]);
+			temp += aintsscxval[scol*maxAngN + ia]*(ctxt->sdyzval[js] + ctxt->sdzyval[js]);
+			temp += aintccxval[scol*maxAngN + ia]*ctxt->sdzzval[js];
+			temp -= apu1xval[scol*maxAngN + ia]*ctxt->spsval[js];
+			temp -= apu1scxval[scol*maxAngN + ia]*ctxt->spsdxval[js];
+			temp -= apu1ssxval[scol*maxAngN +  ia]*ctxt->spsdyval[js];
+			temp -= apu1cxval[scol*maxAngN +  ia]*ctxt->spsdzval[js];
 		}
 		result[ctxt->offset[is] + ia]  = temp;
 	} 
 	}
 
 
- 
-	ctxt->A2.Ax(x, ctxt->A2x);
+ 	RCAx(ctxt->A2, x, ctxt->A2x);
     	complex *res  = result.data_buffer();
     	complex *arg1 = ctxt->A2x.data_buffer();
     	for (int i=0; i < dof; i++)
@@ -1608,10 +1946,10 @@ CVector getDiag(void * context)
     {
 	for(int j = 0; j < ctxt->node_angN[i]; j++)
 	{
-		a0_rte = ctxt->Aint.Get(j, j) * ctxt->Sint.Get(i, i);
-		a0_sdm =  ctxt->Aintsc.Get(j, j)*ctxt->Sdx.Get(i, i);
-		a0_sdm += ctxt->Aintss.Get(j, j) * ctxt->Sdy.Get(i, i);
-  		a0_sdm += ctxt->Aintc.Get(j, j)*ctxt->Sdz.Get(i, i);
+		a0_rte = complex(0, ctxt->Aint.Get(j, j) * ctxt->Sint.Get(i, i));
+		a0_sdm = complex(0, ctxt->Aintsc.Get(j, j)*ctxt->Sdx.Get(i, i));
+		a0_sdm += complex(0, ctxt->Aintss.Get(j, j) * ctxt->Sdy.Get(i, i));
+  		a0_sdm += complex(0, ctxt->Aintc.Get(j, j)*ctxt->Sdz.Get(i, i));
 
 		a1_rte = ctxt->Aintsc.Get(j, j)*ctxt->Sx.Get(i, i);	
 		a1_rte += ctxt->Aintss.Get(j, j)*ctxt->Sy.Get(i, i);
@@ -1634,7 +1972,7 @@ CVector getDiag(void * context)
 	
 		a2 = ctxt->A2.Get(ctxt->offset[i] + j, ctxt->offset[i] + j);
 
-        	a0 = a0_rte + a0_sdm;
+		a0 = a0_rte + a0_sdm;
 	
 		a1 = a1_sdm - a1_rte;
 	
