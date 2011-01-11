@@ -1,0 +1,1 @@
+This library produces a binary which can used to run local basis FEM simulation using RTE for the case 'g=0'. Note that the 'g' has been limited to zero for time efficiency.

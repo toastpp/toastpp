@@ -5,6 +5,8 @@
 using namespace std;
 using namespace toast;
 
+#define VERBOSE_GMRES_LOCAL
+
 int itcount = 0;
 // global counter for GMRES iterations
 
@@ -325,7 +327,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 		{
 		    j++;
 		    
-#ifdef VERBOSE_GMRES
+#ifdef VERBOSE_GMRES_LOCAL
 		    cerr << "\033[1Agmres(" << cycle << ',' << j << "): res="
 			 << (norm_x/norm_b) << "    " << endl;
 		    cout << "gmres cycle "<< cycle << " iter " << j+1

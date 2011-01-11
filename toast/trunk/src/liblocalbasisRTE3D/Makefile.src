@@ -1,0 +1,41 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = liblocalbasisRTE3D
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+EXE = rte3D_localbasis
+
+VPATH = $(TSRC)/liblocalbasisRTE3D
+
+all:: $(EXE)
+
+LIBSRCS = source.cc pparse.cc calc_paramdistr_nobf_new_3D.cc \
+	genmat_3DBman_newF.cc genmat_angint_3D.cc genmat_angint_sdm_3D.cc \
+	genmat_boundint_3D.cc genmat_source_3D.cc genmat_sourceint_3D.cc \
+	genmat_sourcevalvector_cos_3D.cc genmat_spatint_sdm_nobf_3D.cc \
+	precompute_3DBman_FEM.cc genmat_spatint_nobf_3D.cc \
+
+EXESRCS = forward_rte1_3D.cc
+
+LIBOBJS = ${LIBSRCS:.cc=.o}
+EXEOBJS = ${EXESRCS:.cc=.o}
+
+HDRS = pparse.h rte3D.h source.h toast_2007.h toast.h
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(LIBOBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+$(EXE) : $(EXEOBJS) $(LIBOBJS)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
+
