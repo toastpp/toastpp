@@ -357,40 +357,24 @@ void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVect
 
 }
 
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives a_{m} 
-*/
-
+/** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m} where the supercript 'R' denotes the real-valued spherical harmonics.
+* This function gives the value of a_{m}
+**/
 complex am(int m)
 {
-	if(m==0) return(complex(1.0, 0.0));
-	else if (m > 0) return(complex(1/sqrt(2.0), 0.0));
-	else return(complex(0.0, sign(m)/sqrt(2.0))); 
+	if(m==0) return(complex(1.0, 0));
+	else if(m>0) return(complex(1.0/sqrt(2), 0));
+	else return(complex(0, -1.0/sqrt(2)));
 }
 
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives b_{m} 
-*/
+/** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m} where the supercript 'R' denotes the real-valued spherical harmonics.
+* This function gives the value of b_{m}
+**/
 complex bm(int m)
 {
-	if(m==0) return(complex(0.0, 0.0));
-	else if (m > 0) return(complex(1/sqrt(2.0), 0.0));
-	else return(complex(0.0, -1*sign(m)/sqrt(2.0))); 
-}
-
-complex delta(int a, int b)
-{
-	return(a == b ? complex(1.0, 0.0) : complex(0.0, 0.0)); 
+	if(m==0) return(complex(0.0, 0));
+	else if(m>0) return(complex(1.0/sqrt(2), 0));
+	else return(complex(0, 1.0/sqrt(2)));
 }
 
 
@@ -398,56 +382,25 @@ complex delta(int a, int b)
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m+1}/\sqrt{-2}, b_{m} = (-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y_{l-1, -m+1}, 
+Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}.
 */
 void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
+	complex alpha = complex(0.5, 0);
+	a[0] = am(m)*Blm(l, -m)*alpha; b[0] = -am(m)*Blm(l+1, m+1)*alpha; 
+	c[0] = -am(m)*Blm(l, m)*alpha; d[0] = am(m)*Blm(l+1, -m+1)*alpha;
 
-	if(m==0)
-	{
-		a[0] = Blm(l, 0)/complex(2.0, 0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(2.0, 0); 
-		c[0] = complex(-1, 0)*Blm(l, 0)/complex(2.0, 0); d[0] = Blm(l+1, 1)/complex(2.0, 0);
-		
-		a[1] = 0; b[1] = 0; //error values which are never used
-		c[1] = 0; d[1] = 0;
-		
-		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
-		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
-		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;//error values which are never used
-		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
-	}
-	else if(m>0)
-	{
-	    	a[0] = Blm(l, -m)/(complex(2.0*sqrt(2), 0)); b[0] =  complex(-1, 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0)); 
-	    	c[0] = complex(-1, 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); d[0] = Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-	    	a[1] = complex(sign(m), 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); b[1] = complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
-		c[1] =  complex(-1*sign(m), 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); d[1] = complex(sign(m), 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
+	a[1] = bm(m)*sign(m)*Blm(l, m)*alpha; b[1] = -bm(m)*sign(m)*Blm(l+1, -m+1)*alpha; 
+	c[1] = -bm(m)*sign(m)*Blm(l, -m)*alpha; d[1] = bm(m)*sign(m)*Blm(l+1, m+1)*alpha;
 
-	   	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
+	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
+	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
 
-	   	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
- 
-	}
-	else
-	{
-	   	a[0] =  Blm(l, m)/(complex(0, 2.0*sqrt(2))); b[0] =  complex(-1, 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2))); 
-	    	c[0] =   complex(-1, 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); d[0] = Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-	    	a[1] = complex(sign(m+1), 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); b[1] = complex(-1*sign(m+1), 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
-		c[1] =  complex(-1*sign(m+1), 0)*Blm(l, m)/(complex(0, 2.0*sqrt(2))); d[1] =  complex(sign(m+1), 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-
-
-	   	a1c(0, 0) = l-1; a1c(0, 1) = -m+1; b1c(0, 0) = l+1; b1c(0, 1) = -m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = -m-1; d1c(0, 0) = l+1; d1c(0, 1) = -m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = m+1; b1c(1, 0) = l+1; b1c(1, 1) = m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = m-1; d1c(1, 0) = l+1; d1c(1, 1) = m-1; 
-	}
+	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
+	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
 
 }
 
@@ -455,104 +408,48 @@ void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y_{l-1, -m+1}, 
+Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}. 
 */
 void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
+	complex alpha = complex(0, -0.5);
+	a[0] = am(m)*Blm(l, -m)*alpha; b[0] = -am(m)*Blm(l+1, m+1)*alpha; 
+	c[0] = am(m)*Blm(l, m)*alpha; d[0] = -am(m)*Blm(l+1, -m+1)*alpha;
 
-	if(m==0)
-	{
-		a[0] = Blm(l, 0)/complex(0, 2.0); b[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0); 
-		c[0] = Blm(l, 0)/complex(0, 2.0); d[0] = complex(-1, 0)*Blm(l+1, 1)/complex(0, 2.0);
-		
-		a[1] = 0; b[1] = 0;//error values which are never used 
-		c[1] = 0; d[1] = 0;
-		
-		a1c(0, 0) = l-1; a1c(0, 1) = 1; b1c(0, 0) = l+1; b1c(0, 1) = 1;
-		c1c(0, 0) = l-1; c1c(0, 1) = -1; d1c(0, 0) = l+1; d1c(0, 1) = -1; 
-		
-		a1c(1, 0) = -1; a1c(1, 1) = -1; b1c(1, 0) = -1; b1c(1, 1) = -1;//error values which are never used 
-		c1c(1, 0) = -1; c1c(1, 1) = -1; d1c(1, 0) = -1; d1c(1, 1) = -1; 				
-	}
-	else if(m>0)
-	{
-	    	a[0] = Blm(l, -m)/(complex(0, 2.0*sqrt(2))); b[0] =  complex(-1, 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2))); 
-	    	c[0] = Blm(l, m)/(complex(0, 2.0*sqrt(2))); d[0] = complex(-1, 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-	    	a[1] = complex(sign(m), 0)*Blm(l, m)/(complex(0, 2.0*sqrt(2))); b[1] = complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(0, 2.0*sqrt(2)));
-		c[1] =  complex(sign(m), 0)*Blm(l, -m)/(complex(0, 2.0*sqrt(2))); d[1] = complex(-1*sign(m), 0)*Blm(l+1, m+1)/(complex(0, 2.0*sqrt(2)));
+	a[1] = bm(m)*sign(m)*Blm(l, m)*alpha; b[1] = -bm(m)*sign(m)*Blm(l+1, -m+1)*alpha; 
+	c[1] = bm(m)*sign(m)*Blm(l, -m)*alpha; d[1] = -bm(m)*sign(m)*Blm(l+1, m+1)*alpha;
 
-	   	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
+	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
+	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
 
-	   	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
- 
-	}
-	else
-	{
-	   	a[0] =  complex(-1, 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); b[0] =  Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0)); 
-	    	c[0] =   complex(-1, 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); d[0] = Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-	    	a[1] = complex(sign(m), 0)*Blm(l, -m)/(complex(2.0*sqrt(2), 0)); b[1] = complex(-1*sign(m), 0)*Blm(l+1, m+1)/(complex(2.0*sqrt(2), 0));
-		c[1] =  complex(sign(m), 0)*Blm(l, m)/(complex(2.0*sqrt(2), 0)); d[1] =  complex(-1*sign(m), 0)*Blm(l+1, -m+1)/(complex(2.0*sqrt(2), 0));
+	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
+	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
 
 
-	   	a1c(0, 0) = l-1; a1c(0, 1) = -m+1; b1c(0, 0) = l+1; b1c(0, 1) = -m+1;
-	   	c1c(0, 0) = l-1; c1c(0, 1) = -m-1; d1c(0, 0) = l+1; d1c(0, 1) = -m-1;
-
-	   	a1c(1, 0) = l-1; a1c(1, 1) = m+1; b1c(1, 0) = l+1; b1c(1, 1) = m+1;
-	   	c1c(1, 0) = l-1; c1c(1, 1) = m-1; d1c(1, 0) = l+1; d1c(1, 1) = m-1; 
-	}
 }
 
 /* Cos(\theta)Y_{l, m}^{R} = Cos(\theta)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l-1, m}, Y_{l+1, m}, Y_{l-1, -m}, Y_{l+1, -m}. 
 */
 void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, IDenseMatrix& f1c)
 {
-	if(m==0)
-	{
-		e[0] = Alm(l, 0); f[0] = Alm(l+1, 0);
-		e[1] = 0; f[1] = 0;//error values
-		
-		e1c(0, 0) = l-1; e1c(0, 1) = 0;
-		f1c(0, 0) = l+1; f1c(0, 1) = 0;
-		
-		e1c(1, 0) = -1; e1c(1, 1) = -1;//error values
-		f1c(1, 0) = -1; f1c(1, 1) = -1;
 
-	}	
-	else if(m>0)
-	{
-		e[0] = Alm(l, m)/complex(sqrt(2), 0); f[0] = Alm(l+1, m)/complex(sqrt(2), 0);
-		e[1] = complex(sign(m), 0)*Alm(l, -m)/complex(sqrt(2), 0); f[1] = complex(sign(m), 0)*Alm(l+1, -m)/complex(sqrt(2), 0);
-	
-		e1c(0, 0) = l-1; e1c(0, 1) = m;
-		f1c(0, 0) = l+1; f1c(0, 1) = m;
+	e[0] = am(m)*Alm(l, m); f[0] = am(m)*Alm(l+1, m);
+	e[1] = bm(m)*sign(m)*Alm(l, -m); f[1] = bm(m)*sign(m)*Alm(l+1, -m);
 
-		e1c(1, 0) = l-1; e1c(1, 1) = -m;
-		f1c(1, 0) = l+1; f1c(1, 1) = -m;
-	}
-	else
-	{
-		e[0] = Alm(l, -m)/complex(0, sqrt(2)); f[0] = Alm(l+1, -m)/complex(0, sqrt(2));
-		e[1] = complex(-1*sign(m), 0)*Alm(l, m)/complex(0, sqrt(2)); f[1] = complex(-1*sign(m), 0)*Alm(l+1, m)/complex(0, sqrt(2));
-	
-		e1c(0, 0) = l-1; e1c(0, 1) = -m;
-		f1c(0, 0) = l+1; f1c(0, 1) = -m;
+	e1c(0, 0) = l-1; e1c(0, 1) = m;
+	f1c(0, 0) = l+1; f1c(0, 1) = m;
 
-		e1c(1, 0) = l-1; e1c(1, 1) = m;
-		f1c(1, 0) = l+1; f1c(1, 1) = m;
-
-	}
+	e1c(1, 0) = l-1; e1c(1, 1) = -m;
+	f1c(1, 0) = l+1; f1c(1, 1) = -m;
 
 }
 
@@ -560,38 +457,18 @@ void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, I
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l, m}, Y_{l, -m}. 
 */
 void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
 {
-	if(m==0)
-	{
-		p[0] = 1.0; 
-		p[1] = 0;//error value
-		
-		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = -1; p1c(1, 1) = -3;//error value
-		
-	}	
-	else if(m>0)
-	{
-		p[0] = complex(1.0, 0)/complex(sqrt(2), 0); p[1] = complex(sign(m), 0)/complex(sqrt(2), 0);
-	
-		p1c(0, 0) = l; p1c(0, 1) = m;
-		p1c(1, 0) = l; p1c(1, 1) = -m;
 
-	}
-	else
-	{
-		p[0] = complex(1.0, 0)/complex(0, sqrt(2)); p[1] = complex(-1*sign(m), 0)/complex(0, sqrt(2));
+	p[0] = am(m); p[1] = bm(m)*sign(m);
 	
-		p1c(0, 0) = l; p1c(0, 1) = -m;
-		p1c(1, 0) = l; p1c(1, 1) = m;
+	p1c(0, 0) = l; p1c(0, 1) = m;
+	p1c(1, 0) = l; p1c(1, 1) = -m;
 
-	}
 }
 
 /*
