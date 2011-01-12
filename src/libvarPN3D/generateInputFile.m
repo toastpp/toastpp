@@ -1,4 +1,5 @@
 function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns, source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
+%function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns, source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
 % This MATLAB script generates the input file required to run variable order P_{N} code
 % Surya sprerapa@cs.ucl.ac.uk 11/01/2011
 % 

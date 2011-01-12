@@ -108,11 +108,11 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	cout<<"Generating boundary integrals ..."<<endl;//slow process
 	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
 	
-	cout<<"Generating spatial Integrals ..."<<endl;
+	cout<<"Generating spatial integrals ..."<<endl;
 	gen_spatint_3D(spatMesh, mua, mus, ref, delta, w, c, Sint, Sdx, Sdy, Sdz, Sx, Sy, Sz, Sdxx, Sdxy, Sdyx, Sdyy, Sdxz, Sdzx, Sdyz, Sdzy, Sdzz, spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz, SPS, SPSdx, SPSdy, SPSdz);
 	
 	int angN = vmax(node_angN);
-	cout<<"Generating angular Integrals ..."<<endl;
+	cout<<"Generating angular integrals ..."<<endl;
       	genmat_angint_3D(sphOrder, angN, Aint, Aintsc, Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc);
 	
 	cout<<"Generating phase integrals ..."<<endl;	
@@ -638,8 +638,8 @@ inline CVector matrixFreeCaller(const CVector& x, void * context);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
 void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const int Nsource,const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_sourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastsourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
 void genmat_toastsource3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
 void WriteData (const RVector &data, char *fname);
 void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
@@ -694,14 +694,14 @@ void genmat_toastsource3D(const IVector& sphOrder, const IVector& node_angN, con
    RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_toastsourcevalvector3D_cos(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_cosine,  pts, wts, Ylm);
+     genmat_toastsourcevalvector_3D(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, is_cosine,  pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
    }
 }
 
 /* Computes the source vector per a boundary source when a QM file has been specified
 */
-void genmat_toastsourcevalvector3D_cos(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+void genmat_toastsourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       
@@ -794,14 +794,14 @@ void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const I
    RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_sourcevalvector_cos_3D(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, is_cosine, pts, wts, Ylm);
+     genmat_sourcevalvector_3D(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, is_cosine, pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
    }
 }
 
 /**Computes source vector for a single point source on the boundary
 **/
-void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+void genmat_sourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -885,7 +885,7 @@ void genmat_sourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_
 
 /**Computes source vector for a single source in the interior of the domain where the source profile is defined in a QM file
 **/
-void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+void genmat_toastintsourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -956,7 +956,7 @@ void genmat_toastintsourcevalvector_cos_3D(const IVector& sphOrder, const IVecto
 
 /**Computes source vector for a single point source in the interior of the domain
 **/
-void genmat_intsourcevalvector_cos_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+void genmat_intsourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RVector& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
 {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -1161,14 +1161,8 @@ int main (int argc, char *argv[])
     //smoothing parameter for the streamline diffusion modification
     RVector delta(qmmesh.elen());
     double min = 1e20, max = -1e20;
-    cout << "delta " ;
     for(el = 0; el <  qmmesh.elen(); el++){ 
 #ifdef VARYDELTA 
-         Point centre = Point3D(0, 0, 0);
-	 int nNode =  elist[el]->nNode();
-	 for(int i=0; i < nNode; i++) 
-		centre += nlist[elist[el]->Node[i]];
-	 centre = centre/nNode;
 	 double sval =  elist[el]->Size()/((muscat[el]));
 	 delta[el] = sval;
 #else
@@ -1187,12 +1181,12 @@ int main (int argc, char *argv[])
    if(argc<3)	
      {
       genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_intsourcevalvector_cos_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);
+      genmat_intsourcevalvector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);
      }
     else 
     {
       genmat_toastsource3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_toastintsourcevalvector_cos_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_cosine, pts, wts, ctxt.Ylm);
+      genmat_toastintsourcevalvector_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_cosine, pts, wts, ctxt.Ylm);
     }
 
     cout << "calculating the radiance\n";

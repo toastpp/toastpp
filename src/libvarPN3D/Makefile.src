@@ -2,20 +2,20 @@ include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libvarPN3D
 LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
-EXE = rte3D_varOrd test_genPN_integrals 
+EXE = rte3D_varOrd 
 
 VPATH = $(TSRC)/libvarPN3D
 
 all:: $(EXE)
 
-LIBSRCS = rte3D_math.cc genmat_angint_3D_PN.cc genmat_angint_sdm_3D_PN.cc phaseFunc.cc source.cc pparse.cc spints.cc
-EXESRCS = rte3D_varOrd.cc test_genPN_integrals.cc 
+LIBSRCS = rte3D_math.cc phaseFunc.cc source.cc pparse.cc 
+EXESRCS = rte3D_varOrd.cc  
 
 
 LIBOBJS = ${LIBSRCS:.cc=.o}
 EXEOBJS = ${EXESRCS:.cc=.o}
 
-HDRS = phaseFunc.h pparse.h rte3D.h rte3D_math.h source.h sphints.h toast_2007.h toast.h
+HDRS = phaseFunc.h pparse.h rte3D.h rte3D_math.h source.h toast.h
 
 %.o : %.cc $(HDRS)
 	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
@@ -25,10 +25,7 @@ $(LIB): $(LIBOBJS)
 	$(MAKE_LIB)
 	$(RANLIB) $(LIB)
 
-rte3D_varOrd : rte3D_varOrd.o rte3D_math.o phaseFunc.o source.o pparse.o
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
-
-test_genPN_integrals : test_genPN_integrals.o rte3D_math.o genmat_angint_3D_PN.o genmat_angint_sdm_3D_PN.o spints.o
+$(EXE) : $(EXEOBJS) $(LIBOBJS)
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 clean:: 
