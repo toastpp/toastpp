@@ -105,9 +105,6 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	Aintscscx.New(spatN, maxAngN); Aintscssx.New(spatN, maxAngN); Aintssssx.New(spatN, maxAngN); Aintsccx.New(spatN, maxAngN);
 	Aintsscx.New(spatN, maxAngN); Aintccx.New(spatN, maxAngN);
 	
-	cout<<"Generating boundary integrals ..."<<endl;//slow process
-	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
-	
 	cout<<"Generating spatial integrals ..."<<endl;
 	gen_spatint_3D(spatMesh, mua, mus, ref, delta, w, c, Sint, Sdx, Sdy, Sdz, Sx, Sy, Sz, Sdxx, Sdxy, Sdyx, Sdyy, Sdxz, Sdzx, Sdyz, Sdzy, Sdzz, spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz, SPS, SPSdx, SPSdy, SPSdz);
 	
@@ -118,6 +115,9 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	cout<<"Generating phase integrals ..."<<endl;	
 	genmat_apu(phaseFunc, g, angN, sphOrder, apu1, apu1sc, apu1ss, apu1c);
 
+	cout<<"Generating boundary integrals ..."<<endl;//slow process
+	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
+	
 	/*Preparing angular integrals for computing Kronecker products implicitly*/	
         apu1.Transpone(); apu1sc.Transpone(); apu1ss.Transpone(); apu1c.Transpone(); 	
 	Aint.Transpone(); Aintsc.Transpone(); Aintss.Transpone(); Aintc.Transpone();   

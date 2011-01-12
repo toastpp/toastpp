@@ -76,38 +76,14 @@ RCompRowMatrix shrink(const RDenseMatrix &dnsmat);
 **/
 void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVector& node_angN, const int el, int &maxSphOrder, int &maxAngN);
 
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives a_{m} 
-*/
-toast::complex am(int m);
-
-/* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
-real-valued spherical harmonics.
-a_{m} = 1, b_{m} = 0, if m=0
-a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
-
-This routine gives b_{m} 
-*/
-toast::complex bm(int m);
-
-/*Kronecker delta function
-*/
-toast::complex delta(int a, int b);
-
 /* Sin(\theta)Cos(\phi)Y_{l, m}^{R} = Sin(\theta)Cos(\phi)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m+1}/\sqrt{-2}, b_{m} = (-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y_{l-1, -m+1}, 
+Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}.
 */
 void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c);
 
@@ -115,10 +91,10 @@ void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y_{l-1, -m+1}, 
+Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}. 
 */
 void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c);
 
@@ -126,10 +102,9 @@ void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l-1, m}, Y_{l+1, m}, Y_{l-1, -m}, Y_{l+1, -m}. 
 */
 void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, IDenseMatrix& f1c);
 
@@ -137,10 +112,9 @@ void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, I
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
 a_{m} = b_{m} = 1/\sqrt{2}, if m>0
-a_{m} = (-1)^{m}/\sqrt{-2}, b_{m} = -(-1)^{m}/\sqrt{-2}, otherwise
+a_{m} = 1/\sqrt{-2}, b_{m} = -1/\sqrt{-2}, otherwise
 
-This routine gives the coefficients of terms Y_{l-1, m+1}, Y_{l+1, m+1}, Y_{l-1, m-1}, Y_{l+1, m-1}, Y^{*}_{l-1, m+1}, 
-Y^{*}_{l+1, m+1}, Y^{*}_{l-1, m-1} and Y^{*}_{l+1, m-1}, 
+This routine gives the coefficients of terms Y_{l, m}, Y_{l, -m}. 
 */
 void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c);
 
