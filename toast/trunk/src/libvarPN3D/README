@@ -2,11 +2,12 @@ Variable order PN approximation
 
 Usage
 
-If not using a QM file
-$TOASTVER/rte3D_varOrd <mesh file name>  <    <input file name>
+1. $TOASTVER/bin/rte3D_varOrd <mesh file name>  <    <input file name>
 
-If using a QM file
-$TOASTVER/rte3D_varOrd <mesh file name > <QM file name> < <input file name>
+2. $TOASTVER/bin/rte3D_varOrd <mesh file name > <QM file name> < <input file name>
 
 Input files can be generated using the MATLAB script 'generateInputFile.m' script contained in this folder
 
+NOTE: The files 'genmat_angint_3D_PN.cc' and 'genmat_angint_sdm_3D_PN.cc' and 'spints.cc' are not part of the 
+core variable order PN code. They contain time and memory efficient implementations of the angular matrices
+and will be integrated and tested into the core program at a later date.
