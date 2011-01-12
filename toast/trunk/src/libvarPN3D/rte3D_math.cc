@@ -175,7 +175,7 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 			{
 				for(int i=0; i<numpts; i++)
 				{
-					temp = (cplxSphHarm[l](l+abs(m), i) - complex(sign(m), 0)*cplxSphHarm[l](l-abs(m), i))/complex(0, sqrt(2));
+					temp = (cplxSphHarm[l](l+m, i) - complex(sign(m), 0)*cplxSphHarm[l](l-m, i))/complex(0, sqrt(2));
 					sphHarm[l](indm, i) = temp.re;	 
 				}
 			}
