@@ -1,36 +1,47 @@
-function [] = generateInputFile(hMesh, fname, output_file_prefix, source_node_num, g, MHz_freq, is_isotropic, directionVector, mua_3layers, mus_3layers)
-% This MATLAB script generates the input file required to run variable order P_{N} code on the 3 layered sphere geometry
-% Surya sprerapa@cs.ucl.ac.uk 27/05/2010
+function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns, source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref)
+%function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns, source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref)
+% This MATLAB script generates the input file required to run variable order P_{N} code
+% Surya sprerapa@cs.ucl.ac.uk 11/01/2011
 % 
 % Inputs
 %  	hMesh -> toast Mesh handle
 %
 %	fname -> output file name
+%    
+%       output_file_prefix -> prefix for output files
 %
-%	source_node_num -> boundary node number around which the source is placed (Currently deals with only a single source)
-%			   e.g. node number 1669 is chosen as source node for our test cases.
+%	specify_QM -> Is a QM file being specified (1. Yes, 0. No)
+%
+%	ns -> number of sources ( If a QM file is not specified)
+%
+%	source_nodes -> A vector of source node numbers (If a QM file is not specified. Zero based indexing)
 %
 %	g -> value of 'g' in Henvey-Greenstein phase function.
 %
 %	MHz_freq -> Modulation frequency in MHz.
 %
-%	is_isotropic -> Flag to indicate if the source is isotropic (1 if isotropic, 0 otherwise).
+%	is_cosine -> Flag to indicate if the source is cosine or directed (1 if cosine, 0 directed).
 %
-%	directionVector -> if 'is_isotropic' is set to 0, this variable specifies the direction vector along which the source 
+%	directionVector -> if 'is_cosine' is set to 0, this variable specifies the direction vector along which the source 
 %			   is directed. NOTE: THIS VECTOR IS NORMALIZED TO BE A UNIT VECTOR INTERNALLY.
 %			   e.g. Inward directed source is specified as [0 0 0] - vtx(source_node_num, :).
 %
-%	mua_3layers -> absorption coefficient (mm^{-1}) for each of the 3 layers
-%		       e.g. [0.01, 0.025, 0.01].
+%	mua -> absorption coefficient (mm^{-1}) for each element
 %
-%	mus_3layers -> scattering coefficient (mm^{-1}) for each of the 3 layers
-%			e.g. [5, 0.1, 5].
+%	mus -> scattering coefficient (mm^{-1}) for each element
+%
+%	ref -> Refractive index for each element
+%
 [vtx, idx] = toastMeshData(hMesh); 
-[mua, mus, ref] = assignMatValues(vtx, idx, mua_3layers, mus_3layers, [1, 1, 1]);
-
-
 fid =  fopen(fname, 'w');
-fprintf(fid, '%s\n%d\n%f\n%d\n%d\n%f\n%f\n%f\n', output_file_prefix, source_node_num, g, MHz_freq, is_isotropic, directionVector(1), directionVector(2), directionVector(3));
+fprintf(fid, '%s\n', output_file_prefix);
+if(specify_QM == 0)
+	fprintf(fid, '%d\n', ns);
+	for i = 1 : ns
+		fprintf(fid, '%d\n', source_nodes(i));
+	end;
+end;
+fprintf(fid, '%f\n%f\n%d\n%f\n%f\n%f\n', g, MHz_freq, is_cosine, directionVector(1), directionVector(2), directionVector(3));
 for i = 1  : size(idx, 1)
 fprintf(fid, '%f\n%f\n%f\n', mua(i), mus(i), ref(i));
 end;

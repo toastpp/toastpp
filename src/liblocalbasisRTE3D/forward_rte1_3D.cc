@@ -26,6 +26,7 @@ typedef unsigned pid_t;
 #include <felib.h>
 #include "source.h"
 #include "pparse.h"
+#include "toast.h"
 #include "rte3D.h"
 #define VARYDELTA
 #define USE_INTONSPHERE
@@ -39,30 +40,30 @@ public:
 double sigma0_0_0; 
 ScatKernType sktyp;  
 CCompRowMatrix Sint, Sdx, Sdy, Sdz;
-CCompRowMatrix Sgrad, Sx, Sy, Sz;
-CCompRowMatrix Sdxx, Sdxy, Sdyx, Sdyy,  Sdxz, Sdzx,  Sdyz, Sdzy, Sdzz;
-CCompRowMatrix Aint, Aintsc, Aintss, Aintc, Anvec, Anvec_sc, Anvec_ss,  Anvec_c;
-CCompRowMatrix Aintscsc,  Aintscss, Aintscc,  Aintssss,  Aintssc,  Aintcc;
-CCompRowMatrix SPS, SPSdx, SPSdy, SPSdz;
-CCompRowMatrix spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz;
-CCompRowMatrix apu1, apu1sc, apu1ss, apu1c;
-CCompRowMatrix A2, b1;
+RCompRowMatrix Sgrad, Sx, Sy, Sz;
+RCompRowMatrix Sdxx, Sdxy, Sdyx, Sdyy,  Sdxz, Sdzx,  Sdyz, Sdzy, Sdzz;
+RCompRowMatrix Aint, Aintsc, Aintss, Aintc, Anvec, Anvec_sc, Anvec_ss,  Anvec_c;
+RCompRowMatrix Aintscsc,  Aintscss, Aintscc,  Aintssss,  Aintssc,  Aintcc;
+RCompRowMatrix SPS, SPSdx, SPSdy, SPSdz;
+RCompRowMatrix spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz;
+RCompRowMatrix apu1, apu1sc, apu1ss, apu1c;
+RCompRowMatrix A2;
+CCompRowMatrix b1;
 CDenseMatrix Aintx, Aintscx, Aintssx, Aintcx;
 CDenseMatrix Aintscscx, Aintscssx, Aintssssx, Aintsccx, Aintsscx, Aintccx;
-CDenseMatrix apu1x, apu1scx, apu1ssx, apu1cx;
+CDenseMatrix apu1x, apu1scx, apu1ssx, apu1cx, Xmat;
 CVector A2x;
-CDenseMatrix A0_RTE, A0_SDM, A1_RTE, A1_SDM, A3, A4, A, Xmat, A0;
 
-const complex *sintval, *sdxval, *sdyval, *sdzval, *sxval, *syval, *szval; 
-const complex *sdxxval, *sdxyval, *sdyxval, *sdyyval, *sdxzval, *sdzxval, *sdyzval, *sdzyval, *sdzzval; 
-const complex *spsval, *spsdxval, *spsdyval, *spsdzval, *spata3_rteval, *spata3_sdmxval, *spata3_sdmyval, *spata3_sdmzval; 
+const complex *sintval, *sdxval, *sdyval, *sdzval;
+const double *sxval, *syval, *szval; 
+const double *sdxxval, *sdxyval, *sdyxval, *sdyyval, *sdxzval, *sdzxval, *sdyzval, *sdzyval, *sdzzval; 
+const double *spsval, *spsdxval, *spsdyval, *spsdzval, *spata3_rteval, *spata3_sdmxval, *spata3_sdmyval, *spata3_sdmzval; 
 
-const complex *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, *apu1ssval, *apu1cval;
-const complex *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
+const double *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, *apu1ssval, *apu1cval;
+const double *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
 complex *xmatval;
 
 int *browptr, *bcolidx, nzb;
-int mfc_count;
 int spatN, angN;
 
 double w, c;
@@ -74,16 +75,19 @@ MyDataContext(QMMesh &spatMesh, Mesh &angMesh, RVector &delta, RVector &muabs, R
 	this->c = c;
 	spatN = spatMesh.nlen();
 	angN = angMesh.nlen();
-	
+
+	cout<<"Generating spatial integrals ..."<<endl;
 	genmat_spatint_nobf_3D(spatMesh, muabs, muscat, Sint, Sgrad, Sx, Sy, Sz, SPS, spatA3_rte);
-        cout<<"Done nobf ..."<<endl;
 	genmat_spatint_sdm_nobf_3D(spatMesh, delta, muabs, muscat, Sdx, Sdy, Sdz, Sdxx, Sdxy, Sdyx, Sdyy,  Sdxz, Sdzx, Sdyz, Sdzy, Sdzz, SPSdx, SPSdy, SPSdz, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz);
+
+	cout<<"Generating angular integrals ..."<<endl;
 	genmat_angint_3D(Aint, Aintsc, Aintss, Aintc, Anvec, angMesh);
-        cout<<"Calling genmat_angint_sdm_3D ..."<<endl;
     	genmat_angint_sdm_3D(Aintscsc,  Aintscss,   Aintscc,  Aintssss,  Aintssc,  Aintcc,  Anvec_sc, Anvec_ss,  Anvec_c, angMesh);
-	cout<<"Calling genmat_apu ..."<<endl;
+
+	cout<<"Generating phase integrals ..."<<endl;
 	genmat_apu(angMesh, Anvec, Anvec_sc, Anvec_ss, Anvec_c, apu1, apu1sc, apu1ss, apu1c, sktyp);
-	cout<<"Calling genmat_boundint_3D ..."<<endl;
+
+	cout<<"Generating boundary integrals ..."<<endl;
   	genmat_boundint_3D(spatMesh,  angMesh, A2, b1);
 	
 
@@ -94,25 +98,34 @@ MyDataContext(QMMesh &spatMesh, Mesh &angMesh, RVector &delta, RVector &muabs, R
 
 	int angN = angMesh.nlen();
 	angMesh.SparseRowStructure (browptr, bcolidx, nzb);
-    
+   	
+	/*Allocating memory for A2x where A2 is the matrix corresponding to boundary*/
 	A2x.New(spatN*angN);
 	CDenseMatrix temp(angN, spatN), temp2(spatN, angN); 
         
 	
-	A0 = temp2; A0_RTE = temp2; A0_SDM = temp2; A1_RTE = temp2; A1_SDM = temp2; A3 = temp2; A4 = temp2; A = temp2; Xmat = temp2;
+	Xmat = temp2;
 
-
+	/*Preparing angular integrals for computing Kronecker products implicitly*/	
     	Aint.Transpone(); Aintsc.Transpone(); Aintss.Transpone(); Aintc.Transpone(); 
     	Aintscsc.Transpone(); Aintscss.Transpone(); Aintssss.Transpone(); Aintscc.Transpone(); 
     	Aintssc.Transpone(); Aintcc.Transpone(); apu1.Transpone();  apu1sc.Transpone();  apu1ss.Transpone();  
     	apu1c.Transpone(); 	
 
+	/*Dereferencing the val pointers of angular matrices*/ 
+	aintval = Aint.ValPtr(); aintscval = Aintsc.ValPtr(); aintssval = Aintss.ValPtr(); aintcval = Aintc.ValPtr();
+	apu1val = apu1.ValPtr(); apu1scval = apu1sc.ValPtr(); apu1ssval = apu1ss.ValPtr(); apu1cval = apu1c.ValPtr();
+	aintscscval = Aintscsc.ValPtr(); aintscssval = Aintscss.ValPtr(); aintssssval = Aintssss.ValPtr(); aintsccval = Aintscc.ValPtr();
+	aintsscval = Aintssc.ValPtr(); aintccval = Aintcc.ValPtr();
+
+	/*Dereferencing the val pointers of spatial matrices*/
 	Aintx.New(spatN, angN); Aintscx.New(spatN, angN); Aintssx.New(spatN, angN); Aintcx.New(spatN, angN);
 	apu1x.New(spatN, angN); apu1scx.New(spatN, angN); apu1ssx.New(spatN, angN); apu1cx.New(spatN, angN);
 	Aintscscx.New(spatN, angN); Aintscssx.New(spatN, angN); Aintssssx.New(spatN, angN); Aintsccx.New(spatN, angN);
 	Aintsscx.New(spatN, angN); Aintccx.New(spatN, angN);
 
 	Xmat.New(spatN, angN);
+	xmatval = Xmat.data_buffer();
 
 	sintval = Sint.ValPtr(); sdxval = Sdx.ValPtr(); sdyval = Sdy.ValPtr();
 	sdzval = Sdz.ValPtr(); sxval = Sx.ValPtr(); syval = Sy.ValPtr(); 
@@ -124,28 +137,6 @@ MyDataContext(QMMesh &spatMesh, Mesh &angMesh, RVector &delta, RVector &muabs, R
 	spata3_sdmxval = spatA3_sdmx.ValPtr(); spata3_sdmyval = spatA3_sdmy.ValPtr(); 
 	spata3_sdmzval = spatA3_sdmz.ValPtr();      
 	
-/*	int *xrowptr = new int[spatN + 1];
-	
-	xrowptr[0]=0;
-	for(int i=1;i < spatN+1; i++)
-		xrowptr[i] = xrowptr[i-1] + angN;
-	
-	int *xcolidx = new int[xrowptr[spatN]];
-	int k=0;
-	for(int i = 0; i < spatN; i++)
-	{
-		for(int j=0; j < angN; j++)
-		{
-			xcolidx[k] = j;
-			k++;
-		}
-	 }
-
-	Xmat.Initialise(xrowptr, xcolidx);
-	*/
- 
-	mfc_count =0;
-
 }
 
 ~MyDataContext()
@@ -156,7 +147,8 @@ MyDataContext(QMMesh &spatMesh, Mesh &angMesh, RVector &delta, RVector &muabs, R
 
 private:
 
-void genmat_spatint_nobf_3D(const Mesh& mesh, const RVector &muabs, const RVector &muscat, CCompRowMatrix& Sint, CCompRowMatrix& Sgrad, CCompRowMatrix& Sx, CCompRowMatrix& Sy, CCompRowMatrix& Sz, CCompRowMatrix &SPS, CCompRowMatrix &spatA3_rte)
+/*Generating the spatial matrices required by RTE*/
+void genmat_spatint_nobf_3D(const Mesh& mesh, const RVector &muabs, const RVector &muscat, CCompRowMatrix& Sint, RCompRowMatrix& Sgrad, RCompRowMatrix& Sx, RCompRowMatrix& Sy, RCompRowMatrix& Sz, RCompRowMatrix &SPS, RCompRowMatrix &spatA3_rte)
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
 
@@ -210,7 +202,8 @@ void genmat_spatint_nobf_3D(const Mesh& mesh, const RVector &muabs, const RVecto
 
 }
 
-void genmat_spatint_sdm_nobf_3D(const Mesh& mesh,  const RVector& delta, const RVector &muabs, const RVector &muscat, CCompRowMatrix& Sdx, CCompRowMatrix& Sdy,  CCompRowMatrix& Sdz, CCompRowMatrix& Sdxx, CCompRowMatrix& Sdxy, CCompRowMatrix& Sdyx, CCompRowMatrix& Sdyy, CCompRowMatrix& Sdxz, CCompRowMatrix& Sdzx, CCompRowMatrix& Sdyz, CCompRowMatrix& Sdzy, CCompRowMatrix& Sdzz, CCompRowMatrix &SPSdx, CCompRowMatrix &SPSdy, CCompRowMatrix &SPSdz, CCompRowMatrix &spatA3_sdmx, CCompRowMatrix &spatA3_sdmy, CCompRowMatrix &spatA3_sdmz)
+/*Generating the spatial matrices required by RTE with SDM*/
+void genmat_spatint_sdm_nobf_3D(const Mesh& mesh,  const RVector& delta, const RVector &muabs, const RVector &muscat, CCompRowMatrix& Sdx, CCompRowMatrix& Sdy,  CCompRowMatrix& Sdz, RCompRowMatrix& Sdxx, RCompRowMatrix& Sdxy, RCompRowMatrix& Sdyx, RCompRowMatrix& Sdyy, RCompRowMatrix& Sdxz, RCompRowMatrix& Sdzx, RCompRowMatrix& Sdyz, RCompRowMatrix& Sdzy, RCompRowMatrix& Sdzz, RCompRowMatrix &SPSdx, RCompRowMatrix &SPSdy, RCompRowMatrix &SPSdz, RCompRowMatrix &spatA3_sdmx, RCompRowMatrix &spatA3_sdmy, RCompRowMatrix &spatA3_sdmz)
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
 
@@ -304,28 +297,60 @@ void genmat_spatint_sdm_nobf_3D(const Mesh& mesh,  const RVector& delta, const R
 
 }
 
-void genmat_angint_3D(CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatrix& Aintss, CCompRowMatrix& Aintc, CCompRowMatrix& Anvec, const Mesh& S2mesh)
+/** Thresholds and shrinks a real dense matrix to give a real sparse matrix
+* NOTE!! The threshold is set to 1e-15
+**/
+RCompRowMatrix shrink(const RDenseMatrix &dnsmat)
 {
-  // this function returns SN X SN matrices of angular shape integrals.
+    int i, j;
+    int *rowptr, *colidx;
+    double *val;
+    int m =  dnsmat.nRows(), n= dnsmat.nCols();
 
-  // S2Mesh must be 3D - should check for that...
+    rowptr = new int[m+1];
+    rowptr[0] = 0;
+    for (i = 0; i < m; i++) {
+	int nz=0;
+	for (j = 0; j < n; j++)
+		if(!(fabs(dnsmat.Get(i, j)) < 1e-15))
+			nz++;
+	rowptr[i+1] = rowptr[i] + nz;
+    }
+    
+    colidx = new int[rowptr[m]];
+    val = new double[rowptr[m]];
+    int k=0;
+    for(i=0; i < m; i++){
+	for(j=0; j<n; j++){
+		if(!(fabs(dnsmat.Get(i, j)) < 1e-15)){
+			colidx[k] = j; 
+			val[k] = dnsmat.Get(i, j);
+			k++;
+		}
+	}
+    }
+    RCompRowMatrix C (m, n, rowptr, colidx, val);
+    delete []rowptr;
+    delete []colidx;
+    delete []val;	
+    return C;
+}
 
+/**
+Computes all the angular integrals required by RTE
+**/
+void genmat_angint_3D(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowMatrix& Aintss, RCompRowMatrix& Aintc, RCompRowMatrix& Anvec, const Mesh& S2mesh)
+{
   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
   const int& SE =  S2mesh.elen();       // number of spherical elements.
 
   int *angrowptr, *angcolidx, nzero;
   S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
-  cout<<"Number of non-zeros in the angular mesh: "<<nzero<<endl;
-  Aint.New(SN,SN);   // integrals of products of shape functions 
-  Aint.Initialise(angrowptr, angcolidx);
-  Aintsc.New(SN,SN); // integrals of products of shape functions X Sin t Cos p
-  Aintsc.Initialise(angrowptr, angcolidx);
-  Aintss.New(SN,SN); // integrals of products of shape functions X Sin t Sin p
-  Aintss.Initialise(angrowptr, angcolidx);
-  Aintc.New(SN,SN);  // integrals of products of shape functions X Cos t
-  Aintc.Initialise(angrowptr, angcolidx);
   Anvec.New(SN,SN);  // and this one...
   Anvec.Initialise(angrowptr, angcolidx);
+
+  RDenseMatrix dnsAint(SN, SN), dnsAintsc(SN, SN), dnsAintss(SN, SN), dnsAintc(SN, SN);
+
 
   int el, i,j,is,js;
 
@@ -348,27 +373,25 @@ void genmat_angint_3D(CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatr
        for(j = 0; j < S2mesh.elist[el]->nNode(); j++) {
 	 if ((js = S2mesh.elist[el]->Node[j]) >= SN) continue;
 #ifdef USE_INTONSPHERE
-	 Aint(is,js) += S2mesh.elist[el]->IntUnitSphereFF (S2mesh.nlist,i, j);
-	 Aintsc(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist,i, j, sx);
-	 Aintss(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist,i, j, sy);
-	 Aintc(is,js)  += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist,i, j, sz);
+	 dnsAint(is,js) += S2mesh.elist[el]->IntUnitSphereFF (S2mesh.nlist,i, j);
+	 dnsAintsc(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist,i, j, sx);
+	 dnsAintss(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist,i, j, sy);
+	 dnsAintc(is,js)  += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist,i, j, sz);
 #else
-	 Aint(is,js) += S2mesh.elist[el]->IntFF (i, j);
-	 Aintsc(is,js) += S2mesh.elist[el]->IntPFF (i, j, sx);
-	 Aintss(is,js) += S2mesh.elist[el]->IntPFF (i, j, sy);
-	 Aintc(is,js)  += S2mesh.elist[el]->IntPFF (i, j, sz);
+	 dnsAint(is,js) += S2mesh.elist[el]->IntFF (i, j);
+	 dnsAintsc(is,js) += S2mesh.elist[el]->IntPFF (i, j, sx);
+	 dnsAintss(is,js) += S2mesh.elist[el]->IntPFF (i, j, sy);
+	 dnsAintc(is,js)  += S2mesh.elist[el]->IntPFF (i, j, sz);
 #endif
        }
     }
   }
 
- //cout<<Aintsc<<endl;
-  // next logic is all Tanja - I don't completely get it...
-  // CHECK carefully with Tanja!!
+ Aint = shrink(dnsAint); Aintsc = shrink(dnsAintsc); Aintss = shrink(dnsAintss); Aintc = shrink(dnsAintc);
 
-  for(int jj = 0; jj < SN; jj++) {  // loop on "directions
-    RVector Anvt(SN);
-    int Jind;
+ for(int jj = 0; jj < SN; jj++) {  // loop on "directions
+   RVector Anvt(SN);
+   int Jind;
 
     for(int el = 0; el < SE; el ++) { // find elements containing node jj
       if(!S2mesh.elist[el]->IsNode(jj)) continue ;
@@ -378,7 +401,6 @@ void genmat_angint_3D(CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatr
 	if( S2mesh.elist[el]->Node[i] == jj)
 	  Jind = i;
       }
-//    cout << "Node " << jj << " is " << Jind << " in element " << el << endl;
       // now integrate shape function of node jj with this element
       for(i = 0; i < S2mesh.elist[el]->nNode(); i++) {
         if ((is = S2mesh.elist[el]->Node[i]) >= SN) continue;  
@@ -396,34 +418,24 @@ void genmat_angint_3D(CCompRowMatrix& Aint, CCompRowMatrix& Aintsc, CCompRowMatr
     }
   } // end loop on "directions"
  delete []angrowptr;
-   delete []angcolidx;
+ delete []angcolidx;
 
 }
 
-void genmat_angint_sdm_3D(CCompRowMatrix& Aintscsc,  CCompRowMatrix& Aintscss,  CCompRowMatrix& Aintscc,  CCompRowMatrix& Aintssss,  CCompRowMatrix& Aintssc,  CCompRowMatrix& Aintcc, CCompRowMatrix& Anvec_sc, CCompRowMatrix& Anvec_ss, CCompRowMatrix& Anvec_c, const Mesh& S2mesh)
+/**
+Computes all the angular integrals required by RTE with SDM
+**/
+void genmat_angint_sdm_3D(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss,  RCompRowMatrix& Aintscc,  RCompRowMatrix& Aintssss,  RCompRowMatrix& Aintssc,  RCompRowMatrix& Aintcc, RCompRowMatrix& Anvec_sc, RCompRowMatrix& Anvec_ss, RCompRowMatrix& Anvec_c, const Mesh& S2mesh)
 {
-  // this function returns SN X SN matrices of angular shape integrals.
-
-  // S2Mesh must be 3D - should check for that...
-
   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
   const int& SE =  S2mesh.elen();       // number of spherical elements.
 
   int *angrowptr, *angcolidx, nzero;
   S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
 
-  Aintscsc.New(SN,SN); // products of shape functions (Sin t Cos p)^2
-  Aintscsc.Initialise(angrowptr, angcolidx);
-  Aintscss.New(SN,SN); // products of shape functions (Sin t Cos p)(Sin t Sint )
-  Aintscss.Initialise(angrowptr, angcolidx);
-  Aintscc.New(SN,SN);  // products of shape functions (Sin t Cos p) Cos t
-  Aintscc.Initialise(angrowptr, angcolidx);
-  Aintssss.New(SN,SN); // products of shape functions (Sin t Sin p)^2
-  Aintssss.Initialise(angrowptr, angcolidx);
-  Aintssc.New(SN,SN); //  products of shape functions (Sin t Sin p) Cos t
-  Aintssc.Initialise(angrowptr, angcolidx);
-  Aintcc.New(SN,SN);  //  products of shape functions ( Cos t )^2
-  Aintcc.Initialise(angrowptr, angcolidx);
+  RDenseMatrix dnsAintscsc(SN, SN), dnsAintscss(SN, SN), dnsAintcc(SN, SN);
+  RDenseMatrix dnsAintscc(SN, SN), dnsAintssss(SN, SN), dnsAintssc(SN, SN);
+
          // and these three
   Anvec_sc.New(SN,SN);  
   Anvec_sc.Initialise(angrowptr, angcolidx);
@@ -467,28 +479,26 @@ void genmat_angint_sdm_3D(CCompRowMatrix& Aintscsc,  CCompRowMatrix& Aintscss,  
        for(j = 0; j < S2mesh.elist[el]->nNode(); j++) {
 	 if ((js = S2mesh.elist[el]->Node[j]) >= SN) continue;
 #ifdef USE_INTONSPHERE
-	 Aintscsc(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, sxx);
-	 Aintscss(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, sxy);
-	 Aintscc(is,js)  += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, sxz);
-	 Aintssss(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, syy);
-	 Aintssc(is,js)  += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, syz);
-	 Aintcc(is,js)   += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, szz);
+	 dnsAintscsc(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, sxx);
+	 dnsAintscss(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, sxy);
+	 dnsAintscc(is,js)  += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, sxz);
+	 dnsAintssss(is,js) += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, syy);
+	 dnsAintssc(is,js)  += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, syz);
+	 dnsAintcc(is,js)   += S2mesh.elist[el]->IntUnitSpherePFF (S2mesh.nlist, i, j, szz);
 #else
-	 Aintscsc(is,js) += S2mesh.elist[el]->IntPFF (i, j, sxx);
-	 Aintscss(is,js) += S2mesh.elist[el]->IntPFF (i, j, sxy);
-	 Aintscc(is,js)  += S2mesh.elist[el]->IntPFF (i, j, sxz);
-	 Aintssss(is,js) += S2mesh.elist[el]->IntPFF (i, j, syy);
-	 Aintssc(is,js)  += S2mesh.elist[el]->IntPFF (i, j, syz);
-	 Aintcc(is,js)   += S2mesh.elist[el]->IntPFF (i, j, szz);
+	 dnsAintscsc(is,js) += S2mesh.elist[el]->IntPFF (i, j, sxx);
+	 dnsAintscss(is,js) += S2mesh.elist[el]->IntPFF (i, j, sxy);
+	 dnsAintscc(is,js)  += S2mesh.elist[el]->IntPFF (i, j, sxz);
+	 dnsAintssss(is,js) += S2mesh.elist[el]->IntPFF (i, j, syy);
+	 dnsAintssc(is,js)  += S2mesh.elist[el]->IntPFF (i, j, syz);
+	 dnsAintcc(is,js)   += S2mesh.elist[el]->IntPFF (i, j, szz);
 #endif
        }
     }
   }
 
-
-
-  // next logic is all Tanja - I don't completely get it...
-  // CHECK carefully with Tanja!!
+  Aintscsc = shrink(dnsAintscsc);Aintscss = shrink(dnsAintscss);Aintscc = shrink(dnsAintscc); Aintssc = shrink(dnsAintssc);
+  Aintssss = shrink(dnsAintssss);Aintcc = shrink(dnsAintcc);
 
   for(int jj = 0; jj < SN; jj++) {  // loop on "directions
     RVector Anvtsc(SN);
@@ -504,7 +514,6 @@ void genmat_angint_sdm_3D(CCompRowMatrix& Aintscsc,  CCompRowMatrix& Aintscss,  
 	if( S2mesh.elist[el]->Node[i] == jj)
 	  Jind = i;
       }
-//    cout << "Node " << jj << " is " << Jind << " in element " << el << endl;
       // now integrate shape function of node jj with this element
       for(i = 0; i < S2mesh.elist[el]->nNode(); i++) {
         if ((is = S2mesh.elist[el]->Node[i]) >= SN) continue;  
@@ -534,7 +543,10 @@ void genmat_angint_sdm_3D(CCompRowMatrix& Aintscsc,  CCompRowMatrix& Aintscss,  
 
 }
 
-void genmat_apu(const Mesh &S2mesh, CCompRowMatrix &Anvec, CCompRowMatrix &Anvec_sc, CCompRowMatrix &Anvec_ss, CCompRowMatrix &Anvec_c, CCompRowMatrix& apu1, CCompRowMatrix& apu1sc, CCompRowMatrix& apu1ss, CCompRowMatrix& apu1c, ScatKernType sktyp)
+/** Phase integrals 
+*  NOTE!! This function has been specialized for g=0
+**/
+void genmat_apu(const Mesh &S2mesh, RCompRowMatrix &Anvec, RCompRowMatrix &Anvec_sc, RCompRowMatrix &Anvec_ss, RCompRowMatrix &Anvec_c, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c, ScatKernType sktyp)
 {
 	const int& SN = S2mesh.nlen();
 	apu1.New(SN,SN);
@@ -546,12 +558,12 @@ void genmat_apu(const Mesh &S2mesh, CCompRowMatrix &Anvec, CCompRowMatrix &Anvec
 	 	case  MUSHOMOG_G0 :
        	 	{
 			 for(int bb = 0; bb < SN; bb++){ // not efficient !
-	 			CCompRowMatrix acol = Anvec.Subcols(bb,bb+1);
-	 			CCompRowMatrix acolsc = Anvec_sc.Subcols(bb,bb+1);
-	 			CCompRowMatrix acolss = Anvec_ss.Subcols(bb,bb+1);
-	 			CCompRowMatrix acolc  = Anvec_c.Subcols(bb,bb+1);
+	 			RCompRowMatrix acol = Anvec.Subcols(bb,bb+1);
+	 			RCompRowMatrix acolsc = Anvec_sc.Subcols(bb,bb+1);
+	 			RCompRowMatrix acolss = Anvec_ss.Subcols(bb,bb+1);
+	 			RCompRowMatrix acolc  = Anvec_c.Subcols(bb,bb+1);
 	 	 		for(int cc = 0; cc < SN; cc++){
-	   				CCompRowMatrix bcol = Anvec.Subcols(cc,cc+1);
+	   				RCompRowMatrix bcol = Anvec.Subcols(cc,cc+1);
 	   				bcol.Transpone();// row vector of column
 
 	   				apu1 +=  kron(acol,bcol);
@@ -569,186 +581,15 @@ void genmat_apu(const Mesh &S2mesh, CCompRowMatrix &Anvec, CCompRowMatrix &Anvec
 		 }
 		 default :
                        cout<<"Unknown g type (g should be zero for this case) "<<endl;
-		/*case MUSINHOMOG_G0 :
-			break;
-     		case MUSHOMOG_GCONST :
-      		{
-			CVector apujjvec(SN*SN), apuscjjvec(SN*SN), apussjjvec(SN*SN), apucjjvec(SN*SN);
-			for(int bb = 0; bb < SN; bb++){ // not efficient !
-	 			CCompRowMatrix acol = Anvec.Subcols(bb,bb+1);
-	 			CCompRowMatrix acolsc = Anvec_sc.Subcols(bb,bb+1);
-	 			CCompRowMatrix acolss = Anvec_ss.Subcols(bb,bb+1);
-	 			CCompRowMatrix acolc  = Anvec_c.Subcols(bb,bb+1);
-	 			
-				CCompRowMatrix apuii = kron(acol,Anvec);
-	 			CCompRowMatrix apuscii = kron(acolsc,Anvec);
-	 			CCompRowMatrix apussii = kron(acolss,Anvec);
-        		        CCompRowMatrix apucii  = kron(acolc,Anvec); // *********** Surya 08/01/2010 AN ERROR MAY BE: TO REVERT REPLACE WITH THE LINE BELOW ************
-	 			//RCompRowMatrix apucii  = kron(acolss,Anvec); 
- 	 			CVector sigcol(SN); // assign a column of sigma[el];
-     	 			for (int ii = 0; ii < SN; ii++)
-	   				sigcol[ii] = complex(sigma[0](ii,bb), 0);
-	 			apujjvec +=  apuii*sigcol;
-	 			apuscjjvec += apuscii*sigcol;
-	 			apussjjvec += apussii*sigcol;
-	 			apucjjvec  += apucii*sigcol;
-				 int* arowptr;
-	 			if( !(arowptr = new int [SN+1]))
-	   				cerr << "Memory Allocation error arowptr = new int\n";
-	 			int* acolidx;
-	 			if( !(acolidx = new int [SN*SN]))
-	   				cerr << "Memory Allocation error acolidx = new int\n";
-	 			int rp = 0;
-	 			for(int ii = 0, cp = 0; ii < SN; ii++) {
-	   				arowptr[ii] = rp; rp += SN;
-	   				for(int kk = 0; kk < SN; kk++)
-	     					acolidx[cp++] = kk;
-	 			}
-	 			arowptr[SN] = rp;
-	 			apu1.Initialise(arowptr,acolidx);
-	 			apu1sc = apu1;
-	 			apu1ss = apu1;
-	 			apu1c  = apu1;
-	 			for (int ii = 0; ii < SN; ii++){
-	   				for(int kk = 0; kk < SN; kk++) {
-	     					apu1(ii,kk) = apujjvec[ii*SN + kk];
-	     					apu1sc(ii,kk) = apuscjjvec[ii*SN + kk];
-	     					apu1ss(ii,kk) = apussjjvec[ii*SN + kk];
-	     					apu1c(ii,kk)  = apucjjvec[ii*SN + kk];
-	   				}
-	 			}
-       				delete []arowptr;
-       				delete []acolidx;
-       			}
-			apu1 *= -1;
-			apu1sc *= -1;
-			apu1ss *= -1;
-			apu1c *= -1;
-
-	 		break;
-		}*/	
-			
-	}
+		}
 } 
 
-void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, CCompRowMatrix& A2, CCompRowMatrix& b1)
+/** Preallocating memory for boundary integral terms.
+The matrix is considered to be sparse both spatially and angularly
+which is eventually shrunk after computation.
+**/
+void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, RCompRowMatrix& A2, CCompRowMatrix& b1)
 {
-   /*int el, nodel, i, j, k,is, js;
-   int *crrowptr, *crcolidx, nzero;
-   int sysdim = mesh.nlen();
-   mesh.SparseRowStructure(crrowptr, crcolidx, nzero);
-   
-   int *status = new int[crrowptr[sysdim]];
-   for(i=0; i<nzero; i++)
-	status[i] = 0; // 1 implies nonzero 0 denotes zero;
-   
-   for (el = 0; el < mesh.elen(); el++) {
-        if(!mesh.elist[el]->HasBoundarySide ()) continue;
-	nodel = mesh.elist[el]->nNode();
-	// now determine the element integrals
-	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++)  {
-	  // if sd is not a boundary side. skip 
-	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
-	  for (int i = 0; i < nodel; i++) {
-	    if ((is = mesh.elist[el]->Node[i]) >= sysdim) continue;
-	    for (int j = 0; j < nodel; j++) {
-		if ((js = mesh.elist[el]->Node[j]) >= sysdim) continue;
-		for (int rp = crrowptr[is]; rp < crrowptr[is+1]; rp++){
-        		if (crcolidx[rp] == js) status[rp] = 1;
-	    }
-	  } 
-	 }*/
-	  /*for(int nd1 = 0; nd1 < mesh.elist[el]->nSideNode(sd); nd1++) {
-	    i = mesh.elist[el]->SideNode(sd,nd1);
-	    is = mesh.elist[el]->Node[i];
-	    for(int nd2 = 0; nd2 < mesh.elist[el]->nSideNode(sd); nd2++){
-		j = mesh.elist[el]->SideNode(sd, nd2);
-		js = mesh.elist[el]->Node[j];
-		for (int rp = crrowptr[is]; rp < crrowptr[is+1]; rp++){
-        		if (crcolidx[rp] == js) status[rp] = 1;
-		}
-	    }
-	  }*/
-/*         }
-    }
-    
-   cout<<"computed 'status' ..."<<endl;
-    int tnzero=0;
-    for(i=0; i < nzero; i++)
-	if(status[i]) tnzero++; 
-   int *spatrowptr, *spatcolidx;
-   spatrowptr = new int[sysdim + 1];
-   spatcolidx = new int[tnzero];
-   spatrowptr[0] = 0;
-   j=0;
-   for(i = 0; i < sysdim; i++)
-   {
-	int rp1 = crrowptr[i];
-	int rp2 = crrowptr[i+1];
-        k=0;
-	for(int rp = rp1; rp < rp2; rp++)
-	{
-		if(status[rp]){ 
-			k++;
-			spatcolidx[j] = crcolidx[rp];
-			j++;			
-		} 
-	}
-	spatrowptr[i+1] = spatrowptr[i] + k;
-   } 
-   delete []status;
-   cout<<"spatrowptr and spatcolidx computed ..."<<endl; 
-    int ia, ib, ka, kb, ja, jb, idx;
-    int va_i, vb_i, v_i;
-    int na = sysdim, ma = sysdim, va = spatrowptr[sysdim], col;
-    int nb = S2mesh.nlen();
-    int *rowptr = new int[na*nb+1];
-    for(i = 0; i < na*nb + 1; i++)
-    	rowptr[i] = 0;
-    
-    k=1; 
-    for (ia = 0; ia < na; ia++)
-    {
-	for(j = 0; j < nb; j++)
-	{
-		for(i = spatrowptr[ia]; i < spatrowptr[ia+1]; i++)
-		{
-			col = spatcolidx[i];
-			rowptr[k] += nb;
-		 }
-
-		k++;
-        } 
-    }
-  
-    for(i = 1; i < na*nb+1; i++)
-	rowptr[i] += rowptr[i-1];
- 
-    
-   int *colidx = new int[rowptr[na*nb]];
-   int col_offset;
-   k=0;
-   for(ia = 0; ia < na; ia++)
-   {
-	for(j = 0; j < nb; j++)
-	{	
-		for(i = spatrowptr[ia]; i < spatrowptr[ia+1]; i++)
-		{
-			col = spatcolidx[i];
-
-			col_offset =0;
-			for(int m = 0; m < col; m++) col_offset += nb;
-
-			for(int l = 0; l < nb; l++)
-			{
-				colidx[k] = col_offset + l;
-				k++;
-			}
-		}
-	}
-   }
-*/
-
     int ia, ib, ka, kb, ja, jb, i, idx;
     int va_i, vb_i, v_i;
     int snzero, anzero;
@@ -762,7 +603,7 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, CCompRowMatrix& A2, CC
    int *status = new int[srowptr[sysdim]];
    for(i=0; i<snzero; i++)
 	status[i] = 0; // 1 implies nonzero 0 denotes zero;
-   
+  /*'status' variable updates the nodes on the boundary*/ 
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->HasBoundarySide ()) continue;
 	nodel = mesh.elist[el]->nNode();
@@ -779,24 +620,13 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, CCompRowMatrix& A2, CC
 	    }
 	  } 
 	 }
-	  /*for(int nd1 = 0; nd1 < mesh.elist[el]->nSideNode(sd); nd1++) {
-	    i = mesh.elist[el]->SideNode(sd,nd1);
-	    is = mesh.elist[el]->Node[i];
-	    for(int nd2 = 0; nd2 < mesh.elist[el]->nSideNode(sd); nd2++){
-		j = mesh.elist[el]->SideNode(sd, nd2);
-		js = mesh.elist[el]->Node[j];
-		for (int rp = crrowptr[is]; rp < crrowptr[is+1]; rp++){
-        		if (crcolidx[rp] == js) status[rp] = 1;
-		}
-	    }
-	  }*/
-         }
+       }
     }
     
-   cout<<"computed 'status' ..."<<endl;
     int tnzero=0;
     for(i=0; i < snzero; i++)
-	if(status[i]) tnzero++; 
+	if(status[i]) tnzero++;
+   /*The new spatial sparsity pattern limited just to the boundary is computed*/ 
    int *spatrowptr, *spatcolidx;
    spatrowptr = new int[sysdim + 1];
    spatcolidx = new int[tnzero];
@@ -831,6 +661,7 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, CCompRowMatrix& A2, CC
 
     rowptr[0] = 0;
     i = idx = 0;
+    /*The overall sparsity pattern is computed based on spatial and angular sparsity patterns*/
     for (ia = 0; ia < na; ia++) {
 	va_i = spatrowptr[ia+1] - spatrowptr[ia]; // nonzeros in row ia of A
 	for (ib = 0; ib < nb; ib++) {
@@ -848,9 +679,6 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, CCompRowMatrix& A2, CC
 	    i++;
 	}
     }
-    /*cout<<"Number of columns in 102420: "<<rowptr[102421] - rowptr[102420]<<endl;
-    for(int i=rowptr[102420] ; i< rowptr[102421]; i++)
-	cout<<colidx[i]<<" "<<endl;*/
    A2.Initialise(rowptr, colidx);
    b1.Initialise(rowptr, colidx);
    A2.Zero(); 
@@ -867,9 +695,19 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, CCompRowMatrix& A2, CC
 
 }
 
-void kronsdplus(const int spatrow, const int spatcol, const int angN, const double a_ij, const CCompRowMatrix &B, CCompRowMatrix& C)
+/** Adds aB to its appropriate place in the system matrix
+* spatrow -> spatial row where 'a' is drawn from
+* spatcol -> spatial column where 'a' is drawn from
+* node_angN -> number of angular degrees of freedom for all the spatial nodes
+* offset -> starting location in the system matrix for each spatial node
+* a_ij -> 'a'
+* B -> B
+* C -> output (System matrix) 
+**/
+template<class MT>
+void kronsdplus(const int spatrow, const int spatcol, const int angN, const double a_ij, const RCompRowMatrix &B, TCompRowMatrix<MT>& C)
 {
-    complex *Cval = C.ValPtr();
+    MT *Cval = C.ValPtr();
     int jb, ib;
     int row_offset = 0, col_offset = 0;
    
@@ -884,29 +722,16 @@ void kronsdplus(const int spatrow, const int spatcol, const int angN, const doub
      for(int jb = B.rowptr[ib]; jb<B.rowptr[ib+1]; jb++)
      {
         col = B.colidx[jb];
-	//cout<<"i: "<<row_offset+ib<<" j: "<<col_offset+col<<endl;
 
-	C(row_offset+ib , col_offset+col) = C.Get(row_offset+ib , col_offset+col) + complex(a_ij, 0)*B.Get(ib, col); 	
+	C(row_offset+ib , col_offset+col) = C.Get(row_offset+ib , col_offset+col) + B.Get(ib, col)*a_ij; 	
      }
     }  
-
-    /*for(int ib = 0; ib < angN; ib++)
-    {
-	 for(int jb=0; jb < angN; jb++)
-	 {
-		cout<<"i: "<<row_offset+ib<<" j: "<<col_offset+jb<<endl;
-		C(row_offset+ib , col_offset+jb) = C.Get(row_offset+ib , col_offset+jb) + complex(a_ij, 0)*B.Get(ib, jb); 	
-	}
-     }*/	
 }
 
-void genmat_boundint_3D(const Mesh& mesh,  const Mesh& S2mesh, CCompRowMatrix& A2, CCompRowMatrix& b1)
-  /*      
-     produces complete matrix of integrals in space and angle for boundary term
-  */
+/**Compute the boundary integral terms
+**/
+void genmat_boundint_3D(const Mesh& mesh,  const Mesh& S2mesh, RCompRowMatrix& A2, CCompRowMatrix& b1)
 {
-  // S2Mesh must be 3D - should check for that...
-
    const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
    const int& SE =  S2mesh.elen();       // number of spherical elements.
    const int sysdim = mesh.nlen();       // dimensions are size of nodes.
@@ -935,13 +760,12 @@ void genmat_boundint_3D(const Mesh& mesh,  const Mesh& S2mesh, CCompRowMatrix& A
     sz[i] = np[2]*ilen;
    }
   
-   CCompRowMatrix  Angbintplus(SN,SN), Angbintminus(SN, SN);
+   RCompRowMatrix  Angbintplus(SN,SN), Angbintminus(SN, SN);
    Angbintplus.Initialise(angrowptr, angcolidx);
    Angbintminus.Initialise(angrowptr, angcolidx);
    RVector f1(SN), f2(SN); 
    // now create matrix, by looping over elements that have a boundary
    for (el = 0; el < mesh.elen(); el++) {
-        //cout<<"element number: "<<el<<endl;
 	if(!(el*100%mesh.elen()))
 		cout<<el*100/mesh.elen() <<"% work done ..."<<endl;
 
@@ -1002,14 +826,12 @@ void genmat_boundint_3D(const Mesh& mesh,  const Mesh& S2mesh, CCompRowMatrix& A
    delete []angcolidx;
 
 }
-
 };
-void genmat_b2_cos(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, const int Nsource, const RVector& dirVec, const bool is_isotropic)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
-{
+
+/**Computes source vector for a single point source in the interior of the domain
+**/
+void genmat_b2(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, const int Nsource, const RVector& dirVec, const bool is_cosine, const int angMesh_node)
+ {
    int el, nodel, i, j, k,is, js;
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
    int SN = S2mesh.nlen();
@@ -1045,13 +867,7 @@ void genmat_b2_cos(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, c
    // now create vector, by looping over elements that have a boundary
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
-        //if(!mesh.elist[el]->HasBoundarySide()) continue;
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
-	  // if sd is not a boundary side. skip 
-	  //if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
-	  
-	  //RVector nhat = mesh.ElDirectionCosine(el,sd);
-	  //dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
 	   dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2];
 
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
@@ -1062,21 +878,13 @@ void genmat_b2_cos(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, c
 		offset = 0;
 		for(int i=0; i < js; i++) offset += SN; 
 
-	    	if(is_isotropic)
+	    	if(is_cosine)
 		{ 
 			for(int i=0; i < SN; i++) Svec(offset + i, 0) = 1.0;
 		}
 	    	else{
-			//cout<<"Source is not isotropic ..."<<endl;
-			for(int i=0; i<SN; i++)
-			{
-			  if((sx[i] == 0) && (sy[i] == -1) && (sz[i] == 0))
-			  {
-				//cout<<"Imposed nonisotropic source at node: "<<i<<endl;
-			  	Svec(offset + i, 0) = 1.0;
-			   }
-			  
-			}		
+			
+			Svec(offset + angMesh_node, 0) = 1.0;
 		}
 	    }
 
@@ -1084,13 +892,6 @@ void genmat_b2_cos(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, c
 	} // end loop on element sides
 
    } // end loop on elements
-
-  /*for(int i =0 ; i < sysdim*SN; i++)
-	{
-	  if (Svec(i, 0) != 0)
-		cout<<"i: "<<i<<" "<<Svec(i, 0)<<endl;
-	}
-*/
 
    delete []rowptr;
    delete []colidx;
@@ -1100,22 +901,17 @@ void genmat_b2_cos(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, c
 // global parameters
 
 SourceMode srctp = SRCMODE_NEUMANN;   // source type
-double avg_cmua = 1.0, avg_ckappa = 1.0;
 ParamParser pp;
 QMMesh qmmesh;
 NodeList &nlist=qmmesh.nlist;
 ElementList &elist=qmmesh.elist;
-
-// =========================================================================
-// local prototypes
-
 inline CVector matrixFreeCaller(const CVector& x, void * context);
-inline void testspeeds(void* context);
-
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
-void genmat_toastsource3D(CCompRowMatrix* & Source, const Mesh& mesh, const Mesh& S2mesh, const CCompRowMatrix qvec, const int ns, const CCompRowMatrix& b1, const bool is_isotropic, const int angMesh_node);
-void genmat_toastsourcevalvector3D_cos(CCompRowMatrix& Svec, const Mesh& mesh, const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isotropic, const int angMesh_node);
+void genmat_toastsource_3D(CCompRowMatrix* & Source, const Mesh& mesh, const Mesh& S2mesh, const CCompRowMatrix qvec, const int ns, const CCompRowMatrix& b1, const bool is_cosine, const int angMesh_node);
+void genmat_toastsourcevalvector_3D(CCompRowMatrix& Svec, const Mesh& mesh, const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_cosine, const int angMesh_node);
+void genmat_source_3D(CCompRowMatrix* & Source, const Mesh& mesh,  const Mesh& S2mesh, const int* Nsource, const int ns, const CCompRowMatrix& b1, const bool is_cosine, const int angMesh_node);
+void genmat_sourcevalvector_3D(CCompRowMatrix& Svec, const Mesh& mesh, const Mesh& S2mesh, const int Nsource, const bool is_cosine, const int angMesh_node);
 void WriteData (const RVector &data, char *fname);
 void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
 void OpenNIM (const char *nimname, const char *meshname, int size);
@@ -1126,25 +922,13 @@ void WritePPM (const RVector &img, const IVector &gdim,
 double *scalemin, double *scalemax, char *fname);
 CVector getDiag(void * context);
 
-
-// error handler for FE library routines *************************************
-
-void LocalErrorhandler (char *msg)
-{
-    cerr << "\nread_toastbemmesh (PID " << getpid() << ")\n" << msg << endl << flush;
-    cerr << "Aborted.\n";
-    //    logfile << msg << endl << "Aborted." << endl;
-    exit (1);
-}
-
 // main routine **************************************************************
 
 int main (int argc, char *argv[])
 {
     char cbuf[200];
     int el;
-
-    //    logfile << "Reading mesh" << endl;
+    
     cout << "Reading mesh " << argv[1] << endl;
     ifstream ifs;
     ifs.open (argv[1]);
@@ -1152,48 +936,44 @@ int main (int argc, char *argv[])
     ifs >> qmmesh;
     xASSERT (ifs.good(), Problem reading mesh.);
     ifs.close ();
-    cout << "* " << qmmesh.elen() << " elements, " << qmmesh.nlen()
+    cout << "Spatial mesh has " << qmmesh.elen() << " elements, " << qmmesh.nlen()
 	 << " nodes\n";
     int dimension = nlist[0].Dim();
     for (int i = 1; i < nlist.Len(); i++)
 	xASSERT(nlist[i].Dim() == dimension, Inconsistent node dimensions.);
     xASSERT(dimension >= 2 && dimension <= 3, Mesh dimension must be 2 or 3.);
-    //    elist[0]->Initialise(nlist);
     qmmesh.Setup();
 
-    // set up angular "mesh"
 
     Mesh S2Mesh;
 
     ifstream ifm(argv[2]);
     ifm >> S2Mesh;
     ifm.close();
-    cout << "Angular  " << S2Mesh.elen() << " elements, " << S2Mesh.nlen()
+    cout << "Angular mesh has " << S2Mesh.elen() << " elements, " << S2Mesh.nlen()
          << " nodes\n";
     S2Mesh.Setup();
     const int& SN =  S2Mesh.nlen();       // dimensions are size of nodes.
 
     char file_extn[200];
     cin>>file_extn;
-    cout<<"File name prefix: "<<file_extn<<endl;
+    cout<<"File name prefix: "<<file_extn<<endl;// prefix for the output files
 
-        //****** sources.
-    //****** should read in QM file, but just set something for now.
-    cout << "Forming the source\n";
-    int ns = 1, nM;
-    int *Nsource = new int [ns];
+    int ns, nM;
+    int *Nsource;
     int    qprof, mprof;   // source/measurement profile (0=Gaussian, 1=Cosine)
     double qwidth, mwidth; // source/measurement support radius [mm]
     CCompRowMatrix qvec, mvec;
-    //    Measurement datatype;
-    if(argc < 4) {
-    //****** should read in QM file, but just set something for now.
-    cin>>Nsource[0];
-    cout << "source node coords: "<<nlist[Nsource[0]]<<endl;
+    if(argc < 4) { //point source
+    	cin>>ns;
+    	Nsource = new int[ns];
+    	for(int i=0; i<ns; i++)
+    	{
+    		cin>>Nsource[i];
+    		cout << i<<"th source node coords: "<<nlist[Nsource[i]]<<endl;
+	}
     }
     else {
-
-    //    logfile << "Reading mesh" << endl;
     cout << "QM file " << argv[3] << endl;
     ifs.open (argv[3]);
     xASSERT (ifs.is_open(), QM file not found.);
@@ -1244,12 +1024,11 @@ int main (int argc, char *argv[])
 	  m[j] *= qmmesh.plist[j].C2A();
 	mvec.SetRow (i, m);
     }
-    cout<<"set measurement vector ..."<<endl;	
     }
     //******** optical parameters
     double freq = 0, hg;
     int is_iso;
-    bool is_isotropic;
+    bool is_cosine;
     RVector dirVec(3);
     
     cin >> hg;  
@@ -1258,11 +1037,11 @@ int main (int argc, char *argv[])
     cin >> freq; 
     cout << "value for frequency (MHz) : "<<freq<<endl;
     cin>> is_iso;
-    is_isotropic = is_iso>0 ? true : false;
-    cout<<"Is the source isotropic or not: "<<is_isotropic<<endl;
+    is_cosine = is_iso>0 ? true : false;
+    cout<<"The source is cosine or directed (1. Cosine 0. Directed): "<<is_cosine<<endl;
     cin>>dirVec[0]; cin>>dirVec[1]; cin>>dirVec[2];
-    dirVec = dirVec*1.0/length(dirVec);
-    cout<<"Source direction vector is: ["<<dirVec[0]<<", "<<dirVec[1]<<", "<<dirVec[2]<<"]"<<endl;
+    dirVec = dirVec*1.0/length(dirVec);// normalize the direction vector just in case
+    cout<<"The direction vector for the source (if it is directed): "<<dirVec[0]<<", "<<dirVec[1]<<", "<<dirVec[2]<<endl;
     double w = freq * 2.0*M_PI*1e-6;
     double c = 0.3;
 
@@ -1279,52 +1058,27 @@ int main (int argc, char *argv[])
       cin >> ref[el]; 
       g[el] = hg; 
     }
-    cout << "mua " << muabs[0] << " mus " << muscat[0] <<endl;
 
     RVector sigmatot(qmmesh.elen());
     RVector sigma(qmmesh.elen()); // to be assigned
     RVector intst;
-    //***** parameters 
-    cout << "Frequency " << freq << " MHz\n";
     
-    //sigma = new RDenseMatrix [qmmesh.elen() ];
     calc_paramdistr_nobf_new_3D(sigma, sigmatot, intst, qmmesh, muscat, muabs,  g, S2Mesh);
 
-    cout << "intst " << intst << endl;
     // "smoothing parameter delta of streamline diffusion modification.
     // Just set to constant for now.
-
-    cout<<"Source node is: "<<nlist[1669]<<endl;
     RVector delta(qmmesh.elen());
     double min = 1e20, max = -1e20;
-    cout << "delta " ;
     for(el = 0; el <  qmmesh.elen(); el++){ // assign something to delta 
 #ifdef VARYDELTA 
-	 // this requires Nsource to be set...
-         Point centre = Point3D(0, 0, 0);
-	 int nNode =  elist[el]->nNode();
-	 for(int i=0; i < nNode; i++) 
-		centre += nlist[elist[el]->Node[i]];
-	 centre = centre/nNode;
-	 //double sval =  elist[el]->Size()/((muscat[el]));
-         double sval = 1/(5.0*(muabs[el] + muscat[el]));
-	 double dist = l2norm(centre - nlist[1669]);
-	 double rval = 5.0*sval/dist; 
-         delta[el] = MIN(sval,rval);
-	 //delta[el] = sval;
+        double sval =  elist[el]->Size()/((muscat[el]));
+	delta[el] = sval;
 #else
 	 min = max = delta[0];
 #endif 
-	 //	 cout << delta[el] << " ";
     }
-    cout << "min : " << vmin(delta) << "max : " << vmax(delta) << endl;
-
-    //************ system matrices
-    cout << "calculating finite element integrals\n";
-    /**/
 
     MyDataContext ctxt(qmmesh, S2Mesh, delta, muabs, muscat, sktyp, w, c);
-    testspeeds(&ctxt);
 
     RVector norm(S2Mesh.nlen());
     for(int i=0; i < S2Mesh.nlen(); i++)
@@ -1350,14 +1104,12 @@ int main (int argc, char *argv[])
     if( !(Source = new  CCompRowMatrix [ns]))
           cerr << "Memory Allocation error Source = new  RCompRowMatrix\n";
     if(argc<4)
-      genmat_source_3D(Source, qmmesh, S2Mesh , Nsource, ns, ctxt.b1);
+      genmat_source_3D(Source, qmmesh, S2Mesh , Nsource, ns, ctxt.b1, is_cosine, angMesh_node);
     else
-      genmat_toastsource3D(Source, qmmesh, S2Mesh, qvec, ns, ctxt.b1, is_isotropic, angMesh_node);
+      genmat_toastsource_3D(Source, qmmesh, S2Mesh, qvec, ns, ctxt.b1, is_cosine, angMesh_node);
 
-  /* CCompRowMatrix b2;
-   RVector dirVec(3); 
-   dirVec[0] = 0; dirVec[1] = 1.0; dirVec[2] = 0; 
-   genmat_b2_cos(qmmesh, S2Mesh, b2, 4630, dirVec, is_isotropic);*/
+   CCompRowMatrix b2;
+   genmat_b2(qmmesh, S2Mesh, b2, Nsource[0], dirVec, is_cosine, angMesh_node);
  
     cout << "calculating the radiance\n";
     int sysdim = qmmesh.nlen();
@@ -1376,18 +1128,16 @@ int main (int argc, char *argv[])
     int iter;
     clock_t start = clock();
     for (int j = 0; j < ns ; j++) {   
-      cout << "start source " << j << endl;
+      cout << "Radiance with the source number:  " << j << endl;
 
       Phi[j].New(fullsysdim);
       Phisum[j].New(sysdim);
-      for(int i = 0; i < fullsysdim; i++)
-	RHS[i] = Source[j].Get(i,0);// + b2.Get(i, 0);
-	//RHS[i] = b2.Get(i, 0);
+      for(int i = 0; i < fullsysdim; i++){
+	RHS[i] = Source[j].Get(i,0) + b2.Get(i, 0);
+	}
 	
       GMRES(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
-      // BiCGSTAB(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
       osRHS << RHS << endl;
-      cout << "finished source " << j << endl;
       osPhi << "Phi " << j << "\n" << Phi[j] << endl;
       for (int k = 0; k < sysdim; k++) {
 	for (int t = 0; t < SN; t++){
@@ -1405,9 +1155,9 @@ int main (int argc, char *argv[])
     osPhisum.close();
     osRHS.close();
     
-    char flnmod[300], farg[300];
-    strcpy(flnmod, file_extn); strcpy(farg, file_extn);
-    strcat(flnmod, "_lnmod.nim"); strcat(farg, "_arg.nim"); 
+    char flnmod[300], farg[300], ftime[300];
+    strcpy(flnmod, file_extn); strcpy(farg, file_extn);strcpy(ftime, file_extn);
+    strcat(flnmod, "_lnmod.nim"); strcat(farg, "_arg.nim");strcat(ftime, "_time.txt");
     OpenNIM (flnmod, argv[1], sysdim);
     OpenNIM (farg, argv[1], sysdim);
     for (int i = 0; i < ns; i++) {
@@ -1416,237 +1166,78 @@ int main (int argc, char *argv[])
     }
     cout << "  Log Mod field written to "<< flnmod << endl;
     cout << "  Arg field written to "<<farg << endl;
-
-    // output data files
-
-
-	WriteData (LogMod(proj), "fmod_hr.fem");
-	cout<<"fmod_hr.fem written ..."<<endl;
-        WriteData (Arg(proj), "farg_hr.fem");
-	cout<<"farg_hr.fem written ..."<<endl;
-        WriteDataBlock (qmmesh, LogMod(proj), "fmod_hr.dat");
-	cout<<"fmod_hr.dat written ..."<<endl;
-	WriteDataBlock (qmmesh, Arg(proj), "farg_hr.dat");
-	cout<<"farg_hr.dat written ..."<<endl;
+ 
+    FILE *fid;
+    fid = fopen(ftime, "w");
+    fprintf(fid, "Time taken by solver: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
+    fclose(fid);
 
     cout<<"The solver took "<<(double)(end-start)/CLOCKS_PER_SEC<<" seconds"<<endl;
 
 	delete []Phi;
 	delete []Phisum;
 	delete []Nsource;
-	//delete []Source;
 
 }
 
-void setrow(CCompRowMatrix &mat, int r, CVector &rv){
-	complex *val = mat.ValPtr();
-	int ncols = rv.Dim();
-	for(int j=0; j < ncols; j++)
-		val[r*ncols + j] = rv[j];
-}
-
-inline CDenseMatrix sdmatmult(const CCompRowMatrix &A, const CDenseMatrix &B)
+/** Computes Ax 
+	A -> Real sparse matrix
+	x -> Complex vector
+     NOTE!! It's rightful place in crmatrix class using templates
+**/
+inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
 {
-    dASSERT(A.nCols() == B.nRows(), Invalid sizes of matrices);
-    int i, j, k, m, ra, ra1, ra2;
-    int nr = A.nRows();
-    int nc = B.nCols();
-    CDenseMatrix C(nr, nc);
-    const complex *val = A.ValPtr();
-    complex *valc = C.data_buffer();
-    for (i = 0; i < nr; i++) {
-	ra1 = A.rowptr[i];
-	ra2 = A.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = A.colidx[ra];
-	    for(j = 0; j < nc; j++){
-		valc[i*nc+j] += val[ra]*B.Get(k, j); 
-		}
-     }
-	}
-  return C;	
+    dASSERT_2PRM(x.Dim() == A.nCols(),
+    "Parameter 1 invalid size (expected %d, actual %d)",
+    A.nCols(), x.Dim());
+    if (res.Dim() != A.nRows()) res.New(A.nRows());
+
+    int r, i, i2;
+    complex br;
+    const double *aval;
+    aval = A.ValPtr();
+
+    for (r = i = 0; r < A.nRows();) {
+	i2 = A.rowptr[r+1];
+	for (br = complex(0, 0); i < i2; i++)
+	    br += x[A.colidx[i]]*aval[i];
+	res[r++] = br;
+    }
+
 }
 
-inline void dsmatmult(const CDenseMatrix &A, const CCompRowMatrix &B, CDenseMatrix &C)
-{
-    dASSERT(A.nCols() == B.nRows(), Invalid sizes of matrices);
-    int i, j, k, m, ra, ra1, ra2;
-    int nar = A.nRows(), nac = A.nCols();
-    int angN = B.nCols();
-    //CDenseMatrix C(nar, angN);
-    const complex *val = B.ValPtr();
-    complex *valc = C.data_buffer();
-    for(i=0; i < nac; i++){
-	ra1 = B.rowptr[i];
-        ra2 = B.rowptr[i+1];
-	for(ra = ra1; ra<ra2; ra++){
-		j = B.colidx[ra];
-		for(k=0; k<nar; k++)	 
-			valc[k*angN + j] += A.Get(k, i)*val[ra];}}
-  //return C;	
-}
-inline void testspeeds(void * context)
-{
-   
-      MyDataContext *ctxt = (MyDataContext*) context;
-    int spatN = ctxt->spatN; 
-    int angN = ctxt->angN;
-    CVector result(spatN*angN);
-    FILE *fid;
-    fid = fopen("MatVecMult_speeds.txt", "w");
-	
-    CVector x(spatN*angN);
-    for(int i=0; i < spatN*angN; i++)
-	x[i] = 1.0;
-    
-    complex *val = ctxt->Xmat.data_buffer();
-    memcpy (val, x.data_buffer(), angN*spatN*sizeof(complex));
-
-    clock_t startA0 = clock();
-    ctxt->Aintx.Zero(); ctxt->Aintscx.Zero(); ctxt->Aintssx.Zero(); ctxt->Aintcx.Zero();
-    dsmatmult(ctxt->Xmat, ctxt->Aint, ctxt->Aintx); dsmatmult(ctxt->Xmat, ctxt->Aintsc, ctxt->Aintscx); 
-    dsmatmult(ctxt->Xmat, ctxt->Aintss, ctxt->Aintssx); dsmatmult(ctxt->Xmat, ctxt->Aintc, ctxt->Aintcx); 
-    ctxt->A0_RTE.Zero(); ctxt->A0_SDM.Zero(); 
-    int i, j,k, ra, ra1, ra2;
-    for (i = 0; i < ctxt->Sint.nRows(); i++) {
-	ra1 = ctxt->Sint.rowptr[i];
-	ra2 = ctxt->Sint.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = ctxt->Sint.colidx[ra];
-	    for(j = 0; j < angN; j++){
-		ctxt->A0_RTE(i, j) = ctxt->A0_RTE.Get(i, j) +  ctxt->sintval[ra]*ctxt->Aintx.Get(k, j); 
-		ctxt->A0_SDM(i, j) = ctxt->A0_SDM.Get(i, j) + ctxt->sdxval[ra]*ctxt->Aintscx.Get(k, j) + ctxt->sdyval[ra]*ctxt->Aintssx.Get(k, j) + ctxt->sdzval[ra]*ctxt->Aintcx.Get(k, j);
-		}
-     }
-   }
- 
-    ctxt->A = (ctxt->A0_RTE + ctxt->A0_SDM); 
-    clock_t endA0 = clock();
-    fprintf(fid, "Time taken by A0 : %f\n", (double)(endA0-startA0)/CLOCKS_PER_SEC);
-
-    clock_t startA1 = clock();
-    ctxt->Aintscx.Zero(); ctxt->Aintssx.Zero(); ctxt->Aintcx.Zero();
-    ctxt->Aintscscx.Zero(); ctxt->Aintscssx.Zero(); ctxt->Aintssssx.Zero(); ctxt->Aintsccx.Zero();
-    ctxt->Aintsscx.Zero(); ctxt->Aintccx.Zero();
-    dsmatmult(ctxt->Xmat, ctxt->Aintsc, ctxt->Aintscx); 
-    dsmatmult(ctxt->Xmat, ctxt->Aintss, ctxt->Aintssx); dsmatmult(ctxt->Xmat, ctxt->Aintc, ctxt->Aintcx); 
-    dsmatmult(ctxt->Xmat, ctxt->Aintscsc, ctxt->Aintscscx); dsmatmult(ctxt->Xmat, ctxt->Aintscss, ctxt->Aintscssx);  
-    dsmatmult(ctxt->Xmat, ctxt->Aintssss, ctxt->Aintssssx); dsmatmult(ctxt->Xmat, ctxt->Aintscc, ctxt->Aintsccx);  
-    dsmatmult(ctxt->Xmat, ctxt->Aintssc, ctxt->Aintsscx); dsmatmult(ctxt->Xmat, ctxt->Aintcc, ctxt->Aintccx); 
-    ctxt->A1_RTE.Zero(); ctxt->A1_SDM.Zero(); 
-    for (i = 0; i < ctxt->Sint.nRows(); i++) {
-	ra1 = ctxt->Sint.rowptr[i];
-	ra2 = ctxt->Sint.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = ctxt->Sint.colidx[ra];
-	    for(j = 0; j < angN; j++){
-		ctxt->A1_RTE(i, j) = ctxt->A1_RTE.Get(i, j) + ctxt->sxval[ra]*ctxt->Aintscx.Get(k, j) + ctxt->syval[ra]*ctxt->Aintssx.Get(k, j) + ctxt->szval[ra]*ctxt->Aintcx.Get(k, j);
-		
-		ctxt->A1_SDM(i, j) = ctxt->A1_SDM.Get(i, j) + ctxt->sdxxval[ra]*ctxt->Aintscscx.Get(k, j) + (ctxt->sdxyval[ra]+ctxt->sdyxval[ra])*ctxt->Aintscssx.Get(k, j);
-		ctxt->A1_SDM(i, j) = ctxt->A1_SDM.Get(i, j) + ctxt->sdyyval[ra]*ctxt->Aintssssx.Get(k, j) + (ctxt->sdyzval[ra]+ctxt->sdzyval[ra])*ctxt->Aintsscx.Get(k, j);
-		ctxt->A1_SDM(i, j) = ctxt->A1_SDM.Get(i, j) + ctxt->sdzzval[ra]*ctxt->Aintccx.Get(k, j) + (ctxt->sdxzval[ra]+ctxt->sdzxval[ra])*ctxt->Aintsccx.Get(k, j);
-		}
-     }
-   }
- 
-    ctxt->A = (ctxt->A1_RTE + ctxt->A1_SDM); 
-    clock_t endA1 = clock();
-    fprintf(fid, "Time taken by A1 : %f\n", (double)(endA1-startA1)/CLOCKS_PER_SEC);
-
-    clock_t startA2 = clock();
-    ctxt->A2.Ax(x, ctxt->A2x);
-    clock_t endA2 = clock();
-    fprintf(fid, "Time taken by A1 : %f\n", (double)(endA2-startA2)/CLOCKS_PER_SEC);
-
-    clock_t startA3 = clock();
-    ctxt->Aintx.Zero(); ctxt->Aintscx.Zero(); ctxt->Aintssx.Zero(); ctxt->Aintcx.Zero();
-    dsmatmult(ctxt->Xmat, ctxt->Aint, ctxt->Aintx); dsmatmult(ctxt->Xmat, ctxt->Aintsc, ctxt->Aintscx); 
-    dsmatmult(ctxt->Xmat, ctxt->Aintss, ctxt->Aintssx); dsmatmult(ctxt->Xmat, ctxt->Aintc, ctxt->Aintcx); 
-    ctxt->A3.Zero(); 
-    for (i = 0; i < ctxt->Sint.nRows(); i++) {
-	ra1 = ctxt->Sint.rowptr[i];
-	ra2 = ctxt->Sint.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = ctxt->Sint.colidx[ra];
-	    for(j = 0; j < angN; j++){
-		ctxt->A3(i, j) = ctxt->A3.Get(i, j) + ctxt->spata3_rteval[ra]*ctxt->Aintx.Get(k, j) + ctxt->spata3_sdmxval[ra]*ctxt->Aintscx.Get(k, j) + ctxt->spata3_sdmyval[ra]*ctxt->Aintssx.Get(k, j) + ctxt->spata3_sdmzval[ra]*ctxt->Aintcx.Get(k, j);
-		}
-     }
-   }
- 
-    ctxt->A = (ctxt->A3); 
-    clock_t endA3 = clock();
-    fprintf(fid, "Time taken by A3 : %f\n", (double)(endA3-startA3)/CLOCKS_PER_SEC);
-
-    clock_t startA4 = clock();
-    ctxt->apu1x.Zero(); ctxt->apu1scx.Zero(); ctxt->apu1ssx.Zero(); ctxt->apu1cx.Zero();
-    dsmatmult(ctxt->Xmat, ctxt->apu1, ctxt->apu1x); dsmatmult(ctxt->Xmat, ctxt->apu1sc, ctxt->apu1scx);  
-    dsmatmult(ctxt->Xmat, ctxt->apu1ss, ctxt->apu1ssx); dsmatmult(ctxt->Xmat, ctxt->apu1c, ctxt->apu1cx); 
-    ctxt->A4.Zero(); 
-    for (i = 0; i < ctxt->Sint.nRows(); i++) {
-	ra1 = ctxt->Sint.rowptr[i];
-	ra2 = ctxt->Sint.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = ctxt->Sint.colidx[ra];
-	    for(j = 0; j < angN; j++){
-	 ctxt->A4(i, j) = ctxt->A4.Get(i, j) + ctxt->spsval[ra]*ctxt->apu1x.Get(k, j) + ctxt->spsdxval[ra]*ctxt->apu1scx.Get(k, j) + ctxt->spsdyval[ra]*ctxt->apu1ssx.Get(k, j) + ctxt->spsdzval[ra]*ctxt->apu1cx.Get(k, j); 
-		}
-     }
-   }
-
-    ctxt->A = (ctxt->A4); 
-    clock_t endA4 = clock();
-    fprintf(fid, "Time taken by A4 : %f\n", (double)(endA4-startA4)/CLOCKS_PER_SEC);
-
-   /*     */
-       /* 
-    
-    */
-
-       //ctxt->A3.Zero(); ctxt->A4.Zero();
-   
-	        /*
-	
-	       */
-//+ (ctxt->A1_SDM - ctxt->A1_RTE) + ctxt->A3 - ctxt->A4;
-
-    /*complex *res  = result.data_buffer();
-    complex *arg1 = ctxt->A2x.data_buffer();
-    complex *arg2 = ctxt->A.data_buffer();
-    for (int i=0; i < spatN*angN; i++)
-    	*res++ += *arg1++ + *arg2++;*/ 
-   	/*ctxt->A2.Ax(x, ctxt->A2x);
-    	complex *res  = result.data_buffer();
-    	complex *arg1 = ctxt->A2x.data_buffer();
-    	for (int i=0; i < dof; i++)
-    		*res++ += *arg1++;*/
-
-    fclose(fid);
-    cout<<"Speed check file written"<<endl;
-
-   }
-
-
+/** Computes Sx required by the GMRES solver
+*	S -> System matrix
+*	x -> current guess of the solution
+**/
 inline CVector matrixFreeCaller(const CVector& x, void * context)
 {
-   /*MyDataContext *ctxt = (MyDataContext*) context;
+    MyDataContext *ctxt = (MyDataContext*) context;
+    	
 	int spatN = ctxt->spatN;
 	int angN = ctxt->angN;
 	int dof = spatN*angN;
 	CVector result(dof);
-
-
+	
+	/*Implict Kronecker product implementation
+	*	(S \circplus A)x = Sx_{r}A^{T}
+	* where 'x_{r}' is a matrix resulting form reshaping of 'x'. 
+	*/
+	
+	/*Reshaping 'x' to 'x_{r}'*/
 	memcpy (ctxt->xmatval, x.data_buffer(), dof*sizeof(complex));
 
 	int i, j, k, m, ra, ra1, ra2, rb, rb1, rb2;
     	int nr = ctxt->Xmat.nRows();
-    	int nc = ctxt->Aint.nCols();
+    	int nc = ctxt->Xmat.nCols();
     	
+	/*Intialize Ax's to zero where A is the angular matrix*/	
 	ctxt->Aintx.Zero(); ctxt->Aintscx.Zero(); ctxt->Aintssx.Zero(); ctxt->Aintcx.Zero();
 	ctxt->apu1x.Zero(); ctxt->apu1scx.Zero(); ctxt->apu1ssx.Zero(); ctxt->apu1cx.Zero();
 	ctxt->Aintscscx.Zero(); ctxt->Aintscssx.Zero(); ctxt->Aintssssx.Zero(); ctxt->Aintsccx.Zero();
 	ctxt->Aintsscx.Zero(); ctxt->Aintccx.Zero();
-	
+
+	/*Dereference the val pointers of Ax's*/
 	complex *aintxval = ctxt->Aintx.data_buffer(); complex *aintscxval = ctxt->Aintscx.data_buffer(); complex *aintssxval = ctxt->Aintssx.data_buffer();
 	complex *aintcxval = ctxt->Aintcx.data_buffer(); complex *apu1xval = ctxt->apu1x.data_buffer(); complex *apu1scxval = ctxt->apu1scx.data_buffer();  
 	complex *apu1ssxval = ctxt->apu1ssx.data_buffer(); complex *apu1cxval = ctxt->apu1cx.data_buffer(); 
@@ -1654,14 +1245,11 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	complex *aintssssxval = ctxt->Aintssssx.data_buffer(); complex *aintsccxval = ctxt->Aintsccx.data_buffer();  
 	complex *aintsscxval = ctxt->Aintsscx.data_buffer();  complex *aintccxval = ctxt->Aintccx.data_buffer();  
 
-
+	/*Computing x_{r}A^{T}*/
 	complex xval;
     	for (i = 0; i < nr; i++) {
-    		ra1 = ctxt->Xmat.rowptr[i];
-		ra2 = ctxt->Xmat.rowptr[i+1];
-		for (ra = ra1; ra < ra2; ra++) {
-			j = ctxt->Xmat.colidx[ra];
-			xval = ctxt->xmatval[ra];
+		for (j = 0; j < nc; j++) {
+			xval = ctxt->Xmat.Get(i, j);
 
 	    		rb1 = ctxt->Aint.rowptr[j];
 	    		rb2 = ctxt->Aint.rowptr[j+1];
@@ -1764,102 +1352,49 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 
 		}
     }
-
+   
+    /*Computing S(x_{r}A^{T})*/
     int scol;
     for(int is = 0; is < spatN; is++)
     {
-	for(int ia = 0; ia < ctxt->angN; ia++)
+	for(int ia = 0; ia < angN; ia++)
 	{
 		complex temp(0, 0);
 		for(int js = ctxt->Sint.rowptr[is]; js < ctxt->Sint.rowptr[is+1]; js++)
 		{
 			scol = ctxt->Sint.colidx[js];
-			temp += (ctxt->sintval[js] + ctxt->spata3_rteval[js])*aintxval[scol*angN +  ia];
-			temp += (ctxt->sdxval[js] + ctxt->spata3_sdmxval[js] - ctxt->sxval[js])*aintscxval[scol*angN +  ia];
-			temp += (ctxt->sdyval[js] + ctxt->spata3_sdmyval[js] - ctxt->syval[js])*aintssxval[scol*angN +  ia];
-			temp += (ctxt->sdzval[js] + ctxt->spata3_sdmzval[js] - ctxt->szval[js])*aintcxval[scol*angN +  ia];
-			temp += ctxt->sdxxval[js]*aintscscxval[scol*angN +  ia];
-			temp += (ctxt->sdxyval[js] + ctxt->sdyxval[js])*aintscssxval[scol*angN +  ia];
-			temp += ctxt->sdyyval[js]*aintssssxval[scol*angN +  ia];
-			temp += (ctxt->sdxzval[js] + ctxt->sdzxval[js])*aintsccxval[scol*angN +  ia];
-			temp += (ctxt->sdyzval[js] + ctxt->sdzyval[js])*aintsscxval[scol*angN +  ia];
-			temp += ctxt->sdzzval[js]*aintccxval[scol*angN +  ia];
-			temp -= ctxt->spsval[js]*apu1xval[scol*angN +  ia];
-			temp -= ctxt->spsdxval[js]*apu1scxval[scol*angN +  ia];
-			temp -= ctxt->spsdyval[js]*apu1ssxval[scol*angN +  ia];
-			temp -= ctxt->spsdzval[js]*apu1cxval[scol*angN +  ia];
+			temp += aintxval[scol*angN +  ia]*(ctxt->sintval[js] + ctxt->spata3_rteval[js]);
+			temp += aintscxval[scol*angN +  ia]*(ctxt->sdxval[js] + ctxt->spata3_sdmxval[js] - ctxt->sxval[js]);
+			temp +=aintssxval[scol*angN +  ia]*(ctxt->sdyval[js] + ctxt->spata3_sdmyval[js] - ctxt->syval[js]);
+			temp += aintcxval[scol*angN +  ia]*(ctxt->sdzval[js] + ctxt->spata3_sdmzval[js] - ctxt->szval[js]);
+			temp += aintscscxval[scol*angN +  ia]*ctxt->sdxxval[js];
+			temp += aintscssxval[scol*angN +  ia]*(ctxt->sdxyval[js] + ctxt->sdyxval[js]);
+			temp += aintssssxval[scol*angN +  ia]*ctxt->sdyyval[js];
+			temp += aintsccxval[scol*angN +  ia]*(ctxt->sdxzval[js] + ctxt->sdzxval[js]);
+			temp += aintsscxval[scol*angN +  ia]*(ctxt->sdyzval[js] + ctxt->sdzyval[js]);
+			temp += aintccxval[scol*angN +  ia]*ctxt->sdzzval[js];
+			temp -= apu1xval[scol*angN +  ia]*ctxt->spsval[js];
+			temp -= apu1scxval[scol*angN +  ia]*ctxt->spsdxval[js];
+			temp -= apu1ssxval[scol*angN +  ia]*ctxt->spsdyval[js];
+			temp -= apu1cxval[scol*angN +  ia]*ctxt->spsdzval[js];
 		}
 		result[is*angN + ia]  = temp;
 	} 
-	}
+    }
 
-
- 
-	ctxt->A2.Ax(x, ctxt->A2x);
-    	complex *res  = result.data_buffer();
-    	complex *arg1 = ctxt->A2x.data_buffer();
-    	for (int i=0; i < dof; i++)
-    		*res++ += *arg1++;
-
-    	return result;*/
-      MyDataContext *ctxt = (MyDataContext*) context;
-    int spatN = ctxt->spatN; 
-    int angN = ctxt->angN;
-    CVector result(spatN*angN);
-  
-    complex *val = ctxt->Xmat.data_buffer();
-    memcpy (val, x.data_buffer(), angN*spatN*sizeof(complex));
-    
-    ctxt->Aintx.Zero(); ctxt->Aintscx.Zero(); ctxt->Aintssx.Zero(); ctxt->Aintcx.Zero();
-    ctxt->apu1x.Zero(); ctxt->apu1scx.Zero(); ctxt->apu1ssx.Zero(); ctxt->apu1cx.Zero();
-    ctxt->Aintscscx.Zero(); ctxt->Aintscssx.Zero(); ctxt->Aintssssx.Zero(); ctxt->Aintsccx.Zero();
-    ctxt->Aintsscx.Zero(); ctxt->Aintccx.Zero();
-    dsmatmult(ctxt->Xmat, ctxt->Aint, ctxt->Aintx); dsmatmult(ctxt->Xmat, ctxt->Aintsc, ctxt->Aintscx); 
-    dsmatmult(ctxt->Xmat, ctxt->Aintss, ctxt->Aintssx); dsmatmult(ctxt->Xmat, ctxt->Aintc, ctxt->Aintcx); 
-    dsmatmult(ctxt->Xmat, ctxt->Aintscsc, ctxt->Aintscscx); dsmatmult(ctxt->Xmat, ctxt->Aintscss, ctxt->Aintscssx);  
-    dsmatmult(ctxt->Xmat, ctxt->Aintssss, ctxt->Aintssssx); dsmatmult(ctxt->Xmat, ctxt->Aintscc, ctxt->Aintsccx);  
-    dsmatmult(ctxt->Xmat, ctxt->Aintssc, ctxt->Aintsscx); dsmatmult(ctxt->Xmat, ctxt->Aintcc, ctxt->Aintccx);  
-    dsmatmult(ctxt->Xmat, ctxt->apu1, ctxt->apu1x); dsmatmult(ctxt->Xmat, ctxt->apu1sc, ctxt->apu1scx);  
-    dsmatmult(ctxt->Xmat, ctxt->apu1ss, ctxt->apu1ssx); dsmatmult(ctxt->Xmat, ctxt->apu1c, ctxt->apu1cx); 
-
-    ctxt->A2.Ax(x, ctxt->A2x); 
-
-    ctxt->A0_RTE.Zero(); ctxt->A0_SDM.Zero(); ctxt->A1_RTE.Zero(); ctxt->A1_SDM.Zero(); ctxt->A3.Zero(); ctxt->A4.Zero();
-    int i, j,k, ra, ra1, ra2;
-    for (i = 0; i < ctxt->Sint.nRows(); i++) {
-	ra1 = ctxt->Sint.rowptr[i];
-	ra2 = ctxt->Sint.rowptr[i+1];
-	for (ra = ra1; ra < ra2; ra++) {
-	    k = ctxt->Sint.colidx[ra];
-	    for(j = 0; j < angN; j++){
-		ctxt->A0_RTE(i, j) = ctxt->A0_RTE.Get(i, j) +  ctxt->sintval[ra]*ctxt->Aintx.Get(k, j); 
-		ctxt->A0_SDM(i, j) = ctxt->A0_SDM.Get(i, j) + ctxt->sdxval[ra]*ctxt->Aintscx.Get(k, j) + ctxt->sdyval[ra]*ctxt->Aintssx.Get(k, j) + ctxt->sdzval[ra]*ctxt->Aintcx.Get(k, j);
-
-	        ctxt->A1_RTE(i, j) = ctxt->A1_RTE.Get(i, j) + ctxt->sxval[ra]*ctxt->Aintscx.Get(k, j) + ctxt->syval[ra]*ctxt->Aintssx.Get(k, j) + ctxt->szval[ra]*ctxt->Aintcx.Get(k, j);
-		
-		ctxt->A1_SDM(i, j) = ctxt->A1_SDM.Get(i, j) + ctxt->sdxxval[ra]*ctxt->Aintscscx.Get(k, j) + (ctxt->sdxyval[ra]+ctxt->sdyxval[ra])*ctxt->Aintscssx.Get(k, j);
-		ctxt->A1_SDM(i, j) = ctxt->A1_SDM.Get(i, j) + ctxt->sdyyval[ra]*ctxt->Aintssssx.Get(k, j) + (ctxt->sdyzval[ra]+ctxt->sdzyval[ra])*ctxt->Aintsscx.Get(k, j);
-		ctxt->A1_SDM(i, j) = ctxt->A1_SDM.Get(i, j) + ctxt->sdzzval[ra]*ctxt->Aintccx.Get(k, j) + (ctxt->sdxzval[ra]+ctxt->sdzxval[ra])*ctxt->Aintsccx.Get(k, j);
-
-		ctxt->A3(i, j) = ctxt->A3.Get(i, j) + ctxt->spata3_rteval[ra]*ctxt->Aintx.Get(k, j) + ctxt->spata3_sdmxval[ra]*ctxt->Aintscx.Get(k, j) + ctxt->spata3_sdmyval[ra]*ctxt->Aintssx.Get(k, j) + ctxt->spata3_sdmzval[ra]*ctxt->Aintcx.Get(k, j);
-
-	        ctxt->A4(i, j) = ctxt->A4.Get(i, j) + ctxt->spsval[ra]*ctxt->apu1x.Get(k, j) + ctxt->spsdxval[ra]*ctxt->apu1scx.Get(k, j) + ctxt->spsdyval[ra]*ctxt->apu1ssx.Get(k, j) + ctxt->spsdzval[ra]*ctxt->apu1cx.Get(k, j); 
-		}
-     }
-   }
- 
-    ctxt->A = (ctxt->A0_RTE + ctxt->A0_SDM) + (ctxt->A1_SDM - ctxt->A1_RTE) + ctxt->A3 - ctxt->A4;
-
+    /*Computing A_{2}x explicitly where A_{2} is the matrix resulting from boundary*/
+    RCAx(ctxt->A2, x, ctxt->A2x);
     complex *res  = result.data_buffer();
     complex *arg1 = ctxt->A2x.data_buffer();
-    complex *arg2 = ctxt->A.data_buffer();
-    for (int i=0; i < spatN*angN; i++)
-    	*res++ += *arg1++ + *arg2++;
-    return result;
+    for (int i=0; i < dof; i++)
+    	*res++ += *arg1++;
 
+    return result;
    
    }
 
+/** Computes the diagonal of the system matrix which is required for preconditioning
+**/
 CVector getDiag(void * context)
 {
     MyDataContext *ctxt = (MyDataContext*) context;
@@ -1875,10 +1410,10 @@ CVector getDiag(void * context)
     for(int j=0; j < nDim; j++)
     {
 	arow = j/angN; brow = j%angN;
-	a0_rte = ctxt->Aint.Get(brow, brow) * ctxt->Sint.Get(arow, arow);
-	a0_sdm =  ctxt->Aintsc.Get(brow, brow)*ctxt->Sdx.Get(arow, arow);
-	a0_sdm += ctxt->Aintss.Get(brow, brow) * ctxt->Sdy.Get(arow, arow);
-  	a0_sdm += ctxt->Aintc.Get(brow, brow)*ctxt->Sdz.Get(arow, arow);
+	a0_rte = ctxt->Sint.Get(arow, arow)*ctxt->Aint.Get(brow, brow);
+	a0_sdm = ctxt->Sdx.Get(arow, arow)*ctxt->Aintsc.Get(brow, brow);
+	a0_sdm += ctxt->Sdy.Get(arow, arow)*ctxt->Aintss.Get(brow, brow);
+  	a0_sdm += ctxt->Sdz.Get(arow, arow)*ctxt->Aintc.Get(brow, brow);
 
 	a1_rte = ctxt->Aintsc.Get(brow, brow)*ctxt->Sx.Get(arow, arow);	
 	a1_rte += ctxt->Aintss.Get(brow, brow)*ctxt->Sy.Get(arow, arow);
@@ -1918,34 +1453,29 @@ CVector getDiag(void * context)
 
 //=========================================================================
 
-void genmat_toastsource3D(CCompRowMatrix* & Source, const Mesh& mesh, const Mesh& S2mesh,  const CCompRowMatrix qvec, const int ns, const CCompRowMatrix& b1, const bool is_isotropic, const int angMesh_node)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+/** Computes source vectors for point sources on the boundary 
+**/
+void genmat_source_3D(CCompRowMatrix* & Source, const Mesh& mesh,  const Mesh& S2mesh, const int* Nsource, const int ns, const CCompRowMatrix& b1, const bool is_cosine, const int angMesh_node)
 {
-   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
-   const int& SE =  S2mesh.elen();       // number of spherical elements.
-   int sysdim = mesh.nlen();       // dimensions are size of nodes.
-   int fullsysdim = sysdim*SN;   // full size of angles X space nodes
+   const int& SN =  S2mesh.nlen();   // dimensions are size of nodes.
+   int sysdim = mesh.nlen();         // dimensions are size of nodes.
+   int fullsysdim = sysdim*SN;       // full size of angles X space nodes
+
    if( !(Source = new  CCompRowMatrix [ns]))
           cerr << "Memory Allocation error Source = new  RCompRowMatrix\n";
 
    CCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
-     genmat_toastsourcevalvector3D_cos(Svec, mesh,  S2mesh, qvec,i, is_isotropic, angMesh_node);
+     genmat_sourcevalvector_3D(Svec, mesh, S2mesh, Nsource[i], is_cosine, angMesh_node);
      Source[i].New(fullsysdim,1);
      b1.AB(Svec,Source[i]);        // Toast weirdness
    }
 }
 
 
-void genmat_toastsourcevalvector3D_cos(CCompRowMatrix& Svec, const Mesh& mesh, 
-const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isotropic, const int angMesh_node)
-  /*      
-    Function generates the source values vector for FEM of the radiative 
-    transfer equation
-  */
+/**Computes source vector for a single point source on the boundary
+**/
+void genmat_sourcevalvector_3D(CCompRowMatrix& Svec, const Mesh& mesh, const Mesh& S2mesh, const int Nsource, const bool is_cosine, const int angMesh_node)
 {
    int el, nodel, i, j, k,is, js;
    const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
@@ -1963,11 +1493,133 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isot
 
    Svec.New (fullsysdim,1);
 
-   //   static int srp[3] = {0,1,2};
-   //   static int sci[2] = {0,0};
-   //   RCompRowMatrix sint(2,1);       // From Tanya's code. Very strange !
-   //   sint.Initialise(srp,sci);
-   //   sint(0,0) = 1; sint(1,0) = 1;
+   int *arp;
+   if( !(arp = new int [SN+1]))
+      cerr << "Memory Allocation error arp = new int\n";
+   for(i = 0; i <= SN; i++) // make it dense for simplicity
+      arp[i] = i;
+
+   int *aci;
+   if( !(aci = new int [SN]))   // structure of boundary element matrix
+      cerr << "Memory Allocation error sci = new int\n";
+   for(i = 0; i < SN; i++) // make it dense for simplicity
+      aci[i] = 0;
+
+
+
+   int *angrowptr, *angcolidx, nzero;
+   S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
+
+   RVector sx(SN);    // sample Sin t Cos p on nodes
+   RVector sy(SN);    // sample Sin t Sin p on nodes
+   RVector sz(SN);    // sample Cos t on nodes
+
+   for (i = 0; i < SN; i++) {  // create the samples on sphere
+    const Node& np = S2mesh.nlist[i] ; // do we really need to copy it ?
+    double ilen = 1.0/length(np); // normalise by length, just to be sure
+    sx[i] = np[0]*ilen;
+    sy[i] = np[1]*ilen;
+    sz[i] = np[2]*ilen;
+   }
+
+   // now create vector, by looping over elements that have a boundary
+   for (el = 0; el < mesh.elen(); el++) {
+        if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
+        if(!mesh.elist[el]->HasBoundarySide()) continue;
+
+	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
+	  // if sd is not a boundary side. skip 
+	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
+
+	  for(i = 0; i < sysdim+1; i++) // make it dense for simplicity
+	    srp[i] = i;
+	  CCompRowMatrix sint(sysdim,1);
+	  sint.Initialise(srp,sci);
+
+	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
+	    is = mesh.elist[el]->SideNode(sd,nd);
+	    js = mesh.elist[el]->Node[is];
+	    sint(js,0) = complex(1.0, 0);
+	  }
+	  // get boundary normal...
+	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector shat = -nhat; // inward directed vector
+
+	  // now do angular integrals
+	  CCompRowMatrix  Angsvec(SN,1);
+	  Angsvec.Initialise(arp, aci);
+	  RVector f(SN);    // sample (shat . nhat) on nodes
+	  int ia,ja,isa,jsa,ela;
+	  for( j = 0; j < SN; j++) {
+	    double tmp = nhat[0]*sx[j] + nhat[1]*sy[j] + nhat[2]*sz[j]; 
+	    f[j] =  (tmp < 0.0 ? -1*tmp : 0.0);
+	  }
+	  for(ela = 0; ela < SE ; ela++){
+	    for(ia = 0; ia < S2mesh.elist[ela]->nNode(); ia++) {
+	      if ((isa = S2mesh.elist[ela]->Node[ia]) >= SN) continue;
+	      for(ja = 0; ja < S2mesh.elist[ela]->nNode(); ja++) {
+		if ((jsa = S2mesh.elist[ela]->Node[ja]) >= SN) continue;
+#ifdef USE_INTONSPHERE
+		if(is_cosine)
+			Angsvec(isa,0) += S2mesh.elist[ela]->IntUnitSpherePFF ( S2mesh.nlist, ia, ja, f);
+#else
+		if(is_cosine)
+			Angsvec(isa,0) += S2mesh.elist[ela]->IntPFF (ia, ja, f);
+#endif
+	      }
+	    }
+	  }
+	  if(!is_cosine)
+		Angsvec(angMesh_node, 0) = 1.0;
+  	  Svec += kron(sint,Angsvec);		
+	} // end loop on element sides
+   } // end loop on elements
+   delete [] sci;
+   delete [] srp;
+   delete [] aci;
+   delete [] arp;
+}
+
+
+/* Computes the source vectors for all the boundary sources when a QM file has been specified
+*/
+void genmat_toastsource_3D(CCompRowMatrix* & Source, const Mesh& mesh, const Mesh& S2mesh,  const CCompRowMatrix qvec, const int ns, const CCompRowMatrix& b1, const bool is_cosine, const int angMesh_node)
+{
+   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
+   const int& SE =  S2mesh.elen();       // number of spherical elements.
+   int sysdim = mesh.nlen();       // dimensions are size of nodes.
+   int fullsysdim = sysdim*SN;   // full size of angles X space nodes
+   if( !(Source = new  CCompRowMatrix [ns]))
+          cerr << "Memory Allocation error Source = new  RCompRowMatrix\n";
+
+   CCompRowMatrix Svec;
+   for (int i = 0; i < ns; i++) {
+     genmat_toastsourcevalvector_3D(Svec, mesh,  S2mesh, qvec,i, is_cosine, angMesh_node);
+     Source[i].New(fullsysdim,1);
+     b1.AB(Svec,Source[i]);        // Toast weirdness
+   }
+}
+
+/* Computes the source vector per a boundary source when a QM file has been specified
+*/
+void genmat_toastsourcevalvector_3D(CCompRowMatrix& Svec, const Mesh& mesh, 
+const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_cosine, const int angMesh_node)
+{
+   int el, nodel, i, j, k,is, js;
+   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
+   const int& SE =  S2mesh.elen();       // number of spherical elements.
+   int sysdim = mesh.nlen();       // dimensions are size of nodes.
+   int fullsysdim = sysdim*SN;   // full size of angles X space nodes
+   int* srp;
+   if( !(srp = new int [sysdim+1]))
+      cerr << "Memory Allocation error srp = new int\n";
+   int* sci;
+   if( !(sci = new int [sysdim]))   // structure of boundary element matrix
+      cerr << "Memory Allocation error sci = new int\n";
+   for(i = 0; i < sysdim; i++) // make it dense for simplicity
+      sci[i] = 0;
+
+   Svec.New (fullsysdim,1);
 
    int *arp;
    if( !(arp = new int [SN+1]))
@@ -1984,7 +1636,6 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isot
    int *angrowptr, *angcolidx, nzero;
    S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
 
-   //cout << "Angles : " << SN << " nodes " << SE << " elements " << nzero << " nonzeros\n";
    RVector sx(SN);    // sample Sin t Cos p on nodes
    RVector sy(SN);    // sample Sin t Sin p on nodes
    RVector sz(SN);    // sample Cos t on nodes
@@ -1996,7 +1647,6 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isot
     sx[i] = np[0]*ilen;
     sy[i] = np[1]*ilen;
     sz[i] = np[2]*ilen;
-    //cout << sx[i] << " " << sy[i] << " " << sz[i] << endl;
    }
    
    for(i = 0; i < sysdim+1; i++) // make it dense for simplicity
@@ -2021,9 +1671,6 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isot
 	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 
-	  //srp = new int [sysdim+1];   // structure of boundary element matrix
-	 
-	  //	  cout << "genmat_sourcevalvector_cos : el " << el << " sd " << sd << endl;
           sint.Zero();
 	  
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
@@ -2031,7 +1678,6 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isot
 	    js = mesh.elist[el]->Node[is];
 	    sint(js,0) = complex(1.0, 0);
 	  }
-	  //	  cout << sint << endl;
 	  // get boundary normal...
 	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  RVector shat = -nhat; // inward directed vector
@@ -2043,28 +1689,24 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_isot
 	  for( j = 0; j < SN; j++) {
 	    double tmp = nhat[0]*sx[j] + nhat[1]*sy[j] + nhat[2]*sz[j]; 
 	    f[j] =  (tmp < 0.0 ? tmp : 0.0);
-	    //	    cout << f[j] << " ";
 	  }
-	  //	  cout << endl;
 	  for(ela = 0; ela < SE ; ela++){
 	    for(ia = 0; ia < S2mesh.elist[ela]->nNode(); ia++) {
 	      if ((isa = S2mesh.elist[ela]->Node[ia]) >= SN) continue;
 	      for(ja = 0; ja < S2mesh.elist[ela]->nNode(); ja++) {
 		if ((jsa = S2mesh.elist[ela]->Node[ja]) >= SN) continue;
-		//XS		cout << "updating Angsvec(" << isa << ",0)\n";
 #ifdef USE_INTONSPHERE
-		if(is_isotropic)
+		if(is_cosine)
 			Angsvec(isa,0) += S2mesh.elist[ela]->IntUnitSpherePFF ( S2mesh.nlist, ia, ja, f);
 #else
-		if(is_isotropic)
+		if(is_cosine)
 			Angsvec(isa,0) += S2mesh.elist[ela]->IntPFF (ia, ja, f);
 #endif
 	      }
 	    }
 	  }
-	  if(!is_isotropic)
+	  if(!is_cosine)
 		Angsvec(angMesh_node, 0) = 1.0;
-	  //	  cout << "Angsvec : " << Angsvec << endl;
   	  Svec += kron(sint,Angsvec)*complex(sweight, 0);		
 	} // end loop on element sides
      } // end loop on elements
