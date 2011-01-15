@@ -2,14 +2,14 @@ include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libvarPN3D
 LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
-EXE = rte3D_varOrd rte3D_varOrd_adjoint 
+EXE = rte3D_varOrd 
 
 VPATH = $(TSRC)/libvarPN3D
 
 all:: $(EXE)
 
 LIBSRCS = rte3D_math.cc phaseFunc.cc source.cc pparse.cc 
-EXESRCS = rte3D_varOrd.cc rte3D_varOrd_adjoint.cc 
+EXESRCS = rte3D_varOrd.cc 
 
 
 LIBOBJS = ${LIBSRCS:.cc=.o}
@@ -25,13 +25,8 @@ $(LIB): $(LIBOBJS)
 	$(MAKE_LIB)
 	$(RANLIB) $(LIB)
 
-#$(EXE) : $(EXEOBJS) $(LIBOBJS)
-rte3D_varOrd: rte3D_varOrd.o rte3D_math.o phaseFunc.o source.o pparse.o 
+$(EXE) : $(EXEOBJS) $(LIBOBJS)
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
-
-rte3D_varOrd_adjoint: rte3D_varOrd_adjoint.o rte3D_math.o phaseFunc.o source.o pparse.o 
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
-
 
 clean:: 
 	$(RM) *.o
