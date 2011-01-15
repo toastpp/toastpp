@@ -1223,6 +1223,10 @@ int main (int argc, char *argv[])
     strcpy(fphi, file_extn); 
     strcat(fphi, "_Phi.sol"); 
     ofstream osPhi(fphi);
+    char fRHS[300];
+    strcpy(fRHS, file_extn);
+    strcat(fRHS, "_RHS.sol");
+    ofstream osRHS(fRHS);
     double res;
     int iter;
     clock_t start = clock();
@@ -1239,7 +1243,9 @@ int main (int argc, char *argv[])
 	RHS[i] = Source[j].Get(i,0) + b2[i];
 
       GMRES(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
+      osRHS << "RHS " << j << "\n" << RHS[j] << endl;
       osPhi << "Phi " << j << "\n" << Phi[j] << endl;
+      
       for (int k = 0; k < sysdim; k++)
       {
 	  Phisum[j][k] += Phi[j][ctxt.offset[k]]*sqrt(4*M_PI);
@@ -1252,6 +1258,7 @@ int main (int argc, char *argv[])
     }
     clock_t end = clock();
     osPhi.close();
+    osRHS.close();
     
     char flnmod[300], farg[300], ftime[300];
     strcpy(flnmod, file_extn); strcpy(farg, file_extn);strcpy(ftime, file_extn);
