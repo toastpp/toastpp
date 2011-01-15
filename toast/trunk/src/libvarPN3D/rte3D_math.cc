@@ -175,7 +175,7 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 			{
 				for(int i=0; i<numpts; i++)
 				{
-					temp = (cplxSphHarm[l](l+m, i) - complex(sign(m), 0)*cplxSphHarm[l](l-m, i))/complex(0, sqrt(2));
+					temp = (cplxSphHarm[l](l+abs(m), i) - complex(sign(m), 0)*cplxSphHarm[l](l-abs(m), i))/complex(0, sqrt(2));
 					sphHarm[l](indm, i) = temp.re;	 
 				}
 			}
@@ -357,24 +357,24 @@ void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVect
 
 }
 
-/** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m} where the supercript 'R' denotes the real-valued spherical harmonics.
+/** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y_{l, -m} where the supercript 'R' denotes the real-valued spherical harmonics.
 * This function gives the value of a_{m}
 **/
 complex am(int m)
 {
 	if(m==0) return(complex(1.0, 0));
 	else if(m>0) return(complex(1.0/sqrt(2), 0));
-	else return(complex(0, -1.0/sqrt(2)));
+	else return(complex(0, sign(m)/sqrt(2)));
 }
 
-/** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m} where the supercript 'R' denotes the real-valued spherical harmonics.
+/** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y_{l, -m} where the supercript 'R' denotes the real-valued spherical harmonics.
 * This function gives the value of b_{m}
 **/
 complex bm(int m)
 {
 	if(m==0) return(complex(0.0, 0));
-	else if(m>0) return(complex(1.0/sqrt(2), 0));
-	else return(complex(0, 1.0/sqrt(2)));
+	else if(m>0) return(complex(sign(m)/sqrt(2), 0));
+	else return(complex(0, -1.0/sqrt(2)));
 }
 
 
@@ -389,12 +389,13 @@ Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}.
 */
 void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
+
 	complex alpha = complex(0.5, 0);
 	a[0] = am(m)*Blm(l, -m)*alpha; b[0] = -am(m)*Blm(l+1, m+1)*alpha; 
 	c[0] = -am(m)*Blm(l, m)*alpha; d[0] = am(m)*Blm(l+1, -m+1)*alpha;
 
-	a[1] = bm(m)*sign(m)*Blm(l, m)*alpha; b[1] = -bm(m)*sign(m)*Blm(l+1, -m+1)*alpha; 
-	c[1] = -bm(m)*sign(m)*Blm(l, -m)*alpha; d[1] = bm(m)*sign(m)*Blm(l+1, m+1)*alpha;
+	a[1] = bm(m)*Blm(l, m)*alpha; b[1] = -bm(m)*Blm(l+1, -m+1)*alpha; 
+	c[1] = -bm(m)*Blm(l, -m)*alpha; d[1] = bm(m)*Blm(l+1, m+1)*alpha;
 
 	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
 	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
@@ -403,7 +404,6 @@ void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVect
 	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
 
 }
-
 /* Sin(\theta)Sin(\phi)Y_{l, m}^{R} = Sin(\theta)Sin(\phi)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
 real-valued spherical harmonics.
 a_{m} = 1, b_{m} = 0, if m=0
@@ -415,20 +415,19 @@ Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}.
 */
 void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
+
 	complex alpha = complex(0, -0.5);
 	a[0] = am(m)*Blm(l, -m)*alpha; b[0] = -am(m)*Blm(l+1, m+1)*alpha; 
 	c[0] = am(m)*Blm(l, m)*alpha; d[0] = -am(m)*Blm(l+1, -m+1)*alpha;
 
-	a[1] = bm(m)*sign(m)*Blm(l, m)*alpha; b[1] = -bm(m)*sign(m)*Blm(l+1, -m+1)*alpha; 
-	c[1] = bm(m)*sign(m)*Blm(l, -m)*alpha; d[1] = -bm(m)*sign(m)*Blm(l+1, m+1)*alpha;
+	a[1] = bm(m)*Blm(l, m)*alpha; b[1] = -bm(m)*Blm(l+1, -m+1)*alpha; 
+	c[1] = bm(m)*Blm(l, -m)*alpha; d[1] = -bm(m)*Blm(l+1, m+1)*alpha;
 
 	a1c(0, 0) = l-1; a1c(0, 1) = m+1; b1c(0, 0) = l+1; b1c(0, 1) = m+1;
 	c1c(0, 0) = l-1; c1c(0, 1) = m-1; d1c(0, 0) = l+1; d1c(0, 1) = m-1;
 
 	a1c(1, 0) = l-1; a1c(1, 1) = -m+1; b1c(1, 0) = l+1; b1c(1, 1) = -m+1;
 	c1c(1, 0) = l-1; c1c(1, 1) = -m-1; d1c(1, 0) = l+1; d1c(1, 1) = -m-1; 
-
-
 }
 
 /* Cos(\theta)Y_{l, m}^{R} = Cos(\theta)(a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
@@ -443,14 +442,13 @@ void cosY(const int l, const int m, CVector& e, CVector& f, IDenseMatrix& e1c, I
 {
 
 	e[0] = am(m)*Alm(l, m); f[0] = am(m)*Alm(l+1, m);
-	e[1] = bm(m)*sign(m)*Alm(l, -m); f[1] = bm(m)*sign(m)*Alm(l+1, -m);
+	e[1] = bm(m)*Alm(l, -m); f[1] = bm(m)*Alm(l+1, -m);
 
 	e1c(0, 0) = l-1; e1c(0, 1) = m;
 	f1c(0, 0) = l+1; f1c(0, 1) = m;
 
 	e1c(1, 0) = l-1; e1c(1, 1) = -m;
 	f1c(1, 0) = l+1; f1c(1, 1) = -m;
-
 }
 
 /* Y_{l, m}^{R} = (a_{m}Y_{l, m} + b_{m}Y^{*}_{l, m}) where the superscript 'R' denote the 
@@ -464,7 +462,7 @@ This routine gives the coefficients of terms Y_{l, m}, Y_{l, -m}.
 void sphY(const int l, const int m, CVector& p, IDenseMatrix& p1c)
 {
 
-	p[0] = am(m); p[1] = bm(m)*sign(m);
+	p[0] = am(m); p[1] = bm(m);
 	
 	p1c(0, 0) = l; p1c(0, 1) = m;
 	p1c(1, 0) = l; p1c(1, 1) = -m;
