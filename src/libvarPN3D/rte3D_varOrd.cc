@@ -1097,7 +1097,7 @@ int main (int argc, char *argv[])
     nM = qmmesh.nM;
     cout << ns << " sources\n";
     SelectSourceProfile (qprof, qwidth, srctp);
-    SelectMeasurementProfile (pp, mprof, mwidth);
+    //SelectMeasurementProfile (pp, mprof, mwidth);
     qvec.New (ns, qmmesh.nlen());
     for (int i = 0; i < ns; i++) {
 	RVector q(qmmesh.nlen());
@@ -1114,7 +1114,7 @@ int main (int argc, char *argv[])
 	}
 	qvec.SetRow (i, q);
     }
-    cout << "Sources set "<<endl;
+    /*cout << "Sources set "<<endl;
     mvec.New (nM, qmmesh.nlen());
     LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (int i = 0; i < nM; i++) {
@@ -1133,7 +1133,7 @@ int main (int argc, char *argv[])
 	for (int j = 0; j < qmmesh.nlen(); j++) 
 	  m[j] *= qmmesh.plist[j].C2A();
 	mvec.SetRow (i, m);
-    }
+    }*/
     }
     //***** parameters 
     double freq = 0, g;
@@ -1251,10 +1251,10 @@ int main (int argc, char *argv[])
 	  Phisum[j][k] += Phi[j][ctxt.offset[k]]*sqrt(4*M_PI);
       }
       
-      for (int im = 0; im < nM; im++) {
+      /*for (int im = 0; im < nM; im++) {
 	for(int in = 0; in < sysdim; in++)
 	  proj[j*nM + im] += Phisum[j][in]*mvec.Get(im,in) ;
-      }
+      }*/
     }
     clock_t end = clock();
     osPhi.close();

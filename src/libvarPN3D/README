@@ -8,6 +8,15 @@ Usage
 
 Input files can be generated using the MATLAB script 'generateInputFile.m' script contained in this folder
 
-NOTE: The files 'genmat_angint_3D_PN.cc' and 'genmat_angint_sdm_3D_PN.cc' and 'spints.cc' are not part of the 
+NOTES: 
+
+1. Currently works only in 'element' basis. Hence mua, mus, ref needs to be specified for each element
+
+2. The files 'genmat_angint_3D_PN.cc' and 'genmat_angint_sdm_3D_PN.cc' and 'spints.cc' are not part of the 
 core variable order PN code. They contain time and memory efficient implementations of the angular matrices
 and will be integrated and tested into the core program at a later date.
+ 
+3.This code currently works for only boundary sources. If interior sources are required uncomment
+'genmat_intsourcevalvector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);' in the source and comment 'genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);' compile ('make' from 'src' level) and run. Similar compilation should be done when using QM files.
+
+ 

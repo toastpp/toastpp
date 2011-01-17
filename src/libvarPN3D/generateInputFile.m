@@ -1,5 +1,5 @@
-function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns, source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
-%function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns, source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
+function [] = generateInputFile(hMesh, fname, output_file_prefix,  ns, specify_QM, source_types, source_profiles, source_widRadii,source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
+%function [] = generateInputFile(hMesh, fname, output_file_prefix,  ns, specify_QM, source_types, source_profiles, source_widRadii,source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
 % This MATLAB script generates the input file required to run variable order P_{N} code
 % Surya sprerapa@cs.ucl.ac.uk 11/01/2011
 % 
@@ -10,9 +10,22 @@ function [] = generateInputFile(hMesh, fname, output_file_prefix, specify_QM, ns
 %    
 %       output_file_prefix -> prefix for output files
 %
+%	ns -> number of sources 
+%
 %	specify_QM -> Is a QM file being specified (1. Yes, 0. No)
 %
-%	ns -> number of sources ( If a QM file is not specified)
+%	source_types -> nQ x 1 vector containing the source types where 'nQ' is the number of sources.
+%		      (1) Neumann boundary source (2) Isotropic point source
+%                     NOTE: Ignored when specify_QM = 0. Use [].
+%
+%	source_profiles -> nQ x 1 vector containing the source profiles where 'nQ' is the number of sources.
+%			  (1) Point (2) Gaussian (3) Cosine
+%                     NOTE: Ignored when specify_QM = 0. Use [].
+%
+%	source_widRadii -> nQ x 1 vector containing the source radii (if a 'Point' source) or width (if a 'Gaussian' source) or ignored (if 'Cosine') 
+%			   where 'nQ' is the number of sources.
+%		      NOTE:Ignore when specify_QM = 0. Use [].
+%
 %
 %	source_nodes -> A vector of source node numbers (If a QM file is not specified)
 %
@@ -40,6 +53,13 @@ if(specify_QM == 0)
 	fprintf(fid, '%d\n', ns);
 	for i = 1 : ns
 		fprintf(fid, '%d\n', source_nodes(i));
+	end;
+else
+	for i = 1 : ns
+		fprintf(fid, '%d\n%d\n', source_types(i), source_profiles(i));
+		if(source_profiles(i) == 1 | source_profiles(i) == 2)
+			fprintf(fid, '%f\n', source_widRadii(i));
+		end;
 	end;
 end;
 fprintf(fid, '%f\n%f\n%d\n%f\n%f\n%f\n', g, MHz_freq, is_cosine, directionVector(1), directionVector(2), directionVector(3));
