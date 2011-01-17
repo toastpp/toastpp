@@ -8,6 +8,13 @@ Usage
 
 Input files can be generated using the MATLAB script 'generateInputFile.m' script contained in this folder
 
+Outputs:
+	<file_prefix>_arg.nim -> The phase of the photons
+	<file_prefix>_lnmod.nim -> The photon density in log scale
+	<file_prefix>_RHS.sol -> Matrix comprised of discretized source vectors
+	<file_prefix>_Phi.sol -> radiance
+	<file_prefix>_time.txt -> Time taken to solve for all the sources
+
 NOTES: 
 
 1. Currently works only in 'element' basis. Hence mua, mus, ref needs to be specified for each element
