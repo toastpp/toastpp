@@ -867,6 +867,21 @@ int Mesh::BoundaryList (int **bndellist, int **bndsdlist) const
 #endif
 }
 
+void Mesh::InitSubdivisionSupport ()
+{
+    int i;
+    for (i = 0; i < elen(); i++)
+	elist[i]->InitSubdivisionSupport();
+    PopulateNeighbourLists();
+}
+
+int Mesh::RefineElement (int el)
+{
+    dASSERT(el >= 0 && el < elen(), Element index out of range);
+    Element *pel = elist[el];
+    pel->Subdivide (this);
+}
+
 bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,
     int &side, double sub) const
 {
@@ -1139,10 +1154,10 @@ double Mesh::Size (Point *centre) const
     for (d = 0; d < dim; d++) {
 	mx[d] = -1e10, mn[d] = 1e10;
 	for (i = 0; i < nlist.Len(); i++) {
-	    mx[d] = ::max (mx[d], nlist[i][d]);
-	    mn[d] = ::min (mn[d], nlist[i][d]);
+	    mx[d] = toast::max (mx[d], nlist[i][d]);
+	    mn[d] = toast::min (mn[d], nlist[i][d]);
 	}
-	size = ::max (size, mx[d]-mn[d]);
+	size = toast::max (size, mx[d]-mn[d]);
     }
     if (centre) *centre = (mx+mn) * 0.5;
     return 0.5 * size;
@@ -1319,7 +1334,7 @@ int MarkBoundary_qsort_comp (const void *arg1, const void *arg2)
     int k;
     const SideRec *sd1 = (SideRec*)arg1;
     const SideRec *sd2 = (SideRec*)arg2;
-    int nnd = ::min (sd1->n, sd2->n);
+    int nnd = toast::min (sd1->n, sd2->n);
     for (k = 0; k < nnd; k++) {
         if (sd1->nd[k] < sd2->nd[k]) return -1;
         else if (sd1->nd[k] > sd2->nd[k]) return 1;
@@ -1409,6 +1424,86 @@ void Mesh::MarkBoundary ()
     // count boundary nodes
     for (i = 0; i < nlen(); i++)
         if (nlist[i].isBnd()) bndnd++;
+
+    // cleanup
+    for (i = 0; i < slen; i++)
+	delete []sd[i].nd;
+    delete []sd;
+}
+
+// ***********************************************
+
+void Mesh::PopulateNeighbourLists ()
+{
+    int i, j, k, n, slen;
+    int nel = elen();
+    bool isbnd;
+    Element *pel;
+
+    // Allocate element neighbour lists
+    for (i = 0; i < nel; i++)
+	elist[i]->InitNeighbourSupport();
+
+    // first we generate a list of sides
+    for (i = slen = 0; i < nel; i++)
+	slen += elist[i]->nSide();
+
+    SideRec *sd = new SideRec[slen];
+
+    for (i = slen = 0; i < nel; i++) {
+	pel = elist[i];
+	for (j = 0; j < pel->nSide(); j++) {
+	    sd[slen].el = i;
+	    sd[slen].sd = j;
+	    sd[slen].n  = pel->nSideNode(j);
+	    sd[slen].nd = new int[sd[slen].n];
+	    for (k = 0; k < sd[slen].n; k++)
+		sd[slen].nd[k] = pel->Node[pel->SideNode(j,k)];
+	    slen++;
+	}
+    }
+
+    // order each side for nodes
+    for (i = 0; i < slen; i++) {
+        for (j = 0; j < sd[i].n-1; j++)
+	    for (k = j+1; k < sd[i].n; k++)
+	        if (sd[i].nd[j] > sd[i].nd[k]) {
+		    int itmp = sd[i].nd[j];
+		    sd[i].nd[j] = sd[i].nd[k];
+		    sd[i].nd[k] = itmp;
+		}
+    }
+
+    // order side list
+    qsort (sd, slen, sizeof(SideRec), MarkBoundary_qsort_comp);
+		
+    // now all non-boundary sides should be listed as consecutive pairs,
+    // so go through the list and look for duplicates
+
+    for (i = 0; i < slen; i++) {
+	isbnd = true;
+	n = sd[i].n;
+	if (i) { // check left neighbour
+	    if (n == sd[i-1].n) {
+		for (j = 0; j < n; j++)
+		    if (sd[i].nd[j] != sd[i-1].nd[j]) break;
+		if (j == n) {
+		    isbnd = false;
+		    elist[sd[i].el]->sdnbhr[sd[i].sd] = elist[sd[i-1].el];
+		}
+	    }
+	}
+	if (i < slen-1 && isbnd) { // check right neighbour
+	    if (n == sd[i+1].n) {
+		for (j = 0; j < n; j++)
+		    if (sd[i].nd[j] != sd[i+1].nd[j]) break;
+		if (j == n) {
+		    isbnd = false;
+		    elist[sd[i].el]->sdnbhr[sd[i].sd] = elist[sd[i+1].el];
+		}
+	    }
+	}
+    }
 
     // cleanup
     for (i = 0; i < slen; i++)
@@ -1514,6 +1609,48 @@ void Mesh::put (ostream &os, ParameterType p1, ParameterType p2,
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal or element coefficients are given by 'coeff'
 
+void AddToElMatrix (const Mesh &mesh, int el, SCGenericSparseMatrix &M,
+    const RVector *coeff, int mode)
+{
+    int i, j, is, js, nnode;
+    scomplex entry;
+
+    nnode = mesh.elist[el]->nNode();
+    for (i = 0; i < nnode; i++) {
+	is = mesh.elist[el]->Node[i];
+	for (j = 0; j < nnode; j++) {
+	    js = mesh.elist[el]->Node[j];
+	    switch (mode) {
+	    case ASSEMBLE_FF:
+	      entry.re = (float)mesh.elist[el]->IntFF (i, j);
+		break;
+	    case ASSEMBLE_DD:
+		entry.re = (float)mesh.elist[el]->IntDD (i, j);
+		break;
+	    case ASSEMBLE_PFF:
+		entry.re = (float)mesh.elist[el]->IntPFF (i, j, *coeff);
+		break;
+	    case ASSEMBLE_PDD:
+		entry.re = (float)mesh.elist[el]->IntPDD (i, j, *coeff);
+		break;
+	    case ASSEMBLE_BNDPFF:
+		entry.re = (float)mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		break;
+	    case ASSEMBLE_PFF_EL:
+		entry.re = (float)mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		break;
+	    case ASSEMBLE_PDD_EL:
+		entry.re = (float)mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		break;
+	    case ASSEMBLE_BNDPFF_EL:
+		entry.re = (float)mesh.elist[el]->BndIntFF (i, j)*(*coeff)[el];
+		break;
+	    }
+	    M.Add (is, js, entry);
+	}
+    }
+}
+
 void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
@@ -1605,11 +1742,66 @@ void AddToSysMatrix (const Mesh &mesh, RGenericSparseMatrix &M,
     }
 }
 
+// Single-precision sysmatrix version
+void AddToSysMatrix (const Mesh &mesh, FGenericSparseMatrix &M,
+    const RVector *coeff, int mode)
+{
+    int i, j, is, js, el, nnode;
+    double entry;
+
+    for (el = 0; el < mesh.elen(); el++) {
+        nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++) {
+	    is = mesh.elist[el]->Node[i];
+	    for (j = 0; j < nnode; j++) {
+	        js = mesh.elist[el]->Node[j];
+	        switch (mode) {
+		case ASSEMBLE_FF:
+		    entry = (float)mesh.elist[el]->IntFF (i, j);
+		    break;
+		case ASSEMBLE_DD:
+		    entry = (float)mesh.elist[el]->IntDD (i, j);
+		    break;
+		case ASSEMBLE_PFF:
+		    entry = (float)mesh.elist[el]->IntPFF (i, j, *coeff);
+		    break;
+		case ASSEMBLE_PDD:
+		    entry = (float)mesh.elist[el]->IntPDD (i, j, *coeff);
+		    break;
+		case ASSEMBLE_BNDPFF:
+		    entry = (float)mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		    break;
+		case ASSEMBLE_PFF_EL:
+		    entry = (float)mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		    break;
+		case ASSEMBLE_PDD_EL:
+		    entry = (float)mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		    break;
+		case ASSEMBLE_BNDPFF_EL:
+		    entry = (float)mesh.elist[el]->BndIntFF (i, j) *
+		        (*coeff)[el];
+		    break;
+		}
+		M.Add (is, js, entry);
+	    }
+	}
+    }
+}
+
 void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int el;
-    complex entry;
+
+    for (el = 0; el < mesh.elen(); el++) {
+	AddToElMatrix (mesh, el, M, coeff, mode);
+    }
+}
+
+void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
+    const RVector *coeff, int mode)
+{
+    int el;
 
     for (el = 0; el < mesh.elen(); el++) {
 	AddToElMatrix (mesh, el, M, coeff, mode);
@@ -1644,6 +1836,38 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
 		}
 		M.Add (is, js, entry);
 		//M(is, js) += entry;
+	    }
+	}
+    }  
+}
+
+void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
+    const double coeff, int mode)
+{
+    int i, j, is, js, el, nnode;
+    scomplex entry;
+
+    for (el = 0; el < mesh.elen(); el++) {
+        nnode = mesh.elist[el]->nNode();
+	for (i = 0; i < nnode; i++) {
+	    is = mesh.elist[el]->Node[i];
+	    for (j = 0; j < nnode; j++) {
+	        js = mesh.elist[el]->Node[j];
+	        switch (mode) {
+		case ASSEMBLE_CFF:
+  		    entry.re = (float)(mesh.elist[el]->IntFF (i, j) * coeff);
+		    break;
+		case ASSEMBLE_CDD:
+		    entry.re = (float)(mesh.elist[el]->IntDD (i, j) * coeff);
+		    break;
+		case ASSEMBLE_iCFF:
+		    entry.im = (float)(mesh.elist[el]->IntFF (i, j) * coeff);
+		    break;
+		case ASSEMBLE_iCDD:
+		    entry.im = (float)(mesh.elist[el]->IntDD (i, j) * coeff);
+		    break;
+		}
+		M.Add (is, js, entry);
 	    }
 	}
     }  
@@ -2773,19 +2997,19 @@ RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
     for (iz = 0; iz < bz; iz++) {
 	if (is3d) {
 	    z0 = (iz-1)*dz;
-	    zm = ::max (0, (int)((iz-3)*dz));
-	    zp = ::min (gz-1, (int)((iz+1)*dz));
+	    zm = toast::max (0, (int)((iz-3)*dz));
+	    zp = toast::min (gz-1, (int)((iz+1)*dz));
 	} else {
 	    zm = 0, zp = 0;
 	}
 	for (iy = 0; iy < by; iy++) {
 	    y0 = (iy-1.0)*dy;
-	    ym = ::max (0, (int)((iy-3)*dy));
-	    yp = ::min (gy-1, (int)((iy+1)*dy));
+	    ym = toast::max (0, (int)((iy-3)*dy));
+	    yp = toast::min (gy-1, (int)((iy+1)*dy));
 	    for (ix = 0; ix < bx; ix++) {
 		x0 = (ix-1.0)*dx; // pixel cnt in bitmap coords
-		xm = ::max (0, (int)((ix-3)*dx));
-		xp = ::min (gx-1, (int)((ix+1)*dx));
+		xm = toast::max (0, (int)((ix-3)*dx));
+		xp = toast::min (gx-1, (int)((ix+1)*dx));
 
 		for (z = zm; z <= zp; z++) {
 		    sz = (is3d ? spline ((z-z0)/dz) : 1.0);
@@ -2815,19 +3039,19 @@ RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
     for (iz = 0; iz < bz; iz++) {
 	if (is3d) {
 	    z0 = (iz-1)*dz;
-	    zm = ::max (0, (int)((iz-3)*dz));
-	    zp = ::min (gz-1, (int)((iz+1)*dz));
+	    zm = toast::max (0, (int)((iz-3)*dz));
+	    zp = toast::min (gz-1, (int)((iz+1)*dz));
 	} else {
 	    zm = 0, zp = 0;
 	}
 	for (iy = 0; iy < by; iy++) {
 	    y0 = (iy-1.0)*dy;
-	    ym = ::max (0, (int)((iy-3)*dy));
-	    yp = ::min (gy-1, (int)((iy+1)*dy));
+	    ym = toast::max (0, (int)((iy-3)*dy));
+	    yp = toast::min (gy-1, (int)((iy+1)*dy));
 	    for (ix = 0; ix < bx; ix++) {
 		x0 = (ix-1.0)*dx; // pixel cnt in bitmap coords
-		xm = ::max (0, (int)((ix-3)*dx));
-		xp = ::min (gx-1, (int)((ix+1)*dx));
+		xm = toast::max (0, (int)((ix-3)*dx));
+		xp = toast::min (gx-1, (int)((ix+1)*dx));
 
 		for (z = zm; z <= zp; z++) {
 		    sz = (is3d ? spline ((z-z0)/dz) : 1.0);

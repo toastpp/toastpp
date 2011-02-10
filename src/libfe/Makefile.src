@@ -14,7 +14,8 @@ SRCS = 	point.cc node.cc ndlist.cc element.cc ellist.cc surface.cc \
 	tet4.cc tet10.cc tet10_ip.cc wdg6.cc wdg18inf.cc \
 	tri3D3.cc tri3D6.cc line2d2.cc \
 	lin_qr.cc tri_qr.cc tet_qr.cc \
-	ordmmd.cc rcm.cc meshopt.cc
+	ordmmd.cc rcm.cc meshopt.cc \
+	refine_mesh.cc
 
 OBJS = ${SRCS:.cc=.o}
 HDRS = ${SRCS:.cc=.h}

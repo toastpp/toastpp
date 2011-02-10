@@ -31,6 +31,7 @@
 #include "toastdef.h"
 
 class Surface;
+class Mesh;
 
 /**
  * \brief A 3-noded (linear) 2-dimensional triangle element.
@@ -247,6 +248,29 @@ public:
     // creates a list of points where the line defined by p1 and p2 intersects
     // the element (in local coordinates) or starts/ends within the element.
     // Returns the length of the list
+
+    void SplitSide (Mesh *mesh, int side, int newnode,
+        Element *nbr1, Element *nbr2, Element *el1, Element *el2);
+    // Subdivide the triangle such that 'side' is split into two parts.
+    // If newnode >= 0 and nbr1, nbr2 != NULL, then the side neighbour has
+    // already been split. In that case, newnode is the node index of the
+    // midpoint node, and nbr1, nbr2 are the new neighbours for the two
+    // side segments.
+    // Otherwise, the SplitSide method is also called for the neighbour
+    // SplitSide either performs a bisection if the current subdivision
+    // level is even, otherwise it performs a merge and resplit operation.
+    // In the latter case, it also calls SplitSide for any additionally
+    // subdivided sides.
+    // On return, el1 and el2 are pointers to the two elements that now
+    // face the split side (i.e. the neighbours of nbr1 and nbr2, if those
+    // were provided)
+
+
+    void Bisect (Mesh *mesh, int side, int newnode,
+        Element *nbr1, Element *nbr2, Element *el1, Element *el2);
+
+    void MergeAndResplit (Mesh *mesh, int side, int newnode,
+        Element *nbr1, Element *nbr2, Element *el1, Element *el2);
 
 protected:
 
