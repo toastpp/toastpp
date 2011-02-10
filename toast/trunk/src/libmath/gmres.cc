@@ -571,6 +571,11 @@ CVector precond (const CGenericSparseMatrix& AC,const CVector& y)
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
+template int gmres (int restart, const TMatrix<float> &A,
+    const TVector<float> &b, TVector<float> &x,
+    const TPreconditioner<float> *precon, double &elim,
+    void (*clbk)(void*));
+
 template int gmres (int restart, const TMatrix<double> &A,
     const TVector<double> &b, TVector<double> &x,
     const TPreconditioner<double> *precon, double &elim,

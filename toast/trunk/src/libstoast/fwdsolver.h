@@ -100,7 +100,7 @@ private:
  * \ref Project and \ref ProjectAll.
  */
 
-template<typename T> class TFwdSolver {
+template<class T> class TFwdSolver {
 public:
     /**
      * \brief Constructor. Creates a forward solver instance.
@@ -116,7 +116,7 @@ public:
      * \note For valid strings to define the linear solver, see
      * \ref SetLinSolver.
      */
-    TFwdSolver (char *solver, double tol = 1e-10);
+    TFwdSolver (const char *solver, double tol = 1e-10);
 
     /**
      * \brief Constructor. Creates a forward solver instance.
@@ -193,7 +193,7 @@ public:
      * <tr><td>GMRES</td><td>Generalised minimum residual solver</td></tr>
      * </table>
      */
-    void SetLinSolver (char *solver, double tol = 1e-10);
+    void SetLinSolver (const char *solver, double tol = 1e-10);
 
     /**
      * \brief Returns the current solver type.
@@ -207,6 +207,14 @@ public:
      * \note The tolerance is only relevant for iterative solvers.
      */
     inline double GetLinSolverTol() const { return iterative_tol; }
+
+    /**
+     * \brief Set max iteration count for iterative solver
+     * \param maxit max number of iterations (0 for auto)
+     * \note If the max iteration count is set to 0, it will be
+     *   set to the dimension of the linear problem.
+     */
+    inline void SetLinSolverMaxit (int maxit) { iterative_maxit = maxit; }
 
     /**
      * \brief Returns a pointer to the FEM mesh associated with the forward
@@ -277,34 +285,43 @@ public:
      * \brief Calculate photon density field for a given source vector.
      * \param [in] qvec source vector (h-basis)
      * \param [out] phi photon density field (h-basis)
+     * \param [out] res optional; if used, and if an iterative solver is
+     *   used, the structure is filled with iteration count and relative
+     *   error.
      * \sa CalcFields
      */
-    void CalcField (const TVector<T> &qvec, TVector<T> &phi) const;
+    void CalcField (const TVector<T> &qvec, TVector<T> &phi,
+        IterativeSolverResult *res = 0) const;
 
     /**
      * \brief Calculate photon density fields for all sources.
      * \param [in] qvec array of column source vectors
      * \param [out] phi array of photon density fields
+     * \param [out] res optional; if used, and if an iterative solver is
+     *   used, the structure is filled with the maximum iteration count
+     *   and the maximum relative error for any source
      * \note On call, phi must be an array of nq vectors, where nq is the
      *   number of rows in qvec.
      * \sa CalcField
      */
-    void CalcFields (const TCompRowMatrix<T> &qvec, TVector<T> *phi) const;
+    void CalcFields (const TCompRowMatrix<T> &qvec, TVector<T> *phi,
+        IterativeSolverResult *res = 0) const;
 
     /**
      * \brief Calculate photon density fields for a range of sources.
-     * \param mesh mesh object
-     * \param nq number of sources
      * \param q0 min source index
      * \param q1 max source index + 1
      * \param qvec complete array of column source vectors
      * \param [out] phi array of photon density fields
+     * \param [out] res optional; if used, and if an iterative solver is
+     *   used, the structure is filled with the maximum iteration count
+     *   and the maximum relative error for any source
      * \note This function calculates the photon density fields of a sub-range
      *   q of sources (q0 <= q < q1)
      * \note The returned array phi contains q1-q0 fields.
      */
-    void CalcFields (const QMMesh &mesh, int nq, int q0, int q1,
-        const TCompRowMatrix<T> &qvec, TVector<T> *phi) const;
+    void CalcFields (int q0, int q1, const TCompRowMatrix<T> &qvec,
+        TVector<T> *phi, IterativeSolverResult *res = 0) const;
 
     /**
      * \brief Return boundary data for a single source, given the
@@ -355,6 +372,8 @@ public:
      */
     RVector ProjectAll_real (const TCompRowMatrix<T> &mvec,
         const TVector<T> *dphi, DataScale scl = DATA_DEFAULT);
+    FVector ProjectAll_singlereal (const TCompRowMatrix<T> &mvec,
+        const TVector<T> *dphi, DataScale scl = DATA_DEFAULT);
 
     /**
      * \brief Return boundary data for all sources and all detectors, given
@@ -375,6 +394,9 @@ public:
     RVector ProjectAll_real (const TCompRowMatrix<T> &qvec,
         const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
         DataScale scl = DATA_DEFAULT);
+    FVector ProjectAll_singlereal (const TCompRowMatrix<T> &qvec,
+        const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
+        DataScale scl = DATA_DEFAULT);
 
     const QMMesh *meshptr;  ///< pointer to the associated FEM mesh
     LSOLVER solvertp;       ///< linear solver type
@@ -386,6 +408,7 @@ public:
     RCompRowMatrix *B;      ///< mass matrix; only used for time-domain problems
     mutable SuperLU_data lu_data; ///< parameters for LU solver
     double iterative_tol;   ///< iterative solver tolerance
+    int iterative_maxit;   ///< iterative solver max iterations (0 for auto)
 
 protected:
 
@@ -399,6 +422,12 @@ protected:
      * \note For real template types, this simply returns the input vector.
      */
     RVector UnfoldComplex (const TVector<T> &vec) const;
+    FVector UnfoldSComplex (const TVector<T> &vec) const;
+
+#ifdef UNDEF
+    void UnfoldComplex (const TVector<T> &vec, RVector &res) const;
+    void UnfoldComplex (const TVector<T> &vec, FVector &res) const;
+#endif
 
     DataScale dscale;       ///< default data scaling: DATA_LIN or DATA_LOG
     TVector<T> *pphi;       ///< work buffer for field calculation
@@ -491,14 +520,18 @@ STOASTLIB void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
 // ==========================================================================
 // template typedefs
 
+typedef TFwdSolver<float>          FFwdSolver;
 typedef TFwdSolver<double>         RFwdSolver;
+typedef TFwdSolver<scomplex>       SCFwdSolver;
 typedef TFwdSolver<toast::complex> CFwdSolver;
 
 // ==========================================================================
 // extern declarations of FwdSolver (only required for VS)
 
 #ifndef __FWDSOLVER_CC
+extern template class STOASTLIB TFwdSolver<float>;
 extern template class STOASTLIB TFwdSolver<double>;
+extern template class STOASTLIB TFwdSolver<scomplex>;
 extern template class STOASTLIB TFwdSolver<toast::complex>;
 #endif // !__FWDSOLVER_CC
 

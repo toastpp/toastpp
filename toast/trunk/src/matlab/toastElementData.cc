@@ -39,7 +39,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int nsd = pel->nSide();
     int nsn = pel->nSideNode(0);
     for (i = 1; i < nsd; i++)
-	nsn = ::max (nsn, pel->nSideNode(i));
+	nsn = std::max (nsn, pel->nSideNode(i));
 
     mxArray *vtx = mxCreateDoubleMatrix (nnd, dim, mxREAL);
     pr = mxGetPr (vtx);

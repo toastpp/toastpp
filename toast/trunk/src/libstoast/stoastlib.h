@@ -32,5 +32,6 @@
 #include "jacobian.h"
 #include "regul.h"
 #include "pscaler.h"
+#include "lsearch.h"
 
 #endif // !__STOASTLIB_H

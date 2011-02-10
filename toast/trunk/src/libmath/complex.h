@@ -338,6 +338,9 @@ inline toast::complex exp (toast::complex &z);
  */
 bool iszero (toast::complex &z);
 
+inline bool cisnan(const toast::complex &z)
+{ return isnan(z.re) || isnan(z.im); }
+
 /**
  * \brief Stream input operator.
  * \param is stream object

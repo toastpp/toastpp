@@ -20,6 +20,10 @@
 //#include "zsp_defs.h" // SuperLU 2
 #include "ilutoast.h"
 
+#ifdef USE_CUDA_FLOAT
+#include "toastcuda.h"
+#endif
+
 #ifdef ML_INTERFACE
 #include "ml_defs.h"
 #include "ml_operator.h"
@@ -1017,6 +1021,35 @@ void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
 	     b.data_buffer(), (int&)rows, dwork, ndwork);
 }
 #endif // USE_SPBLAS
+
+#ifdef USE_CUDA_FLOAT
+// Specialisation: single precision
+template<>
+void TCompRowMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b)
+    const
+{
+    dASSERT_2PRM(x.Dim() == cols,
+	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
+    if (b.Dim() != rows) b.New(rows);
+
+    cuda_Ax (val, rowptr, colidx, rows, cols, x.data_buffer(),
+        b.data_buffer());
+}
+
+// Specialisation: single precision complex
+template<>
+void TCompRowMatrix<scomplex>::Ax (const TVector<scomplex> &x,
+    TVector<scomplex> &b) const
+{
+    dASSERT_2PRM(x.Dim() == cols,
+	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
+    if (b.Dim() != rows) b.New(rows);
+
+    cuda_Ax_cplx (val, rowptr, colidx, rows, cols, x.data_buffer(),
+        b.data_buffer());
+}
+
+#endif // USE_CUDA_FLOAT
 
 // ==========================================================================
 
@@ -2143,6 +2176,499 @@ int ILUSymSolve (TCompRowMatrix<complex> &A, const TVector<complex> &b,
 }
 
 // ==========================================================================
+// If we are using CUDA, the CompRowMatrix PCG and BiCGSTAB solvers are
+// overloaded to make use of the CUSP implementations
+
+#ifdef USE_CUDA_FLOAT
+
+
+template<class MT>
+MATHLIB int PCG (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
+    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon, int maxit)
+{
+    return PCG((const TMatrix<MT>&)A, b, x, tol, precon, maxit);
+}
+
+template<> // specialisation: single precision
+MATHLIB int PCG<float> (const FCompRowMatrix &A, const FVector &b,
+    FVector &x, double &tol, const FPreconditioner *precon, int maxit)
+{
+    const float *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    float *x_val = x.data_buffer();
+    const float *b_val = b.data_buffer();
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult res;
+    float ftol = (float)tol;
+    cuda_CG (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, ftol, maxit,
+		   &res);
+    tol = (double)res.rel_error;
+    return res.it_count;
+}
+
+template<> // specialisation: double precision
+MATHLIB int PCG<double> (const RCompRowMatrix &A, const RVector &b,
+    RVector &x, double &tol, const RPreconditioner *precon, int maxit)
+{
+    const double *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    double *x_val = x.data_buffer();
+    const double *b_val = b.data_buffer();
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult res;
+    cuda_CG (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, tol, maxit,
+		   &res);
+    tol = res.rel_error;
+    return res.it_count;
+}
+
+// ==========================================================================
+// These versions use multiple right-hand sides
+
+template<class MT>
+MATHLIB void PCG (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
+    TVector<MT> *x, int nrhs, double tol, int maxit,
+    const TPreconditioner<MT> *precon, IterativeSolverResult *res)
+{
+    PCG ((const TMatrix<MT>&)A, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<> // specialisation: single precision
+MATHLIB void PCG<float> (const FCompRowMatrix &A, const FVector *b, FVector *x,
+    int nrhs, double tol, int maxit, const FPreconditioner *precon,
+    IterativeSolverResult *res)
+{
+    static int nbuf = 32;
+    static float **x_val = new float*[nbuf];
+    static const float **b_val = new const float*[nbuf];
+    if (nrhs > nbuf) {
+        nbuf = nrhs;
+        delete []x_val;
+	delete []b_val;
+	x_val = new float*[nbuf];
+	b_val = new const float*[nbuf];
+    }
+    
+    const float *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    for (int i = 0; i < nrhs; i++) {
+        x_val[i] = x[i].data_buffer();
+	b_val[i] = b[i].data_buffer();
+    }
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult cuda_res;
+    float ftol = (float)tol;
+    cuda_CG (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, nrhs, ftol, maxit,
+		   &cuda_res);
+    if (res) {
+        res->it_count = cuda_res.it_count;
+	res->rel_err  = cuda_res.rel_error;
+    }
+}
+
+template<> // specialisation: double precision
+MATHLIB void PCG<double> (const RCompRowMatrix &A, const RVector *b,
+    RVector *x, int nrhs, double tol, int maxit, const RPreconditioner *precon,
+    IterativeSolverResult *res)
+{
+    static int nbuf = 32;
+    static double **x_val = new double*[nbuf];
+    static const double **b_val = new const double*[nbuf];
+    if (nrhs > nbuf) {
+        nbuf = nrhs;
+        delete []x_val;
+	delete []b_val;
+	x_val = new double*[nbuf];
+	b_val = new const double*[nbuf];
+    }
+    
+    const double *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    for (int i = 0; i < nrhs; i++) {
+        x_val[i] = x[i].data_buffer();
+	b_val[i] = b[i].data_buffer();
+    }
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult cuda_res;
+    cuda_CG (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, nrhs, tol, maxit,
+		   &cuda_res);
+    if (res) {
+        res->it_count = cuda_res.it_count;
+	res->rel_err  = cuda_res.rel_error;
+    }
+}
+
+// ==========================================================================
+
+template<class MT>
+MATHLIB int BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
+    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon, int maxit)
+{
+    return BiCGSTAB((const TMatrix<MT>&)A, b, x, tol, precon, maxit);
+    // by default, use the TMatrix implementation
+}
+
+template<> // specialisation: single precision
+MATHLIB int BiCGSTAB<float> (const FCompRowMatrix &A, const FVector &b,
+    FVector &x, double &tol, const FPreconditioner *precon, int maxit)
+{
+    const float *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    float *x_val = x.data_buffer();
+    const float *b_val = b.data_buffer();
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult res;
+    float ftol = (float)tol;
+    cuda_BiCGSTAB (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, ftol, maxit,
+		   &res);
+    tol = (double)res.rel_error;
+    return res.it_count;
+}
+
+template<> // specialisation: single complex
+MATHLIB int BiCGSTAB<scomplex> (const SCCompRowMatrix &A, const SCVector &b,
+    SCVector &x, double &tol, const SCPreconditioner *precon, int maxit)
+{
+    const scomplex *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    scomplex *x_val = x.data_buffer();
+    const scomplex *b_val = b.data_buffer();
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult res;
+    float ftol = (float)tol;
+    cuda_BiCGSTAB_cplx (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, ftol,
+			maxit, &res);
+    tol = (double)res.rel_error;
+    return res.it_count;
+}
+
+template<> // specialisation: double precision
+MATHLIB int BiCGSTAB<double> (const RCompRowMatrix &A, const RVector &b,
+    RVector &x, double &tol, const RPreconditioner *precon, int maxit)
+{
+    const double *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    double *x_val = x.data_buffer();
+    const double *b_val = b.data_buffer();
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult res;
+    cuda_BiCGSTAB (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, tol, maxit,
+		   &res);
+    tol = (double)res.rel_error;
+    return res.it_count;
+}
+
+template<> // specialisation: double complex
+MATHLIB int BiCGSTAB<complex> (const CCompRowMatrix &A, const CVector &b,
+    CVector &x, double &tol, const CPreconditioner *precon, int maxit)
+{
+    const complex *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    complex *x_val = x.data_buffer();
+    const complex *b_val = b.data_buffer();
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult res;
+    cuda_BiCGSTAB_cplx (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, tol,
+			maxit, &res);
+    tol = (double)res.rel_error;
+    return res.it_count;
+}
+
+// ==========================================================================
+// These versions use multiple right-hand sides
+
+template<class MT>
+MATHLIB void BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
+    TVector<MT> *x, int nrhs, double tol, int maxit,
+    const TPreconditioner<MT> *precon, IterativeSolverResult *res)
+{
+    BiCGSTAB ((const TMatrix<MT>&)A, b, x, nrhs, tol, maxit, precon, res);
+    // by default, use the TMatrix implementation
+}
+
+template<> // specialisation: single precision
+MATHLIB void BiCGSTAB<float> (const FCompRowMatrix &A, const FVector *b,
+    FVector *x, int nrhs, double tol, int maxit, const FPreconditioner *precon,
+    IterativeSolverResult *res)
+{
+    static int nbuf = 32;
+    static float **x_val = new float*[nbuf];
+    static const float **b_val = new const float*[nbuf];
+    if (nrhs > nbuf) {
+        nbuf = nrhs;
+        delete []x_val;
+	delete []b_val;
+	x_val = new float*[nbuf];
+	b_val = new const float*[nbuf];
+    }
+    
+    const float *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    for (int i = 0; i < nrhs; i++) {
+        x_val[i] = x[i].data_buffer();
+	b_val[i] = b[i].data_buffer();
+    }
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult cuda_res;
+    float ftol = (float)tol;
+    cuda_BiCGSTAB (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, nrhs, ftol,
+        maxit, &cuda_res);
+    if (res) {
+        res->it_count = cuda_res.it_count;
+	res->rel_err  = cuda_res.rel_error;
+    }
+}
+
+template<> // specialisation: single complex
+MATHLIB void BiCGSTAB<scomplex> (const SCCompRowMatrix &A, const SCVector *b,
+    SCVector *x, int nrhs, double tol, int maxit,
+    const SCPreconditioner *precon, IterativeSolverResult *res)
+{
+    static int nbuf = 32;
+    static scomplex **x_val = new scomplex*[nbuf];
+    static const scomplex **b_val = new const scomplex*[nbuf];
+    if (nrhs > nbuf) {
+        nbuf = nrhs;
+        delete []x_val;
+	delete []b_val;
+	x_val = new scomplex*[nbuf];
+	b_val = new const scomplex*[nbuf];
+    }
+    
+    const scomplex *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    for (int i = 0; i < nrhs; i++) {
+        x_val[i] = x[i].data_buffer();
+	b_val[i] = b[i].data_buffer();
+    }
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult cuda_res;
+    float ftol = (float)tol;
+    cuda_BiCGSTAB_cplx (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, nrhs,
+        ftol, maxit, &cuda_res);
+    if (res) {
+        res->it_count = cuda_res.it_count;
+	res->rel_err  = cuda_res.rel_error;
+    }
+}
+
+template<> // specialisation: double precision
+MATHLIB void BiCGSTAB<double> (const RCompRowMatrix &A, const RVector *b,
+    RVector *x, int nrhs, double tol, int maxit, const RPreconditioner *precon,
+    IterativeSolverResult *res)
+{
+    static int nbuf = 32;
+    static double **x_val = new double*[nbuf];
+    static const double **b_val = new const double*[nbuf];
+    if (nrhs > nbuf) {
+        nbuf = nrhs;
+        delete []x_val;
+	delete []b_val;
+	x_val = new double*[nbuf];
+	b_val = new const double*[nbuf];
+    }
+    
+    const double *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    for (int i = 0; i < nrhs; i++) {
+        x_val[i] = x[i].data_buffer();
+	b_val[i] = b[i].data_buffer();
+    }
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult cuda_res;
+    cuda_BiCGSTAB (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, nrhs, tol,
+        maxit, &cuda_res);
+    if (res) {
+        res->it_count = cuda_res.it_count;
+	res->rel_err  = cuda_res.rel_error;
+    }
+}
+
+template<> // specialisation: double complex
+MATHLIB void BiCGSTAB<complex> (const CCompRowMatrix &A, const CVector *b,
+    CVector *x, int nrhs, double tol, int maxit,
+    const CPreconditioner *precon, IterativeSolverResult *res)
+{
+    static int nbuf = 32;
+    static complex **x_val = new complex*[nbuf];
+    static const complex **b_val = new const complex*[nbuf];
+    if (nrhs > nbuf) {
+        nbuf = nrhs;
+        delete []x_val;
+	delete []b_val;
+	x_val = new complex*[nbuf];
+	b_val = new const complex*[nbuf];
+    }
+    
+    const complex *A_val = A.ValPtr();
+    const int *A_rowptr = A.rowptr;
+    const int *A_colidx = A.colidx;
+    for (int i = 0; i < nrhs; i++) {
+        x_val[i] = x[i].data_buffer();
+	b_val[i] = b[i].data_buffer();
+    }
+    int m = A.nRows();
+    int n = A.nCols();
+    SolverResult cuda_res;
+    cuda_BiCGSTAB_cplx (A_val, A_rowptr, A_colidx, m, n, b_val, x_val, nrhs,
+        tol, maxit, &cuda_res);
+    if (res) {
+        res->it_count = cuda_res.it_count;
+	res->rel_err  = cuda_res.rel_error;
+    }
+}
+
+#endif // CUDA_FLOAT
+
+// ==========================================================================
+
+template<class MT>
+int TCompRowMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, const TPreconditioner<MT> *precon, int maxit) const
+{
+    return TMatrix<MT>::pcg (b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<float>::pcg (const FVector &b, FVector &x,
+    double &tol, const FPreconditioner *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<double>::pcg (const RVector &b, RVector &x,
+    double &tol, const RPreconditioner *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
+    double tol, int maxit, const TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    TMatrix<MT>::pcg (b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, const FPreconditioner *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, const RPreconditioner *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+// ==========================================================================
+
+template<class MT>
+int TCompRowMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, const TPreconditioner<MT> *precon, int maxit) const
+{
+    //return TMatrix<MT>::bicgstab (b, x, tol, precon, maxit);
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+#ifdef UNDEF
+template<>
+int TCompRowMatrix<float>::bicgstab (const FVector &b, FVector &x,
+    double &tol, const FPreconditioner *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<scomplex>::bicgstab (const SCVector &b, SCVector &x,
+    double &tol, const SCPreconditioner *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<double>::bicgstab (const RVector &b, RVector &x,
+    double &tol, const RPreconditioner *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<complex>::bicgstab (const CVector &b, CVector &x,
+    double &tol, const CPreconditioner *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+#endif
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x,
+    int nrhs, double tol, int maxit, const TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+    //TMatrix<MT>::bicgstab (b, x, nrhs, tol, maxit, precon, res);
+}
+
+#ifdef UNDEF
+template<>
+void TCompRowMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, const FPreconditioner *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, const RPreconditioner *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<scomplex>::bicgstab (const SCVector *b, SCVector *x,
+    int nrhs, double tol, int maxit, const SCPreconditioner *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+#endif
+
+// ==========================================================================
 
 template<class MT>
 void TCompRowMatrix<MT>::ExportHB (ostream &os)
@@ -2430,8 +2956,10 @@ template MATHLIB TCompRowMatrix<scomplex> kron (const TCompRowMatrix<scomplex> &
 template MATHLIB TCompRowMatrix<int> kron (const TCompRowMatrix<int> &A,
     const TCompRowMatrix<int> &B);
 
-template MATHLIB bool CholeskyFactorize (const RCompRowMatrix &A, RCompRowMatrix &L,
-    RVector &d, bool recover);
+template MATHLIB bool CholeskyFactorize (const FCompRowMatrix &A,
+    FCompRowMatrix &L, FVector &d, bool recover);
+template MATHLIB bool CholeskyFactorize (const RCompRowMatrix &A,
+    RCompRowMatrix &L, RVector &d, bool recover);
 
 // complex ones probably not allowed
 
@@ -2440,6 +2968,8 @@ template bool CholeskyFactorize (const CCompRowMatrix &A, CCompRowMatrix &L,
 template bool CholeskyFactorize (const SCCompRowMatrix &A, SCCompRowMatrix &L,
     SCVector &d, bool recover);
 
+template MATHLIB bool IncompleteCholeskyFactorize (const FCompRowMatrix &A,
+    FCompRowMatrix &L, FVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const RCompRowMatrix &A,
     RCompRowMatrix &L, RVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const CCompRowMatrix &A,
@@ -2451,6 +2981,8 @@ template MATHLIB void LUFactorize (RCompRowMatrix &A, bool LUrealloc);
 template MATHLIB void LUFactorize (CCompRowMatrix &A, bool LUrealloc);
 template MATHLIB void LUFactorize (SCCompRowMatrix &A, bool LUrealloc);
 
+template MATHLIB void CholeskySolve (const FCompRowMatrix &L,
+    const FVector &d, const FVector &b, FVector &x);
 template MATHLIB void CholeskySolve (const RCompRowMatrix &L,
     const RVector &d, const RVector &b, RVector &x);
 
@@ -2474,6 +3006,32 @@ template MATHLIB void LUSolve (const CCompRowMatrix &LU, const CVector &b,
     CVector &x);
 template MATHLIB void LUSolve (const SCCompRowMatrix &LU, const SCVector &b,
     SCVector &x);
+
+#ifdef USE_CUDA_FLOAT
+//template MATHLIB int PCG (const RCompRowMatrix &A, const RVector &b,
+//    RVector &x, double &tol, const RPreconditioner *precon, int maxit);
+
+//template MATHLIB void PCG (const RCompRowMatrix &A, const RVector *b,
+//    RVector *x, int nrhs, double tol, int maxit, const RPreconditioner *precon,
+//    IterativeSolverResult *res);
+
+//template MATHLIB int BiCGSTAB (const RCompRowMatrix &A, const RVector &b,
+//    RVector &x, double &tol, const RPreconditioner *precon, int maxit);
+//template MATHLIB int BiCGSTAB (const CCompRowMatrix &A, const CVector &b,
+//    CVector &x, double &tol, const CPreconditioner *precon, int maxit);
+
+//template MATHLIB void BiCGSTAB (const RCompRowMatrix &A, const RVector *b,
+//    RVector *x, int nrhs, double tol, int maxit, const RPreconditioner *precon,
+//    IterativeSolverResult *res);
+//template MATHLIB void BiCGSTAB (const CCompRowMatrix &A, const CVector *b,
+//    CVector *x, int nrhs, double tol, int maxit, const CPreconditioner *precon,
+//    IterativeSolverResult *res);
+template MATHLIB int BiCGSTAB (const ICompRowMatrix &A, const IVector &b,
+    IVector &x, double &tol, const IPreconditioner *precon, int maxit);
+template MATHLIB void BiCGSTAB (const ICompRowMatrix &A, const IVector *b,
+    IVector *x, int nrhs, double tol, int maxit, const IPreconditioner *precon,
+    IterativeSolverResult *res);
+#endif
 
 template MATHLIB istream &operator>> (istream &is, RCompRowMatrix &m);
 template MATHLIB istream &operator>> (istream &is, CCompRowMatrix &m);

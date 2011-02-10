@@ -55,7 +55,7 @@ extern void zcheck_tempv();
  */
 
 void
-zpanel_bmod (
+toast_zpanel_bmod (
 	    const int  m,          /* in - number of rows in the matrix */
 	    const int  w,          /* in */
 	    const int  jcol,       /* in */

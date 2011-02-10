@@ -6,9 +6,11 @@
 #include "stoastlib.h"
 #include "util.h"
 #include "timing.h"
+#include <fstream>
 
 //#define OUTPUT_FIELDS
 
+using namespace std;
 using namespace toast;
 
 // fix these extern references
@@ -245,24 +247,6 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
     double tm_gradient = 0.0;
     double tm_innerloop = 0.0;
 
-#ifdef OUTPUT_FIELDS
-    char cbuf[256];
-    RVector *vg = new RVector[mesh.nQ];
-    for (q = 0; q < mesh.nQ; q++) vg[q].New(glen);
-    for (q = 0; q < mesh.nQ; q++)
-	raster.Map_MeshToGrid (Re(dphi[q]), vg[q]);
-    WritePPMArray (vg, raster.GDim(), mesh.nQ, 2, 0, 0, "images/dphi_re");
-    for (q = 0; q < mesh.nQ; q++)
-	raster.Map_MeshToGrid (Im(dphi[q]), vg[q]);
-    WritePPMArray (vg, raster.GDim(), mesh.nQ, 2, 0, 0, "images/dphi_im");
-    for (q = 0; q < mesh.nQ; q++)
-	raster.Map_MeshToGrid (-Arg(dphi[q]), vg[q]);
-    WritePPMArray (vg, raster.GDim(), mesh.nQ, 2, 0, 0, "images/dphi_arg");
-    for (q = 0; q < mesh.nQ; q++)
-	raster.Map_MeshToGrid (LogMod(dphi[q]), vg[q]);
-    WritePPMArray (vg, raster.GDim(), mesh.nQ, 2, 0, 0, "images/dphi_mod");
-#endif
-
     LOGOUT1_INIT_PROGRESSBAR ("AddGradient", 50, mesh.nQ);
     for (q = 0; q < mesh.nQ; q++) {
 
@@ -322,23 +306,8 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
 
 	// adjoint field and gradient
 	CVector wphia (mesh.nlen());
-	FWS.CalcField (wqa, wphia);
 
-#ifdef OUTPUT_FIELDS
-	raster.Map_MeshToGrid (Re(wphia), vg[0]);
-	sprintf (cbuf, "images/apsi_re_%003d.ppm", q);
-	WritePPM (vg[0], raster.GDim(), 0, 0, cbuf);
-	raster.Map_MeshToGrid (Im(wphia), vg[0]);
-	sprintf (cbuf, "images/apsi_im_%003d.ppm", q);
-	WritePPM (vg[0], raster.GDim(), 0, 0, cbuf);
-	raster.Map_MeshToGrid (Arg(wphia), vg[0]);
-	sprintf (cbuf, "images/apsi_arg_%003d.ppm", q);
-	double hack = -1.3;
-	WritePPM (vg[0], raster.GDim(), 0, &hack, cbuf);
-	raster.Map_MeshToGrid (LogMod(wphia), vg[0]);
-	sprintf (cbuf, "images/apsi_mod_%003d.ppm", q);
-	WritePPM (vg[0], raster.GDim(), 0, 0, cbuf);
-#endif
+	FWS.CalcField (wqa, wphia);
 
 	CVector cafield(glen);
 	CVector *cafield_grad = new CVector[dim];
@@ -353,21 +322,8 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
 	tic();
 	raster.Map_GridToSol (cdfield * cafield, dgrad);
 
-#ifdef OUTPUT_FIELDS
-	sprintf (cbuf, "images/dphi_apsi_re_%03d.ppm", q);
-	WritePPM (Re(cdfield*cafield), raster.GDim(), 0, 0, cbuf);
-	sprintf (cbuf, "images/dphi_apsi_im_%03d.ppm", q);
-	WritePPM (Im(cdfield*cafield), raster.GDim(), 0, 0, cbuf);
-#endif
-
 	tm_grid2sol += toc();
 	grad_cmua -= Re(dgrad);
-
-#ifdef OUTPUT_FIELDS
-	raster.Map_SolToGrid (grad_cmua, vg[0]);
-	sprintf (cbuf, "images/grad_mua_accu_%03d.ppm", q);
-	WritePPM (vg[0], raster.GDim(), 0, 0, cbuf);
-#endif
 
 	// diffusion contribution
 	// multiply complex field gradients
@@ -378,21 +334,8 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
 	tic();
 	raster.Map_GridToSol (gk, dgrad);
 
-#ifdef OUTPUT_FIELDS
-	sprintf (cbuf, "images/gdphi_gapsi_re_%03d.ppm", q);
-	WritePPM (Re(gk), raster.GDim(), 0, 0, cbuf);
-	sprintf (cbuf, "images/gdphi_gapsi_im_%03d.ppm", q);
-	WritePPM (Im(gk), raster.GDim(), 0, 0, cbuf);
-#endif
-
 	tm_grid2sol += toc();
 	grad_ckappa -= Re(dgrad);
-
-#ifdef OUTPUT_FIELDS
-	raster.Map_SolToGrid (grad_ckappa, vg[0]);
-	sprintf (cbuf, "images/grad_kappa_accu_%03d.ppm", q);
-	WritePPM (vg[0], raster.GDim(), 0, 0, cbuf);
-#endif
 
 	ofs_mod += n; // step to next source
 	ofs_arg += n;
@@ -401,9 +344,6 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
 	delete []cafield_grad;
 	LOGOUT1_PROGRESS (q);
     }
-#ifdef OUTPUT_FIELDS
-    delete []vg;
-#endif
 }
 
 void ObjectiveFunction::add_gradient_prior (const Solution &sol,

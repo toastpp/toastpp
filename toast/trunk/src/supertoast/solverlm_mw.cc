@@ -8,6 +8,7 @@
 #include "mwsolution.h"
 #include "solverlm_mw.h"
 #include "fwdsolver_mw.h"
+#include "supertoast_mw.h"
 #include "timing.h"
 #include <time.h>
 #include "timing.h"
@@ -21,15 +22,11 @@ using namespace toast;
 // ==========================================================================
 // external references
 
-extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
 extern char g_meshname[256];
 extern int g_nimsize;
 extern double g_refind;
-
-extern void WriteJacobian (const RMatrix *J, const Raster &raster,
-    const QMMesh &mesh);
 
 // ==========================================================================
 // local prototypes
@@ -1095,6 +1092,19 @@ void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     // create the regularisation instance
     reg = Regularisation::Create (pp, &x0, &raster);
     
+    // Set up the context data for the line search callback
+    OF_CLBK_DATA ofdata;
+    ofdata.fws = &FWS;
+    ofdata.raster = &raster;
+    ofdata.pscaler = pscaler;
+    ofdata.meshsol = &msol;
+    ofdata.reg = reg;
+    ofdata.qvec = &qvec;
+    ofdata.mvec = &mvec;
+    ofdata.omega = omega;
+    ofdata.data = &data;
+    ofdata.sd = &sd;
+
     // add model error means to data
     if (modelerr) {
 	(RVector)data -= merr;
@@ -1129,7 +1139,7 @@ void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 		toc(clock0), err0);
     J = new RDenseMatrix (ndat, n);
     hdata.J = J;
-    
+
     // LM iteration loop
     for (inr = 0; (!nrmax || inr < nrmax) &&
 	     err0 > gn_tol*errstart && fabs(err00-err0) > gn_tol; inr++) {
@@ -1160,8 +1170,6 @@ void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	// apply Hessian normalisation M
 	M = RescaleHessian (J, x, &RHess);
 	J->ColScale (M);
-	    
-	if (bWriteJ) WriteJacobian (J, raster, *mesh);
 	    
 	// calculate Gradient
 	J->ATx (b,r);                            // gradient
@@ -1228,9 +1236,12 @@ void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	    if (do_linesearch) {
 		static double alpha_ls = stepsize;
 		//if (alpha < 0.0) alpha = stepsize; // initialise step length
-		if (!LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec,
-                  data, sd, omega, d, err0, fmin, alpha_ls, msol, x0, x,
-		  reg, cov)) {
+		if (LineSearch (x, d, alpha_ls, err0, of_clbk, &alpha_ls,
+			&fmin, &ofdata) != 0) {
+
+		    //if (!LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec,
+		    //data, sd, omega, d, err0, fmin, alpha_ls, msol, x0, x,
+		    //reg, cov)) {
 		    lambda *= lambda_scale;
 		    if (lambda_scale == 1.0) KeepGoing = false;
 		    LOGOUT ("No decrease in line search");

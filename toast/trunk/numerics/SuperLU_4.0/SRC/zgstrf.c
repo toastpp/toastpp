@@ -294,6 +294,7 @@ toast_zgstrf (superlu_options_t *options, SuperMatrix *A,
 	    fsupc    = xsup[jsupno];
 	    new_next = nextlu + (xlsub[fsupc+1]-xlsub[fsupc])*(kcol-jcol+1);
 	    nzlumax = Glu.nzlumax;
+
 	    while ( new_next > nzlumax ) {
 		if ( (*info = zLUMemXpand(jcol, nextlu, LUSUP, &nzlumax, &Glu)) )
 		    return;
@@ -306,10 +307,14 @@ toast_zgstrf (superlu_options_t *options, SuperMatrix *A,
     		for (k = xa_begin[icol]; k < xa_end[icol]; k++)
         	    dense[asub[k]] = a[k];
 
+		// DEBUG!!!
+		//for (int ii=0; ii<10000; ii++)
+		//    toast_zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu, stat);
+
 	       	/* Numeric update within the snode */
 	        toast_zsnode_bmod(icol, jsupno, fsupc, dense, tempv, &Glu, stat);
 
-		if ( (*info = zpivotL(icol, diag_pivot_thresh, &usepr, perm_r,
+		if ( (*info = toast_zpivotL(icol, diag_pivot_thresh, &usepr, perm_r,
 				      iperm_r, iperm_c, &pivrow, &Glu, stat)) )
 		    if ( iinfo == 0 ) iinfo = *info;
 		
@@ -336,12 +341,12 @@ toast_zgstrf (superlu_options_t *options, SuperMatrix *A,
 	    panel_histo[panel_size]++;
 
 	    /* symbolic factor on a panel of columns */
-	    zpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1,
+	    toast_zpanel_dfs(m, panel_size, jcol, A, perm_r, &nseg1,
 		      dense, panel_lsub, segrep, repfnz, xprune,
 		      marker, parent, xplore, &Glu);
 	    
 	    /* numeric sup-panel updates in topological order */
-	    zpanel_bmod(m, panel_size, jcol, nseg1, dense,
+	    toast_zpanel_bmod(m, panel_size, jcol, nseg1, dense,
 		        tempv, segrep, repfnz, &Glu, stat);
 	    
 	    /* Sparse LU within the panel, and below panel diagonal */
@@ -350,26 +355,26 @@ toast_zgstrf (superlu_options_t *options, SuperMatrix *A,
 
 		nseg = nseg1;	/* Begin after all the panel segments */
 
-	    	if ((*info = zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k],
+	    	if ((*info = toast_zcolumn_dfs(m, jj, perm_r, &nseg, &panel_lsub[k],
 					segrep, &repfnz[k], xprune, marker,
 					parent, xplore, &Glu)) != 0) return;
 
 	      	/* Numeric updates */
-	    	if ((*info = zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
+	    	if ((*info = toast_zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
 					 tempv, &segrep[nseg1], &repfnz[k],
 					 jcol, &Glu, stat)) != 0) return;
 		
 	        /* Copy the U-segments to ucol[*] */
-		if ((*info = zcopy_to_ucol(jj, nseg, segrep, &repfnz[k],
+		if ((*info = toast_zcopy_to_ucol(jj, nseg, segrep, &repfnz[k],
 					  perm_r, &dense[k], &Glu)) != 0)
 		    return;
 
-	    	if ( (*info = zpivotL(jj, diag_pivot_thresh, &usepr, perm_r,
+	    	if ( (*info = toast_zpivotL(jj, diag_pivot_thresh, &usepr, perm_r,
 				      iperm_r, iperm_c, &pivrow, &Glu, stat)) )
 		    if ( iinfo == 0 ) iinfo = *info;
 
 		/* Prune columns (0:jj-1) using column jj */
-	    	zpruneL(jj, perm_r, pivrow, nseg, segrep,
+	    	toast_zpruneL(jj, perm_r, pivrow, nseg, segrep,
                         &repfnz[k], xprune, &Glu);
 
 		/* Reset repfnz[] for this column */

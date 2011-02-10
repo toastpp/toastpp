@@ -93,6 +93,7 @@ void SuperLU_data::Solve (SuperMatrix *B, SuperMatrix *X)
     //fact = 'F';
     //refact = 'Y';
     used_LU = true;
+    StatFree (&stat);
 }
 
 // =========================================================================
@@ -103,6 +104,7 @@ TFwdSolver<T>::TFwdSolver (LSOLVER linsolver, double tol)
     dscale   = DATA_LIN;
     solvertp = linsolver;
     iterative_tol = tol;
+    iterative_maxit = 0;
     F  = 0;
     FL = 0;
     Fd = 0;
@@ -115,10 +117,11 @@ TFwdSolver<T>::TFwdSolver (LSOLVER linsolver, double tol)
 }
 
 template<class T>
-TFwdSolver<T>::TFwdSolver (char *solver, double tol)
+TFwdSolver<T>::TFwdSolver (const char *solver, double tol)
 {
     dscale   = DATA_LIN;
     SetLinSolver (solver, tol);
+    iterative_maxit = 0;
     F  = 0;
     FL = 0;
     Fd = 0;
@@ -134,6 +137,7 @@ template<class T>
 TFwdSolver<T>::TFwdSolver (ParamParser &pp)
 {
     dscale   = DATA_LIN;
+    iterative_maxit = 0;
     ReadParams (pp);
     F  = 0;
     FL = 0;
@@ -170,6 +174,37 @@ template<class T>
 DataScale TFwdSolver<T>::GetDataScaling () const
 {
     return dscale;
+}
+
+template<>
+void TFwdSolver<float>::Allocate (const QMMesh &mesh)
+{
+    int *rowptr, *colidx, nzero;
+    int n = mesh.nlen();
+    int nq = mesh.nQ;
+
+    meshptr = &mesh;
+
+    // allocate system matrix
+    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    if (F) delete F;
+    F = new FCompRowMatrix (n, n, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    // allocate factorisations and preconditioners
+    if (solvertp == LSOLVER_DIRECT) {
+	F->SymbolicCholeskyFactorize (rowptr, colidx);
+	if (FL) delete FL;
+	FL = new FCompRowMatrix (n, n, rowptr, colidx);
+	if (Fd) delete Fd;
+	Fd = new FVector (n);
+	delete []rowptr;
+	delete []colidx;
+    } else {
+	if (precon) delete precon;
+	precon = new FPrecon_Diag;
+    }
 }
 
 template<>
@@ -229,6 +264,74 @@ void TFwdSolver<complex>::Allocate (const QMMesh &mesh)
 }
 
 template<>
+void TFwdSolver<scomplex>::Allocate (const QMMesh &mesh)
+{
+    int *rowptr, *colidx, nzero;
+    int n = mesh.nlen();
+    int nq = mesh.nQ;
+
+    meshptr = &mesh;
+
+    // allocate system matrix
+    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    if (F) delete F;
+    F = new SCCompRowMatrix (n, n, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    // allocate factorisations and preconditioners
+    if (solvertp == LSOLVER_DIRECT) {
+        // direct solver does not work yet with single complex
+	// lu_data.Setup(meshptr->nlen(), F);
+    } else {
+	if (precon) delete precon;
+	precon = new SCPrecon_Diag;
+    }
+}
+
+template<>
+void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
+    double omega, bool elbasis)
+{
+    // real version
+    xASSERT(omega==0, Nonzero omega parameter not allowed here);
+
+    RVector prm(meshptr->nlen());
+
+    // To improve accuracy, we assemble the system matrix in double
+    // precision, and map it to single precision after assembly
+
+    RCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
+    prm = sol.GetParam (OT_CMUA);
+    AddToSysMatrix (*meshptr, FF, &prm,
+                    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    prm = sol.GetParam (OT_CKAPPA);
+    AddToSysMatrix (*meshptr, FF, &prm,
+		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    prm = sol.GetParam (OT_C2A);
+    AddToSysMatrix (*meshptr, FF, &prm,
+		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+
+    int i, nz = F->nVal();
+    float *fval = F->ValPtr();
+    double *dval = FF.ValPtr();
+    for (i = 0; i < nz; i++) *fval++ = (float)*dval++;
+ 
+#ifdef UNDEF
+    F->Zero();
+    prm = sol.GetParam (OT_CMUA);
+    AddToSysMatrix (*meshptr, *F, &prm,
+		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    prm = sol.GetParam (OT_CKAPPA);
+    AddToSysMatrix (*meshptr, *F, &prm,
+		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    prm = sol.GetParam (OT_C2A);
+    AddToSysMatrix (*meshptr, *F, &prm,
+		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+#endif
+}
+
+template<>
 void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
@@ -247,6 +350,51 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     prm = sol.GetParam (OT_C2A);
     AddToSysMatrix (*meshptr, *F, &prm,
 		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+}
+
+template<>
+void TFwdSolver<scomplex>::AssembleSystemMatrix (const Solution &sol,
+    double omega, bool elbasis)
+{
+    // complex version
+    RVector prm(meshptr->nlen());
+
+    // To improve accuracy, we assemble the system matrix in double
+    // precision, and map it to single precision after assembly
+
+    CCompRowMatrix FF (F->nRows(), F->nCols(), F->rowptr, F->colidx);
+    prm = sol.GetParam (OT_CMUA);
+    AddToSysMatrix (*meshptr, FF, &prm,
+		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    prm = sol.GetParam (OT_CKAPPA);
+    AddToSysMatrix (*meshptr, FF, &prm,
+		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    prm = sol.GetParam (OT_C2A);
+    AddToSysMatrix (*meshptr, FF, &prm,
+		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrix (*meshptr, FF, omega, ASSEMBLE_iCFF);
+
+    int i, nz = F->nVal();
+    scomplex *sval = F->ValPtr();
+    complex *cval = FF.ValPtr();
+    for (i = 0; i < nz; i++) {
+        sval[i].re = (float)cval[i].re;
+	sval[i].im = (float)cval[i].im;
+    }
+
+#ifdef UNDEF
+    F->Zero();
+    prm = sol.GetParam (OT_CMUA);
+    AddToSysMatrix (*meshptr, *F, &prm,
+		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+    prm = sol.GetParam (OT_CKAPPA);
+    AddToSysMatrix (*meshptr, *F, &prm,
+		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+    prm = sol.GetParam (OT_C2A);
+    AddToSysMatrix (*meshptr, *F, &prm,
+    		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+    AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
+#endif
 }
 
 template<>
@@ -296,12 +444,37 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
 }
 
 template<>
+void TFwdSolver<float>::Reset (const Solution &sol, double omega)
+{
+    // real version
+    AssembleSystemMatrix (sol, omega);
+    if (solvertp == LSOLVER_DIRECT)
+	CholeskyFactorize (*F, *FL, *Fd, true);
+    else
+	precon->Reset (F);
+    if (B) AssembleMassMatrix();
+}
+
+template<>
 void TFwdSolver<double>::Reset (const Solution &sol, double omega)
 {
     // real version
     AssembleSystemMatrix (sol, omega);
     if (solvertp == LSOLVER_DIRECT)
 	CholeskyFactorize (*F, *FL, *Fd, true);
+    else
+	precon->Reset (F);
+    if (B) AssembleMassMatrix();
+}
+
+template<>
+void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
+{
+    // single complex version
+    AssembleSystemMatrix (sol, omega);
+    if (solvertp == LSOLVER_DIRECT)
+	lu_data.options.Fact = DOFACT;
+	//lu_data.fact = 'N';
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -321,8 +494,8 @@ void TFwdSolver<complex>::Reset (const Solution &sol, double omega)
 }
 
 template<>
-void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
-    TVector<double> &phi) const
+void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
+    TVector<float> &phi, IterativeSolverResult *res) const
 {
     // calculate the (real) photon density field for a given (real)
     // source distribution. Use only if data type is INTENSITY
@@ -331,13 +504,52 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
 	CholeskySolve (*FL, *Fd, qvec, phi);
     } else {
 	double tol = iterative_tol;
-	IterativeSolve (*F, qvec, phi, tol, precon);
+	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);
+	if (res) {
+	    res->it_count = it;
+	    res->rel_err = tol;
+	}
+    }
+}
+
+template<>
+void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
+    TVector<double> &phi, IterativeSolverResult *res) const
+{
+    // calculate the (real) photon density field for a given (real)
+    // source distribution. Use only if data type is INTENSITY
+
+    if (solvertp == LSOLVER_DIRECT) {
+	CholeskySolve (*FL, *Fd, qvec, phi);
+    } else {
+	double tol = iterative_tol;
+	int it = IterativeSolve (*F, qvec, phi, tol, precon, iterative_maxit);
+	if (res) {
+	    res->it_count = it;
+	    res->rel_err = tol;
+	}
+    }
+}
+
+template<>
+void TFwdSolver<scomplex>::CalcField (const TVector<scomplex> &qvec,
+    TVector<scomplex> &cphi, IterativeSolverResult *res) const
+{
+    if (solvertp == LSOLVER_DIRECT) {
+        xERROR(Not implemented yet);
+    } else {
+        double tol = iterative_tol;
+	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
+	if (res) {
+	    res->it_count = it;
+	    res->rel_err = tol;
+	}
     }
 }
 
 template<>
 void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
-    TVector<complex> &cphi) const
+    TVector<complex> &cphi, IterativeSolverResult *res) const
 {
     // calculate the complex field for a given source distribution
 
@@ -360,7 +572,11 @@ void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
 	toast_Destroy_SuperMatrix_Store (&X);
     } else {
         double tol = iterative_tol;
-	IterativeSolve (*F, qvec, cphi, tol, precon);
+	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
+	if (res) {
+	    res->it_count = it;
+	    res->rel_err = tol;
+	}
     }
 #ifdef DO_PROFILE
     times (&tm);
@@ -371,17 +587,38 @@ void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
 
 template<class T>
 void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
-    TVector<T> *phi) const
+    TVector<T> *phi, IterativeSolverResult *res) const
 {
     // calculate the fields for all sources
+    static IterativeSolverResult s_res_single;
+    IterativeSolverResult *res_single = 0;
+    if (res) {
+        res_single = &s_res_single;
+	res->it_count = 0;
+	res->rel_err = 0.0;
+    }
 
 #ifndef TOAST_MPI
-
     int i, nq = qvec.nRows();
-    LOGOUT1_INIT_PROGRESSBAR ("CalcFields", 50, nq);
-    for (i = 0; i < nq; i++) {
-	CalcField (qvec.Row(i), phi[i]);
-	LOGOUT1_PROGRESS(i);
+
+    if (solvertp == LSOLVER_DIRECT) {
+        LOGOUT1_INIT_PROGRESSBAR ("CalcFields", 50, nq);
+	for (i = 0; i < nq; i++) {
+	    CalcField (qvec.Row(i), phi[i], res_single);
+	    if (res) {
+	        if (res_single->it_count > res->it_count)
+		    res->it_count = res_single->it_count;
+		if (res_single->rel_err > res->rel_err)
+		    res->rel_err = res_single->rel_err;
+	    }
+	    LOGOUT1_PROGRESS(i);
+	}
+    } else {
+        TVector<T> *qv = new TVector<T>[nq];
+	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
+        IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
+            precon, res);
+	delete []qv;
     }
 
 #else
@@ -421,13 +658,26 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 // =========================================================================
 
 template<class T>
-void TFwdSolver<T>::CalcFields (const QMMesh &mesh, int nq, int q0, int q1,
-    const TCompRowMatrix<T> &qvec, TVector<T> *phi) const
+void TFwdSolver<T>::CalcFields (int q0, int q1, const TCompRowMatrix<T> &qvec,
+    TVector<T> *phi, IterativeSolverResult *res) const
 {
     // calculate fields for sources q0 <= q < q1
+    static IterativeSolverResult s_res_single;
+    IterativeSolverResult *res_single = 0;
+    if (res) {
+        res_single = &s_res_single;
+	res->it_count = 0;
+	res->rel_err = 0.0;
+    }
 
     for (int i = q0; i < q1; i++) {
-	CalcField (qvec.Row(i), phi[i]);
+        CalcField (qvec.Row(i), phi[i], res_single);
+	if (res) {
+	    if (res_single->it_count > res->it_count)
+	        res->it_count = res_single->it_count;
+	    if (res_single->rel_err > res->rel_err)
+	        res->rel_err = res_single->rel_err;
+	}
     }
 }
 
@@ -507,25 +757,6 @@ TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &qvec,
 
 // =========================================================================
 
-template<class T>
-RVector TFwdSolver<T>::ProjectAll_real (const TCompRowMatrix<T> &mvec,
-    const TVector<T> *phi, DataScale scl)
-{
-    return UnfoldComplex (ProjectAll (mvec, phi, scl));
-}
-
-// =========================================================================
-
-template<class T>
-RVector TFwdSolver<T>::ProjectAll_real (const TCompRowMatrix<T> &qvec,
-    const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
-    DataScale scl)
-{
-    return UnfoldComplex (ProjectAll (qvec, mvec, sol, omega, scl));
-}
-
-// =========================================================================
-
 template<>
 STOASTLIB RVector TFwdSolver<double>::UnfoldComplex (const RVector &vec)
    const
@@ -543,6 +774,93 @@ STOASTLIB RVector TFwdSolver<complex>::UnfoldComplex (const CVector &vec)
     RVector rvec_r(rvec,0,n); rvec_r = Re(vec);
     RVector rvec_i(rvec,n,n); rvec_i = Im(vec);
     return rvec;
+}
+
+template<>
+STOASTLIB FVector TFwdSolver<float>::UnfoldSComplex (const FVector &vec)
+   const
+{
+    // nothing to do for real case
+    return vec;
+}
+
+template<>
+STOASTLIB FVector TFwdSolver<scomplex>::UnfoldSComplex (const SCVector &vec)
+   const
+{
+    int n = vec.Dim();
+    FVector rvec(n*2);
+    FVector rvec_r(rvec,0,n); rvec_r = Re(vec);
+    FVector rvec_i(rvec,n,n); rvec_i = Im(vec);
+    return rvec;
+}
+
+// =========================================================================
+
+template<>
+RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &mvec,
+    const RVector *phi, DataScale scl)
+{
+    return ProjectAll (mvec, phi, scl);
+}
+
+template<>
+RVector TFwdSolver<complex>::ProjectAll_real (const CCompRowMatrix &mvec,
+    const CVector *phi, DataScale scl)
+{
+    return UnfoldComplex (ProjectAll (mvec, phi, scl));
+}
+
+// =========================================================================
+
+template<>
+FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &mvec,
+    const FVector *phi, DataScale scl)
+{
+    ProjectAll (mvec, phi, scl);
+}
+
+template<>
+FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
+    const SCCompRowMatrix &mvec, const SCVector *phi, DataScale scl)
+{
+    return UnfoldSComplex (ProjectAll (mvec, phi, scl));
+}
+
+// =========================================================================
+
+template<>
+RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &qvec,
+    const RCompRowMatrix &mvec, const Solution &sol, double omega,
+    DataScale scl)
+{
+    return ProjectAll (qvec, mvec, sol, omega, scl);
+}
+
+template<>
+RVector TFwdSolver<complex>::ProjectAll_real (const CCompRowMatrix &qvec,
+    const CCompRowMatrix &mvec, const Solution &sol, double omega,
+    DataScale scl)
+{
+    return UnfoldComplex (ProjectAll (qvec, mvec, sol, omega, scl));
+}
+
+// =========================================================================
+
+template<>
+FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &qvec,
+    const FCompRowMatrix &mvec, const Solution &sol, double omega,
+    DataScale scl)
+{
+    return ProjectAll (qvec, mvec, sol, omega, scl);
+}
+
+template<>
+FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
+    const SCCompRowMatrix &qvec, const SCCompRowMatrix &mvec,
+    const Solution &sol, double omega, DataScale scl)
+{
+    return UnfoldSComplex (ProjectAll (qvec, mvec, sol, omega, scl));
 }
 
 // =========================================================================
@@ -617,6 +935,9 @@ void TFwdSolver<T>::ReadParams (ParamParser &pp)
     }
 
     if (solvertp == LSOLVER_ITERATIVE) {
+        FGenericSparseMatrix::GlobalSelectIterativeSolver (method);
+        RGenericSparseMatrix::GlobalSelectIterativeSolver (method);
+	SCGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
 	CGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
 
 	if (!pp.GetReal ("LINSOLVER_TOL", iterative_tol)) {
@@ -664,7 +985,7 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
 }
 
 template<class T>
-void TFwdSolver<T>::SetLinSolver (char *solver, double tol)
+void TFwdSolver<T>::SetLinSolver (const char *solver, double tol)
 {
     if (!strcasecmp (solver, "DIRECT")) {
 	solvertp = LSOLVER_DIRECT;
@@ -681,6 +1002,7 @@ void TFwdSolver<T>::SetLinSolver (char *solver, double tol)
 	    method = ITMETHOD_GMRES;
 	else
 	    method = ITMETHOD_GAUSSSEIDEL;
+	TGenericSparseMatrix<T>::GlobalSelectIterativeSolver (method);
 	CGenericSparseMatrix::GlobalSelectIterativeSolver_complex (method);
     }
 }
@@ -807,7 +1129,7 @@ TVector<T> ProjectSingle (const QMMesh *mesh, int q,
     TVector<T> proj(mesh->nQMref[q]);
 
     for (i = 0; i < mesh->nQMref[q]; i++) {
-	m = mesh->QMref[q][i];
+        m = mesh->QMref[q][i];
 	proj[i] = dot (phi, mvec.Row(m));
     }
     return (dscale == DATA_LIN ? proj : log(proj));
@@ -863,16 +1185,26 @@ void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
+template class STOASTLIB TFwdSolver<float>;
 template class STOASTLIB TFwdSolver<double>;
+template class STOASTLIB TFwdSolver<scomplex>;
 template class STOASTLIB TFwdSolver<complex>;
 
+template STOASTLIB FVector ProjectSingle (const QMMesh *mesh, int q,
+    const FCompRowMatrix &mvec, const FVector &phi, DataScale dscale);
 template STOASTLIB RVector ProjectSingle (const QMMesh *mesh, int q,
     const RCompRowMatrix &mvec, const RVector &phi, DataScale dscale);
 template STOASTLIB CVector ProjectSingle (const QMMesh *mesh, int q,
     const CCompRowMatrix &mvec, const CVector &phi, DataScale dscale);
+template STOASTLIB SCVector ProjectSingle (const QMMesh *mesh, int q,
+    const SCCompRowMatrix &mvec, const SCVector &phi, DataScale dscale);
 
+template STOASTLIB FVector ProjectAll (const QMMesh *mesh,
+    const FCompRowMatrix &mvec, const FVector *phi, DataScale dscale);
 template STOASTLIB RVector ProjectAll (const QMMesh *mesh,
     const RCompRowMatrix &mvec, const RVector *phi, DataScale dscale);
+template STOASTLIB SCVector ProjectAll (const QMMesh *mesh,
+    const SCCompRowMatrix &mvec, const SCVector *phi, DataScale dscale);
 template STOASTLIB CVector ProjectAll (const QMMesh *mesh,
     const CCompRowMatrix &mvec, const CVector *phi, DataScale dscale);
 

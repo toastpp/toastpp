@@ -24,6 +24,7 @@ nel = size(idx,1);
 nnd = size(vtx,1);
 
 if nargin > 1
+    showsurfdata = true;
     if dim == 3
         surfdata = vtxdata(perm);
     else
@@ -49,21 +50,28 @@ if nargin > 1
         surfdata = ones(nnd,1);
     end
 else
+    showsurfdata = false;
     surfdata = ones(nnd,1);
 end
 
 if dim==3
 
-    patch('Vertices', vtx, 'Faces', idx, 'FaceLighting', 'Phong','CData',surfdata);
-    view([1 1 1]);
-    shading interp
-    lightangle(45,30)
-    set(gcf,'Renderer','zbuffer')
-    set(findobj(gca,'type','surface'),...
-        'FaceLighting','phong',...
-        'AmbientStrength',.2,'DiffuseStrength',.8,...
-        'SpecularStrength',.3,'SpecularExponent',5,...
-        'BackFaceLighting','unlit')
+    if showsurfdata == true
+        patch('Vertices', vtx, 'Faces', idx, 'FaceLighting', 'Phong','CData',surfdata);
+        view([1 1 1]);
+        shading interp
+        lightangle(45,30)
+        set(gcf,'Renderer','zbuffer')
+        set(findobj(gca,'type','surface'),...
+            'FaceLighting','phong',...
+            'AmbientStrength',.2,'DiffuseStrength',.8,...
+            'SpecularStrength',.3,'SpecularExponent',5,...
+            'BackFaceLighting','unlit')
+    else
+        patch('Vertices', vtx, 'Faces', idx, 'FaceColor', 'white', 'EdgeColor', 'black');
+        view([1 1 1]);
+        set(gcf,'Renderer','zbuffer')
+    end
 
 else
 

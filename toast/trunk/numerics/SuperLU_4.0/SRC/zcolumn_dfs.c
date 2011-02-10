@@ -63,7 +63,7 @@
  * </pre>
  */
 int
-zcolumn_dfs(
+toast_zcolumn_dfs(
 	   const int  m,         /* in - number of rows in the matrix */
 	   const int  jcol,      /* in */
 	   int        *perm_r,   /* in */

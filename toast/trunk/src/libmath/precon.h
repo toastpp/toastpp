@@ -150,28 +150,40 @@ private:
 // template typedefs
 
 typedef TPreconditioner<double>         RPreconditioner;
+typedef TPreconditioner<float>          FPreconditioner;
 typedef TPreconditioner<toast::complex> CPreconditioner;
 typedef TPreconditioner<scomplex>       SCPreconditioner;
+typedef TPreconditioner<int>            IPreconditioner;
 
 typedef TPrecon_Null<double>            RPrecon_Null;
+typedef TPrecon_Null<float>             FPrecon_Null;
 typedef TPrecon_Null<toast::complex>    CPrecon_Null;
 typedef TPrecon_Null<scomplex>          SCPrecon_Null;
+typedef TPrecon_Null<int>               IPrecon_Null;
 
 typedef TPrecon_Diag<double>            RPrecon_Diag;
+typedef TPrecon_Diag<float>             FPrecon_Diag;
 typedef TPrecon_Diag<toast::complex>    CPrecon_Diag;
 typedef TPrecon_Diag<scomplex>          SCPrecon_Diag;
+typedef TPrecon_Diag<int>               IPrecon_Diag;
 
 typedef TPrecon_IC<double>              RPrecon_IC;
+typedef TPrecon_IC<float>               FPrecon_IC;
 typedef TPrecon_IC<toast::complex>      CPrecon_IC;
 typedef TPrecon_IC<scomplex>            SCPrecon_IC;
+typedef TPrecon_IC<int>                 IPrecon_IC;
 
 typedef TPrecon_DILU<double>            RPrecon_DILU;
+typedef TPrecon_DILU<float>             FPrecon_DILU;
 typedef TPrecon_DILU<toast::complex>    CPrecon_DILU;
 typedef TPrecon_DILU<scomplex>          SCPrecon_DILU;
+typedef TPrecon_DILU<int>               IPrecon_DILU;
 
 typedef TPrecon_CG_Multigrid<double>    RPrecon_CG_Multigrid;
+typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<toast::complex> CPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<scomplex>  SCPrecon_CG_Multigrid;
+typedef TPrecon_CG_Multigrid<int>       IPrecon_CG_Multigrid;
 
 
 // ==========================================================================
