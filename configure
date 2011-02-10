@@ -9238,8 +9238,9 @@ else
 fi;
 if test "$isok" = "yes" ; then
     TOAST_DEBUG=1
-#   CXXFLAGS="${CXXFLAGS} -DFEM_DEBUG"
+    CFLAGS="-g -DFEM_DEBUG"
     CXXFLAGS="-g -DFEM_DEBUG"
+#   CXXFLAGS="${CXXFLAGS} -DFEM_DEBUG"
 else
     TOAST_DEBUG=0
 fi

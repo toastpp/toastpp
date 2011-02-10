@@ -164,6 +164,9 @@ template<class VT>
 MATHLIB bool operator!= (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
+MATHLIB bool visnan (const TVector<VT> &v);
+
+template<class VT>
 MATHLIB std::ostream &operator<< (std::ostream &os, const TVector<VT> &v);
 
 template<class VT>
@@ -879,6 +882,8 @@ public:
     friend TVector<VT> (::operator/ <>) (const VT &s, const TVector<VT> &v);
 #endif
 
+    friend MATHLIB bool visnan<> (const TVector<VT> &v);
+
     /**
      * \brief Write vector to output stream
      * \param os output stream
@@ -1420,7 +1425,9 @@ typedef TVector<scomplex> SCVector;
 typedef TVector<int>      IVector;
 
 /* add specific function for CVector */
+MATHLIB FVector Re(const SCVector &);
 MATHLIB RVector Re(const CVector &);
+MATHLIB FVector Im(const SCVector &);
 MATHLIB RVector Im(const CVector &);
 RVector Mod(const CVector &);
 MATHLIB RVector LogMod(const CVector &);

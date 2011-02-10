@@ -23,7 +23,7 @@
 #include "slu_zdefs.h"
 
 int
-zcopy_to_ucol(
+toast_zcopy_to_ucol(
 	      int        jcol,	  /* in */
 	      int        nseg,	  /* in */
 	      int        *segrep,  /* in */

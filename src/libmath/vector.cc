@@ -883,6 +883,30 @@ MATHLIB TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2)
 }
 
 template<class VT>
+MATHLIB bool visnan (const TVector<VT> &v)
+{
+    for (int i = 0; i < v.size; i++)
+	if (isnan(v[i])) return true;
+    return false;
+}
+
+template<>
+MATHLIB bool visnan (const CVector &v)
+{
+    for (int i = 0; i < v.size; i++)
+	if (cisnan(v[i])) return true;
+    return false;
+}
+
+template<>
+MATHLIB bool visnan (const SCVector &v)
+{
+    for (int i = 0; i < v.size; i++)
+	if (cisnan(v[i])) return true;
+    return false;
+}
+
+template<class VT>
 MATHLIB ostream &operator<< (ostream &os, const TVector<VT> &v)
 {
     os << '[';
@@ -1210,6 +1234,10 @@ template MATHLIB CVector  cat (const CVector &v1, const CVector &v2);
 template MATHLIB SCVector cat (const SCVector &v1, const SCVector &v2);
 template MATHLIB IVector  cat (const IVector &v1, const IVector &v2);
 
+template MATHLIB bool visnan (const RVector &v);
+template MATHLIB bool visnan (const FVector &v);
+template MATHLIB bool visnan (const IVector &v);
+
 template MATHLIB RVector  operator+ (const double  &s, const RVector &v);
 template MATHLIB FVector  operator+ (const float   &s, const FVector &v);
 template MATHLIB CVector  operator+ (const complex &s, const CVector &v);
@@ -1267,6 +1295,13 @@ template double SparseDotp (const RVector &v1, idxtype *idx1, int nidx1,
 /* Explicit complex conversions */
 /* These ought to be friends really, except that I can't see how to do that
 when using template */
+MATHLIB FVector Re (const SCVector &vec)
+{
+    FVector tmp(vec.Dim());
+    for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].re;
+    return tmp;
+}
+
 MATHLIB RVector Re (const CVector &vec)
 {
     RVector tmp(vec.Dim());
@@ -1274,6 +1309,12 @@ MATHLIB RVector Re (const CVector &vec)
     return tmp;
 }
 
+MATHLIB FVector Im (const SCVector &vec)
+{
+    FVector tmp(vec.Dim());
+    for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].im;
+    return tmp;
+}
 
 MATHLIB RVector Im (const CVector &vec)
 {

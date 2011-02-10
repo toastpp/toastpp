@@ -52,9 +52,14 @@ void QRSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &c,
 
 
 template<class MT>
-MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
-    int maxit = 0);
+MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A,
+    const TVector<MT> &b, TVector<MT> &x, double &tol,
+    const TPreconditioner<MT> *precon = 0, int maxit = 0);
+
+template<class MT>
+MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
+    const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit = 0,
+    const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 
 template<class MT>
 MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
@@ -263,6 +268,10 @@ public:
     // tol is tolerance limit on start, and final error on exit
     // maxit is iteration limit (0 = no limit)
     // return value is iteration count
+
+    friend MATHLIB void IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
+        const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
+        const TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
     friend MATHLIB int CG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon,

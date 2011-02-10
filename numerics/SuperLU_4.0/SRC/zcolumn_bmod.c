@@ -47,7 +47,7 @@ void zmatvec(int, int, int, doublecomplex*, doublecomplex*, doublecomplex*);
  * </pre>
  */
 int
-zcolumn_bmod (
+toast_zcolumn_bmod (
 	     const int  jcol,	  /* in */
 	     const int  nseg,	  /* in */
 	     doublecomplex     *dense,	  /* in */

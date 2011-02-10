@@ -209,3 +209,9 @@ void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 
     mesh->Setup();
 }
+
+
+
+void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
+{
+}

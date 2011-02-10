@@ -1,6 +1,3 @@
-/// UNFINISHED !!!
-
-
 // ==========================================================================
 // SolverPCG: preconditioned nonlinear conjugate gradients
 // ==========================================================================
@@ -8,11 +5,13 @@
 #include "stoastlib.h"
 #include "util.h"
 #include "mwsolution.h"
-#include "solverpcg_cw_mw.h"
+#include "solverpcg_mw.h"
+#include "supertoast_mw.h"
 #include "timing.h"
 #include <time.h>
 
 using namespace std;
+using namespace toast;
 
 #define PCG_RESET_INTERVAL 10
 #define DJTJ_LIMIT 1e-8
@@ -23,17 +22,8 @@ using namespace std;
 // ==========================================================================
 // external references
 
-extern int bWriteGrad;
-extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
-
-extern char g_meshname[256];
-extern int g_nimsize;
-
-void WriteJacobian (const RMatrix *J, const Raster &raster,
-    const QMMesh &mesh);
-void WriteImage (const RVector &nim, int imgno, char *nimname);
 
 // ==========================================================================
 // local prototypes
@@ -50,20 +40,22 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &A,
 void ATA_dense (const Raster &raster, const RDenseMatrix &a,
     RSymMatrix &ata);
 
-bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
-    const Scaler *pscaler, const RCompRowMatrix &qvec,
-    const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &grad, double f0, double &fmin, double &lambda,
-    MWsolution &meshsol, const RVector &p0, const RVector &p,
-    const Regularisation *reg, const RMatrix *cov = 0);
+double of_clbk (const RVector &x, void *context);
 
-void MW_get_gradient (const Raster &raster, RFwdSolverMW &FWS,
-		      RVector *dphi,
-		      const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
+//static bool LineSearchWithPrior (CFwdSolverMW &FWS, const Raster &raster,
+//    const Scaler *pscaler, const CCompRowMatrix &qvec,
+//    const CCompRowMatrix &mvec, const RVector &data, const RVector &sd,
+//    double omega, const RVector &grad, double f0, double &fmin, double &lambda,
+//    MWsolution &meshsol, const RVector &p,
+//    const Regularisation *reg);
+
+void MW_get_gradient (const Raster &raster, CFwdSolverMW &FWS,
+		      CVector *dphi,
+		      const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
 		      const MWsolution *msol, RVector &grad,
-		      const RVector &data, const RVector &sd);
+		      const RVector &data, const RVector &sd, double omega);
 
-static bool CheckRange (const MWsolution &sol);
+//static bool CheckRange (const MWsolution &sol);
 
 // ==========================================================================
 
@@ -125,6 +117,22 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     CVector *dphi = new CVector[mesh->nQ];
     for (i = 0; i < mesh->nQ; i++) dphi[i].New (nlen);
 
+    // initialise regularisation instance
+    reg = Regularisation::Create (pp, &x0, &raster);
+
+    // Set up the context data for the line search callback
+    OF_CLBK_DATA ofdata;
+    ofdata.fws = &FWS;
+    ofdata.raster = &raster;
+    ofdata.pscaler = pscaler;
+    ofdata.meshsol = &msol;
+    ofdata.reg = reg;
+    ofdata.qvec = &qvec;
+    ofdata.mvec = &mvec;
+    ofdata.omega = omega;
+    ofdata.data = &data;
+    ofdata.sd = &sd;
+
     // Start of Shewchuk implementation
 
     int i_count = 0; // iteration counter
@@ -132,17 +140,16 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 
     CVector cproj(ndat/2);
     LOGOUT("Generating fields and gradient");
-    for (i = 0; i < nofwavel; i++) {
-	FWS.Reset (*msol.swsol[i], 0);
-	FWS.CalcFields (qvec, dphi);
-	RVector proj_i (proj, i*mesh->nQM, mesh->nQM);
-	proj_i = FWS.ProjectAll (mvec, dphi);
-    }
-
-    reg = Regularisation::Create (pp, &x0, &raster);
+    proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
+    //for (i = 0; i < nofwavel; i++) {
+    //	FWS.Reset (*msol.swsol[i], omega);
+    //	FWS.CalcFields (qvec, dphi);
+    //	RVector proj_i (proj, i*mesh->nQM, mesh->nQM);
+    //	proj_i = FWS.ProjectAll (mvec, dphi);
+    //}
 
     // r = -f'(x)
-    MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd);
+    MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd, omega);
     pscaler->ScaleGradient (bsol.GetActiveParams(), r);
     r += reg->GetGradient (x0);
     r0 = r;
@@ -152,48 +159,6 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     of_value = ObjectiveFunction::get_value (data, proj, sd);
     of_prior = reg->GetValue (x0);
     of = of_value + of_prior;
-
-#ifdef UNDEF
-    if (precon != PCG_PRECON_NONE) {
-        // calculate preconditioner M
-	LOGOUT("Calculating Jacobian ...");
-	J.New (ndat, n);
-	GenerateJacobian (&raster, mesh, mvec, dphi, aphi,
-            FWS.GetDataScaling(), J);
-	J.RowScale (inv(sd));
-	pscaler->ScaleJacobian (bsol.GetActiveParams(), J);
-	if (bWriteJ) WriteJacobian (&J, raster, *mesh);
-	switch (precon) {
-	case PCG_PRECON_FULLJTJ:
-	    // Full Hessian preconditioner setup
-	    LOGOUT ("Generating dense JTJ");
-	    ATA_dense (raster, J, JTJ);
-	    LOGOUT ("Using preconditioner FULLJTJ");
-	    break;
-	case PCG_PRECON_SPARSEJTJ:
-	    // Incomplete CH preconditioner setup
-	    LOGOUT ("Generating sparse JTJ");
-	    ATA_sparse (raster, J, JTJ_L, JTJ_d);
-	    LOGOUT ("Using preconditioner SPARSEJTJ");
-	    break;
-	case PCG_PRECON_DIAGJTJ:
-	    // Diagonal Hessian preconditioner setup
-	    LOGOUT ("Calculating diagonal of JTJ");
-	    ATA_diag (J, M);
-	    LOGOUT_2PRM ("Range: %f to %f", vmin(M), vmax(M));
-#ifdef DJTJ_LIMIT
-	    M.Clip (DJTJ_LIMIT, 1e50);
-	    LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
-#endif // DJTJ_LIMIT
-	    LOGOUT ("Using preconditioner DIAGJTJ");
-	    break;
-	}
-	LOGOUT_1PRM ("Precon reset interval: %d", reset_count);
-    } else {
-	LOGOUT ("Using preconditioner NONE");
-    }
-#endif
-
 
     LOGOUT_3PRM ("Iteration 0  CPU %f  OF %g  (prior %g)",
         toc(clock0), of, of_prior);
@@ -226,8 +191,9 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	    LOGOUT_1PRM ("Initial step length reset to %f", alpha);
 	}
 	// line search. this replaces the Secant method of the Shewchuk code
-	if (LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec, data,
-	    sd, 0, d, of, fmin, alpha, msol, x0, x, reg)) {
+	if (LineSearch (x, d, alpha, of, of_clbk, &alpha, &fmin, &ofdata)==0) {
+	    //if (LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec, data,
+	    //sd, omega, d, of, fmin, alpha, msol, x, reg)) {
 
 	    x += d*alpha; // update scaled solution
 	    bsol.SetActiveParams (pscaler->Unscale(x));
@@ -249,10 +215,20 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 		}
 		break;
 	    case IMGFMT_RAW:
-	        Solution rsol(OT_NPARAM, blen);
-		raster.Map_SolToBasis (bsol, rsol, true);
-		rsol.WriteImg_mua (i_count+1, "recon_mua.raw");
-		rsol.WriteImg_mus (i_count+1, "recon_mus.raw");
+	        Solution gsol(msol.nParam(), blen);
+		raster.Map_SolToBasis (bsol, gsol, true);
+		for (i = 0; i < msol.nParam(); i++) {
+		    char fname[256];
+		    if (msol.IsActive(i)) {
+			if (i < msol.nmuaChromo) 
+			    sprintf (fname,"reconChromophore_%d.raw",i+1);
+			else if (i == msol.nmuaChromo)
+			    sprintf (fname,"reconScatPrefactor_A.raw");
+			else if (i == msol.nmuaChromo + 1) 
+			    sprintf (fname,"reconScatPower_b.raw");
+			gsol.WriteImgGeneric (i_count+1, fname, i);
+		    }
+		}
 		break;
 	    }
 
@@ -264,26 +240,18 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 
 	// r = -f'(x)
 	LOGOUT ("Generating fields and gradient");
-	for (i = 0; i < nofwavel; i++) {
-	    FWS.Reset (*msol.swsol[i], 0);
-	    FWS.CalcFields (qvec, dphi);
-	    RVector proj_i (proj, i*mesh->nQM, mesh->nQM);
-	    proj_i = FWS.ProjectAll (mvec, dphi);
-	}
+	proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
+	//for (i = 0; i < nofwavel; i++) {
+	//    FWS.Reset (*msol.swsol[i], omega);
+	//    FWS.CalcFields (qvec, dphi);
+	//    RVector proj_i (proj, i*mesh->nQM, mesh->nQM);
+	//    proj_i = FWS.ProjectAll (mvec, dphi);
+	//}
 
-	MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd);
+	MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd,
+			 omega);
 	pscaler->ScaleGradient (bsol.GetActiveParams(), r);
 	r += reg->GetGradient(x);
-
-	if (bWriteGrad) {
-	    RVector r_mua (r, 0, slen);
-	    RVector r_mus (r, slen, slen);
-	    RVector rim(blen);
-	    raster.Map_SolToBasis (r_mua, rim);
-	    WriteImage (rim, i_count+1, "grad_mua.raw");
-	    raster.Map_SolToBasis (r_mus, rim);
-	    WriteImage (rim, i_count+1, "grad_mus.raw");
-	}
 
 #ifdef RESCALE_HESSIAN
 	RVector x1(x);
@@ -303,35 +271,6 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	delta_mid = r & s;
 
 	k_count++;
-
-#ifdef UNDEF
-	if (precon != PCG_PRECON_NONE && k_count == reset_count) {
-	    // re-calculate preconditioner and reset CG
-	    LOGOUT ("Calculating Jacobian ...");
-	    GenerateJacobian (&raster, mesh, mvec, dphi, aphi,
-                FWS.GetDataScaling(), J);
-	    J.RowScale (inv(sd)); // data space rescaling
-	    pscaler->ScaleJacobian (bsol.GetActiveParams(), J);
-	    switch (precon) {
-	    case PCG_PRECON_FULLJTJ:
-	        LOGOUT ("Generating dense JTJ ...");
-		ATA_dense (raster, J, JTJ);
-		break;
-	    case PCG_PRECON_SPARSEJTJ:
-  	        LOGOUT ("Generating sparse JTJ ...");
-		ATA_sparse (raster, J, JTJ_L, JTJ_d);
-		break;
-	    case PCG_PRECON_DIAGJTJ:
-	        LOGOUT ("Calculating diagonal of JTJ ...");
-		ATA_diag (J, M);
-		LOGOUT_2PRM ("Range %f to %f", vmin(M), vmax(M));
-#ifdef DJTJ_LIMIT
-		M.Clip (DJTJ_LIMIT, 1e50);
-		LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
-#endif // DJTJ_LIMIT
-	    }
-	}
-#endif
 
 	// apply preconditioner
 	switch (precon) {
@@ -367,7 +306,7 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     }
 }
 
-void SolverPCG_CW_MW::ReadParams (ParamParser &pp)
+void SolverPCG_MW::ReadParams (ParamParser &pp)
 {
     char cbuf[256];
     bool def = false;
@@ -428,7 +367,7 @@ void SolverPCG_CW_MW::ReadParams (ParamParser &pp)
     } while (alpha < 0.0);
 }
 
-void SolverPCG_CW_MW::WriteParams (ParamParser &pp)
+void SolverPCG_MW::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "PCG");
     pp.PutReal ("NONLIN_TOL", cg_tol);
@@ -608,33 +547,41 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
 }
 
 // ==========================================================================
-
-bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
-    const Scaler *pscaler, const RCompRowMatrix &qvec,
-    const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
+#ifdef UNDEF
+bool LineSearchWithPrior (CFwdSolverMW &FWS, const Raster &raster,
+    const Scaler *pscaler, const CCompRowMatrix &qvec,
+    const CCompRowMatrix &mvec, const RVector &data, const RVector &sd,
     double omega, const RVector &grad, double f0, double &fmin, double &lambda,
-    MWsolution &meshsol, const RVector &p0, const RVector &p,
-    const Regularisation *reg, const RMatrix *cov)
+    MWsolution &meshsol, const RVector &p,
+    const Regularisation *reg)
 {
     const int MAXIT = 16;
-    const double df_limit = 1e-4;
-    double x0 = 0.0, xm, fm, fmd, fmp, fb, fbd, fbp, fmind, fm_prev;
-    double fminp, xb = lambda;
+    double x0 = 0.0, xm, fm, fmd, fmp, fb, fbd, fbp, fmind, fminp,xb = lambda;
     RVector proj(data.Dim());
     
     RVector p1 = p+grad*xb;
     raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
     meshsol.RegisterChange();
-    if (CheckRange (meshsol)) {
-	proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-	fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
-	fbp = reg->GetValue (p1);
-	fb  = fbd + fbp;
-	LOGOUT_4PRM("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g", xb,fbd,fbp,fb);
-    } else {
-	LOGOUT ("Parameters out of range in trial step");
-	fb = f0*4.0; // force reduction in step size
+    while (!CheckRange (meshsol)) {
+	LOGOUT ("** Invalid nodal parameters. Reducing step size");
+	xb *= 0.5;
+	p1 = p+grad*xb;
+	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
+	meshsol.RegisterChange();
     }
+    proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+    while (visnan(proj)) {
+	LOGOUT ("** Projection returns nan. Reducing step size");
+	xb *= 0.5;
+	p1 = p+grad*xb;
+	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
+	meshsol.RegisterChange();
+	proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+    }
+    fbd = ObjectiveFunction::get_value (data, proj, sd);
+    fbp = reg->GetValue (p1);
+    fb  = fbd + fbp;
+    LOGOUT_4PRM("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g", xb,fbd,fbp,fb);
 
     if (fb < f0) { // increase interval
         xm = xb; fm = fb;
@@ -643,15 +590,15 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	meshsol.RegisterChange();
 	if (CheckRange (meshsol)) {
-	    proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-	    fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
+	    proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+	    fbd = ObjectiveFunction::get_value (data, proj, sd);
 	    fbp = reg->GetValue (p1);
 	    fb  = fbd + fbp;
 	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 		     xb, fbd, fbp, fb);
 	} else {
 	    LOGOUT ("Parameters out of range in trial step");
-	    fb = fm*4.0; // stop growing the interval
+	    fb = fm*10.0; // stop growing the interval
 	}
 
 	while (fb < fm) {
@@ -662,15 +609,15 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	    meshsol.RegisterChange();
 	    if (CheckRange (meshsol)) {
-		proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-		fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
+		proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+		fbd = ObjectiveFunction::get_value (data, proj, sd);
 		fbp = reg->GetValue (p1);
 		fb  = fbd + fbp;
 		LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 			 xb, fbd, fbp, fb);
 	    } else {
 		LOGOUT ("Parameters out of range in trial step");
-		fb = fm*4.0; // stop growing the interval
+		fb = fm*10.0; // stop growing the interval
 	    }
 	}
     } else { // decrease interval
@@ -678,17 +625,12 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	p1 = p+grad*xm;
 	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	meshsol.RegisterChange();
-	if (CheckRange (meshsol)) {
-	    proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-	    fmd = ObjectiveFunction::get_value (data, proj, sd, cov);
-	    fmp = reg->GetValue (p1);
-	    fm  = fmd + fmp;
-	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
+	proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+	fmd = ObjectiveFunction::get_value (data, proj, sd);
+	fmp = reg->GetValue (p1);
+	fm  = fmd + fmp;
+	LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 		     xm, fmd, fmp, fm);
-	} else {
-	    LOGOUT ("Parameters out of range in trial step");
-	    fm = f0*4.0; // force reduction of interval
-	}
 	int itcount = 0;
 	while (fm > f0) {
   	    if (++itcount > MAXIT) return false;
@@ -697,19 +639,12 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	    p1 = p+grad*xm;
 	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	    meshsol.RegisterChange();
-	    fm_prev = fm;
-	    if (CheckRange (meshsol)) {
-		proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-		fmd = ObjectiveFunction::get_value (data, proj, sd, cov);
-		fmp = reg->GetValue (p1);
-		fm  = fmd + fmp;
-		LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
+	    proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+	    fmd = ObjectiveFunction::get_value (data, proj, sd);
+	    fmp = reg->GetValue (p1);
+	    fm  = fmd + fmp;
+	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 			 xm, fmd, fmp, fm);
-	    } else {
-		LOGOUT ("Parameters out of range in trial step");
-		fm = f0*4.0; // force reduction of interval
-	    }
-	    if (fabs(fm_prev-fm)/fm < df_limit) return false;
 	}
     }
     // quadratic interpolation
@@ -719,8 +654,8 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
     p1 = p+grad*lambda;
     raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
     meshsol.RegisterChange();
-    proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-    fmind = ObjectiveFunction::get_value (data, proj, sd, cov);
+    proj = FWS.ProjectAll_wavel_real (qvec, mvec, meshsol, omega);
+    fmind = ObjectiveFunction::get_value (data, proj, sd);
     fminp = reg->GetValue (p1);
     fmin  = fmind + fminp;
     if (fmin > fm) {  // interpolation didn't give improvement
@@ -733,45 +668,13 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
  
     return true;
 }
-
-// ==========================================================================
-
-bool CheckRange (const MWsolution &sol)
-{
-    bool inrange = true;
-
-    const double MIN_CMUA = 0;
-    const double MAX_CMUA = 0.1;
-    const double MIN_CKAPPA = 0;
-    const double MAX_CKAPPA = 10;
-
-    double vmin, vmax;
-    int i;
-    int nofwavel = sol.nofwavel;
-
-    for (i = 0; i < nofwavel; i++) {
-
-	sol.swsol[i]->Extents (OT_CMUA, vmin, vmax);
-	if (vmin < MIN_CMUA || vmax > MAX_CMUA) {
-	    cerr << "WARNING: " << vmin << " < CMUA < " << vmax
-		 << " in trial solution" << endl;
-	    inrange = false;
-	}
-	sol.swsol[i]->Extents (OT_CKAPPA, vmin, vmax);
-	if (vmin < MIN_CKAPPA || vmax > MAX_CKAPPA) {
-	    cerr << "WARNING: " << vmin << " < CKAPPA < " << vmax
-		 << " in trial solution" << endl;
-	    inrange = false;
-	}
-    }
-    return inrange;
-}
+#endif
 
 // ==========================================================================
 
 RVector single_gradient_data (const Raster &raster,
-    RFwdSolverMW &FWS, const RVector &proj, RVector *dphi,
-    const RCompRowMatrix &mvec, const RVector &data,
+    CFwdSolverMW &FWS, const RVector &proj, CVector *dphi,
+    const CCompRowMatrix &mvec, const RVector &data,
     const RVector &sd)
 {
     const QMMesh &mesh = *FWS.meshptr;
@@ -784,9 +687,9 @@ RVector single_gradient_data (const Raster &raster,
     const RVector &gsize = raster.GSize();
     const int *elref = raster.Elref();
     RVector grad(slen*2);
-    RVector wqa (mesh.nlen());
+    CVector wqa (mesh.nlen());
     RVector wqb (mesh.nlen());
-    RVector dgrad (slen);
+    CVector dgrad (slen);
     ofs_mod = 0;         // data offset for Mod data
     ofs_arg = mesh.nQM;  // data offset for Arg data
     RVector grad_cmua(grad, 0, slen);       // mua part of grad
@@ -801,8 +704,8 @@ RVector single_gradient_data (const Raster &raster,
     for (q = 0; q < mesh.nQ; q++) {
 
         // expand field and gradient
-        RVector cdfield (glen);
-        RVector *cdfield_grad = new RVector[dim];
+        CVector cdfield (glen);
+        CVector *cdfield_grad = new CVector[dim];
 	tic();
 	raster.Map_MeshToGrid (dphi[q], cdfield);
 	tm_mesh2grid += toc();
@@ -818,24 +721,35 @@ RVector single_gradient_data (const Raster &raster,
 	RVector b_mod(n);
 	b_mod = (y_mod-ypm_mod)/s_mod;
 
+	RVector y_arg (data, ofs_arg, n);
+	RVector s_arg (sd, ofs_arg, n);
+	RVector ypm_arg (proj, ofs_arg, n);
+	RVector b_arg(n);
+	b_arg = (y_arg-ypm_arg)/s_arg;
+
 	RVector ype(n);
 	ype = 1.0;  // will change if data type is normalised
 
-	RVector cproj(n);
+	CVector cproj(n);
 	cproj = FWS.ProjectSingle (q, mvec, dphi[q], DATA_LIN);
-	wqa = 0.0;
+	wqa = complex(0,0);
 	wqb = 0.0;
 
 	tic();
 	for (m = idx = 0; m < mesh.nM; m++) {
 	    if (!mesh.Connected (q, m)) continue;
-	    const RVector qs = mvec.Row(m);
-	    double rp = cproj[idx];
-	    double dn = 1.0/(rp*rp);
+	    const CVector qs = mvec.Row(m);
+	    double rp = cproj[idx].re;
+	    double ip = cproj[idx].im;
+	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
-	    term = -/* 2.0 * */ b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * (term*rp*dn);
+	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
+	    wqa += qs * complex (term*rp*dn, -term*ip*dn);
+
+	    // phase term
+	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
+	    wqa += qs * complex (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -843,11 +757,11 @@ RVector single_gradient_data (const Raster &raster,
 	tm_innerloop += toc();
 
 	// adjoint field and gradient
-	RVector wphia (mesh.nlen());
+	CVector wphia (mesh.nlen());
 	FWS.CalcField (wqa, wphia);
 
-	RVector cafield(glen);
-	RVector *cafield_grad = new RVector[dim];
+	CVector cafield(glen);
+	CVector *cafield_grad = new CVector[dim];
 	tic();
 	raster.Map_MeshToGrid (wphia, cafield);
 	tm_mesh2grid += toc();
@@ -860,11 +774,11 @@ RVector single_gradient_data (const Raster &raster,
 	raster.Map_GridToSol (cdfield * cafield, dgrad);
 
 	tm_grid2sol += toc();
-	grad_cmua -= dgrad;
+	grad_cmua -= Re(dgrad);
 
 	// diffusion contribution
 	// multiply complex field gradients
-	RVector gk(glen);
+	CVector gk(glen);
 	for (i = 0; i < glen; i++)
 	    for (j = 0; j < dim; j++)
 	        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
@@ -872,7 +786,7 @@ RVector single_gradient_data (const Raster &raster,
 	raster.Map_GridToSol (gk, dgrad);
 
 	tm_grid2sol += toc();
-	grad_ckappa -= dgrad;
+	grad_ckappa -= Re(dgrad);
 
 	ofs_mod += n; // step to next source
 	ofs_arg += n;
@@ -881,21 +795,25 @@ RVector single_gradient_data (const Raster &raster,
 	delete []cafield_grad;
 	LOGOUT1_PROGRESS (q);
     }
-    return grad;
+
+    // hack: make this general
+    double c = 0.3/1.4;
+    return grad*c; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
 }
 
 // ==========================================================================
 
-void MW_get_gradient (const Raster &raster, RFwdSolverMW &FWS,
-		      RVector *dphi,
-		      const RCompRowMatrix &qvec, const RCompRowMatrix &mvec,
+void MW_get_gradient (const Raster &raster, CFwdSolverMW &FWS,
+		      CVector *dphi,
+		      const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
 		      const MWsolution *msol, RVector &grad,
-		      const RVector &data, const RVector &sd)
+		      const RVector &data, const RVector &sd, double omega)
 {
     int i, j;
     const QMMesh *mesh = FWS.MeshPtr();
     RDenseMatrix extcoef = msol->extcoef;
     int nqm     = mesh->nQM;
+    int ndat_i  = nqm*2;
     int slen    = raster.SLen();
     int nchromo = extcoef.nCols();
     int nlambda = extcoef.nRows();
@@ -903,18 +821,22 @@ void MW_get_gradient (const Raster &raster, RFwdSolverMW &FWS,
     bool bFactorA = msol->IsActive(nchromo);
     bool bPowerb  = msol->IsActive(nchromo+1);
     bool bScatter = bFactorA || bPowerb;
-    RVector proj_i(mesh->nQM);
-    RVector data_i(mesh->nQM);
-    RVector sd_i(mesh->nQM);
+    RVector proj_i, data_i(ndat_i), sd_i(ndat_i);
     RVector sA, sb;
 
     grad.Clear();
     for (i = 0; i < nlambda; i++) {
-	FWS.Reset (*msol->swsol[i], 0);
+	FWS.Reset (*msol->swsol[i], omega);
 	FWS.CalcFields (qvec, dphi);
-	proj_i = FWS.ProjectAll (mvec, dphi);
-	data_i = RVector(data,i*nqm,nqm);
-	sd_i = RVector(sd,i*nqm,nqm);
+	proj_i = FWS.ProjectAll_real (mvec, dphi);
+	for (j = 0; j < nqm; j++) {
+	    data_i[j] = data[i*nqm+j];
+	    data_i[j+nqm] = data[(nlambda+i)*nqm+j];
+	    sd_i[j] = sd[i*nqm+j];
+	    sd_i[j+nqm] = sd[(nlambda+i)*nqm+j];
+	}
+	//data_i = RVector(data,i*ndat_i,ndat_i);
+	//sd_i = RVector(sd,i*ndat_i,ndat_i);
 	RVector sgrad = single_gradient_data (raster, FWS, proj_i, dphi, mvec, data_i, sd_i);
 	RVector sgrad_mua(sgrad,0,slen);
 	RVector sgrad_kap(sgrad,slen,slen);

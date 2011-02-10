@@ -43,7 +43,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // max number of nodes per element
     int nnd = mesh->elist[0]->nNode();
     for (i = 0; i < elen; i++)
-	nnd = ::max (nnd, mesh->elist[i]->nNode());
+	nnd = std::max (nnd, mesh->elist[i]->nNode());
 
     // element index list
     // (1-based; value 0 indicates unused matrix entry)

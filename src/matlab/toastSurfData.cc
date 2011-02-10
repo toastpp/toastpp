@@ -50,7 +50,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int nnd = 0, nface, sd, nn, nd, bn, *bndellist, *bndsdlist;
     nface = mesh->BoundaryList (&bndellist, &bndsdlist);
     for (j = 0; j < nface; j++)
-	nnd = ::max (nnd, mesh->elist[bndellist[j]]->nSideNode(bndsdlist[j]));
+	nnd = std::max (nnd, mesh->elist[bndellist[j]]->nSideNode(bndsdlist[j]));
     mxArray *idx = mxCreateDoubleMatrix (nface, nnd, mxREAL);
     pr = mxGetPr (idx);
     

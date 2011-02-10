@@ -327,6 +327,13 @@ void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s) const
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
+template class MATHLIB TPreconditioner<float>;
+template class MATHLIB TPrecon_Null<float>;
+template class MATHLIB TPrecon_Diag<float>;
+template class MATHLIB TPrecon_IC<float>;
+template class MATHLIB TPrecon_DILU<float>;
+template class MATHLIB TPrecon_CG_Multigrid<float>;
+
 template class MATHLIB TPreconditioner<double>;
 template class MATHLIB TPrecon_Null<double>;
 template class MATHLIB TPrecon_Diag<double>;

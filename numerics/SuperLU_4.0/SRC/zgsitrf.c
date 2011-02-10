@@ -426,7 +426,7 @@ zgsitrf(superlu_options_t *options, SuperMatrix *A, int relax, int panel_size,
                           marker, parent, xplore, &Glu);
 
 	    /* numeric sup-panel updates in topological order */
-	    zpanel_bmod(m, panel_size, jcol, nseg1, dense,
+	    toast_zpanel_bmod(m, panel_size, jcol, nseg1, dense,
 			tempv, segrep, repfnz, &Glu, stat);
 
 	    /* Sparse LU within the panel, and below panel diagonal */
@@ -444,7 +444,7 @@ zgsitrf(superlu_options_t *options, SuperMatrix *A, int relax, int panel_size,
 		    return;
 
 		/* Numeric updates */
-		if ((*info = zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
+		if ((*info = toast_zcolumn_bmod(jj, (nseg - nseg1), &dense[k],
 					  tempv, &segrep[nseg1], &repfnz[k],
 					  jcol, &Glu, stat)) != 0) return;
 

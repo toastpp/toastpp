@@ -215,4 +215,7 @@ inline scomplex exp (scomplex& z)
 inline scomplex hadamard (const scomplex& a, const scomplex & b)
 { return scomplex (a.re * b.re, a.im * b.im); }
 
+inline bool cisnan(const scomplex &z)
+{ return isnan(z.re) || isnan(z.im); }
+
 #endif // !__SCOMPLEX_H

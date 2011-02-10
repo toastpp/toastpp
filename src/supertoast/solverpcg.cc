@@ -55,7 +55,7 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
 
 bool LineSearchWithPrior (CFwdSolver &FWS, const Raster &raster,
     const Scaler *pscaler,
-    const ObjectiveFunction &OF, const CCompRowMatrix &qvec,
+    const CCompRowMatrix &qvec,
     const CCompRowMatrix &mvec, const RVector &data, const RVector &sd,
     double omega, const RVector &p, const RVector &grad, double f0,
     double &fmin, double &lambda, Solution &meshsol, RVector &proj,
@@ -144,8 +144,7 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     reg = Regularisation::Create (pp, &x0, &raster);
 
     // r = -f'(x)
-    OF.get_gradient (raster, FWS, proj, dphi, mvec, &bsol, r);
-
+    OF.get_gradient (raster, FWS, proj, dphi, mvec, 0/* &bsol*/, r);
 
 #ifdef OUTPUT_PMDF
     {
@@ -286,8 +285,9 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 	    alpha = of / l2norm (d);
 	    LOGOUT_1PRM ("Initial step length reset to %f", alpha);
 	}
+
 	// line search. this replaces the Secant method of the Shewchuk code
-	if (LineSearchWithPrior (FWS, raster, pscaler, OF, qvec, mvec, data,
+	if (LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec, data,
 	    sd, omega, x, d, of, fmin, alpha, msol, proj, pvalid, reg)) {
 
 	    x += d*alpha; // update scaled solution
@@ -656,9 +656,8 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
 // ==========================================================================
 
 bool LineSearchWithPrior (CFwdSolver &FWS, const Raster &raster,
-    const Scaler *pscaler, const ObjectiveFunction &OF,
-    const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-    const RVector &data, const RVector &sd,
+    const Scaler *pscaler, const CCompRowMatrix &qvec,
+    const CCompRowMatrix &mvec, const RVector &data, const RVector &sd,
     double omega, const RVector &p, const RVector &grad, double f0,
     double &fmin, double &lambda, Solution &meshsol, RVector &proj,
     bool &proj_valid, const Regularisation *reg)

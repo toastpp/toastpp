@@ -56,7 +56,7 @@
  */
 
 void
-zpanel_dfs (
+toast_zpanel_dfs (
 	   const int  m,           /* in - number of rows in the matrix */
 	   const int  w,           /* in */
 	   const int  jcol,        /* in */

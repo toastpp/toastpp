@@ -78,7 +78,7 @@ int main (int argc, char *argv[]) {
     CCompRowMatrix qvec, mvec;
     CVector *dphi;
     int i, j, cmd;
-    double t0, t1;
+    double t0, dt;
     Point bbmin, bbmax;
 
     CFwdSolver FWS (pp);
@@ -164,14 +164,24 @@ int main (int argc, char *argv[]) {
     cout << endl << endl << "----------" << endl;
 
     cout << "Assembling and pre-processing system matrix" << endl;
+    t0 = clock();
     FWS.Reset (sol, omega);
+    dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
+    pp.PutReal("T(assembly): ", dt);
+    cout << "T(assembly): " << dt << endl;
 
     // solve for fields
     cout << "Computing fields" << endl;
-    t0 = tic();
-    FWS.CalcFields (qvec, dphi);
-    t1 = tic();
-    cout << "Time: " << t1-t0 << " seconds" << endl << endl;
+    IterativeSolverResult res;
+    t0 = clock();
+    FWS.CalcFields (qvec, dphi, &res);
+    dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
+    pp.PutReal("T(solve): ", dt);
+    if (FWS.LinSolver() != LSOLVER_DIRECT) {
+        cout << "Max iterations: " << res.it_count << endl;
+	cout << "Max rel. error: " << res.rel_err << endl;
+    }
+    cout << "T(solve): " << dt << endl << endl;
 
     // output fields as NIM files
     cout << "Output nodal fields (1/0)? " << flush;
@@ -299,7 +309,7 @@ void WriteNIM (const char *nimname, const RVector &img, int size, int no)
     ofstream ofs (nimname, ios::app);
     ofs << "Image " << no << endl;
     for (int i = 0; i < size; i++)
-        ofs << img[i] << ' ';
+      ofs << setprecision(10) << img[i] << ' ';
     ofs << endl;
 }
 

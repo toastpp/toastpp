@@ -53,7 +53,7 @@
  */
 
 int
-zpivotL(
+toast_zpivotL(
         const int  jcol,     /* in */
         const double u,      /* in - diagonal pivoting threshold */
         int        *usepr,   /* re-use the pivot sequence given by perm_r/iperm_r */
