@@ -288,6 +288,11 @@ public:
     // as boundary nodes
 
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
+	SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+    // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
+    // (only fills entries relevant for the element)
+
+    friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
 	CGenericSparseMatrix &M, const RVector *coeff, int mode);
     // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
     // (only fills entries relevant for the element)
@@ -298,13 +303,23 @@ public:
     // the specified mode
     // For modes FF and DD 'coeff' is ignored
 
-    friend FELIB void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
-        const RVector *coeff, int mode);
+    friend FELIB void AddToSysMatrix (const Mesh &mesh,
+        FGenericSparseMatrix &M, const RVector *coeff, int mode);
+    // Assembles coefficient vector 'coeff' into system matrix 'M' using
+    // the specified mode
+    // For modes FF and DD 'coeff' is ignored
+
+    friend FELIB void AddToSysMatrix (const Mesh &mesh,
+        SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+    friend FELIB void AddToSysMatrix (const Mesh &mesh,
+        CGenericSparseMatrix &M, const RVector *coeff, int mode);
     // As above but for complex system matrix. Modes can also contain assembly
     // commands for imaginary part
 
-    friend FELIB void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
-        const double coeff, int mode);
+    friend FELIB void AddToSysMatrix (const Mesh &mesh,
+        CGenericSparseMatrix &M, const double coeff, int mode);
+    friend FELIB void AddToSysMatrix (const Mesh &mesh,
+        SCGenericSparseMatrix &M, const double coeff, int mode);
     // This version adds a component with constant coefficient 'coeff' to
     // the real or imaginary part of system matrix M
 
@@ -424,6 +439,20 @@ public:
 
     void SetBoundary (const Surface &_boundary);
     // Set or reset parametric mesh surface
+
+    void PopulateNeighbourLists ();
+
+    void InitSubdivisionSupport ();
+
+    /**
+     * \brief Refine an element by subdivision
+     * \param el element index (>= 0)
+     * \return Refinement level of subdivided elements
+     * \note This function may recursively also refine the element's
+     *   neighbours, to make sure that refinement levels between neighbours
+     *   differ by no more than 1
+     */
+    int RefineElement (int el);
 
     RVector *bnd_param;
     // List of boundary parametrisations for all boundary nodes

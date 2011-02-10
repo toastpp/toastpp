@@ -21,6 +21,7 @@ Element::Element ()
     bndside = 0;
     sdnbhr = 0;
     region = -1;
+    subdivdata = 0;
 }
 
 Element::Element (const Element& el)   // copy constructor
@@ -29,12 +30,14 @@ Element::Element (const Element& el)   // copy constructor
     bndside = 0;
     sdnbhr = 0;
     region = -1;
+    subdivdata = 0;
 }
 
 Element::~Element ()
 {
     if (bndside) delete []bndside;
     if (sdnbhr)  delete []sdnbhr;
+    if (subdivdata) delete subdivdata;
 }
 
 void Element::Initialise (const NodeList& nlist)
@@ -43,17 +46,14 @@ void Element::Initialise (const NodeList& nlist)
     //*** logic changed 17-09-06 to include Internal interfaces
     //*** this is open to improvement, certainly 
     if (!bndside) bndside = new bool[nSide()];
-    if (!sdnbhr)  sdnbhr  = new int[nSide()];
     bndel   = false;
     interfaceel = false;
     for (int side = 0; side < nSide(); side++) {
 	bndside[side] = false;
-	sdnbhr[side] = -2;
 #ifdef UNDEF
         bool internal = false;
 	bool boundary = false;
         bndside[side] = true;
-	sdnbhr[side] = -2; // invalidate
         for (int n = 0; n < nSideNode (side); n++) {
 	    int nd = Node[SideNode (side, n)]; 
 	    
@@ -254,6 +254,25 @@ int Element::BndSideList (const NodeList &nlist, int *list)
 	if (bnd) list[recno++] = i;
     }
     return recno;
+}
+
+void Element::InitNeighbourSupport ()
+{
+    if (!sdnbhr) sdnbhr = new Element*[nSide()];
+    for (int i = 0; i < nSide(); i++)
+	sdnbhr[i] = NULL;
+}
+
+void Element::InitSubdivisionSupport ()
+{
+    if (!subdivdata) subdivdata = new ElementSubdivisionData;
+    subdivdata->level = 0;
+    subdivdata->sibling = NULL;
+}
+
+int Element::SubdivisionLevel () const
+{
+    return (subdivdata ? subdivdata->level : 0);
 }
 
 istream &operator>> (istream& i, Element &el)

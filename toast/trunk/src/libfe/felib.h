@@ -56,5 +56,6 @@
 #include "meshopt.h"
 #include "qmmesh.h"
 #include "timespec.h"
+#include "refine_mesh.h"
 
 #endif // !__FELIB_H

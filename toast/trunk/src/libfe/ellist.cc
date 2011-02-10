@@ -93,28 +93,14 @@ void ElementList::RemoveNodeRef (int nd)
 	    if (List[el]->Node[n] > nd) List[el]->Node[n]--;
 }
 
-int ElementList::SideNeighbour (int el, int side)
+Element *ElementList::SideNeighbour (int el, int side)
 {
     dASSERT(el >= 0 && el < Length, Element index out of range);
     dASSERT(side >= 0 && side < List[el]->nSide(), Side index out of range);
 
     Element *pel = List[el];
+    dASSERT(pel->sdnbhr, Element neighour lists not available);
 
-    if (pel->sdnbhr[side] < -1) { // not yet computed
-        const int max_sidenode = 10;
-        int i, i1, i2, nd[max_sidenode], nn = pel->nSideNode (side);
-	dASSERT(nn <= max_sidenode, Nodes per side limit exceeded);
-	for (i = 0; i < nn; i++)
-	    nd[i] = pel->Node[pel->SideNode (side, i)];
-	// search from el outward to improve efficiency
-	for (i1 = el-1, i2 = el+1; i1 >= 0 || i2 < Length; i1--, i2++) {
-	    if (i1 >= 0 && (List[i1]->IsSide (nn, nd) >= 0))
-	      { pel->sdnbhr[side] = i1; break; }
-	    if (i2 < Length && (List[i2]->IsSide (nn, nd) >= 0))
-	      { pel->sdnbhr[side] = i2; break; }
-	}
-	pel->sdnbhr[side] = -1;
-    }
     return pel->sdnbhr[side];
 }
 

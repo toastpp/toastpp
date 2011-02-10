@@ -62,6 +62,14 @@
 //@}
 
 class Surface;
+class Element;
+class Mesh;
+
+typedef struct ElementSubdivisionData {
+    int level;             // subdivision level (>= 0)
+    Element *sibling;      // sibling neighbour for dual splits
+    bool is_sibling0;      // distinguish the two siblings
+};
 
 // ==========================================================================
 // class Element
@@ -395,6 +403,20 @@ public:
      * \sa IsBoundarySide, HasBoundarySide, IsSideNode
      */
     virtual int BndSideList (const NodeList& nlist, int *list);
+
+    void InitNeighbourSupport ();
+    void InitSubdivisionSupport ();
+
+    /**
+     * \brief Returns the element's subdivison level
+     * \return subdivision level (>= 0)
+     * \note By default, all elements have level 0. The subdivision level
+     *   can increase during dynamic mesh refinement.
+     */
+    int SubdivisionLevel () const;
+
+    virtual void Subdivide (Mesh *mesh)
+    { xERROR(Not implemented); }
 
     /**
      * \brief Returns the values of the shape functions at a local point.
@@ -970,12 +992,28 @@ public:
     int Region() const {return region;} // region id for segmented meshes
     void SetRegion(int nr) {region = nr;} // set region id 
 
-protected:
+    virtual void SplitSide (Mesh *mesh, int side, int newnode,
+        Element *nbr1, Element *nbr2, Element *el1, Element *el2)
+    { xERROR(Not implemented); }
 
-    int *sdnbhr;
-    // List of side neighbours for the element. A value of -1 indicates no
-    // neighbour, i.e. a boundary side. A value of < -1 indicates an invalid
-    // (not yet computed) entry.
+    virtual void Bisect (Mesh *mesh, int side, int newnode,
+        Element *nbr1, Element *nbr2, Element *el1, Element *el2)
+    { xERROR(Not implemented); }
+
+    virtual void MergeAndResplit (Mesh *mesh, int side, int newnode,
+        Element *nbr1, Element *nbr2, Element *el1, Element *el2)
+
+    { xERROR(Not implemented); }
+
+    ElementSubdivisionData *subdivdata;
+
+    Element **sdnbhr;
+    // List of side neighbours for the element.
+    // A NULL entry indicates no neighbour (boundary side)
+    // Note: this list is only created if Mesh::PopulateNeighbourLists is
+    // called.
+
+protected:
 
     bool *bndside;
     // boundary flag for each side of the element. A side is a boundary

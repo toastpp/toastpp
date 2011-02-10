@@ -62,9 +62,11 @@ public:
     // references to the following node (which is then assigned the identifier
     // nd)
 
-    int SideNeighbour (int el, int side);
-    // Return neighbour element of 'el' at 'side', or -1 if side has
+    Element *SideNeighbour (int el, int side);
+    // Return neighbour element of 'el' at 'side', or NULL if side has
     // no neighbour, i.e. if the side is part of the mesh surface
+    // Note: This function requires a preceeding call to
+    // Mesh::PopulateNeighbourLists
     // Note: This replaces 'EdgeAdjacentElement'
 
     int EdgeAdjacentElement (int el, int side);
