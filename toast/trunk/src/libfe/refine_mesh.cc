@@ -212,6 +212,6 @@ void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 
 
 
-void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
+void Tetrahedron4Mesh (Mesh *mesh, bool *elrefine)
 {
 }
