@@ -173,6 +173,13 @@ Point Element::SideCentre (int side) const
     return cnt / (double)nnode;
 }
 
+Element *Element::SideNeighbour (int side) const
+{
+    dASSERT(side >= 0 && side < nSide(), Invalid value for argument side.);
+    dASSERT(sdnbhr, Neighbour support not initialised);
+    return sdnbhr[side];
+}
+
 RDenseMatrix Element::Elgeom (const NodeList& nlist) const
 {
     RDenseMatrix tmp(nNode(), Dimension());
