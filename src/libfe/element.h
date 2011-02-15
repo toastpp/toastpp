@@ -309,6 +309,16 @@ public:
     virtual Point SideCentre (int side) const;
 
     /**
+     * \brief returns a pointer to the element connected at 'side', or NULL
+     *   if this is a boundary side.
+     * \param side side index (>= 0)
+     * \return Element pointer or NULL
+     * \note This function is only supported if Mesh::PopulateNeighbourLists
+     *   has been called before.
+     */
+    Element *SideNeighbour (int side) const;
+
+    /**
      * \brief Maps a point from local element coordinates to global
      *   coordinates.
      * \param nlist mesh node list
