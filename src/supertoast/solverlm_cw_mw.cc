@@ -10,12 +10,11 @@
 #include "util.h"
 #include "mwsolution.h"
 #include "solverlm_cw_mw.h"
+#include "supertoast_util.h"
+#include "supertoast_cw_mw.h"
 #include "timing.h"
 #include <time.h>
 #include "timing.h"
-
-#define DEBUG_FRECHET
-#define BYHAND
 
 using namespace std;
 using namespace toast;
@@ -26,12 +25,7 @@ using namespace toast;
 extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
-extern char g_meshname[256];
-extern int g_nimsize;
 extern double g_refind;
-
-extern void WriteJacobian (const RMatrix *J, const Raster &raster,
-    const QMMesh &mesh);
 
 // ==========================================================================
 // local prototypes
@@ -51,15 +45,6 @@ RVector RescaleHessian (const RMatrix *J, const RVector &x,
 RVector RescaleHessianPart (RDenseMatrix &Jpart, const RVector &x,
     RCompRowMatrix *RHess, int rank);
 #endif
-
-bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
-    const Scaler *pscaler, const RCompRowMatrix &qvec,
-    const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    const RVector &grad, double f0, double &fmin, double &lambda,
-    MWsolution &meshsol, const RVector &p0, const RVector &p,
-    const Regularisation *reg, const RMatrix *cov = 0);
-
-bool CheckRange (const MWsolution &sol);
 
 RVector Mergewavels (const RVector &b, int r0, int len, int nofwavel);
 
@@ -1282,6 +1267,18 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     // create the regularisation instance
     reg = Regularisation::Create (pp, &x0, &raster);
     
+    // Set up the context data for the line search callback
+    OF_CLBK_DATA ofdata;
+    ofdata.fws = &FWS;
+    ofdata.raster = &raster;
+    ofdata.pscaler = pscaler;
+    ofdata.meshsol = &msol;
+    ofdata.reg = reg;
+    ofdata.qvec = &qvec;
+    ofdata.mvec = &mvec;
+    ofdata.data = &data;
+    ofdata.sd = &sd;
+
     // add model error means to data
     if (modelerr) {
 	(RVector)data -= merr;
@@ -1472,8 +1469,8 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    if (do_linesearch) {
 		static double alpha_ls = stepsize;
 		//if (alpha < 0.0) alpha = stepsize; // initialise step length
-		if (!LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec,
-                  data, sd, d, err0, fmin, alpha_ls, msol, x0, x, reg, cov)) {
+		if (LineSearch (x, d, alpha_ls, err0, of_clbk, &alpha_ls,
+				&fmin, &ofdata) != 0) {
 		    LOGOUT ("No decrease in line search");
 		    lambda *= lambda_scale;
 		    if (lambda_scale == 1.0) {
@@ -1887,164 +1884,6 @@ void SolverLM_CW_MW::WriteParams (ParamParser &pp)
 	pp.PutString ("FMOD_MODEL_ERROR", merr_fmod_fname);
 	pp.PutString ("FARG_MODEL_ERROR", merr_farg_fname);
     }
-}
-
-// ==========================================================================
-
-bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
-    const Scaler *pscaler, const RCompRowMatrix &qvec,
-    const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    const RVector &grad, double f0, double &fmin, double &lambda,
-    MWsolution &meshsol, const RVector &p0, const RVector &p,
-    const Regularisation *reg, const RMatrix *cov)
-{
-    const int MAXIT = 16;
-    const double df_limit = 1e-4;
-    double x0 = 0.0, xm, fm, fmd, fmp, fb, fbd, fbp, fmind, fm_prev;
-    double fminp, xb = lambda;
-    RVector proj(data.Dim());
-    
-    RVector p1 = p+grad*xb;
-    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-    meshsol.RegisterChange();
-    if (CheckRange (meshsol)) {
-	proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-	fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
-	fbp = reg->GetValue (p1);
-	fb  = fbd + fbp;
-	LOGOUT_4PRM("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g", xb,fbd,fbp,fb);
-    } else {
-	LOGOUT ("Parameters out of range in trial step");
-	fb = f0*4.0; // force reduction in step size
-    }
-
-    if (fb < f0) { // increase interval
-        xm = xb; fm = fb;
-	xb *= 2.0;
-	p1 = p+grad*xb;
-	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	meshsol.RegisterChange();
-	if (CheckRange (meshsol)) {
-	    proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-	    fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
-	    fbp = reg->GetValue (p1);
-	    fb  = fbd + fbp;
-	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
-		     xb, fbd, fbp, fb);
-	} else {
-	    LOGOUT ("Parameters out of range in trial step");
-	    fb = fm*4.0; // stop growing the interval
-	}
-
-	while (fb < fm) {
-	    x0 = xm; f0 = fm;
-	    xm = xb; fm = fb;
-	    xb *= 2.0;
-	    p1 = p+grad*xb;
-	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	    meshsol.RegisterChange();
-	    if (CheckRange (meshsol)) {
-		proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-		fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
-		fbp = reg->GetValue (p1);
-		fb  = fbd + fbp;
-		LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
-			 xb, fbd, fbp, fb);
-	    } else {
-		LOGOUT ("Parameters out of range in trial step");
-		fb = fm*4.0; // stop growing the interval
-	    }
-	}
-    } else { // decrease interval
-        xm = 0.5*xb;
-	p1 = p+grad*xm;
-	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	meshsol.RegisterChange();
-	if (CheckRange (meshsol)) {
-	    proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-	    fmd = ObjectiveFunction::get_value (data, proj, sd, cov);
-	    fmp = reg->GetValue (p1);
-	    fm  = fmd + fmp;
-	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
-		     xm, fmd, fmp, fm);
-	} else {
-	    LOGOUT ("Parameters out of range in trial step");
-	    fm = f0*4.0; // force reduction of interval
-	}
-	int itcount = 0;
-	while (fm > f0) {
-  	    if (++itcount > MAXIT) return false;
-	    xb = xm; fb = fm;
-	    xm = 0.5*xb;
-	    p1 = p+grad*xm;
-	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	    meshsol.RegisterChange();
-	    fm_prev = fm;
-	    if (CheckRange (meshsol)) {
-		proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-		fmd = ObjectiveFunction::get_value (data, proj, sd, cov);
-		fmp = reg->GetValue (p1);
-		fm  = fmd + fmp;
-		LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
-			 xm, fmd, fmp, fm);
-	    } else {
-		LOGOUT ("Parameters out of range in trial step");
-		fm = f0*4.0; // force reduction of interval
-	    }
-	    if (fabs(fm_prev-fm)/fm < df_limit) return false;
-	}
-    }
-    // quadratic interpolation
-    double a = ((f0-fb)/(x0-xb) - (f0-fm)/(x0-xm)) / (xb-xm);
-    double b = (f0-fb)/(x0-xb) - a*(x0+xb);
-    lambda = -b/(2.0*a);
-    p1 = p+grad*lambda;
-    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-    meshsol.RegisterChange();
-    proj = FWS.ProjectAll_wavel (qvec, mvec, meshsol, 0);
-    fmind = ObjectiveFunction::get_value (data, proj, sd, cov);
-    fminp = reg->GetValue (p1);
-    fmin  = fmind + fminp;
-    if (fmin > fm) {  // interpolation didn't give improvement
-        lambda = xm, fmin = fm;
-    }
-    LOGOUT_4PRM("Lsearch final: STEP %g OF %g PRIOR %g TOTAL %g",
-		lambda, fmind, fminp, fmin);
-    // restimate tau 
-    //    tau = fmind/fminp;
- 
-    return true;
-}
-
-bool CheckRange (const MWsolution &sol)
-{
-    bool inrange = true;
-
-    const double MIN_CMUA = 0;
-    const double MAX_CMUA = 0.1;
-    const double MIN_CKAPPA = 0;
-    const double MAX_CKAPPA = 10;
-
-    double vmin, vmax;
-    int i;
-    int nofwavel = sol.nofwavel;
-
-    for (i = 0; i < nofwavel; i++) {
-
-	sol.swsol[i]->Extents (OT_CMUA, vmin, vmax);
-	if (vmin < MIN_CMUA || vmax > MAX_CMUA) {
-	    cerr << "WARNING: " << vmin << " < CMUA < " << vmax
-		 << " in trial solution" << endl;
-	    inrange = false;
-	}
-	sol.swsol[i]->Extents (OT_CKAPPA, vmin, vmax);
-	if (vmin < MIN_CKAPPA || vmax > MAX_CKAPPA) {
-	    cerr << "WARNING: " << vmin << " < CKAPPA < " << vmax
-		 << " in trial solution" << endl;
-	    inrange = false;
-	}
-    }
-    return inrange;
 }
 
 // ==========================================================================

@@ -5,7 +5,7 @@
 #include "stoastlib.h"
 #include "util.h"
 #include "mwsolution.h"
-#include "solverpcg_mw.h"
+#include "solverpcg_mw_mpi.h"
 #include "supertoast_mw.h"
 #include "timing.h"
 #include <time.h>
@@ -48,7 +48,7 @@ void MW_get_gradient (const Raster &raster, CFwdSolverMW &FWS,
 
 // ==========================================================================
 
-SolverPCG_MW::SolverPCG_MW (ParamParser *_pp): Solver_MW (_pp)
+SolverPCG_MW_MPI::SolverPCG_MW_MPI (ParamParser *_pp): Solver_MW_MPI (_pp)
 {
     itmax = 50;
     cg_tol = 1e-8;
@@ -59,7 +59,7 @@ SolverPCG_MW::SolverPCG_MW (ParamParser *_pp): Solver_MW (_pp)
 // This is an implementation of preconditioned nonlinear CG
 // from the Shewchuk paper, B5 (pg.53) but without Secant method
 
-void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
+void SolverPCG_MW_MPI::Solve (CFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
     const RVector &sd, Solution &bsol, MWsolution &msol,
     const CCompRowMatrix &qvec, const CCompRowMatrix &mvec, double omega)
@@ -292,7 +292,7 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     }
 }
 
-void SolverPCG_MW::ReadParams (ParamParser &pp)
+void SolverPCG_MW_MPI::ReadParams (ParamParser &pp)
 {
     char cbuf[256];
     bool def = false;
@@ -353,7 +353,7 @@ void SolverPCG_MW::ReadParams (ParamParser &pp)
     } while (alpha < 0.0);
 }
 
-void SolverPCG_MW::WriteParams (ParamParser &pp)
+void SolverPCG_MW_MPI::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "PCG");
     pp.PutReal ("NONLIN_TOL", cg_tol);

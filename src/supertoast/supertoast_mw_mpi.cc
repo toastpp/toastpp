@@ -1,14 +1,15 @@
 #include "stoastlib.h"
+#include <fstream>
 #include <iomanip>
 #include <string.h>
 #include "util.h"
-#include "solver.h"
+#include "solver_mw_mpi.h"
 #include "source.h"
-#include "timing.h"
-#include "supertoast.h"
+#include "supertoast_mw.h"
 #include "supertoast_util.h"
+#include "timing.h"
 #include <time.h>
-#include <mpi.h>
+#include "mpi.h"
 
 using namespace std;
 using namespace toast;
@@ -16,26 +17,14 @@ using namespace toast;
 // Max number of mesh regions
 #define MAXREGION 100
 
+// Multi-Wavelength Related Parameters
+#define MAX_NOFWLENGTH 50
+
 // Verbose timing output
 //#define DO_PROFILE
 
 // ==========================================================================
 // Global variables
-
-enum PCG_PRECON {           // preconditioners for PCG solver
-    PCG_PRECON_NONE,        //   no preconditioner
-    PCG_PRECON_DIAGJTJ,     //   diagonal of JTJ
-    PCG_PRECON_SPARSEJTJ,   //   sparse JTJ
-    PCG_PRECON_FULLJTJ      //   complete JTJ
-} g_pcg_precon = PCG_PRECON_NONE;
-
-enum LM_PRECON {            // preconditioners for LM solver
-    LM_PRECON_NONE,         //   no preconditioner
-    LM_PRECON_HDIAG,        //   diagonal of Hessian
-    LM_PRECON_CH,           //   Cholesky factorisation using explicit Hessian
-    LM_PRECON_ICH,          //   Incomplete Cholesky with sparse Hessian
-    LM_PRECON_GMRES         //   "matrix-less" Krylov subspace method (GMRES)
-} g_lm_precon = LM_PRECON_NONE;
 
 enum PARAM_SCALE {          // parameter scaling method
     PARAM_SCALE_NONE,       //   no scaling
@@ -44,15 +33,20 @@ enum PARAM_SCALE {          // parameter scaling method
     PARAM_SCALE_BOUNDLOG    //   x -> ln ((x-a)(b-x))
 } g_pscale = PARAM_SCALE_NONE;
 
-double g_lm_gmres_tol;      // convergence criterion for LM GMRES precon
-
 double g_lsolver_tol;       // convergence criterion for linear solver
 
 double g_param_cmuamin, g_param_cmuamax;
 double g_param_ckappamin, g_param_ckappamax;
 double g_refind;
 char g_meshname[256];
+int g_nimsize;
 int g_imgfmt = IMGFMT_NIM;
+
+SourceMode srctp = SRCMODE_NEUMANN;   // source type
+int bOutputUpdate = 1;
+int bOutputGradient = 1;
+double avg_cmua = 1.0, avg_ckappa = 1.0;
+ParamParser pp;
 
 double clock0;
 
@@ -60,28 +54,18 @@ double clock0;
 double solver_time = 0.0;
 #endif
 
-// =========================================================================
-// global parameters
-
-SourceMode srctp = SRCMODE_NEUMANN;   // source type
-int bWriteJ    = 0;
-int bWriteGrad = 0;
-int bOutputUpdate = 1;
-int bOutputGradient = 1;
-double avg_cmua = 1.0, avg_ckappa = 1.0;
-ParamParser pp;
 
 // =========================================================================
 // local prototypes
 
 void OutputProgramInfo ();
-void SelectPCGOptions ();
-void SelectLMOptions ();
 void SelectMesh (char *meshname, QMMesh &mesh);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (int &mtype, double &mwidth);
-void SelectInitialParams (const Mesh &mesh, Solution &msol);
-void SelectData (DataScale dscale, int nqm, double &freq, RVector &data);
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol);
+void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
+    int whichWavel);
+void SelectData (DataScale dscale, int len, double &freq, RVector &data);
 void SelectBasis (IVector &gdim, IVector &bdim);
 int  SelectImageFormat ();
 PARAM_SCALE SelectParamScaling ();
@@ -92,8 +76,6 @@ int  SelectSDMode ();
 
 int main (int argc, char *argv[])
 {
-    MPI_Init (&argc, &argv);
-
     clock0 = tic();
 
     if (argc > 1 && pp.Open (argv[1]))
@@ -106,6 +88,18 @@ int main (int argc, char *argv[])
 	cout << "Writing log to gridbasis.out" << endl;
     }
     OutputProgramInfo ();
+
+#ifdef TOAST_MPI
+    // Initialise MPI
+    int mpi_rank, mpi_size;
+    int mpi_status = MPI_Init (&argc, &argv);
+    MPI_Comm_rank (MPI_COMM_WORLD, &mpi_rank);
+    MPI_Comm_size (MPI_COMM_WORLD, &mpi_size);
+    LOGOUT_1PRM("Initialising MPI session. MPI status = %d", mpi_status);
+    LOGOUT_2PRM("Processor %d of %d", mpi_rank, mpi_size);
+
+    cerr << "processor " << mpi_rank << " of " << mpi_size << endl;
+#endif // TOAST_MPI
 
     const double c0 = 0.3;
 
@@ -127,6 +121,7 @@ int main (int argc, char *argv[])
     SelectMeasurementProfile (mprof, mwidth);
     strcpy (g_meshname, meshname);
     n   = mesh.nlen();
+    g_nimsize = n;
     dim = mesh.Dimension();
     nQ  = mesh.nQ;
     nM  = mesh.nM;
@@ -145,48 +140,79 @@ int main (int argc, char *argv[])
     }
 
     g_pscale  = SelectParamScaling ();
-    Solver *solver = Solver::Create (&pp); // the nonlinear solver
+    Solver_MW_MPI *solver = Solver_MW_MPI::Create (&pp);
+    // the nonlinear solver
 
     CCompRowMatrix qvec, mvec;
     CVector *dphi, *aphi;
     int cmd;
-    CFwdSolver FWS (pp);
+    CFwdSolverMW FWS (pp);
     FWS.WriteParams (pp);
     g_lsolver_tol = FWS.GetLinSolverTol();
-    RVector data, data1, data2;
+    RVector data;
     bool useref = false;
 
-    // solution in mesh basis
-    Solution msol(OT_NPARAM, n);
-    msol.SetActive (OT_CMUA, true);
-    msol.SetActive (OT_CKAPPA, true);
+    // --------------------------------------------------------------
+    // multi-wavelength data information
+
+    int nofMuachromo; // number of chromophores contributing to mua
+    int nofwavel = 0; // number of measurement wavelengths
+    double val;
+    RVector wlength(MAX_NOFWLENGTH);
+
+    // wavelengths
+    if (!pp.GetString("WAVELENGTH", cbuf)) {
+	cout << "Enter the wavelengths, ex: 690 750 830\n>> " << flush;
+	cin.getline (cbuf, 256);
+    }
+    pp.PutString ("WAVELENGTH", cbuf);
+    istringstream iss(cbuf);
+    while (iss >> val) {
+	wlength[nofwavel++] = val;
+	xASSERT(nofwavel <= MAX_NOFWLENGTH, Max wavelength count exceeded);
+    }
+
+    // chromophores
+    if (!pp.GetInt("NOFMUACHROMOPHORES", nofMuachromo)) {
+	cout << "Number of mua chromophores?\n>> " << flush;
+	cin >> nofMuachromo;
+    }
+    pp.PutInt ("NOFMUACHROMOPHORES", nofMuachromo);
+
+    // extinction coefficients
+    RDenseMatrix extcoef(nofwavel, nofMuachromo);
+    double ecoeff;
+    for (i = 0; i < nofwavel; i++) {
+	for  (j = 0; j < nofMuachromo; j++) {
+	    char exttype[30];
+	    sprintf (exttype,"EXTINC_WAVEL_%d_CHROMO_%d", int(wlength[i]),j+1);
+    
+	    if (!pp.GetReal (exttype, extcoef(i,j))) {
+		cout << "Enter the extinction value for Chromophore " << j+1
+		     << " at wavelength " << wlength[i] << "\n>> " << flush;
+		cin >> ecoeff;
+		extcoef(i, j) = ecoeff;
+	    }
+	    pp.PutReal (exttype, extcoef(i,j) );
+	}
+    }
+    
+
+    // multi-wavelength solution in mesh basis
+    int nprm = nofMuachromo; // chromophores
+    nprm += 2;               // scattering parameters A and b
+    nprm += 1;               // refractive index
+    nprm += nofwavel;        // background mua at each wavelength
+    MWsolution msol(nprm, n, nofwavel, extcoef, wlength);
 
     SelectInitialParams (mesh, msol);
 
-    SelectData (FWS.GetDataScaling(), nQM, omega, data);
+    SelectData (FWS.GetDataScaling(), nQM * nofwavel, omega, data);
     sdmode = SelectSDMode();
     omega *= 2.0*Pi*1e-6; // convert from MHz to rad/ps
 
-    data1.Relink (data, 0, nQM);
-    data2.Relink (data, nQM, nQM);
-
     // Generate sd vector by assuming sd=data ('normalised')
     RVector sd(data);
-#ifdef USE_DATA_AVERAGE_AS_SCALING
-    // now try just the average of the data
-    double avd1 =0.0, avd2 = 0.0;
-    for (i = 0; i < nQM; i++){
-      avd1 += data1[i];
-      avd2 += data2[i];
-    }
-    avd1 /= nQM;
-    avd2 /= nQM;
-    cout << "Average amplitude : " << avd1 << " phase " << avd2 << endl;
-    for (i = 0; i < nQM; i++){
-      sd[i] = avd1;
-      sd[i+nQM] = avd2;
-    }
-#endif
 
     // build the source vectors
     qvec.New (nQ, n);
@@ -250,9 +276,9 @@ int main (int argc, char *argv[])
     slen = raster->SLen();
 
     // solution in sparse user basis
-    Solution bsol(OT_NPARAM, raster->SLen());
-    bsol.SetActive (OT_CMUA, true);
-    bsol.SetActive (OT_CKAPPA, true);
+    Solution bsol(nprm, raster->SLen());
+    for (i = 0; i < nprm; i++)
+	bsol.SetActive (i, msol.IsActive(i));
     raster->Map_MeshToSol (msol, bsol, true);
 
     // output image format
@@ -265,19 +291,6 @@ int main (int argc, char *argv[])
 	useref = (cmd != 0);
     }
     pp.PutBool ("REFDATA", useref);
-
-    // debugging flags
-    if (!pp.GetInt ("DBG_WRITEJACOBIAN", bWriteJ)) {
-	cout << "Output Jacobian during reconstruction (1/0)?\n>> " << flush;
-	cin >> bWriteJ;
-    }
-    pp.PutInt ("DBG_WRITEJACOBIAN", bWriteJ);
-
-    if (!pp.GetInt ("DBG_WRITEGRAD", bWriteGrad)) {
-	cout << "Output gradient during reconstruction (1/0)?\n>> " << flush;
-	cin >> bWriteGrad;
-    }
-    pp.PutInt ("DBG_WRITEGRAD", bWriteGrad);
 
     // set parameter scaling
     Scaler *pscaler;
@@ -311,46 +324,62 @@ int main (int argc, char *argv[])
 	break;
     }
 
-    cout << "  Original solution:\n";
-    cout << "    CMUA:   " << vmin (msol.GetParam(OT_CMUA)) << " to "
-	 << vmax (msol.GetParam(OT_CMUA)) << endl;
-    cout << "    CKAPPA: " << vmin (msol.GetParam(OT_CKAPPA)) << " to "
-	 << vmax (msol.GetParam(OT_CKAPPA)) << endl;
-
     cout << "  Mapped solution" << endl;
-    cout << "    CMUA:   " << vmin (bsol.GetParam(OT_CMUA)) << " to "
-	 << vmax (bsol.GetParam(OT_CMUA)) << endl;
-    cout << "    CKAPPA: " << vmin (bsol.GetParam(OT_CKAPPA)) << " to "
-	 << vmax (bsol.GetParam(OT_CKAPPA)) << endl;
+    double v1, v2;
+    v1 = vmin (bsol.GetParam(OT_CMUA));
+    v2 = vmax (bsol.GetParam(OT_CMUA));
+    cout << "    CMUA:   " << v1 << " to " << v2 << endl;
+    v1 = vmin (bsol.GetParam(OT_CKAPPA));
+    v2 = vmax (bsol.GetParam(OT_CKAPPA));
+    cout << "    CKAPPA: " << v1 << " to " << v2 << endl;
 
     // map bsol back to msol to make sure msol contains a valid
     // basis representation of the solution
-    //  raster->Map_SolToMesh (bsol, msol, true);
+    raster->Map_SolToMesh (bsol, msol, true);
 
-    //cout << "  Re-mapped solution:\n";
-    //cout << "    CMUA:   " << vmin (msol.GetParam(OT_CMUA)) << " to "
-    // << vmax (msol.GetParam(OT_CMUA)) << endl;
-    //cout << "    CKAPPA: " << vmin (msol.GetParam(OT_CKAPPA)) << " to "
-    // << vmax (msol.GetParam(OT_CKAPPA)) << endl;
+    cout << "  Re-mapped mesh:\n";
+    v1 = vmin (msol.GetParam(OT_CMUA));
+    v2 = vmax (msol.GetParam(OT_CMUA));
+    cout << "    CMUA:   " << v1 << " to " << v2 << endl;
+    v1 = vmin (msol.GetParam(OT_CKAPPA));
+    v2 = vmax (msol.GetParam(OT_CKAPPA));
+    cout << "    CKAPPA: " << v1 << " to " << v2 << endl;
 
-    cout << "Assembling and pre-processing system matrix" << endl;
-    FWS.Reset (msol, omega);
+    // convert chromophores, Scatter Params and N to cmua, ckappa, n
+    msol.RegisterChange();
 
     switch (g_imgfmt) {
     case IMGFMT_NIM:
-        WriteNimHeader (meshname, n, "recon_mua.nim", "MUA");
-	WriteNimHeader (meshname, n, "recon_mus.nim", "MUS");
-	// write out the initial images
-	msol.WriteImg_mua (0, "recon_mua.nim");
-	msol.WriteImg_mus (0, "recon_mus.nim");
+	for (i = 0; i < msol.nParam(); i++) {
+	    char fname[256];
+	    if (msol.IsActive(i)) {
+		if (i < msol.nmuaChromo) 
+		    sprintf (fname,"reconChromophore_%d.nim",i+1);
+		if (i == msol.nmuaChromo)
+		    sprintf (fname,"reconScatPrefactor_A.nim");
+		if (i == msol.nmuaChromo + 1) 
+		    sprintf (fname,"reconScatPower_b.nim");
+		WriteNimHeader (meshname, n, fname, "N/A");  
+		msol.WriteImgGeneric (0, fname, i);
+	    }
+	}
 	break;
     case IMGFMT_RAW:
-        Solution rsol (OT_NPARAM, raster->BLen());
-	raster->Map_SolToBasis (bsol, rsol, true);
-	WriteRimHeader (raster->BDim(), "recon_mua.raw");
-	WriteRimHeader (raster->BDim(), "recon_mus.raw");
-	rsol.WriteImg_mua (0, "recon_mua.raw");
-	rsol.WriteImg_mus (0, "recon_mus.raw");
+	Solution gsol(nprm, raster->BLen());
+	raster->Map_SolToBasis (bsol, gsol, true);
+	for (i = 0; i < msol.nParam(); i++) {
+	    if (msol.IsActive(i)) {
+		char fname[256];
+		if (i < msol.nParam() - 3) 
+		    sprintf (fname,"reconChromophore_%d.raw",i+1);
+		if (i == msol.nParam() - 3)
+		    sprintf (fname,"reconScatPrefactor_A.raw");
+		if (i == msol.nParam() - 2) 
+		    sprintf (fname,"reconScatPower_b.raw");
+		WriteRimHeader (raster->BDim(), fname);
+		gsol.WriteImgGeneric (0, fname, i);
+	    }
+	}
 	break;
     }
 
@@ -363,49 +392,63 @@ int main (int argc, char *argv[])
 	WriteNimHeader (meshname, n, "gradient_mus.nim", "MUS");
     }
 
-    if (bWriteGrad) {
-        WriteRimHeader (raster->BDim(), "grad_mua.raw");
-	WriteRimHeader (raster->BDim(), "grad_mus.raw");
-    }
-
     if (useref) {
-        RVector refdata(nQM);
-	RVector proj(nQM*2);
-	char file_re[32], file_im[32];
-	char name_re[32], name_im[32];
-        switch (FWS.GetDataScaling()) {
-	case DATA_LIN:
-	    strcpy (file_re, "REFDATA_REAL");
-	    strcpy (file_im, "REFDATA_IMAG");
-	    strcpy (name_re, "real component");
-	    strcpy (name_im, "imaginary component");
-	    break;
-	case DATA_LOG:
-	    strcpy (file_re, "REFDATA_MOD");
-	    strcpy (file_im, "REFDATA_ARG");
-	    strcpy (name_re, "log amplitude");
-	    strcpy (name_im, "phase");
-	    break;
-	}
+	RVector refdata(nQM*2*nofwavel);
+        RVector refdata_mod(refdata,0,nQM*nofwavel);
+	RVector refdata_arg(refdata,nQM*nofwavel,nQM*nofwavel);
+	RVector proj(nQM*2*nofwavel);
+	bool refEqualinitial;
 
-	if (!pp.GetString (file_re, cbuf)) {
-	    cout << "Reference file: " << name_re << ": ";
+	if (!pp.GetString ("REFDATA_MOD", cbuf)) {
+	    cout << "Mod data reference file (all wavelengths): ";
 	    cin  >> cbuf;
 	}
-	ReadDataFile (cbuf, refdata);
-	pp.PutString (file_re, cbuf);
-	data1 -= refdata;
+	ReadDataFile (cbuf, refdata_mod);
+	pp.PutString ("REFDATA_MOD", cbuf);
+
+	if (!pp.GetString ("REFDATA_ARG", cbuf)) {
+	    cout << "Arg data reference file (all wavelengths): ";
+	    cin  >> cbuf;
+	}
+	ReadDataFile (cbuf, refdata_arg);
+	pp.PutString ("REFDATA_ARG", cbuf);
+
+	if (!pp.GetBool ("REFEQUALINITIAL", refEqualinitial)) {
+	    cout << "\nAre reference optical properties equal to initial "
+		 << "guess\n[1|0] >> ";
+	    cin >> cmd;
+	    refEqualinitial = (cmd != 0);
+	}
+	pp.PutBool ("REFEQUALINITIAL", refEqualinitial);
 	
-	if (!pp.GetString (file_im, cbuf)) {
-	    cout << "Reference file: " << name_im << ": ";
-	    cin  >> cbuf;
+	data -= refdata;
+	
+	for (i = 0; i < nofwavel; i++) {
+	    cout << "Assembling and pre-processing system matrix at "
+		 << "wavelength " << wlength[i] <<endl;
+	  
+	    if (refEqualinitial) {
+		// use if ref state = initial guess 
+		FWS.Reset (*msol.swsol[i], omega); 
+	    } else {
+		// reference optical properties are different to initial guess
+		Solution refsol(OT_NPARAM, n);
+		SelectInitialReferenceParams (mesh, refsol, int(wlength[i]));
+		// now to be consistent with msol first map to a basis sol
+		// then map it back!
+		Solution dummybsol(OT_NPARAM, raster->SLen());
+		raster->Map_MeshToSol (refsol, dummybsol, true);
+		raster->Map_SolToMesh (dummybsol, refsol, true);
+		FWS.Reset (refsol, omega);
+	    }
+          	  
+	    cout << "Generating model baseline" << endl;
+	    // this returns Phi
+	    FWS.CalcFields (qvec, dphi/*, qcoup_lnmod*/);
+	    // this returns Log(Phi) projected on Detectors
+	    RVector proj_i(proj, i*nQM*2, nQM*2);
+	    proj_i = FWS.ProjectAll_real (mvec, dphi/*, mcoup_lnmod*/);
 	}
-	ReadDataFile (cbuf, refdata);
-	pp.PutString (file_im, cbuf);
-	data2 -= refdata;
-	cout << "Generating model baseline" << endl;
-	FWS.CalcFields (qvec, dphi);
-	proj = FWS.ProjectAll_real (mvec, dphi);
 	data += proj;
     }
 
@@ -434,42 +477,42 @@ int main (int argc, char *argv[])
 	break;
     case 3: { // scale with averages over data types
 	cout << "Generating model baseline" << endl;
-	RVector proj(nQM*2);
-	FWS.CalcFields (qvec, dphi);
-	proj = FWS.ProjectAll_real (mvec, dphi);
+	RVector proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 	sd = proj;
 	double avd1 = 0.0, avd2 = 0.0;
-	for (i = 0; i < nQM; i++) {
+	int phofs = nQM*nofwavel;
+	// note: This sums over all wavelengths. Maybe better to scale
+	// wavelengths individually
+	for (i = 0; i < phofs; i++) {
 	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+nQM]*sd[i+nQM];
+	    avd2 += sd[i+phofs]*sd[i+phofs];
 	}
 	avd1 = sqrt(avd1);
 	avd2 = sqrt(avd2);
-	for (i = 0; i < nQM; i++) {
+	for (i = 0; i < phofs; i++) {
 	    sd[i] = avd1;
-	    sd[i+nQM] = avd2;
+	    sd[i+phofs] = avd2;
 	}
 	cout << "Averages: amplitude " << avd1 << ", phase " << avd2
 	     << endl << endl;
 	} break;		
     case 4: { // scale with difference averages over data types
 	cout << "Generating model baseline" << endl;
-	RVector proj(nQM*2);
-
-	FWS.CalcFields (qvec, dphi);
-	proj = FWS.ProjectAll_real (mvec, dphi);
-
+	RVector proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 	sd = (data - proj);
 	double avd1 = 0.0, avd2 = 0.0;
-	for (i = 0; i < nQM; i++) {
+	int phofs = nQM*nofwavel;
+	// note: This sums over all wavelengths. Maybe better to scale
+	// wavelengths individually
+	for (i = 0; i < phofs; i++) {
 	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+nQM]*sd[i+nQM];
+	    avd2 += sd[i+phofs]*sd[i+phofs];
 	}
 	avd1 = sqrt(avd1);
 	avd2 = sqrt(avd2);
-	for (i = 0; i < nQM; i++) {
+	for (i = 0; i < phofs; i++) {
 	    sd[i] = avd1;
-	    sd[i+nQM] = avd2;
+	    sd[i+phofs] = avd2;
 	}
 	cout << "Averages: amplitude " << avd1 << ", phase " << avd2
 	     << endl << endl;
@@ -486,18 +529,14 @@ int main (int argc, char *argv[])
 
     // ==================================================================
     // Start the solver
-    LOGOUT_1PRM ("**** SOLVER started: CPU %f", toc(clock0));
     solver->Solve (FWS, *raster, pscaler, OF, data, sd, bsol, msol, qvec, mvec,
         omega);
-    LOGOUT_1PRM ("**** SOLVER finished: CPU %f", toc(clock0));
     delete solver;
 
     // cleanup
     delete []dphi;
     delete []aphi;
 
-    //times (&tme);
-    //double total_time = (double)(tme.tms_utime-clock0)/(double)HZ;
     double total_time = toc(clock0);
     LOGOUT ("Final timings:");
     LOGOUT_1PRM ("Total: %f", total_time);
@@ -505,9 +544,13 @@ int main (int argc, char *argv[])
     LOGOUT_1PRM ("Solver: %f", solver_time);
 #endif
 
+#ifdef TOAST_MPI
     MPI_Finalize();
+#endif
+
     return 0;
 }                                                                              
+
 
 // ============================================================================
 
@@ -531,115 +574,6 @@ void OutputProgramInfo ()
 	pp.Lineout (cbuf);
     }
     pp.Lineout ("===================================================");
-}
-
-// ============================================================================
-
-void SelectPCGOptions()
-{
-    char cbuf[256];
-    bool def = false;
-
-    // parse from definition file
-    if (pp.GetString ("PCG_PRECON", cbuf)) {
-        if (!strcasecmp (cbuf, "NONE"))
-	    g_pcg_precon = PCG_PRECON_NONE, def = true;
-	else if (!strcasecmp (cbuf, "DIAGJTJ"))
-	    g_pcg_precon = PCG_PRECON_DIAGJTJ, def = true;
-	else if (!strcasecmp (cbuf, "SPARSEJTJ"))
-	    g_pcg_precon = PCG_PRECON_SPARSEJTJ, def = true;
-	else if (!strcasecmp (cbuf, "FULLJTJ"))
-	    g_pcg_precon = PCG_PRECON_FULLJTJ, def = true;
-    }
-
-    // ask user
-    while (!def) {
-        int cmd;
-	cout << "\nSelect PCG preconditioner:\n";
-	cout << "(1) None\n";
-	cout << "(2) diagonal of JTJ\n";
-	cout << "(3) sparse JTJ\n";
-	cout << "(4) full JTJ\n";
-	cout << ">> ";
-	cin >> cmd;
-	switch (cmd) {
-	case 1: g_pcg_precon = PCG_PRECON_NONE, def = true; break;
-	case 2: g_pcg_precon = PCG_PRECON_DIAGJTJ, def = true; break;
-	case 3: g_pcg_precon = PCG_PRECON_SPARSEJTJ, def = true; break;
-	case 4: g_pcg_precon = PCG_PRECON_FULLJTJ, def = true; break;
-	}
-    }
-
-    // write back
-    switch (g_pcg_precon) {
-    case PCG_PRECON_NONE:      pp.PutString ("PCG_PRECON", "NONE"); break;
-    case PCG_PRECON_DIAGJTJ:   pp.PutString ("PCG_PRECON", "DIAGJTJ"); break;
-    case PCG_PRECON_SPARSEJTJ: pp.PutString ("PCG_PRECON", "SPARSEJTJ"); break;
-    case PCG_PRECON_FULLJTJ:   pp.PutString ("PCG_PRECON", "FULLJTJ"); break;
-    }
-}
-
-// ============================================================================
-
-void SelectLMOptions()
-{
-    char cbuf[256];
-    bool def = false;
-
-    // 1. === PRECONDITIONER ===
-
-    // parse from definition file
-    if (pp.GetString ("LM_PRECON", cbuf)) {
-        if (!strcasecmp (cbuf, "NONE"))
-	    g_lm_precon = LM_PRECON_NONE,  def = true;
-	else if (!strcasecmp (cbuf, "HDIAG"))
-	    g_lm_precon = LM_PRECON_HDIAG, def = true;
-	else if (!strcasecmp (cbuf, "CH"))
-	    g_lm_precon = LM_PRECON_CH,    def = true;
-	else if (!strcasecmp (cbuf, "ICH"))
-	    g_lm_precon = LM_PRECON_ICH,   def = true;
-	else if (!strcasecmp (cbuf, "GMRES"))
-	    g_lm_precon = LM_PRECON_GMRES, def = true;
-    }
-    // ask user
-    while (!def) {
-        int cmd;
-	cout << "\nSelect LM preconditioner:\n";
-	cout << "(1) None\n";
-	cout << "(2) Diagonal of Hessian\n";
-	cout << "(3) Cholesky factorisation of full Hessian\n";
-	cout << "(4) Incomplete CH factorisation of sparse Hessian\n";
-	cout << "(5) GMRES solver with implicit Hessian\n";
-	cout << ">> ";
-	cin >> cmd;
-	switch (cmd) {
-	case 1: g_lm_precon = LM_PRECON_NONE,  def = true; break;
-	case 2: g_lm_precon = LM_PRECON_HDIAG, def = true; break;
-	case 3: g_lm_precon = LM_PRECON_CH,    def = true; break;
-	case 4: g_lm_precon = LM_PRECON_ICH,   def = true; break;
-	case 5: g_lm_precon = LM_PRECON_GMRES, def = true; break;
-	}
-    }
-    // write back
-    switch (g_lm_precon) {
-    case LM_PRECON_NONE:  pp.PutString ("LM_PRECON", "NONE");  break;
-    case LM_PRECON_HDIAG: pp.PutString ("LM_PRECON", "HDIAG"); break;
-    case LM_PRECON_CH:    pp.PutString ("LM_PRECON", "CH");    break;
-    case LM_PRECON_ICH:   pp.PutString ("LM_PRECON", "ICH");   break;
-    case LM_PRECON_GMRES: pp.PutString ("LM_PRECON", "GMRES"); break;
-    }
-
-    // 2. === GMRES CONVERGENCE CRITERION ===
-
-    if (g_lm_precon == LM_PRECON_GMRES) {
-        if (!pp.GetReal ("LM_GMRES_TOL", g_lm_gmres_tol) ||
-	  g_lm_gmres_tol <= 0.0) do {
-	    cout << "\nSelect LM GMRES convergence criterion (>0):\n";
-	    cout << ">> ";
-	    cin >> g_lm_gmres_tol;
-	} while (g_lm_gmres_tol <= 0.0);
-	pp.PutReal ("LM_GMRES_TOL", g_lm_gmres_tol);
-    }
 }
 
 // ============================================================================
@@ -809,20 +743,154 @@ int ScanRegions (const Mesh &mesh, int *nregnode)
     return nreg;
 }
 
-void SelectInitialParams (const Mesh &mesh, Solution &msol)
+// ============================================================================
+
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol)
+{
+    char cbuf[256], *valstr;
+    int resettp = 0;
+    double prm, reg_prm[MAXREGION];
+    int nparam = msol.nParam();
+    RVector param[nparam];
+    int i, j, k, n, p, nreg, nregnode[MAXREGION];
+ 
+    for (p = 0; p < nparam; p++) {
+      char resetstr[256];
+      char reconstr[256];
+
+      if (p < msol.nmuaChromo) {
+	sprintf (resetstr,"CHROMOPHORE_%d",p+1);
+	sprintf (reconstr, "RECON_CHROMOPHORE_%d",p+1);
+      } else if (p == msol.nmuaChromo) {
+	sprintf (resetstr,"SCATTERING_PREFACTOR_A");
+	sprintf (reconstr, "RECON_SCATTERING_PREFACTOR_A");
+      } else if (p == msol.nmuaChromo+1) {
+	sprintf (resetstr,"SCATTERING_POWER_B");
+	sprintf (reconstr, "RECON_SCATTERING_POWER_B");
+      } else if (p == msol.nmuaChromo+2) {
+	sprintf (resetstr,"RESET_N");
+      } else {
+	  sprintf (resetstr, "BACKGROUND_MUA_%d",
+		   (int)msol.wlength[p-msol.nmuaChromo-3]);
+      }
+
+      param[p].New(mesh.nlen());
+	if (pp.GetString (resetstr, cbuf)) {
+	    pp.PutString (resetstr, cbuf);
+	    //    if (!strcasecmp (cbuf, "MESH")) {
+	    //	param[p] = mesh.plist.Param(prmtp[p]);
+	    //} else
+	    if (!strncasecmp (cbuf, "HOMOG", 5)) {
+		sscanf (cbuf+5, "%lf", &prm);
+		param[p] = prm;
+	    } else if (!strncasecmp (cbuf, "REGION_HOMOG", 12)) {
+		valstr = strtok (cbuf+12, " \t");
+		for (n = 0; n < MAXREGION && valstr; n++) {
+		    sscanf (valstr, "%lf", reg_prm+n);
+		    valstr = strtok (NULL, " \t");
+		}
+		nreg = ScanRegions (mesh, nregnode);
+		for (i = k = 0; k < n && i < MAXREGION; i++) {
+		    if (nregnode[i]) {
+			for (j = 0; j < mesh.nlen(); j++)
+			    if (mesh.nlist[j].Region() == i)
+				param[p][j] = reg_prm[k];
+			k++;
+		    }
+		}	     
+	    } else if (!strncasecmp (cbuf, "NIM", 3)) {
+		ReadNim (cbuf+4, param[p]);
+	    }
+	} else {
+	    cout << "\nSelect initial distribution for " << resetstr
+		 << endl;
+	    // cout << "(1) Use values stored in mesh\n";
+	    cout << "(1) Global homogeneous\n";
+	    cout << "(2) Homogeneous in regions\n";
+	    cout << "(3) Nodal image file (NIM)\n";
+	    cout << "[1|2|3] >> ";
+	    cin >> resettp;
+	    switch (resettp) {
+	      //case 1:
+	      //	param[p] = mesh.plist.Param(prmtp[p]);
+	      //	strcpy (cbuf, "MESH");
+	      //	break;
+	    case 1:
+		cout << "\nGlobal value:\n>> ";
+		cin >> prm;
+		param[p] = prm;
+		sprintf (cbuf, "HOMOG %f", prm);
+		break;
+	    case 2:
+		nreg = ScanRegions (mesh, nregnode);
+		strcpy (cbuf, "REGION_HOMOG");
+		cout << "\nFound " << nreg << " regions\n";
+		for (i = 0; i < MAXREGION; i++) {
+		    if (nregnode[i]) {
+			cout << "Value for region " << i << " (" << nregnode[i]
+			     << " nodes):\n>> ";
+			cin >> prm;
+			sprintf (cbuf+strlen(cbuf), " %f", prm);
+			for (j = 0; j < mesh.nlen(); j++)
+			    if (mesh.nlist[j].Region() == i)
+				param[p][j] = prm;
+		    }
+		}
+		break;
+	    case 3:
+		cout << "\nNIM file name:\n>> ";
+		strcpy (cbuf, "NIM ");
+		cin >> cbuf+4;
+		ReadNim (cbuf+4, param[p]);
+		break;
+	    }
+	    pp.PutString (resetstr, cbuf);
+	}
+
+	if (p < msol.nmuaChromo+2) {
+	  bool active;
+	    if (!pp.GetBool (reconstr, active)) {
+		char c;
+		do {
+		    cout << "\nActivate " << resetstr
+			 << " for reconstruction?\n[y|n] >> ";
+		    cin >> c;
+		} while (c != 'y' && c != 'n');
+		active = (c == 'y');
+	    }
+	    pp.PutBool (reconstr, active);
+	    msol.SetActive (p, active);
+	}
+	msol.SetParam (p, param[p]);
+    }
+    g_refind = mean (param[nparam-1]); // assuming homogeneous n
+    
+    //msol.SetParam (OT_CMUA, param[0]*c0/param[2]);
+    //msol.SetParam (OT_CKAPPA, c0/(3*param[2]*(param[0]+param[1])));
+    //for (i = 0; i < param[2].Dim(); i++)
+    //	param[2][i] = c0/(2*param[2][i]*A_Keijzer(param[2][i]));
+    //msol.SetParam (OT_C2A, param[2]);   
+}
+
+// ===========================================================================
+
+void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
+    int whichWavel)
 {
     char cbuf[256], *valstr;
     int resettp = 0;
     double prm, reg_prm[MAXREGION];
     RVector param[3];
     int i, j, k, n, p, nreg, nregnode[MAXREGION];
-    const char *resetstr[3] = {"RESET_MUA", "RESET_MUS", "RESET_N"};
+    const char *rootstr[3] = {"RESET_REF_MUA", "RESET_REF_MUS", "RESET_REF_N"};
     const ParameterType prmtp[3] = {PRM_MUA, PRM_MUS, PRM_N};
     for (p = 0; p < 3; p++) {
+        char resetstr[256];
+	sprintf (resetstr,"%s_%d", rootstr[p], whichWavel);
 
 	param[p].New(mesh.nlen());
-	if (pp.GetString (resetstr[p], cbuf)) {
-	    pp.PutString (resetstr[p], cbuf);
+	if (pp.GetString (resetstr, cbuf)) {
+	    pp.PutString (resetstr, cbuf);
 	    if (!strcasecmp (cbuf, "MESH")) {
 		param[p] = mesh.plist.Param(prmtp[p]);
 	    } else if (!strncasecmp (cbuf, "HOMOG", 5)) {
@@ -847,7 +915,7 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
 		ReadNim (cbuf+4, param[p]);
 	    }
 	} else {
-	    cout << "\nSelect initial distribution for " << resetstr[p]
+	    cout << "\nSelect initial distribution for " << resetstr
 		 << endl;
 	    cout << "(1) Use values stored in mesh\n";
 	    cout << "(2) Global homogeneous\n";
@@ -889,58 +957,58 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
 		ReadNim (cbuf+4, param[p]);
 		break;
 	    }
-	    pp.PutString (resetstr[p], cbuf);
+	    pp.PutString (resetstr, cbuf);
 	}
     }
     g_refind = mean (param[2]); // assuming homogeneous n
+    //msol.SetRefind (g_refind);
     msol.SetParam (OT_CMUA, param[0]*c0/param[2]);
     msol.SetParam (OT_CKAPPA, c0/(3.0*param[2]*(param[0]+param[1])));
-    msol.SetParam (OT_N, param[2]);
     for (i = 0; i < param[2].Dim(); i++)
-	param[2][i] = c0/(2*param[2][i]*A_Keijzer(param[2][i]));
+	param[2][i] = c0/(2.0*param[2][i]*A_Keijzer(param[2][i]));
     msol.SetParam (OT_C2A, param[2]);
 }
 
 // ============================================================================
 
-void SelectData (DataScale dscale, int nqm, double &freq, RVector &data)
+void SelectData (DataScale dscale, int len, double &freq, RVector &data)
 {
     char cbuf[256];
     bool def = false;
     RVector pdata;
+    
+    data.New (len*2);
 
     switch (dscale) {
     case DATA_LIN:
-	data.New (2*nqm);
 	if (!pp.GetString ("DATA_REAL", cbuf)) {
-	    cout << "\nData file 1 (real):\n>> ";
+	    cout << "\nData file 1 (real, all wavelengths:\n>> ";
 	    cin >> cbuf;
 	}
-	pdata.Relink (data,0,nqm);
+	pdata.Relink (data,0,len);
 	ReadDataFile (cbuf, pdata);
 	pp.PutString ("DATA_REAL", cbuf);
 	if (!pp.GetString ("DATA_IMAG", cbuf)) {
-	    cout << "\nData file 2 (imag)\n>> ";
+	    cout << "\nData file 2 (imag, all wavelengths:\n>> ";
 	    cin >> cbuf;
 	}
-	pdata.Relink (data,nqm,nqm);
+	pdata.Relink (data,len,len);
 	ReadDataFile (cbuf, pdata);
 	pp.PutString ("DATA_IMAG", cbuf);
 	break;
     case DATA_LOG:
-	data.New (2*nqm);
 	if (!pp.GetString ("DATA_MOD", cbuf)) {
-	    cout << "\nData file 1 (mod):\n>> ";
+	    cout << "\nData file 1 (log amp, all wavelengths):\n>> ";
 	    cin >> cbuf;
 	}
-	pdata.Relink (data,0,nqm);
+	pdata.Relink (data,0,len);
 	ReadDataFile (cbuf, pdata);
 	pp.PutString ("DATA_MOD", cbuf);
 	if (!pp.GetString ("DATA_ARG", cbuf)) {
-	    cout << "\nData file 2 (arg)\n>> ";
+	    cout << "\nData file 2 (phase, all wavelenghts):\n>> ";
 	    cin >> cbuf;
 	}
-	pdata.Relink (data,nqm,nqm);
+	pdata.Relink (data,len,len);
 	ReadDataFile (cbuf, pdata);
 	pp.PutString ("DATA_ARG", cbuf);
 	break;
@@ -1125,7 +1193,7 @@ int SelectSDMode ()
 
 // ==========================================================================
 
-static bool CheckRange (const Solution &sol)
+static bool CheckRange (const MWsolution &sol)
 {
     bool inrange = true;
 
@@ -1135,17 +1203,23 @@ static bool CheckRange (const Solution &sol)
     const double MAX_CKAPPA = 10;
 
     double vmin, vmax;
-    sol.Extents (OT_CMUA, vmin, vmax);
-    if (vmin < MIN_CMUA || vmax > MAX_CMUA) {
-	cerr << "WARNING: " << vmin << " < CMUA < " << vmax
-	     << " in trial solution" << endl;
-	inrange = false;
-    }
-    sol.Extents (OT_CKAPPA, vmin, vmax);
-    if (vmin < MIN_CKAPPA || vmax > MAX_CKAPPA) {
-	cerr << "WARNING: " << vmin << " < CKAPPA < " << vmax
-	     << " in trial solution" << endl;
-	inrange = false;
+    int i;
+    int nofwavel = sol.nofwavel;
+
+    for (i = 0; i < nofwavel; i++) {
+
+	sol.swsol[i]->Extents (OT_CMUA, vmin, vmax);
+	if (vmin < MIN_CMUA || vmax > MAX_CMUA) {
+	    cerr << "WARNING: " << vmin << " < CMUA < " << vmax
+		 << " in trial solution" << endl;
+	    inrange = false;
+	}
+	sol.swsol[i]->Extents (OT_CKAPPA, vmin, vmax);
+	if (vmin < MIN_CKAPPA || vmax > MAX_CKAPPA) {
+	    cerr << "WARNING: " << vmin << " < CKAPPA < " << vmax
+		 << " in trial solution" << endl;
+	    inrange = false;
+	}
     }
     return inrange;
 }
@@ -1157,10 +1231,10 @@ static bool CheckRange (const Solution &sol)
 double of_clbk (const RVector &x, double *of_sub, void *context)
 {
     OF_CLBK_DATA *ofdata = (OF_CLBK_DATA*)context;
-    CFwdSolver *fws = ofdata->fws;
+    CFwdSolverMW *fws = ofdata->fws;
     const Raster *raster = ofdata->raster;
     const Scaler *pscaler = ofdata->pscaler;
-    Solution *meshsol = ofdata->meshsol;
+    MWsolution *meshsol = ofdata->meshsol;
     const Regularisation *reg = ofdata->reg;
     const CCompRowMatrix *qvec = ofdata->qvec;
     const CCompRowMatrix *mvec = ofdata->mvec;
@@ -1169,11 +1243,12 @@ double of_clbk (const RVector &x, double *of_sub, void *context)
     const RVector *sd = ofdata->sd;
 
     raster->Map_ActiveSolToMesh (pscaler->Unscale(x), *meshsol);
+    meshsol->RegisterChange();
     if (!CheckRange (*meshsol)) return -1.0; // error
 
-    RVector proj = fws->ProjectAll_real (*qvec, *mvec, *meshsol, omega);
+    RVector proj = fws->ProjectAll_wavel_real (*qvec, *mvec, *meshsol, omega);
     if (visnan (proj)) return -1.0; // error
-
+    
     double fd = ObjectiveFunction::get_value (*data, proj, *sd);
     double fp = reg->GetValue (x);
     if (of_sub) {
