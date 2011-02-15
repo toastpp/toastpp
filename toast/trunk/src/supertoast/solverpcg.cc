@@ -9,11 +9,10 @@
 #include "of.h"
 #include "solverpcg.h"
 #include "jacobian.h"
+#include "supertoast.h"
+#include "supertoast_util.h"
 #include "timing.h"
-//#include <unistd.h>
 #include <time.h>
-//#include <sys/times.h>
-//#include <sys/param.h>
 
 using namespace std;
 
@@ -31,11 +30,6 @@ extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
 
-extern char g_meshname[256];
-extern int g_nimsize;
-
-void WriteJacobian (const RMatrix *J, const Raster &raster,
-    const QMMesh &mesh);
 void WriteImage (const RVector &nim, int imgno, char *nimname);
 
 // ==========================================================================
@@ -52,14 +46,6 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &A,
 
 void ATA_dense (const Raster &raster, const RDenseMatrix &a,
     RSymMatrix &ata);
-
-bool LineSearchWithPrior (CFwdSolver &FWS, const Raster &raster,
-    const Scaler *pscaler,
-    const CCompRowMatrix &qvec,
-    const CCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &p, const RVector &grad, double f0,
-    double &fmin, double &lambda, Solution &meshsol, RVector &proj,
-    bool &proj_valid, const Regularisation *reg);
 
 // ==========================================================================
 
@@ -142,6 +128,19 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 #endif
 
     reg = Regularisation::Create (pp, &x0, &raster);
+
+    // Set up the context data for the line search callback
+    OF_CLBK_DATA ofdata;
+    ofdata.fws = &FWS;
+    ofdata.raster = &raster;
+    ofdata.pscaler = pscaler;
+    ofdata.meshsol = &msol;
+    ofdata.reg = reg;
+    ofdata.qvec = &qvec;
+    ofdata.mvec = &mvec;
+    ofdata.omega = omega;
+    ofdata.data = &data;
+    ofdata.sd = &sd;
 
     // r = -f'(x)
     OF.get_gradient (raster, FWS, proj, dphi, mvec, 0/* &bsol*/, r);
@@ -287,9 +286,7 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 	}
 
 	// line search. this replaces the Secant method of the Shewchuk code
-	if (LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec, data,
-	    sd, omega, x, d, of, fmin, alpha, msol, proj, pvalid, reg)) {
-
+	if (LineSearch (x, d, alpha, of, of_clbk, &alpha, &fmin, &ofdata)==0) {
 	    x += d*alpha; // update scaled solution
 	    bsol.SetActiveParams (pscaler->Unscale(x));
 	    raster.Map_SolToMesh (bsol, msol, true);
@@ -651,100 +648,4 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
         LOGOUT ("*** ATA not positive definite. Aborting.");
 	exit (1);
     }
-}
-
-// ==========================================================================
-
-bool LineSearchWithPrior (CFwdSolver &FWS, const Raster &raster,
-    const Scaler *pscaler, const CCompRowMatrix &qvec,
-    const CCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &p, const RVector &grad, double f0,
-    double &fmin, double &lambda, Solution &meshsol, RVector &proj,
-    bool &proj_valid, const Regularisation *reg)
-{
-    LOGOUT ("Linesearch Start");
-    const int MAXIT = 16;
-    double x0 = 0.0, xm, fm, fmd, fmp, fb, fbd, fbp, fmind, fminp, xb = lambda;
-    proj_valid = false;
-    
-    RVector p1 = p+grad*xb;
-    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-    while (!meshsol.Valid()) {
-	LOGOUT ("** Invalid nodal parameters. Reducing step size");
-	xb *= 0.5;
-	p1 = p+grad*xb;
-	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-    }
-    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
-    fbd = ObjectiveFunction::get_value (data, proj, sd);
-    fbp = reg->GetValue(p1);
-    fb  = fbd+fbp;
-    LOGOUT_2PRM ("Step  %f  OF %f", xb, fb);
-
-    if (fb < f0) { // increase interval
-        xm = xb; fm = fb;
-	xb *= 2.0;
-	p1 = p+grad*xb;
-	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	if (!meshsol.Valid()) {
-	    LOGOUT ("** Invalid nodal parameters. Truncating step size.");
-	    fb = fm*10.0; // invalidate this step
-	} else {
-	    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
-	    fbd = ObjectiveFunction::get_value (data, proj, sd);
-	    fbp = reg->GetValue(p1);
-	    fb  = fbd+fbp;
-	    LOGOUT_2PRM ("Step  %f  OF %f", xb, fb);
-	}
-	while (fb < fm) {
-	    x0 = xm; f0 = fm;
-	    xm = xb; fm = fb;
-	    xb *= 2.0;
-	    p1 = p+grad*xb;
-	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
-	    fbd = ObjectiveFunction::get_value (data, proj, sd);
-	    fbp = reg->GetValue(p1);
-	    fb  = fbd+fbp;
-	    LOGOUT_2PRM ("Step  %f  OF %f", xb, fb);
-	}
-    } else { // decrease interval
-        xm = 0.5*xb;
-	p1 = p+grad*xm;
-	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
-	fmd = ObjectiveFunction::get_value (data, proj, sd);
-	fmp = reg->GetValue(p1);
-	fm  = fmd+fmp;
-	LOGOUT_2PRM ("Step  %f  OF %f", xm, fm);
-	int itcount = 0;
-	while (fm > f0) {
-  	    if (++itcount > MAXIT) return false;
-	    xb = xm; fb = fm;
-	    xm = 0.5*xb;
-	    p1 = p+grad*xm;
-	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-	    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
-	    fmd = ObjectiveFunction::get_value (data, proj, sd);
-	    fmp = reg->GetValue(p1);
-	    fm  = fmd+fmp;
-	    LOGOUT_2PRM ("Step  %f  OF %f", xm, fm);
-	}
-    }
-    // quadratic interpolation
-    double a = ((f0-fb)/(x0-xb) - (f0-fm)/(x0-xm)) / (xb-xm);
-    double b = (f0-fb)/(x0-xb) - a*(x0+xb);
-    lambda = -b/(2.0*a);
-    p1 = p+grad*lambda;
-    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
-    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
-    fmind = ObjectiveFunction::get_value (data, proj, sd);
-    fminp = reg->GetValue (p1);
-    fmin  = fmind + fminp;
-    if (fmin > fm) {  // interpolation didn't give improvement
-        lambda = xm, fmin = fm;
-    } else proj_valid = true;
-    LOGOUT_2PRM ("Final %f  OF %f", lambda, fmin);
-    LOGOUT ("Linesearch End");
-    return true;
 }

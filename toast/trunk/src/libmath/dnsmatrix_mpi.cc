@@ -298,10 +298,10 @@ void TDenseMatrixMPI<MT>::Alloc (int r, int c)
     MPI_Comm_rank (MPI_COMM_WORLD, &rnk);
     MPI_Comm_size (MPI_COMM_WORLD, &sze);
 
-    nr_max = ::max (1, (r+sze-1)/sze);   // rows per processor
-    r0 = ::min (r, rnk*nr_max);          // base index
-    r1 = ::min (r, (rnk+1)*nr_max);      // top index+1
-    nr = r1-r0;                          // actual rows for this process
+    nr_max = toast::max (1, (r+sze-1)/sze);   // rows per processor
+    r0 = toast::min (r, rnk*nr_max);          // base index
+    r1 = toast::min (r, (rnk+1)*nr_max);      // top index+1
+    nr = r1-r0;                               // actual rows for this process
 
     if (nr) {
 	val = new MT[nr*c];

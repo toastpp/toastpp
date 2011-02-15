@@ -1,18 +1,17 @@
-#ifndef __SUPERTOAST_MW_H
-#define __SUPERTOAST_MW_H
+#ifndef __SUPERTOAST_CW_MW_H
+#define __SUPERTOAST_CW_MW_H
 
 // ==========================================================================
 // Context data for line search callback function
 
 struct OF_CLBK_DATA {
-    CFwdSolverMW *fws;
+    RFwdSolverMW *fws;
     const Raster *raster;
     const Scaler *pscaler;
     MWsolution *meshsol;
     const Regularisation *reg;
-    const CCompRowMatrix *qvec;
-    const CCompRowMatrix *mvec;
-    double omega;
+    const RCompRowMatrix *qvec;
+    const RCompRowMatrix *mvec;
     const RVector *data;
     const RVector *sd;
 };
@@ -23,4 +22,4 @@ struct OF_CLBK_DATA {
 
 double of_clbk (const RVector &x, double *of_sub, void *context);
 
-#endif // !__SUPERTOAST_MW_H
+#endif // !__SUPERTOAST_CW_MW_H

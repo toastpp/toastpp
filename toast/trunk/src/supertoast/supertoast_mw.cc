@@ -6,6 +6,7 @@
 #include "solver_mw.h"
 #include "source.h"
 #include "supertoast_mw.h"
+#include "supertoast_util.h"
 #include "timing.h"
 #include <time.h>
 #ifdef TOAST_MPI
@@ -71,8 +72,6 @@ void SelectBasis (IVector &gdim, IVector &bdim);
 int  SelectImageFormat ();
 PARAM_SCALE SelectParamScaling ();
 int  SelectSDMode ();
-void ReadDataFile (char *fname, RVector &data);
-
 
 // =========================================================================
 // MAIN
@@ -1193,21 +1192,6 @@ int SelectSDMode ()
     return mode;
 }
 
-// ============================================================================
-
-void ReadDataFile (char *fname, RVector &data)
-{
-    int i, n = data.Dim();
-    char c;
-    ifstream ifs (fname);
-    do {
-        ifs >> c;
-    } while (ifs.good() && c != '[');
-    for (i = 0; i < n; i++)
-        ifs >> data[i];
-}
-
-
 // ==========================================================================
 
 static bool CheckRange (const MWsolution &sol)
@@ -1245,7 +1229,7 @@ static bool CheckRange (const MWsolution &sol)
 // The callback function for obtaining the objective function during
 // line search
 
-double of_clbk (const RVector &x, void *context)
+double of_clbk (const RVector &x, double *of_sub, void *context)
 {
     OF_CLBK_DATA *ofdata = (OF_CLBK_DATA*)context;
     CFwdSolverMW *fws = ofdata->fws;
@@ -1268,5 +1252,9 @@ double of_clbk (const RVector &x, void *context)
     
     double fd = ObjectiveFunction::get_value (*data, proj, *sd);
     double fp = reg->GetValue (x);
+    if (of_sub) {
+	of_sub[0] = fd;
+	of_sub[1] = fp;
+    }
     return fd + fp;
 }
