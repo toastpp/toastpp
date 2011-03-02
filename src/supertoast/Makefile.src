@@ -2,8 +2,8 @@ include $(TOASTDIR)/Makefile.incl
 
 VPATH = $(TSRC)/supertoast
 OPATH = $(TOASTOBJ)/supertoast
-#BINS = fwdfem supertoast supertoast2
-BINS = fwdfem fwdfem_cw supertoast supertoast_mw supertoast_cw_mw test_basis
+BINS  = fwdfem fwdfem_cw fwdfem_tpsf
+BINS += supertoast supertoast_mw supertoast_cw_mw test_basis
 
 ifdef MAKE_MPI
 BINS += supertoast_mpi supertoast_mw_mpi supertoast_cw_mw_mpi
@@ -30,11 +30,16 @@ all:: $(BINS)
 .cc.o :
 	$(CXX) $(STOASTFLAGS) -c $<
 
+
 fwdfem : fwdfem.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 fwdfem_cw : fwdfem_cw.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+fwdfem_tpsf : fwdfem_tpsf.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
 
 supertoast : supertoast.o supertoast_util.o util.o solver.o solverlm.o \
 	solverpcg.o solverlin.o \
@@ -59,8 +64,8 @@ supertoast_mw_mpi : supertoast_mw_mpi.o supertoast_util.o util.o \
 	solver_mw_mpi.o solverpcg_mw_mpi.o solverlm_mw_mpi.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
-supertoast_cw_mw_mpi : supertoast_cw_mw.o util.o solver_cw.o \
-	solverlm_cw_mw_mpi.o
+supertoast_cw_mw_mpi : supertoast_cw_mw.o supertoast_util.o util.o \
+	solver_cw_mw_mpi.o solverlm_cw_mw_mpi.o solverpcg_cw_mw_mpi.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 pmdf : pmdf.o

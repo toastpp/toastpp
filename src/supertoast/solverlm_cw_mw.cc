@@ -1,10 +1,7 @@
 // ==========================================================================
 // SolverLM: Levenberg-Marquardt
+// CW, multi-wavelength version
 // ==========================================================================
-
-#ifdef TOAST_MPI
-#include <mpi.h>
-#endif
 
 #include "stoastlib.h"
 #include "util.h"
@@ -22,7 +19,6 @@ using namespace toast;
 // ==========================================================================
 // external references
 
-extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
 extern double g_refind;
@@ -40,11 +36,6 @@ RCompRowMatrix BuildRHessian (Regularisation *reg, const RVector &x,
 
 RVector RescaleHessian (const RMatrix *J, const RVector &x,
     RCompRowMatrix *RHess);
-
-#ifdef TOAST_MPI
-RVector RescaleHessianPart (RDenseMatrix &Jpart, const RVector &x,
-    RCompRowMatrix *RHess, int rank);
-#endif
 
 RVector Mergewavels (const RVector &b, int r0, int len, int nofwavel);
 
@@ -73,22 +64,7 @@ RDenseMatrix mul (const RMatrix &A, const RMatrix &B)
 // This data structure defines the Hessian implicitly
 
 struct HESS_DATA {
-#ifdef TOAST_MPI                 // information for Jacobian-splitting
-    RDenseMatrix *Jpart;         // partial Jacobian
-    int np, rank;                // number of processes, current process
-    int rtot;                    // total number of rows in complete Jacobian
-    int r0, r1;                  // first, last+1 rows of Jacobian to calculate
-    DataScale dscale;            // lin/log data
-    const Raster *raster;        // pointer to raster instance
-    const QMMesh *mesh;          // pointer to mesh instance
-    const Solution *sol;         // pointer to solution instance (s-basis)
-    const RCompRowMatrix *mvec;  // array of measurement vectors
-    const RVector *sd;
-    const RVector *dphi;         // direct fields
-    const RVector *aphi;         // adjoint fields
-#else
     const RMatrix *J;            // Jacobian
-#endif
     const RVector *M;            // normalisation diagonal matrix
     const double *lambda;        // diagonal scaling factor
     const Regularisation *reg;   // regularisation
@@ -132,11 +108,7 @@ static RSymMatrix Hess_full (const HESS_DATA &data, const RVector &x)
     // lambda is a scalar, and I is identity
 
     // unpack the data
-#ifdef TOAST_MPI
-    const RDenseMatrix *J     =  data.Jpart;
-#else
     const RMatrix *J          =  data.J;
-#endif
     const Regularisation *reg =  data.reg;
     const RVector &M          = *data.M;
     const double lambda       = *data.lambda;
@@ -169,11 +141,7 @@ static RVector Hess_diag (const HESS_DATA &data, const RVector &x)
     // lambda is a scalar
 
     // unpack the data
-#ifdef TOAST_MPI
-    const RDenseMatrix *J       =  data.Jpart;
-#else
     const RMatrix *J            =  data.J;
-#endif
     const RCompRowMatrix *RHess =  data.RHess;
     const RVector &M            = *data.M;
     const double lambda         = *data.lambda;
@@ -200,20 +168,11 @@ static RVector JTJx_clbk (const RVector &x, void *context)
 
     // unpack the data
     HESS_DATA *data             = (HESS_DATA*)context;
-#ifdef TOAST_MPI
-    const RDenseMatrix &Jpart   = *data->Jpart;
-#else
     const RMatrix *J            =  data->J;
-#endif
     const RCompRowMatrix *RHess =  data->RHess;
     const RVector &M            = *data->M;
     const double lambda         = *data->lambda;
-#ifdef TOAST_MPI
-    int m = Jpart.nRows(), n = Jpart.nCols();
-    int mtot = data->rtot;
-#else
     int m = J->nRows(), n = J->nCols();
-#endif
 
     RVector Px(n);
 
@@ -234,19 +193,7 @@ static RVector JTJx_clbk (const RVector &x, void *context)
 
     RVector JTJx(n);
 
-#ifdef TOAST_MPI
-    RVector JTJxpart(n);
-    JTJxpart = ATx (Jpart, Ax (Jpart, x));
-    // collect JTJx components from processors and re-distribute
-    MPI_Reduce ((void*)JTJxpart.data_buffer(), (void*)JTJx.data_buffer(),
-	n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast ((void*)JTJx.data_buffer(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-#else // serial version
-    RVector y = Ax(*J,x);
-    JTJx = ATx(*J,y);
-
-    //JTJx =  ATx (*J, Ax (*J, x));
-#endif
+    JTJx =  ATx (*J, Ax (*J, x));
    
     return JTJx + Px + lambda*x;
 }
@@ -587,7 +534,6 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	ofs_mod += n; // step to next source
 	ofs_arg += n;
-
 	delete []cdfield_grad;
 	delete []cafield_grad;
     }
@@ -721,7 +667,6 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	    }
 	}
     }
-
     delete []pds;
     delete []pd_grad;
     for (i = 0; i < nq; i++) delete []pds_grad[i];
@@ -1194,15 +1139,19 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     const RVector &sd, Solution &bsol, MWsolution &msol,
     const RCompRowMatrix &qvec, const RCompRowMatrix &mvec)
 {
-    int np = 1;                       // number of processors
-    int rank = 0;                     // processor id
+    RDenseMatrix extcoef = msol.extcoef;
+    // extinction coefficients for all chromophores at all wavelengths
+
+    int nlambda = msol.nofwavel;   // number of wavelengths
+    int nch =     extcoef.nCols(); // number of chromophores
+
+    const QMMesh *mesh = FWS.MeshPtr();
 
     bool Use_precon = true;
     bool Gradient_descent = false;
 
     // initialisations
     int i, inr;
-    const QMMesh *mesh = FWS.MeshPtr();
     int nq   = mesh->nQ;
     int nm   = mesh->nM;
     int nqm  = mesh->nQM;
@@ -1214,10 +1163,8 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     int glen = raster.GLen();
     int nprm = bsol.nActive();
     int n    = bsol.ActiveDim();
-    int nofwavel = msol.nofwavel;
     double of, fmin, errstart, err0, err00, err1;
     double lambda = lambda0, alpha = -1.0;
-    RDenseMatrix extcoef = msol.extcoef;
 
     RVector r(n), s(n), d(n);
     RVector h(n), dold(n), M(n);
@@ -1238,16 +1185,16 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     // current solution, trial solution (scaled);
 
     // allocate field vectors for all wavelengths
-    dphi = new RVector[nq*nofwavel];
-    for (i = 0; i < nq*nofwavel; i++) dphi[i].New (nlen);
+    dphi = new RVector[nq*nlambda];
+    for (i = 0; i < nq*nlambda; i++) dphi[i].New (nlen);
     if ((precon != LM_PRECON_GMRES_DIRECT) || hscale == LM_HSCALE_IMPLICIT) {
-	aphi = new RVector[nm*nofwavel];
-	for (i = 0; i < nm*nofwavel; i++) aphi[i].New (nlen);
+	aphi = new RVector[nm*nlambda];
+	for (i = 0; i < nm*nlambda; i++) aphi[i].New (nlen);
     }
 
     // reset forward solver
     LOGOUT("Resetting forward solver");
-    for (i = 0; i < nofwavel; i++) {
+    for (i = 0; i < nlambda; i++) {
 	FWS.Reset (*msol.swsol[i], 0);
 	FWS.CalcFields (qvec, dphi+i*nq);
 	RVector proj_i(proj, i*nqm, nqm);
@@ -1354,8 +1301,6 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    M = RescaleHessian (J, x, &RHess);
 	    J->ColScale (M);
 
-	    if (bWriteJ) WriteJacobian (J, raster, *mesh);
-	    
 	    // calculate Gradient
 	    J->ATx (b,r);                            // gradient
 
@@ -1502,7 +1447,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    msol.RegisterChange();
 
 	    if (1/*!status_valid*/) {
-		for (i = 0; i < nofwavel; i++) {
+		for (i = 0; i < nlambda; i++) {
 		    FWS.Reset (*msol.swsol[i], 0);
 		    FWS.CalcFields (qvec, dphi+i*nq);
 		    if (aphi)
@@ -1522,7 +1467,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		bsol.SetActiveParams (pscaler->Unscale(x));
 		raster.Map_SolToMesh (bsol, msol);
 		msol.RegisterChange();
-		for (i = 0; i < nofwavel; i++) {
+		for (i = 0; i < nlambda; i++) {
 		    FWS.Reset (*msol.swsol[i], 0);
 		    FWS.CalcFields (qvec, dphi+i*nq);
 		    if (aphi)
@@ -2042,7 +1987,7 @@ void GenerateJacobian (RFwdSolverMW &FWS, const Raster &raster,
 	for (j = 0; j < nchromo; j++)
 	    Jlambda = cath (Jlambda, *Jmua * excoef(i,j));
 
-	// Scattering prefactor
+	// Scattering prefactor A
 	if (bFactorA) {
 	    raster.Map_MeshToSol (sol.GetJacobianCoeff_A(i), sA);
 	    RDenseMatrix JA(*Jkap);
@@ -2050,7 +1995,7 @@ void GenerateJacobian (RFwdSolverMW &FWS, const Raster &raster,
 	    Jlambda = cath (Jlambda, JA);
 	}
 
-	// Scattering power
+	// Scattering power b
 	if (bPowerb) {
 	    raster.Map_MeshToSol (sol.GetJacobianCoeff_b(i), sb);
 	    RDenseMatrix Jb(*Jkap);

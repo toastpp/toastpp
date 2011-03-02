@@ -947,6 +947,11 @@ void TFwdSolver<T>::ReadParams (ParamParser &pp)
 		cin >> iterative_tol;
 	    } while (iterative_tol <= 0.0);
 	}
+
+	if (!pp.GetInt ("LINSOLVER_MAXIT", iterative_maxit)) {
+	    cout << "\nLinear solver iteration limit (0=auto):\n>> ";
+	    cin >> iterative_maxit;
+	}
     }
 }
 
@@ -981,6 +986,7 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
 	    pp.PutString ("LINSOLVER", "GAUSSSEIDEL");break;
 	}
 	pp.PutReal ("LINSOLVER_TOL", iterative_tol);
+	pp.PutInt ("LINSOLVER_MAXIT", iterative_maxit);
     }
 }
 

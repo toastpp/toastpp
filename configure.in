@@ -419,10 +419,12 @@ AC_ARG_ENABLE(threads,
     [  --enable-threads        build pthreads parallel version],
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
-    CXXFLAGS="${CXXFLAGS} -DTOAST_PARALLEL"
-    TASKLIB="-ltask -lpthread"
-    TASKDIR="libtask"
+    CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
+    MAKE_THREAD="yes"
+    TASKLIB="-lpthread"
+#    TASKDIR="libtask"
 fi
+AC_SUBST(MAKE_THREAD)
 
 # =========================================================================
 # Check whether user wants to build an MPI version
@@ -626,7 +628,7 @@ AC_SUBST(XVIEWINC)
 AC_SUBST(GUIFLAGS)
 AC_SUBST(GUILIBS)
 AC_SUBST(TASKLIB)
-AC_SUBST(TASKDIR)
+#AC_SUBST(TASKDIR)
 AC_SUBST(TOAST_SHARED)
 AC_SUBST(ILUPACKDIR)
 AC_SUBST(RPATH)

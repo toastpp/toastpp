@@ -37,7 +37,7 @@
 #include "blasnames.h"
 
 #if (!defined(WIN32))&&(!defined(WIN64))
-#define USE_BLAS_LEVEL1
+//#define USE_BLAS_LEVEL1
 // Use external BLAS level 1 routines (vector-vector operations)
 // instead of local C++ implementations where possible.
 // This is not guaranteed to improve performance, since the function

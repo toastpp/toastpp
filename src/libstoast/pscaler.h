@@ -58,6 +58,17 @@ public:
     RVector JScale (const RVector &unscaled) const { return unscaled; }
 };
 
+class STOASTLIB LinLogScaler: public Scaler {
+public:
+    LinLogScaler (const RVector &scale): Scaler () { sc = scale; }
+    const char *ScalingMethod () const { return "LINLOG"; }
+    RVector Scale (const RVector &unscaled) const { return log(unscaled*sc); }
+    RVector Unscale (const RVector &scaled) const { return exp(scaled)/sc; }
+    RVector JScale (const RVector &unscaled) const { return unscaled; }
+private:
+    RVector sc;
+};
+
 class STOASTLIB BoundLogScaler: public Scaler {
 public:
     BoundLogScaler (const RVector &_xmin, const RVector &_xmax): Scaler()

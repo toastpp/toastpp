@@ -32,6 +32,7 @@ enum PARAM_SCALE {          // parameter scaling method
     PARAM_SCALE_NONE,       //   no scaling
     PARAM_SCALE_AVG,        //   scale with average of initial distribution
     PARAM_SCALE_LOG,        //   log scaling
+    PARAM_SCALE_LINLOG,     //   lin+log scaling
     PARAM_SCALE_BOUNDLOG    //   x -> ln ((x-a)(b-x))
 } g_pscale = PARAM_SCALE_NONE;
 
@@ -41,12 +42,11 @@ double g_param_cmuamin, g_param_cmuamax;
 double g_param_ckappamin, g_param_ckappamax;
 double g_refind;
 char g_meshname[256];
-int g_nimsize;
 int g_imgfmt = IMGFMT_NIM;
 
 SourceMode srctp = SRCMODE_NEUMANN;   // source type
-int bOutputUpdate = 1;
-int bOutputGradient = 1;
+int bOutputUpdate = 0;
+int bOutputGradient = 0;
 double avg_cmua = 1.0, avg_ckappa = 1.0;
 ParamParser pp;
 
@@ -56,7 +56,6 @@ double clock0;
 double solver_time = 0.0;
 #endif
 
-
 // =========================================================================
 // local prototypes
 
@@ -64,7 +63,8 @@ void OutputProgramInfo ();
 void SelectMesh (char *meshname, QMMesh &mesh);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (int &mtype, double &mwidth);
-void SelectInitialParams (const Mesh &mesh, MWsolution &msol);
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
+    const RVector &wlength);
 void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
     int whichWavel);
 void SelectData (DataScale dscale, int len, double &freq, RVector &data);
@@ -107,6 +107,7 @@ int main (int argc, char *argv[])
 
     char meshname[256], cbuf[256];
     double omega;
+    double wscale;
     int    qprof, mprof;   // source/measurement profile (0=Gaussian, 1=Cosine)
     double qwidth, mwidth; // source/measurement support radius [mm]
     int sdmode;
@@ -123,7 +124,6 @@ int main (int argc, char *argv[])
     SelectMeasurementProfile (mprof, mwidth);
     strcpy (g_meshname, meshname);
     n   = mesh.nlen();
-    g_nimsize = n;
     dim = mesh.Dimension();
     nQ  = mesh.nQ;
     nM  = mesh.nM;
@@ -173,6 +173,10 @@ int main (int argc, char *argv[])
 	xASSERT(nofwavel <= MAX_NOFWLENGTH, Max wavelength count exceeded);
     }
 
+    if (!pp.GetReal ("WAVELENGTH_SCALE", wscale))
+	wscale = 1.0;
+    pp.PutReal ("WAVELENGTH_SCALE", wscale);
+
     // chromophores
     if (!pp.GetInt("NOFMUACHROMOPHORES", nofMuachromo)) {
 	cout << "Number of mua chromophores?\n>> " << flush;
@@ -198,19 +202,17 @@ int main (int argc, char *argv[])
 	}
     }
     
-
     // multi-wavelength solution in mesh basis
     int nprm = nofMuachromo; // chromophores
     nprm += 2;               // scattering parameters A and b
     nprm += 1;               // refractive index
     nprm += nofwavel;        // background mua at each wavelength
-    MWsolution msol(nprm, n, nofwavel, extcoef, wlength);
+    MWsolution msol(nprm, n, nofwavel, extcoef, wlength*wscale);
 
-    SelectInitialParams (mesh, msol);
-
+    SelectInitialParams (mesh, msol, wlength);
     SelectData (FWS.GetDataScaling(), nQM * nofwavel, omega, data);
-    sdmode = SelectSDMode();
     omega *= 2.0*Pi*1e-6; // convert from MHz to rad/ps
+    sdmode = SelectSDMode();
 
     // Generate sd vector by assuming sd=data ('normalised')
     RVector sd(data);
@@ -312,7 +314,18 @@ int main (int argc, char *argv[])
 	} break;
     case PARAM_SCALE_LOG:
         pscaler = new LogScaler;
-	break;
+        break;
+    case PARAM_SCALE_LINLOG: {
+	RVector scale = bsol.GetActiveParams();
+	for (i = 0; i < bsol.nActive(); i++) {
+	    double sum = 0;
+	    for (j = 0; j < slen; j++)
+	        sum += scale[i*slen+j];
+	    for (j = 0; j < slen; j++)
+	        scale[i*slen+j] = slen/sum;
+	}
+	pscaler = new LinLogScaler (scale);
+	} break;
     case PARAM_SCALE_BOUNDLOG:
 	RVector xmin(slen), xmax(slen);
 	for (i = 0; i < slen/2; i++) {
@@ -371,11 +384,11 @@ int main (int argc, char *argv[])
 	for (i = 0; i < msol.nParam(); i++) {
 	    if (msol.IsActive(i)) {
 		char fname[256];
-		if (i < msol.nParam() - 3) 
+		if (i < msol.nmuaChromo) 
 		    sprintf (fname,"reconChromophore_%d.raw",i+1);
-		if (i == msol.nParam() - 3)
+		if (i == msol.nmuaChromo)
 		    sprintf (fname,"reconScatPrefactor_A.raw");
-		if (i == msol.nParam() - 2) 
+		if (i == msol.nmuaChromo) 
 		    sprintf (fname,"reconScatPower_b.raw");
 		WriteRimHeader (raster->BDim(), fname);
 		gsol.WriteImgGeneric (0, fname, i);
@@ -401,14 +414,14 @@ int main (int argc, char *argv[])
 	bool refEqualinitial;
 
 	if (!pp.GetString ("REFDATA_MOD", cbuf)) {
-	    cout << "Mod data reference file (all wavelengths): ";
+	    cout << "Logamp data reference file (all wavelengths): ";
 	    cin  >> cbuf;
 	}
 	ReadDataFile (cbuf, refdata_mod);
 	pp.PutString ("REFDATA_MOD", cbuf);
 
 	if (!pp.GetString ("REFDATA_ARG", cbuf)) {
-	    cout << "Arg data reference file (all wavelengths): ";
+	    cout << "Phase data reference file (all wavelengths): ";
 	    cin  >> cbuf;
 	}
 	ReadDataFile (cbuf, refdata_arg);
@@ -481,20 +494,20 @@ int main (int argc, char *argv[])
 	RVector proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 	sd = proj;
 	double avd1 = 0.0, avd2 = 0.0;
-	int phofs = nQM*nofwavel;
+	int ndat = nQM*nofwavel;
 	// note: This sums over all wavelengths. Maybe better to scale
 	// wavelengths individually
-	for (i = 0; i < phofs; i++) {
+	for (i = 0; i < ndat; i++) {
 	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+phofs]*sd[i+phofs];
+	    avd2 += sd[i+ndat]*sd[i+ndat];
 	}
 	avd1 = sqrt(avd1);
 	avd2 = sqrt(avd2);
-	for (i = 0; i < phofs; i++) {
+	for (i = 0; i < ndat; i++) {
 	    sd[i] = avd1;
-	    sd[i+phofs] = avd2;
+	    sd[i+ndat] = avd2;
 	}
-	cout << "Averages: amplitude " << avd1 << ", phase " << avd2
+	cout << "Averages: log amplitude " << avd1 << ", phase " << avd2
 	     << endl << endl;
 	} break;		
     case 4: { // scale with difference averages over data types
@@ -502,20 +515,20 @@ int main (int argc, char *argv[])
 	RVector proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 	sd = (data - proj);
 	double avd1 = 0.0, avd2 = 0.0;
-	int phofs = nQM*nofwavel;
+	int ndat = nQM*nofwavel;
 	// note: This sums over all wavelengths. Maybe better to scale
 	// wavelengths individually
-	for (i = 0; i < phofs; i++) {
+	for (i = 0; i < ndat; i++) {
 	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+phofs]*sd[i+phofs];
+	    avd2 += sd[i+ndat]*sd[i+ndat];
 	}
 	avd1 = sqrt(avd1);
 	avd2 = sqrt(avd2);
-	for (i = 0; i < phofs; i++) {
+	for (i = 0; i < ndat; i++) {
 	    sd[i] = avd1;
-	    sd[i+phofs] = avd2;
+	    sd[i+ndat] = avd2;
 	}
-	cout << "Averages: amplitude " << avd1 << ", phase " << avd2
+	cout << "Averages: log amplitude " << avd1 << ", phase " << avd2
 	     << endl << endl;
 	} break;
     }
@@ -746,7 +759,8 @@ int ScanRegions (const Mesh &mesh, int *nregnode)
 
 // ============================================================================
 
-void SelectInitialParams (const Mesh &mesh, MWsolution &msol)
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
+    const RVector &wlength)
 {
     char cbuf[256], *valstr;
     int resettp = 0;
@@ -754,25 +768,25 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol)
     int nparam = msol.nParam();
     RVector param[nparam];
     int i, j, k, n, p, nreg, nregnode[MAXREGION];
- 
+
     for (p = 0; p < nparam; p++) {
       char resetstr[256];
       char reconstr[256];
 
       if (p < msol.nmuaChromo) {
-	sprintf (resetstr,"CHROMOPHORE_%d",p+1);
-	sprintf (reconstr, "RECON_CHROMOPHORE_%d",p+1);
+	  sprintf (resetstr,"CHROMOPHORE_%d",p+1);
+	  sprintf (reconstr, "RECON_CHROMOPHORE_%d",p+1);
       } else if (p == msol.nmuaChromo) {
-	sprintf (resetstr,"SCATTERING_PREFACTOR_A");
-	sprintf (reconstr, "RECON_SCATTERING_PREFACTOR_A");
+	  sprintf (resetstr,"SCATTERING_PREFACTOR_A");
+	  sprintf (reconstr, "RECON_SCATTERING_PREFACTOR_A");
       } else if (p == msol.nmuaChromo+1) {
-	sprintf (resetstr,"SCATTERING_POWER_B");
-	sprintf (reconstr, "RECON_SCATTERING_POWER_B");
+	  sprintf (resetstr,"SCATTERING_POWER_B");
+	  sprintf (reconstr, "RECON_SCATTERING_POWER_B");
       } else if (p == msol.nmuaChromo+2) {
-	sprintf (resetstr,"RESET_N");
+	  sprintf (resetstr,"RESET_N");
       } else {
 	  sprintf (resetstr, "BACKGROUND_MUA_%d",
-		   (int)msol.wlength[p-msol.nmuaChromo-3]);
+		   (int)wlength[p-msol.nmuaChromo-3]);
       }
 
       param[p].New(mesh.nlen());
@@ -975,7 +989,6 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 void SelectData (DataScale dscale, int len, double &freq, RVector &data)
 {
     char cbuf[256];
-    bool def = false;
     RVector pdata;
     
     data.New (len*2);
@@ -983,14 +996,14 @@ void SelectData (DataScale dscale, int len, double &freq, RVector &data)
     switch (dscale) {
     case DATA_LIN:
 	if (!pp.GetString ("DATA_REAL", cbuf)) {
-	    cout << "\nData file 1 (real, all wavelengths:\n>> ";
+	    cout << "\nData file 1 (real, all wavelengths):\n>> ";
 	    cin >> cbuf;
 	}
 	pdata.Relink (data,0,len);
 	ReadDataFile (cbuf, pdata);
 	pp.PutString ("DATA_REAL", cbuf);
 	if (!pp.GetString ("DATA_IMAG", cbuf)) {
-	    cout << "\nData file 2 (imag, all wavelengths:\n>> ";
+	    cout << "\nData file 2 (imag, all wavelengths):\n>> ";
 	    cin >> cbuf;
 	}
 	pdata.Relink (data,len,len);
@@ -1084,6 +1097,8 @@ PARAM_SCALE SelectParamScaling ()
 	    ps = PARAM_SCALE_AVG,  def = true;
 	else if (!strcasecmp (cbuf, "LOG"))
 	    ps = PARAM_SCALE_LOG,  def = true;
+	else if (!strcasecmp (cbuf, "LINLOG"))
+	    ps = PARAM_SCALE_LINLOG, def = true;
 	else if (!strcasecmp (cbuf, "LOG_BOUNDED"))
 	    ps = PARAM_SCALE_BOUNDLOG, def = true;
     }
@@ -1093,20 +1108,23 @@ PARAM_SCALE SelectParamScaling ()
 	cout << "(0) None\n";
 	cout << "(1) Initial parameter averages\n";
 	cout << "(2) Log parameters\n";
-	cout << "(3) Bounded log parameters\n";
-	cout << "[0|1|2|3] >> ";
+	cout << "(3) Lin+log scaling\n";
+	cout << "(4) Bounded log parameters\n";
+	cout << "[0|1|2|3|4] >> ";
 	cin >> cmd;
 	switch (cmd) {
 	case 0: ps = PARAM_SCALE_NONE,     def = true; break;
 	case 1: ps = PARAM_SCALE_AVG,      def = true; break;
 	case 2: ps = PARAM_SCALE_LOG,      def = true; break;
-	case 3: ps = PARAM_SCALE_BOUNDLOG, def = true; break;
+	case 3: ps = PARAM_SCALE_LINLOG,   def = true; break;
+	case 4: ps = PARAM_SCALE_BOUNDLOG, def = true; break;
 	}
     }
     switch (ps) {
     case PARAM_SCALE_NONE:     pp.PutString ("PARAM_SCALE", "NONE"); break;
     case PARAM_SCALE_AVG:      pp.PutString ("PARAM_SCALE", "AVG");  break;
     case PARAM_SCALE_LOG:      pp.PutString ("PARAM_SCALE", "LOG");  break;
+    case PARAM_SCALE_LINLOG:   pp.PutString ("PARAM_SCALE", "LINLOG");  break;
     case PARAM_SCALE_BOUNDLOG: pp.PutString ("PARAM_SCALE", "LOG_BOUNDED");
 	break;
     }

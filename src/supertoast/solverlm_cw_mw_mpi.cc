@@ -2,16 +2,14 @@
 // SolverLM: Levenberg-Marquardt
 // ==========================================================================
 
-#ifdef TOAST_MPI
 #include <mpi.h>
-#endif
 
 #include "stoastlib.h"
 #include "dnsmatrix_mpi.h"
 #include "util.h"
 #include "mwsolution.h"
 #include "jacobian_mpi.h"
-#include "solverlm_cw_mw.h"
+#include "solverlm_cw_mw_mpi.h"
 #include "timing.h"
 #include <time.h>
 #include "timing.h"
@@ -30,8 +28,6 @@ extern int g_imgfmt;
 extern int bOutputUpdate;
 extern int bOutputGradient;
 extern double clock0;
-extern char g_meshname[256];
-extern int g_nimsize;
 extern double g_refind;
 
 extern void WriteJacobian (const RMatrix *J, const Raster &raster,
@@ -54,7 +50,7 @@ RVector RescaleHessian (const  RDenseMatrixMPI &J, const RVector &x,
 bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const RCompRowMatrix &qvec,
     const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &grad, double f0, double &fmin, double &lambda,
+    const RVector &grad, double f0, double &fmin, double &lambda,
     MWsolution &meshsol, const RVector &p0, const RVector &p,
     const Regularisation *reg, const RMatrix *cov = 0);
 
@@ -115,7 +111,6 @@ struct JAC_DATA {
     const RCompRowMatrix *RHess;   // Hessian of prior (1 matrix per parameter)
     const RVector *M;              // normalisation diagonal matrix
     const double *lambda;          // diagonal scaling factor
-          double omega;            // modulation frequency
 };
 
 // ==========================================================================
@@ -999,7 +994,8 @@ RVector DistScaling (const Raster &raster, const RVector &logx)
 }
 
 // ==========================================================================
-SolverLM_CW_MW::SolverLM_CW_MW (ParamParser *_pp): Solver_CW (_pp)
+SolverLM_CW_MW_MPI::SolverLM_CW_MW_MPI (ParamParser *_pp)
+: Solver_CW_MW_MPI (_pp)
 {
     nrmax = 50;
     itmax = 1000;
@@ -1016,17 +1012,17 @@ SolverLM_CW_MW::SolverLM_CW_MW (ParamParser *_pp): Solver_CW (_pp)
     modelerr = false;
 }
 
-SolverLM_CW_MW::~SolverLM_CW_MW ()
+SolverLM_CW_MW_MPI::~SolverLM_CW_MW_MPI ()
 {
     if (reg) delete reg;
 }
 
 // ==========================================================================
 
-void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
+void SolverLM_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
     const RVector &sd, Solution &bsol, MWsolution &msol,
-    const RCompRowMatrix &qvec, const RCompRowMatrix &mvec, double omega)
+    const RCompRowMatrix &qvec, const RCompRowMatrix &mvec)
 {
     bool Use_precon = true;
     bool Gradient_descent = false;
@@ -1078,7 +1074,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     // reset forward solver
     LOGOUT("Resetting forward solver");
     for (i = 0; i < nlambda; i++) {
-	FWS.Reset (*msol.swsol[i], omega);
+	FWS.Reset (*msol.swsol[i], 0);
 	FWS.CalcFields (qvec, dphi);
 	RVector proj_i(proj, i*mesh->nQM, mesh->nQM);
 	proj_i = FWS.ProjectAll (mvec, dphi);
@@ -1115,7 +1111,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     
     bool logparam = !strcmp (pscaler->ScalingMethod(), "LOG");
     JAC_DATA jdata = {mesh, &raster, &FWS, &dphi, &aphi, &mvec, &data, &sd,
-		      &prmscl, reg, &RHess, &M, &lambda, omega};
+		      &prmscl, reg, &RHess, &M, &lambda};
     // set the components for the implicit definition of the Jacobian
     
     of  = ObjectiveFunction::get_value (data, proj, sd, cov);
@@ -1243,7 +1239,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		static double alpha_ls = stepsize;
 		//if (alpha < 0.0) alpha = stepsize; // initialise step length
 		if (!LineSearchWithPrior (FWS, raster, pscaler, qvec, mvec,
-                  data, sd, omega, d, err0, fmin, alpha_ls, msol, x0, x,
+                  data, sd, d, err0, fmin, alpha_ls, msol, x0, x,
 		  reg, cov)) {
 		    LOGOUT ("No decrease in line search");
 		    lambda *= lambda_scale;
@@ -1392,7 +1388,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		rp/tau, inr);
 }
 
-void SolverLM_CW_MW::ReadParams (ParamParser &pp)
+void SolverLM_CW_MW_MPI::ReadParams (ParamParser &pp)
 {
     char cbuf[256], c;
     bool def = false;
@@ -1612,7 +1608,7 @@ void SolverLM_CW_MW::ReadParams (ParamParser &pp)
     }
 }
 
-void SolverLM_CW_MW::WriteParams (ParamParser &pp)
+void SolverLM_CW_MW_MPI::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "LM");
     pp.PutReal ("NONLIN_TOL", gn_tol);
@@ -1681,7 +1677,7 @@ void SolverLM_CW_MW::WriteParams (ParamParser &pp)
 bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const RCompRowMatrix &qvec,
     const RCompRowMatrix &mvec, const RVector &data, const RVector &sd,
-    double omega, const RVector &grad, double f0, double &fmin, double &lambda,
+    const RVector &grad, double f0, double &fmin, double &lambda,
     MWsolution &meshsol, const RVector &p0, const RVector &p,
     const Regularisation *reg, const RMatrix *cov)
 {

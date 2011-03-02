@@ -839,6 +839,67 @@ double l1norm (const TVector<float> &v)
 
 // ==========================================================================
 
+#ifdef TOAST_THREAD
+
+template<class VT>
+void *l2normsq_engine (void *context)
+{
+    typedef struct {
+	const TVector<VT> *v;
+	pthread_t ht;
+	int i0, i1;
+	double sum;
+    } THDATA;
+    THDATA *thdata = (THDATA*)context;
+
+    double term;
+    thdata->sum = 0.0;
+    const TVector<VT> &v = *thdata->v;
+    for (int i = thdata->i0; i < thdata->i1; i++) {
+	term = norm(v[i]);
+	thdata->sum += term*term;
+    }
+    return NULL;
+}
+
+#ifdef NEED_EXPLICIT_INSTANTIATION
+template void *l2normsq_engine<double> (void *context);
+template void *l2normsq_engine<float> (void *context);
+template void *l2normsq_engine<complex> (void *context);
+template void *l2normsq_engine<scomplex> (void *context);
+template void *l2normsq_engine<int> (void *context);
+#endif
+
+template<class VT>
+MATHLIB double l2normsq (const TVector<VT> &v)
+{
+    //static const int nthread = 2;
+    static struct {
+	const TVector<VT> *v;
+	pthread_t ht;
+	int i0, i1;
+	double sum;
+    } thdata[NUMTHREAD];
+
+    int i;
+
+    for (i = 0; i < NUMTHREAD; i++) {
+	thdata[i].v = &v;
+	thdata[i].i0 = (i*v.size)/NUMTHREAD;
+	thdata[i].i1 = ((i+1)*v.size)/NUMTHREAD;
+	pthread_create (&thdata[i].ht, NULL,
+	    l2normsq_engine<VT>, (void*)(thdata+i));
+    }
+    double sum = 0.0;
+    for (i = 0; i < NUMTHREAD; i++) {
+	pthread_join (thdata[i].ht, NULL);
+	sum += thdata[i].sum;
+    }
+    return sum;
+}
+
+#else
+
 template<class VT>
 MATHLIB double l2normsq (const TVector<VT> &v)
 {
@@ -849,6 +910,8 @@ MATHLIB double l2normsq (const TVector<VT> &v)
     }
     return sum;
 }
+
+#endif
 
 template<class VT>
 MATHLIB double linfnorm (const TVector<VT> &v)
@@ -1216,7 +1279,7 @@ double length (const CVector &vec);
 double length (const SCVector &vec);
 double length (const IVector &vec);
 
-template MATHLIB double   l2normsq (const RVector &vec);
+template MATHLIB double   l2normsq<double> (const RVector &vec);
 template MATHLIB double   l2normsq (const FVector &vec);
 template MATHLIB double   l2normsq (const CVector &vec);
 template MATHLIB double   l2normsq (const SCVector &vec);
