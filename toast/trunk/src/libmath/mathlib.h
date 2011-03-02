@@ -45,6 +45,10 @@
 #include "arpack.h"
 #include "fourn.h" // only needed if using C version rather than C++
 
+#ifdef TOAST_THREAD
+#include "task.h"
+#endif
+
 #ifdef TOAST_MPI
 #include <mpi.h>
 #include "toast_mpi.h"

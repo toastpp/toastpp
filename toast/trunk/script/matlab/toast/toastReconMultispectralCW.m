@@ -161,7 +161,7 @@ while (itr < itrmax) && ...
     end
     
     % Gradient of cost function
-    dy = 2*((data-proj)./sd);
+    dy = ((data-proj)./sd);
     for i=1:size(J,2) % do product by hand to save space
         r(i,1) = J(:,i)' * dy;
     end

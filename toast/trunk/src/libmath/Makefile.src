@@ -37,6 +37,11 @@ SRCS += \
 	eigpair.cc
 endif
 
+ifdef MAKE_THREAD
+SRCS += \
+	task.cc	
+endif
+
 ifdef MAKE_MPI
 SRCS += \
 	crmatrix_mpi.cc \

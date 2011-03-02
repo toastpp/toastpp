@@ -4,9 +4,9 @@
 #include <string.h>
 #include "util.h"
 #include "solver_cw.h"
-#include "supertoast_util.h"
-#include "supertoast_cw_mw.h"
 #include "source.h"
+#include "supertoast_cw_mw.h"
+#include "supertoast_util.h"
 #include "timing.h"
 #include <time.h>
 #ifdef TOAST_MPI
@@ -28,29 +28,13 @@ using namespace toast;
 // ==========================================================================
 // Global variables
 
-enum PCG_PRECON {           // preconditioners for PCG solver
-    PCG_PRECON_NONE,        //   no preconditioner
-    PCG_PRECON_DIAGJTJ,     //   diagonal of JTJ
-    PCG_PRECON_SPARSEJTJ,   //   sparse JTJ
-    PCG_PRECON_FULLJTJ      //   complete JTJ
-} g_pcg_precon = PCG_PRECON_NONE;
-
-enum LM_PRECON {            // preconditioners for LM solver
-    LM_PRECON_NONE,         //   no preconditioner
-    LM_PRECON_HDIAG,        //   diagonal of Hessian
-    LM_PRECON_CH,           //   Cholesky factorisation using explicit Hessian
-    LM_PRECON_ICH,          //   Incomplete Cholesky with sparse Hessian
-    LM_PRECON_GMRES         //   "matrix-less" Krylov subspace method (GMRES)
-} g_lm_precon = LM_PRECON_NONE;
-
 enum PARAM_SCALE {          // parameter scaling method
     PARAM_SCALE_NONE,       //   no scaling
     PARAM_SCALE_AVG,        //   scale with average of initial distribution
     PARAM_SCALE_LOG,        //   log scaling
+    PARAM_SCALE_LINLOG,     //   lin+log scaling
     PARAM_SCALE_BOUNDLOG    //   x -> ln ((x-a)(b-x))
 } g_pscale = PARAM_SCALE_NONE;
-
-double g_lm_gmres_tol;      // convergence criterion for LM GMRES precon
 
 double g_lsolver_tol;       // convergence criterion for linear solver
 
@@ -61,8 +45,6 @@ char g_meshname[256];
 int g_imgfmt = IMGFMT_NIM;
 
 SourceMode srctp = SRCMODE_NEUMANN;   // source type
-int bWriteJ    = 0;
-int bWriteGrad = 0;
 int bOutputUpdate = 0;
 int bOutputGradient = 0;
 double avg_cmua = 1.0, avg_ckappa = 1.0;
@@ -78,22 +60,21 @@ double solver_time = 0.0;
 // local prototypes
 
 void OutputProgramInfo ();
-void SelectPCGOptions ();
-void SelectLMOptions ();
 void SelectMesh (char *meshname, QMMesh &mesh);
 void SelectSourceProfile (int &qtype, double &qwidth, SourceMode &srctp);
 void SelectMeasurementProfile (int &mtype, double &mwidth);
-void SelectInitialParams (const Mesh &mesh, MWsolution &msol);
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
+    const RVector &wlength);
 void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
     int whichWavel);
-void SelectData (int nqm, RVector &data);
+void SelectData (DataScale dscale, int len, RVector &data);
 void SelectBasis (IVector &gdim, IVector &bdim);
 int  SelectImageFormat ();
 PARAM_SCALE SelectParamScaling ();
 int  SelectSDMode ();
 
 // =========================================================================
-// MAIN 
+// MAIN
 
 int main (int argc, char *argv[])
 {
@@ -125,6 +106,7 @@ int main (int argc, char *argv[])
     const double c0 = 0.3;
 
     char meshname[256], cbuf[256];
+    double wscale;
     int    qprof, mprof;   // source/measurement profile (0=Gaussian, 1=Cosine)
     double qwidth, mwidth; // source/measurement support radius [mm]
     int sdmode;
@@ -190,6 +172,10 @@ int main (int argc, char *argv[])
 	xASSERT(nofwavel <= MAX_NOFWLENGTH, Max wavelength count exceeded);
     }
 
+    if (!pp.GetReal ("WAVELENGTH_SCALE", wscale))
+	wscale = 1.0;
+    pp.PutReal ("WAVELENGTH_SCALE", wscale);
+
     // chromophores
     if (!pp.GetInt("NOFMUACHROMOPHORES", nofMuachromo)) {
 	cout << "Number of mua chromophores?\n>> " << flush;
@@ -220,11 +206,10 @@ int main (int argc, char *argv[])
     nprm += 2;               // scattering parameters A and b
     nprm += 1;               // refractive index
     nprm += nofwavel;        // background mua at each wavelength
-    MWsolution msol(nprm, n, nofwavel, extcoef, wlength);
+    MWsolution msol(nprm, n, nofwavel, extcoef, wlength*wscale);
 
-    SelectInitialParams (mesh, msol);
-
-    SelectData (nQM * nofwavel, data);
+    SelectInitialParams (mesh, msol, wlength);
+    SelectData (FWS.GetDataScaling(), nQM * nofwavel, data);
     sdmode = SelectSDMode();
 
     // Generate sd vector by assuming sd=data ('normalised')
@@ -306,19 +291,6 @@ int main (int argc, char *argv[])
     }
     pp.PutBool ("REFDATA", useref);
 
-    // debugging flags
-    if (!pp.GetInt ("DBG_WRITEJACOBIAN", bWriteJ)) {
-	cout << "Output Jacobian during reconstruction (1/0)?\n>> " << flush;
-	cin >> bWriteJ;
-    }
-    pp.PutInt ("DBG_WRITEJACOBIAN", bWriteJ);
-
-    if (!pp.GetInt ("DBG_WRITEGRAD", bWriteGrad)) {
-	cout << "Output gradient during reconstruction (1/0)?\n>> " << flush;
-	cin >> bWriteGrad;
-    }
-    pp.PutInt ("DBG_WRITEGRAD", bWriteGrad);
-
     // set parameter scaling
     Scaler *pscaler;
     switch (g_pscale) {
@@ -338,7 +310,18 @@ int main (int argc, char *argv[])
 	} break;
     case PARAM_SCALE_LOG:
         pscaler = new LogScaler;
-	break;
+        break;
+    case PARAM_SCALE_LINLOG: {
+	RVector scale = bsol.GetActiveParams();
+	for (i = 0; i < bsol.nActive(); i++) {
+	    double sum = 0;
+	    for (j = 0; j < slen; j++)
+	        sum += scale[i*slen+j];
+	    for (j = 0; j < slen; j++)
+	        scale[i*slen+j] = slen/sum;
+	}
+	pscaler = new LinLogScaler (scale);
+	} break;
     case PARAM_SCALE_BOUNDLOG:
 	RVector xmin(slen), xmax(slen);
 	for (i = 0; i < slen/2; i++) {
@@ -380,11 +363,11 @@ int main (int argc, char *argv[])
 	for (i = 0; i < msol.nParam(); i++) {
 	    char fname[256];
 	    if (msol.IsActive(i)) {
-		if (i < msol.nParam() - 3) 
+		if (i < msol.nmuaChromo) 
 		    sprintf (fname,"reconChromophore_%d.nim",i+1);
-		if (i == msol.nParam() - 3)
+		if (i == msol.nmuaChromo)
 		    sprintf (fname,"reconScatPrefactor_A.nim");
-		if (i == msol.nParam() - 2) 
+		if (i == msol.nmuaChromo + 1) 
 		    sprintf (fname,"reconScatPower_b.nim");
 		WriteNimHeader (meshname, n, fname, "N/A");  
 		msol.WriteImgGeneric (0, fname, i);
@@ -392,14 +375,19 @@ int main (int argc, char *argv[])
 	}
 	break;
     case IMGFMT_RAW:
-	for (i = 0; i < bsol.nParam(); i++) {
-	    if (bsol.IsActive(i)) {
+	Solution gsol(nprm, raster->BLen());
+	raster->Map_SolToBasis (bsol, gsol, true);
+	for (i = 0; i < msol.nParam(); i++) {
+	    if (msol.IsActive(i)) {
 		char fname[256];
-		RVector img(blen);
-		sprintf (fname, "reconParam_%d.raw", i+1);
-		raster->Map_SolToBasis(bsol.GetParam(i), img);
+		if (i < msol.nmuaChromo) 
+		    sprintf (fname,"reconChromophore_%d.raw",i+1);
+		if (i == msol.nmuaChromo)
+		    sprintf (fname,"reconScatPrefactor_A.raw");
+		if (i == msol.nmuaChromo) 
+		    sprintf (fname,"reconScatPower_b.raw");
 		WriteRimHeader (raster->BDim(), fname);
-		Solution::WriteImgGeneric (0, fname, img);
+		gsol.WriteImgGeneric (0, fname, i);
 	    }
 	}
 	break;
@@ -414,18 +402,13 @@ int main (int argc, char *argv[])
 	WriteNimHeader (meshname, n, "gradient_mus.nim", "MUS");
     }
 
-    if (bWriteGrad) {
-        WriteRimHeader (raster->BDim(), "grad_mua.raw");
-	WriteRimHeader (raster->BDim(), "grad_mus.raw");
-    }
-
     if (useref) {
         RVector refdata(nQM*nofwavel);
 	RVector proj(nQM*nofwavel);
 	bool refEqualinitial;
 
 	if (!pp.GetString ("REFDATA_MOD", cbuf)) {
-	    cout << "Reference file: ";
+	    cout << "Logamp data reference file (all wavelengths): ";
 	    cin  >> cbuf;
 	}
 	ReadDataFile (cbuf, refdata);
@@ -495,44 +478,25 @@ int main (int argc, char *argv[])
 	break;
     case 3: { // scale with averages over data types
 	cout << "Generating model baseline" << endl;
-	RVector proj(nQM*2);
-	FWS.CalcFields (qvec, dphi);
-	proj = FWS.ProjectAll (mvec, dphi);
+	RVector proj = FWS.ProjectAll_wavel (qvec, mvec, msol, 0);
 	sd = proj;
-	double avd1 = 0.0, avd2 = 0.0;
-	for (i = 0; i < nQM; i++) {
-	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+nQM]*sd[i+nQM];
+	for (i = 0; i < nofwavel; i++) {
+	    double avd = 0.0;
+	    for (j = 0; j < nQM; j++) avd += sd[i*nQM+j]*sd[i*nQM+j];
+	    avd = sqrt(avd);
+	    for (j = 0; j < nQM; j++) sd[i*nQM+j] = avd;
 	}
-	avd1 = sqrt(avd1);
-	avd2 = sqrt(avd2);
-	for (i = 0; i < nQM; i++) {
-	    sd[i] = avd1;
-	    sd[i+nQM] = avd2;
-	}
-	cout << "Averages: amplitude " << avd1 << ", phase " << avd2
-	     << endl << endl;
 	} break;		
     case 4: { // scale with difference averages over data types
 	cout << "Generating model baseline" << endl;
-	RVector proj(nQM*nofwavel);
-	for (i = 0; i < nofwavel; i++) {
-	    FWS.Reset (*msol.swsol[i],0);
-	    FWS.CalcFields (qvec, dphi);
-	    RVector proj_i(proj, i*nQM, nQM);
-	    proj_i = FWS.ProjectAll (mvec, dphi);
-	}
+	RVector proj = FWS.ProjectAll_wavel (qvec, mvec, msol, 0);
 	sd = (data - proj);
-
-	double avd1 = 0.0, avd2 = 0.0;
-	for (i = 0; i < sd.Dim(); i++) {
-	    avd1 += sd[i]*sd[i];
+	for (i = 0; i < nofwavel; i++) {
+	    double avd = 0.0;
+	    for (j = 0; j < nQM; j++) avd += sd[i*nQM+j]*sd[i*nQM+j];
+	    avd = sqrt(avd);
+	    for (j = 0; j < nQM; j++) sd[i*nQM+j] = avd;
 	}
-	avd1 = sqrt(avd1);
-	for (i = 0; i < sd.Dim(); i++) {
-	    sd[i] = avd1;
-	}
-	cout << "Averages: amplitude " << avd1 << endl << endl;
 	} break;
     }
 
@@ -549,25 +513,10 @@ int main (int argc, char *argv[])
     solver->Solve (FWS, *raster, pscaler, OF, data, sd, bsol, msol, qvec,mvec);
     delete solver;
 
-#ifdef UNDEF
-    switch (g_solver) {
-    case SOLVER_LINEAR:
-	cout << "Entering linear solver ..." << endl;
-	LinSolve (FWS, raster, pscaler, OF, data, sd, msol, bsol, qvec,
-	    mvec, omega, logparam, 1e-6);
-	break;
-    default:
-        cerr << "Nonlinear solver not defined. Aborting." << endl;
-	exit (1);
-    }
-#endif
-
     // cleanup
     delete []dphi;
     delete []aphi;
 
-    //times (&tme);
-    //double total_time = (double)(tme.tms_utime-clock0)/(double)HZ;
     double total_time = toc(clock0);
     LOGOUT ("Final timings:");
     LOGOUT_1PRM ("Total: %f", total_time);
@@ -581,6 +530,9 @@ int main (int argc, char *argv[])
 
     return 0;
 }                                                                              
+
+
+// ============================================================================
 
 void OutputProgramInfo ()
 {
@@ -602,115 +554,6 @@ void OutputProgramInfo ()
 	pp.Lineout (cbuf);
     }
     pp.Lineout ("===================================================");
-}
-
-// ============================================================================
-
-void SelectPCGOptions()
-{
-    char cbuf[256];
-    bool def = false;
-
-    // parse from definition file
-    if (pp.GetString ("PCG_PRECON", cbuf)) {
-        if (!strcasecmp (cbuf, "NONE"))
-	    g_pcg_precon = PCG_PRECON_NONE, def = true;
-	else if (!strcasecmp (cbuf, "DIAGJTJ"))
-	    g_pcg_precon = PCG_PRECON_DIAGJTJ, def = true;
-	else if (!strcasecmp (cbuf, "SPARSEJTJ"))
-	    g_pcg_precon = PCG_PRECON_SPARSEJTJ, def = true;
-	else if (!strcasecmp (cbuf, "FULLJTJ"))
-	    g_pcg_precon = PCG_PRECON_FULLJTJ, def = true;
-    }
-
-    // ask user
-    while (!def) {
-        int cmd;
-	cout << "\nSelect PCG preconditioner:\n";
-	cout << "(1) None\n";
-	cout << "(2) diagonal of JTJ\n";
-	cout << "(3) sparse JTJ\n";
-	cout << "(4) full JTJ\n";
-	cout << ">> ";
-	cin >> cmd;
-	switch (cmd) {
-	case 1: g_pcg_precon = PCG_PRECON_NONE, def = true; break;
-	case 2: g_pcg_precon = PCG_PRECON_DIAGJTJ, def = true; break;
-	case 3: g_pcg_precon = PCG_PRECON_SPARSEJTJ, def = true; break;
-	case 4: g_pcg_precon = PCG_PRECON_FULLJTJ, def = true; break;
-	}
-    }
-
-    // write back
-    switch (g_pcg_precon) {
-    case PCG_PRECON_NONE:      pp.PutString ("PCG_PRECON", "NONE"); break;
-    case PCG_PRECON_DIAGJTJ:   pp.PutString ("PCG_PRECON", "DIAGJTJ"); break;
-    case PCG_PRECON_SPARSEJTJ: pp.PutString ("PCG_PRECON", "SPARSEJTJ"); break;
-    case PCG_PRECON_FULLJTJ:   pp.PutString ("PCG_PRECON", "FULLJTJ"); break;
-    }
-}
-
-// ============================================================================
-
-void SelectLMOptions()
-{
-    char cbuf[256];
-    bool def = false;
-
-    // 1. === PRECONDITIONER ===
-
-    // parse from definition file
-    if (pp.GetString ("LM_PRECON", cbuf)) {
-        if (!strcasecmp (cbuf, "NONE"))
-	    g_lm_precon = LM_PRECON_NONE,  def = true;
-	else if (!strcasecmp (cbuf, "HDIAG"))
-	    g_lm_precon = LM_PRECON_HDIAG, def = true;
-	else if (!strcasecmp (cbuf, "CH"))
-	    g_lm_precon = LM_PRECON_CH,    def = true;
-	else if (!strcasecmp (cbuf, "ICH"))
-	    g_lm_precon = LM_PRECON_ICH,   def = true;
-	else if (!strcasecmp (cbuf, "GMRES"))
-	    g_lm_precon = LM_PRECON_GMRES, def = true;
-    }
-    // ask user
-    while (!def) {
-        int cmd;
-	cout << "\nSelect LM preconditioner:\n";
-	cout << "(1) None\n";
-	cout << "(2) Diagonal of Hessian\n";
-	cout << "(3) Cholesky factorisation of full Hessian\n";
-	cout << "(4) Incomplete CH factorisation of sparse Hessian\n";
-	cout << "(5) GMRES solver with implicit Hessian\n";
-	cout << ">> ";
-	cin >> cmd;
-	switch (cmd) {
-	case 1: g_lm_precon = LM_PRECON_NONE,  def = true; break;
-	case 2: g_lm_precon = LM_PRECON_HDIAG, def = true; break;
-	case 3: g_lm_precon = LM_PRECON_CH,    def = true; break;
-	case 4: g_lm_precon = LM_PRECON_ICH,   def = true; break;
-	case 5: g_lm_precon = LM_PRECON_GMRES, def = true; break;
-	}
-    }
-    // write back
-    switch (g_lm_precon) {
-    case LM_PRECON_NONE:  pp.PutString ("LM_PRECON", "NONE");  break;
-    case LM_PRECON_HDIAG: pp.PutString ("LM_PRECON", "HDIAG"); break;
-    case LM_PRECON_CH:    pp.PutString ("LM_PRECON", "CH");    break;
-    case LM_PRECON_ICH:   pp.PutString ("LM_PRECON", "ICH");   break;
-    case LM_PRECON_GMRES: pp.PutString ("LM_PRECON", "GMRES"); break;
-    }
-
-    // 2. === GMRES CONVERGENCE CRITERION ===
-
-    if (g_lm_precon == LM_PRECON_GMRES) {
-        if (!pp.GetReal ("LM_GMRES_TOL", g_lm_gmres_tol) ||
-	  g_lm_gmres_tol <= 0.0) do {
-	    cout << "\nSelect LM GMRES convergence criterion (>0):\n";
-	    cout << ">> ";
-	    cin >> g_lm_gmres_tol;
-	} while (g_lm_gmres_tol <= 0.0);
-	pp.PutReal ("LM_GMRES_TOL", g_lm_gmres_tol);
-    }
 }
 
 // ============================================================================
@@ -880,7 +723,10 @@ int ScanRegions (const Mesh &mesh, int *nregnode)
     return nreg;
 }
 
-void SelectInitialParams (const Mesh &mesh, MWsolution &msol)
+// ============================================================================
+
+void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
+    const RVector &wlength)
 {
     char cbuf[256], *valstr;
     int resettp = 0;
@@ -906,7 +752,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol)
 	  sprintf (resetstr,"RESET_N");
       } else {
 	  sprintf (resetstr, "BACKGROUND_MUA_%d",
-		   (int)msol.wlength[p-msol.nmuaChromo-3]);
+		   (int)wlength[p-msol.nmuaChromo-3]);
       }
 
       param[p].New(mesh.nlen());
@@ -1106,20 +952,30 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 
 // ============================================================================
 
-void SelectData (int nqm, RVector &data)
+void SelectData (DataScale dscale, int len, RVector &data)
 {
     char cbuf[256];
-    bool def = false;
-    RVector pdata;
+    
+    data.New (len);
 
-    pp.PutString ("DATATYPE", "INTENSITY");
-    data.New (nqm);
-    if (!pp.GetString ("DATA_INTENSITY", cbuf)) {
-	cout << "\nData file (log intensity)\n>> ";
-	cin >> cbuf;
+    switch (dscale) {
+    case DATA_LIN:
+	if (!pp.GetString ("DATA_REAL", cbuf)) {
+	    cout << "\nData file (lin amp, all wavelengths):\n>> ";
+	    cin >> cbuf;
+	}
+	ReadDataFile (cbuf, data);
+	pp.PutString ("DATA_REAL", cbuf);
+	break;
+    case DATA_LOG:
+	if (!pp.GetString ("DATA_MOD", cbuf)) {
+	    cout << "\nData file (log amp, all wavelengths):\n>> ";
+	    cin >> cbuf;
+	}
+	ReadDataFile (cbuf, data);
+	pp.PutString ("DATA_MOD", cbuf);
+	break;
     }
-    ReadDataFile (cbuf, data);
-    pp.PutString ("DATA_INTENSITY", cbuf);
 }
 
 // ============================================================================
@@ -1184,6 +1040,8 @@ PARAM_SCALE SelectParamScaling ()
 	    ps = PARAM_SCALE_AVG,  def = true;
 	else if (!strcasecmp (cbuf, "LOG"))
 	    ps = PARAM_SCALE_LOG,  def = true;
+	else if (!strcasecmp (cbuf, "LINLOG"))
+	    ps = PARAM_SCALE_LINLOG, def = true;
 	else if (!strcasecmp (cbuf, "LOG_BOUNDED"))
 	    ps = PARAM_SCALE_BOUNDLOG, def = true;
     }
@@ -1193,20 +1051,23 @@ PARAM_SCALE SelectParamScaling ()
 	cout << "(0) None\n";
 	cout << "(1) Initial parameter averages\n";
 	cout << "(2) Log parameters\n";
-	cout << "(3) Bounded log parameters\n";
-	cout << "[0|1|2|3] >> ";
+	cout << "(3) Lin+log scaling\n";
+	cout << "(4) Bounded log parameters\n";
+	cout << "[0|1|2|3|4] >> ";
 	cin >> cmd;
 	switch (cmd) {
 	case 0: ps = PARAM_SCALE_NONE,     def = true; break;
 	case 1: ps = PARAM_SCALE_AVG,      def = true; break;
 	case 2: ps = PARAM_SCALE_LOG,      def = true; break;
-	case 3: ps = PARAM_SCALE_BOUNDLOG, def = true; break;
+	case 3: ps = PARAM_SCALE_LINLOG,   def = true; break;
+	case 4: ps = PARAM_SCALE_BOUNDLOG, def = true; break;
 	}
     }
     switch (ps) {
     case PARAM_SCALE_NONE:     pp.PutString ("PARAM_SCALE", "NONE"); break;
     case PARAM_SCALE_AVG:      pp.PutString ("PARAM_SCALE", "AVG");  break;
     case PARAM_SCALE_LOG:      pp.PutString ("PARAM_SCALE", "LOG");  break;
+    case PARAM_SCALE_LINLOG:   pp.PutString ("PARAM_SCALE", "LINLOG");  break;
     case PARAM_SCALE_BOUNDLOG: pp.PutString ("PARAM_SCALE", "LOG_BOUNDED");
 	break;
     }

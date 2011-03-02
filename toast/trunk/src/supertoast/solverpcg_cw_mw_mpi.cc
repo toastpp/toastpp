@@ -5,8 +5,8 @@
 #include "stoastlib.h"
 #include "util.h"
 #include "mwsolution.h"
-#include "solverpcg_cw_mw.h"
-#include "supertoast_cw_mw.h"
+#include "solverpcg_cw_mw_mpi.h"
+//#include "supertoast_cw_mw.h"
 #include "timing.h"
 #include <time.h>
 
@@ -21,6 +21,8 @@ using namespace std;
 // ==========================================================================
 // external references
 
+extern int bWriteGrad;
+extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
 
@@ -51,7 +53,8 @@ void MW_get_gradient (const Raster &raster, RFwdSolverMW &FWS,
 
 // ==========================================================================
 
-SolverPCG_CW_MW::SolverPCG_CW_MW (ParamParser *_pp): Solver_CW (_pp)
+SolverPCG_CW_MW_MPI::SolverPCG_CW_MW_MPI (ParamParser *_pp)
+: Solver_CW_MW_MPI (_pp)
 {
     itmax = 50;
     cg_tol = 1e-8;
@@ -62,7 +65,7 @@ SolverPCG_CW_MW::SolverPCG_CW_MW (ParamParser *_pp): Solver_CW (_pp)
 // This is an implementation of preconditioned nonlinear CG
 // from the Shewchuk paper, B5 (pg.53) but without Secant method
 
-void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
+void SolverPCG_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
     const RVector &sd, Solution &bsol, MWsolution &msol,
     const RCompRowMatrix &qvec, const RCompRowMatrix &mvec)
@@ -149,6 +152,48 @@ void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     of_prior = reg->GetValue (x0);
     of = of_value + of_prior;
 
+#ifdef UNDEF
+    if (precon != PCG_PRECON_NONE) {
+        // calculate preconditioner M
+	LOGOUT("Calculating Jacobian ...");
+	J.New (ndat, n);
+	GenerateJacobian (&raster, mesh, mvec, dphi, aphi,
+            FWS.GetDataScaling(), J);
+	J.RowScale (inv(sd));
+	pscaler->ScaleJacobian (bsol.GetActiveParams(), J);
+	if (bWriteJ) WriteJacobian (&J, raster, *mesh);
+	switch (precon) {
+	case PCG_PRECON_FULLJTJ:
+	    // Full Hessian preconditioner setup
+	    LOGOUT ("Generating dense JTJ");
+	    ATA_dense (raster, J, JTJ);
+	    LOGOUT ("Using preconditioner FULLJTJ");
+	    break;
+	case PCG_PRECON_SPARSEJTJ:
+	    // Incomplete CH preconditioner setup
+	    LOGOUT ("Generating sparse JTJ");
+	    ATA_sparse (raster, J, JTJ_L, JTJ_d);
+	    LOGOUT ("Using preconditioner SPARSEJTJ");
+	    break;
+	case PCG_PRECON_DIAGJTJ:
+	    // Diagonal Hessian preconditioner setup
+	    LOGOUT ("Calculating diagonal of JTJ");
+	    ATA_diag (J, M);
+	    LOGOUT_2PRM ("Range: %f to %f", vmin(M), vmax(M));
+#ifdef DJTJ_LIMIT
+	    M.Clip (DJTJ_LIMIT, 1e50);
+	    LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
+#endif // DJTJ_LIMIT
+	    LOGOUT ("Using preconditioner DIAGJTJ");
+	    break;
+	}
+	LOGOUT_1PRM ("Precon reset interval: %d", reset_count);
+    } else {
+	LOGOUT ("Using preconditioner NONE");
+    }
+#endif
+
+
     LOGOUT_3PRM ("Iteration 0  CPU %f  OF %g  (prior %g)",
         toc(clock0), of, of_prior);
 
@@ -229,6 +274,16 @@ void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd);
 	pscaler->ScaleGradient (bsol.GetActiveParams(), r);
 	r += reg->GetGradient(x);
+
+	if (bWriteGrad) {
+	    RVector r_mua (r, 0, slen);
+	    RVector r_mus (r, slen, slen);
+	    RVector rim(blen);
+	    raster.Map_SolToBasis (r_mua, rim);
+	    WriteImage (rim, i_count+1, "grad_mua.raw");
+	    raster.Map_SolToBasis (r_mus, rim);
+	    WriteImage (rim, i_count+1, "grad_mus.raw");
+	}
 
 #ifdef RESCALE_HESSIAN
 	RVector x1(x);
@@ -312,7 +367,7 @@ void SolverPCG_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     }
 }
 
-void SolverPCG_CW_MW::ReadParams (ParamParser &pp)
+void SolverPCG_CW_MW_MPI::ReadParams (ParamParser &pp)
 {
     char cbuf[256];
     bool def = false;
@@ -373,7 +428,7 @@ void SolverPCG_CW_MW::ReadParams (ParamParser &pp)
     } while (alpha < 0.0);
 }
 
-void SolverPCG_CW_MW::WriteParams (ParamParser &pp)
+void SolverPCG_CW_MW_MPI::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "PCG");
     pp.PutReal ("NONLIN_TOL", cg_tol);

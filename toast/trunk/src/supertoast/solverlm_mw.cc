@@ -13,9 +13,6 @@
 #include <time.h>
 #include "timing.h"
 
-#define DEBUG_FRECHET
-#define BYHAND
-
 using namespace std;
 using namespace toast;
 
@@ -24,8 +21,6 @@ using namespace toast;
 
 extern int g_imgfmt;
 extern double clock0;
-extern char g_meshname[256];
-extern int g_nimsize;
 extern double g_refind;
 
 // ==========================================================================
@@ -993,21 +988,6 @@ SolverLM_MW::~SolverLM_MW ()
 
 // ==========================================================================
 
-#ifdef UNDEF
-void GenerateJacobianPart (HESS_DATA &data)
-{
-    // this function is called by the workers to build their part of the
-    // Jacobian
-    cerr << "P" << data.rank << ": working on rows " << data.r0 << "-"
-      << data.r1-1 << " For Wavelength number:"<< data.activeWl + 1 <<endl;
-    GenerateJacobianRows (*data.raster, data.mesh, *data.sol, *data.mvec,
-        data.dphi, data.aphi, data.dscale, *data.Jpart, data.r0, data.r1,
-	*data.sd, *data.extcoef, data.activeWl, *data.Acoeff, *data.bcoeff);
-}
-#endif
-
-// ==========================================================================
-
 void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     const Scaler *pscaler, const ObjectiveFunction &OF, const RVector &data,
     const RVector &sd, Solution &bsol, MWsolution &msol,
@@ -1015,11 +995,6 @@ void SolverLM_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 {
     int np = 1;                       // number of processors
     int rank = 0;                     // processor id
-#ifdef TOAST_MPI
-    MPI_Barrier (MPI_COMM_WORLD); // wait for everybody
-    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-    MPI_Comm_size (MPI_COMM_WORLD, &np);
-#endif // TOAST_MPI
 
     bool Use_precon = true;
 

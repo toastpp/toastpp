@@ -29,13 +29,13 @@ using namespace toast;
 // =========================================================================
 // local prototypes
 
-void Project (const QMMesh &mesh, int q, const RVector &phi,
-    RVector &proj);
+//void Project (const QMMesh &mesh, int q, const RVector &phi,
+//    RVector &proj);
 void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf);
 void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
-    const RVector *dphi, const RVector *aphi,
+    const RCompRowMatrix &mvec, const RVector *dphi, const RVector *aphi,
     bool logparam, RDenseMatrix &J);
-void GenerateJacobian (const QMMesh &mesh,
+void GenerateJacobian (const QMMesh &mesh, const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
     bool logparam, RDenseMatrix &J);
 
@@ -91,9 +91,9 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     int nprm = slen;
     RDenseMatrix J(ndat,nprm);
     if (raster)
-	GenerateJacobian (*raster, *mesh, dphi, aphi, logparam, J);
+	GenerateJacobian (*raster, *mesh, mvec, dphi, aphi, logparam, J);
     else
-	GenerateJacobian (*mesh, dphi, aphi, logparam, J);
+	GenerateJacobian (*mesh, mvec, dphi, aphi, logparam, J);
 
     delete []dphi;
     delete []aphi;
@@ -104,6 +104,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 // ============================================================================
 // generate a projection from a field - complex case
 
+#ifdef UNDEF
 void Project (const QMMesh &mesh, int q, const RVector &phi,
     RVector &proj)
 {
@@ -127,6 +128,7 @@ void Project (const QMMesh &mesh, int q, const RVector &phi,
 	proj[i] = dphi;
     }
 }
+#endif
 
 // absorption PMDF (real)
 void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf)
@@ -163,7 +165,7 @@ void PMDF_mua (const CVector &pmdf, complex proj,
 // ============================================================================
 
 void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
-    const RVector *dphi, const RVector *aphi,
+    const RCompRowMatrix &mvec, const RVector *dphi, const RVector *aphi,
     bool logparam, RDenseMatrix &J)
 {
     int i, j, jj, k, idx, dim, nQ, nM, nQM, slen, glen;
@@ -200,10 +202,8 @@ void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
 	ImageGradient (gdim, gsize, cdfield, cdfield_grad,
 		       raster.Elref());
 
-	if (logparam) {
-	    proj.New (mesh.nQMref[i]);
-	    Project (mesh, i, dphi[i], proj);
-	}
+	if (logparam)
+	    proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
 
 	for (j = jj = 0; j < nM; j++) {
 	    if (!mesh.Connected (i,j)) continue;
@@ -263,7 +263,7 @@ RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g)
 // ============================================================================
 // This version doesn't use base mapping and works directly on the mesh basis
 
-void GenerateJacobian (const QMMesh &mesh,
+void GenerateJacobian (const QMMesh &mesh, const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
     bool logparam, RDenseMatrix &J)
 {
@@ -282,8 +282,8 @@ void GenerateJacobian (const QMMesh &mesh,
 
     for (i = idx = 0; i < nQ; i++) {
 
-	proj.New (mesh.nQMref[i]);
-	Project (mesh, i, dphi[i], proj);
+	if (logparam)
+	    proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
 
 	for (j = jj = 0; j < nM; j++) {
 
@@ -308,14 +308,10 @@ void GenerateJacobian (const QMMesh &mesh,
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     // mesh
-    //int hMesh = (int)mxGetScalar (prhs[0]);
-    //QMMesh *mesh = (QMMesh*)hMesh;
     QMMesh *mesh = (QMMesh*)Handle2Ptr (mxGetScalar (prhs[0]));
     int n = mesh->nlen();
 
     // raster
-    //int hRaster = (int)mxGetScalar (prhs[1]);
-    //Raster *raster = (Raster*)hRaster;
     Raster *raster = (Raster*)Handle2Ptr (mxGetScalar (prhs[1]));
 
     // source vectors

@@ -978,6 +978,71 @@ MT TCompRowMatrix<MT>::GetNext (int &r, int &c) const
 
 // ==========================================================================
 
+#ifdef TOAST_THREAD
+
+template<class MT>
+void Ax_engine (void *arg, int r0, int r1)
+{
+    typedef struct {
+	const TCompRowMatrix<MT> *A;
+	const TVector<MT> *x;
+	TVector<MT> *b;
+    } AX_DATA;
+    AX_DATA *ax_data = (AX_DATA*)arg;
+    const TCompRowMatrix<MT> *A = ax_data->A;
+    const TVector<MT> *x = ax_data->x;
+    TVector<MT> *b = ax_data->b;
+    MT br;
+    const MT *A_val = A->ValPtr();
+    const MT *x_val = x->data_buffer();
+    MT *b_val = b->data_buffer();
+    int r, i = A->rowptr[r0], i2;
+    int *colidx = A->colidx;
+
+    for (r = r0; r < r1;) {
+	i2 = A->rowptr[r+1];
+	for (br = (MT)0; i < i2; i++)
+	    br += A_val[i] * x_val[colidx[i]];
+	b_val[r++] = br;
+    }
+}
+
+#ifdef NEED_EXPLICIT_INSTANTIATION
+template void Ax_engine<double> (void *arg, int r, int r1);
+template void Ax_engine<float> (void *arg, int r, int r1);
+template void Ax_engine<complex> (void *arg, int r, int r1);
+template void Ax_engine<scomplex> (void *arg, int r, int r1);
+template void Ax_engine<int> (void *arg, int r, int r1);
+#endif
+
+template<class MT>
+void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
+{
+    int grain = 3000;
+    dASSERT(g_tpool, ThreadPool not initialised);
+    dASSERT_2PRM(x.Dim() == this->cols,
+	"Parameter 1 invalid size (expected %d, actual %d)",
+        this->cols, x.Dim());
+    if (b.Dim() != this->rows) b.New(this->rows);
+
+    int r, i, i2;
+    MT br;
+    
+    typedef struct {
+	const TCompRowMatrix<MT> *A;
+	const TVector<MT> *x;
+	TVector<MT> *b;
+    } AX_DATA;
+    AX_DATA ax_data;
+    ax_data.A = this;
+    ax_data.x = &x;
+    ax_data.b = &b;
+
+    g_tpool->ProcessSequence (Ax_engine<MT>, &ax_data, 0, this->rows, grain);
+}
+
+#else
+
 template<class MT>
 void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
@@ -996,6 +1061,8 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 	b[r++] = br;
     }
 }
+#endif // TOAST_THREAD
+
 #ifdef UNDEF// USE_SPBLAS
 // warning: SPBLAS appears to have a size limit to the matrix and fails with
 // an arithmetic exception if this is exceeded.
