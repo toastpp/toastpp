@@ -3,6 +3,8 @@
 // Implicit or explicit version
 // Generates time profiles (TPSF) for all measurements
 // Output format: ASCII table of intensity values (measurement vs. time step)
+//
+// CUDA implementation
 
 #include "stoastlib.h"
 #include <fstream>
@@ -15,6 +17,12 @@
 #include "source.h"
 #include "timing.h"
 #include <time.h>
+
+#include "toastcuda.h"
+#include <thrust/extrema.h>
+#include <cusp/csr_matrix.h>
+#include "vector_cusp.h"
+#include "crmatrix_cusp.h"
 
 #define MAXREGION 100
 
@@ -55,6 +63,8 @@ void SelectTstepParams (ParamParser &pp, double &theta, double &dtime,
 
 int main (int argc, char *argv[])
 {
+    cuda_EchoDeviceProperties();
+
     double theta;
     double dtime;
     int nstep;
@@ -81,9 +91,9 @@ int main (int argc, char *argv[])
     }
 
     QMMesh mesh;
-    int nQ, nM, nQM;
-    RCompRowMatrix qvec, mvec;
-    RVector *dphi;
+    int nQ, nM, nQM, ndat;
+    RVector *qvec, *mvec;
+    //RVector *dphi;
     int i, j, idx, cmd;
     Point bbmin, bbmax;
 
@@ -100,13 +110,13 @@ int main (int argc, char *argv[])
     int dim = mesh.Dimension();
     nQ = mesh.nQ;
     nM = mesh.nM;
-    nQM = mesh.nQM;
+    //nQM = mesh.nQM;
+    ndat = nQ*nM;
     mesh.BoundingBox (bbmin, bbmax);
-    RVector tpsf(nQM*nstep);
 
     // build the field vectors
-    dphi = new RVector[nQ];
-    for (i = 0; i < nQ; i++) dphi[i].New(n);
+    //dphi = new RVector[nQ];
+    //for (i = 0; i < nQ; i++) dphi[i].New(n);
 
     // reset initial parameter estimates
     Solution sol(OT_NPARAM, n);
@@ -114,44 +124,39 @@ int main (int argc, char *argv[])
     //RVector c2a = sol.GetParam (OT_C2A);
 
     // build the source vectors
-    qvec.New (nQ, n);
+    qvec = new RVector[nQ];
     LOGOUT1_INIT_PROGRESSBAR ("Source vectors", 50, nQ);
     for (i = 0; i < nQ; i++) {
-	RVector q(n);
 	switch (qprof) {
 	case 0:
-	    q = QVec_Point (mesh, mesh.Q[i], srctp);
+	    qvec[i] = QVec_Point (mesh, mesh.Q[i], srctp);
 	    break;
 	case 1:
-	    q = QVec_Gaussian (mesh, mesh.Q[i], qwidth, srctp);
+	    qvec[i] = QVec_Gaussian (mesh, mesh.Q[i], qwidth, srctp);
 	    break;
 	case 2:
-	    q = QVec_Cosine (mesh, mesh.Q[i], qwidth, srctp);
+	    qvec[i] = QVec_Cosine (mesh, mesh.Q[i], qwidth, srctp);
 	    break;
 	}
-	qvec.SetRow (i, q);
-
 	LOGOUT1_PROGRESS(i);
     }
 
     // build the measurement vectors
-    mvec.New (nM, n);
+    mvec = new RVector[nM];
     LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (i = 0; i < nM; i++) {
-	RVector m(n);
 	switch (mprof) {
 	case 0:
-	    m = QVec_Point (mesh, mesh.M[i], SRCMODE_NEUMANN);
+	    mvec[i] = QVec_Point (mesh, mesh.M[i], SRCMODE_NEUMANN);
 	    break;
 	case 1:
-	    m = QVec_Gaussian (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
+	    mvec[i] = QVec_Gaussian (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	case 2:
-	    m = QVec_Cosine (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
+	    mvec[i] = QVec_Cosine (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
-	mvec.SetRow (i, m);
+	for (j = 0; j < n; j++) mvec[i][j] *= mesh.plist[j].C2A();
 	LOGOUT1_PROGRESS(i);
     }
 
@@ -176,32 +181,66 @@ int main (int argc, char *argv[])
     RCompRowMatrix K0 = -(*smat*(1-theta) - *mmat*(1.0/dtime));
     RCompRowMatrix K1 = *smat*theta + *mmat*(1.0/dtime);
 
+    for (i = 0; i < nQ; i++)
+    	qvec[i] *= (1.0/dtime); // should be shifted onto GPU
+
     // set up initial conditions
     LOGOUT1_INIT_PROGRESSBAR ("Time steps", 50, nstep);
     t0 = clock();
     wc0 = time(NULL);
-    RVector qi(n);
-    RPreconditioner *precon = 0;
-    for (i = 0; i < nQ; i++) {
-    	double tol = lin_tol;
-	RVector q = qvec.Row(i) * (1.0/dtime);
-    	cerr << "Calling bicgstab " << i << endl;
-    	BiCGSTAB(K1, q, dphi[i], tol, precon, maxit);
-    }
-    RVector proj(tpsf,0,nQM);
-    proj = FWS.ProjectAll (mvec, dphi);
+
+
+    //RVector qi(n);
+    //RPreconditioner *precon = 0;
+    //for (i = 0; i < nQ; i++) {
+    //	double tol = lin_tol;
+    //	cerr << "Calling bicgstab " << i << endl;
+    //	BiCGSTAB(K1, qvec[i], dphi[i], tol, precon, maxit);
+    //}
+    //cout << "Finished initial field calculation" << endl;
+
+    //RVector proj = FWS.ProjectAll (mvec, dphi);
     int step;
 
+    //ofstream ofs("tpsf.dat");
+    //for (i = 0; i < ndat; i++)
+    //    ofs << proj[i] << (i < ndat-1 ? '\t':'\n');
+
+    //double **dphi_val = new double*[nQ];
+    //for (i = 0; i < nQ; i++)
+    //	dphi_val[i] = dphi[i].data_buffer();
+
+    double **qvec_val = new double*[nQ];
+    for (i = 0; i < nQ; i++)
+	qvec_val[i] = qvec[i].data_buffer();
+
+    double **mvec_val = new double*[nM];
+    for (i = 0; i < nM; i++)
+	mvec_val[i] = mvec[i].data_buffer();
+
+    RVector proj(nstep*nQ*nM);
+    double *proj_val = proj.data_buffer();
+
+    cout << "Before time stepping loop" << endl;
+
+    Tstep_loop (n, nQ, nM, K0.ValPtr(), K0.rowptr, K0.colidx,
+		K1.ValPtr(), K1.rowptr, K1.colidx,
+		qvec_val, mvec_val, proj_val, lin_tol, maxit, nstep);
+		
+#ifdef UNDEF
     for (step = 1; step < nstep; step++) {
 	for (i = 0; i < nQ; i++) {
 	    K0.Ax(dphi[i],qi);
 	    double tol = lin_tol;
 	    BiCGSTAB (K1, qi, dphi[i], tol, precon, maxit);
 	}
-	RVector proj(tpsf,step*nQM,nQM);
 	proj = FWS.ProjectAll (mvec, dphi);
+	for (i = 0; i < ndat; i++)
+	    ofs << proj[i] << (i < ndat-1 ? '\t':'\n');
 	LOGOUT1_PROGRESS (step);
     }
+#endif
+
     dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
     dwc = time(NULL)-wc0;
     LOGOUT1_2PRM("Solution: wallclock=%d, processor=%f", dwc, dt);
@@ -209,12 +248,15 @@ int main (int argc, char *argv[])
 
     ofstream ofs("tpsf.dat");
     for (i = idx = 0; i < nstep; i++) {
-	for (j = 0; j < nQM; j++)
-	    ofs << proj[idx++] << (j == nQM-1 ? '\n':'\t');
+	for (j = 0; j < ndat; j++)
+	    ofs << proj[idx++] << (j == ndat-1 ? '\n':'\t');
     }
 
     // cleanup
-    delete []dphi;
+    //delete []dphi;
+    //delete []dphi_val;
+    delete []qvec_val;
+    delete []mvec_val;
 
     return 0;
 }                                                                              

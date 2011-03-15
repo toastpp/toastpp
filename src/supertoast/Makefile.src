@@ -9,6 +9,10 @@ ifdef MAKE_MPI
 BINS += supertoast_mpi supertoast_mw_mpi supertoast_cw_mw_mpi
 endif
 
+ifdef ENABLE_CUDA
+BINS += fwdfem_tpsf_cuda
+endif
+
 SUBDIRS = gridbasis++
 
 TOASTLIB = -L$(TLIB) -lsuperlu -lfe -lmath -lblzpack -larpack -llapack $(BLASLIB) $(SPBLASLIB) $(FLIBS)
@@ -40,6 +44,8 @@ fwdfem_cw : fwdfem_cw.o
 fwdfem_tpsf : fwdfem_tpsf.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
+fwdfem_tpsf_cuda : fwdfem_tpsf_cuda.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(STOASTLIB)
 
 supertoast : supertoast.o supertoast_util.o util.o solver.o solverlm.o \
 	solverpcg.o solverlin.o \
