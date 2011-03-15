@@ -467,8 +467,9 @@ MATHLIB int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b
 // ==========================================================================
 
 template<class MT>
-MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon, int maxit)
+MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A,
+    const TVector<MT> &b, TVector<MT> &x, double &tol,
+    const TPreconditioner<MT> *precon, int maxit)
 {
     int niter;
 

@@ -373,6 +373,8 @@ public:
     // special case: multiply transpose with complex vector (only instantiated
     // for real matrix)
 
+    void Ax (const TVector<MT> *x, TVector<MT> *b, int nrhs) const;
+
     void AB (const TCompRowMatrix<MT> &B, TCompRowMatrix<MT> &C) const;
     // sparse matrix x matrix multiplication: C = *this * B
 
@@ -431,13 +433,14 @@ public:
         int maxit = 0, const TPreconditioner<MT> *precon = 0,
         IterativeSolverResult *res = 0) const;
 
-    void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx) const;
+    void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx)
+        const;
     // Calculate the sparse fill-in structure of the lower triangle of
     // the Cholesky factorisation of the matrix (excluding diagonal)
     // and return in index lists `frowptr' and 'fcolidx'
 
-    void CalculateIncompleteCholeskyFillin (idxtype *&frowptr, idxtype *&fcolidx)
-        const;
+    void CalculateIncompleteCholeskyFillin (idxtype *&frowptr,
+        idxtype *&fcolidx) const;
     // Calculate sparse structure for the lower triangle of the the
     // incomplete Cholesky factorisation of the matrix. This is simply the
     // structure of the lower triangle of the original matrix, excluding the
