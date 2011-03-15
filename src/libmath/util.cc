@@ -14,12 +14,6 @@
 
 using namespace std;
 
-#ifdef WIN64
-extern "C" {
-	DLLEXPORT char **_environ;
-}
-#endif
-
 // ============================================================================
 // Converts 0-terminated string 'str' to uppercase
 // Returns str

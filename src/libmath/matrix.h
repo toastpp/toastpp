@@ -65,16 +65,16 @@ MATHLIB TVector<MT> ATA_diag (const TMatrix<MT> &A);
 // Returns the diagonal of A^T A as a vector
 
 template<class MT>
-MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
-   int nrhs, double tol, int maxit = 0, const TPreconditioner<MT> *precon = 0,
-   IterativeSolverResult *res = 0);
-// PCG solver for multiple right-hand sides
-
-template<class MT>
 MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0);
 // PCG (preconditioned conjugate gradient) linear solver
 // Solves Ax = b for given tolerance and preconditioner
+
+template<class MT>
+MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
+   int nrhs, double tol, int maxit = 0, const TPreconditioner<MT> *precon = 0,
+   IterativeSolverResult *res = 0);
+// PCG solver for multiple right-hand sides
 
 template<class MT>
 MATHLIB int PCG (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,

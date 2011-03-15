@@ -49,25 +49,61 @@ SRCS += \
 	toast_mpi.cc
 endif
 
+#ifdef ENABLE_CUDA
+#SRCS += \
+	vector_cusp.cu \
+#	crmatrix_cusp.cc
+#endif
+
 OBJS = ${SRCS:.cc=.o} 
 HDRS = ${SRCS:.cc=.h}
 
+#--------------------------------------------------------------------
+# CUDA support
+
+SPMVDIR = $(TOASTDIR)/numerics/cuda/spmv
+CUINC = -I$(SPMVDIR)
+
+CUSRCS = toastcuda.cu toastspmv.cu
+
+CUBINDIR := cuda
+PTXDIR := cuda
+
+$(CUBINDIR)/%.cubin : $(VPATH)/%.cu
+	mkdir -p $(CUBINDIR)
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) -o $@ -cubin $<
+
+$(PTXDIR)/%.ptx : $(VPATH)/%.cu
+	mkdir -p $(PTXDIR)
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) -o $@ -ptx $<
+
+ifeq ($(ENABLE_CUDA),1)
+OBJS += ${CUSRCS:.cu=.o}
+CUBINS = ${CUSRCS:%.cu=$(CUBINDIR)/%.cubin}
+PTXBINS = ${CUSRCS:%.cu=$(CUBINDIR)/%.ptx}
+endif
+
+
 %.o : %.cc $(HDRS)
 	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+%.o : %.cu $(CU_DEPS)
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) --compiler-options $(SHLIB_CFLAGS) -o $@ -c $<
+
 
 #fourn.o :: fourn.c
 #	gcc  $(FLAGS) $(SHLIB_CFLAGS) -c $?
 #
 
 # make static version of library
-$(LIBNAME)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack $(CUBINS) $(PTXBINS)
 	@$(RM) $@
 	ar cr $@ $(OBJS) $(ILUPACKSTATIC)
 	$(RANLIB) $@
 	make ilupack_clean
 
 # make shared version of library
-$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack $(CUBINS) $(PTXBINS)
 	@$(RM) $@
 	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(MATHLIB) $(ILUPACKSTATIC)
 	make ilupack_clean

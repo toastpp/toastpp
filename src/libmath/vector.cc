@@ -20,6 +20,10 @@
 
 #include "mathlib.h"
 
+#ifdef USE_CUDA_FLOAT
+#include "toastcuda.h"
+#endif
+
 using namespace std;
 using namespace toast;
 
@@ -111,6 +115,10 @@ void TVector<VT>::ShiftRight (int n)
     for (; i >= 0; i--) data[i] = (VT)0;
 }
 
+// ==========================================================================
+
+// vector-vector addition, general template
+
 template<class VT>
 TVector<VT> TVector<VT>::operator+ (const TVector<VT> &v) const
 {
@@ -130,8 +138,13 @@ MATHLIB TVector<double> TVector<double>::operator+ (const TVector<double> &v) co
     daxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
 }
+#endif // BLAS
+
+// vector-vector addition, single precision specialisation
+
+#ifdef USE_BLAS_LEVEL1 // interface to BLAS level 1 SAXPY functions
 template<>
-MATHLIB TVector<float> TVector<float>::operator+ (const TVector<float> &v) const
+MATHLIB TVector<float> TVector<float>::operator+(const TVector<float> &v) const
 {
     dASSERT(size == v.size, Vectors have different size.);
     static int incr = 1;
@@ -140,7 +153,9 @@ MATHLIB TVector<float> TVector<float>::operator+ (const TVector<float> &v) const
     saxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
 }
-#endif // USE_BLAS_LEVEL1
+#endif // BLAS
+
+// ==========================================================================
 
 template<class VT>
 TVector<VT> TVector<VT>::operator+ (const VT &s) const
@@ -150,6 +165,7 @@ TVector<VT> TVector<VT>::operator+ (const VT &s) const
     return tmp;
 }
 
+#ifndef USE_CUDA_FLOAT
 template<class VT>
 MATHLIB TVector<VT> operator+ (const VT &s, const TVector<VT> &v)
 {
@@ -158,6 +174,7 @@ MATHLIB TVector<VT> operator+ (const VT &s, const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp.data[i] += s;
     return tmp;  
 }
+#endif
 
 template<class VT>
 TVector<VT> TVector<VT>::operator- (const TVector<VT> &v) const
@@ -1279,7 +1296,7 @@ double length (const CVector &vec);
 double length (const SCVector &vec);
 double length (const IVector &vec);
 
-template MATHLIB double   l2normsq<double> (const RVector &vec);
+template MATHLIB double   l2normsq (const RVector &vec);
 template MATHLIB double   l2normsq (const FVector &vec);
 template MATHLIB double   l2normsq (const CVector &vec);
 template MATHLIB double   l2normsq (const SCVector &vec);
@@ -1301,11 +1318,13 @@ template MATHLIB bool visnan (const RVector &v);
 template MATHLIB bool visnan (const FVector &v);
 template MATHLIB bool visnan (const IVector &v);
 
+#ifndef USE_CUDA_FLOAT
 template MATHLIB RVector  operator+ (const double  &s, const RVector &v);
 template MATHLIB FVector  operator+ (const float   &s, const FVector &v);
 template MATHLIB CVector  operator+ (const complex &s, const CVector &v);
 template MATHLIB SCVector operator+ (const scomplex &s, const SCVector &v);
 template MATHLIB IVector  operator+ (const int     &s, const IVector &v);
+#endif
 
 template RVector  operator- (const double  &s, const RVector &v);
 template FVector  operator- (const float   &s, const FVector &v);

@@ -179,7 +179,7 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 	}
 	// check convergence
 	err = l2norm (r);
-	cerr << niter << " " << err/bnorm << endl;
+	//cerr << niter << " " << err/bnorm << endl;
 	if (err <= tol*bnorm) break;
     }
     tol = err/bnorm;
@@ -378,12 +378,10 @@ int BiPCG<complex> (const CMatrix &A, const CVector &b, CVector &x,
     return niter;
 }
 
-
 // ==========================================================================
 // Preconditioned bi-conjugate gradient Stabilised (BiCGSTAB) solver
 // from: netlib (http://www.netlib.org/linalg/html_templates/node41.html)
 // ==========================================================================
-
 
 template<class MT>
 int TMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,

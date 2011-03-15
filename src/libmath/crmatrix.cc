@@ -22,6 +22,7 @@
 
 #ifdef USE_CUDA_FLOAT
 #include "toastcuda.h"
+#include "toastspmv.h"
 #endif
 
 #ifdef ML_INTERFACE
@@ -1090,6 +1091,19 @@ void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
 #endif // USE_SPBLAS
 
 #ifdef USE_CUDA_FLOAT
+// Specialisation: double precision
+template<>
+void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
+    const
+{
+    dASSERT_2PRM(x.Dim() == cols,
+	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
+    if (b.Dim() != rows) b.New(rows);
+
+    Ax_spmv (rows, cols, val, rowptr, colidx, x.data_buffer(),
+	     b.data_buffer());
+}
+
 // Specialisation: single precision
 template<>
 void TCompRowMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b)
@@ -1099,8 +1113,10 @@ void TCompRowMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b)
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);
 
-    cuda_Ax (val, rowptr, colidx, rows, cols, x.data_buffer(),
-        b.data_buffer());
+    //cuda_Ax (val, rowptr, colidx, rows, cols, x.data_buffer(),
+    //    b.data_buffer());
+    Ax_spmv (rows, cols, val, rowptr, colidx, x.data_buffer(),
+	     b.data_buffer());
 }
 
 // Specialisation: single precision complex
@@ -1143,6 +1159,8 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
     }
 }
 
+// ==========================================================================
+
 template<class MT>
 void TCompRowMatrix<MT>::Ax_cplx (const TVector<complex> &x,
     TVector<complex> &b) const
@@ -1179,6 +1197,8 @@ MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<complex> &x,
     INC_FLOPS_MUL (rowptr[rows]*2);
 }
 
+// ==========================================================================
+
 template<class MT>
 void TCompRowMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 {
@@ -1214,6 +1234,8 @@ MATHLIB void TCompRowMatrix<complex>::ATx (const TVector<complex> &x,
     }
 }
 
+// ==========================================================================
+
 template<class MT>
 void TCompRowMatrix<MT>::ATx_cplx (const TVector<complex> &x,
     TVector<complex> &b) const
@@ -1239,6 +1261,62 @@ MATHLIB void TCompRowMatrix<double>::ATx_cplx (const TVector<complex> &x,
 	b[c].im += val[vofs[i]] * x[rowidx[i]].im;
     }
 }
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::Ax (const TVector<MT> *x, TVector<MT> *b, int nrhs)
+    const
+{
+    for (int i = 0; i < nrhs; i++)
+	Ax (x[i], b[i]);
+}
+
+#ifdef USE_CUDA_FLOAT
+
+template<>
+void TCompRowMatrix<float>::Ax (const TVector<float> *x, TVector<float> *b,
+    int nrhs) const
+{
+    static int bufsize = 16;
+    static const float **xbuf = new const float*[bufsize];
+    static float **bbuf = new float*[bufsize];
+    if (nrhs > bufsize) {
+	bufsize = nrhs;
+	delete []xbuf;    xbuf = new const float*[bufsize];
+	delete []bbuf;    bbuf = new float*[bufsize];
+    }
+    for (int i = 0; i < nrhs; i++) {
+	xbuf[i] = x[i].data_buffer();
+	bbuf[i] = b[i].data_buffer();
+    }
+
+    Ax_spmv (rows, cols, val, rowptr, colidx, xbuf, bbuf, nrhs);
+}
+
+template<>
+void TCompRowMatrix<double>::Ax (const TVector<double> *x, TVector<double> *b,
+    int nrhs) const
+{
+    static int bufsize = 16;
+    static const double **xbuf = new const double*[bufsize];
+    static double **bbuf = new double*[bufsize];
+    if (nrhs > bufsize) {
+	bufsize = nrhs;
+	delete []xbuf;    xbuf = new const double*[bufsize];
+	delete []bbuf;    bbuf = new double*[bufsize];
+    }
+    for (int i = 0; i < nrhs; i++) {
+	xbuf[i] = x[i].data_buffer();
+	bbuf[i] = b[i].data_buffer();
+    }
+
+    Ax_spmv (rows, cols, val, rowptr, colidx, xbuf, bbuf, nrhs);
+}
+
+#endif // USE_CUDA_FLOAT
+
+// ==========================================================================
 
 template<class MT>
 void TCompRowMatrix<MT>::AB (const TCompRowMatrix<MT> &B,
