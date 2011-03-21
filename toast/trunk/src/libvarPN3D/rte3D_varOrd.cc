@@ -21,7 +21,7 @@ typedef unsigned pid_t;
 #include <vector>
 #include<set>
 #include <time.h>
-#include <iomanip.h>
+#include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -63,9 +63,9 @@ const double *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, 
 const double *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
 CCompRowMatrix Xmat;
 RDenseMatrix *Ylm;
-complex *xmatval;
+toast::complex *xmatval;
 double w, c;
-MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, RVector &mua, RVector &mus, RVector &ref, const double g, complex (*phaseFunc)(const double g, const double costheta), double w, double c, const RDenseMatrix& pts, const RVector &wts)
+MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, RVector &mua, RVector &mus, RVector &ref, const double g, toast::complex (*phaseFunc)(const double g, const double costheta), double w, double c, const RDenseMatrix& pts, const RVector &wts)
 { 
 	this->w = w;
 	this->c = c;
@@ -115,13 +115,13 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	cout<<"Generating phase integrals ..."<<endl;	
 	genmat_apu(phaseFunc, g, angN, sphOrder, apu1, apu1sc, apu1ss, apu1c);
 
+	//Writing Sint Aint and apu1 for Jacobian Computation
+	WriteSparseMatrix(Sint, "Sint.txt", spatN);
+	WriteSparseMatrix(Aint, "Aint.txt", maxAngN);
+	WriteSparseMatrix(apu1, "apu1.txt", maxAngN);
+
 	cout<<"Generating boundary integrals ..."<<endl;//slow process
 	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
-
-	//Writing Sint Aint and apu1 for Jacobian Computation
-	WriteSparseMatrix(Sint, "Sint.mat", spatN);
-	WriteSparseMatrix(Aint, "Aint.mat", maxAngN);
-	WriteSparseMatrix(apu1, "apu1.mat", maxAngN);
 		
 	Sint = Sint*(w/c); Sdx = Sdx*(w/c); Sdy = Sdy*(w/c); Sdz = Sdz*(w/c);
 
@@ -174,7 +174,9 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 
 	Xmat.Initialise(xrowptr, xcolidx);
 	xmatval = Xmat.ValPtr();
-
+	
+	delete []xrowptr;
+	delete []xcolidx;
 }
 
 ~MyDataContext()
@@ -189,8 +191,8 @@ void WriteSparseMatrix(RCompRowMatrix &mat, char *fname, const int nr)
 	int nzero;
 		
 	fid = fopen(fname, "w");
-	double *valptr = Sint.ValPtr();
-	nzero = Sint.GetSparseStructure(&rowptr, &colidx);
+	double *valptr = mat.ValPtr();
+	nzero = mat.GetSparseStructure(&rowptr, &colidx);
 	for(int i=0; i < nr; i++)
 	  for(int j=rowptr[i]; j< rowptr[i+1]; j++)
 	 	fprintf(fid, "%d %d %f\n", i, colidx[j], valptr[j]);
@@ -290,21 +292,27 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 		SPSdy(is, js) += dss*elsy_ij*muscat[el];
 		spatA3_sdmy(is, js) += dss*elsy_ij*sigmatot;
 
-		elsz_ij = mesh.elist[el]->IntFd (j,i,2);
-		Sz(is,js) += elsz_ij;
-  		Sdz(is,js) += dss*elsz_ij;
-		SPSdz(is, js) += dss*elsz_ij*muscat[el];
-		spatA3_sdmz(is, js) += dss*elsz_ij*sigmatot;
-
-		Sdxx(is,js) += dss * eldd(i*3,j*3);
-	       	Sdxy(is,js) += dss * eldd(i*3,j*3+1);
-     		Sdyx(is,js) += dss * eldd(i*3+1,j*3);
-       		Sdyy(is,js) += dss * eldd(i*3+1,j*3+1);	
-	       	Sdxz(is,js) += dss * eldd(i*3,j*3+2);
-     		Sdzx(is,js) += dss * eldd(i*3+2,j*3);
-	       	Sdyz(is,js) += dss * eldd(i*3+1,j*3+2);
-     		Sdzy(is,js) += dss * eldd(i*3+2,j*3+1);
-       		Sdzz(is,js) += dss * eldd(i*3+2,j*3+2);	
+		if(mesh.elist[el]->Dimension() == 3)
+		{
+			elsz_ij = mesh.elist[el]->IntFd (j,i,2);
+			Sz(is,js) += elsz_ij;
+  			Sdz(is,js) += dss*elsz_ij;
+			SPSdz(is, js) += dss*elsz_ij*muscat[el];
+			spatA3_sdmz(is, js) += dss*elsz_ij*sigmatot;
+		}
+		int dim = mesh.elist[el]->Dimension();
+		Sdxx(is,js) += dss * eldd(i*dim,j*dim);
+	       	Sdxy(is,js) += dss * eldd(i*dim,j*dim+1);
+     		Sdyx(is,js) += dss * eldd(i*dim+1,j*dim);
+       		Sdyy(is,js) += dss * eldd(i*dim+1,j*dim+1);
+		if(mesh.elist[el]->Dimension() == 3)
+		{
+	       		Sdxz(is,js) += dss * eldd(i*dim,j*dim+2);
+     			Sdzx(is,js) += dss * eldd(i*dim+2,j*dim);
+	       		Sdyz(is,js) += dss * eldd(i*dim+1,j*dim+2);
+     			Sdzy(is,js) += dss * eldd(i*dim+2,j*dim+1);
+       			Sdzz(is,js) += dss * eldd(i*dim+2,j*dim+2);	
+		}
 	    }
 	}
    }
@@ -413,7 +421,7 @@ void genmat_angint_3D(const int sphOrder, const int angN, RCompRowMatrix& Aint, 
 Phase function discretization
 NOTE!! Only Henyey-Greenstein phase function has been implemented currently
 **/
-RVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const double costheta), const double g)
+RVector phaseFuncDisc(int sphOrder, toast::complex (*phaseFunc)(const double g, const double costheta), const double g)
 {
  RVector phaseFn(sphOrder+1);
  for(int l=0; l <= sphOrder; l++)
@@ -423,7 +431,7 @@ RVector phaseFuncDisc(int sphOrder, complex (*phaseFunc)(const double g, const d
 
 /** Phase integrals 
 **/
-void genmat_apu(complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
+void genmat_apu(toast::complex (*phaseFunc)(const double g, const double costheta), const double g, const int angN, const int sphOrder, RCompRowMatrix& apu1, RCompRowMatrix& apu1sc, RCompRowMatrix& apu1ss, RCompRowMatrix& apu1c)
 {
  RDenseMatrix dnsapu1(angN, angN), dnsapu1sc(angN, angN), dnsapu1ss(angN, angN), dnsapu1c(angN, angN);
      RVector phaseFn;
@@ -619,7 +627,15 @@ void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVecto
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++)  {
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
             
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  
 	  RCompRowMatrix  Angbintplus, Angbintminus;
 	  int lmaxAngN, lmaxSphOrder;
@@ -663,6 +679,11 @@ void genmat_source_3D(const IVector& sphOrder, const IVector& node_angN, const I
 void genmat_sourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
 void genmat_toastsourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
 void genmat_toastsource_3D(const IVector& sphOrder, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, const RVector& dirVec, const bool is_cosine, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm);
+void genmat_detector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Detector, const Mesh& mesh,  const int* Ndetector, const int nd, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_detectorvalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Dvec, const Mesh& mesh, const int Ndetector, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastdetector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Detector, const Mesh& mesh, const RCompRowMatrix mvec, const int nd, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+void genmat_toastdetectorvalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Dvec, const Mesh& mesh, const RCompRowMatrix mvec, const int iq, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
+
 void WriteData (const RVector &data, char *fname);
 void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
 void OpenNIM (const char *nimname, const char *meshname, int size);
@@ -752,7 +773,15 @@ void genmat_toastsourcevalvector_3D(const IVector& sphOrder, const IVector& node
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
 	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
- 			RVector nhat = mesh.ElDirectionCosine(el,sd);
+ 			RVector nhat(3);
+	  		RVector temp = mesh.ElDirectionCosine(el,sd);
+	  		if(mesh.Dimension() == 3){
+		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  		}
+	  		else
+	  		{
+				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  		}
 			dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
@@ -851,7 +880,15 @@ void genmat_sourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN
 	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 	  
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
@@ -922,7 +959,15 @@ void genmat_toastintsourcevalvector_3D(const IVector& sphOrder, const IVector& n
    	for (el = 0; el < mesh.elen(); el++) {
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
- 			RVector nhat = mesh.ElDirectionCosine(el,sd);
+ 			 RVector nhat(3);
+	  		 RVector temp = mesh.ElDirectionCosine(el,sd);
+	  		if(mesh.Dimension() == 3){
+		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  		}
+	  		else
+	  		{
+				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  		}
 			dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
@@ -990,7 +1035,15 @@ void genmat_intsourcevalvector_3D(const IVector& sphOrder, const IVector& node_a
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	   RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  //cout<<"direction vector: "<<dirMat<<endl;
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
@@ -1046,6 +1099,172 @@ void genmat_intsourcevalvector_3D(const IVector& sphOrder, const IVector& node_a
    } // end loop on elements
 }
 // main routine **************************************************************
+/* Computes the source vectors for all the boundary sources when a QM file has been specified
+*/
+void genmat_toastdetector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Detector, const Mesh& mesh, const RCompRowMatrix mvec, const int nd, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+{
+   int sysdim = mesh.nlen();       
+   int fullsysdim = sum(node_angN);   
+   //RCompRowMatrix Dvec;
+   for (int i = 0; i < nd; i++) {
+     Detector[i].New(fullsysdim,1);
+     genmat_toastdetectorvalvector_3D(sphOrder, node_angN, offset, Detector[i], mesh, mvec,i, pts, wts, Ylm);
+     //b1.AB(Dvec, Detector[i]);
+   }
+}
+
+/* Computes the source vector per a boundary source when a QM file has been specified
+*/
+void genmat_toastdetectorvalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Dvec, const Mesh& mesh, const RCompRowMatrix mvec, const int iq, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+{
+   int el, nodel, i, j, k,is, js;
+   int sysdim = mesh.nlen();       
+   int fullsysdim = sum(node_angN);      
+   int *rowptr, *colidx;
+   rowptr = new int[fullsysdim+1];
+   colidx = new int[fullsysdim];
+   rowptr[0] = 0;
+   for(int i=1;  i <= fullsysdim; i++)
+	rowptr[i] = i;
+   for(int i=0; i<fullsysdim; i++)
+	colidx[i] = 0;
+   Dvec.New (fullsysdim,1);
+   Dvec.Initialise(rowptr, colidx);
+
+   int row_offset = 0;
+   RDenseMatrix Ystarlm;
+   RDenseMatrix dirMat(1, 3);
+
+   for (int jq = mvec.rowptr[iq]; jq < mvec.rowptr[iq+1]; jq++) {
+   	int Ndetector = mvec.colidx[jq];
+   	double sweight = norm(mvec.Get(iq,Ndetector)); 
+   	for (el = 0; el < mesh.elen(); el++) {
+        	if(!mesh.elist[el]->IsNode(Ndetector)) continue; // source not in this el
+        	if(!mesh.elist[el]->HasBoundarySide()) continue;
+		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
+	  		// if sd is not a boundary side. skip 
+	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
+ 			RVector nhat(3);
+	  		RVector temp = mesh.ElDirectionCosine(el,sd);
+	  		if(mesh.Dimension() == 3){
+		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  		}
+	  		else
+	  		{
+				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  		}
+	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
+	    			is = mesh.elist[el]->SideNode(sd,nd);
+	    			js = mesh.elist[el]->Node[is];
+				double ela_i =  mesh.elist[el]->IntF(is);
+				RDenseMatrix Angsvec(node_angN[js], 1);
+				for(int l=0; l<= sphOrder[js]; l++){
+					int indl = l*l;
+					for(int m=-l; m<=l; m++){
+						int indm = l + m;
+						for(int i=0; i < pts.nRows(); i++)
+						{
+							double sdotn = nhat[0]*pts.Get(i, 0) + nhat[1]*pts.Get(i, 1) + nhat[2]*pts.Get(i, 2);
+							if(sdotn>0)
+								Angsvec(indl+indm, 0) += Ylm[l](indm, i)*(sdotn)*wts[i]*4*M_PI;
+						}
+					}
+				}
+				for(int i = 0; i < node_angN[js]; i++)
+					Dvec(offset[js] + i, 0) += Angsvec(i, 0)*sweight*ela_i;
+
+			}
+
+		} // end loop on element sides
+
+   	} // end loop on elements
+  }
+   delete []rowptr;
+   delete []colidx;
+}  
+
+/** Computes source vectors for point sources on the boundary 
+**/
+void genmat_detector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Detector, const Mesh& mesh,  const int* Ndetector, const int nd, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+{
+   int sysdim = mesh.nlen();         // dimensions are size of nodes.
+   int fullsysdim = sum(node_angN);       // full size of angles X space nodes
+
+   //RCompRowMatrix Dvec;
+   for (int i = 0; i < nd; i++) {
+     Detector[i].New(fullsysdim,1);
+     genmat_detectorvalvector_3D(sphOrder, node_angN, offset, Detector[i], mesh, Ndetector[i], pts, wts, Ylm);
+     //b1.AB(Dvec, Detector[i]);
+   }
+}
+
+/**Computes source vector for a single point source on the boundary
+**/
+void genmat_detectorvalvector_3D(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Dvec, const Mesh& mesh, const int Ndetector, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm)
+{
+   int el, nodel, i, j, k,is, js;
+   int sysdim = mesh.nlen();       // dimensions are size of nodes.
+   int fullsysdim = sum(node_angN);   // full size of angles X space nodes
+   
+   int *rowptr, *colidx;
+   rowptr = new int[fullsysdim+1];
+   colidx = new int[fullsysdim];
+   rowptr[0] = 0;
+   for(int i=1;  i <= fullsysdim; i++)
+	rowptr[i] = i;
+   for(int i=0; i<fullsysdim; i++)
+	colidx[i] = 0;
+   Dvec.New (fullsysdim,1);
+   Dvec.Initialise(rowptr, colidx);
+
+   int row_offset = 0;
+   RDenseMatrix dirMat(1, 3);
+   RDenseMatrix Ystarlm;
+
+   for (el = 0; el < mesh.elen(); el++) {
+        if(!mesh.elist[el]->IsNode(Ndetector)) continue; // source not in this el
+        if(!mesh.elist[el]->HasBoundarySide()) continue;
+	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
+	  // if sd is not a boundary side. skip 
+	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
+	  
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
+	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
+	    is = mesh.elist[el]->SideNode(sd,nd);
+	    js = mesh.elist[el]->Node[is];
+	    double ela_i =  mesh.elist[el]->IntF(is);
+	    RDenseMatrix Angsvec(node_angN[js], 1);
+	    for(int l=0; l<= sphOrder[js]; l++){
+		int indl = l*l;
+		for(int m=-l; m<=l; m++){
+			int indm = l + m;
+			for(int i=0; i < pts.nRows(); i++)
+			{
+				double sdotn = nhat[0]*pts.Get(i, 0) + nhat[1]*pts.Get(i, 1) + nhat[2]*pts.Get(i, 2);
+				if(sdotn>0)
+					Angsvec(indl+indm, 0) += Ylm[l](indm, i)*(sdotn)*wts[i]*4*M_PI;
+			}
+		}
+	    }
+	   for(int i = 0; i < node_angN[js]; i++)
+		Dvec(offset[js] + i, 0) = Angsvec(i, 0)*ela_i;
+			
+	}
+    } 
+
+
+   } // end loop on elements
+   delete []rowptr;
+   delete []colidx;
+}
 
 int main (int argc, char *argv[])
 {
@@ -1064,12 +1283,13 @@ int main (int argc, char *argv[])
     int dimension = nlist[0].Dim();
     for (int i = 1; i < nlist.Len(); i++)
 	xASSERT(nlist[i].Dim() == dimension, Inconsistent node dimensions.);
-    xASSERT(dimension == 3, Mesh dimension must be  3.);
+    //xASSERT(dimension == 3, Mesh dimension must be  3.);
     qmmesh.Setup();
 
     cout << "Forming the source\n";
-    int ns = 1, nM;
+    int ns = 1, nM=1;
     int *Nsource = new int [ns];
+    int *Ndetector = new int [nM];
     int    qprof, mprof;   // source/measurement profile (0=Gaussian, 1=Cosine)
     double qwidth, mwidth; // source/measurement support radius [mm]
     RCompRowMatrix qvec, mvec;
@@ -1084,7 +1304,16 @@ int main (int argc, char *argv[])
 	 cout << "source node coords: "<<endl;
 	 for(int i=0; i<ns; i++){
 		cin >>Nsource[i];
-     	 cout<<nlist[Nsource[i]]<<"   "<<endl;}
+     	 	cout<<nlist[Nsource[i]]<<"   "<<endl;
+	 }
+	 cin >> nM;
+	 cout<<"Number of detectors: "<<nM<<endl;
+	 Ndetector = new int[nM];
+	 cout << "detector node coords: "<<endl;
+	 for(int i=0; i<nM; i++){
+		cin>>Ndetector[i];
+		cout<<nlist[Ndetector[i]]<<"  "<<endl;
+	}
     }
     else { //distributed source to be read from a QM file
     cout << "QM file " << argv[2] << endl;
@@ -1193,43 +1422,63 @@ int main (int argc, char *argv[])
 
      
     CVector proj(ns*nM); // projection data
-    RCompRowMatrix* Source;
+    RCompRowMatrix *Source, *Detector;
     RVector b2(sum(ctxt.node_angN));
     if( !(Source = new  RCompRowMatrix [ns]))
           cerr << "Memory Allocation error Source = new  RCompRowMatrix\n";
-    cout<<"Computing the source vector ..."<<endl;
+     if( !(Detector = new  RCompRowMatrix [nM]))
+          cerr << "Memory Allocation error Detector = new  RCompRowMatrix\n";
+
+    cout<<"Computing the source and detector vectors ..."<<endl;
    if(argc<3)	
      {
-      genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);	
+      genmat_detector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Detector, qmmesh, Ndetector, nM, pts, wts, ctxt.Ylm);
       //genmat_intsourcevalvector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);
      }
     else 
     {
       genmat_toastsource_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_toastdetector_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Detector, qmmesh, mvec, nM, pts, wts, ctxt.Ylm);
       //genmat_toastintsourcevalvector_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_cosine, pts, wts, ctxt.Ylm);
     }
 
     cout << "calculating the radiance\n";
     int sysdim = qmmesh.nlen();
     int fullsysdim = sum(ctxt.node_angN);
-    CVector RHS(fullsysdim);
+    CVector RHS(fullsysdim), detect(fullsysdim);
     CVector * Phi = new CVector [ns];
     CVector * Phisum = new CVector [ns];
-    CPrecon_Diag * AACP = new  CPrecon_Diag;
     CVector idiag = getDiag(&ctxt);
+    
+    clock_t precon_start = clock();
+    CPrecon_Diag * AACP = new  CPrecon_Diag;
     AACP->ResetFromDiagonal(idiag);
+    clock_t precon_end = clock();
+	
     double tol = 1e-9;
-    char fphi[300];
-    strcpy(fphi, file_extn); 
-    strcat(fphi, "_Phi.sol"); 
-    ofstream osPhi(fphi);
-    char fRHS[300];
-    strcpy(fRHS, file_extn);
-    strcat(fRHS, "_RHS.sol");
-    ofstream osRHS(fRHS);
+   
+    char fphi_re[300], fphi_im[300];
+    strcpy(fphi_re, file_extn); strcpy(fphi_im, file_extn); 
+    strcat(fphi_re, "_Phi_re.sol"); strcat(fphi_im, "_Phi_im.sol"); 
+    
+    char fRHS_re[300], fRHS_im[300];
+    strcpy(fRHS_re, file_extn); strcpy(fRHS_im, file_extn);
+    strcat(fRHS_re, "_RHS_re.sol"); strcat(fRHS_im, "_RHS_im.sol");
+    
+    FILE *osRHS_re, *osRHS_im, *osPhi_re, *osPhi_im;
+    osRHS_re = fopen(fRHS_re, "w"); osRHS_im = fopen(fRHS_im, "w");
+    osPhi_re = fopen(fphi_re, "w"); osPhi_im = fopen(fphi_im, "w");
+    
+    char fDet_re[300], fDet_im[300];
+    strcpy(fDet_re, file_extn); strcpy(fDet_im, file_extn);
+    strcat(fDet_re, "_Det_re.sol"); strcat(fDet_im, "_Det_im.sol");
+    FILE *osDet_re, *osDet_im;
+    osDet_re = fopen(fDet_re, "w"); osDet_im = fopen(fDet_im, "w");
+
     double res;
     int iter;
-    clock_t start = clock();
+    clock_t solver_start = clock();
     int row_offset = 0;
     for (int j = 0; j < ns ; j++) {   
       cout << "Radiance with the source number:  " << j << endl;
@@ -1240,25 +1489,44 @@ int main (int argc, char *argv[])
       Phi[j].New(fullsysdim);
       Phisum[j].New(sysdim);
        for(int i = 0; i < fullsysdim; i++)
-	RHS[i] = Source[j].Get(i,0) + b2[i];
+       {
+	 RHS[i] = Source[j].Get(i,0) + b2[i];
+	 detect[i] = Detector[j].Get(i, 0);
+	}
 
       GMRES(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
-      osRHS << "RHS " << j << "\n" << RHS[j] << endl;
-      osPhi << "Phi " << j << "\n" << Phi[j] << endl;
-      
+      //cout<<"Exit GMRES... writing data to file "<<endl;
+      //osRHS << "RHS " << j << "\n" << RHS[j] << endl;
+      //osPhi << "Phi " << j << "\n" << Phi[j] << endl;
+      for(int i =0; i<fullsysdim; i++)
+      {
+	fprintf(osRHS_re, "%12e ", RHS[i].re);
+	fprintf(osRHS_im, "%12e ", RHS[i].im);
+	fprintf(osDet_re, "%12e ", detect[i].re);
+	fprintf(osDet_im, "%12e ", detect[i].im);
+	fprintf(osPhi_re, "%12e ", Phi[j][i].re);
+	fprintf(osPhi_im, "%12e ", Phi[j][i].im);
+	}
+      fprintf(osRHS_re, "\n");fprintf(osRHS_im, "\n");
+      fprintf(osDet_re, "\n");fprintf(osDet_im, "\n");
+      fprintf(osPhi_re, "\n");fprintf(osPhi_im, "\n");
+      //cout<<"Files written ... computing output fields"<<endl;
       for (int k = 0; k < sysdim; k++)
       {
-	  Phisum[j][k] += Phi[j][ctxt.offset[k]]*sqrt(4*M_PI);
+	 Phisum[j][k] += Phi[j][ctxt.offset[k]]*sqrt(4*M_PI);
       }
       
-      /*for (int im = 0; im < nM; im++) {
+     /* for (int im = 0; im < nM; im++) {
 	for(int in = 0; in < sysdim; in++)
 	  proj[j*nM + im] += Phisum[j][in]*mvec.Get(im,in) ;
       }*/
     }
-    clock_t end = clock();
-    osPhi.close();
-    osRHS.close();
+    clock_t solver_end = clock();
+    //osPhi.close();
+    //osRHS.close();
+    fclose(osPhi_re);fclose(osPhi_im);
+    fclose(osRHS_re);fclose(osRHS_im);
+    fclose(osDet_re);fclose(osDet_im);
     
     char flnmod[300], farg[300], ftime[300];
     strcpy(flnmod, file_extn); strcpy(farg, file_extn);strcpy(ftime, file_extn);
@@ -1274,14 +1542,18 @@ int main (int argc, char *argv[])
 
     FILE *fid;
     fid = fopen(ftime, "w");
-    fprintf(fid, "Time taken by solver: %f\n", (double)(end-start)/CLOCKS_PER_SEC);
+    fprintf(fid, "Time taken to compute preconditioner: %f\n", (double)(precon_end-precon_start)/CLOCKS_PER_SEC);
+    fprintf(fid, "Time taken by solver: %f\n", (double)(solver_end-solver_start)/CLOCKS_PER_SEC);
     fclose(fid);
-    cout<<"The solver took "<<(double)(end-start)/CLOCKS_PER_SEC<<" seconds"<<endl;
+    cout<<"Time taken to compute the preconditioner "<<(double)(precon_end-precon_start)/CLOCKS_PER_SEC<<" seconds"<<endl;
+    cout<<"The solver took "<<(double)(solver_end-solver_start)/CLOCKS_PER_SEC<<" seconds"<<endl;
 
     delete []Phi;
     delete []Phisum;
     delete []Nsource;
+    delete []Ndetector;
     delete []Source;
+    delete []Detector;
 
 }
 /** Computes Ax 
@@ -1297,13 +1569,13 @@ inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
     if (res.Dim() != A.nRows()) res.New(A.nRows());
 
     int r, i, i2;
-    complex br;
+    toast::complex br;
     const double *aval;
     aval = A.ValPtr();
 
     for (r = i = 0; r < A.nRows();) {
 	i2 = A.rowptr[r+1];
-	for (br = complex(0, 0); i < i2; i++)
+	for (br = toast::complex(0, 0); i < i2; i++)
 	    br += x[A.colidx[i]]*aval[i];
 	res[r++] = br;
     }
@@ -1328,7 +1600,7 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	*/
 
 	/*Reshaping 'x' to 'x_{r}'*/
-	memcpy (ctxt->xmatval, x.data_buffer(), dof*sizeof(complex));
+	memcpy (ctxt->xmatval, x.data_buffer(), dof*sizeof(toast::complex));
 
 	int i, j, k, m, ra, ra1, ra2, rb, rb1, rb2;
     	int nr = ctxt->Xmat.nRows();
@@ -1341,15 +1613,15 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	ctxt->Aintsscx.Zero(); ctxt->Aintccx.Zero();
 
 	/*Dereference the val pointers of Ax's*/	
-	complex *aintxval = ctxt->Aintx.data_buffer(); complex *aintscxval = ctxt->Aintscx.data_buffer(); complex *aintssxval = ctxt->Aintssx.data_buffer();
-	complex *aintcxval = ctxt->Aintcx.data_buffer(); complex *apu1xval = ctxt->apu1x.data_buffer(); complex *apu1scxval = ctxt->apu1scx.data_buffer();  
-	complex *apu1ssxval = ctxt->apu1ssx.data_buffer(); complex *apu1cxval = ctxt->apu1cx.data_buffer(); 
-	complex *aintscscxval = ctxt->Aintscscx.data_buffer(); complex *aintscssxval = ctxt->Aintscssx.data_buffer();  
-	complex *aintssssxval = ctxt->Aintssssx.data_buffer(); complex *aintsccxval = ctxt->Aintsccx.data_buffer();  
-	complex *aintsscxval = ctxt->Aintsscx.data_buffer();  complex *aintccxval = ctxt->Aintccx.data_buffer();  
+	toast::complex *aintxval = ctxt->Aintx.data_buffer(); toast::complex *aintscxval = ctxt->Aintscx.data_buffer(); toast::complex *aintssxval = ctxt->Aintssx.data_buffer();
+	toast::complex *aintcxval = ctxt->Aintcx.data_buffer(); toast::complex *apu1xval = ctxt->apu1x.data_buffer(); toast::complex *apu1scxval = ctxt->apu1scx.data_buffer();  
+	toast::complex *apu1ssxval = ctxt->apu1ssx.data_buffer(); toast::complex *apu1cxval = ctxt->apu1cx.data_buffer(); 
+	toast::complex *aintscscxval = ctxt->Aintscscx.data_buffer(); toast::complex *aintscssxval = ctxt->Aintscssx.data_buffer();  
+	toast::complex *aintssssxval = ctxt->Aintssssx.data_buffer(); toast::complex *aintsccxval = ctxt->Aintsccx.data_buffer();  
+	toast::complex *aintsscxval = ctxt->Aintsscx.data_buffer();  toast::complex *aintccxval = ctxt->Aintccx.data_buffer();  
 
 	/*Computing x_{r}A^{T}*/
-	complex xval;
+	toast::complex xval;
     	for (i = 0; i < nr; i++) {
     		ra1 = ctxt->Xmat.rowptr[i];
 		ra2 = ctxt->Xmat.rowptr[i+1];
@@ -1465,14 +1737,14 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
     {
 	for(int ia = 0; ia < ctxt->node_angN[is]; ia++)
 	{
-		complex temp(0, 0);
+		toast::complex temp(0, 0);
 		for(int js = ctxt->Sint.rowptr[is]; js < ctxt->Sint.rowptr[is+1]; js++)
 		{
 			scol = ctxt->Sint.colidx[js];
-			temp += complex(0, ctxt->sintval[js])*aintxval[scol*maxAngN + ia];
-			temp += complex(0, ctxt->sdxval[js])*aintscxval[scol*maxAngN + ia];
-			temp += complex(0, ctxt->sdyval[js])*aintssxval[scol*maxAngN + ia];
-			temp += complex(0, ctxt->sdzval[js])*aintcxval[scol*maxAngN +  ia];
+			temp += toast::complex(0, ctxt->sintval[js])*aintxval[scol*maxAngN + ia];
+			temp += toast::complex(0, ctxt->sdxval[js])*aintscxval[scol*maxAngN + ia];
+			temp += toast::complex(0, ctxt->sdyval[js])*aintssxval[scol*maxAngN + ia];
+			temp += toast::complex(0, ctxt->sdzval[js])*aintcxval[scol*maxAngN +  ia];
 			temp += aintxval[scol*maxAngN + ia]*ctxt->spata3_rteval[js];
 			temp += aintscxval[scol*maxAngN + ia]*(ctxt->spata3_sdmxval[js] - ctxt->sxval[js]);
 			temp += aintssxval[scol*maxAngN + ia]*(ctxt->spata3_sdmyval[js] - ctxt->syval[js]);
@@ -1496,8 +1768,8 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
  	RCAx(ctxt->A2, x, ctxt->A2x);
 
 	/*Computing and returning the result*/
-    	complex *res  = result.data_buffer();
-    	complex *arg1 = ctxt->A2x.data_buffer();
+    	toast::complex *res  = result.data_buffer();
+    	toast::complex *arg1 = ctxt->A2x.data_buffer();
     	for (int i=0; i < dof; i++)
     		*res++ += *arg1++;
 
@@ -1512,18 +1784,18 @@ CVector getDiag(void * context)
     int nDim = sum(ctxt->node_angN);
     CVector result(nDim);
     int arow, brow;
-    complex a0_rte, a0_sdm, a1_rte, a1_sdm;
-    complex a0, a1, a2, a3, a4;
+    toast::complex a0_rte, a0_sdm, a1_rte, a1_sdm;
+    toast::complex a0, a1, a2, a3, a4;
     double  coeff = ctxt->w/ctxt->c;
 
     for(int i = 0; i < spatN; i++)
     {
 	for(int j = 0; j < ctxt->node_angN[i]; j++)
 	{
-		a0_rte = complex(0, ctxt->Aint.Get(j, j) * ctxt->Sint.Get(i, i));
-		a0_sdm = complex(0, ctxt->Aintsc.Get(j, j)*ctxt->Sdx.Get(i, i));
-		a0_sdm += complex(0, ctxt->Aintss.Get(j, j) * ctxt->Sdy.Get(i, i));
-  		a0_sdm += complex(0, ctxt->Aintc.Get(j, j)*ctxt->Sdz.Get(i, i));
+		a0_rte = toast::complex(0, ctxt->Aint.Get(j, j) * ctxt->Sint.Get(i, i));
+		a0_sdm = toast::complex(0, ctxt->Aintsc.Get(j, j)*ctxt->Sdx.Get(i, i));
+		a0_sdm += toast::complex(0, ctxt->Aintss.Get(j, j) * ctxt->Sdy.Get(i, i));
+  		a0_sdm += toast::complex(0, ctxt->Aintc.Get(j, j)*ctxt->Sdz.Get(i, i));
 
 		a1_rte = ctxt->Aintsc.Get(j, j)*ctxt->Sx.Get(i, i);	
 		a1_rte += ctxt->Aintss.Get(j, j)*ctxt->Sy.Get(i, i);
