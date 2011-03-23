@@ -367,8 +367,8 @@ int main (int argc, char *argv[])
      cerr << "Memory Allocation error dummyrow = new int\n";
     if( !(dummycol = new int [fullnzero])) // holds col indices struture 
       cerr << "Memory Allocation error dummycol = new int\n";
-    complex *dummydata;
-    if( !(dummydata = new complex [fullnzero])) // holds data  
+    toast::complex *dummydata;
+    if( !(dummydata = new toast::complex [fullnzero])) // holds data  
      cerr << "Memory Allocation error dummydata = new int\n";    
     // insert the structure into dummy rows 
     cout << "Building global matrix structure \n";
@@ -479,7 +479,7 @@ int main (int argc, char *argv[])
 	    ela_ij = (elist[el]->HasBoundarySide() ? 
 		      elist[el]->BndIntFF (i, j) : 0.0);
 	    //	    cout << elb_ij << " " << elk_ij << " "  << ela_ij << endl; 
-	    KK(is,js) += complex(c*mua[el],-omega*rind[el])*elb_ij + 
+	    KK(is,js) += toast::complex(c*mua[el],-omega*rind[el])*elb_ij + 
 	      c*diff[el]*elk_ij  + c2a[el]*ela_ij;
 
 	  }
@@ -559,7 +559,7 @@ int main (int argc, char *argv[])
       cout << "start source " << j << endl;
       dphi[j].New(sysdim);
       cout << "Built dphi\n";
-      RHS = complex(0,0);
+      RHS = toast::complex(0,0);
       for(i = 0; i < sysdim; i++) 
 	RHS[i] = qvec.Get(j,i); //) << " ";
       //      BiCGSTAB (KK, RHS, x, tol,KKCP, 100);

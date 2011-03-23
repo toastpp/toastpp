@@ -939,7 +939,7 @@ RVector ApproxHessianScaling (const QMMesh &mesh, const Raster &raster,
 		   pmdf2_kap, dim);
 
     if (FWS.datatype = MEAS_FMOD_FARG) {
-	complex scal = complex(1,0); // don't know yet
+	toast::complex scal = toast::complex(1,0); // don't know yet
 	RVector pmdf_mod(glen*2), pmdf_arg(glen*2);
 	PMDF_Mod (pmdf1, pmdf2, scal, pmdf_mod);
 	PMDF_Arg (pmdf1, pmdf2, scal, pmdf_arg);
