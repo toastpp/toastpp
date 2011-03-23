@@ -1,0 +1,46 @@
+directory with elementary driver routines.
+
+
+makefile
+--------
+
+o makefile with appropriate compilation and linking options
+  for 64 long bit integers make sure to use 64 bit integers all the way through
+  -->> makefile
+
+
+
+
+C drivers
+---------
+
+o drivers for symmetric (Hermitian) positive definite matrices 
+  (single/double/complex/complex double)
+  -->> smainspd, dmainspd, cmainspd, zmainspd
+
+o drivers for symmetric (Hermitian) matrices 
+  (single/double/complex hermitian/complex hermitian double/
+   complex symmetric/complex symmetric double)
+  -->> smainsym, dmainsym, cmainher, zmainher, cmainsym, zmainsym
+
+o drivers for general matrices (single/double/complex/complex double)
+  -->> smaingnl, dmaingnl, cmaingnl, zmaingnl
+
+
+
+
+
+FORTRAN77 drivers
+-----------------
+
+o drivers for symmetric (Hermitian) positive definite matrices 
+  (single/double/complex/complex double)
+  -->> sfmainspd, dfmainspd, cfmainhpd, zfmainhpd
+
+o drivers for symmetric (Hermitian) matrices 
+  (single/double/complex hermitian/complex hermitian double/
+   complex symmetric/complex symmetric double)
+  -->> sfmainsym, dfmainsym, cfmainher, zfmainher, cfmainsym, zfmainsym
+
+o drivers for general matrices (single/double/complex/complex double)
+  -->> sfmaingnl, dfmaingnl, cfmaingnl, zfmaingnl

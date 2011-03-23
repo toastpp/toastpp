@@ -1,0 +1,109 @@
+# where are the libraries for the Linux platform located
+# note that the platform will be added to this path!
+PLATFORM=MACOSX64
+
+# name of the PARDISO library
+PARDISO=-lpardiso33_GNU41_INTEL32
+
+# MATLAB mex file extension
+EXT=mexmaci
+
+# -------------------------------
+# C-preprocessor used for FORTRAN source codes
+CPP=gfortran
+# preprocessor options
+CPPFLAGS=-E
+
+# -------------------------------
+# which C-compiler do we use
+CC=gcc 
+# C compiler options
+CCFLAGS= -Wall -O -arch x86_64 
+#CCFLAGS= -g
+
+
+
+# -------------------------------
+# switch for names alias of fortran routines
+# -D__UNDERSCORE__   use this, if a fortran routine say "daxpy" has to be 
+#                    called from C using the name "daxpy_"
+# -D__CAPS__         use this, if a fortran routine say "daxpy" has to be
+#                    called from C using the name "DAXPY"
+# -D__2UNDERSCORES__ use this, if a fortran routine say "daxpy" has to be 
+#                    called from C using the name "daxpy__"
+# You can combine __CAPS__ with either __UNDERSCORE__ or __2UNDERSCORES__
+# to obtain names like "DAXPY_" or "DAXPY__"
+# SOLARIS OS:      -D__UNDERSCORE__
+# Red Hat Linux:   -D__UNDERSCORE__
+# AIX:             none
+FORTRANNAMES=-D__UNDERSCORE__
+
+
+# decide whether integer should be 32 bit or 64 bit
+#LONGINTEGER=-D_LONG_INTEGER_
+LONGINTEGER=
+
+
+# -------------------------------
+# which fortran compiler is used
+FF=gfortran
+# its flags
+FFFLAGS= -Wall -O -arch x86_64 -fimplicit-none 
+#FFFLAGS=  -g
+
+
+# -------------------------------
+# Preprocessor + FORTRAN Compiler
+FCOMPILE=$(FF)  $(FFFLAGS)  -I. -I$(INCDIR) $(ARITHMETIC) $(LONGINTEGER) -c -o $@ $<
+
+#FCOMPILE=rm -rf $*.f;\
+#         $(CPP) $(CPPFLAGS) -I$(INCDIR) $(ARITHMETIC) $<  >$*.f;\
+#         $(FF)  $(FFFLAGS)  -I$(INCDIR) -c -o $@ $*.f;\
+#	 rm -rf $*.f
+
+
+# -------------------------------
+# which linker do we use
+#LD=$(CC)
+# its flags
+#LDFLAGS=
+LD=$(FF)
+# its flags
+LDFLAGS= -arch x86_64
+
+
+
+# -------------------------------
+# libraries
+# Linux, Linux GNU 64, IBM AIX
+LIBS=-lilupack $(MUMPSLIB) $(PARDISOLIB) -lamd -lsparspak -lmetis -llapack -lblaslike -lblas -lm -lc 
+
+# Linux, Linux GNU 64 with Intel MKL
+#LIBS=  -lilupack $(MUMPSLIB) $(PARDISOLIB) -lamd -lsparspak  -lblaslike -lmetis -L/opt/intel/mkl/current/lib/em64t -lmkl_lapack -lmkl -lguide -lpthread -lc
+
+
+
+# -------------------------------
+# how do we create a library
+AR=ar
+# its flags
+ARFLAGS=ru
+
+
+
+# -------------------------------
+# how to update the library
+RL=ranlib
+# its flags
+RLFLAGS=
+
+
+
+# -------------------------------
+# miscelaneous abbreviations
+CAT=cat
+RM=rm
+MV=mv
+CP=cp
+CPLN=ln
+
