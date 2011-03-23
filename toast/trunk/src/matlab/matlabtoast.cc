@@ -1383,7 +1383,7 @@ void MatlabToast::ReadVector (int nlhs, mxArray *plhs[], int nrhs,
 	plhs[0] = mxCreateDoubleMatrix (cdata.Dim(), 1, mxCOMPLEX);
 	double *pr = mxGetPr (plhs[0]);
 	double *pi = mxGetPi (plhs[0]);
-	complex *buf = cdata.data_buffer();
+	toast::complex *buf = cdata.data_buffer();
 	for (int i = 0; i < cdata.Dim(); i++) {
 	    pr[i] = buf[i].re;
 	    pi[i] = buf[i].im;

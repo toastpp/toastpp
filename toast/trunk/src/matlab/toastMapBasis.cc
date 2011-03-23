@@ -82,7 +82,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	double *pr = mxGetPr(prhs[2]);
 	double *pi = mxGetPi(prhs[2]);
 	CVector src(nsrc), tgt;
-	complex *vptr = src.data_buffer();
+	toast::complex *vptr = src.data_buffer();
 	for (int i = 0; i < nsrc; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];

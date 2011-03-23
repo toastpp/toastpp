@@ -126,7 +126,7 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 	CVector cproj(n);
 	//Project_cplx (*mesh, q, dphi[q], cproj);
 	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
-	wqa = complex(0,0);
+	wqa = toast::complex(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
@@ -138,11 +138,11 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 
 	    // amplitude term
 	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * complex (term*rp*dn, -term*ip*dn);
+	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -223,7 +223,7 @@ void AddDataGradient2 (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 	CVector cproj(n);
 	//Project_cplx (*mesh, q, dphi[q], cproj);
 	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
-	wqa_row = complex(0,0);
+	wqa_row = toast::complex(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
@@ -235,11 +235,11 @@ void AddDataGradient2 (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 
 	    // amplitude term
 	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa_row += qs * complex (term*rp*dn, -term*ip*dn);
+	    wqa_row += qs * toast::complex (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa_row += qs * complex (-term*ip*dn, -term*rp*dn);
+	    wqa_row += qs * toast::complex (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
