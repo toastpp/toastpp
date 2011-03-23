@@ -68,7 +68,7 @@ CVector BEM_Triangle6::Integrate_Singular (BEM_Kernel *kernel, int nodep, const 
 
 	int icd; 
 	double det_J_r;
-	complex kern1, kern2;
+	toast::complex kern1, kern2;
 	Point2D loc;
 
 	static RVector jac_tab(dimension+1), shapf(dimension);
@@ -358,7 +358,7 @@ CVector BEM_Triangle6::Integrate_Nonsingular (BEM_Kernel *kernel, const Point3D 
 	const int i_kern = 4;
 	int ic, icd;
 	double  a_wsj;
-	complex kern1;
+	toast::complex kern1;
 	static RVector jac_tab(dimension+1);//, shapf(dimension);
 	static CVector kern_tab(i_kern);
 	CVector a_aux(dim2);
