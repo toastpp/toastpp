@@ -576,7 +576,7 @@ void DGAddToElMatrix (NonconformingMesh &mesh, int el, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int i, j, is, js, nnode;
-    complex entry;
+    toast::complex entry;
     
     nnode = mesh.elist[el]->nNode();
     for (i = 0; i < nnode; i++) {
@@ -669,7 +669,7 @@ void DGAddToSysMatrix (NonconformingMesh &mesh, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int el;
-    complex entry;
+    toast::complex entry;
      for (el = 0; el < mesh.elen(); el++) {
 	DGAddToElMatrix (mesh, el, M, coeff, mode);
     }
@@ -679,7 +679,7 @@ void DGAddToSysMatrix (NonconformingMesh &mesh, CGenericSparseMatrix &M,
     const double coeff, int mode)
 {
     int i, j, is, js, el, nnode;
-    complex entry;
+    toast::complex entry;
     for (el = 0; el < mesh.elen(); el++) {
         nnode = mesh.elist[el]->nNode();
 	for (i = 0; i < nnode; i++) {
