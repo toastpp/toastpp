@@ -35,10 +35,10 @@ void bemdiff::single_region_ms(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   const double c=0.3*1.e+12/nu;                  // Speed of light in the medium in mm/ps
   double omega=2.*pi*freq;                       // Angular speed
   D[0] = 1./(3.*(mua+mus));                      // Diffusion coefficient
-  k[0] = sqrt(complex(mua*c, -omega)/(c*D[0]));  // Wave number
+  k[0] = sqrt(toast::complex(mua*c, -omega)/(c*D[0]));  // Wave number
   ma[0]=mua;
   ms[0]=mus;
-  iwc[0]=complex(0,omega/c);
+  iwc[0]=toast::complex(0,omega/c);
   
   // ############## The Geometrical  definitions ########################################;  
  
@@ -154,10 +154,10 @@ void bemdiff::single_region_ma(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   const double c=0.3*1.e+12/nu;                  // Speed of light in the medium in mm/ps
   double omega=2.*pi*freq;                       // Angular speed
   D[0] = 1./(3.*(mua+mus));                      // Diffusion coefficient
-  k[0] = sqrt(complex(mua*c, -omega)/(c*D[0]));  // Wave number
+  k[0] = sqrt(toast::complex(mua*c, -omega)/(c*D[0]));  // Wave number
   ma[0]=mua;
   ms[0]=mus;
-  iwc[0]=complex(0,omega/c);
+  iwc[0]=toast::complex(0,omega/c);
   
   // ############## The Geometrical  definitions ########################################;  
  
@@ -274,10 +274,10 @@ void bemdiff::single_region_3D(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   const double c=0.3*1.e+12/nu;                  // Speed of light in the medium in mm/ps
   double omega=2.*pi*freq;                       // Angular speed
   D[0] = 1./(3.*(mua+mus));                      // Diffusion coefficient
-  k[0] = sqrt(complex(mua*c, -omega)/(c*D[0]));  // Wave number
+  k[0] = sqrt(toast::complex(mua*c, -omega)/(c*D[0]));  // Wave number
   ma[0]=mua;
   ms[0]=mus;
-  iwc[0]=complex(0,omega/c);
+  iwc[0]=toast::complex(0,omega/c);
   
   // ############## The Geometrical  definitions ########################################;  
  
@@ -397,10 +397,10 @@ void bemdiff::single_region_refidx_3D(RDenseMatrix &S_nodes, IDenseMatrix &S_ele
   const double c=0.3*1.e+12/nu;                  // Speed of light in the medium in mm/ps
   double omega=2.*pi*freq;                       // Angular speed
   D[0] = 1./(3.*(mua+mus));                      // Diffusion coefficient
-  k[0] = sqrt(complex(mua*c, -omega)/(c*D[0]));  // Wave number
+  k[0] = sqrt(toast::complex(mua*c, -omega)/(c*D[0]));  // Wave number
   ma[0]=mua;
   ms[0]=mus;
-  iwc[0]=complex(0,omega/c);
+  iwc[0]=toast::complex(0,omega/c);
   
   // ############## The Geometrical  definitions ########################################;  
  
@@ -685,7 +685,7 @@ CVector bemdiff::kernel(int i_region, int ielem, double ksi1, double ksi2, doubl
   //==================================================================
   int iic;  
   double xq, yq, zq, rpq1, rpq2, xpxq, ypyq, zpzq;
-  complex krpq1, k_aux, e_aux;
+  toast::complex krpq1, k_aux, e_aux;
   static RVector shapf(dimension);
   static CVector kern_tab(i_kern);
 
@@ -732,7 +732,7 @@ CVector bemdiff::kernel_mat( int ielem, int ig , double xp, double yp, double zp
   //==================================================================
   int iic;  
   double xq, yq, zq, rpq1, rpq2, xpxq, ypyq, zpzq;
-  complex krpq1, k_aux, e_aux;
+  toast::complex krpq1, k_aux, e_aux;
   static CVector kern_tab(i_kern);
     
   // local coordinate system
@@ -777,7 +777,7 @@ CVector bemdiff::Dkernel_dms_mat( int ielem, int ig , double xp, double yp, doub
   //==================================================================
   int iic;  
   double xq, yq, zq, xpxq, ypyq, zpzq, rpq;
-  complex krpq, k_aux, e_aux;
+  toast::complex krpq, k_aux, e_aux;
   static CVector kern_tab(i_kern);
   const double c=0.3*1.e+12/1;//nu here
   // local coordinate system
@@ -823,7 +823,7 @@ CVector bemdiff::Dkernel_dms(int i_region, int ielem, double ksi1, double ksi2, 
   //==================================================================
   int iic;  
   double xq, yq, zq, xpxq, ypyq, zpzq, rpq;
-  complex krpq, k_aux, e_aux;
+  toast::complex krpq, k_aux, e_aux;
   static CVector kern_tab(i_kern);
   static RVector shapf(dimension);
 
@@ -873,7 +873,7 @@ CVector bemdiff::Dkernel_dma_mat( int ielem, int ig , double xp, double yp, doub
   //==================================================================
   int iic;  
   double xq, yq, zq, xpxq, ypyq, zpzq, rpq;
-  complex krpq, k_aux, e_aux, MaMsIwc;
+  toast::complex krpq, k_aux, e_aux, MaMsIwc;
   static CVector kern_tab(i_kern);
   const double c=0.3*1.e+12/1;//nu here
   // local coordinate system
@@ -924,7 +924,7 @@ CVector bemdiff::Dkernel_dma(int i_region, int ielem, double ksi1, double ksi2, 
   //==================================================================
   int iic;  
   double xq, yq, zq, xpxq, ypyq, zpzq, rpq;
-  complex krpq, k_aux, e_aux, MaMsIwc;
+  toast::complex krpq, k_aux, e_aux, MaMsIwc;
   static CVector kern_tab(i_kern);
   static RVector shapf(dimension);
 
@@ -988,7 +988,7 @@ CVector bemdiff::singu2(int i_region, int ic, int nodep, int ielemq,
 {  
   int icd, *norder = new int[dimension]; 
   double ksi1, ksi2, det_J_r;
-  complex kern1, kern2;
+  toast::complex kern1, kern2;
 
   static RVector jac_tab(dimension+1), shapf(dimension);
   static CVector kern_tab(i_kern), a_aux(dim2);
@@ -999,7 +999,7 @@ CVector bemdiff::singu2(int i_region, int ic, int nodep, int ielemq,
 
 //matrix a_aux initialization
   for(int i=0;i<dim2;++i){
-    a_aux[i]=complex(0.,0.);
+    a_aux[i]=toast::complex(0.,0.);
   }
   icd= ic + dimension;
 
@@ -1399,7 +1399,7 @@ CVector bemdiff::singu4(int i_region, int ic, int nodep, int ielemq, double xp, 
   int icd, *norder = new int[dimension]; 
   
   double ksi1, ksi2, det_J_r;
-  complex kern1, kern2;
+  toast::complex kern1, kern2;
   
   static RVector jac_tab(dimension+1), shapf(dimension);
   static CVector kern_tab(i_kern), a_aux(dim2);
@@ -1410,7 +1410,7 @@ CVector bemdiff::singu4(int i_region, int ic, int nodep, int ielemq, double xp, 
   
   //matrix a_aux initialization
   for(int i=0;i<dim2;++i){
-    a_aux[i]=complex(0.,0.);
+    a_aux[i]=toast::complex(0.,0.);
   }
   icd= ic + dimension;
   
@@ -1907,13 +1907,13 @@ CVector bemdiff::nonsin_mat(int ic, int ielemq, double xp, double yp, double zp 
   //==================================================================
   int icd;
   double  a_wsj;
-  complex kern1;
+  toast::complex kern1;
   static CVector kern_tab(i_kern),a_aux(dim2);
   
   //matrix a_aux initialization
   for(int ix=0;ix<dim2;++ix)
     {
-      a_aux[ix]=complex(0.,0.);
+      a_aux[ix]=toast::complex(0.,0.);
     }
   
   icd=ic+dimension;
@@ -1967,7 +1967,7 @@ CVector bemdiff::nonsin(int ic, int ielemq, double xp, double yp, double zp)
   
   int icd;
   double  a_wsj;
-  complex kern1;
+  toast::complex kern1;
   static RVector jac_tab(dimension+1);//, shapf(dimension);
   static CVector kern_tab(i_kern),a_aux(dim2);
    
@@ -1979,7 +1979,7 @@ CVector bemdiff::nonsin(int ic, int ielemq, double xp, double yp, double zp)
   //matrix a_aux initialization
   for(int ix=0;ix<dim2;++ix)
     {
-      a_aux[ix]=complex(0.,0.);
+      a_aux[ix]=toast::complex(0.,0.);
     }
   icd=ic+dimension;
   //made the variable ksi1, ksi2 equal to the ordinary Gaussian quadrature
@@ -2048,7 +2048,7 @@ void bemdiff:: int_cal(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   const double c=0.3*1.e+12/nu;                  // Speed of light in the medium in mm/ps
   double omega=2.*pi*freq;                       // Angular speed
   D[0] = 1./(3.*(mua+mus));                      // Diffusion coefficient
-  k[0] = sqrt(complex(mua*c, -omega)/(c*D[0]));  // Wave number
+  k[0] = sqrt(toast::complex(mua*c, -omega)/(c*D[0]));  // Wave number
  
   
   // The surfaces definition------------------------------------
@@ -2074,8 +2074,8 @@ void bemdiff:: int_cal(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   
   int nodeq;
   double ksi1, ksi2, x_in, y_in, z_in;
-  complex  fi_temp, dfi_temp;// fi_in,
-  complex kern1;
+  toast::complex  fi_temp, dfi_temp;// fi_in,
+  toast::complex kern1;
   
 
 
@@ -2147,7 +2147,7 @@ void bemdiff:: int_cal_mat(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   const double c=0.3*1.e+12/nu;                  // Speed of light in the medium in mm/ps
   double omega=2.*pi*freq;                       // Angular speed
   D[0] = 1./(3.*(mua+mus));                      // Diffusion coefficient
-  k[0] = sqrt(complex(mua*c, -omega)/(c*D[0]));  // Wave number
+  k[0] = sqrt(toast::complex(mua*c, -omega)/(c*D[0]));  // Wave number
  
   
   // The surfaces definition------------------------------------
@@ -2173,7 +2173,7 @@ void bemdiff:: int_cal_mat(RDenseMatrix &S_nodes, IDenseMatrix &S_elements,
   
   int nodeq;
   double ksi1, ksi2, x_in, y_in, z_in;
-  complex kern1;
+  toast::complex kern1;
   
   static RVector jac_tab(dimension+1), shapf(dimension);
   static CVector kern_tab(i_kern);
