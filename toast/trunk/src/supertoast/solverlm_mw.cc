@@ -288,14 +288,14 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	    Project_cplx (mesh, q, dphi_h[q], proj);
 	    for (i = 0; i < nm; i++) {
 		double scl = norm2 (proj[i]);
-		complex c = projdelta[i]*conj(proj[i]);
+		toast::complex c = projdelta[i]*conj(proj[i]);
 		projdelta[i] = c/scl;
 	    }
 	}
 
 	// map data types into real vector
 	for (i = 0; i < nm; i++) {
-	    complex proji = projdelta[i];
+	    toast::complex proji = projdelta[i];
 	    y_h_delta[ofs_lnmod++] = proji.re;
 	    y_h_delta[ofs_phase++] = proji.im;
 	}
@@ -397,7 +397,7 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 		res[ofs] -= pds_alpha_grad[q][i] & pas_grad[i];
 	    if (FWS.GetDataScaling() == DATA_LOG) {
 		double scl = norm2 (proj[q][mm]);
-		complex c = res[ofs]*conj(proj[q][mm]);
+		toast::complex c = res[ofs]*conj(proj[q][mm]);
 		res[ofs] = c/scl;
 	    }
 	}
@@ -472,7 +472,7 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	CVector cproj(n);
 	Project_cplx (mesh, q, dphi_h[q], cproj);
-	wqa = complex(0,0);
+	wqa = toast::complex(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh.nM; m++) {
@@ -484,11 +484,11 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	    // amplitude term
 	    term = /* -2.0 * */ b_mod[idx] /* / (ype[idx]*s_mod[idx]) */;
-	    wqa += qs * complex (term*rp*dn, -term*ip*dn);
+	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = /* -2.0 * */ b_arg[idx] /* / (ype[idx]*s_arg[idx]) */;
-	    wqa += qs * complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -603,8 +603,8 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	    double yre = ysd[ofs], yim = ysd[ofs+nqm];
 	    if (FWS.GetDataScaling() == DATA_LOG) {
 		// rescale for log data (lnamp + phase)
-		complex logscl = proj[q][mm]/norm2 (proj[q][mm]);
-		complex logdat = complex(yre,yim) * logscl;
+		toast::complex logscl = proj[q][mm]/norm2 (proj[q][mm]);
+		toast::complex logdat = toast::complex(yre,yim) * logscl;
 		yre = logdat.re;
 		yim = logdat.im;
 	    }
@@ -853,7 +853,7 @@ RVector ApproxHessianScaling (const QMMesh &mesh, const Raster &raster,
 		   pmdf2_kap, dim);
 
     if (FWS.datatype = MEAS_FMOD_FARG) {
-	complex scal = complex(1,0); // don't know yet
+	toast::complex scal = toast::complex(1,0); // don't know yet
 	RVector pmdf_mod(glen*2), pmdf_arg(glen*2);
 	PMDF_Mod (pmdf1, pmdf2, scal, pmdf_mod);
 	PMDF_Arg (pmdf1, pmdf2, scal, pmdf_arg);
