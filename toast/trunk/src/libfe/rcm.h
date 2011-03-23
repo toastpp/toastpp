@@ -1,11 +1,11 @@
-typedef int integer;
-typedef bool logical;
+//typedef int int;
+//typedef bool logical;
 typedef double doublereal;
 
-int perphn_(integer *n, integer *ja, integer *ia, integer *init,
-	integer *iperm, integer *mask, integer *maskval, integer *nlev,
-	integer *riord, integer *levels);
-int bfs_(integer *n, integer *ja, integer *ia, integer *
-	nfirst, integer *iperm, integer *mask, integer *maskval, integer *
-	riord, integer *levels, integer *nlev);
-int reversp_(integer *n, integer *riord);
+int perphn_(int *n, int *ja, int *ia, int *init,
+	int *iperm, int *mask, int *maskval, int *nlev,
+	int *riord, int *levels);
+int bfs_(int *n, int *ja, int *ia, int *
+	nfirst, int *iperm, int *mask, int *maskval, int *
+	riord, int *levels, int *nlev);
+int reversp_(int *n, int *riord);
