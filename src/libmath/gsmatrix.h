@@ -59,7 +59,7 @@ MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT>
 template<class MT>
 MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
     const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit = 0,
-    const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
+    TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 
 template<class MT>
 MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
@@ -271,7 +271,7 @@ public:
 
     friend MATHLIB void IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-        const TPreconditioner<MT> *precon, IterativeSolverResult *res);
+        TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
     friend MATHLIB int CG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
