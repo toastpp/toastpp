@@ -262,7 +262,7 @@ void TDiagMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 
 template class TDiagMatrix<double>;
 template class TDiagMatrix<float>;
-template class TDiagMatrix<complex>;
+template class TDiagMatrix<toast::complex>;
 template class TDiagMatrix<int>;
 
 #endif // NEED_EXPLICIT_INSTANTIATION

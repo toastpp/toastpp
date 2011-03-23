@@ -92,7 +92,7 @@ istream &operator>> (istream& is, scomplex& z)
     return is;
 }
 /*--------------- double -> single versions */
-scomplex scomplex::operator/ (const complex &z) const
+scomplex scomplex::operator/ (const toast::complex &z) const
 {
     double r, den;
     if (fabs (z.re) >= fabs (z.im)) {
@@ -106,7 +106,7 @@ scomplex scomplex::operator/ (const complex &z) const
     }
 }
 
-scomplex scomplex::operator/= (const complex& z)
+scomplex scomplex::operator/= (const toast::complex& z)
 {
     double r, den, nr;
     if (fabs (z.re) >= fabs (z.im)) {

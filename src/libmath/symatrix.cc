@@ -286,7 +286,7 @@ MATHLIB TVector<MT> CHsubst (const TSymMatrix<MT> &a, const TVector<MT> &b)
 
 template class MATHLIB TSymMatrix<double>;
 template class MATHLIB TSymMatrix<float>;
-template class MATHLIB TSymMatrix<complex>;
+template class MATHLIB TSymMatrix<toast::complex>;
 template class MATHLIB TSymMatrix<scomplex>;
 template class MATHLIB TSymMatrix<int>;
 

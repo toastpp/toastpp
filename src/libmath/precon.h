@@ -13,13 +13,15 @@
 #include "matrix.h"
 #include "dgmatrix.h"
 #include "crmatrix.h"
+#include "ilupack.h"
 
 typedef enum {
     PRECON_NULL,
     PRECON_DIAG,
     PRECON_ICH,
     PRECON_DILU,
-    PRECON_CG_MULTIGRID
+    PRECON_CG_MULTIGRID,
+    PRECON_ILU
 } PreconType;
 
 // ==========================================================================
@@ -35,7 +37,7 @@ public:
     virtual void Reset (const TMatrix<MT> *A) = 0;
     // Reset preconditioner for matrix A
     
-    virtual void Apply (const TVector<MT> &r, TVector<MT> &s) const = 0;
+    virtual void Apply (const TVector<MT> &r, TVector<MT> &s)=0;
     // Apply preconditioner to r and return the result in s
     // e.g. s = M^-1 r for a preconditioner matrix M
     virtual void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const =0;
@@ -54,7 +56,7 @@ public:
     TPrecon_Null() {}
     PreconType Type() { return PRECON_NULL; }
     void Reset (const TMatrix<MT>*) {}
-    void Apply (const TVector<MT> &r, TVector<MT> &s) const { s = r; }
+    void Apply (const TVector<MT> &r, TVector<MT> &s) { s = r; }
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
 
 };
@@ -69,7 +71,7 @@ public:
     PreconType Type() { return PRECON_DIAG; }
     void Reset (const TMatrix<MT> *A);
     void ResetFromDiagonal (const TVector<MT> &diag);
-    void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TVector<MT> &r, TVector<MT> &s);
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const;
 
 private:
@@ -85,7 +87,7 @@ public:
     TPrecon_IC() {}
     PreconType Type() { return PRECON_ICH; }
     void Reset (const TMatrix<MT> *A);
-    void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TVector<MT> &r, TVector<MT> &s);
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
 
 private:
@@ -103,13 +105,42 @@ public:
     TPrecon_DILU() {}
     PreconType Type() { return PRECON_DILU; }
     void Reset (const TMatrix<MT> *);
-    void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TVector<MT> &r, TVector<MT> &s);
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
 
 private:
     int dim;                   // problem dimension
     TVector<MT>ipivot;         // inverse pivots
     const TMatrix<MT> *A;  // pointer to matrix
+};
+
+// ==========================================================================
+// class TPrecon_ILU 
+// ILU: incomplete LU preconditioner using ILUPACK
+
+template<class MT> class TPrecon_ILU: public TPreconditioner<MT> {
+public:
+    TPrecon_ILU() {}
+    PreconType Type() { return PRECON_ILU; }
+    void Reset (const TMatrix<MT> *){ xERROR('NOT IMPLEMENTED');};
+    void Reset (CCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow);
+    void Reset (SCCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    void Reset (RCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    void Reset (FCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    void Apply (const CVector &r, CVector &s);
+    void Apply (const SCVector &r, SCVector &s){xERROR('NOT IMPLEMENTED'); };
+    void Apply (const RVector &r, RVector &s){xERROR('NOT IMPLEMENTED'); };
+    void Apply (const FVector &r, FVector &s){xERROR('NOT IMPLEMENTED'); };
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const{ xERROR('NOT IMPLEMENTED');};
+    ~TPrecon_ILU();
+private:
+    int dim;                   // problem dimension
+    //ilu_doublecomplex *rhs, *sol, *buff;
+    ilu_doublecomplex *rhs, *sol;
+    Zmat A;
+    ZAMGlevelmat  PRE;
+    ZILUPACKparam param;
+    //char dummy[100]; 
 };
 
 // ==========================================================================
@@ -131,7 +162,7 @@ public:
     // _A points to an *array* of nlvl system matrices, from finest to
     // coarsest grid
 
-    void Apply (const TVector<MT> &r, TVector<MT> &s) const;
+    void Apply (const TVector<MT> &r, TVector<MT> &s);
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
 
 
@@ -179,6 +210,11 @@ typedef TPrecon_DILU<toast::complex>    CPrecon_DILU;
 typedef TPrecon_DILU<scomplex>          SCPrecon_DILU;
 typedef TPrecon_DILU<int>               IPrecon_DILU;
 
+typedef TPrecon_ILU<double>            RPrecon_ILU;
+typedef TPrecon_ILU<toast::complex>    CPrecon_ILU;
+typedef TPrecon_ILU<scomplex>          SCPrecon_ILU;
+
+
 typedef TPrecon_CG_Multigrid<double>    RPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<toast::complex> CPrecon_CG_Multigrid;
@@ -203,7 +239,7 @@ public:
     virtual void Reset (const SCCompRowMatrixMixed *A) = 0;
     // Reset preconditioner for matrix A
     
-    virtual void Apply (const CVector &r, CVector &s) const = 0;
+    virtual void Apply (const CVector &r, CVector &s)=0;
     // Apply preconditioner to r and return the result in s
     // e.g. s = M^-1 r for a preconditioner matrix M
 
@@ -216,7 +252,7 @@ public:
     SCPreconMixed_Null() {}
     PreconType Type() { return PRECON_NULL; }
     void Reset (const SCCompRowMatrixMixed*) {}
-    void Apply (const CVector &r, CVector &s) const { s = r; }
+    void Apply (const CVector &r, CVector &s) { s = r; }
 };
 
 class SCPreconMixed_Diag: public SCPreconditionerMixed {
@@ -224,7 +260,7 @@ public:
     SCPreconMixed_Diag() {}
     PreconType Type() { return PRECON_DIAG; }
     void Reset (const SCCompRowMatrixMixed *A);
-    void Apply (const CVector &r, CVector &s) const;
+    void Apply (const CVector &r, CVector &s) ;
 
 private:
     CVector idiag;
@@ -235,7 +271,7 @@ public:
     SCPreconMixed_DILU() {}
     PreconType Type() { return PRECON_DILU; }
     void Reset (const SCCompRowMatrixMixed *);
-    void Apply (const CVector &r, CVector &s) const;
+    void Apply (const CVector &r, CVector &s);
 
 private:
     int dim;                       // problem dimension

@@ -338,8 +338,8 @@ void TSymCompRowMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 }
 
 template<>
-void TSymCompRowMatrix<complex>::ATx (const TVector<complex> &x,
-    TVector<complex> &b) const
+void TSymCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     dASSERT_2PRM(x.Dim() == cols,
         "Parameter 1 invalid size %d (expected %d)", x.Dim(), cols);
@@ -529,7 +529,7 @@ ostream &operator<< (ostream &os, const TSymCompRowMatrix<MT> &m)
 
 template class TSymCompRowMatrix<double>;
 template class TSymCompRowMatrix<float>;
-template class TSymCompRowMatrix<complex>;
+template class TSymCompRowMatrix<toast::complex>;
 template class TSymCompRowMatrix<scomplex>;
 template class TSymCompRowMatrix<int>;
 

@@ -3,7 +3,7 @@
 #ifndef __FBLAS_H
 #define __FBLAS_H
 
-typedef int integer;
+//typedef int integer;
 typedef struct { double r, i; } dcomplex;
 
 extern "C" {
@@ -22,7 +22,7 @@ extern "C" {
 
     double  ddot_   (int&, double*, int&, double*, int&);
     float   sdot_   (int&, float*, int&, float*, int&);
-    dcomplex zdotu_  (integer*, dcomplex*, integer*, dcomplex*, integer*);
+    dcomplex zdotu_  (int*, dcomplex*, int*, dcomplex*, int*);
     dcomplex zdotc_  (int&, toast::complex*, int&, toast::complex*,
 			    int&);
 

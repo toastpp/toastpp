@@ -262,8 +262,8 @@ void TDenseMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b) const
            x.data_buffer(), incr, beta, b.data_buffer(), incr);
 }
 template<>
-void TDenseMatrix<complex>::Ax (const TVector<complex> &x,
-    TVector<complex> &b) const
+void TDenseMatrix<toast::complex>::Ax (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     dASSERT(cols == x.Dim(), Argument 1: vector has wrong dimension);
     if (b.Dim() != rows) b.New (rows);  // resize;
@@ -271,7 +271,7 @@ void TDenseMatrix<complex>::Ax (const TVector<complex> &x,
     // we need to transpose and flip the row and column dimensions
     // to convert from c++ row storage to fortran column storage
     static char trans = 'T';
-    static complex alpha(1,0), beta(0,0);
+    static toast::complex alpha(1,0), beta(0,0);
     static int incr = 1;
 
     zgemv_(trans, (int&)cols, (int&)rows, alpha, val, (int&)cols,
@@ -327,14 +327,14 @@ void TDenseMatrix<float>::ATx (const TVector<float> &x, TVector<float> &b)
            x.data_buffer(), incr, beta, b.data_buffer(), incr);
 }
 template<>
-void TDenseMatrix<complex>::ATx (const TVector<complex> &x,
-    TVector<complex> &b) const
+void TDenseMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     dASSERT(rows == x.Dim(), Argument 1: vector has wrong dimension);
     if (b.Dim() != cols) b.New (cols);  // resize
     
     static char trans = 'N';
-    static complex alpha(1,0), beta(0,0);
+    static toast::complex alpha(1,0), beta(0,0);
     static int incr = 1;
 
     zgemv_(trans, (int&)cols, (int&)rows, alpha, val, (int&)cols,
@@ -407,8 +407,8 @@ MATHLIB void TDenseMatrix<float>::AB (const TDenseMatrix<float> &A,
 	   B.val, (int&)B.cols, A.val, (int&)A.cols, beta, val, (int&)B.cols);
 }
 template<>
-MATHLIB void TDenseMatrix<complex>::AB (const TDenseMatrix<complex> &A,
-    const TDenseMatrix<complex> &B)
+MATHLIB void TDenseMatrix<toast::complex>::AB (const TDenseMatrix<toast::complex> &A,
+    const TDenseMatrix<toast::complex> &B)
 {
     dASSERT(A.cols == B.rows, Matrix sizes do not match for this operation.);
 
@@ -422,7 +422,7 @@ MATHLIB void TDenseMatrix<complex>::AB (const TDenseMatrix<complex> &A,
     // i.e. we need to flip the order of the operands
 
     static char transa = 'N', transb = 'N';
-    static complex alpha(1,0), beta = (0,0);
+    static toast::complex alpha(1,0), beta = (0,0);
 
     zgemm_(transa, transb, (int&)B.cols, (int&)A.rows, (int&)A.cols, alpha,
 	   B.val, (int&)B.cols, A.val, (int&)A.cols, beta, val, (int&)B.cols);
@@ -511,24 +511,24 @@ MATHLIB TSymMatrix<float> ATA (const TDenseMatrix<float> &A)
     return ata;
 }
 template<>
-MATHLIB TSymMatrix<complex> ATA (const TDenseMatrix<complex> &A)
+MATHLIB TSymMatrix<toast::complex> ATA (const TDenseMatrix<toast::complex> &A)
 {
     static char uplo = 'U';  // return result in upper triangle
     static char trans = 'N'; // 'N' actually indicates AAT, but since fortran
                              // stores in column format, all matrices are
                              // interpreted as transpose, so we actually
                              // request ATA
-    static complex alpha = complex (1.0, 0.0);
-    static complex beta = complex (0.0, 0.0);
+    static toast::complex alpha = toast::complex (1.0, 0.0);
+    static toast::complex beta = toast::complex (0.0, 0.0);
 
     int n = A.nCols(), k = A.nRows();
-    complex *c = new complex[n*n];
+    toast::complex *c = new toast::complex[n*n];
 
     zsyrk_(uplo, trans, n, k, alpha, A.val, n, beta, c, n);
 
     // now we need to copy the results into a SymMatrix
-    TSymMatrix<complex> ata(n);
-    complex *ata_buf = ata.data_buffer();
+    TSymMatrix<toast::complex> ata(n);
+    toast::complex *ata_buf = ata.data_buffer();
     int i, j, idx;
     for (i = idx = 0; i < n; i++)
         for (j = 0; j <= i; j++)
@@ -612,24 +612,24 @@ MATHLIB TSymMatrix<float> AAT (const TDenseMatrix<float> &A)
     return aat;
 }
 template<>
-MATHLIB TSymMatrix<complex> AAT (const TDenseMatrix<complex> &A)
+MATHLIB TSymMatrix<toast::complex> AAT (const TDenseMatrix<toast::complex> &A)
 {
     static char uplo = 'U';  // return result in upper triangle
     static char trans = 'T'; // 'T' actually indicates ATA, but since fortran
                              // stores in column format, all matrices are
                              // interpreted as transpose, so we actually
                              // request AAT
-    static complex alpha = complex (1.0, 0.0);
-    static complex beta = complex (0.0, 0.0);
+    static toast::complex alpha = toast::complex (1.0, 0.0);
+    static toast::complex beta = toast::complex (0.0, 0.0);
 
     int n = A.nRows(), k = A.nCols();
-    complex *c = new complex[n*n];
+    toast::complex *c = new toast::complex[n*n];
 
     zsyrk_(uplo, trans, n, k, alpha, A.val, k, beta, c, n);
 
     // now we need to copy the results into a SymMatrix
-    TSymMatrix<complex> aat(n);
-    complex *aat_buf = aat.data_buffer();
+    TSymMatrix<toast::complex> aat(n);
+    toast::complex *aat_buf = aat.data_buffer();
     int i, j, idx;
     for (i = idx = 0; i < n; i++)
         for (j = 0; j <= i; j++)
@@ -1114,7 +1114,7 @@ MATHLIB ostream &operator<< (ostream &os, const TDenseMatrix<MT> &m)
 
 template class MATHLIB TDenseMatrix<double>;
 template class MATHLIB TDenseMatrix<float>;
-template class MATHLIB TDenseMatrix<complex>;
+template class MATHLIB TDenseMatrix<toast::complex>;
 template class MATHLIB TDenseMatrix<scomplex>;
 template class MATHLIB TDenseMatrix<int>;
 
@@ -1125,52 +1125,52 @@ template MATHLIB ostream &operator<< (ostream &os, const CDenseMatrix &m);
 
 template MATHLIB TDenseMatrix<double> cath (const TDenseMatrix<double> &A,
     const TDenseMatrix<double> &B);
-template MATHLIB TDenseMatrix<complex> cath (const TDenseMatrix<complex> &A,
-    const TDenseMatrix<complex> &B);
+template MATHLIB TDenseMatrix<toast::complex> cath (const TDenseMatrix<toast::complex> &A,
+    const TDenseMatrix<toast::complex> &B);
 
 template MATHLIB TDenseMatrix<double> catv (const TDenseMatrix<double> &A,
     const TDenseMatrix<double> &B);
-template MATHLIB TDenseMatrix<complex> catv (const TDenseMatrix<complex> &A,
-    const TDenseMatrix<complex> &B);
+template MATHLIB TDenseMatrix<toast::complex> catv (const TDenseMatrix<toast::complex> &A,
+    const TDenseMatrix<toast::complex> &B);
 
 #ifndef USE_BLAS_LEVEL3 // otherwise use BLAS interface specialisations
 template MATHLIB TSymMatrix<double> ATA (const TDenseMatrix<double> &A);
 template MATHLIB TSymMatrix<float> ATA (const TDenseMatrix<float> &A);
-template MATHLIB TSymMatrix<complex> ATA (const TDenseMatrix<complex> &A);
+template MATHLIB TSymMatrix<toast::complex> ATA (const TDenseMatrix<toast::complex> &A);
 #endif
 
 #ifndef USE_BLAS_LEVEL3 // otherwise use BLAS interface specialisations
 template MATHLIB TSymMatrix<double> AAT (const TDenseMatrix<double> &A);
 template MATHLIB TSymMatrix<float> AAT (const TDenseMatrix<float> &A);
-template MATHLIB TSymMatrix<complex> AAT (const TDenseMatrix<complex> &A);
+template MATHLIB TSymMatrix<toast::complex> AAT (const TDenseMatrix<toast::complex> &A);
 #endif
 
 template MATHLIB TDenseMatrix<double> kron (const TDenseMatrix<double> &A,
     const TDenseMatrix<double> &B);
-template MATHLIB TDenseMatrix<complex> kron (const TDenseMatrix<complex> &A,
-    const TDenseMatrix<complex> &B);
+template MATHLIB TDenseMatrix<toast::complex> kron (const TDenseMatrix<toast::complex> &A,
+    const TDenseMatrix<toast::complex> &B);
 template MATHLIB TDenseMatrix<int> kron (const TDenseMatrix<int> &A,
     const TDenseMatrix<int> &B);
 
 template MATHLIB double det (const TDenseMatrix<double> &A, TDenseMatrix<double> *Ai);
 template MATHLIB TDenseMatrix<double> inverse (const TDenseMatrix<double> &A);
 template MATHLIB TDenseMatrix<double> transpose (const TDenseMatrix<double> &A);
-template MATHLIB TDenseMatrix<complex> transpose (const TDenseMatrix<complex> &A);
+template MATHLIB TDenseMatrix<toast::complex> transpose (const TDenseMatrix<toast::complex> &A);
 
 template MATHLIB int QRFactorize (TDenseMatrix<double> &A, TVector<double> &c,
     TVector<double> &d);
-template MATHLIB int QRFactorize (TDenseMatrix<complex> &A, TVector<complex> &c,
-    TVector<complex> &d);
+template MATHLIB int QRFactorize (TDenseMatrix<toast::complex> &A, TVector<toast::complex> &c,
+    TVector<toast::complex> &d);
 
 template MATHLIB void RSolve (const TDenseMatrix<double> &A, const TVector<double> &d,
     TVector<double> &b);
-template MATHLIB void RSolve (const TDenseMatrix<complex> &A, const TVector<complex> &d,
-    TVector<complex> &b);
+template MATHLIB void RSolve (const TDenseMatrix<toast::complex> &A, const TVector<toast::complex> &d,
+    TVector<toast::complex> &b);
 
 template MATHLIB void QRSolve (const TDenseMatrix<double> &A, const TVector<double> &c,
     const TVector<double> &d, const TVector<double> &b, TVector<double> &x);
-template MATHLIB void QRSolve (const TDenseMatrix<complex> &A, const TVector<complex> &c,
-    const TVector<complex> &d, const TVector<complex> &b, TVector<complex> &x);
+template MATHLIB void QRSolve (const TDenseMatrix<toast::complex> &A, const TVector<toast::complex> &c,
+    const TVector<toast::complex> &d, const TVector<toast::complex> &b, TVector<toast::complex> &x);
 
 
 template MATHLIB void LUFactorize (TDenseMatrix<double> &a, IVector &indx, double &d);

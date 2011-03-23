@@ -460,19 +460,19 @@ MATHLIB ostream &operator<< (ostream &os, const TCoordMatrix<MT> &m)
 
 template class MATHLIB TCoordMatrix<double>;
 template class MATHLIB TCoordMatrix<float>;
-template class MATHLIB TCoordMatrix<complex>;
+template class MATHLIB TCoordMatrix<toast::complex>;
 template class MATHLIB TCoordMatrix<scomplex>;
 template class MATHLIB TCoordMatrix<int>;
 
 template MATHLIB TCoordMatrix<double> cath (const TCoordMatrix<double> &A,
     const TCoordMatrix<double> &B);
-template MATHLIB TCoordMatrix<complex> cath (const TCoordMatrix<complex> &A,
-    const TCoordMatrix<complex> &B);
+template MATHLIB TCoordMatrix<toast::complex> cath (const TCoordMatrix<toast::complex> &A,
+    const TCoordMatrix<toast::complex> &B);
 
 template MATHLIB TCoordMatrix<double> catv (const TCoordMatrix<double> &A,
 	const TCoordMatrix<double> &B);
-template MATHLIB TCoordMatrix<complex> catv (const TCoordMatrix<complex> &A,
-	const TCoordMatrix<complex> &B);
+template MATHLIB TCoordMatrix<toast::complex> catv (const TCoordMatrix<toast::complex> &A,
+	const TCoordMatrix<toast::complex> &B);
 
 template MATHLIB istream &operator>> (istream &is, RCoordMatrix &m);
 template MATHLIB istream &operator>> (istream &is, FCoordMatrix &m);

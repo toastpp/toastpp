@@ -52,9 +52,9 @@ void QRSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &c,
 
 
 template<class MT>
-MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A,
-    const TVector<MT> &b, TVector<MT> &x, double &tol,
-    const TPreconditioner<MT> *precon = 0, int maxit = 0);
+MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
+    int maxit = 0);
 
 template<class MT>
 MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
@@ -63,12 +63,12 @@ MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
 
 template<class MT>
 MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
 MATHLIB int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
@@ -262,7 +262,7 @@ public:
 
     friend MATHLIB int IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
-	const TPreconditioner<MT> *precon, int maxit);
+	TPreconditioner<MT> *precon, int maxit);
     // Solves Ax=b using the previously selected iterative solver
     // x contains initial guess on start, solution on exit
     // tol is tolerance limit on start, and final error on exit
@@ -274,12 +274,12 @@ public:
         const TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
     friend MATHLIB int CG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-        TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon,
+        TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
         int maxit);
     // preconditioned conjugate gradient method.
 
     friend MATHLIB int BiCG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
-        TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon,
+        TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
         int maxit);
     // biconjugate gradient method.
 

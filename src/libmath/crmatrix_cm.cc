@@ -37,12 +37,12 @@ SCCompRowMatrixMixed::SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m)
 SCCompRowMatrixMixed::~SCCompRowMatrixMixed ()
 {}
 
-int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci, complex *rv) const
+int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci, toast::complex *rv) const
 {
     int i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
     for (i = 0; i < nz; i++) {
         ci[i] = colidx[r0+i];
-	rv[i] = (complex)val[r0+i];
+	rv[i] = (toast::complex)val[r0+i];
     }
     return nz;
 }
@@ -54,12 +54,12 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b) const
     if (b.Dim() != rows) b.New(rows);
 
     int r, i, i2;
-    complex br;
+    toast::complex br;
 
     for (r = i = 0; r < rows;) {
 	i2 = rowptr[r+1];
-	for (br = complex(0,0); i < i2; i++)
-	    br += (complex)val[i] * x[colidx[i]];
+	for (br = toast::complex(0,0); i < i2; i++)
+	    br += (toast::complex)val[i] * x[colidx[i]];
 	b[r++] = br;
     }
 }
@@ -73,15 +73,15 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b,
     idxtype r, i2;
     idxtype i = rowptr[r1];
     idxtype *pcolidx = colidx+i;
-    complex br;
+    toast::complex br;
     scomplex *pval = val+i;
 
     if (b.Dim() != rows) b.New (rows);
 
     for (r = r1; r < r2;) {
 	i2 = rowptr[r+1];
-	for (br = complex(0,0); i < i2; i++)
-	    br += (complex)(*pval++) * x[*pcolidx++];
+	for (br = toast::complex(0,0); i < i2; i++)
+	    br += (toast::complex)(*pval++) * x[*pcolidx++];
 	b[r++] = br;
     }
 }
@@ -96,7 +96,7 @@ void SCCompRowMatrixMixed::ATx (const CVector &x, CVector &b) const
     for (c = 0; c < cols; c++) b[c] = 0;
     for (i = c = 0; i < nval; i++) {
         while (colptr[c+1] <= i) c++;
-	b[c] += conj((complex)val[vofs[i]]) * x[rowidx[i]];
+	b[c] += conj((toast::complex)val[vofs[i]]) * x[rowidx[i]];
     }
 }
 
@@ -105,7 +105,7 @@ void SCCompRowMatrixMixed::ATx (const CVector &x, CVector &b) const
 // ==========================================================================
 
 int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
-    double &elim, const SCPreconditionerMixed *precon, int restart,
+    double &elim, SCPreconditionerMixed *precon, int restart,
     void (*clbk)(void*))
 {
 #ifdef VERBOSE_GMRES
@@ -116,13 +116,13 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
     int MAX_GMRES_STEPS=restart;
     int j, k, l, cycle, n;
     double norm_b,norm_v,norm_x, tmp;
-    complex h1, h2, r, sum;
-    TVector<complex> y(MAX_GMRES_STEPS);
-    TVector<complex> s(MAX_GMRES_STEPS+1);
-    TVector<complex> c1(MAX_GMRES_STEPS);
-    TVector<complex> c2(MAX_GMRES_STEPS);
-    TDenseMatrix<complex> H(MAX_GMRES_STEPS,MAX_GMRES_STEPS+1);
-    TVector<complex> *v = new TVector<complex>[MAX_GMRES_STEPS+1];
+    toast::complex h1, h2, r, sum;
+    TVector<toast::complex> y(MAX_GMRES_STEPS);
+    TVector<toast::complex> s(MAX_GMRES_STEPS+1);
+    TVector<toast::complex> c1(MAX_GMRES_STEPS);
+    TVector<toast::complex> c2(MAX_GMRES_STEPS);
+    TDenseMatrix<toast::complex> H(MAX_GMRES_STEPS,MAX_GMRES_STEPS+1);
+    TVector<toast::complex> *v = new TVector<toast::complex>[MAX_GMRES_STEPS+1];
     for (j = 0; j <= MAX_GMRES_STEPS; j++)
         v[j].New (N);
  
@@ -195,14 +195,14 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
  
 	    // for (n=0; n < N; n++) ctmp1[n] = v[j][n];
 
- 	    TVector<complex> &vj1 = v[j+1];
+ 	    TVector<toast::complex> &vj1 = v[j+1];
 	    if (precon) precon->Apply (A*v[j], vj1);
 	    else        vj1 = A*v[j];
 
 	    /* modified Gram-Schmidt orthogonalization */
 	    for (k = 0; k <= j; k++) {
-	        TVector<complex> &vk = v[k];
-                sum = complex(0,0);
+	        TVector<toast::complex> &vk = v[k];
+                sum = toast::complex(0,0);
 		for (n = 0; n < N; n++) sum += vj1[n] * conj(vk[n]);
 		H(j,k) = sum;  // H(j,k) = C-innerproduct(v[j+1],v[k]);
 		for (n = 0; n < N; n++) vj1[n] -= sum * vk[n];

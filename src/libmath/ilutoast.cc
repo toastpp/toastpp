@@ -10,7 +10,6 @@
 #ifdef HAVE_ILU
 
 #define _DOUBLE_REAL_
-#include "ilupack.hpp"
 //#include "ilupackmacros.h"
 #include "ilutoast.h"
 
@@ -26,16 +25,34 @@ void ILUSetPermtype (int ptype)
 // reference to the original data array, since that
 // remains valid
 
-#ifdef UNDEF
+//#ifdef UNDEF
 void CreateDmat (const RCompRowMatrix &A, Dmat *mat)
 {
     mat->nr = A.nRows();
     mat->nc = A.nCols();
-    mat->ia = new int[A.nRows()+1];
-    mat->ja = new int[A.nVal()];
+    mat->ia = new integer[A.nRows()+1];
+    mat->ja = new integer[A.nVal()];
 
     mat->a = new double[A.nVal()];
     memcpy (mat->a, A.ValPtr(), A.nVal()*sizeof(double));
+    // need to copy the value array because it is corrupted by
+    // the solver
+
+    for (int i = 0; i <= A.nRows(); i++)
+	mat->ia[i] = A.rowptr[i]+1;
+    for (int j = 0; j < A.nVal(); j++)
+	mat->ja[j] = A.colidx[j]+1;
+}
+
+void CreateSmat (const FCompRowMatrix &A, Smat *mat)
+{
+    mat->nr = A.nRows();
+    mat->nc = A.nCols();
+    mat->ia = new integer[A.nRows()+1];
+    mat->ja = new integer[A.nVal()];
+
+    mat->a = new float[A.nVal()];
+    memcpy (mat->a, A.ValPtr(), A.nVal()*sizeof(float));
     // need to copy the value array because it is corrupted by
     // the solver
 
@@ -54,9 +71,102 @@ void DeleteDmat (Dmat *mat)
     delete []mat->a;
 }
 
+//#endif
+
+void CreateZmat (const CCompRowMatrix &A, Zmat *mat)
+{
+    int i, j, nv = A.nVal();
+    mat->nr = A.nRows();
+    mat->nc = A.nCols();
+    mat->nnz = nv;
+    mat->ia = new integer[A.nRows()+1];
+    mat->ja = new integer[nv];
+    mat->a  = new ilu_doublecomplex[nv];
+
+    const toast::complex *vptr = A.ValPtr();
+    for (i = 0; i < nv; i++) {
+	mat->a[i].r = vptr[i].re;
+	mat->a[i].i = vptr[i].im;
+    }
+
+    for (i = 0; i <= A.nRows(); i++)
+	mat->ia[i] = A.rowptr[i]+1;
+    for (j = 0; j < A.nVal(); j++)
+	mat->ja[j] = A.colidx[j]+1;
+}
+
+void CreateCmat (const SCCompRowMatrix &A, Cmat *mat)
+{
+    int i, j, nv = A.nVal();
+
+    mat->nr = A.nRows();
+    mat->nc = A.nCols();
+    mat->ia = new integer[A.nRows()+1];
+    mat->ja = new integer[nv];
+    mat->a  = new ::complex[nv];
+
+    const scomplex *vptr = A.ValPtr();
+    for (i = 0; i < nv; i++) {
+	mat->a[i].r = vptr[i].re;
+	mat->a[i].i = vptr[i].im;
+    }
+
+    for (i = 0; i <= A.nRows(); i++)
+	mat->ia[i] = A.rowptr[i]+1;
+    for (j = 0; j < A.nVal(); j++)
+	mat->ja[j] = A.colidx[j]+1;
+}
+
+
+void CreateZSYMmat (const CCompRowMatrix &A, Zmat *mat)
+{
+    // creates a symmetric ILU Zmat from a general TOAST matrix
+    // simply takes upper triangle without testing for symmetry
+
+    int i, j, r, c, nz, nv = A.nVal();
+    const toast::complex *vptr = A.ValPtr();
+
+    mat->nr = A.nRows();
+    mat->nc = A.nCols();
+    mat->ia = new integer[A.nRows()+1];
+    mat->ia[0] = 1;
+
+    // pass 1: scan for nonzeros in upper triangle
+    for (r = 0; r < A.nRows(); r++) {
+	nz = 0;
+	for (i = A.rowptr[r]; i < A.rowptr[r+1]; i++) {
+	    c = A.colidx[i];
+	    if (c >= r) nz++; // upper triangle
+	}
+	mat->ia[r+1] = mat->ia[r]+nz;
+    }
+    nz = mat->ia[A.nRows()]-1;
+    mat->ja = new integer[nz];
+    mat->a  = new ilu_doublecomplex[nz];
+
+    // pass 2: fill column index and value arrays
+    for (r = nz = 0; r < A.nRows(); r++) {
+	for (i = A.rowptr[r]; i < A.rowptr[r+1]; i++) {
+	    c = A.colidx[i];
+	    if (c >= r) {
+		mat->ja[nz] = c+1;
+		mat->a[nz].r = vptr[i].re;
+		mat->a[nz].i = vptr[i].im;
+		nz++;
+	    }
+	}
+    }
+}
+
+void DeleteZmat (Zmat *mat)
+{
+    delete []mat->ia;
+    delete []mat->ja;
+    delete []mat->a;
+}
 void ILUSolveDGNL (const RCompRowMatrix &A, const RVector &b, RVector &x)
 {
-    Dmat Ailu;
+   /* Dmat Ailu;
     DAMGlevelmat PRE;
     DILUPACKparam param;
     int flags, elbow, max_it, ierr, nrestart;
@@ -92,85 +202,76 @@ void ILUSolveDGNL (const RCompRowMatrix &A, const RVector &b, RVector &x)
     droptols[1] = 1e-2; elbow = 5;
     DGNLAMGsetparams (Ailu, &param, flags, elbow, droptols, condest, restol,
 		      max_it, nrestart);
-    ierr = DGNLAMGfactor (&Ailu, &PRE, &nlev, &param, perm0, perm, permf);
-    ierr = DGNLAMGsolver (Ailu, PRE, nlev, &param, sol, rhs);
+    ierr = DGNLAMGfactor (&Ailu, &PRE, &nlev, &param, perm0, perm, permf);*/
+     Dmat ilupackA;
+    CreateDmat(A, &ilupackA);
+ 
+    DAMGlevelmat  PRE;
+    DILUPACKparam param;
+
+    DGNLAMGinit(&ilupackA, &param);
+    param.matching=1;
+    param.ordering="metisn";
+    param.droptol=1e-2;
+    param.droptolS=0.1*param.droptol;
+    param.condest=5;
+    param.elbow=5;
+
+    long int ierr;
+
+    ierr=DGNLAMGfactor(&ilupackA, &PRE, &param);
+
+    switch (ierr)
+    {
+           case  0: /* perfect! */
+	            printf("factorization successful with %d levels completed\n", 
+			   PRE.nlev);
+		    printf("final elbow space factor=%8.2f\n",param.elbow+0.005);
+	            break;
+           case -1: /* Error. input matrix may be wrong.
+                       (The elimination process has generated a
+			row in L or U whose length is .gt.  n.) */
+	            printf("Error. input matrix may be wrong at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -2: /* The matrix L overflows the array alu */
+	            printf("The matrix L overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -3: /* The matrix U overflows the array alu */
+	            printf("The matrix U overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -4: /* Illegal value for lfil */
+	            printf("Illegal value for lfil at level %d\n",PRE.nlev);
+		    break;
+           case -5: /* zero row encountered */
+	            printf("zero row encountered at level %d\n",PRE.nlev);
+		    break;
+           case -6: /* zero column encountered */
+	            printf("zero column encountered at level %d\n",PRE.nlev);
+		    break;
+           case -7: /* buffers too small */
+	            printf("buffers are too small\n");
+           default: /* zero pivot encountered at step number ierr */
+	            printf("zero pivot encountered at step number %d of level %d\n",
+			   ierr,PRE.nlev);
+		    break;
+    } /* end switch */
+	
+    double *rhs = (double*)b.data_buffer();
+    double *sol = (double*)x.data_buffer();
+
+    ierr = DGNLAMGsolver (&ilupackA, &PRE, &param, sol, rhs);
+    DGNLAMGdelete(&ilupackA,&PRE,&param);
+
     //delete []dbuff;
-}
-#endif
-
-void CreateZmat (const CCompRowMatrix &A, Zmat *mat)
-{
-    int i, j, nv = A.nVal();
-
-    mat->nr = A.nRows();
-    mat->nc = A.nCols();
-    mat->ia = new int[A.nRows()+1];
-    mat->ja = new int[nv];
-    mat->a  = new doublecomplex[nv];
-
-    const toast::complex *vptr = A.ValPtr();
-    for (i = 0; i < nv; i++) {
-	mat->a[i].r = vptr[i].re;
-	mat->a[i].i = vptr[i].im;
-    }
-
-    for (i = 0; i <= A.nRows(); i++)
-	mat->ia[i] = A.rowptr[i]+1;
-    for (j = 0; j < A.nVal(); j++)
-	mat->ja[j] = A.colidx[j]+1;
-}
-
-void CreateZSYMmat (const CCompRowMatrix &A, Zmat *mat)
-{
-    // creates a symmetric ILU Zmat from a general TOAST matrix
-    // simply takes upper triangle without testing for symmetry
-
-    int i, j, r, c, nz, nv = A.nVal();
-    const toast::complex *vptr = A.ValPtr();
-
-    mat->nr = A.nRows();
-    mat->nc = A.nCols();
-    mat->ia = new int[A.nRows()+1];
-    mat->ia[0] = 1;
-
-    // pass 1: scan for nonzeros in upper triangle
-    for (r = 0; r < A.nRows(); r++) {
-	nz = 0;
-	for (i = A.rowptr[r]; i < A.rowptr[r+1]; i++) {
-	    c = A.colidx[i];
-	    if (c >= r) nz++; // upper triangle
-	}
-	mat->ia[r+1] = mat->ia[r]+nz;
-    }
-    nz = mat->ia[A.nRows()]-1;
-    mat->ja = new int[nz];
-    mat->a  = new doublecomplex[nz];
-
-    // pass 2: fill column index and value arrays
-    for (r = nz = 0; r < A.nRows(); r++) {
-	for (i = A.rowptr[r]; i < A.rowptr[r+1]; i++) {
-	    c = A.colidx[i];
-	    if (c >= r) {
-		mat->ja[nz] = c+1;
-		mat->a[nz].r = vptr[i].re;
-		mat->a[nz].i = vptr[i].im;
-		nz++;
-	    }
-	}
-    }
-}
-
-void DeleteZmat (Zmat *mat)
-{
-    delete []mat->ia;
-    delete []mat->ja;
-    delete []mat->a;
 }
 
 int ILUSolveZGNL (const CCompRowMatrix &A, const CVector &b, CVector &x,
     double tol, double droptol, int maxit)
 {
-    Zmat Ailu;
+    /*Zmat Ailu;
     ZAMGlevelmat PRE;
     ZILUPACKparam param;
     int flags, elbow, max_it, ierr, nrestart;
@@ -248,7 +349,69 @@ int ILUSolveZGNL (const CCompRowMatrix &A, const CVector &b, CVector &x,
     ZGNLAMGsetparams (Ailu, &param, flags, elbow, droptols, condest, restol,
 		      max_it, nrestart);
     ierr = ZGNLAMGfactor (&Ailu, &PRE, &nlev, &param, perm0, perm, permf);
-    ierr = ZGNLAMGsolver (Ailu, PRE, nlev, &param, sol, rhs);
+    ierr = ZGNLAMGsolver (Ailu, PRE, nlev, &param, sol, rhs);*/
+    Zmat ilupackA;
+    CreateZmat(A, &ilupackA);
+ 
+    ZAMGlevelmat  PRE;
+    ZILUPACKparam param;
+
+    ZGNLAMGinit(&ilupackA, &param);
+    param.matching=1;
+    param.ordering="metisn";
+    param.droptol=1e-2;
+    param.droptolS=0.1*param.droptol;
+    param.condest=5;
+    param.elbow=5;
+
+    long int ierr;
+
+    ierr=ZGNLAMGfactor(&ilupackA, &PRE, &param);
+
+    switch (ierr)
+    {
+           case  0: /* perfect! */
+	            printf("factorization successful with %d levels completed\n", 
+			   PRE.nlev);
+		    printf("final elbow space factor=%8.2f\n",param.elbow+0.005);
+	            break;
+           case -1: /* Error. input matrix may be wrong.
+                       (The elimination process has generated a
+			row in L or U whose length is .gt.  n.) */
+	            printf("Error. input matrix may be wrong at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -2: /* The matrix L overflows the array alu */
+	            printf("The matrix L overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -3: /* The matrix U overflows the array alu */
+	            printf("The matrix U overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -4: /* Illegal value for lfil */
+	            printf("Illegal value for lfil at level %d\n",PRE.nlev);
+		    break;
+           case -5: /* zero row encountered */
+	            printf("zero row encountered at level %d\n",PRE.nlev);
+		    break;
+           case -6: /* zero column encountered */
+	            printf("zero column encountered at level %d\n",PRE.nlev);
+		    break;
+           case -7: /* buffers too small */
+	            printf("buffers are too small\n");
+           default: /* zero pivot encountered at step number ierr */
+	            printf("zero pivot encountered at step number %d of level %d\n",
+			   ierr,PRE.nlev);
+		    break;
+    } /* end switch */
+	
+    ilu_doublecomplex *rhs = (ilu_doublecomplex*)b.data_buffer();
+    ilu_doublecomplex *sol = (ilu_doublecomplex*)x.data_buffer();
+
+    ierr = ZGNLAMGsolver (&ilupackA, &PRE, &param, sol, rhs);
+    ZGNLAMGdelete(&ilupackA,&PRE,&param);
+
 
     return ierr;
     //delete []dbuff;
@@ -258,7 +421,7 @@ int ILUSolveZGNL (const CCompRowMatrix &A, const CVector &b, CVector &x,
 int ILUSolveZSYM (const CCompRowMatrix &A, const CVector &b, CVector &x,
     double tol, double droptol, int maxit)
 {
-    Zmat Ailu;
+    /*Zmat Ailu;
     ZAMGlevelmat PRE;
     ZILUPACKparam param;
     int flags, elbow, max_it, ierr, nrestart;
@@ -332,13 +495,76 @@ int ILUSolveZSYM (const CCompRowMatrix &A, const CVector &b, CVector &x,
 		      max_it);
     ierr = ZSYMAMGfactor (&Ailu, &PRE, &nlev, &param, perm0, perm, permf);
     ierr = ZSYMAMGsolver (Ailu, PRE, nlev, &param, sol, rhs);
+*/
+    Zmat ilupackA;
+    CreateZmat(A, &ilupackA);
+ 
+    ZAMGlevelmat  PRE;
+    ZILUPACKparam param;
+
+    ZSYMAMGinit(&ilupackA, &param);
+    param.matching=1;
+    param.ordering="metisn";
+    param.droptol=1e-2;
+    param.droptolS=0.1*param.droptol;
+    param.condest=5;
+    param.elbow=5;
+
+    long int ierr;
+
+    ierr=ZSYMAMGfactor(&ilupackA, &PRE, &param);
+
+    switch (ierr)
+    {
+           case  0: /* perfect! */
+	            printf("factorization successful with %d levels completed\n", 
+			   PRE.nlev);
+		    printf("final elbow space factor=%8.2f\n",param.elbow+0.005);
+	            break;
+           case -1: /* Error. input matrix may be wrong.
+                       (The elimination process has generated a
+			row in L or U whose length is .gt.  n.) */
+	            printf("Error. input matrix may be wrong at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -2: /* The matrix L overflows the array alu */
+	            printf("The matrix L overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -3: /* The matrix U overflows the array alu */
+	            printf("The matrix U overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -4: /* Illegal value for lfil */
+	            printf("Illegal value for lfil at level %d\n",PRE.nlev);
+		    break;
+           case -5: /* zero row encountered */
+	            printf("zero row encountered at level %d\n",PRE.nlev);
+		    break;
+           case -6: /* zero column encountered */
+	            printf("zero column encountered at level %d\n",PRE.nlev);
+		    break;
+           case -7: /* buffers too small */
+	            printf("buffers are too small\n");
+           default: /* zero pivot encountered at step number ierr */
+	            printf("zero pivot encountered at step number %d of level %d\n",
+			   ierr,PRE.nlev);
+		    break;
+    } /* end switch */
+	
+    ilu_doublecomplex *rhs = (ilu_doublecomplex*)b.data_buffer();
+    ilu_doublecomplex *sol = (ilu_doublecomplex*)x.data_buffer();
+
+    ierr = ZSYMAMGsolver (&ilupackA, &PRE, &param, sol, rhs);
+    ZSYMAMGdelete(&ilupackA,&PRE,&param);
+
+
 
     return ierr;
     //delete []dbuff;
     
 
 }
-
 
 #else // !HAVE_ILU
 

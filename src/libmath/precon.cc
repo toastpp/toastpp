@@ -10,7 +10,8 @@
 #define MATHLIB_IMPLEMENTATION
 
 #include "mathlib.h"
-
+#include "ilutoast.h"
+#include <ilupack.h>
 using namespace std;
 using namespace toast;
 
@@ -32,6 +33,9 @@ TPreconditioner<MT> *TPreconditioner<MT>::Create (PreconType type)
 	break;
     case PRECON_DILU:         // diagonal incomplete LU decomposition
         return new TPrecon_DILU<MT>;
+	break;
+     case PRECON_ILU:         // diagonal incomplete LU decomposition
+        return new TPrecon_ILU<MT>;
 	break;
     //case PRECON_CG_MULTIGRID: // CG multigrid
         //return new TPrecon_CG_Multigrid<MT>;
@@ -64,7 +68,7 @@ void TPrecon_Diag<MT>::ResetFromDiagonal (const TVector<MT> &diag)
 }
 
 template<class MT>
-void TPrecon_Diag<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
+void TPrecon_Diag<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) 
 {
     dASSERT(r.Dim() == idiag.Dim(), Dimension mismatch);
     dASSERT(s.Dim() == idiag.Dim(), Dimension mismatch);
@@ -73,7 +77,7 @@ void TPrecon_Diag<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
 
 template<class MT>
 void TPrecon_Diag<MT>::Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
-{
+ {
     dASSERT(r.nRows() == idiag.Dim(), Dimension mismatch);
     dASSERT(s.nRows() == r.nRows(), Dimension mismatch);
     dASSERT(s.nCols() == r.nCols(), Dimension mismatch);
@@ -110,7 +114,7 @@ void TPrecon_IC<MT>::Reset (const TMatrix<MT> *A)
 }
 
 template<class MT>
-void TPrecon_IC<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
+void TPrecon_IC<MT>::Apply (const TVector<MT> &r, TVector<MT> &s)
 {
     CholeskySolve (L, d, r, s);
 }
@@ -143,7 +147,7 @@ void TPrecon_DILU<MT>::Reset (const TMatrix<MT> *_A)
 }
 
 template<class MT>
-void TPrecon_DILU<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) const
+void TPrecon_DILU<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) 
 {
     int i, j, k, nz;
     MT sum;
@@ -182,7 +186,6 @@ void TPrecon_CG_Multigrid<MT>::Reset (const TMatrix<MT> *_A)
 
 template<class MT>
 void TPrecon_CG_Multigrid<MT>::Apply (const TVector<MT> &r, TVector<MT> &s)
-    const
 {
     MGM (r, s, 0);
 }
@@ -265,7 +268,7 @@ void SCPreconMixed_Diag::Reset (const SCCompRowMatrixMixed *A)
     idiag = MakeCVector(inv (A->Diag()));
 }
 
-void SCPreconMixed_Diag::Apply (const CVector &r, CVector &s) const
+void SCPreconMixed_Diag::Apply (const CVector &r, CVector &s)
 {
     dASSERT(r.Dim() == idiag.Dim(), Dimension mismatch);
     dASSERT(s.Dim() == idiag.Dim(), Dimension mismatch);
@@ -277,12 +280,12 @@ void SCPreconMixed_DILU::Reset (const SCCompRowMatrixMixed *_A)
     // assumes symmetric A
     A = _A;
 
-    const complex unit = complex(1,0);
+    const toast::complex unit = toast::complex(1,0);
     int i, r, c, nz;
     dim = (A->nRows() < A->nCols() ? A->nRows() : A->nCols());
     CVector Ar(A->nCols());
     int *ci = new int[dim];
-    complex *rv = new complex[dim];
+    toast::complex *rv = new toast::complex[dim];
     if (ipivot.Dim() != dim) ipivot.New (dim);
     ipivot = MakeCVector (A->Diag());
     for (r = 0; r < dim; r++) {
@@ -295,30 +298,119 @@ void SCPreconMixed_DILU::Reset (const SCCompRowMatrixMixed *_A)
     delete []rv;
 }
 
-void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s) const
+void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s)
 {
     int i, j, k, nz;
-    complex sum;
+    toast::complex sum;
     CVector row(dim);
     CVector z(dim);
     int *ci = new int[dim];
-    complex *rv = new complex[dim];
+    toast::complex *rv = new toast::complex[dim];
     for (i = 0; i < dim; i++) {
         nz = A->SparseRow (i, ci, rv);
-	sum = complex(0,0);
+	sum = toast::complex(0,0);
 	for (k = 0; k < nz; k++)
 	    if ((j = ci[k]) < i) sum += rv[k]*z[j];
 	z[i] = ipivot[i]*(r[i]-sum);
     }
     for (i = dim-1; i >= 0; i--) {
         nz = A->SparseRow (i, ci, rv);
-	sum = complex(0,0);
+	sum = toast::complex(0,0);
 	for (k = 0; k < nz; k++)
 	    if ((j = ci[k]) > i) sum += rv[k]*s[j];
 	s[i] = z[i] - ipivot[i]*sum;
     }
     delete []ci;
     delete []rv;
+}
+
+// ==========================================================================
+// class TPrecon_ILU
+template <>
+void TPrecon_ILU<toast::complex>::Reset (TCompRowMatrix<toast::complex> &_A, int matching, char *ordering, double droptol, int condest, int elbow)
+{
+    CreateZmat(_A, &A);
+
+    ZGNLAMGinit(&A, &param);
+    param.matching=matching;
+    param.ordering = ordering;
+    param.droptol = droptol;
+    param.droptolS = 0.1*param.droptol;
+    param.condest=condest;
+    param.elbow=elbow;
+
+    long int ierr;
+    ierr=ZGNLAMGfactor(&A, &PRE, &param);
+    
+    switch (ierr)
+    {
+           case  0: /* perfect! */
+	            printf("factorization successful with %d levels completed\n", 
+			   PRE.nlev);
+		    printf("final elbow space factor=%8.2f\n",param.elbow+0.005);
+	            break;
+           case -1: /* Error. input matrix may be wrong.
+                       (The elimination process has generated a
+			row in L or U whose length is .gt.  n.) */
+	            printf("Error. input matrix may be wrong at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -2: /* The matrix L overflows the array alu */
+	            printf("The matrix L overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -3: /* The matrix U overflows the array alu */
+	            printf("The matrix U overflows the array alu at level %d\n",
+			   PRE.nlev);
+		    break;
+           case -4: /* Illegal value for lfil */
+	            printf("Illegal value for lfil at level %d\n",PRE.nlev);
+		    break;
+           case -5: /* zero row encountered */
+	            printf("zero row encountered at level %d\n",PRE.nlev);
+		    break;
+           case -6: /* zero column encountered */
+	            printf("zero column encountered at level %d\n",PRE.nlev);
+		    break;
+           case -7: /* buffers too small */
+	            printf("buffers are too small\n");
+           default: /* zero pivot encountered at step number ierr */
+	            printf("zero pivot encountered at step number %d of level %d\n",
+			   ierr,PRE.nlev);
+		    break;
+    } /* end switch */
+
+    rhs = new ilu_doublecomplex[A.nr];
+    sol = new ilu_doublecomplex[A.nr];
+}
+
+template<class MT>
+TPrecon_ILU<MT>::~TPrecon_ILU ()
+{
+	ZGNLAMGdelete(&A,&PRE,&param);
+	delete []rhs;
+	delete []sol;
+	delete []A.ia;
+	delete []A.ja;
+	delete []A.a;
+}
+
+template<>
+void TPrecon_ILU<toast::complex>::Apply (const TVector<toast::complex> &rh, TVector<toast::complex> &s)
+{
+	/*for(int j=0; j < A.nr; j++)
+	{
+		rhs[j].r = rh[j].re;
+		rhs[j].i = rh[j].im;
+	}*/
+	memcpy(rhs, rh.data_buffer(), A.nr*sizeof(ilu_doublecomplex));
+	ZGNLAMGsol(&PRE, &param, rhs, sol);
+	memcpy(s.data_buffer(), sol, A.nr*sizeof(ilu_doublecomplex));
+	/*for(int j=0; j < A.nr; j++)
+	{
+		s[j].re = sol[j].r;
+		s[j].im = sol[j].i;
+	}*/
 }
 
 
@@ -332,6 +424,7 @@ template class MATHLIB TPrecon_Null<float>;
 template class MATHLIB TPrecon_Diag<float>;
 template class MATHLIB TPrecon_IC<float>;
 template class MATHLIB TPrecon_DILU<float>;
+template class MATHLIB TPrecon_ILU<float>;
 template class MATHLIB TPrecon_CG_Multigrid<float>;
 
 template class MATHLIB TPreconditioner<double>;
@@ -339,20 +432,23 @@ template class MATHLIB TPrecon_Null<double>;
 template class MATHLIB TPrecon_Diag<double>;
 template class MATHLIB TPrecon_IC<double>;
 template class MATHLIB TPrecon_DILU<double>;
+template class MATHLIB TPrecon_ILU<double>;
 template class MATHLIB TPrecon_CG_Multigrid<double>;
 
-template class MATHLIB TPreconditioner<complex>;
-template class MATHLIB TPrecon_Null<complex>;
-template class MATHLIB TPrecon_Diag<complex>;
-template class MATHLIB TPrecon_IC<complex>;
-template class MATHLIB TPrecon_DILU<complex>;
-template class MATHLIB TPrecon_CG_Multigrid<complex>;
+template class MATHLIB TPreconditioner<toast::complex>;
+template class MATHLIB TPrecon_Null<toast::complex>;
+template class MATHLIB TPrecon_Diag<toast::complex>;
+template class MATHLIB TPrecon_IC<toast::complex>;
+template class MATHLIB TPrecon_DILU<toast::complex>;
+template class MATHLIB TPrecon_ILU<toast::complex>;
+template class MATHLIB TPrecon_CG_Multigrid<toast::complex>;
 
 template class MATHLIB TPreconditioner<scomplex>;
 template class MATHLIB TPrecon_Null<scomplex>;
 template class MATHLIB TPrecon_Diag<scomplex>;
 template class MATHLIB TPrecon_IC<scomplex>;
 template class MATHLIB TPrecon_DILU<scomplex>;
+template class MATHLIB TPrecon_ILU<scomplex>;
 template class MATHLIB TPrecon_CG_Multigrid<scomplex>;
 
 #endif // NEED_EXPLICIT_INSTANTIATION

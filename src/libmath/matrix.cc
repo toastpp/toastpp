@@ -22,7 +22,7 @@ using namespace toast;
 // ==========================================================================
 typedef TMatrix<double>  RMatrix;	// 'real'
 typedef TMatrix<float>   FMatrix;	// 'float'
-typedef TMatrix<complex> CMatrix;	// 'complex'
+typedef TMatrix<toast::complex> CMatrix;	// 'toast::complex'
 typedef TMatrix<int>     IMatrix;	// 'integer'
 // ==========================================================================
 
@@ -142,7 +142,7 @@ void TMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
 
 template<class MT>
 MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon, int maxit)
+    double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     dASSERT(A.rows == A.cols, Matrix not square);
     dASSERT(b.Dim() == A.rows, Dimension mismatch);
@@ -211,7 +211,7 @@ MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
 template<class MT>
 MATHLIB int PCG (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
     void *context), void * context, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon, int maxit)
+    double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     double dnew, dold, alpha, beta;
     double err, bnorm;
@@ -260,7 +260,7 @@ MATHLIB int PCG (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 
 template<class MT>
 int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon, int maxit)
+    double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
     double rho, alpha, aden, beta, bden, err, bnorm;
@@ -316,8 +316,8 @@ int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 
 template<> // specialisation: complex
 // should try to merge this into the templated version
-int BiPCG<complex> (const CMatrix &A, const CVector &b, CVector &x,
-    double &tol, const CPreconditioner *cprecon, int maxit)
+int BiPCG<toast::complex> (const CMatrix &A, const CVector &b, CVector &x,
+    double &tol, CPreconditioner *cprecon, int maxit)
 {
     int i, niter, dim = x.Dim();
     double rho=0, alpha, aden, beta, bden, err, bnorm;
@@ -435,7 +435,7 @@ void TMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
 
 template<class MT>
 MATHLIB int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon, int maxit)
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
     double rho=0, alpha, aden, beta, bden, omega, err, bnorm;
@@ -497,8 +497,8 @@ MATHLIB int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
 }
 
 template<> // specialisation: complex
-MATHLIB int BiCGSTAB<complex> (const CMatrix &A, const CVector &b,
-    CVector &x, double &tol, const CPreconditioner *precon, int maxit)
+MATHLIB int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
+    CVector &x, double &tol, CPreconditioner *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
     double err, bnorm, rho=0, rhop, alpha, beta, omega, aden, onum, oden;
@@ -646,7 +646,7 @@ MATHLIB void BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> *b,
 template<class MT>
 MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
     void *context), void *context, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon, int maxit)
+    double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
     MT rho = (MT)0, aden, bden, alpha, beta, omega;
@@ -716,7 +716,7 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 // MVM is "in place" Matrix vector multiply.
 template<class MT>
 MATHLIB int BiCGSTAB (void (* MVM)( TVector<MT> &),  const TVector<MT> &b, 
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon, int maxit)
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
     double rho=0, alpha, aden, beta, bden, omega, err, bnorm;
@@ -789,7 +789,7 @@ MATHLIB int BiCGSTAB (void (* MVM)( TVector<MT> &),  const TVector<MT> &b,
 
 template<class MT>
 MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon, int restart,
+    double &tol, TPreconditioner<MT> *precon, int restart,
     void (*clbk)(void*))
 {
     return gmres (restart, A, b, x, precon, tol, clbk);
@@ -798,7 +798,7 @@ MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 template<class MT>
 MATHLIB int GMRES (TVector<MT> (*Av_clbk)(const TVector<MT> &v, void *context),
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,
-    const TPreconditioner<MT> *precon, int restart, int *iter, double *res)
+    TPreconditioner<MT> *precon, int restart, int *iter, double *res)
 {
     int it = gmres (restart, Av_clbk, b, x, precon, tol, context);
     if (iter) *iter = it;
@@ -813,7 +813,7 @@ MATHLIB int GMRES (TVector<MT> (*Av_clbk)(const TVector<MT> &v, void *context),
 
 template class MATHLIB TMatrix<double>;
 template class MATHLIB TMatrix<float>;
-template class MATHLIB TMatrix<complex>;
+template class MATHLIB TMatrix<toast::complex>;
 template class MATHLIB TMatrix<scomplex>;
 template class MATHLIB TMatrix<int>;
 
@@ -848,26 +848,16 @@ template MATHLIB FVector  ATA_diag (const FMatrix &A);
 template MATHLIB CVector  ATA_diag (const CMatrix &A);
 template MATHLIB SCVector ATA_diag (const SCMatrix &A);
 
-template MATHLIB int PCG (const FMatrix &A, const FVector &b, FVector &x,
-    double &tol, const FPreconditioner *precon, int maxit);
-template MATHLIB int PCG (const RMatrix &A, const RVector &b, RVector &x,
-    double &tol, const RPreconditioner *precon, int maxit);
-
-template MATHLIB void PCG (const FMatrix &A, const FVector *b, FVector *x,
-    int nrhs, double tol, int maxit, const FPreconditioner *precon,
-    IterativeSolverResult *res);
-template MATHLIB void PCG (const RMatrix &A, const RVector *b, RVector *x,
-    int nrhs, double tol, int maxit, const RPreconditioner *precon,
-    IterativeSolverResult *res);
-
+template MATHLIB int PCG (const RMatrix &A, const RVector &b, RVector &x, double &tol,
+      RPreconditioner *precon, int maxit);
 template MATHLIB int PCG (RVector (*Mv_clbk)( const RVector &v,
     void *context), void * context, const RVector &b, RVector &x,
-    double &tol, const RPreconditioner *precon, int maxit);
+    double &tol, RPreconditioner *precon, int maxit);
 
 template MATHLIB int BiCGSTAB (const FMatrix &A, const FVector &b,
     FVector &x, double &tol, const FPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (const RMatrix &A, const RVector &b,
-    RVector &x, double &tol, const RPreconditioner *precon, int maxit);
+    RVector &x, double &tol, RPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (const IMatrix &A, const IVector &b,
     IVector &x, double &tol, const IPreconditioner *precon, int maxit);
 
@@ -889,28 +879,28 @@ template MATHLIB void BiCGSTAB (const IMatrix &A, const IVector *b, IVector *x,
 
 template MATHLIB int BiCGSTAB (RVector(*Mv_clbk)(const RVector &v,
     void *context), void *context, const RVector &b, RVector &x,
-    double &tol, const RPreconditioner *precon, int maxit);
+    double &tol, RPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (CVector(*Mv_clbk)(const CVector &v,
     void *context), void *context, const CVector &b, CVector &x,
-    double &tol, const CPreconditioner *precon, int maxit);
+    double &tol, CPreconditioner *precon, int maxit);
 template MATHLIB int BiCGSTAB (void (* MVM)(RVector &),  const RVector &b, 
-    RVector &x, double &tol, const RPreconditioner *precon, int maxit);
+    RVector &x, double &tol, RPreconditioner *precon, int maxit);
 
 template MATHLIB int GMRES (const FMatrix &A, const FVector &b, FVector &x,
     double &tol, const FPreconditioner *precon, int maxit, void(*clbk)(void*));
 template MATHLIB int GMRES (const RMatrix &A, const RVector &b, RVector &x,
-    double &tol, const RPreconditioner *precon, int maxit, void(*clbk)(void*));
+    double &tol, RPreconditioner *precon, int maxit, void(*clbk)(void*));
 template MATHLIB int GMRES (const CMatrix &A, const CVector &b, CVector &x,
-    double &tol, const CPreconditioner *precon, int maxit, void(*clbk)(void*));
+    double &tol, CPreconditioner *precon, int maxit, void(*clbk)(void*));
 template MATHLIB int GMRES (const SCMatrix &A, const SCVector &b, SCVector &x,
-    double &tol, const SCPreconditioner *precon, int maxit,
+    double &tol, SCPreconditioner *precon, int maxit,
     void(*clbk)(void*));
 
 template MATHLIB int GMRES (RVector (*Av_clbk)(const RVector &v, void *context),
     void *context, const RVector &b, RVector &x, double tol,
-    const RPreconditioner *precon, int restart, int *iter, double *res);
+    RPreconditioner *precon, int restart, int *iter, double *res);
 template MATHLIB int GMRES (CVector (*Av_clbk)(const CVector &v, void *context),
     void *context, const CVector &b, CVector &x, double tol,
-    const CPreconditioner *precon, int restart, int *iter, double *res);
+    CPreconditioner *precon, int restart, int *iter, double *res);
 
 #endif // NEED_EXPLICIT_INSTANTIATION
