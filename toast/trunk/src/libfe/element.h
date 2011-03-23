@@ -65,7 +65,7 @@ class Surface;
 class Element;
 class Mesh;
 
-typedef struct ElementSubdivisionData {
+struct ElementSubdivisionData {
     int level;             // subdivision level (>= 0)
     Element *sibling;      // sibling neighbour for dual splits
     bool is_sibling0;      // distinguish the two siblings
