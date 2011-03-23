@@ -89,7 +89,7 @@ CCompRowMatrix myCCompRowMatrix::AttA ()
   At.Transpone();
 
   int i, j,k;//, n = nCols();
-  complex at_ik, at_jk;
+  toast::complex at_ik, at_jk;
   // cerr<<"A"<<endl;
   //CCoordMatrix ata(At.nRows(), At.nRows());
   CDenseMatrix ata2(At.nRows(), At.nRows());

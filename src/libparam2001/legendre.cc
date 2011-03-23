@@ -78,7 +78,7 @@ double plgndr(int l, int m, double x) //Computes the associated Legendre polynom
 
 
 
-complex SphericalHarmonic(int l,int m, double thi, double fi)// calculates the spherical harmonic
+toast::complex SphericalHarmonic(int l,int m, double thi, double fi)// calculates the spherical harmonic
                                                          //of degree l order m at the (thi,fi) point
 { 
 
@@ -128,7 +128,7 @@ complex SphericalHarmonic(int l,int m, double thi, double fi)// calculates the s
       im = (-1)*d1 * mon * d2 * p * i;
       //  cout <<re<<"  "<<im<<" i";
     }  
-  complex z(re,im);
+  toast::complex z(re,im);
   //  cout << " complex z= " << z << endl;
   return z;   
 }
