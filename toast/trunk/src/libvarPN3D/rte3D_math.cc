@@ -1,19 +1,17 @@
 #include <sstream>
 #include <unistd.h>
 #include <time.h>
-#include <fstream.h>
-#include <iomanip.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include<stdio.h>
 #include <mathlib.h>
 #include <felib.h>
+#include <limits>
 #include "rte3D_math.h"
 using namespace toast;
 #define MIN(A,B) ( (A) < (B) ? (A) : (B))
 #define MAX(A,B) ( (A) > (B) ? (A) : (B))
-#define Alm(l, m) (sqrt(complex((((l)+(m))*((l)-(m)))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
-#define Blm(l, m) (sqrt(complex((((l)+(m))*((l)+(m)-1))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
+#define Alm(l, m) (sqrt(toast::complex((((l)+(m))*((l)-(m)))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
+#define Blm(l, m) (sqrt(toast::complex((((l)+(m))*((l)+(m)-1))/((double)(2*(l)+1)*(2*(l)-1)), 0)))
 
 double fac[] = {1.000000e+000, 1.000000e+000, 2.000000e+000, 6.000000e+000, 2.400000e+001, 1.200000e+002, 7.200000e+002, 5.040000e+003, 4.032000e+004, 3.628800e+005, 3.628800e+006, 3.991680e+007, 4.790016e+008, 6.227021e+009, 8.717829e+010, 1.307674e+012, 2.092279e+013, 3.556874e+014, 6.402374e+015, 1.216451e+017, 2.432902e+018, 5.109094e+019, 1.124001e+021, 2.585202e+022, 6.204484e+023, 1.551121e+025, 4.032915e+026, 1.088887e+028, 3.048883e+029, 8.841762e+030, 2.652529e+032, 8.222839e+033, 2.631308e+035, 8.683318e+036, 2.952328e+038, 1.033315e+040, 3.719933e+041, 1.376375e+043, 5.230226e+044, 2.039788e+046, 8.159153e+047, 3.345253e+049, 1.405006e+051, 6.041526e+052, 2.658272e+054, 1.196222e+056, 5.502622e+057, 2.586232e+059, 1.241392e+061, 6.082819e+062, 3.041409e+064, 1.551119e+066, 8.065818e+067, 4.274883e+069, 2.308437e+071, 1.269640e+073, 7.109986e+074, 4.052692e+076, 2.350561e+078, 1.386831e+080, 8.320987e+081, 5.075802e+083, 3.146997e+085, 1.982608e+087, 1.268869e+089, 8.247651e+090, 5.443449e+092, 3.647111e+094, 2.480036e+096, 1.711225e+098, 1.197857e+100, 8.504786e+101, 6.123446e+103, 4.470115e+105, 3.307885e+107, 2.480914e+109, 1.885495e+111, 1.451831e+113, 1.132428e+115, 8.946182e+116, 7.156946e+118, 5.797126e+120, 4.753643e+122, 3.945524e+124, 3.314240e+126, 2.817104e+128, 2.422710e+130, 2.107757e+132, 1.854826e+134, 1.650796e+136, 1.485716e+138, 1.352002e+140, 1.243841e+142, 1.156773e+144, 1.087366e+146, 1.032998e+148, 9.916779e+149, 9.619276e+151, 9.426890e+153, 9.332622e+155, 9.332622e+157};
 
@@ -64,11 +62,11 @@ int signum(int m){
 
 /* evaluates \int_{S^{2}} Y_{\ell_{1}, m_{1}} Y_{\ell_{2}, m_{2}} where both Y's are complex spherical harmonics
 */
-complex kronD(const IVector &a, const IVector &b)
+toast::complex kronD(const IVector &a, const IVector &b)
 {
         int l1 = a[0], l2 = b[0], m1 = a[1], m2 = b[1];
-	if(l1 >= 0 && l2>=0 && abs(m1) <= l1 && abs(m2) <= l2 && l1==l2 && m1 == -1*m2) return(complex(sign(m2), 0.0));
-	else return(complex(0.0, 0.0));
+	if(l1 >= 0 && l2>=0 && abs(m1) <= l1 && abs(m2) <= l2 && l1==l2 && m1 == -1*m2) return(toast::complex(sign(m2), 0.0));
+	else return(toast::complex(0.0, 0.0));
 }
 
 /** Computes associated Legendre polynomials of a given order on a set of points 
@@ -118,7 +116,7 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 	{
 		cplxSphHarm[l].New(2*l+1, numpts);
 	}
-	complex ctmp;
+	toast::complex ctmp;
         RDenseMatrix *LT;
 	LT = new RDenseMatrix[order+1];
 	for(int l=0; l<=order; l++)
@@ -142,14 +140,14 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 						if(normfac!=0){
 							ctmp.re = pt.Get(i, 0)/normfac; ctmp.im = -1*pt.Get(i, 1)/normfac;
 							ctmp = cpowi(ctmp, abs(m));
-							cplxSphHarm[l](k, i) = ctmp*complex(dtmp2, 0);
+							cplxSphHarm[l](k, i) = ctmp*toast::complex(dtmp2, 0);
 						}
 						break;
 	       				case 2:
 						if(normfac!=0){
 							ctmp.re = pt.Get(i, 0)/normfac; ctmp.im = pt.Get(i, 1)/normfac;
 							ctmp = cpowi(ctmp, abs(m));
-							cplxSphHarm[l](k, i) = ctmp*complex(dtmp2, 0);
+							cplxSphHarm[l](k, i) = ctmp*toast::complex(dtmp2, 0);
 						}
 						break;
 				}
@@ -157,7 +155,7 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 		k++;	
 		}
 	}
-	complex temp; 
+	toast::complex temp; 
         int indm;
 	for(int l=0; l<=order; l++)
 	{
@@ -167,7 +165,7 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 			{
 				for(int i=0; i<numpts; i++)
 				{
-					temp = (cplxSphHarm[l](m+l, i) + complex(sign(m), 0)*cplxSphHarm[l](l-m, i))/complex(sqrt(2), 0);
+					temp = (cplxSphHarm[l](m+l, i) + toast::complex(sign(m), 0)*cplxSphHarm[l](l-m, i))/toast::complex(sqrt(2), 0);
 					sphHarm[l](indm, i) = temp.re; 
 				}
 			}
@@ -175,7 +173,7 @@ void sphericalHarmonics(const int order, const int numpts, const RDenseMatrix& p
 			{
 				for(int i=0; i<numpts; i++)
 				{
-					temp = (cplxSphHarm[l](l+abs(m), i) - complex(sign(m), 0)*cplxSphHarm[l](l-abs(m), i))/complex(0, sqrt(2));
+					temp = (cplxSphHarm[l](l+abs(m), i) - toast::complex(sign(m), 0)*cplxSphHarm[l](l-abs(m), i))/toast::complex(0, sqrt(2));
 					sphHarm[l](indm, i) = temp.re;	 
 				}
 			}
@@ -341,6 +339,141 @@ void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const
 
 } 
 
+void BRIntUnitSphere(const double nin, const double nout, const int size1, const int size2, const int sphOrder1, const int sphOrder2,  const RDenseMatrix& pts, const RVector& wts, const RVector& bnormal, RDenseMatrix* &Ylm, RCompRowMatrix& bintplus, RCompRowMatrix& bintminus, RCompRowMatrix& brintminus)
+{
+	
+   int numpts = pts.nRows();
+
+   /*Finding points which are on the outward facing or inward facing sides*/ 
+   RDenseMatrix dnssdotnplus(1, numpts), dnssdotnminus(1, numpts), dnsrdotnminus(1, numpts);
+   for(int i=0; i < numpts; i++)
+   {
+	   double costheta = bnormal[0]*pts.Get(i, 0) + bnormal[1]*pts.Get(i, 1) + bnormal[2]*pts.Get(i, 2);
+	   if(costheta>0) dnssdotnplus(0, i) = costheta; 
+	   else if(costheta<0) 
+	   {
+		dnssdotnminus(0, i) = -costheta;
+		double sintheta_sq = 1 - costheta*costheta;
+		double term_sq = 1 - (nin*nin*sintheta_sq)/(nout*nout);
+		if(term_sq >0)
+		{
+			double eps = std::numeric_limits<double>::epsilon();
+
+			double nipnt = nin/nout;
+			double costht = sqrt( 1.0 - pow(nipnt, 2.0) * (1.0 - pow(costheta, 2.0)) );
+			double thi;
+				
+			if(costheta > 0.0) thi = acos(costheta);
+			else thi = acos(-costheta);
+			double tht = acos(costht);
+			double R;
+			if( !(sin(thi + tht) > eps) ) R = pow( (nipnt - 1.0) / (nipnt + 1.0), 2.0 );
+			else R = 0.5 * ( pow(sin(thi - tht) / sin(thi + tht), 2.0) + pow(tan(thi - tht) / tan(thi + tht), 2.0) );
+
+				/*double term = -sqrt(term);
+				//std::cout<<"nin: "<<nin<<" nout: "<<nout<<" costheta: "<<costheta<<"term in sqrt: "<< (1 - (nin*nin*sintheta_sq)/(nout*nout))<<" term: "<<term<<std::endl; 
+				double R_s = (nin*costheta - nout*term)/(nin*costheta + nout*term);
+				//std::cout<<"R_s: "<<R_s<<std::endl;
+				R_s *= R_s;
+				//std::cout<<"After squaring R_s: "<<R_s<<std::endl;
+				double R_p = (nin*term - nout*costheta)/(nin*term + nout*costheta);
+				//std::cout<<"R_p: "<<R_p<<std::endl;
+				R_p *= R_p;
+				//std::cout<<"After squaring R_p: "<<R_p<<std::endl;
+				//cout<<"term in sqrt: "<< (1 - (nin*nin*sintheta_sq)/(nout*nout))<<" R_s: "<<R_s<<" R_p: "<<R_p<<endl;
+				dnsrdotnminus(0, i) = 0.5*costheta*(R_s + R_p);
+				std::cout<<"if block "<<0.5*(R_s + R_p)<<std::endl;*/
+			dnsrdotnminus(0, i) = costheta*R;
+			//std::cout<<"if block "<<R<<std::endl;
+		}
+		else
+		{
+		     dnsrdotnminus(0, i) = costheta;
+		     //std::cout<<"else block 1"<<std::endl;
+		}
+	   }
+     }
+    
+    RDenseMatrix H(3, 3);
+    for(int i=0; i < 3; i++)
+    {
+	for(int j=0; j < 3; j++)
+	{
+		if(i == j) H(i, i) = -2*bnormal[i]*bnormal[i] + 1;
+		else H(i, j) = -2*bnormal[i]*bnormal[j];
+	}
+    }
+    // making them sparse for computational efficiency
+    RCompRowMatrix sdotnplus = shrink(dnssdotnplus);
+    RCompRowMatrix sdotnminus = shrink(dnssdotnminus);
+    RCompRowMatrix rsdotnminus = shrink(dnsrdotnminus);
+    const int *rowptr1, *colidx1, *rowptr2, *colidx2, *rowptr3, *colidx3;
+    sdotnplus.GetSparseStructure(&rowptr1, &colidx1);
+    sdotnminus.GetSparseStructure(&rowptr2, &colidx2);
+    rsdotnminus.GetSparseStructure(&rowptr3, &colidx3);
+ 
+    RDenseMatrix subPts(rowptr3[1], 3);
+    int idx = 0;
+    for(int i=0; i < rowptr3[1]; i++)
+    {
+	subPts(idx, 0) = H(0, 0)*pts.Get(colidx3[i], 0) + H(0, 1)*pts.Get(colidx3[i], 1) + H(0, 2)*pts.Get(colidx3[i], 2);
+	subPts(idx, 1) = H(1, 0)*pts.Get(colidx3[i], 0) + H(1, 1)*pts.Get(colidx3[i], 1) + H(1, 2)*pts.Get(colidx3[i], 2);	
+	subPts(idx, 2) = H(2, 0)*pts.Get(colidx3[i], 0) + H(2, 1)*pts.Get(colidx3[i], 1) + H(2, 2)*pts.Get(colidx3[i], 2);	
+	idx++;	
+    } 
+    
+    RDenseMatrix *YHlm;
+    YHlm = new RDenseMatrix[sphOrder1+1];
+    for(int l=0; l<=sphOrder1; l++)
+		YHlm[l].New(2*l+1, subPts.nRows());
+    sphericalHarmonics(sphOrder1, subPts.nRows(), subPts, YHlm);
+ 
+     //computing integrals by quadrature
+     int is, js, indl1, indm1, indl2, indm2;
+     RDenseMatrix dnsbintplus(size1, size2), dnsbintminus(size1, size2), dnsbrintminus(size1, size2);
+     for(int l1 = 0; l1 <= sphOrder1; l1++){
+	indl1 = l1*l1; 
+	for(int m1 = -1*l1; m1 <= l1; m1++){
+		indm1 = l1 + m1;
+		is = indl1 + indm1;
+	        for(int l2 = 0; l2 <= sphOrder2; l2++){
+			indl2 = l2*l2;
+			for(int m2 = -l2; m2 <= l2; m2++){
+				indm2 = l2 + m2;
+				js = indl2 + indm2;
+				for(int i=0; i<sdotnplus.nRows(); i++)
+				{
+					for(int j=rowptr1[i]; j < rowptr1[i+1]; j++)
+						dnsbintplus(is, js) += sdotnplus(i, colidx1[j])*Ylm[l1](indm1, colidx1[j])*Ylm[l2](indm2, colidx1[j])*wts[colidx1[j]]*4*M_PI;
+				}
+				for(int i=0; i<sdotnminus.nRows(); i++)
+				{
+					for(int j=rowptr2[i]; j < rowptr2[i+1]; j++)
+						dnsbintminus(is, js) += sdotnminus(i, colidx2[j])*Ylm[l1](indm1, colidx2[j])*Ylm[l2](indm2, colidx2[j])*wts[colidx2[j]]*4*M_PI;
+				}
+				for(int i=0; i<rsdotnminus.nRows(); i++)
+				{
+					int idx =0;
+					for(int j=rowptr3[i]; j < rowptr3[i+1]; j++)
+					{
+						dnsbrintminus(is, js) += rsdotnminus(i, colidx3[j])*YHlm[l1](indm1, idx)*Ylm[l2](indm2, colidx3[j])*wts[colidx3[j]]*4*M_PI;
+						idx++;
+					}
+				}
+			
+			}
+		}
+	
+	     }
+	}
+	delete []YHlm;	
+         //shrinking the matrices finally		
+         bintplus = shrink(dnsbintplus);
+	 bintminus = shrink(dnsbintminus);
+	 brintminus = shrink(dnsbrintminus);
+	
+} 
+
 /**Computes the maximum spherical harmonic order used in a given element
 **/
 void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVector& node_angN, const int el, int &maxSphOrder, int &maxAngN)
@@ -360,21 +493,21 @@ void findMaxLocalSphOrder(const Mesh &mesh, const IVector& sphOrder, const IVect
 /** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y_{l, -m} where the supercript 'R' denotes the real-valued spherical harmonics.
 * This function gives the value of a_{m}
 **/
-complex am(int m)
+toast::complex am(int m)
 {
-	if(m==0) return(complex(1.0, 0));
-	else if(m>0) return(complex(1.0/sqrt(2), 0));
-	else return(complex(0, sign(m)/sqrt(2)));
+	if(m==0) return(toast::complex(1.0, 0));
+	else if(m>0) return(toast::complex(1.0/sqrt(2), 0));
+	else return(toast::complex(0, sign(m)/sqrt(2)));
 }
 
 /** Y_{l, m}^{R} = a_{m}Y_{l, m} + b_{m}Y_{l, -m} where the supercript 'R' denotes the real-valued spherical harmonics.
 * This function gives the value of b_{m}
 **/
-complex bm(int m)
+toast::complex bm(int m)
 {
-	if(m==0) return(complex(0.0, 0));
-	else if(m>0) return(complex(sign(m)/sqrt(2), 0));
-	else return(complex(0, -1.0/sqrt(2)));
+	if(m==0) return(toast::complex(0.0, 0));
+	else if(m>0) return(toast::complex(sign(m)/sqrt(2), 0));
+	else return(toast::complex(0, -1.0/sqrt(2)));
 }
 
 
@@ -390,7 +523,7 @@ Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}.
 void sincosY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
 
-	complex alpha = complex(0.5, 0);
+	toast::complex alpha = toast::complex(0.5, 0);
 	a[0] = am(m)*Blm(l, -m)*alpha; b[0] = -am(m)*Blm(l+1, m+1)*alpha; 
 	c[0] = -am(m)*Blm(l, m)*alpha; d[0] = am(m)*Blm(l+1, -m+1)*alpha;
 
@@ -416,7 +549,7 @@ Y_{l+1, -m+1}, Y_{l-1, -m-1} and Y_{l+1, -m-1}.
 void sinsinY(const int l, const int m, CVector& a, CVector& b, CVector& c, CVector& d, IDenseMatrix& a1c, IDenseMatrix& b1c, IDenseMatrix& c1c, IDenseMatrix& d1c)
 {
 
-	complex alpha = complex(0, -0.5);
+	toast::complex alpha = toast::complex(0, -0.5);
 	a[0] = am(m)*Blm(l, -m)*alpha; b[0] = -am(m)*Blm(l+1, m+1)*alpha; 
 	c[0] = am(m)*Blm(l, m)*alpha; d[0] = -am(m)*Blm(l+1, -m+1)*alpha;
 
@@ -475,7 +608,7 @@ Computes integral of the form
 */
 double Integrate2(CVector &a, CVector &b, IDenseMatrix &a1c, IDenseMatrix &b1c)
 {
-   complex temp;
+   toast::complex temp;
    temp =  a[0]*b[0]*kronD(a1c.Row(0), b1c.Row(0)) + a[0]*b[1]*kronD(a1c.Row(0), b1c.Row(1)) + a[1]*b[0]*kronD(a1c.Row(1), b1c.Row(0)) + a[1]*b[1]*kronD(a1c.Row(1), b1c.Row(1));
    return(temp.re);
 }

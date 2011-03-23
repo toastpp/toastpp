@@ -1,4 +1,4 @@
-#include<mathlib.h>
+#include "mathlib.h"
 /** factorial
 **/
 double factorial(int n);
@@ -65,7 +65,27 @@ void kronplus(const int spatrow, const int spatcol, const IVector& node_angN, co
 	 * 	bintplus -> boundary integral on the outward facing half sphere
 	 *      bintminus -> boundary integral on the inward facing half sphere
 */
-void BIntUnitSphere(const int size1, const int size2, const int sphOrder1, const int sphOrder1, const RDenseMatrix& ptsPlus, const RVector& wtsPlus, const RVector& bnormal, RDenseMatrix* &Ylm, RCompRowMatrix& intSdotnPlusHemisphere, RCompRowMatrix& intSdotnMinusHemisphere);
+void BIntUnitSphere(const int, const int, const int, const int, const RDenseMatrix&, const RVector&, const RVector&, RDenseMatrix* &, RCompRowMatrix&, RCompRowMatrix&);
+
+/*Computes the integral on the sphere of the form 
+	 * \int_{S^{n-1}} (s.n)_{plus} \psi_{i} \psi_{j}, \int_{S^{n-1}} (s.n)_{minus} \psi_{i} \psi_{j} and \int_{S^{n-1}} (s.n)_{minus} R(s) \psi_{i}(Hs) \psi_{j} (s) for reflection boundary condition
+	 * Inputs:
+	 *      ref_in -> refractive index inside the domain
+	 *      ref_out -> refractive index of the medium outside the domain
+	 * 	size1 -> number of rows
+	 *	size2 -> number of columns
+	 *	sphOrder1 -> order of spherical harmonics along rows
+         * 	sphOrder2 -> order of spherical harmonics along columns
+	 *      pts -> quadrature points
+	 *      wts -> quadrature weights
+	 *      bnormal -> outward pointing normal to the boundary
+	 *      Ylm -> precomputed table of spherical harmonics over the quadrature points
+	 * Output:
+	 * 	bintplus -> boundary integral on the outward facing half sphere
+	 *      bintminus -> boundary integral on the inward facing half sphere
+*/
+void BRIntUnitSphere(const double, const double, const int, const int, const int, const int, const RDenseMatrix&, const RVector&, const RVector&, RDenseMatrix* &, RCompRowMatrix&, RCompRowMatrix&, RCompRowMatrix&);
+
 
 /** Thresholds and shrinks a real dense matrix to give a real sparse matrix
 * NOTE!! The threshold is set to 1e-15

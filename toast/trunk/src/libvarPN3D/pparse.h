@@ -5,9 +5,9 @@
 #ifndef __PPARSE_H
 #define __PPARSE_H
 
-#include <fstream.h>
-#include <iostream.h>
-
+#include <fstream>
+#include <iostream>
+using namespace std;
 class Raster;
 
 class ParamParser {
