@@ -110,23 +110,23 @@ int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 #ifdef USE_CUDA_FLOAT
 template<class MT>
 MATHLIB int PCG (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
 MATHLIB void PCG (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
     TVector<MT> *x, int nrhs, double tol, int maxit = 0,
-    const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
+    TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 
 template<class MT>
 MATHLIB int BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
 MATHLIB void BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
     TVector<MT> *x, int nrhs, double tol, int maxit = 0,
-    const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
+    TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 #endif
 
 
@@ -418,19 +418,19 @@ public:
     // Explicit linear solvers
 
     int pcg (const TVector<MT> &b, TVector<MT> &x,
-        double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0)
+        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
         const;
 
     void pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol,
-        int maxit = 0, const TPreconditioner<MT> *precon = 0,
+        int maxit = 0, TPreconditioner<MT> *precon = 0,
         IterativeSolverResult *res = 0) const;
 
     int bicgstab (const TVector<MT> &b, TVector<MT> &x,
-        double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0)
+        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
         const;
   
     void bicgstab (const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol,
-        int maxit = 0, const TPreconditioner<MT> *precon = 0,
+        int maxit = 0, TPreconditioner<MT> *precon = 0,
         IterativeSolverResult *res = 0) const;
 
     void SymbolicCholeskyFactorize (idxtype *&frowptr, idxtype *&fcolidx)
@@ -495,20 +495,20 @@ public:
 #ifdef USE_CUDA_FLOAT
     friend MATHLIB int PCG<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
-        const TPreconditioner<MT> *precon, int maxit);
+        TPreconditioner<MT> *precon, int maxit);
 
     friend MATHLIB void PCG<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-        const TPreconditioner<MT> *precon, IterativeSolverResult *res);
+        TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
     friend MATHLIB int BiCGSTAB<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
-        const TPreconditioner<MT> *precon, int maxit);
+        TPreconditioner<MT> *precon, int maxit);
     // biconjugate gradient stabilised method.
 
     friend MATHLIB void BiCGSTAB<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-        const TPreconditioner<MT> *precon, IterativeSolverResult *res);
+        TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
 #endif
 
