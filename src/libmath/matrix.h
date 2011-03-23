@@ -72,7 +72,7 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 
 template<class MT>
 MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
-   int nrhs, double tol, int maxit = 0, const TPreconditioner<MT> *precon = 0,
+   int nrhs, double tol, int maxit = 0, TPreconditioner<MT> *precon = 0,
    IterativeSolverResult *res = 0);
 // PCG solver for multiple right-hand sides
 
@@ -96,7 +96,7 @@ MATHLIB int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
 template<class MT>
 MATHLIB void BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> *b,
     TVector<MT> *x, int nrhs, double tol, int maxit = 0,
-    const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
+    TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 // BiCGSTAB solver for multiple right-hand sides
 
 template<class MT>
@@ -369,21 +369,21 @@ public:
     // Explicit linear solvers
 
     virtual int pcg (const TVector<MT> &b, TVector<MT> &x,
-        double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0)
+        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
         const;
 
     virtual void pcg (const TVector<MT> *b, TVector<MT> *x,
         int nrhs, double tol, int maxit = 0,
-        const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
+        TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
         const;
 
     virtual int bicgstab (const TVector<MT> &b, TVector<MT> &x,
-        double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0)
+        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
         const;
 
     virtual void bicgstab (const TVector<MT> *b, TVector<MT> *x,
         int nrhs, double tol, int maxit = 0,
-        const TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
+        TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
         const;
 
     /**
@@ -416,7 +416,7 @@ public:
 
     friend MATHLIB void PCG<> (const TMatrix<MT> &A, const TVector<MT> *b,
         TVector<MT> *x, int nrhs, double tol, int maxit,
-        const TPreconditioner<MT> *precon, IterativeSolverResult *res);
+        TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
     friend MATHLIB int BiCGSTAB<> (const TMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
@@ -425,7 +425,7 @@ public:
 
     friend MATHLIB void BiCGSTAB<> (const TMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-        const TPreconditioner<MT> *precon, IterativeSolverResult *res);
+        TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
     friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
         const TMatrix<MT> &mat);
