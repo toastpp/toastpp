@@ -12,7 +12,7 @@
 
 /* Table of constant values */
 
-static integer c__1 = 1;
+static int c__1 = 1;
 
 /* ----------------------------------------------------------------------c */
 /*                          S P A R S K I T                             c */
@@ -25,22 +25,22 @@ static integer c__1 = 1;
 /* perphn  : finds a peripheral node and does a BFS search from it.     c */
 /* add_lvst: routine for adding a new level set in BFS algorithm        c */
 /* reversp : routine to reverse a given permuation (e.g., for RCMK)     c */
-/* maskdeg : integer function to compute the `masked' of a node         c */
+/* maskdeg : int function to compute the `masked' of a node         c */
 /* ----------------------------------------------------------------------c */
-/* Subroutine */ int bfs_(integer *n, integer *ja, integer *ia, integer *
-	nfirst, integer *iperm, integer *mask, integer *maskval, integer *
-	riord, integer *levels, integer *nlev)
+/* Subroutine */ int bfs_(int *n, int *ja, int *ia, int *
+	nfirst, int *iperm, int *mask, int *maskval, int *
+	riord, int *levels, int *nlev)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    static integer iend;
-    extern /* Subroutine */ int add_lvst__(integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *);
-    static integer j, ii, istart;
-    static logical permut;
-    static integer nod;
+    static int iend;
+    extern /* Subroutine */ int add_lvst__(int *, int *, int *, 
+	    int *, int *, int *, int *, int *);
+    static int j, ii, istart;
+    static bool permut;
+    static int nod;
 
 /* -----------------------------------------------------------------------
  */
@@ -57,7 +57,7 @@ static integer c__1 = 1;
 */
 /*          structure) */
 /* nfirst = number of nodes in the first level that is input in riord */
-/* iperm  = integer array indicating in which order to  traverse the graph
+/* iperm  = int array indicating in which order to  traverse the graph
  */
 /*          in order to generate all connected components. */
 /*          The nodes will be traversed in order iperm(1),....,iperm(n) */
@@ -189,26 +189,26 @@ L2:
 } /* bfs_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int dblstr_(integer *n, integer *ja, integer *ia, integer *
-	ip1, integer *ip2, integer *nfirst, integer *riord, integer *ndom, 
-	integer *map, integer *mapptr, integer *mask, integer *levels, 
-	integer *iwk)
+/* Subroutine */ int dblstr_(int *n, int *ja, int *ia, int *
+	ip1, int *ip2, int *nfirst, int *riord, int *ndom, 
+	int *map, int *mapptr, int *mask, int *levels, 
+	int *iwk)
 {
     /* System generated locals */
-    integer i__1, i__2;
+    int i__1, i__2;
 
     /* Local variables */
-    static integer idom, jdom, kdom, init, nlev, j, k;
-    extern /* Subroutine */ int perphn_(integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *);
-    static integer numnod;
-    extern /* Subroutine */ int bfs_(integer *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
+    static int idom, jdom, kdom, init, nlev, j, k;
+    extern /* Subroutine */ int perphn_(int *, int *, int *, 
+	    int *, int *, int *, int *, int *, int *, 
+	    int *);
+    static int numnod;
+    extern /* Subroutine */ int bfs_(int *, int *, int *, int 
+	    *, int *, int *, int *, int *, int *, int 
 	    *);
-    static integer maskval, nextdom, ndp1;
-    extern /* Subroutine */ int stripes_(integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
+    static int maskval, nextdom, ndp1;
+    extern /* Subroutine */ int stripes_(int *, int *, int *, 
+	    int *, int *, int *, int *);
 
 /* -----------------------------------------------------------------------
  */
@@ -227,10 +227,10 @@ L2:
 /* ja, ia = pattern of matrix in CSR format (the ja,ia arrays of csr data 
 */
 /*          structure) */
-/* ip1    = integer indicating the number of large partitions ('number of 
+/* ip1    = int indicating the number of large partitions ('number of 
 */
 /*          paritions in first direction') */
-/* ip2    = integer indicating the number of smaller partitions, per */
+/* ip2    = int indicating the number of smaller partitions, per */
 /*          large partition, ('number of partitions in second direction') 
 */
 /* nfirst = number of nodes in the first level that is input in riord */
@@ -253,7 +253,7 @@ L2:
 */
 /*          node for the first (large) partitioning. */
 /*          mask is also used as a marker of  visited nodes. */
-/* levels = integer array of length .le. n used to hold the pointer */
+/* levels = int array of length .le. n used to hold the pointer */
 /*          arrays for the various level structures obtained from BFS. */
 /* -----------------------------------------------------------------------
  */
@@ -338,21 +338,21 @@ L2:
 } /* dblstr_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int perphn_(integer *n, integer *ja, integer *ia, integer *
-	init, integer *iperm, integer *mask, integer *maskval, integer *nlev, 
-	integer *riord, integer *levels)
+/* Subroutine */ int perphn_(int *n, int *ja, int *ia, int *
+	init, int *iperm, int *mask, int *maskval, int *nlev, 
+	int *riord, int *levels)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    static integer j, nlevp, mindeg, nfirst, deg;
-    extern /* Subroutine */ int bfs_(integer *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
+    static int j, nlevp, mindeg, nfirst, deg;
+    extern /* Subroutine */ int bfs_(int *, int *, int *, int 
+	    *, int *, int *, int *, int *, int *, int 
 	    *);
-    static integer nod;
-    extern integer maskdeg_(integer *, integer *, integer *, integer *, 
-	    integer *);
+    static int nod;
+    extern int maskdeg_(int *, int *, int *, int *, 
+	    int *);
 
 /* -----------------------------------------------------------------------
  */
@@ -410,15 +410,15 @@ L1:
 } /* perphn_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int add_lvst__(integer *istart, integer *iend, integer *nlev,
-	 integer *riord, integer *ja, integer *ia, integer *mask, integer *
+/* Subroutine */ int add_lvst__(int *istart, int *iend, int *nlev,
+	 int *riord, int *ja, int *ia, int *mask, int *
 	maskval)
 {
     /* System generated locals */
-    integer i__1, i__2;
+    int i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, k, ir, nod;
+    static int i__, j, k, ir, nod;
 
 /* ---------------------------------------------------------------------- 
 */
@@ -457,14 +457,14 @@ L1:
 } /* add_lvst__ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int stripes_(integer *nlev, integer *riord, integer *levels, 
-	integer *ip, integer *map, integer *mapptr, integer *ndom)
+/* Subroutine */ int stripes_(int *nlev, int *riord, int *levels, 
+	int *ip, int *map, int *mapptr, int *ndom)
 {
     /* System generated locals */
-    integer i__1, i__2, i__3, i__4;
+    int i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    static integer ilev, nsiz, psiz, k, ib, ktr;
+    static int ilev, nsiz, psiz, k, ib, ktr;
 
 /* -----------------------------------------------------------------------
  */
@@ -548,13 +548,13 @@ L1:
 } /* stripes_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int reversp_(integer *n, integer *riord)
+/* Subroutine */ int reversp_(int *n, int *riord)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    static integer j, k;
+    static int j, k;
 
 /* -----------------------------------------------------------------------
  */
@@ -577,14 +577,14 @@ L1:
 } /* reversp_ */
 
 /* ----------------------------------------------------------------------- */
-integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask, 
-	integer *maskval)
+int maskdeg_(int *ja, int *ia, int *nod, int *mask, 
+	int *maskval)
 {
     /* System generated locals */
-    integer ret_val, i__1;
+    int ret_val, i__1;
 
     /* Local variables */
-    static integer k, deg;
+    static int k, deg;
 
 /* -----------------------------------------------------------------------
  */
@@ -606,16 +606,16 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 } /* maskdeg_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int rperm_(integer *nrow, doublereal *a, integer *ja, 
-	integer *ia, doublereal *ao, integer *jao, integer *iao, integer *
-	perm, integer *job)
+/* Subroutine */ int rperm_(int *nrow, doublereal *a, int *ja, 
+	int *ia, doublereal *ao, int *jao, int *iao, int *
+	perm, int *job)
 {
     /* System generated locals */
-    integer i__1, i__2;
+    int i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, k, ii, ko;
-    static logical values;
+    static int i__, j, k, ii, ko;
+    static bool values;
 
 /* -----------------------------------------------------------------------
  */
@@ -630,14 +630,14 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 /* ---------- */
 /* n 	= dimension of the matrix */
 /* a, ja, ia = input matrix in csr format */
-/* perm 	= integer array of length nrow containing the permutation arrays 
+/* perm 	= int array of length nrow containing the permutation arrays 
 */
 /* 	  for the rows: perm(i) is the destination of row i in the */
 /*         permuted matrix. */
 /*         ---> a(i,j) in the original matrix becomes a(perm(i),j) */
 /*         in the output  matrix. */
 
-/* job	= integer indicating the work to be done: */
+/* job	= int indicating the work to be done: */
 /* 		job = 1	permute a, ja, ia into ao, jao, iao */
 /*                       (including the copying of real values ao and */
 /*                       the array iao). */
@@ -716,15 +716,15 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 } /* rperm_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int cperm_(integer *nrow, doublereal *a, integer *ja, 
-	integer *ia, doublereal *ao, integer *jao, integer *iao, integer *
-	perm, integer *job)
+/* Subroutine */ int cperm_(int *nrow, doublereal *a, int *ja, 
+	int *ia, doublereal *ao, int *jao, int *iao, int *
+	perm, int *job)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    static integer i__, k, nnz;
+    static int i__, k, nnz;
 
 /* -----------------------------------------------------------------------
  */
@@ -742,12 +742,12 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 
 /* a, ja, ia = input matrix in csr format. */
 
-/* perm	= integer array of length ncol (number of columns of A */
+/* perm	= int array of length ncol (number of columns of A */
 /*         containing the permutation array  the columns: */
 /*         a(i,j) in the original matrix becomes a(i,perm(j)) */
 /*         in the output matrix. */
 
-/* job	= integer indicating the work to be done: */
+/* job	= int indicating the work to be done: */
 /* 		job = 1	permute a, ja, ia into ao, jao, iao */
 /*                       (including the copying of real values ao and */
 /*                       the array iao). */
@@ -815,15 +815,15 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 } /* cperm_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int dperm_(integer *nrow, doublereal *a, integer *ja, 
-	integer *ia, doublereal *ao, integer *jao, integer *iao, integer *
-	perm, integer *qperm, integer *job)
+/* Subroutine */ int dperm_(int *nrow, doublereal *a, int *ja, 
+	int *ia, doublereal *ao, int *jao, int *iao, int *
+	perm, int *qperm, int *job)
 {
-    extern /* Subroutine */ int cperm_(integer *, doublereal *, integer *, 
-	    integer *, doublereal *, integer *, integer *, integer *, integer 
-	    *), rperm_(integer *, doublereal *, integer *, integer *, 
-	    doublereal *, integer *, integer *, integer *, integer *);
-    static integer locjob;
+    extern /* Subroutine */ int cperm_(int *, doublereal *, int *, 
+	    int *, doublereal *, int *, int *, int *, int 
+	    *), rperm_(int *, doublereal *, int *, int *, 
+	    doublereal *, int *, int *, int *, int *);
+    static int locjob;
 
 /* -----------------------------------------------------------------------
  */
@@ -848,7 +848,7 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 /* n 	= dimension of the matrix */
 /* a, ja, */
 /*    ia = input matrix in a, ja, ia format */
-/* perm 	= integer array of length n containing the permutation arrays */
+/* perm 	= int array of length n containing the permutation arrays */
 /* 	  for the rows: perm(i) is the destination of row i in the */
 /*         permuted matrix -- also the destination of column i in case */
 /*         permutation is symmetric (job .le. 2) */
@@ -857,7 +857,7 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 /*         if job=3 or job=4, i.e., only in the case of a nonsymmetric */
 /* 	  permutation of rows and columns. Otherwise qperm is a dummy */
 
-/* job	= integer indicating the work to be done: */
+/* job	= int indicating the work to be done: */
 /* * job = 1,2 permutation is symmetric  Ao :== P * A * transp(P) */
 /* 		job = 1	permute a, ja, ia into ao, jao, iao */
 /* 		job = 2 permute matrix ignoring real values. */
@@ -920,15 +920,15 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
  */
 } /* dperm_ */
 
-/* Subroutine */ int csrcoo_(integer *nrow, integer *job, integer *nzmax, 
-	doublereal *a, integer *ja, integer *ia, integer *nnz, doublereal *ao,
-	 integer *ir, integer *jc, integer *ierr)
+/* Subroutine */ int csrcoo_(int *nrow, int *job, int *nzmax, 
+	doublereal *a, int *ja, int *ia, int *nnz, doublereal *ao,
+	 int *ir, int *jc, int *ierr)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    static integer i__, k, k1, k2;
+    static int i__, k, k1, k2;
 
 /* -----------------------------------------------------------------------
  */
@@ -943,7 +943,7 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 /* on entry: */
 /* --------- */
 /* nrow	= dimension of the matrix. */
-/* job   = integer serving as a job indicator. */
+/* job   = int serving as a job indicator. */
 /*         if job = 1 fill in only the array ir, ignore jc, and ao. */
 /*         if job = 2 fill in ir, and jc but not ao */
 /*         if job = 3 fill in everything. */
@@ -973,7 +973,7 @@ integer maskdeg_(integer *ja, integer *ia, integer *nod, integer *mask,
 /* ao, ir, jc = matrix in coordinate format. */
 
 /* nnz        = number of nonzero elements in matrix. */
-/* ierr       = integer error indicator. */
+/* ierr       = int error indicator. */
 /*         ierr .eq. 0 means normal retur */
 /*         ierr .eq. 1 means that the the code stopped */
 /*         because there was no space in ao, ir, jc */
@@ -1034,15 +1034,15 @@ L3:
  */
 } /* csrcoo_ */
 
-/* Subroutine */ int amudia_(integer *nrow, integer *job, doublereal *a, 
-	integer *ja, integer *ia, doublereal *diag, doublereal *b, integer *
-	jb, integer *ib)
+/* Subroutine */ int amudia_(int *nrow, int *job, doublereal *a, 
+	int *ja, int *ia, doublereal *diag, doublereal *b, int *
+	jb, int *ib)
 {
     /* System generated locals */
-    integer i__1, i__2;
+    int i__1, i__2;
 
     /* Local variables */
-    static integer k, k1, k2, ii;
+    static int k, k1, k2, ii;
 
 /* -----------------------------------------------------------------------
  */
@@ -1051,10 +1051,10 @@ L3:
  */
 /* on entry: */
 /* --------- */
-/* nrow	= integer. The row dimension of A */
+/* nrow	= int. The row dimension of A */
 
-/* job   = integer. job indicator. Job=0 means get array b only */
-/*         job = 1 means get b, and the integer arrays ib, jb. */
+/* job   = int. job indicator. Job=0 means get array b only */
+/*         job = 1 means get b, and the int arrays ib, jb. */
 
 /* a, */
 /* ja, */
@@ -1121,30 +1121,30 @@ L3:
  */
 } /* amudia_ */
 
-/* Subroutine */ int ilutp_(integer *n, doublereal *a, integer *ja, integer *
-	ia, integer *lfil, doublereal *droptol, doublereal *permtol, integer *
-	mbloc, doublereal *alu, integer *jlu, integer *ju, integer *iwk, 
-	doublereal *wu, doublereal *wl, integer *jr, integer *jwl, integer *
-	jwu, integer *iperm, integer *ierr)
+/* Subroutine */ int ilutp_(int *n, doublereal *a, int *ja, int *
+	ia, int *lfil, doublereal *droptol, doublereal *permtol, int *
+	mbloc, doublereal *alu, int *jlu, int *ju, int *iwk, 
+	doublereal *wu, doublereal *wl, int *jr, int *jwl, int *
+	jwu, int *iperm, int *ierr)
 {
     /* System generated locals */
-    integer i__1, i__2, i__3;
+    int i__1, i__2, i__3;
     doublereal d__1;
 
     /* Local variables */
     static doublereal fact;
-    static integer lenl, imax, lenu, icut, jpos;
+    static int lenl, imax, lenu, icut, jpos;
     static doublereal xmax;
-    static integer jrow, lenl0, lenu0;
+    static int jrow, lenl0, lenu0;
     static doublereal xmax0;
-    static integer i__, j, k;
+    static int i__, j, k;
     static doublereal s, t;
-    static integer j1, j2;
+    static int j1, j2;
     static doublereal tnorm;
-    static integer ii, jj, nl;
-    extern /* Subroutine */ int qsplit_(doublereal *, integer *, integer *, 
-	    integer *);
-    static integer ju0, len;
+    static int ii, jj, nl;
+    extern /* Subroutine */ int qsplit_(doublereal *, int *, int *, 
+	    int *);
+    static int ju0, len;
     static doublereal tmp;
 
 /* -----------------------------------------------------------------------
@@ -1202,12 +1202,12 @@ L3:
 
 /* on entry: */
 /* ========== */
-/* n       = integer. The dimension of the matrix A. */
+/* n       = int. The dimension of the matrix A. */
 
 /* a,ja,ia = matrix stored in Compressed Sparse Row format. */
 /*           ONE RETURN THE COLUMNS OF A ARE PERMUTED. */
 
-/* lfil    = integer. The fill-in parameter. Each row of L and */
+/* lfil    = int. The fill-in parameter. Each row of L and */
 /*           each row of U will have a maximum of lfil elements */
 /*           in addition to their original number of nonzero elements. */
 /*           Thus storage can be determined beforehand. */
@@ -1225,7 +1225,7 @@ L3:
 /*           blocks of size mbloc. Useful for PDE problems with several */
 /*           degrees of freedom.. If feature not wanted take mbloc=n. */
 
-/* iwk     = integer. The minimum length of arrays alu and jlu */
+/* iwk     = int. The minimum length of arrays alu and jlu */
 /*           to work properly, the code requires that iwk be */
 
 /*                      .ge. nnz + 2*lfil*n + 2 */
@@ -1246,13 +1246,13 @@ L3:
 */
 /*           followed by the i-th row of U. */
 
-/* ju      = integer array of length n containing the pointers to */
+/* ju      = int array of length n containing the pointers to */
 /*           the beginning of each row of U in the matrix alu,jlu. */
 /* iperm   = contains the permutation arrays .. */
 /*           iperm(1:n) = old numbers of unknowns */
 /*           iperm(n+1:2*n) = reverse permutation = new unknowns. */
 
-/* ierr    = integer. Error message with the following meaning. */
+/* ierr    = int. Error message with the following meaning. */
 /*           ierr  = 0    --> successful return. */
 /*           ierr .gt. 0  --> zero pivot encountered at step number ierr. 
 */
@@ -1266,7 +1266,7 @@ L3:
 
 /* work arrays: */
 /* ============= */
-/* jr,jwu,jwl 	  = integer work arrays of length n. */
+/* jr,jwu,jwl 	  = int work arrays of length n. */
 /* wu, wl          = real work arrays of length n+1, and n resp. */
 
 /* Notes: */
@@ -1306,7 +1306,7 @@ L3:
     ju0 = *n + 2;
     jlu[1] = ju0;
 
-/*  integer double pointer array. */
+/*  int double pointer array. */
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
@@ -1693,17 +1693,17 @@ L999:
 } /* ilutp_ */
 
 /* ---------------------------------------------------------------------- */
-/* Subroutine */ int qsplit_(doublereal *a, integer *ind, integer *n, integer 
+/* Subroutine */ int qsplit_(doublereal *a, int *ind, int *n, int 
 	*ncut)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
     doublereal d__1;
 
     /* Local variables */
-    static integer last, itmp, j, first;
+    static int last, itmp, j, first;
     static doublereal abskey;
-    static integer mid;
+    static int mid;
     static doublereal tmp;
 
 /* -----------------------------------------------------------------------
@@ -1713,7 +1713,7 @@ L999:
 /*     on output a(1:n) is permuted such that its elements satisfy: */
 /*     a(i) .le. a(ncut) for i .le. ncut and */
 /*     a(i) .ge. a(ncut) for i .ge. ncut */
-/*    ind(1:n) is an integer array which permuted in the same way as a(*).
+/*    ind(1:n) is an int array which permuted in the same way as a(*).
 */
 /* -----------------------------------------------------------------------
  */
@@ -1776,14 +1776,14 @@ L1:
  */
 } /* qsplit_ */
 
-/* Subroutine */ int atob_(integer *n, doublereal *a, integer *ja, integer *
-	ia, doublereal *b, integer *jb, integer *ib)
+/* Subroutine */ int atob_(int *n, doublereal *a, int *ja, int *
+	ia, doublereal *b, int *jb, int *ib)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    static integer i__;
+    static int i__;
 
 /* ... Copy matrix a,ja,ia to b,jb,ib.  Both matrices are in */
 /*     compressed sparse row format. */
@@ -1813,27 +1813,27 @@ L1:
 
 /*  end of atob */
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int djreord_(integer *neq, integer *neqp1, integer *nnzmx, 
-	char *premeth, doublereal *jac, integer *ja, integer *ia, doublereal *
-	awk, integer *jwk, integer *iwk, integer *perm, integer *qperm, 
-	integer *levels, integer *mask, integer *ireorder)
+/* Subroutine */ int djreord_(int *neq, int *neqp1, int *nnzmx, 
+	char *premeth, doublereal *jac, int *ja, int *ia, doublereal *
+	awk, int *jwk, int *iwk, int *perm, int *qperm, 
+	int *levels, int *mask, int *ireorder)
 {
     /* System generated locals */
-    integer i__1;
+    int i__1;
 
     /* Local variables */
-    extern /* Subroutine */ int atob_(integer *, doublereal *, integer *, 
-	    integer *, doublereal *, integer *, integer *);
-    static integer nlev, i__;
-    extern /* Subroutine */ int dperm_(integer *, doublereal *, integer *, 
-	    integer *, doublereal *, integer *, integer *, integer *, integer 
-	    *, integer *);
-    static integer nfirst;
-    extern /* Subroutine */ int bfs_(integer *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
+    extern /* Subroutine */ int atob_(int *, doublereal *, int *, 
+	    int *, doublereal *, int *, int *);
+    static int nlev, i__;
+    extern /* Subroutine */ int dperm_(int *, doublereal *, int *, 
+	    int *, doublereal *, int *, int *, int *, int 
+	    *, int *);
+    static int nfirst;
+    extern /* Subroutine */ int bfs_(int *, int *, int *, int 
+	    *, int *, int *, int *, int *, int *, int 
 	    *);
-    static integer maskval;
-    extern /* Subroutine */ int reversp_(integer *, integer *);
+    static int maskval;
+    extern /* Subroutine */ int reversp_(int *, int *);
 
 /* ... Version of 10-6-95 */
 /* ... If desired, reorder the Jacobian matrix. */
