@@ -17,7 +17,6 @@
 #include <iomanip>
 #include <math.h>
 #include <cstdlib>
-
 #include "mathlib.h"
 
 #ifdef USE_CUDA_FLOAT
@@ -82,9 +81,9 @@ bool TVector<VT>::Clip (VT vmin, VT vmax)
 }
 
 template<>
-bool TVector<complex>::Clip (complex vmin, complex vmax)
+bool TVector<toast::complex>::Clip (toast::complex vmin, toast::complex vmax)
 {
-    // complex version: clip real and imaginary parts separately
+    // toast::complex version: clip real and imaginary parts separately
 
     bool clip = false;
 
@@ -665,14 +664,14 @@ float dot (const TVector<float> &v1, const TVector<float> &v2)
     return sdot_(size, v1.data, incr, v2.data, incr);
 }
 template<>
-complex dot (const TVector<complex> &v1, const TVector<complex> &v2)
+toast::complex dot (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
 {
     dASSERT (v1.size == v2.size, Vector dimensions incompatible);
     static int incr = 1;
     int size = v1.size;
     dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
 			       (dcomplex*)v2.data, &incr);
-    return complex(z.r, z.i);
+    return toast::complex(z.r, z.i);
 }
 #endif // USE_BLAS_LEVEL1
 #endif // MATH_DEBUG
@@ -686,16 +685,16 @@ VT doth (const TVector<VT> &v1, const TVector<VT> &v2)
     return dot (v1, v2);
 }
 template<>
-complex doth (const TVector<complex> &v1, const TVector<complex> &v2)
+toast::complex doth (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
 {
     dASSERT (v1.size == v2.size, Vector dimensions incompatible);
 #ifdef USE_BLAS_LEVEL1
     static int incr = 1;
     int size = v1.size;
     dcomplex z = zdotc_(size, v1.data, incr, v2.data, incr);
-    return complex(z.r, z.i);
+    return toast::complex(z.r, z.i);
 #else
-    complex d = (complex)0;
+    toast::complex d = (toast::complex)0;
     for (int i = 0; i < v1.size; i++) d += conj(v1[i]) * v2[i];
     return d;
 #endif // USE_BLAS_LEVEL1
@@ -1157,7 +1156,7 @@ template MATHLIB SCVector exp (const SCVector &v);
 
 template RVector  pow (const RVector &vec, const double &vt);
 template FVector  pow (const FVector &vec, const float &vt);
-template CVector  pow (const CVector &vec, const complex &vt);
+template CVector  pow (const CVector &vec, const toast::complex &vt);
 template SCVector pow (const SCVector &vec, const scomplex &vt);
 template IVector  pow (const IVector &vec, const int &vt);
 
@@ -1204,7 +1203,7 @@ template FVector atanh (const FVector &v);
 #ifndef USE_BLAS_LEVEL1
 template double   dot (const RVector &v1, const RVector &v2);
 template float    dot (const FVector &v1, const FVector &v2);
-template complex  dot (const CVector &v1, const CVector &v2);
+template toast::complex  dot (const CVector &v1, const CVector &v2);
 #endif // !USE_BLAS_LEVEL1
 template int      dot (const IVector &v1, const IVector &v2);
 template scomplex dot (const SCVector &v1, const SCVector &v2);
@@ -1212,20 +1211,20 @@ template scomplex dot (const SCVector &v1, const SCVector &v2);
 template double   doth (const RVector &v1, const RVector &v2);
 template float    doth (const FVector &v1, const FVector &v2);
 #ifndef USE_BLAS_LEVEL1
-template complex  doth (const CVector &v1, const CVector &v2);
+template toast::complex  doth (const CVector &v1, const CVector &v2);
 #endif // !USE_BLAS_LEVEL1
 template scomplex doth (const SCVector &v1, const SCVector &v2);
 template int      doth (const IVector &v1, const IVector &v2);
 
 template MATHLIB double   vmin (const RVector &v);
 template MATHLIB float    vmin (const FVector &v);
-template MATHLIB complex  vmin (const CVector &v);
+template MATHLIB toast::complex  vmin (const CVector &v);
 template MATHLIB scomplex vmin (const SCVector &v);
 template MATHLIB int      vmin (const IVector &v);
 
 template MATHLIB double   vmax (const RVector &v);
 template MATHLIB float    vmax (const FVector &v);
-template MATHLIB complex  vmax (const CVector &v);
+template MATHLIB toast::complex  vmax (const CVector &v);
 template MATHLIB scomplex vmax (const SCVector &v);
 template MATHLIB int      vmax (const IVector &v);
 
@@ -1242,30 +1241,30 @@ template void vsort (const IVector &v, IVector &sorted_v, IVector &sort_order);
 
 template double   sum  (const RVector &v);
 template float    sum  (const FVector &v);
-template complex  sum  (const CVector &v);
+template toast::complex  sum  (const CVector &v);
 template scomplex sum  (const SCVector &v);
 template int      sum  (const IVector &v);
 
 template MATHLIB double   mean (const RVector &v);
 template MATHLIB float    mean (const FVector &v);
-template MATHLIB complex  mean (const CVector &v);
+template MATHLIB toast::complex  mean (const CVector &v);
 template MATHLIB scomplex mean (const SCVector &v);
 template MATHLIB int      mean (const IVector &v);
 
 template double  median (const RVector &v);
 template float   median (const FVector &v);
-template complex median (const CVector &v);
+template toast::complex median (const CVector &v);
 template int     median (const IVector &v);
 
 template double   variance (const RVector &v);
 template float    variance (const FVector &v);
-template complex  variance (const CVector &v);
+template toast::complex  variance (const CVector &v);
 template scomplex variance (const SCVector &v);
 template int      variance (const IVector &v);
 
 template double   stdv (const RVector &v);
 template float    stdv (const FVector &v);
-template complex  stdv (const CVector &v);
+template toast::complex  stdv (const CVector &v);
 template scomplex stdv (const SCVector &v);
 
 #ifndef USE_CBLAS
@@ -1321,26 +1320,26 @@ template MATHLIB bool visnan (const IVector &v);
 #ifndef USE_CUDA_FLOAT
 template MATHLIB RVector  operator+ (const double  &s, const RVector &v);
 template MATHLIB FVector  operator+ (const float   &s, const FVector &v);
-template MATHLIB CVector  operator+ (const complex &s, const CVector &v);
+template MATHLIB CVector  operator+ (const toast::complex &s, const CVector &v);
 template MATHLIB SCVector operator+ (const scomplex &s, const SCVector &v);
 template MATHLIB IVector  operator+ (const int     &s, const IVector &v);
 #endif
 
 template RVector  operator- (const double  &s, const RVector &v);
 template FVector  operator- (const float   &s, const FVector &v);
-template CVector  operator- (const complex &s, const CVector &v);
+template CVector  operator- (const toast::complex &s, const CVector &v);
 template SCVector operator- (const scomplex &s, const SCVector &v);
 template IVector  operator- (const int     &s, const IVector &v);
 
 template MATHLIB RVector  operator* (const double  &s, const RVector &v);
 template MATHLIB FVector  operator* (const float   &s, const FVector &v);
-template MATHLIB CVector  operator* (const complex &s, const CVector &v);
+template MATHLIB CVector  operator* (const toast::complex &s, const CVector &v);
 template MATHLIB SCVector operator* (const scomplex &s, const SCVector &v);
 template MATHLIB IVector  operator* (const int     &s, const IVector &v);
 
 template MATHLIB RVector  operator/ (const double  &s, const RVector &v);
 template MATHLIB FVector  operator/ (const float   &s, const FVector &v);
-template MATHLIB CVector  operator/ (const complex &s, const CVector &v);
+template MATHLIB CVector  operator/ (const toast::complex &s, const CVector &v);
 template MATHLIB SCVector operator/ (const scomplex &s, const SCVector &v);
 template MATHLIB IVector  operator/ (const int     &s, const IVector &v);
 
@@ -1463,6 +1462,6 @@ CVector MakeCVector (const SCVector &v)
 {
     CVector c(v.Dim());
     for (int i = 0; i < v.Dim(); i++)
-	c[i] = (complex)v[i];
+	c[i] = (toast::complex)v[i];
     return c;
 }

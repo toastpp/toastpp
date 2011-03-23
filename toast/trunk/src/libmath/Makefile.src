@@ -85,7 +85,7 @@ endif
 
 
 %.o : %.cc $(HDRS)
-	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+	$(CXX) $(FLAGS)  -I$(ILUPACKDIR)/include $(SHLIB_CFLAGS) -c $<
 
 %.o : %.cu $(CU_DEPS)
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) --compiler-options $(SHLIB_CFLAGS) -o $@ -c $<
@@ -116,14 +116,14 @@ ifeq '$(LIB_SUFFIX)' '.a'
 	rm -rf /tmp/ilupack_expand
 	mkdir /tmp/ilupack_expand
 	pushd /tmp/ilupack_expand;\
-	ar x ${ILUPACKLIBDIR}/libZilupack.a;\
+	ar x ${ILUPACKLIBDIR}/libilupack.a;\
 	ar x ${ILUPACKLIBDIR}/libamd.a;\
 	ar x ${ILUPACKLIBDIR}/libsparspak.a;\
 	ar x ${ILUPACKLIBDIR}/libblaslike.a;\
 	popd
 ILUPACKSTATIC = /tmp/ilupack_expand/*
 else
-ILUPACKSTATIC = ${ILUPACKLIBDIR}/libZilupack.a ${ILUPACKLIBDIR}/libamd.a ${ILUPACKLIBDIR}/libsparspak.a ${ILUPACKLIBDIR}/libblaslike.a
+ILUPACKSTATIC = ${ILUPACKLIBDIR}/libilupack.a ${ILUPACKLIBDIR}/libmumps.a ${ILUPACKLIBDIR}/libamd.a ${ILUPACKLIBDIR}/libsparspak.a ${ILUPACKLIBDIR}/libmetis.a ${ILUPACKLIBDIR}/liblapack.a ${ILUPACKLIBDIR}/libblaslike.a ${ILUPACKLIBDIR}/libblas.a 
 endif
 endif
 

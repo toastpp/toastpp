@@ -38,7 +38,7 @@ RVector ATA_lambdaI_x (const TMatrix<double> &A, double lambda,
 
 template<class MT>
 int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, const TPreconditioner<MT> *precon, double &elim,
+    TVector<MT> &x, TPreconditioner<MT> *precon, double &elim,
     void (*clbk)(void*))
 {
 #ifdef VERBOSE_GMRES
@@ -233,7 +233,7 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
 template<class MT>
 int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
     void *context), const TVector<MT> &b, TVector<MT> &x,
-    const TPreconditioner<MT> *precon, double &elim, void *context)
+    TPreconditioner<MT> *precon, double &elim, void *context)
 {
     // This "matrix-less" version of gmres can be used whenever matrix A is
     // not available in explicit form. The user provides a callback function
@@ -435,7 +435,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 CVector precond_setup (const CGenericSparseMatrix& AC, const CVector& b)
 {
     int j, k, N = b.Dim();
-    complex tmp1, tmp2;
+    toast::complex tmp1, tmp2;
     CVector diag(N);
  
     for (j = 0; j < N; j++) {
@@ -443,15 +443,15 @@ CVector precond_setup (const CGenericSparseMatrix& AC, const CVector& b)
     }
  
     for (j = 0; j < N; j++) {
-        if ( diag[j] == complex(0.,0.) )
+        if ( diag[j] == toast::complex(0.,0.) )
 	    continue;
  
-	diag[j] = complex(1.,0.)/diag[j];
+	diag[j] = toast::complex(1.,0.)/diag[j];
  
 	for (k = (j+1); k < N; k++) {
 	  if (
-	      ((tmp1=AC.Get(j,k)) == complex(0.,0.)) ||
-	      ((tmp2=AC.Get(k,j)) == complex(0.,0.))
+	      ((tmp1=AC.Get(j,k)) == toast::complex(0.,0.)) ||
+	      ((tmp2=AC.Get(k,j)) == toast::complex(0.,0.))
 	      )
 	    continue;
  
@@ -529,16 +529,16 @@ CVector precond (const CGenericSparseMatrix& AC,const CVector& y)
    // D-ILU
    //
  
-   complex sum, tmp;
+   toast::complex sum, tmp;
    CVector z(N), x_new(N);
  
    for (j = 0; j < N; j++)
    {
-      sum = complex(0.,0.);
+      sum = toast::complex(0.,0.);
  
       for (k = 0; k < j; k++)
       {
-         if ((tmp=AC.Get(j,k)) == complex(0.,0.))
+         if ((tmp=AC.Get(j,k)) == toast::complex(0.,0.))
             continue;
  
          sum += tmp*z[k];
@@ -549,10 +549,10 @@ CVector precond (const CGenericSparseMatrix& AC,const CVector& y)
  
    for (j = (N-1); j >= 0; j--)
    {
-      sum = complex(0.,0.);
-                                                                                      for (k = (j+1); k < N; k++)
+      sum = toast::complex(0.,0.);
+      for (k = (j+1); k < N; k++)
       {
-         if ((tmp=AC.Get(j,k)) == complex(0.,0.))
+         if ((tmp=AC.Get(j,k)) == toast::complex(0.,0.))
             continue;
  
          sum += tmp*x_new[k];
@@ -578,27 +578,27 @@ template int gmres (int restart, const TMatrix<float> &A,
 
 template int gmres (int restart, const TMatrix<double> &A,
     const TVector<double> &b, TVector<double> &x,
-    const TPreconditioner<double> *precon, double &elim,
+    TPreconditioner<double> *precon, double &elim,
     void (*clbk)(void*));
 
-template int gmres (int restart, const TMatrix<complex> &A,
-    const TVector<complex> &b, TVector<complex> &x,
-    const TPreconditioner<complex> *precon, double &elim,
+template int gmres (int restart, const TMatrix<toast::complex> &A,
+    const TVector<toast::complex> &b, TVector<toast::complex> &x,
+    TPreconditioner<toast::complex> *precon, double &elim,
     void (*clbk)(void*));
 
 template int gmres (int restart, const TMatrix<scomplex> &A,
     const TVector<scomplex> &b, TVector<scomplex> &x,
-    const TPreconditioner<scomplex> *precon, double &elim,
+    TPreconditioner<scomplex> *precon, double &elim,
     void (*clbk)(void*));
 
 template int gmres (int restart,
     TVector<double> (*Av_clbk)(const TVector<double> &v, void *context),
     const TVector<double> &b, TVector<double> &x,
-    const TPreconditioner<double> *precon, double &elim, void *context);
+    TPreconditioner<double> *precon, double &elim, void *context);
 
 template int gmres (int restart,
-    TVector<complex> (*Av_clbk)(const TVector<complex> &v, void *context),
-    const TVector<complex> &b, TVector<complex> &x,
-    const TPreconditioner<complex> *precon, double &elim, void *context);
+    TVector<toast::complex> (*Av_clbk)(const TVector<toast::complex> &v, void *context),
+    const TVector<toast::complex> &b, TVector<toast::complex> &x,
+    TPreconditioner<toast::complex> *precon, double &elim, void *context);
 
 #endif // NEED_EXPLICIT_INSTANTIATION

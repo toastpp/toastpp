@@ -66,7 +66,7 @@ MATHLIB TVector<MT> ATA_diag (const TMatrix<MT> &A);
 
 template<class MT>
 MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0);
+    double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0);
 // PCG (preconditioned conjugate gradient) linear solver
 // Solves Ax = b for given tolerance and preconditioner
 
@@ -79,18 +79,18 @@ MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
 template<class MT>
 MATHLIB int PCG (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
     void *context), void *context, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon = 0, 
+    double &tol, TPreconditioner<MT> *precon = 0, 
     int maxit = 0);
 
 template<class MT>
 int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon = 0, int maxit = 0);
+    double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0);
 // BiPCG (preconditioned bi-conjugate gradient) linear solver
 // Solves Ax = b for given tolerance and preconditioner
 
 template<class MT>
 MATHLIB int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon = 0,
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
@@ -102,17 +102,17 @@ MATHLIB void BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> *b,
 template<class MT>
 MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
     void *context), void *context, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon = 0, 
+    double &tol, TPreconditioner<MT> *precon = 0, 
     int maxit = 0);
 
 template<class MT>
 MATHLIB int BiCGSTAB (void (*MVM)(TVector<MT> &),  const TVector<MT> &b, 
-    TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon  = 0, 
+    TVector<MT> &x, double &tol, TPreconditioner<MT> *precon  = 0, 
     int maxit = 0);
 
 template<class MT>
 MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, const TPreconditioner<MT> *precon = 0, int restart = 10,
+    double &tol, TPreconditioner<MT> *precon = 0, int restart = 10,
     void (*clbk)(void*) = 0);
 // GMRES (generalised minimum residual) linear solver
 // Solves Ax = b for given tolerance and preconditioner
@@ -139,7 +139,7 @@ MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 template<class MT>
 MATHLIB int GMRES (TVector<MT> (*Mv_clbk)(const TVector<MT> &v, void *context),
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,
-    const TPreconditioner<MT> *precon = 0, int restart = 10, int *iter = 0,
+    TPreconditioner<MT> *precon = 0, int restart = 10, int *iter = 0,
     double *res = 0);
 
 template<class MT>
@@ -411,7 +411,7 @@ public:
     friend MATHLIB TVector<MT>ATA_diag<> (const TMatrix<MT> &A);
 
     friend MATHLIB int PCG<> (const TMatrix<MT> &A, const TVector<MT> &b,
-        TVector<MT> &x, double &tol, const TPreconditioner<MT> *precon,
+        TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
         int maxit);
 
     friend MATHLIB void PCG<> (const TMatrix<MT> &A, const TVector<MT> *b,
@@ -420,7 +420,7 @@ public:
 
     friend MATHLIB int BiCGSTAB<> (const TMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
-        const TPreconditioner<MT> *precon, int maxit);
+        TPreconditioner<MT> *precon, int maxit);
     // biconjugate gradient stabilised method.
 
     friend MATHLIB void BiCGSTAB<> (const TMatrix<MT> &A,

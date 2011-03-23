@@ -16,7 +16,7 @@
 
 #include "mathlib.h"
 #include "slu_zdefs.h"  // SuperLU 4
-#include "supermatrix.h"
+//#include "supermatrix.h"
 //#include "zsp_defs.h" // SuperLU 2
 #include "ilutoast.h"
 
@@ -301,9 +301,9 @@ void TCompRowMatrix<MT>::Unlink ()
     TGenericSparseMatrix<MT>::Unlink();
 }
 
-TCompRowMatrix<complex> cplx (const TCompRowMatrix<double> &A)
+TCompRowMatrix<toast::complex> cplx (const TCompRowMatrix<double> &A)
 {
-    TCompRowMatrix<complex> C(A.nRows(), A.nCols(), A.rowptr, A.colidx);
+    TCompRowMatrix<toast::complex> C(A.nRows(), A.nCols(), A.rowptr, A.colidx);
     for (int i = 0; i < A.nval; i++)
 	C.val[i].re = A.val[i];
     return C;
@@ -1162,16 +1162,16 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
 // ==========================================================================
 
 template<class MT>
-void TCompRowMatrix<MT>::Ax_cplx (const TVector<complex> &x,
-    TVector<complex> &b) const
+void TCompRowMatrix<MT>::Ax_cplx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     // Specialisation MT=double only (see below)
     xERROR(Method Ax_cplx not defined for return type);
 }
 
 template<>
-MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<complex> &x,
-    TVector<complex> &b) const
+MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     dASSERT(x.Dim() == cols, Invalid size - vector x);
 
@@ -1219,8 +1219,8 @@ void TCompRowMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 }
 
 template<> // specialisation:: complex
-MATHLIB void TCompRowMatrix<complex>::ATx (const TVector<complex> &x,
-    TVector<complex> &b) const
+MATHLIB void TCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     dASSERT(x.Dim() == rows, Invalid size - vector x);
     dASSERT(b.Dim() == cols, Invalid size - vector b);
@@ -1237,16 +1237,16 @@ MATHLIB void TCompRowMatrix<complex>::ATx (const TVector<complex> &x,
 // ==========================================================================
 
 template<class MT>
-void TCompRowMatrix<MT>::ATx_cplx (const TVector<complex> &x,
-    TVector<complex> &b) const
+void TCompRowMatrix<MT>::ATx_cplx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     // Specialisation MT=double only (see below)
     xERROR(Method ATx_cplx not defined for return type);
 }
 
 template<>
-MATHLIB void TCompRowMatrix<double>::ATx_cplx (const TVector<complex> &x,
-    TVector<complex> &b) const
+MATHLIB void TCompRowMatrix<double>::ATx_cplx (const TVector<toast::complex> &x,
+    TVector<toast::complex> &b) const
 {
     dASSERT(x.Dim() == rows, Invalid size - vector x);
     dASSERT(b.Dim() == cols, Invalid size - vector b);
@@ -2071,8 +2071,8 @@ MATHLIB bool IncompleteCholeskyFactorize (const TCompRowMatrix<MT> &A,
 }
 
 template<>
-void LU (TCompRowMatrix<complex> &A, const TVector<complex> &b,
-    TVector<complex> &x)
+void LU (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
+    TVector<toast::complex> &x)
 {
     int n = b.Dim();
     char fact   = 'N';
@@ -2296,8 +2296,8 @@ int ILUSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 }
 
 template<>
-int ILUSolve (TCompRowMatrix<complex> &A, const TVector<complex> &b,
-    TVector<complex> &x, double tol, double droptol, int maxit)
+int ILUSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
+    TVector<toast::complex> &x, double tol, double droptol, int maxit)
 {
     return ILUSolveZGNL (A, b, x, tol, droptol, maxit);
 }
@@ -2314,8 +2314,8 @@ int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 }
 
 template<>
-int ILUSymSolve (TCompRowMatrix<complex> &A, const TVector<complex> &b,
-    TVector<complex> &x, double tol, double droptol, int maxit)
+int ILUSymSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
+    TVector<toast::complex> &x, double tol, double droptol, int maxit)
 {
     return ILUSolveZSYM (A, b, x, tol, droptol, maxit);
 }
@@ -2905,7 +2905,7 @@ void TCompRowMatrix<MT>::ExportRCV (ostream &os)
 }
 
 template<> // specialisation: complex
-MATHLIB void TCompRowMatrix<complex>::ExportRCV (ostream &os)
+MATHLIB void TCompRowMatrix<toast::complex>::ExportRCV (ostream &os)
 {
     int r, c, j;
     for (r = 0; r < this->rows; r++) {
@@ -3071,31 +3071,31 @@ int ML_getrow<double> (ML_Operator *Amat, int N_requested_rows,
 
 template class MATHLIB TCompRowMatrix<double>;
 template class MATHLIB TCompRowMatrix<float>;
-template class MATHLIB TCompRowMatrix<complex>;
+template class MATHLIB TCompRowMatrix<toast::complex>;
 template class MATHLIB TCompRowMatrix<scomplex>;
 template class MATHLIB TCompRowMatrix<int>;
 
 template MATHLIB TCompRowMatrix<double> transp (const TCompRowMatrix<double> &m);
-template MATHLIB TCompRowMatrix<complex> transp (const TCompRowMatrix<complex> &m);
+template MATHLIB TCompRowMatrix<toast::complex> transp (const TCompRowMatrix<toast::complex> &m);
 
 template MATHLIB TCompRowMatrix<double> cath (const TCompRowMatrix<double> &A,
     const TCompRowMatrix<double> &B);
-template MATHLIB TCompRowMatrix<complex> cath (const TCompRowMatrix<complex> &A,
-    const TCompRowMatrix<complex> &B);
+template MATHLIB TCompRowMatrix<toast::complex> cath (const TCompRowMatrix<toast::complex> &A,
+    const TCompRowMatrix<toast::complex> &B);
 
 template MATHLIB TCompRowMatrix<double> catv (const TCompRowMatrix<double> &A,
     const TCompRowMatrix<double> &B);
-template MATHLIB TCompRowMatrix<complex> catv (const TCompRowMatrix<complex> &A,
-    const TCompRowMatrix<complex> &B);
+template MATHLIB TCompRowMatrix<toast::complex> catv (const TCompRowMatrix<toast::complex> &A,
+    const TCompRowMatrix<toast::complex> &B);
 
 template MATHLIB double l2norm (const TCompRowMatrix<double> &A);
-template MATHLIB double l2norm (const TCompRowMatrix<complex> &A);
+template MATHLIB double l2norm (const TCompRowMatrix<toast::complex> &A);
 template MATHLIB double l2norm (const TCompRowMatrix<scomplex> &A);
 
 template MATHLIB TCompRowMatrix<double> kron (const TCompRowMatrix<double> &A,
     const TCompRowMatrix<double> &B);
-template MATHLIB TCompRowMatrix<complex> kron (const TCompRowMatrix<complex> &A,
-    const TCompRowMatrix<complex> &B);
+template MATHLIB TCompRowMatrix<toast::complex> kron (const TCompRowMatrix<toast::complex> &A,
+    const TCompRowMatrix<toast::complex> &B);
 template MATHLIB TCompRowMatrix<scomplex> kron (const TCompRowMatrix<scomplex> &A,
     const TCompRowMatrix<scomplex> &B);
 template MATHLIB TCompRowMatrix<int> kron (const TCompRowMatrix<int> &A,
@@ -3117,6 +3117,8 @@ template MATHLIB bool IncompleteCholeskyFactorize (const FCompRowMatrix &A,
     FCompRowMatrix &L, FVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const RCompRowMatrix &A,
     RCompRowMatrix &L, RVector &d, bool recover);
+template MATHLIB bool IncompleteCholeskyFactorize (const FCompRowMatrix &A,
+    FCompRowMatrix &L, FVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const CCompRowMatrix &A,
     CCompRowMatrix &L, CVector &d, bool recover);
 template MATHLIB bool IncompleteCholeskyFactorize (const SCCompRowMatrix &A,
@@ -3130,6 +3132,8 @@ template MATHLIB void CholeskySolve (const FCompRowMatrix &L,
     const FVector &d, const FVector &b, FVector &x);
 template MATHLIB void CholeskySolve (const RCompRowMatrix &L,
     const RVector &d, const RVector &b, RVector &x);
+template MATHLIB void CholeskySolve (const FCompRowMatrix &L,
+    const FVector &d, const FVector &b, FVector &x);
 
 template MATHLIB void CholeskySolve (const RCompRowMatrix &L,
     const RVector &d, const RDenseMatrix &BT, RDenseMatrix&XT, int n);
