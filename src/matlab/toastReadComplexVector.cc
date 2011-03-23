@@ -57,7 +57,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double *pr = mxGetPr (plhs[0]);
     double *pi = mxGetPi (plhs[0]);
 
-    complex *buf = data.data_buffer();
+    toast::complex *buf = data.data_buffer();
     for (int i = 0; i < data.Dim(); i++) {
 	pr[i] = buf[i].re;
 	pi[i] = buf[i].im;

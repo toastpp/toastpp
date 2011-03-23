@@ -202,7 +202,7 @@ void MatlabToast::MapBasis (int nlhs, mxArray *plhs[], int nrhs,
 	double *pr = mxGetPr(prhs[2]);
 	double *pi = mxGetPi(prhs[2]);
 	CVector src(nsrc), tgt;
-	complex *vptr = src.data_buffer();
+	toast::complex *vptr = src.data_buffer();
 	for (int i = 0; i < nsrc; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -396,7 +396,7 @@ void MatlabToast::MapMeshToBasis (int nlhs, mxArray *plhs[], int nrhs,
 	CVector img (bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = nim.data_buffer();
+	toast::complex *vptr = nim.data_buffer();
 	for (int i = 0; i < nn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -436,7 +436,7 @@ void MatlabToast::MapMeshToGrid (int nlhs, mxArray *plhs[], int nrhs,
 	CVector img (gn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = nim.data_buffer();
+	toast::complex *vptr = nim.data_buffer();
 	for (int i = 0; i < nn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -477,7 +477,7 @@ void MatlabToast::MapMeshToSol (int nlhs, mxArray *plhs[], int nrhs,
 	CVector img (sn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = nim.data_buffer();
+	toast::complex *vptr = nim.data_buffer();
 	for (int i = 0; i < nn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -517,7 +517,7 @@ void MatlabToast::MapBasisToMesh (int nlhs, mxArray *plhs[], int nrhs,
 	CVector nim (nn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < bn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -558,7 +558,7 @@ void MatlabToast::MapSolToMesh (int nlhs, mxArray *plhs[], int nrhs,
 	CVector nim (nn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < sn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -599,7 +599,7 @@ void MatlabToast::MapSolToBasis (int nlhs, mxArray *plhs[], int nrhs,
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < sn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -640,7 +640,7 @@ void MatlabToast::MapSolToGrid (int nlhs, mxArray *plhs[], int nrhs,
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < sn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -681,7 +681,7 @@ void MatlabToast::MapGridToMesh (int nlhs, mxArray *plhs[], int nrhs,
 	CVector nim (nn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < gn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -722,7 +722,7 @@ void MatlabToast::MapGridToBasis (int nlhs, mxArray *plhs[], int nrhs,
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < gn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];
@@ -763,7 +763,7 @@ void MatlabToast::MapGridToSol (int nlhs, mxArray *plhs[], int nrhs,
 	CVector simg(sn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	complex *vptr = img.data_buffer();
+	toast::complex *vptr = img.data_buffer();
 	for (int i = 0; i < gn; i++) {
 	    vptr[i].re = pr[i];
 	    vptr[i].im = pi[i];

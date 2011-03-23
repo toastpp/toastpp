@@ -42,7 +42,7 @@ RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g);
 void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf);
 RVector PMDF_mua (const RVector &dphi, const RVector &aphi, double proj);
 CVector PMDF_mua (const CVector &dphi, const CVector &aphi);
-void PMDF_mua (const CVector &pmdf, complex proj,
+void PMDF_mua (const CVector &pmdf, toast::complex proj,
     RVector &pmdf_mod, RVector &pmdf_arg);
 
 // =========================================================================
@@ -547,7 +547,7 @@ CVector PMDF_mua (const CVector &dphi, const CVector &aphi)
 }
 
 // Extract modulation amplitude PMDF and phase PMDF from complex PMDF
-void PMDF_mua (const CVector &pmdf, complex proj,
+void PMDF_mua (const CVector &pmdf, toast::complex proj,
     RVector &pmdf_mod, RVector &pmdf_arg)
 {
     double idenom = 1.0/(proj.re*proj.re + proj.im*proj.im);
