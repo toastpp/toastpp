@@ -1209,7 +1209,7 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
     }
  
     // filter it
-    complex *dz = new complex[dim];
+    toast::complex *dz = new toast::complex[dim];
 
     for(int ng = 0; ng < ngim; ng++) {
       if(!iflags[ng]) // skip if not set
@@ -1221,13 +1221,13 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
     case 2 :
       for(int iy = 0; iy < paddim[1]; iy ++) {
 	int offy = iy*paddim[0];
-	dz[1] = complex(0.0,d1[1][iy]);
+	dz[1] = toast::complex(0.0,d1[1][iy]);
 	for(int ix = 0; ix < paddim[0]; ix ++) {
-	  dz[0] = complex(0.0,d1[0][ix]);
+	  dz[0] = toast::complex(0.0,d1[0][ix]);
 
-	  complex z(data0[2*(offy + ix)],data0[2*(offy + ix)+1]);
+	  toast::complex z(data0[2*(offy + ix)],data0[2*(offy + ix)+1]);
 	  //	  cout << z << " " << (filter[0][ix]*filter[1][iy]) << " ";
-	  z *= complex(filter[0][ix]*filter[1][iy],0.0); // no complex*real??
+	  z *= toast::complex(filter[0][ix]*filter[1][iy],0.0); // no toast::complex*real??
 	  //       	  cout << z << " ";
 	  for(int idim = 0; idim < dim; idim++) {
 	    for(int p = 0; p < D2D[idim][ng] ; p++)
@@ -1245,16 +1245,16 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
       cout <<"Dimension 3 !\n";
       for(int iz = 0; iz < paddim[2]; iz ++) {
        int offz = iz*paddim[0]*paddim[1];
-       dz[2] = complex(0.0,d1[2][iz]);
+       dz[2] = toast::complex(0.0,d1[2][iz]);
        for(int iy = 0; iy < paddim[1]; iy ++) {
 	int offtot = offz + iy*paddim[0];
-	dz[1] = complex(0.0,d1[1][iy]);
+	dz[1] = toast::complex(0.0,d1[1][iy]);
 	for(int ix = 0; ix < paddim[0]; ix ++) {
-	  dz[0] = complex(0.0,d1[0][ix]);
+	  dz[0] = toast::complex(0.0,d1[0][ix]);
 
-	  complex z(data0[2*(offtot + ix)],data0[2*(offtot + ix)+1]);
+	  toast::complex z(data0[2*(offtot + ix)],data0[2*(offtot + ix)+1]);
 	  //	  cout << z << " " << (filter[0][ix]*filter[1][iy]) << " ";
-	  z *= complex(filter[0][ix]*filter[1][iy]*filter[2][iz],0.0); // no complex*real??
+	  z *= toast::complex(filter[0][ix]*filter[1][iy]*filter[2][iz],0.0); // no toast::complex*real??
 	  //       	  cout << z << " ";
 	  for(int idim = 0; idim < dim; idim++) {
 	    for(int p = 0; p < D3D[idim][ng] ; p++)
