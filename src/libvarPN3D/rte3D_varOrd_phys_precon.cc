@@ -19,15 +19,15 @@ typedef unsigned pid_t;
 #include <string.h>
 #include <algorithm>
 #include <vector>
-#include<set>
+#include <set>
 #include <time.h>
 #include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <mathlib.h>
+#include "mathlib.h"
 #include "matrix.h"
-#include <felib.h>
+#include "felib.h"
 #include "source.h"
 #include "pparse.h"
 #include "rte3D_math.h"
@@ -53,8 +53,8 @@ CDenseMatrix Aintx, Aintscx, Aintssx, Aintcx;
 CDenseMatrix apu1x, apu1scx, apu1ssx, apu1cx;
 CDenseMatrix Aintscscx, Aintscssx, Aintssssx, Aintsccx, Aintsscx, Aintccx;
 int mfc_count;
-int spatN, sphOrder, maxAngN;
-IVector nodal_sphOrder, node_angN, offset;
+int spatN, maxAngN, maxSphOrder;
+IVector node_angN, offset, lowfi_sphOrder, hifi_sphOrder, ;
 const double *sintval, *sdxval, *sdyval, *sdzval, *sxval, *syval, *szval; 
 const double *sdxxval, *sdxyval, *sdyxval, *sdyyval, *sdxzval, *sdzxval, *sdyzval, *sdzyval, *sdzzval; 
 const double *spsval, *spsdxval, *spsdyval, *spsdzval, *spata3_rteval, *spata3_sdmxval, *spata3_sdmyval, *spata3_sdmzval; 
@@ -64,20 +64,23 @@ const double *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval,
 CCompRowMatrix Xmat;
 RDenseMatrix *Ylm;
 toast::complex *xmatval;
-double w, c;
-MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, RVector &mua, RVector &mus, RVector &ref, const double g, toast::complex (*phaseFunc)(const double g, const double costheta), double w, double c, const RDenseMatrix& pts, const RVector &wts)
+double w, c, g;
+CCompRowMatrix augA;
+MyDataContext(QMMesh &spatMesh, const IVector& lowfi_sphOrder, const IVector& hifi_sphOrder, RVector &delta, RVector &mua, RVector &mus, RVector &ref, const double g, toast::complex (*phaseFunc)(const double g, const double costheta), double w, double c, const RDenseMatrix& pts, const RVector &wts)
 { 
 	this->w = w;
 	this->c = c;
-	this->nodal_sphOrder = nodal_sphOrder;
-	sphOrder = vmax(nodal_sphOrder);
+	this->hifi_sphOrder = hifi_sphOrder;
+	this->lowfi_sphOrder = lowfi_sphOrder;
+	this->g = g;
+	maxSphOrder = vmax(hifi_sphOrder);
 
 	/*Precomputing spherical harmonics over the quadarture points 
 	which are required by the boundary integrals*/
-	Ylm = new RDenseMatrix[sphOrder +1];
-	for(int l=0; l<=sphOrder; l++)
+	Ylm = new RDenseMatrix[maxSphOrder +1];
+	for(int l=0; l<=maxSphOrder; l++)
 		Ylm[l].New(2*l+1, pts.nRows());
-	sphericalHarmonics(sphOrder, pts.nRows(), pts, Ylm);
+	sphericalHarmonics(maxSphOrder, pts.nRows(), pts, Ylm);
 
 	spatN = spatMesh.nlen();
 
@@ -86,7 +89,7 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	for(int i=0; i < spatN; i++)
 	{
 		node_angN[i] = 0;
-		for(int l=0; l <= nodal_sphOrder[i]; l++)
+		for(int l=0; l <= hifi_sphOrder[i]; l++)
 			node_angN[i] += (2*l+1);
 	}
 	maxAngN = vmax(node_angN);
@@ -107,24 +110,18 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	
 	cout<<"Generating spatial integrals ..."<<endl;
 	gen_spatint_3D(spatMesh, mua, mus, ref, delta, w, c, Sint, Sdx, Sdy, Sdz, Sx, Sy, Sz, Sdxx, Sdxy, Sdyx, Sdyy, Sdxz, Sdzx, Sdyz, Sdzy, Sdzz, spatA3_rte, spatA3_sdmx, spatA3_sdmy, spatA3_sdmz, SPS, SPSdx, SPSdy, SPSdz);
-	
-	int angN = vmax(node_angN);
-	cout<<"Generating angular integrals ..."<<endl;
-      	genmat_angint_3D(sphOrder, angN, Aint, Aintsc, Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc);
-	
-	cout<<"Generating phase integrals ..."<<endl;	
-	genmat_apu(phaseFunc, g, angN, sphOrder, apu1, apu1sc, apu1ss, apu1c);
-
-	//Writing Sint Aint and apu1 for Jacobian Computation
-	WriteSparseMatrix(Sint, "Sint.txt", spatN);
-	WriteSparseMatrix(Aint, "Aint.txt", maxAngN);
-	WriteSparseMatrix(apu1, "apu1.txt", maxAngN);
-
-	cout<<"Generating boundary integrals ..."<<endl;//slow process
-	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
-		
 	Sint = Sint*(w/c); Sdx = Sdx*(w/c); Sdy = Sdy*(w/c); Sdz = Sdz*(w/c);
 
+	int angN = vmax(node_angN);
+	cout<<"Generating angular integrals ..."<<endl;
+      	genmat_angint_3D(maxSphOrder, angN, Aint, Aintsc, Aintss, Aintc, Aintscsc, Aintscss, Aintscc,  Aintssss, Aintssc, Aintcc);
+	
+	cout<<"Generating phase integrals ..."<<endl;	
+	genmat_apu(phaseFunc, g, angN, maxSphOrder, apu1, apu1sc, apu1ss, apu1c);
+
+	cout<<"Generating boundary integrals ..."<<endl;//slow process
+	genmat_boundint_3D(spatMesh, hifi_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
+		
 	/*Preparing angular integrals for computing Kronecker products implicitly*/	
         apu1.Transpone(); apu1sc.Transpone(); apu1ss.Transpone(); apu1c.Transpone(); 	
 	Aint.Transpone(); Aintsc.Transpone(); Aintss.Transpone(); Aintc.Transpone();   
@@ -147,6 +144,8 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	spsdyval = SPSdy.ValPtr(); spsdzval = SPSdz.ValPtr(); spata3_rteval = spatA3_rte.ValPtr(); 
 	spata3_sdmxval = spatA3_sdmx.ValPtr(); spata3_sdmyval = spatA3_sdmy.ValPtr(); 
 	spata3_sdmzval = spatA3_sdmz.ValPtr();      
+
+	initializePrecon(spatMesh, g, phaseFunc, pts, wts);
 	
 
 	/*Allocating memory for A2x where A2 is the matrix corresponding to boundary*/
@@ -179,23 +178,174 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	delete []xcolidx;
 }
 
+void initializePrecon(QMMesh &spatMesh, const double g, toast::complex (*phaseFunc)(const double g, const double costheta), const RDenseMatrix& pts, const RVector &wts)
+
+{
+	RCompRowMatrix Aint_lowfi, Aintsc_lowfi, Aintss_lowfi, Aintc_lowfi;
+	RCompRowMatrix Aintscsc_lowfi,  Aintscss_lowfi, Aintscc_lowfi, Aintssss_lowfi,  Aintssc_lowfi, Aintcc_lowfi;
+	RCompRowMatrix apu1_lowfi, apu1sc_lowfi, apu1ss_lowfi, apu1c_lowfi;
+	RCompRowMatrix A2_lowfi, b1_lowfi;
+	CCompRowMatrix A;
+	int spatN, max_lowfi_sphOrder, lowfi_maxAngN;
+	IVector lowfi_node_angN, lowfi_offset;
+ 
+	max_lowfi_sphOrder = vmax(lowfi_sphOrder);
+
+	spatN = spatMesh.nlen();
+
+	/*Computing the angular degrees of freedom at each spatial node*/
+	lowfi_node_angN.New(spatN);
+	for(int i=0; i < spatN; i++)
+	{
+		lowfi_node_angN[i] = 0;
+		for(int l=0; l <= lowfi_sphOrder[i]; l++)
+			lowfi_node_angN[i] += (2*l+1);
+	}
+	lowfi_maxAngN = vmax(lowfi_node_angN);
+
+	IVector idx2node(sum(lowfi_node_angN));
+	int idx = 0;
+	for(int i=0; i < spatN; i++)
+	{
+		for(int j = 0; j < lowfi_node_angN[i]; j++)
+			idx2node[idx++] = i;	
+	}
+
+	/*Computes the start location for a given spatial node 
+	in the system matrix or solution vector*/
+	lowfi_offset.New(spatN);
+	lowfi_offset[0] = 0;
+	for(int i=1; i < spatN; i++)
+		lowfi_offset[i] = lowfi_offset[i-1] + lowfi_node_angN[i-1];
+
+	cout<<"Generating angular integrals ..."<<endl;
+      	genmat_angint_3D(max_lowfi_sphOrder, lowfi_maxAngN, Aint_lowfi, Aintsc_lowfi, Aintss_lowfi, Aintc_lowfi, Aintscsc_lowfi, Aintscss_lowfi, Aintscc_lowfi,  Aintssss_lowfi, Aintssc_lowfi, Aintcc_lowfi);
+	
+	cout<<"Generating phase integrals ..."<<endl;	
+	genmat_apu(phaseFunc, g, lowfi_maxAngN, max_lowfi_sphOrder, apu1_lowfi, apu1sc_lowfi, apu1ss_lowfi, apu1c_lowfi);
+
+	cout<<"Generating boundary integrals ..."<<endl;//slow process
+	genmat_boundint_3D(spatMesh, lowfi_sphOrder, lowfi_node_angN, lowfi_offset, pts, wts, Ylm, A2_lowfi, b1_lowfi);
+		
+	A = imaginary(kron(Sint, Aint_lowfi) + kron(Sdx, Aintsc_lowfi) + kron(Sdy, Aintss_lowfi) + kron(Sdz, Aintc_lowfi));
+	A = A - cplx(kron(Sx, Aintsc_lowfi)) - cplx(kron(Sy, Aintss_lowfi)) - cplx(kron(Sz, Aintc_lowfi));
+	A = A + cplx(kron(Sdxx, Aintscsc_lowfi) + kron(Sdxy, Aintscss_lowfi) + kron(Sdyx, Aintscss_lowfi));
+	A = A + cplx(kron(Sdxz, Aintscc_lowfi) + kron(Sdzx, Aintscc_lowfi) + kron(Sdyy, Aintssss_lowfi));
+   	A = A + cplx(kron(Sdyz, Aintssc_lowfi) + kron(Sdzy, Aintssc_lowfi) + kron(Sdzz, Aintcc_lowfi));
+	A = A + cplx(kron(spatA3_rte, Aint_lowfi) + kron(spatA3_sdmx, Aintsc_lowfi) + kron(spatA3_sdmy, Aintss_lowfi) + kron(spatA3_sdmz, Aintc_lowfi));
+	A = A - cplx(kron(SPS, apu1_lowfi)) - cplx(kron(SPSdx, apu1sc_lowfi)) - cplx(kron(SPSdy, apu1ss_lowfi)) - cplx(kron(SPSdz, apu1c_lowfi));
+	A = A + cplx(A2_lowfi);
+
+	const int *rowptr, *colidx;
+	A.GetSparseStructure(&rowptr, &colidx);
+
+	int lowfi_sysdim = sum(lowfi_node_angN);
+	int hifi_sysdim = sum(node_angN);
+	int *augrowptr, *augcolidx;
+	toast::complex *val;
+	
+	augrowptr = new int[hifi_sysdim + 1];
+	augrowptr[0] = 0;
+	for(int i=0; i < spatN; i++)
+	{
+		for(int j=0; j < lowfi_node_angN[i]; j++)
+			augrowptr[offset[i]+j+1] = augrowptr[offset[i]+j]+(rowptr[lowfi_offset[i]+j+1]-rowptr[lowfi_offset[i]+j]);
+		
+		for(int j=lowfi_node_angN[i]; j < node_angN[i]; j++)
+			augrowptr[offset[i]+j+1] = augrowptr[offset[i]+j] + 1;
+	}
+
+	augcolidx = new int[augrowptr[hifi_sysdim]];
+	val = new toast::complex[augrowptr[hifi_sysdim]];
+	toast::complex *aval = A.ValPtr();
+	toast::complex a0_rte, a0_sdm, a1_rte, a1_sdm, a2, a3, a4, a0, a1;
+	int idxaug=0;
+	idx=0;
+	for(int i=0; i < spatN; i++)
+	{
+		for(int j=0; j < lowfi_node_angN[i]; j++)
+		{
+			for(int k=rowptr[lowfi_offset[i]+j]; k<rowptr[lowfi_offset[i]+j+1]; k++)
+			{
+				int node_num = idx2node[colidx[idx]];
+				augcolidx[idxaug] = offset[node_num] + colidx[idx] - lowfi_offset[node_num];//colidx[idx];
+				val[idxaug] = aval[idx];
+				idxaug++;
+				idx++;
+			}
+			
+		}
+		for(int j=lowfi_node_angN[i]; j < node_angN[i]; j++)
+		{	
+			augcolidx[idxaug] = offset[i] + j;
+			a0_rte = toast::complex(0,  Sint.Get(i, i))*Aint.Get(j, j);
+			a0_sdm = toast::complex(0, Sdx.Get(i, i))*Aintsc.Get(j, j);
+			a0_sdm += toast::complex(0, Sdy.Get(i, i))*Aintss.Get(j, j);
+  			a0_sdm += toast::complex(0, Sdz.Get(i, i))*Aintc.Get(j, j);
+
+			a1_rte = Aintsc.Get(j, j)*Sx.Get(i, i);	
+			a1_rte += Aintss.Get(j, j)*Sy.Get(i, i);
+			a1_rte += Aintc.Get(j, j)*Sz.Get(i, i);
+
+			a1_sdm = Aintscsc.Get(j, j)*Sdxx.Get(i, i);
+			a1_sdm +=  Aintscss.Get(j, j)*Sdxy.Get(i, i);
+        		a1_sdm += Aintscss.Get(j, j)*Sdyx.Get(i, i);
+			a1_sdm += Aintssss.Get(j, j)*Sdyy.Get(i, i);	
+			a1_sdm += Aintscc.Get(j, j)*Sdxz.Get(i, i);
+			a1_sdm +=  Aintscc.Get(j, j)*Sdzx.Get(i, i);	
+			a1_sdm += Aintssc.Get(j, j)*Sdyz.Get(i, i);
+			a1_sdm += Aintssc.Get(j, j)*Sdzy.Get(i, i);	
+			a1_sdm += Aintcc.Get(j, j)*Sdzz.Get(i, i);
+	
+			a3 = Aint.Get(j, j)*spatA3_rte.Get(i, i) + Aintsc.Get(j, j)*spatA3_sdmx.Get(i, i) + Aintss.Get(j, j)*spatA3_sdmy.Get(i, i) + Aintc.Get(j, j)*spatA3_sdmz.Get(i, i);
+
+
+			a4 = apu1.Get(j, j)*SPS.Get(i, i) + apu1sc.Get(j, j)*SPSdx.Get(i, i) + apu1ss.Get(j, j)*SPSdy.Get(i, i) + apu1c.Get(j, j)*SPSdz.Get(i, i);
+	
+			a2 = A2.Get(offset[i] + j, offset[i] + j);
+
+			a0 = a0_rte + a0_sdm;
+	
+			a1 = a1_sdm - a1_rte;
+
+			val[idxaug] = a0+a1+a2+a3-a4;
+			idxaug++;
+		}
+	}
+	augA.New(hifi_sysdim, hifi_sysdim);
+	augA.Initialise(augrowptr, augcolidx, val);
+	
+}
+
+TCompRowMatrix<toast::complex> imaginary (const TCompRowMatrix<double> &A)
+{
+    TCompRowMatrix<toast::complex> C(A.nRows(), A.nCols(), A.rowptr, A.colidx);
+    toast::complex *cval = C.ValPtr();
+    const double *aval = A.ValPtr();
+    for (int i = 0; i < A.rowptr[A.nRows()]; i++){
+	cval[i].im = aval[i];cval[i].re = 0;}
+    return C;
+}
+
 ~MyDataContext()
 {
   delete []Ylm;
 };
 
-void WriteSparseMatrix(RCompRowMatrix &mat, char *fname, const int nr)
+void WriteSparseMatrix(CCompRowMatrix &mat, char *fname, const int nr)
 {
 	FILE *fid;
 	const int *rowptr, *colidx;
 	int nzero;
 		
 	fid = fopen(fname, "w");
-	double *valptr = mat.ValPtr();
+	toast::complex *valptr = mat.ValPtr();
 	nzero = mat.GetSparseStructure(&rowptr, &colidx);
-	for(int i=0; i < nr; i++)
+	for(int i=0; i < nr; i++){
+	  //cout<<i<<" "<<rowptr[i]<<" "<<rowptr[i+1]<<endl;
 	  for(int j=rowptr[i]; j< rowptr[i+1]; j++)
-	 	fprintf(fid, "%d %d %f\n", i, colidx[j], valptr[j]);
+	 	fprintf(fid, "%d %d %e %e\n", i, colidx[j], valptr[j].re, valptr[j].im);
+	}
 	fclose(fid);
 	
 }
@@ -292,27 +442,21 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 		SPSdy(is, js) += dss*elsy_ij*muscat[el];
 		spatA3_sdmy(is, js) += dss*elsy_ij*sigmatot;
 
-		if(mesh.elist[el]->Dimension() == 3)
-		{
-			elsz_ij = mesh.elist[el]->IntFd (j,i,2);
-			Sz(is,js) += elsz_ij;
-  			Sdz(is,js) += dss*elsz_ij;
-			SPSdz(is, js) += dss*elsz_ij*muscat[el];
-			spatA3_sdmz(is, js) += dss*elsz_ij*sigmatot;
-		}
-		int dim = mesh.elist[el]->Dimension();
-		Sdxx(is,js) += dss * eldd(i*dim,j*dim);
-	       	Sdxy(is,js) += dss * eldd(i*dim,j*dim+1);
-     		Sdyx(is,js) += dss * eldd(i*dim+1,j*dim);
-       		Sdyy(is,js) += dss * eldd(i*dim+1,j*dim+1);
-		if(mesh.elist[el]->Dimension() == 3)
-		{
-	       		Sdxz(is,js) += dss * eldd(i*dim,j*dim+2);
-     			Sdzx(is,js) += dss * eldd(i*dim+2,j*dim);
-	       		Sdyz(is,js) += dss * eldd(i*dim+1,j*dim+2);
-     			Sdzy(is,js) += dss * eldd(i*dim+2,j*dim+1);
-       			Sdzz(is,js) += dss * eldd(i*dim+2,j*dim+2);	
-		}
+		elsz_ij = mesh.elist[el]->IntFd (j,i,2);
+		Sz(is,js) += elsz_ij;
+  		Sdz(is,js) += dss*elsz_ij;
+		SPSdz(is, js) += dss*elsz_ij*muscat[el];
+		spatA3_sdmz(is, js) += dss*elsz_ij*sigmatot;
+
+		Sdxx(is,js) += dss * eldd(i*3,j*3);
+	       	Sdxy(is,js) += dss * eldd(i*3,j*3+1);
+     		Sdyx(is,js) += dss * eldd(i*3+1,j*3);
+       		Sdyy(is,js) += dss * eldd(i*3+1,j*3+1);	
+	       	Sdxz(is,js) += dss * eldd(i*3,j*3+2);
+     		Sdzx(is,js) += dss * eldd(i*3+2,j*3);
+	       	Sdyz(is,js) += dss * eldd(i*3+1,j*3+2);
+     		Sdzy(is,js) += dss * eldd(i*3+2,j*3+1);
+       		Sdzz(is,js) += dss * eldd(i*3+2,j*3+2);	
 	    }
 	}
    }
@@ -627,15 +771,7 @@ void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVecto
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++)  {
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
             
-	  RVector nhat(3);
-	  RVector temp = mesh.ElDirectionCosine(el,sd);
-	  if(mesh.Dimension() == 3){
-		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  }
-	  else
-	  {
-		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  }
+	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  
 	  RCompRowMatrix  Angbintplus, Angbintminus;
 	  int lmaxAngN, lmaxSphOrder;
@@ -663,6 +799,7 @@ void genmat_boundint_3D(const Mesh& mesh,  const IVector& sphOrder, const IVecto
 }
 
 };// end MyDataContext class
+
 
 // =========================================================================
 // global parameters
@@ -773,15 +910,7 @@ void genmat_toastsourcevalvector_3D(const IVector& sphOrder, const IVector& node
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
 	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
- 			RVector nhat(3);
-	  		RVector temp = mesh.ElDirectionCosine(el,sd);
-	  		if(mesh.Dimension() == 3){
-		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  		}
-	  		else
-	  		{
-				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  		}
+ 			RVector nhat = mesh.ElDirectionCosine(el,sd);
 			dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
@@ -880,15 +1009,7 @@ void genmat_sourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN
 	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 	  
-	  RVector nhat(3);
-	  RVector temp = mesh.ElDirectionCosine(el,sd);
-	  if(mesh.Dimension() == 3){
-		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  }
-	  else
-	  {
-		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  }
+	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
@@ -959,15 +1080,7 @@ void genmat_toastintsourcevalvector_3D(const IVector& sphOrder, const IVector& n
    	for (el = 0; el < mesh.elen(); el++) {
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
- 			 RVector nhat(3);
-	  		 RVector temp = mesh.ElDirectionCosine(el,sd);
-	  		if(mesh.Dimension() == 3){
-		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  		}
-	  		else
-	  		{
-				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  		}
+ 			RVector nhat = mesh.ElDirectionCosine(el,sd);
 			dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
@@ -1035,23 +1148,12 @@ void genmat_intsourcevalvector_3D(const IVector& sphOrder, const IVector& node_a
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
-	  RVector nhat(3);
-	  RVector temp = mesh.ElDirectionCosine(el,sd);
-	  if(mesh.Dimension() == 3){
-		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  }
-	  else
-	  {
-		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  }
+	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  //cout<<"direction vector: "<<dirMat<<endl;
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
 	    js = mesh.elist[el]->Node[is];
-	    //cout<<"is "<<js<<" node ==source: "<<(js == Nsource)<<" isbnd: "<< nlist[js].isBnd()<<endl;
-	    if(nlist[js].isBnd() || js != Nsource) continue;
-	    cout<<js<<" jhsdgfsdg"<<endl; 
 	  // if(js != Nsource) continue;
 	    double ela_i =  mesh.elist[el]->IntF(is);
 	    if(is_cosine)
@@ -1147,15 +1249,7 @@ void genmat_toastdetectorvalvector_3D(const IVector& sphOrder, const IVector& no
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
 	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
- 			RVector nhat(3);
-	  		RVector temp = mesh.ElDirectionCosine(el,sd);
-	  		if(mesh.Dimension() == 3){
-		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  		}
-	  		else
-	  		{
-				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  		}
+ 			RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
 	    			js = mesh.elist[el]->Node[is];
@@ -1231,15 +1325,7 @@ void genmat_detectorvalvector_3D(const IVector& sphOrder, const IVector& node_an
 	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 	  
-	  RVector nhat(3);
-	  RVector temp = mesh.ElDirectionCosine(el,sd);
-	  if(mesh.Dimension() == 3){
-		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
-	  }
-	  else
-	  {
-		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
-	  }
+	  RVector nhat = mesh.ElDirectionCosine(el,sd);
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
 	    js = mesh.elist[el]->Node[is];
@@ -1273,7 +1359,6 @@ int main (int argc, char *argv[])
 {
     char cbuf[200];
     int el;
-    
     cout << "Reading mesh " << argv[1] << endl;
     ifstream ifs;
     ifs.open (argv[1]);
@@ -1286,7 +1371,7 @@ int main (int argc, char *argv[])
     int dimension = nlist[0].Dim();
     for (int i = 1; i < nlist.Len(); i++)
 	xASSERT(nlist[i].Dim() == dimension, Inconsistent node dimensions.);
-    //xASSERT(dimension == 3, Mesh dimension must be  3.);
+    xASSERT(dimension == 3, Mesh dimension must be  3.);
     qmmesh.Setup();
 
     cout << "Forming the source\n";
@@ -1346,27 +1431,7 @@ int main (int argc, char *argv[])
 	}
 	qvec.SetRow (i, q);
     }
-    /*cout << "Sources set "<<endl;
-    mvec.New (nM, qmmesh.nlen());
-    LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
-    for (int i = 0; i < nM; i++) {
-	RVector m(qmmesh.nlen());
-	switch (mprof) {
-	case 0:
-	    m = QVec_Point (qmmesh, qmmesh.M[i], SRCMODE_NEUMANN);
-	    break;
-	case 1:
-	    m = QVec_Gaussian (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
-	    break;
-	case 2:
-	    m = QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
-	    break;
-	}
-	for (int j = 0; j < qmmesh.nlen(); j++) 
-	  m[j] *= qmmesh.plist[j].C2A();
-	mvec.SetRow (i, m);
-    }*/
-    }
+   }
     //***** parameters 
     double freq = 0, g;
     int phaseExpOrder, is_cos;
@@ -1405,10 +1470,17 @@ int main (int argc, char *argv[])
       cin >> ref[el]; 
     }
     
-    IVector sphOrder(qmmesh.nlen());
-    cout<<"Reading spherical harmonic expansion order for each node: "<<endl;
+    IVector hifi_sphOrder(qmmesh.nlen());
     for(int i=0; i < qmmesh.nlen(); i++)
-	cin >> sphOrder[i]; 
+	cin >> hifi_sphOrder[i];
+    cout<<"Read spherical harmonic expansion order for high-fidelity model (min max): "<<vmin(hifi_sphOrder)<<" "<<vmax(hifi_sphOrder)<<endl;
+
+     IVector lowfi_sphOrder(qmmesh.nlen());
+     for(int i=0; i < qmmesh.nlen(); i++)
+	cin >> lowfi_sphOrder[i]; 
+     cout<<"Read spherical harmonic expansion order for low-fidelity model (to compute preconditioner): "<<vmin(lowfi_sphOrder)<<" "<<vmax(lowfi_sphOrder)<<endl;
+
+ 
 
     //smoothing parameter for the streamline diffusion modification
     RVector delta(qmmesh.elen());
@@ -1421,8 +1493,7 @@ int main (int argc, char *argv[])
 	 min = max = delta[0];
 #endif 
     }
-   MyDataContext ctxt(qmmesh, sphOrder, delta, muabs, muscat, ref, g, &phaseFunc, w, c, pts, wts);
-
+   MyDataContext ctxt(qmmesh, lowfi_sphOrder, hifi_sphOrder, delta, muabs, muscat, ref, g, &phaseFunc, w, c, pts, wts);
      
     CVector proj(ns*nM); // projection data
     RCompRowMatrix *Source, *Detector;
@@ -1435,30 +1506,27 @@ int main (int argc, char *argv[])
     cout<<"Computing the source and detector vectors ..."<<endl;
    if(argc<3)	
      {
-      genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);	
-      genmat_detector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Detector, qmmesh, Ndetector, nM, pts, wts, ctxt.Ylm);
-      genmat_intsourcevalvector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);
+      genmat_source_3D(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);	
+      genmat_detector_3D(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Detector, qmmesh, Ndetector, nM, pts, wts, ctxt.Ylm);
+      //genmat_intsourcevalvector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);
      }
     else 
     {
-      genmat_toastsource_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_toastdetector_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, Detector, qmmesh, mvec, nM, pts, wts, ctxt.Ylm);
+      genmat_toastsource_3D(ctxt.hifi_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);
+      genmat_toastdetector_3D(ctxt.hifi_sphOrder,  ctxt.node_angN, ctxt.offset, Detector, qmmesh, mvec, nM, pts, wts, ctxt.Ylm);
       //genmat_toastintsourcevalvector_3D(ctxt.nodal_sphOrder,  ctxt.node_angN, ctxt.offset, b2, qmmesh, qvec, 0, dirVec, is_cosine, pts, wts, ctxt.Ylm);
     }
 
-    cout << "calculating the radiance\n";
     int sysdim = qmmesh.nlen();
     int fullsysdim = sum(ctxt.node_angN);
     CVector RHS(fullsysdim), detect(fullsysdim);
     CVector * Phi = new CVector [ns];
     CVector * Phisum = new CVector [ns];
-    CVector idiag = getDiag(&ctxt);
-    
+    cout<<"Initializing the preconditioner"<<endl;
     clock_t precon_start = clock();
-    CPrecon_Diag * AACP = new  CPrecon_Diag;
-    AACP->ResetFromDiagonal(idiag);
+    CPrecon_ILU *AACP = new  CPrecon_ILU;
+    AACP->Reset(ctxt.augA, 1, "amd", 0.1, 5, 5);
     clock_t precon_end = clock();
-	
     double tol = 1e-9;
    
     char fphi_re[300], fphi_im[300];
@@ -1496,11 +1564,7 @@ int main (int argc, char *argv[])
 	 RHS[i] = Source[j].Get(i,0) + b2[i];
 	 detect[i] = Detector[j].Get(i, 0);
 	}
-
       GMRES(&matrixFreeCaller, &ctxt, RHS, Phi[j], tol, AACP, 100);
-      //cout<<"Exit GMRES... writing data to file "<<endl;
-      //osRHS << "RHS " << j << "\n" << RHS[j] << endl;
-      //osPhi << "Phi " << j << "\n" << Phi[j] << endl;
       for(int i =0; i<fullsysdim; i++)
       {
 	fprintf(osRHS_re, "%12e ", RHS[i].re);
@@ -1513,17 +1577,13 @@ int main (int argc, char *argv[])
       fprintf(osRHS_re, "\n");fprintf(osRHS_im, "\n");
       fprintf(osDet_re, "\n");fprintf(osDet_im, "\n");
       fprintf(osPhi_re, "\n");fprintf(osPhi_im, "\n");
-      //cout<<"Files written ... computing output fields"<<endl;
+      cout<<"Files written ... computing output fields"<<endl;
       for (int k = 0; k < sysdim; k++)
       {
 	 Phisum[j][k] += Phi[j][ctxt.offset[k]]*sqrt(4*M_PI);
       }
       
-     /* for (int im = 0; im < nM; im++) {
-	for(int in = 0; in < sysdim; in++)
-	  proj[j*nM + im] += Phisum[j][in]*mvec.Get(im,in) ;
-      }*/
-    }
+     }
     clock_t solver_end = clock();
     //osPhi.close();
     //osRHS.close();

@@ -2,14 +2,15 @@ include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libvarPN3D
 LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
-EXE = rte3D_varOrd rte3D_varOrd_adjoint 
+EXE = rte3D_varOrd rte3D_varOrd_phys_precon rte3D_varOrd_fast rte3D_varOrd_parallel rte3D_varOrd_parallel_rbc  
 
 VPATH = $(TSRC)/libvarPN3D
 
 all:: $(EXE)
 
 LIBSRCS = rte3D_math.cc phaseFunc.cc source.cc pparse.cc 
-EXESRCS = rte3D_varOrd.cc rte3D_varOrd_adjoint.cc 
+EXESRCS = rte3D_varOrd.cc rte3D_varOrd_phys_precon.cc rte3D_varOrd_fast.cc rte3D_varOrd_parallel.cc rte3D_varOrd_parallel_rbc.cc  
+ 
 
 
 LIBOBJS = ${LIBSRCS:.cc=.o}
@@ -18,7 +19,7 @@ EXEOBJS = ${EXESRCS:.cc=.o}
 HDRS = phaseFunc.h pparse.h rte3D.h rte3D_math.h source.h toast.h
 
 %.o : %.cc $(HDRS)
-	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+	$(CXX) $(FLAGS) -I/cs/research/medim/projects2/projects/sprerapa/trunk/numerics/ILUPACK/include $(SHLIB_CFLAGS) -c $<
 
 $(LIB): $(LIBOBJS)
 	@$(RM) $(LIB)
@@ -29,9 +30,17 @@ $(LIB): $(LIBOBJS)
 rte3D_varOrd: rte3D_varOrd.o $(LIBOBJS)
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
-rte3D_varOrd_adjoint: rte3D_varOrd_adjoint.o $(LIBOBJS)
+rte3D_varOrd_phys_precon: rte3D_varOrd_phys_precon.o $(LIBOBJS)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -L//cs/research/medim/projects2/projects/sprerapa/trunk/numerics/ILUPACK/lib/GNU64_long/ -lilupack
+
+rte3D_varOrd_fast: rte3D_varOrd_fast.o $(LIBOBJS)
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
+rte3D_varOrd_parallel: rte3D_varOrd_parallel.o $(LIBOBJS) 
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread 
+
+rte3D_varOrd_parallel_rbc: rte3D_varOrd_parallel_rbc.o $(LIBOBJS) 
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread 
 
 clean:: 
 	$(RM) *.o
