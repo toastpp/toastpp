@@ -573,7 +573,7 @@ CVector precond (const CGenericSparseMatrix& AC,const CVector& y)
 
 template int gmres (int restart, const TMatrix<float> &A,
     const TVector<float> &b, TVector<float> &x,
-    const TPreconditioner<float> *precon, double &elim,
+    TPreconditioner<float> *precon, double &elim,
     void (*clbk)(void*));
 
 template int gmres (int restart, const TMatrix<double> &A,
