@@ -194,6 +194,6 @@ void TFwdSolverMW<T>::Cleanup ()
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
 template class STOASTLIB TFwdSolverMW<double>;
-template class STOASTLIB TFwdSolverMW<complex>;
+template class STOASTLIB TFwdSolverMW<toast::complex>;
 
 #endif // NEED_EXPLICIT_INSTANTIATION
