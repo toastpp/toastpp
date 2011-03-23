@@ -5,16 +5,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stream.h>
+#include <fstream>
 #include <math.h>
 #include <time.h>
 #include <string.h>
-#include <mathlib.h>
-#include <felib.h>
+#include "mathlib.h"
+#include "felib.h"
 #include "toast.h"
 #include "rte3D.h"
 
-    using namespace toast;
+using namespace toast;
 
 
 // generates some parameter distributions
@@ -52,7 +52,7 @@ void calc_paramdistr_nobf_new_3D(RVector& sigma, RVector& sigmatot, RVector& int
        }
      }
      if(!(el*100%mesh.elen()) )
-       cout << el*100/mesh.elen() << "%\n";
+       std::cout << el*100/mesh.elen() << "%\n";
    } // end loop on elements
 }
 

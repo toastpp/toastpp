@@ -5,7 +5,6 @@
 #include "pparse.h"
 #include "mathlib.h"
 #include "error.h"
-#include <fstream.h>
 
 ParamParser::ParamParser ()
 {
