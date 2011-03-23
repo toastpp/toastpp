@@ -498,7 +498,7 @@ MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT>
 
 template<> // specialisation for single complex case
 MATHLIB int IterativeSolve (const SCGenericSparseMatrix &A, const SCVector &b,
-    SCVector &x, double &tol, const SCPreconditioner *precon, int maxit)
+    SCVector &x, double &tol, SCPreconditioner *precon, int maxit)
 {
     int niter = 0;
 
@@ -559,7 +559,7 @@ int IterativeSolve<toast::complex> (const CGenericSparseMatrix &A, const CVector
 template<class MT>
 MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
     const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
-    const TPreconditioner<MT> *precon, IterativeSolverResult *res)
+    TPreconditioner<MT> *precon, IterativeSolverResult *res)
 {
     switch (TGenericSparseMatrix<MT>::itmethod_general) {
     case ITMETHOD_CG:
@@ -576,7 +576,7 @@ MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
 template<> // specialisation: single complex
 void IterativeSolve (const SCGenericSparseMatrix &A, const SCVector *b,
     SCVector *x, int nrhs, double tol, int maxit,
-    const SCPreconditioner *precon, IterativeSolverResult *res)
+    SCPreconditioner *precon, IterativeSolverResult *res)
 {
     switch (TGenericSparseMatrix<scomplex>::itmethod_complex) {
     case ITMETHOD_BICGSTAB:
@@ -589,10 +589,10 @@ void IterativeSolve (const SCGenericSparseMatrix &A, const SCVector *b,
 
 template<> // specialisation: complex
 void IterativeSolve (const CGenericSparseMatrix &A, const CVector *b,
-    CVector *x, int nrhs, double tol, int maxit, const CPreconditioner *precon,
+    CVector *x, int nrhs, double tol, int maxit, CPreconditioner *precon,
     IterativeSolverResult *res)
 {
-    switch (TGenericSparseMatrix<complex>::itmethod_complex) {
+    switch (TGenericSparseMatrix<toast::complex>::itmethod_complex) {
     case ITMETHOD_BICGSTAB:
         A.bicgstab (b, x, nrhs, tol, maxit, precon, res);
 	break;
@@ -695,7 +695,7 @@ template MATHLIB int CG (const FGenericSparseMatrix &A, const FVector &b,
     FVector &x, double &tol, FPreconditioner *precon, int maxit);
 
 template MATHLIB int BiCG (const FGenericSparseMatrix &A, const FVector &b,
-    FVector &x, double &tol, const FPreconditioner *precon, int maxit);
+    FVector &x, double &tol, FPreconditioner *precon, int maxit);
 template MATHLIB int BiCG (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
 
@@ -707,8 +707,6 @@ template MATHLIB int GaussSeidel (const CGenericSparseMatrix &A,
     const CVector &b, CVector &x, double &tol, int maxit);
 template MATHLIB int GaussSeidel (const SCGenericSparseMatrix &A,
     const SCVector &b, SCVector &x, double &tol, int maxit);
-template MATHLIB int GaussSeidel (const FGenericSparseMatrix &A, const FVector &b,
-    FVector &x, double &tol, int maxit);
 
 // Note that specialisations are not explicitly instantiated
 
