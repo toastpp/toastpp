@@ -4,9 +4,10 @@
 
 #include "mathlib.h"
 #include "felib.h"
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 
+using namespace std;
 void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type);
 void WriteEim (const RVector &eim, int imgno, char *eimname);
 

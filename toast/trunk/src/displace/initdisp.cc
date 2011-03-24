@@ -1,13 +1,14 @@
 // Generate file containing initial boundary displacements
 // defined by user input
 
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "felib.h"
 
+using namespace std;
 const char *WS = " \t";
 typedef enum {
   OP_GT,
