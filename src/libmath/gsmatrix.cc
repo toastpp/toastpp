@@ -689,6 +689,16 @@ template void QRSolve (const TGenericSparseMatrix<double> &A,
 
 template MATHLIB int IterativeSolve (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
+template MATHLIB int IterativeSolve (const FGenericSparseMatrix &A, const FVector &b,
+    FVector &x, double &tol, FPreconditioner *precon, int maxit);
+template MATHLIB void IterativeSolve (const RGenericSparseMatrix &A,
+    const RVector *b, RVector *x, int nrhs, double tol, int maxit,
+    RPreconditioner *precon, IterativeSolverResult *res);
+template MATHLIB void IterativeSolve (const FGenericSparseMatrix &A,
+    const FVector *b, FVector *x, int nrhs, double tol, int maxit,
+    FPreconditioner *precon, IterativeSolverResult *res);
+
+
 template MATHLIB int CG (const RGenericSparseMatrix &A, const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
 template MATHLIB int CG (const FGenericSparseMatrix &A, const FVector &b,
