@@ -17,7 +17,7 @@
 
 TOAST_SRC="$TOASTDIR/src"
 
-TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libbemdiff -I $TOAST_SRC/libbem -I $TOAST_SRC/libdgfe"
+TOAST_INC="-I $TOASTDIR -I $TOASTDIR/include -I $TOAST_SRC/libmath -I $TOAST_SRC/libfe -I $TOAST_SRC/libstoast -I $TOAST_SRC/libbemdiff -I $TOAST_SRC/libbem -I $TOAST_SRC/libdgfe -I $TOASTDIR/numerics/ILUPACK/include"
 
 TOAST_LIB="-L $TOASTDIR/@OBJDIR@/lib -ldgfe -lbemdiff -lbem -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs @FLIBS@"
 
