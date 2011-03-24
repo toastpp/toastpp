@@ -850,9 +850,15 @@ template MATHLIB SCVector ATA_diag (const SCMatrix &A);
 
 template MATHLIB int PCG (const RMatrix &A, const RVector &b, RVector &x, double &tol,
      RPreconditioner *precon, int maxit);
+template MATHLIB int PCG (const FMatrix &A, const FVector &b, FVector &x, double &tol,
+     FPreconditioner *precon, int maxit);
 template MATHLIB int PCG (RVector (*Mv_clbk)( const RVector &v,
     void *context), void * context, const RVector &b, RVector &x,
     double &tol, RPreconditioner *precon, int maxit);
+template MATHLIB void PCG (const RMatrix &A, const RVector *b, RVector *x,
+    int nrhs, double tol, int maxit, RPreconditioner *precon, IterativeSolverResult *res);
+template MATHLIB void PCG (const FMatrix &A, const FVector *b, FVector *x,
+    int nrhs, double tol, int maxit, FPreconditioner *precon, IterativeSolverResult *res);
 
 template MATHLIB int BiCGSTAB (const FMatrix &A, const FVector &b,
     FVector &x, double &tol, FPreconditioner *precon, int maxit);
