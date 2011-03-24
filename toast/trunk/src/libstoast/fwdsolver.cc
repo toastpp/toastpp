@@ -376,7 +376,7 @@ void TFwdSolver<scomplex>::AssembleSystemMatrix (const Solution &sol,
 
     int i, nz = F->nVal();
     scomplex *sval = F->ValPtr();
-    complex *cval = FF.ValPtr();
+    toast::complex *cval = FF.ValPtr();
     for (i = 0; i < nz; i++) {
         sval[i].re = (float)cval[i].re;
 	sval[i].im = (float)cval[i].im;
@@ -481,7 +481,7 @@ void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
 }
 
 template<>
-void TFwdSolver<complex>::Reset (const Solution &sol, double omega)
+void TFwdSolver<toast::complex>::Reset (const Solution &sol, double omega)
 {
     // complex version
     AssembleSystemMatrix (sol, omega);
@@ -548,8 +548,8 @@ void TFwdSolver<scomplex>::CalcField (const TVector<scomplex> &qvec,
 }
 
 template<>
-void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
-    TVector<complex> &cphi, IterativeSolverResult *res) const
+void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
+    TVector<toast::complex> &cphi, IterativeSolverResult *res) const
 {
     // calculate the complex field for a given source distribution
 
@@ -766,7 +766,7 @@ STOASTLIB RVector TFwdSolver<double>::UnfoldComplex (const RVector &vec)
 }
 
 template<>
-STOASTLIB RVector TFwdSolver<complex>::UnfoldComplex (const CVector &vec)
+STOASTLIB RVector TFwdSolver<toast::complex>::UnfoldComplex (const CVector &vec)
    const
 {
     int n = vec.Dim();
@@ -805,7 +805,7 @@ RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &mvec,
 }
 
 template<>
-RVector TFwdSolver<complex>::ProjectAll_real (const CCompRowMatrix &mvec,
+RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &mvec,
     const CVector *phi, DataScale scl)
 {
     return UnfoldComplex (ProjectAll (mvec, phi, scl));
@@ -838,7 +838,7 @@ RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &qvec,
 }
 
 template<>
-RVector TFwdSolver<complex>::ProjectAll_real (const CCompRowMatrix &qvec,
+RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &qvec,
     const CCompRowMatrix &mvec, const Solution &sol, double omega,
     DataScale scl)
 {
