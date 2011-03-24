@@ -8,7 +8,7 @@
 #include "supertoast.h"
 #include "supertoast_util.h"
 #include <time.h>
-
+//latest version
 using namespace std;
 using namespace toast;
 
@@ -2615,8 +2615,6 @@ void BFGSsolve (CFwdSolver &FWS, const Raster &raster, ObjectiveFunction &OF,
     
 }
 
-=======
->>>>>>> .r264
 // ==========================================================================
 
 static bool CheckRange (const Solution &sol)
