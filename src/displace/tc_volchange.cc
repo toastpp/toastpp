@@ -2,16 +2,17 @@
 // given an original and a distorted mesh
 // We use element size difference as objective function
 
-#include <fstream.h>
+#include <fstream>
 #include <time.h>
 #include "mathlib.h"
 #include "felib.h"
-#include <iostream.h>
+#include <iostream>
 
 #define ENCODE_STRAINENERGY
 #define MAXREGION 100
 #define BIGSPRING 1e7
 
+using namespace std;
 struct MatList {      // material properties
   double E;         // Young's modulus
   double nu;        // Poisson's ratio

@@ -1,5 +1,5 @@
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 //#include <stdlib.h>
 #include "mathlib.h"
 #include "felib.h"
@@ -7,6 +7,7 @@
 const char *WS = " \t";
 const bool add_displacements = true;
 
+using namespace std;
 //RVector ReadDisp (char *disp_name, int nnodes);
 
 void usage()
