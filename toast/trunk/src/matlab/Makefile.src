@@ -98,7 +98,7 @@ SRCS +=  toastBasisToMeshMatrix.cc \
 	toast_bem_Dk_matrix.cc \
 	surface_int.cc
 
-SRCS += toastPNJacobian.cc\
+#SRCS += toastPNJacobian.cc\
 
 ifeq ($(BUILD_FDOT),1)
 SRCS += makeFDOTFwd.cc \
