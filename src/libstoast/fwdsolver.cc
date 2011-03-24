@@ -352,6 +352,7 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
 		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
 }
 
+template<>
 void TFwdSolver<scomplex>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
@@ -467,18 +468,6 @@ void TFwdSolver<double>::Reset (const Solution &sol, double omega)
 }
 
 template<>
-void TFwdSolver<toast::complex>::Reset (const Solution &sol, double omega)
-{
-    // complex version
-    AssembleSystemMatrix (sol, omega);
-    if (solvertp == LSOLVER_DIRECT)
-	lu_data.options.Fact = DOFACT;
-	//lu_data.fact = 'N';
-    else
-	precon->Reset (F);
-    if (B) AssembleMassMatrix();
-}
-
 void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
 {
     // single complex version
@@ -491,6 +480,18 @@ void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
     if (B) AssembleMassMatrix();
 }
 
+template<>
+void TFwdSolver<complex>::Reset (const Solution &sol, double omega)
+{
+    // complex version
+    AssembleSystemMatrix (sol, omega);
+    if (solvertp == LSOLVER_DIRECT)
+	lu_data.options.Fact = DOFACT;
+	//lu_data.fact = 'N';
+    else
+	precon->Reset (F);
+    if (B) AssembleMassMatrix();
+}
 
 template<>
 void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
@@ -531,8 +532,24 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
 }
 
 template<>
-void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
-    TVector<toast::complex> &cphi) const
+void TFwdSolver<scomplex>::CalcField (const TVector<scomplex> &qvec,
+    TVector<scomplex> &cphi, IterativeSolverResult *res) const
+{
+    if (solvertp == LSOLVER_DIRECT) {
+        xERROR(Not implemented yet);
+    } else {
+        double tol = iterative_tol;
+	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
+	if (res) {
+	    res->it_count = it;
+	    res->rel_err = tol;
+	}
+    }
+}
+
+template<>
+void TFwdSolver<complex>::CalcField (const TVector<complex> &qvec,
+    TVector<complex> &cphi, IterativeSolverResult *res) const
 {
     // calculate the complex field for a given source distribution
 
@@ -567,22 +584,6 @@ void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
 #endif
     //cerr << "Solve time = " << solver_time << endl;
 }
-
-void TFwdSolver<scomplex>::CalcField (const TVector<scomplex> &qvec,
-    TVector<scomplex> &cphi, IterativeSolverResult *res) const
-{
-    if (solvertp == LSOLVER_DIRECT) {
-        xERROR(Not implemented yet);
-    } else {
-        double tol = iterative_tol;
-	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
-	if (res) {
-	    res->it_count = it;
-	    res->rel_err = tol;
-	}
-    }
-}
-
 
 template<class T>
 void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
@@ -855,15 +856,12 @@ FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &qvec,
 }
 
 template<>
-STOASTLIB RVector TFwdSolver<toast::complex>::UnfoldComplex (const CVector &vec)
-   const
-{
-    return UnfoldSComplex (ProjectAll (qvec, mvec, sol, omega, scl));
-}
-
 FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
     const SCCompRowMatrix &qvec, const SCCompRowMatrix &mvec,
     const Solution &sol, double omega, DataScale scl)
+{
+    return UnfoldSComplex (ProjectAll (qvec, mvec, sol, omega, scl));
+}
 
 // =========================================================================
 
