@@ -1374,7 +1374,6 @@ int main (int argc, char *argv[])
     xASSERT(dimension == 3, Mesh dimension must be  3.);
     qmmesh.Setup();
 
-    cout << "Forming the source\n";
     int ns = 1, nM=1;
     int *Nsource = new int [ns];
     int *Ndetector = new int [nM];
