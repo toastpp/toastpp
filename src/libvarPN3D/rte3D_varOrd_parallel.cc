@@ -1248,6 +1248,8 @@ int main (int argc, char *argv[])
 
     cin>>file_extn;
     cout<<"File name prefix: "<<file_extn<<endl;// prefix for the output files
+    cin>>NUM_THREADS;
+    cout<<"Number of threads used for this computation: "<<NUM_THREADS<<endl;
     if(argc < 3) { // point source 
          cin >> ns;
 	 cout<< "Number of sources: "<<ns<<endl;
