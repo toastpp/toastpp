@@ -289,22 +289,29 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 		Sdy(is,js) += toast::complex(0, w*ref[el]*dss*elsy_ij/c);
 		SPSdy(is, js) += toast::complex(dss*elsy_ij*muscat[el], 0);
 		spatA3_sdmy(is, js) += toast::complex(dss*elsy_ij*sigmatot, 0);
-
-		elsz_ij = mesh.elist[el]->IntFd (j,i,2);
-		Sz(is,js) += toast::complex(elsz_ij, 0);
-  		Sdz(is,js) += toast::complex(0, w*ref[el]*dss*elsz_ij/c);
-		SPSdz(is, js) += toast::complex(dss*elsz_ij*muscat[el], 0);
-		spatA3_sdmz(is, js) += toast::complex(dss*elsz_ij*sigmatot, 0);
+	
+		if(mesh.elist[el]->Dimension() == 3)
+		{
+			elsz_ij = mesh.elist[el]->IntFd (j,i,2);
+			Sz(is,js) += toast::complex(elsz_ij, 0);
+  			Sdz(is,js) += toast::complex(0, w*ref[el]*dss*elsz_ij/c);
+			SPSdz(is, js) += toast::complex(dss*elsz_ij*muscat[el], 0);
+			spatA3_sdmz(is, js) += toast::complex(dss*elsz_ij*sigmatot, 0);
+		}
 
 		Sdxx(is,js) += toast::complex(dss * eldd(i*3,j*3), 0);
 	       	Sdxy(is,js) += toast::complex(dss * eldd(i*3,j*3+1), 0);
      		Sdyx(is,js) += toast::complex(dss * eldd(i*3+1,j*3), 0);
        		Sdyy(is,js) += toast::complex(dss * eldd(i*3+1,j*3+1), 0);	
-	       	Sdxz(is,js) += toast::complex(dss * eldd(i*3,j*3+2), 0);
-     		Sdzx(is,js) += toast::complex(dss * eldd(i*3+2,j*3), 0);
-	       	Sdyz(is,js) += toast::complex(dss * eldd(i*3+1,j*3+2), 0);
-     		Sdzy(is,js) += toast::complex(dss * eldd(i*3+2,j*3+1), 0);
-       		Sdzz(is,js) += toast::complex(dss * eldd(i*3+2,j*3+2), 0);	
+		
+		if(mesh.elist[el]->Dimension() == 3)
+		{
+	       		Sdxz(is,js) += toast::complex(dss * eldd(i*3,j*3+2), 0);
+     			Sdzx(is,js) += toast::complex(dss * eldd(i*3+2,j*3), 0);
+	       		Sdyz(is,js) += toast::complex(dss * eldd(i*3+1,j*3+2), 0);
+     			Sdzy(is,js) += toast::complex(dss * eldd(i*3+2,j*3+1), 0);
+       			Sdzz(is,js) += toast::complex(dss * eldd(i*3+2,j*3+2), 0);	
+		}
 	    }
 	}
    }
@@ -618,7 +625,15 @@ void genmat_boundint_3D(const Mesh& mesh,  const RVector &ref, const double ref_
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++)  {
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
             
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  	  
 	  RCompRowMatrix  Angbintplus, Angbintminus, Angbrintminus;
 	  int lmaxAngN, lmaxSphOrder;
@@ -770,7 +785,15 @@ void genmat_toastsourcevalvector_3D(const IVector& sphOrder, const IVector& node
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
 	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
- 			RVector nhat = mesh.ElDirectionCosine(el,sd);
+ 			RVector nhat(3);
+	  		RVector temp = mesh.ElDirectionCosine(el,sd);
+	  		if(mesh.Dimension() == 3){
+		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  		}
+	  		else
+	  		{
+				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  		}
 			dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
@@ -869,7 +892,15 @@ void genmat_sourcevalvector_3D(const IVector& sphOrder, const IVector& node_angN
 	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 	  
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
@@ -940,7 +971,15 @@ void genmat_toastintsourcevalvector_3D(const IVector& sphOrder, const IVector& n
    	for (el = 0; el < mesh.elen(); el++) {
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip
- 			RVector nhat = mesh.ElDirectionCosine(el,sd);
+ 			RVector nhat(3);
+	  		RVector temp = mesh.ElDirectionCosine(el,sd);
+	  		if(mesh.Dimension() == 3){
+		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  		}
+	  		else
+	  		{
+				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  		}
 			dirMat(0, 0) = -1*nhat[0]; dirMat(0, 1) = -1*nhat[1]; dirMat(0, 2) = -1*nhat[2]; 
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
@@ -1011,7 +1050,15 @@ void genmat_intsourcevalvector_3D(const IVector& sphOrder, const IVector& node_a
    for (el = 0; el < mesh.elen(); el++) {
         if(!mesh.elist[el]->IsNode(Nsource)) continue; // source not in this el
 	for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  dirMat(0, 0) = dirVec[0]; dirMat(0, 1) = dirVec[1]; dirMat(0, 2) = dirVec[2]; 
 	  //cout<<"direction vector: "<<dirMat<<endl;
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
@@ -1113,7 +1160,15 @@ void genmat_toastdetectorvalvector_3D(const IVector& sphOrder, const IVector& no
 		for(int sd = 0; sd <  mesh.elist[el]->nSide(); sd++) {
 	  		// if sd is not a boundary side. skip 
 	  		if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
- 			RVector nhat = mesh.ElDirectionCosine(el,sd);
+ 			RVector nhat(3);
+	  		RVector temp = mesh.ElDirectionCosine(el,sd);
+	  		if(mesh.Dimension() == 3){
+		 		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  		}
+	  		else
+	  		{
+				nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  		}
 	  		for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    			is = mesh.elist[el]->SideNode(sd,nd);
 	    			js = mesh.elist[el]->Node[is];
@@ -1189,7 +1244,15 @@ void genmat_detectorvalvector_3D(const IVector& sphOrder, const IVector& node_an
 	  // if sd is not a boundary side. skip 
 	  if(!mesh.elist[el]->IsBoundarySide (sd)) continue;
 	  
-	  RVector nhat = mesh.ElDirectionCosine(el,sd);
+	  RVector nhat(3);
+	  RVector temp = mesh.ElDirectionCosine(el,sd);
+	  if(mesh.Dimension() == 3){
+		 nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = temp[2];
+	  }
+	  else
+	  {
+		nhat[0] = temp[0]; nhat[1] = temp[1]; nhat[2] = 0;
+	  }
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
 	    js = mesh.elist[el]->Node[is];
@@ -1237,7 +1300,6 @@ int main (int argc, char *argv[])
     int dimension = nlist[0].Dim();
     for (int i = 1; i < nlist.Len(); i++)
 	xASSERT(nlist[i].Dim() == dimension, Inconsistent node dimensions.);
-    xASSERT(dimension == 3, Mesh dimension must be  3.);
     qmmesh.Setup();
 
     ns = 1;
