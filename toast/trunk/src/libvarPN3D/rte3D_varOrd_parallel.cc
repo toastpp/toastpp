@@ -1340,7 +1340,6 @@ int main (int argc, char *argv[])
     nM = qmmesh.nM;
     cout << ns << " sources\n";
     SelectSourceProfile (qprof, qwidth, srctp);
-    //SelectMeasurementProfile (pp, mprof, mwidth);
     qvec.New (ns, qmmesh.nlen());
     for (int i = 0; i < ns; i++) {
 	RVector q(qmmesh.nlen());
@@ -1357,9 +1356,9 @@ int main (int argc, char *argv[])
 	}
 	qvec.SetRow (i, q);
     }
-    /*cout << "Sources set "<<endl;
+    cout << "Sources set "<<endl;
+    SelectMeasurementProfile (pp, mprof, mwidth);
     mvec.New (nM, qmmesh.nlen());
-    LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (int i = 0; i < nM; i++) {
 	RVector m(qmmesh.nlen());
 	switch (mprof) {
@@ -1373,10 +1372,10 @@ int main (int argc, char *argv[])
 	    m = QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (int j = 0; j < qmmesh.nlen(); j++) 
-	  m[j] *= qmmesh.plist[j].C2A();
+	//for (int j = 0; j < qmmesh.nlen(); j++) 
+	  //m[j] *= qmmesh.plist[j].C2A();
 	mvec.SetRow (i, m);
-    }*/
+    }
     }
     //***** parameters 
     double freq = 0, g;
