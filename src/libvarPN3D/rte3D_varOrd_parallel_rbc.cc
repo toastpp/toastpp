@@ -298,19 +298,18 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 			SPSdz(is, js) += toast::complex(dss*elsz_ij*muscat[el], 0);
 			spatA3_sdmz(is, js) += toast::complex(dss*elsz_ij*sigmatot, 0);
 		}
-
-		Sdxx(is,js) += toast::complex(dss * eldd(i*3,j*3), 0);
-	       	Sdxy(is,js) += toast::complex(dss * eldd(i*3,j*3+1), 0);
-     		Sdyx(is,js) += toast::complex(dss * eldd(i*3+1,j*3), 0);
-       		Sdyy(is,js) += toast::complex(dss * eldd(i*3+1,j*3+1), 0);	
-		
+		int dim = mesh.elist[el]->Dimension();
+		Sdxx(is,js) += dss * eldd(i*dim,j*dim);
+	       	Sdxy(is,js) += dss * eldd(i*dim,j*dim+1);
+     		Sdyx(is,js) += dss * eldd(i*dim+1,j*dim);
+       		Sdyy(is,js) += dss * eldd(i*dim+1,j*dim+1);
 		if(mesh.elist[el]->Dimension() == 3)
 		{
-	       		Sdxz(is,js) += toast::complex(dss * eldd(i*3,j*3+2), 0);
-     			Sdzx(is,js) += toast::complex(dss * eldd(i*3+2,j*3), 0);
-	       		Sdyz(is,js) += toast::complex(dss * eldd(i*3+1,j*3+2), 0);
-     			Sdzy(is,js) += toast::complex(dss * eldd(i*3+2,j*3+1), 0);
-       			Sdzz(is,js) += toast::complex(dss * eldd(i*3+2,j*3+2), 0);	
+	       		Sdxz(is,js) += dss * eldd(i*dim,j*dim+2);
+     			Sdzx(is,js) += dss * eldd(i*dim+2,j*dim);
+	       		Sdyz(is,js) += dss * eldd(i*dim+1,j*dim+2);
+     			Sdzy(is,js) += dss * eldd(i*dim+2,j*dim+1);
+       			Sdzz(is,js) += dss * eldd(i*dim+2,j*dim+2);	
 		}
 	    }
 	}
@@ -1345,7 +1344,6 @@ int main (int argc, char *argv[])
     nM = qmmesh.nM;
     cout << ns << " sources\n";
     SelectSourceProfile (qprof, qwidth, srctp);
-    //SelectMeasurementProfile (pp, mprof, mwidth);
     qvec.New (ns, qmmesh.nlen());
     for (int i = 0; i < ns; i++) {
 	RVector q(qmmesh.nlen());
@@ -1362,9 +1360,9 @@ int main (int argc, char *argv[])
 	}
 	qvec.SetRow (i, q);
     }
-    /*cout << "Sources set "<<endl;
+    cout << "Sources set "<<endl;
+    SelectMeasurementProfile (pp, mprof, mwidth);
     mvec.New (nM, qmmesh.nlen());
-    LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (int i = 0; i < nM; i++) {
 	RVector m(qmmesh.nlen());
 	switch (mprof) {
@@ -1378,10 +1376,8 @@ int main (int argc, char *argv[])
 	    m = QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (int j = 0; j < qmmesh.nlen(); j++) 
-	  m[j] *= qmmesh.plist[j].C2A();
 	mvec.SetRow (i, m);
-    }*/
+    }
     }
     //***** parameters 
     double freq = 0, g;
