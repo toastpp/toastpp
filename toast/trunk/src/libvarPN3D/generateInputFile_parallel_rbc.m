@@ -38,7 +38,7 @@ function [] = generateInputFile_parallel_rbc(hMesh, fname, output_file_prefix, n
 %
 %	meas_widRadii -> nM x 1 vector containing the source radii (if a 'Point' source) or width (if a 'Gaussian' source) or ignored (if 'Cosine') 
 %			 where 'nM' is the number of measurements.
-%		         NOTE:Ignore when specify_QM = 0. Use [].
+%		         NOTE:Ignore when specify_QM = 0 and when meas_profiles = 1. Use [].
 %
 %	meas_nodes -> A vector of measurement node numbers (If a QM file is not specified)
 %
@@ -83,7 +83,9 @@ else
 	end;
 	for i = 1 : nM
 		fprintf(fid, '%d\n', meas_profiles(i));
-		if(meas_profiles(i) == 1 | meas_profiles(i) == 2)
+		if((meas_profiles(i)-1) > 0)
+			disp('Entered here')
+			meas_profiles(i) - 1
 			fprintf(fid, '%f\n', meas_widRadii(i));
 		end;
 	end;

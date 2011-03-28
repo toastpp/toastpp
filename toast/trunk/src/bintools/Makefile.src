@@ -29,10 +29,10 @@ all:: $(BINS)
 	$(CXX) $(STOASTFLAGS) -c $<
 
 % : %.o
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) $(ILUPACKLIB)
 
 opt2 : opt2.o
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) $(ILUPACKLIB)
 
 clean:: 
 	$(RM) *.o

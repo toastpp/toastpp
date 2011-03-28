@@ -298,19 +298,18 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 			SPSdz(is, js) += toast::complex(dss*elsz_ij*muscat[el], 0);
 			spatA3_sdmz(is, js) += toast::complex(dss*elsz_ij*sigmatot, 0);
 		}
-	
-		Sdxx(is,js) += toast::complex(dss * eldd(i*3,j*3), 0);
-	       	Sdxy(is,js) += toast::complex(dss * eldd(i*3,j*3+1), 0);
-     		Sdyx(is,js) += toast::complex(dss * eldd(i*3+1,j*3), 0);
-       		Sdyy(is,js) += toast::complex(dss * eldd(i*3+1,j*3+1), 0);	
-		
+		int dim = mesh.elist[el]->Dimension();
+		Sdxx(is,js) += dss * eldd(i*dim,j*dim);
+	       	Sdxy(is,js) += dss * eldd(i*dim,j*dim+1);
+     		Sdyx(is,js) += dss * eldd(i*dim+1,j*dim);
+       		Sdyy(is,js) += dss * eldd(i*dim+1,j*dim+1);
 		if(mesh.elist[el]->Dimension() == 3)
 		{
-	       		Sdxz(is,js) += toast::complex(dss * eldd(i*3,j*3+2), 0);
-     			Sdzx(is,js) += toast::complex(dss * eldd(i*3+2,j*3), 0);
-	       		Sdyz(is,js) += toast::complex(dss * eldd(i*3+1,j*3+2), 0);
-     			Sdzy(is,js) += toast::complex(dss * eldd(i*3+2,j*3+1), 0);
-       			Sdzz(is,js) += toast::complex(dss * eldd(i*3+2,j*3+2), 0);		
+	       		Sdxz(is,js) += dss * eldd(i*dim,j*dim+2);
+     			Sdzx(is,js) += dss * eldd(i*dim+2,j*dim);
+	       		Sdyz(is,js) += dss * eldd(i*dim+1,j*dim+2);
+     			Sdzy(is,js) += dss * eldd(i*dim+2,j*dim+1);
+       			Sdzz(is,js) += dss * eldd(i*dim+2,j*dim+2);	
 		}
 	    }
 	}

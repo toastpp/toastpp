@@ -450,19 +450,18 @@ void gen_spatint_3D(const QMMesh& mesh, const RVector& muabs, const RVector& mus
 			SPSdz(is, js) += dss*elsz_ij*muscat[el];
 			spatA3_sdmz(is, js) += dss*elsz_ij*sigmatot;
 		}
-
-		Sdxx(is,js) += dss * eldd(i*3,j*3);
-	       	Sdxy(is,js) += dss * eldd(i*3,j*3+1);
-     		Sdyx(is,js) += dss * eldd(i*3+1,j*3);
-       		Sdyy(is,js) += dss * eldd(i*3+1,j*3+1);
-		
+		int dim = mesh.elist[el]->Dimension();
+		Sdxx(is,js) += dss * eldd(i*dim,j*dim);
+	       	Sdxy(is,js) += dss * eldd(i*dim,j*dim+1);
+     		Sdyx(is,js) += dss * eldd(i*dim+1,j*dim);
+       		Sdyy(is,js) += dss * eldd(i*dim+1,j*dim+1);
 		if(mesh.elist[el]->Dimension() == 3)
 		{
-	       		Sdxz(is,js) += dss * eldd(i*3,j*3+2);
-     			Sdzx(is,js) += dss * eldd(i*3+2,j*3);
-	       		Sdyz(is,js) += dss * eldd(i*3+1,j*3+2);
-     			Sdzy(is,js) += dss * eldd(i*3+2,j*3+1);
-       			Sdzz(is,js) += dss * eldd(i*3+2,j*3+2);	
+	       		Sdxz(is,js) += dss * eldd(i*dim,j*dim+2);
+     			Sdzx(is,js) += dss * eldd(i*dim+2,j*dim);
+	       		Sdyz(is,js) += dss * eldd(i*dim+1,j*dim+2);
+     			Sdzy(is,js) += dss * eldd(i*dim+2,j*dim+1);
+       			Sdzz(is,js) += dss * eldd(i*dim+2,j*dim+2);	
 		}
 	    }
 	}
