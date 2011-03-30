@@ -115,10 +115,6 @@ MyDataContext(QMMesh &spatMesh, const IVector& nodal_sphOrder, RVector &delta, R
 	cout<<"Generating phase integrals ..."<<endl;	
 	genmat_apu(phaseFunc, g, angN, sphOrder, apu1, apu1sc, apu1ss, apu1c);
 
-	//Writing Sint Aint and apu1 for Jacobian Computation
-	WriteSparseMatrix(Sint, "Sint.txt", spatN);
-	WriteSparseMatrix(Aint, "Aint.txt", maxAngN);
-	WriteSparseMatrix(apu1, "apu1.txt", maxAngN);
 
 	cout<<"Generating boundary integrals ..."<<endl;//slow process
 	genmat_boundint_3D(spatMesh, nodal_sphOrder, node_angN, offset, pts, wts, Ylm, A2, b1);
@@ -1329,7 +1325,6 @@ int main (int argc, char *argv[])
     nM = qmmesh.nM;
     cout << ns << " sources\n";
     SelectSourceProfile (qprof, qwidth, srctp);
-    //SelectMeasurementProfile (pp, mprof, mwidth);
     qvec.New (ns, qmmesh.nlen());
     for (int i = 0; i < ns; i++) {
 	RVector q(qmmesh.nlen());
@@ -1346,7 +1341,8 @@ int main (int argc, char *argv[])
 	}
 	qvec.SetRow (i, q);
     }
-    /*cout << "Sources set "<<endl;
+    cout << "Sources set "<<endl;
+    SelectMeasurementProfile (pp, mprof, mwidth);
     mvec.New (nM, qmmesh.nlen());
     LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
     for (int i = 0; i < nM; i++) {
@@ -1362,10 +1358,10 @@ int main (int argc, char *argv[])
 	    m = QVec_Cosine (qmmesh, qmmesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (int j = 0; j < qmmesh.nlen(); j++) 
-	  m[j] *= qmmesh.plist[j].C2A();
+	//for (int j = 0; j < qmmesh.nlen(); j++) 
+	 // m[j] *= qmmesh.plist[j].C2A();
 	mvec.SetRow (i, m);
-    }*/
+    }
     }
     //***** parameters 
     double freq = 0, g;
