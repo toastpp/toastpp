@@ -2,7 +2,7 @@ include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libvarPN3D
 LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
-EXE = rte3D_varOrd rte3D_varOrd_phys_precon rte3D_varOrd_parallel rte3D_varOrd_parallel_rbc  
+EXE = rte3D_varOrd rte3D_varOrd_adjoint rte3D_varOrd_phys_precon rte3D_varOrd_parallel rte3D_varOrd_parallel_rbc  
 
 VPATH = $(TSRC)/libvarPN3D
 
@@ -33,8 +33,8 @@ rte3D_varOrd: rte3D_varOrd.o $(LIBOBJS)
 rte3D_varOrd_phys_precon: rte3D_varOrd_phys_precon.o $(LIBOBJS)
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -L$(ILUPACKLIBDIR) -lilupack
 
-#rte3D_varOrd_fast: rte3D_varOrd_fast.o $(LIBOBJS)
-#	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+rte3D_varOrd_adjoint: rte3D_varOrd_adjoint.o $(LIBOBJS)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 rte3D_varOrd_parallel: rte3D_varOrd_parallel.o $(LIBOBJS) 
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread 
