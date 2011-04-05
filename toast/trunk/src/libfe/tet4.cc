@@ -1147,7 +1147,7 @@ double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
 #ifdef UNDEF
 double Tetrahedron4::BndIntFD (Mesh &mesh, int el2, int i, int j, int k)
 {
-    if (!mesh.ElConnected
+    // todo
 }
 #endif
 
@@ -1192,4 +1192,82 @@ RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     }
     sum *= ssize;
     return sum;
+}
+    
+int Tetrahedron4::Intersection (const Point &p1, const Point &p2, Point **pi)
+{
+    int i, j, n = 0;
+    double a, rx, ry, rz;
+    double sx = p1[0], sy = p1[1], sz = p1[2];
+    double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];
+
+    static Point pi_local[2];
+    static bool need_setup = true;
+
+    if (need_setup) {
+	for (i = 0; i < 2; i++)
+	    pi_local[i].New(3);
+    }
+
+    // intersection with plane z=0
+    if (dz) {
+	a = -sz/dz;
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    pi_local[n][0] = rx;
+	    pi_local[n][1] = ry;
+	    pi_local[n][2] = 0.0;
+	    n++;
+	}
+    }
+
+    // intersection with plane y=0
+    if (dy) {
+	a = -sy/dy;
+	rx = sx + a*dx;
+	rz = sz + a*dz;
+	if (rx >= 0 && rz >= 0 && rx+rz <= 1) {
+	    pi_local[n][0] = rx;
+	    pi_local[n][1] = 0.0;
+	    pi_local[n][2] = rz;
+	    n++;
+	}
+    }
+
+    // intersection with plane x=0
+    if (dx) {
+	a = -sx/dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (ry >= 0 && rz >= 0 && ry+rz <= 1) {
+	    pi_local[n][0] = 0.0;
+	    pi_local[n][1] = ry;
+	    pi_local[n][2] = rz;
+	    n++;
+	}
+    }
+
+    // intersection with plane 1-x-y-z=0
+    a = (1-sx-sy-sz)/(dx+dy+dz);
+    rx = sx + a*dx;
+    ry = sy + a*dy;
+    rz = sz + a*dz;
+    if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	pi_local[n][0] = rx;
+	pi_local[n][1] = ry;
+	pi_local[n][2] = rz;
+	n++;
+    }
+
+    if (n) *pi = pi_local;
+    else *pi = NULL;
+
+    return n;
+}
+
+int Tetrahedron4::GlobalIntersection (const NodeList &nlist, const Point &p1,
+    const Point &p2, Point **list)
+{
+    return Intersection (Local (nlist, p1), Local (nlist, p2), list);
 }

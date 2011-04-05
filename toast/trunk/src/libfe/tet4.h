@@ -175,10 +175,22 @@ public:
     RVector DThermalExpansionVector (double E, double nu);
 
     int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { xERROR(Not implemented); return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { xERROR(Not implemented); return 0; }
+	const Point &p2, Point **list);
+
+    /**
+     * \brief Calculate intersection of a ray with element surfaces.
+     * \param p1 First point defining the ray
+     * \param p2 Second point defining the ray
+     * \param pi On return, points to list of intersection points
+     * \return Number of points found (should be 0 or 2)
+     * \note The ray is assumed to be of infinite length, not just the
+     *  segment between p1 and p2
+     * \note On return, pi points to a static list. It should not be
+     *  deallocated by the caller, and it will be overwritten by the next
+     *  call to Intersection.
+     * \note If no intersection points are found, pi is set to NULL.
+     */
+    int Intersection (const Point &p1, const Point &p2, Point** pi);
 
 protected:
 
