@@ -59,6 +59,8 @@ int main (int argc, char *argv[])
     double dtime;
     int nstep;
     int maxit;
+    IterativeMethod method;
+    LSOLVER solver;
 
     double t0, dt;
     time_t wc0, dwc;
@@ -91,6 +93,15 @@ int main (int argc, char *argv[])
     FWS.WriteParams (pp);
     lin_tol = FWS.GetLinSolverTol();
     maxit = FWS.iterative_maxit;
+    solver = FWS.solvertp;
+    method = FWS.method;
+
+    if (solver != LSOLVER_ITERATIVE) {
+	cout << "Warning: Only iterative linear solvers are supported" << endl;
+	cout << "Switching to CG" << endl;
+	method = ITMETHOD_CG;
+    }
+    RGenericSparseMatrix::GlobalSelectIterativeSolver (method);
 
     SelectMesh (pp, meshname, mesh);
     SelectSourceProfile (pp, qprof, qwidth, srctp);
@@ -185,8 +196,7 @@ int main (int argc, char *argv[])
     for (i = 0; i < nQ; i++) {
     	double tol = lin_tol;
 	RVector q = qvec.Row(i) * (1.0/dtime);
-    	cerr << "Calling bicgstab " << i << endl;
-    	BiCGSTAB(K1, q, dphi[i], tol, precon, maxit);
+    	IterativeSolve (K1, q, dphi[i], tol, precon, maxit);
     }
     RVector proj(tpsf,0,nQM);
     proj = FWS.ProjectAll (mvec, dphi);
@@ -196,7 +206,7 @@ int main (int argc, char *argv[])
 	for (i = 0; i < nQ; i++) {
 	    K0.Ax(dphi[i],qi);
 	    double tol = lin_tol;
-	    BiCGSTAB (K1, qi, dphi[i], tol, precon, maxit);
+	    IterativeSolve (K1, qi, dphi[i], tol, precon, maxit);
 	}
 	RVector proj(tpsf,step*nQM,nQM);
 	proj = FWS.ProjectAll (mvec, dphi);
