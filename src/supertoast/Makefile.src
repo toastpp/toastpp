@@ -3,7 +3,7 @@ include $(TOASTDIR)/Makefile.incl
 VPATH = $(TSRC)/supertoast
 OPATH = $(TOASTOBJ)/supertoast
 BINS  = fwdfem fwdfem_cw fwdfem_tpsf
-BINS += supertoast supertoast_mw supertoast_cw_mw test_basis
+BINS += supertoast supertoast_mw supertoast_cw_mw
 
 ifdef MAKE_MPI
 BINS += supertoast_mpi supertoast_mw_mpi supertoast_cw_mw_mpi
