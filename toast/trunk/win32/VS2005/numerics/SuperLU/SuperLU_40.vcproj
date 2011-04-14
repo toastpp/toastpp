@@ -40,6 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(ToastRootDir)include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SUPERLU_40_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

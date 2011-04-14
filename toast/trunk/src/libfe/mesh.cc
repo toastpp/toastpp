@@ -880,6 +880,7 @@ int Mesh::RefineElement (int el)
     dASSERT(el >= 0 && el < elen(), Element index out of range);
     Element *pel = elist[el];
     pel->Subdivide (this);
+	return 0;
 }
 
 bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,

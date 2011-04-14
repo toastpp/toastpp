@@ -28,7 +28,7 @@ typedef double (*OF_CLBK)(const RVector &x, double *ofparts, void *context);
  * defined in the call to LineSearch, and the return value is the value
  * of the objective function
  */
-int LineSearch (const RVector &x0, const RVector &dx, double s0, double of0,
+STOASTLIB int LineSearch (const RVector &x0, const RVector &dx, double s0, double of0,
 		OF_CLBK of, double *smin, double *ofmin, void *context = 0);
 
 #endif // !__LSEARCH_H

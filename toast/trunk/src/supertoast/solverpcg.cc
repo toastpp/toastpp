@@ -223,7 +223,7 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
             FWS.GetDataScaling(), J);
 	J.RowScale (inv(sd));
 	pscaler->ScaleJacobian (bsol.GetActiveParams(), J);
-	if (bWriteJ) WriteJacobian (&J, raster, *mesh);
+	//if (bWriteJ) WriteJacobian (&J, raster, *mesh);
 	switch (precon) {
 	case PCG_PRECON_FULLJTJ:
 	    // Full Hessian preconditioner setup

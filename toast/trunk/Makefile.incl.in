@@ -123,11 +123,10 @@ endif
 # =======================================================================
 FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask -I$(TSRC)/libmath \
 	    -I$(TSRC)/libfe -I$(TSRC)/libdiffreg $(ILUPACKINC) $(CUDAINC) 
-TOASTINC  = $(FEINC) -I$(TSRC)/libtoast
-TOASTCINC = $(TOASTINC) -I$(TSRC)/libctoast
+TOASTINC  = $(FEINC) -I$(TSRC)/libstoast
 STOASTINC = $(FEINC) -I$(TSRC)/libstoast
 FDOTINC   = $(STOASTINC) -I$(TSRC)/libfdot
-INCLUDE   = $(TOASTCINC)
+INCLUDE   = $(TOASTINC)
 # =======================================================================
 
 # =======================================================================

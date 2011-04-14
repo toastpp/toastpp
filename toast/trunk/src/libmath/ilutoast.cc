@@ -7,11 +7,11 @@
 
 #include "mathlib.h"
 
-#ifdef HAVE_ILU
-
 #define _DOUBLE_REAL_
 //#include "ilupackmacros.h"
 #include "ilutoast.h"
+
+#ifdef HAVE_ILU
 
 static int permtype = ILUPERM_NULL;
 

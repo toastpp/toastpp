@@ -817,7 +817,7 @@ template<>
 FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &mvec,
     const FVector *phi, DataScale scl)
 {
-    ProjectAll (mvec, phi, scl);
+    return ProjectAll (mvec, phi, scl);
 }
 
 template<>

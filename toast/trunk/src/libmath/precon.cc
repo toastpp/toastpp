@@ -10,8 +10,11 @@
 #define MATHLIB_IMPLEMENTATION
 
 #include "mathlib.h"
+#ifdef HAVE_ILU
 #include "ilutoast.h"
 #include <ilupack.h>
+#endif // HAVE_ILU
+
 using namespace std;
 using namespace toast;
 
@@ -34,9 +37,11 @@ TPreconditioner<MT> *TPreconditioner<MT>::Create (PreconType type)
     case PRECON_DILU:         // diagonal incomplete LU decomposition
         return new TPrecon_DILU<MT>;
 	break;
+#ifdef HAVE_ILU
      case PRECON_ILU:         // diagonal incomplete LU decomposition
         return new TPrecon_ILU<MT>;
 	break;
+#endif // HAVE_ILU
     //case PRECON_CG_MULTIGRID: // CG multigrid
         //return new TPrecon_CG_Multigrid<MT>;
 	//break;
@@ -326,7 +331,16 @@ void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s)
 
 // ==========================================================================
 // class TPrecon_ILU
-template <>
+
+#ifdef HAVE_ILU
+
+template<class MT>
+void TPrecon_ILU<MT>::Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow)
+{
+	xERROR(NOT IMPLEMENTED);
+}
+
+template<>
 void TPrecon_ILU<toast::complex>::Reset (TCompRowMatrix<toast::complex> &_A, int matching, char *ordering, double droptol, int condest, int elbow)
 {
     CreateZmat(_A, &A);
@@ -395,6 +409,12 @@ TPrecon_ILU<MT>::~TPrecon_ILU ()
 	delete []A.a;
 }
 
+template<class MT>
+void TPrecon_ILU<MT>::Apply (const TVector<MT> &rh, TVector<MT> &s)
+{
+	xERROR(NOT IMPLEMENTED);
+}
+
 template<>
 void TPrecon_ILU<toast::complex>::Apply (const TVector<toast::complex> &rh, TVector<toast::complex> &s)
 {
@@ -413,6 +433,7 @@ void TPrecon_ILU<toast::complex>::Apply (const TVector<toast::complex> &rh, TVec
 	}*/
 }
 
+#endif // HAVE_ILU
 
 // ==========================================================================
 // class and friend instantiations
@@ -424,7 +445,6 @@ template class MATHLIB TPrecon_Null<float>;
 template class MATHLIB TPrecon_Diag<float>;
 template class MATHLIB TPrecon_IC<float>;
 template class MATHLIB TPrecon_DILU<float>;
-template class MATHLIB TPrecon_ILU<float>;
 template class MATHLIB TPrecon_CG_Multigrid<float>;
 
 template class MATHLIB TPreconditioner<double>;
@@ -432,7 +452,6 @@ template class MATHLIB TPrecon_Null<double>;
 template class MATHLIB TPrecon_Diag<double>;
 template class MATHLIB TPrecon_IC<double>;
 template class MATHLIB TPrecon_DILU<double>;
-template class MATHLIB TPrecon_ILU<double>;
 template class MATHLIB TPrecon_CG_Multigrid<double>;
 
 template class MATHLIB TPreconditioner<toast::complex>;
@@ -440,7 +459,6 @@ template class MATHLIB TPrecon_Null<toast::complex>;
 template class MATHLIB TPrecon_Diag<toast::complex>;
 template class MATHLIB TPrecon_IC<toast::complex>;
 template class MATHLIB TPrecon_DILU<toast::complex>;
-template class MATHLIB TPrecon_ILU<toast::complex>;
 template class MATHLIB TPrecon_CG_Multigrid<toast::complex>;
 
 template class MATHLIB TPreconditioner<scomplex>;
@@ -448,7 +466,13 @@ template class MATHLIB TPrecon_Null<scomplex>;
 template class MATHLIB TPrecon_Diag<scomplex>;
 template class MATHLIB TPrecon_IC<scomplex>;
 template class MATHLIB TPrecon_DILU<scomplex>;
-template class MATHLIB TPrecon_ILU<scomplex>;
 template class MATHLIB TPrecon_CG_Multigrid<scomplex>;
+
+#ifdef HAVE_ILU
+template class MATHLIB TPrecon_ILU<float>;
+template class MATHLIB TPrecon_ILU<double>;
+template class MATHLIB TPrecon_ILU<toast::complex>;
+template class MATHLIB TPrecon_ILU<scomplex>;
+#endif // HAVE_ILU
 
 #endif // NEED_EXPLICIT_INSTANTIATION
