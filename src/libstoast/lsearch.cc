@@ -6,7 +6,7 @@
 #define STOASTLIB_IMPLEMENTATION
 #include "lsearch.h"
 
-int LineSearch (const RVector &x0, const RVector &dx, double s0, double of0,
+STOASTLIB int LineSearch (const RVector &x0, const RVector &dx, double s0, double of0,
 		OF_CLBK of, double *smin, double *ofmin, void *context)
 {
     const int MAXIT = 16;

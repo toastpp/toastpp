@@ -366,26 +366,6 @@ public:
     // inner product of row r with full vector given by x
     // where dimension(x) >= ncols
 
-    // Explicit linear solvers
-
-    virtual int pcg (const TVector<MT> &b, TVector<MT> &x,
-        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
-        const;
-
-    virtual void pcg (const TVector<MT> *b, TVector<MT> *x,
-        int nrhs, double tol, int maxit = 0,
-        TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
-        const;
-
-    virtual int bicgstab (const TVector<MT> &b, TVector<MT> &x,
-        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
-        const;
-
-    virtual void bicgstab (const TVector<MT> *b, TVector<MT> *x,
-        int nrhs, double tol, int maxit = 0,
-        TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
-        const;
-
     /**
      * \brief Write matrix to ASCII stream.
      *
@@ -426,6 +406,26 @@ public:
     friend MATHLIB void BiCGSTAB<> (const TMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
         TPreconditioner<MT> *precon, IterativeSolverResult *res);
+
+    // Explicit linear solvers
+
+    virtual int pcg (const TVector<MT> &b, TVector<MT> &x,
+        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
+        const;
+
+    virtual void pcg (const TVector<MT> *b, TVector<MT> *x,
+        int nrhs, double tol, int maxit = 0,
+        TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
+        const;
+
+    virtual int bicgstab (const TVector<MT> &b, TVector<MT> &x,
+        double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0)
+        const;
+
+    virtual void bicgstab (const TVector<MT> *b, TVector<MT> *x,
+        int nrhs, double tol, int maxit = 0,
+        TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
+        const;
 
     friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
         const TMatrix<MT> &mat);
@@ -523,6 +523,106 @@ TSymMatrix<MT> ATA (const TMatrix<MT> &A)
 	    ata(i,j) = col & A.Col(j);
     }
     return ata;
+}
+
+// --------------------------------------------------------------------------
+
+template<>
+inline int TMatrix<float>::pcg (const FVector &b, FVector &x,
+    double &tol, TPreconditioner<float> *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TMatrix<double>::pcg (const RVector &b, RVector &x,
+    double &tol, TPreconditioner<double> *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+template<class MT>
+int TMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, TPreconditioner<MT> *precon, int maxit) const
+{
+    xERROR(Not implemented);
+    return 0;
+}
+
+// --------------------------------------------------------------------------
+
+template<>
+inline void TMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<float> *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+inline void TMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<double> *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<class MT>
+void TMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
+    double tol, int maxit, TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    xERROR(Not implemented);
+}
+
+// --------------------------------------------------------------------------
+
+template<>
+inline int TMatrix<float>::bicgstab (const FVector &b, FVector &x,
+    double &tol, TPreconditioner<float> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TMatrix<double>::bicgstab (const RVector &b, RVector &x,
+    double &tol, TPreconditioner<double> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<class MT>
+int TMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, TPreconditioner<MT> *precon, int maxit) const
+{
+    xERROR(Not implemented);
+    return 0;
+}
+
+// --------------------------------------------------------------------------
+
+template<>
+inline void TMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit,TPreconditioner<float> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+inline void TMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<double> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<class MT>
+void TMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x, int nrhs,
+    double tol, int maxit, TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    xERROR(Not implemented);
 }
 
 // --------------------------------------------------------------------------

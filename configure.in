@@ -449,10 +449,8 @@ AC_ARG_ENABLE(cuda,
     [  --enable-cuda           enable CUDA GPU support],
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
-    ENABLE_CUDA=1
+    ENABLE_CUDA="yes"
     CXXFLAGS="${CXXFLAGS} -DUSE_CUDA_FLOAT"
-else
-    ENABLE_CUDA=0
 fi
 
 # ========================================================================

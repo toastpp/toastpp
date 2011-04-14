@@ -610,6 +610,133 @@ friend int ML_getrow<> (ML_Operator *Amat, int N_requested_rows,
 };
 
 // ==========================================================================
+// inline and template definitions
+
+template<class MT>
+int TCompRowMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, TPreconditioner<MT> *precon, int maxit) const
+{
+    return TMatrix<MT>::pcg (b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TCompRowMatrix<float>::pcg (const FVector &b, FVector &x,
+    double &tol, TPreconditioner<float> *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TCompRowMatrix<double>::pcg (const RVector &b, RVector &x,
+    double &tol, TPreconditioner<double> *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
+    double tol, int maxit, TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    TMatrix<MT>::pcg (b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+inline void TCompRowMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<float> *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+inline void TCompRowMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<double> *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+// ==========================================================================
+
+template<class MT>
+int TCompRowMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, TPreconditioner<MT> *precon, int maxit) const
+{
+    //return TMatrix<MT>::bicgstab (b, x, tol, precon, maxit);
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+#ifdef UNDEF
+template<>
+inline int TCompRowMatrix<float>::bicgstab (const FVector &b, FVector &x,
+    double &tol, TPreconditioner<float> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TCompRowMatrix<scomplex>::bicgstab (const SCVector &b, SCVector &x,
+    double &tol, TPreconditioner<scomplex> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TCompRowMatrix<double>::bicgstab (const RVector &b, RVector &x,
+    double &tol, TPreconditioner<double> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+inline int TCompRowMatrix<complex>::bicgstab (const CVector &b, CVector &x,
+    double &tol, TPreconditioner<complex> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+#endif
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x,
+    int nrhs, double tol, int maxit, TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+    //TMatrix<MT>::bicgstab (b, x, nrhs, tol, maxit, precon, res);
+}
+
+#ifdef UNDEF
+template<>
+inline void TCompRowMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<float> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+inline void TCompRowMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<double> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+inline void TCompRowMatrix<scomplex>::bicgstab (const SCVector *b, SCVector *x,
+    int nrhs, double tol, int maxit, TPreconditioner<scomplex> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+#endif
+
+// ==========================================================================
 // typedefs for specific instances of `TCompRowMatrix'
 
 typedef TCompRowMatrix<double>	 RCompRowMatrix;	// 'real'
@@ -621,7 +748,8 @@ typedef TCompRowMatrix<int>	 ICompRowMatrix;	// 'integer'
 // ==========================================================================
 // extern declarations of TCompRowMatrix (only required for VS)
 
-#ifndef __CRMATRIX_CC
+#ifdef UNDEF
+//#ifndef __CRMATRIX_CC
 extern template class MATHLIB TCompRowMatrix<double>;
 extern template class MATHLIB TCompRowMatrix<float>;
 extern template class MATHLIB TCompRowMatrix<toast::complex>;

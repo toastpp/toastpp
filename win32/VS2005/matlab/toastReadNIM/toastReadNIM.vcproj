@@ -243,7 +243,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\matlab\toastmex.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\matlab\toastReadNIM.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\matlab\util.cc"
 				>
 			</File>
 		</Filter>
@@ -252,6 +260,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\..\src\matlab\toastmex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\matlab\util.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

@@ -9,10 +9,13 @@
 
 #include <process.h>
 #include <direct.h>
+#include <float.h>
+#include <time.h>
 
 // work around language incompatibilities
 #define strcasecmp(str1,str2) _stricmp((str1),(str2))
 #define strncasecmp(str1,str2,n) _strnicmp((str1),(str2),(n))
+#define isnan(arg) _isnan((arg))
 
 // avoid annoying warnings
 #define hypot(x,y) _hypot((x),(y))

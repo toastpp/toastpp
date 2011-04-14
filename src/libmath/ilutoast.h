@@ -1,5 +1,8 @@
 #ifndef __ILUTOAST_H
 #define __ILUTOAST_H
+
+#ifdef HAVE_ILU
+
 #include <ilupack.h>
 #include "mathlib.h"
 
@@ -24,5 +27,6 @@ void CreateDmat (const RCompRowMatrix &A, Dmat *mat);
 void CreateCmat (const SCCompRowMatrix &A, Cmat *mat);
 void CreateSmat (const FCompRowMatrix &A, Smat *mat);
 
+#endif // HAVE_ILU
 
 #endif // !__ILUTOAST_H

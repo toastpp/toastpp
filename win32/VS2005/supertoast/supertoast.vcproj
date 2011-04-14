@@ -299,6 +299,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\supertoast\supertoast_util.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\supertoast\util.cc"
 				>
 			</File>
@@ -338,6 +342,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\supertoast\solverpcg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\supertoast\supertoast_util.h"
 				>
 			</File>
 			<File

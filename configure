@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_THREAD MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT OGLLIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_THREAD MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT OGLLIB ENABLE_CUDA CUDA_INSTALL_PATH LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -865,6 +865,7 @@ Optional Features:
   --enable-prof           build profiling version
   --enable-threads        build pthreads parallel version
   --enable-mpi            build MPI distributed version
+  --enable-cuda           enable CUDA GPU support
   --disable-shared        do not build shared TOAST libraries
   --disable-blas-shared   do not build shared BLAS libraries
   --disable-lapack-shared do not build shared LAPACK libraries
@@ -889,6 +890,9 @@ Optional Packages:
                               Default is auto-search for BLT
   --with-ilu=PATH         Path to ILUPACK base directory
                               If not specified, no ILU support is provided
+  --with-cuda=PATH        Path to CUDA base directory
+                              (implies --enable-cuda). If not specified,
+                              CUDA_INSTALL_PATH environment variable is used
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -2767,7 +2771,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2770:" \
+echo "$as_me:2774:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -2963,7 +2967,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:2966: \"$ac_link\") >&5
+(eval echo $as_me:2970: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -3041,7 +3045,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:3044: \"$ac_link\") >&5
+(eval echo $as_me:3048: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -9307,6 +9311,33 @@ fi
 
 
 # =========================================================================
+# Check whether user wants CUDA support
+
+# Check whether --enable-cuda or --disable-cuda was given.
+if test "${enable_cuda+set}" = set; then
+  enableval="$enable_cuda"
+  isok=$enableval
+else
+  isok=no
+fi;
+if test "$isok" = "yes" ; then
+    ENABLE_CUDA="yes"
+    CXXFLAGS="${CXXFLAGS} -DUSE_CUDA_FLOAT"
+fi
+
+# ========================================================================
+# Check for CUDA installation directory
+
+
+# Check whether --with-cuda or --without-cuda was given.
+if test "${with_cuda+set}" = set; then
+  withval="$with_cuda"
+  CUDA_INSTALL_PATH=$withval
+else
+  CUDA_INSTALL_PATH=${CUDA_INSTALL_PATH}
+fi;
+
+# =========================================================================
 # Check whether user wants to disable shared libraries
 
 TOAST_SHARED="--enable-shared"
@@ -9661,6 +9692,8 @@ fi
 
 
 #AC_SUBST(TASKDIR)
+
+
 
 
 
@@ -10366,6 +10399,8 @@ s,@ILUPACKDIR@,$ILUPACKDIR,;t t
 s,@RPATH@,$RPATH,;t t
 s,@TOAST_FDOT@,$TOAST_FDOT,;t t
 s,@OGLLIB@,$OGLLIB,;t t
+s,@ENABLE_CUDA@,$ENABLE_CUDA,;t t
+s,@CUDA_INSTALL_PATH@,$CUDA_INSTALL_PATH,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 
@@ -11376,6 +11411,8 @@ s,@ILUPACKDIR@,$ILUPACKDIR,;t t
 s,@RPATH@,$RPATH,;t t
 s,@TOAST_FDOT@,$TOAST_FDOT,;t t
 s,@OGLLIB@,$OGLLIB,;t t
+s,@ENABLE_CUDA@,$ENABLE_CUDA,;t t
+s,@CUDA_INSTALL_PATH@,$CUDA_INSTALL_PATH,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 

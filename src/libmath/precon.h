@@ -13,7 +13,9 @@
 #include "matrix.h"
 #include "dgmatrix.h"
 #include "crmatrix.h"
+#ifdef HAVE_ILU
 #include "ilupack.h"
+#endif // HAVE_ILU
 
 typedef enum {
     PRECON_NULL,
@@ -118,19 +120,22 @@ private:
 // class TPrecon_ILU 
 // ILU: incomplete LU preconditioner using ILUPACK
 
+#ifdef HAVE_ILU
+
 template<class MT> class TPrecon_ILU: public TPreconditioner<MT> {
 public:
     TPrecon_ILU() {}
     PreconType Type() { return PRECON_ILU; }
-    void Reset (const TMatrix<MT> *){ xERROR('NOT IMPLEMENTED');};
-    void Reset (CCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow);
-    void Reset (SCCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
-    void Reset (RCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
-    void Reset (FCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
-    void Apply (const CVector &r, CVector &s);
-    void Apply (const SCVector &r, SCVector &s){xERROR('NOT IMPLEMENTED'); };
-    void Apply (const RVector &r, RVector &s){xERROR('NOT IMPLEMENTED'); };
-    void Apply (const FVector &r, FVector &s){xERROR('NOT IMPLEMENTED'); };
+    void Reset (const TMatrix<MT> *){ xERROR('NOT IMPLEMENTED'); }
+	void Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow);
+    //void Reset (CCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow);
+    //void Reset (SCCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    //void Reset (RCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    //void Reset (FCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    void Apply (const TVector<MT> &r, TVector<MT> &s);
+    //void Apply (const SCVector &r, SCVector &s){xERROR('NOT IMPLEMENTED'); };
+    //void Apply (const RVector &r, RVector &s){xERROR('NOT IMPLEMENTED'); };
+    //void Apply (const FVector &r, FVector &s){xERROR('NOT IMPLEMENTED'); };
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const{ xERROR('NOT IMPLEMENTED');};
     ~TPrecon_ILU();
 private:
@@ -142,6 +147,8 @@ private:
     ZILUPACKparam param;
     //char dummy[100]; 
 };
+
+#endif // HAVE_ILU
 
 // ==========================================================================
 // class TPrecon_CG_Multigrid
@@ -210,10 +217,11 @@ typedef TPrecon_DILU<toast::complex>    CPrecon_DILU;
 typedef TPrecon_DILU<scomplex>          SCPrecon_DILU;
 typedef TPrecon_DILU<int>               IPrecon_DILU;
 
+#ifdef HAVE_ILU
 typedef TPrecon_ILU<double>            RPrecon_ILU;
 typedef TPrecon_ILU<toast::complex>    CPrecon_ILU;
 typedef TPrecon_ILU<scomplex>          SCPrecon_ILU;
-
+#endif // HAVE_ILU
 
 typedef TPrecon_CG_Multigrid<double>    RPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;

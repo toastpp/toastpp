@@ -89,55 +89,6 @@ MATHLIB ostream &operator<< (ostream &os, const TMatrix<MT> &mat)
 // ==========================================================================
 // Preconditioned conjugate gradients (PCG)
 // ==========================================================================
-
-template<class MT>
-int TMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
-    double &tol, TPreconditioner<MT> *precon, int maxit) const
-{
-    xERROR(Not implemented);
-    return 0;
-}
-
-template<>
-int TMatrix<float>::pcg (const FVector &b, FVector &x,
-    double &tol, FPreconditioner *precon, int maxit) const
-{
-    return PCG (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TMatrix<double>::pcg (const RVector &b, RVector &x,
-    double &tol, RPreconditioner *precon, int maxit) const
-{
-    return PCG (*this, b, x, tol, precon, maxit);
-}
-
-// ==========================================================================
-
-template<class MT>
-void TMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
-    double tol, int maxit, TPreconditioner<MT> *precon,
-    IterativeSolverResult *res) const
-{
-    xERROR(Not implemented);
-}
-
-template<>
-void TMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
-    double tol, int maxit, FPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
-    double tol, int maxit, RPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
 // ==========================================================================
 
 template<class MT>
@@ -381,56 +332,6 @@ int BiPCG<toast::complex> (const CMatrix &A, const CVector &b, CVector &x,
 // ==========================================================================
 // Preconditioned bi-conjugate gradient Stabilised (BiCGSTAB) solver
 // from: netlib (http://www.netlib.org/linalg/html_templates/node41.html)
-// ==========================================================================
-
-template<class MT>
-int TMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
-    double &tol, TPreconditioner<MT> *precon, int maxit) const
-{
-    xERROR(Not implemented);
-    return 0;
-}
-
-template<>
-int TMatrix<float>::bicgstab (const FVector &b, FVector &x,
-    double &tol, FPreconditioner *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TMatrix<double>::bicgstab (const RVector &b, RVector &x,
-    double &tol, RPreconditioner *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-// ==========================================================================
-
-template<class MT>
-void TMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x, int nrhs,
-    double tol, int maxit, TPreconditioner<MT> *precon,
-    IterativeSolverResult *res) const
-{
-    xERROR(Not implemented);
-}
-
-template<>
-void TMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
-    double tol, int maxit,FPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
-    double tol, int maxit, RPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
 // ==========================================================================
 
 template<class MT>

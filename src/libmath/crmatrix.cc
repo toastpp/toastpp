@@ -2299,7 +2299,12 @@ template<>
 int ILUSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
     TVector<toast::complex> &x, double tol, double droptol, int maxit)
 {
+#ifdef HAVE_ILU
     return ILUSolveZGNL (A, b, x, tol, droptol, maxit);
+#else
+    xERROR(ILUPACK support not configured);
+	return 0;
+#endif
 }
 
 // ==========================================================================
@@ -2317,7 +2322,12 @@ template<>
 int ILUSymSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
     TVector<toast::complex> &x, double tol, double droptol, int maxit)
 {
+#ifdef HAVE_ILU
     return ILUSolveZSYM (A, b, x, tol, droptol, maxit);
+#else
+    xERROR(ILUPACK support not configured);
+	return 0;
+#endif
 }
 
 // ==========================================================================
@@ -2686,132 +2696,6 @@ MATHLIB void BiCGSTAB<complex> (const CCompRowMatrix &A, const CVector *b,
 }
 
 #endif // CUDA_FLOAT
-
-// ==========================================================================
-
-template<class MT>
-int TCompRowMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
-    double &tol, TPreconditioner<MT> *precon, int maxit) const
-{
-    return TMatrix<MT>::pcg (b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<float>::pcg (const FVector &b, FVector &x,
-    double &tol, FPreconditioner *precon, int maxit) const
-{
-    return PCG (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<double>::pcg (const RVector &b, RVector &x,
-    double &tol, RPreconditioner *precon, int maxit) const
-{
-    return PCG (*this, b, x, tol, precon, maxit);
-}
-
-// ==========================================================================
-
-template<class MT>
-void TCompRowMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
-    double tol, int maxit, TPreconditioner<MT> *precon,
-    IterativeSolverResult *res) const
-{
-    TMatrix<MT>::pcg (b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TCompRowMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
-    double tol, int maxit, FPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TCompRowMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
-    double tol, int maxit, RPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-// ==========================================================================
-
-template<class MT>
-int TCompRowMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
-    double &tol, TPreconditioner<MT> *precon, int maxit) const
-{
-    //return TMatrix<MT>::bicgstab (b, x, tol, precon, maxit);
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-#ifdef UNDEF
-template<>
-int TCompRowMatrix<float>::bicgstab (const FVector &b, FVector &x,
-    double &tol, FPreconditioner *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<scomplex>::bicgstab (const SCVector &b, SCVector &x,
-    double &tol, SCPreconditioner *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<double>::bicgstab (const RVector &b, RVector &x,
-    double &tol, RPreconditioner *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-
-template<>
-int TCompRowMatrix<complex>::bicgstab (const CVector &b, CVector &x,
-    double &tol, CPreconditioner *precon, int maxit) const
-{
-    return BiCGSTAB (*this, b, x, tol, precon, maxit);
-}
-#endif
-
-// ==========================================================================
-
-template<class MT>
-void TCompRowMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x,
-    int nrhs, double tol, int maxit, TPreconditioner<MT> *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-    //TMatrix<MT>::bicgstab (b, x, nrhs, tol, maxit, precon, res);
-}
-
-#ifdef UNDEF
-template<>
-void TCompRowMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
-    double tol, int maxit, FPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TCompRowMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
-    double tol, int maxit, RPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-
-template<>
-void TCompRowMatrix<scomplex>::bicgstab (const SCVector *b, SCVector *x,
-    int nrhs, double tol, int maxit, SCPreconditioner *precon,
-    IterativeSolverResult *res) const
-{
-    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
-}
-#endif
 
 // ==========================================================================
 

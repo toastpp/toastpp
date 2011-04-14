@@ -1261,7 +1261,7 @@ void SolverLM::Solve (CFwdSolver &FWS, const Raster &raster,
 	    M = RescaleHessian ((RDenseMatrix*)J, x, &RHess);
 	    J->ColScale (M);
 
-	    if (bWriteJ) WriteJacobian (J, raster, *mesh);
+	    //if (bWriteJ) WriteJacobian (J, raster, *mesh);
 
 	    // calculate Gradient
 	    J->ATx (b,r);                            // gradient
