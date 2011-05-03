@@ -104,7 +104,7 @@ liblbfgs::
 	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/Makefile.in ./sample; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/sample.c ./sample;\
 	if test "$(ARCHDIR)" = "darwin"; then \
-		./configure CC=$(CC) CXX=$(CXX) F77=$(F77) FFLAGS=-m32 CFLAGS=-m32 CXXFLAGS=-m32 --exec-prefix=/Thisisaveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeryloooooooooooooooooooooooooooooooongstring; \
+		./configure CC=$(CC) CXX=$(CXX) F77=$(F77) FFLAGS=$(FFLAGS) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) --exec-prefix=/Thisisaveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeryloooooooooooooooooooooooooooooooongstring; \
 	else \
 		./configure; \
 	fi; \
