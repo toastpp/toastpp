@@ -24,7 +24,7 @@ $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath $(MATHLIB)
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lstoast -lfe -lmath $(MATHLIB)
 	
 clean:: 
 	$(RM) *.o
