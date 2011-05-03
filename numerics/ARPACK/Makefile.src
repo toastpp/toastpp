@@ -70,7 +70,7 @@ $(LIBNAME)$(STLIB_SUFFIX): arpack_src arpack_util
 # make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): arpack_src arpack_util
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ *.o $(SHLIB_LD_LIBS) $(FLIBS)
+	$(SHLIB_LD) -o $@ *.o -L$(TLIB) $(BLASLIB) $(LAPACKLIB) $(SHLIB_LD_LIBS) $(FLIBS)
 
 
 arpack_src :
