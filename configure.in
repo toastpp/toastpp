@@ -286,6 +286,27 @@ RPATH=""
 VERSIONFLAG=""
 
 case $system in
+     Linux*)
+	if test "`uname -m`" = "x86_64" ; then
+	   ARCHDIR="linux64"
+	else
+	   ARCHDIR="linux32"
+	fi
+	;;
+     Darwin*)
+	if test "`uname -m`" = "x86_64" ; then
+	   ARCHDIR="darwin64"
+	   VERSIONFLAG="-m64"
+	else
+	   ARCHDIR="darwin32"
+	   VERSIONFLAG="-m32"
+	fi
+	;;
+esac
+
+AC_SUBST(ARCHDIR)
+
+case $system in
     IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD="ld -n32 -shared -rdata_shared"
@@ -566,25 +587,6 @@ else
     OBJDIR="${CCVERSION}_static"
 fi
 AC_SUBST(OBJDIR)
-
-case $system in
-     Linux*)
-	if test "`uname -m`" = "x86_64" ; then
-	   ARCHDIR="linux64"
-	else
-	   ARCHDIR="linux32"
-	fi
-	;;
-     Darwin*)
-	if test "`uname -m`" = "x86_64" ; then
-	   ARCHDIR="darwin64"
-	else
-	   ARCHDIR="darwin32"
-	fi
-	;;
-esac
-
-AC_SUBST(ARCHDIR)
 
 # =========================================================================
 # Check for mex compiler flags
