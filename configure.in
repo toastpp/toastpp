@@ -310,7 +310,6 @@ case $system in
 	fi
     	;;
     Darwin*)
-	VERSIONFLAG="-m32"
 	SHLIB_CFLAGS="-fPIC ${VERSIONFLAG}"
 	SHLIB_LD_LIBS='${LIBS}'
 	SHLIB_SUFFIX=".dylib"
@@ -577,7 +576,11 @@ case $system in
 	fi
 	;;
      Darwin*)
-        ARCHDIR="darwin"
+	if test "`uname -m`" = "x86_64" ; then
+	   ARCHDIR="darwin64"
+	else
+	   ARCHDIR="darwin32"
+	fi
 	;;
 esac
 
@@ -594,12 +597,12 @@ case $ARCHDIR in
         MEXFLAGS="${MEXFLAGS} -largeArrayDims"
 	MEXEXT="mexa64"
 	;;
-     darwin)
+     darwin32)
+        MEXEXT="mexmaci"
+        ;;
+     darwin64)
         MEXFLAGS="${MEXFLAGS} -largeArrayDims"
         MEXEXT="mexmaci64"
-	if test "$VERSIONFLAG" = "-m32"; then
-	   MEXEXT="mexmaci"
-	fi
         ;;
 esac	
 if test "${TOAST_DEBUG}" = "1" ; then
