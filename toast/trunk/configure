@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT MAKE_THREAD MAKE_MPI CCVERSION OBJDIR ARCHDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT OGLLIB ENABLE_CUDA CUDA_INSTALL_PATH LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT ARCHDIR MAKE_THREAD MAKE_MPI CCVERSION OBJDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT OGLLIB ENABLE_CUDA CUDA_INSTALL_PATH LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -8856,6 +8856,27 @@ RPATH=""
 VERSIONFLAG=""
 
 case $system in
+     Linux*)
+	if test "`uname -m`" = "x86_64" ; then
+	   ARCHDIR="linux64"
+	else
+	   ARCHDIR="linux32"
+	fi
+	;;
+     Darwin*)
+	if test "`uname -m`" = "x86_64" ; then
+	   ARCHDIR="darwin64"
+	   VERSIONFLAG="-m64"
+	else
+	   ARCHDIR="darwin32"
+	   VERSIONFLAG="-m32"
+	fi
+	;;
+esac
+
+
+
+case $system in
     IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
 	SHLIB_CFLAGS=""
 	SHLIB_LD="ld -n32 -shared -rdata_shared"
@@ -9610,25 +9631,6 @@ else
 fi
 
 
-case $system in
-     Linux*)
-	if test "`uname -m`" = "x86_64" ; then
-	   ARCHDIR="linux64"
-	else
-	   ARCHDIR="linux32"
-	fi
-	;;
-     Darwin*)
-	if test "`uname -m`" = "x86_64" ; then
-	   ARCHDIR="darwin64"
-	else
-	   ARCHDIR="darwin32"
-	fi
-	;;
-esac
-
-
-
 # =========================================================================
 # Check for mex compiler flags
 # =========================================================================
@@ -10370,11 +10372,11 @@ s,@LOCAL_TCL@,$LOCAL_TCL,;t t
 s,@LOCAL_TK@,$LOCAL_TK,;t t
 s,@LOCAL_TIX@,$LOCAL_TIX,;t t
 s,@LOCAL_BLT@,$LOCAL_BLT,;t t
+s,@ARCHDIR@,$ARCHDIR,;t t
 s,@MAKE_THREAD@,$MAKE_THREAD,;t t
 s,@MAKE_MPI@,$MAKE_MPI,;t t
 s,@CCVERSION@,$CCVERSION,;t t
 s,@OBJDIR@,$OBJDIR,;t t
-s,@ARCHDIR@,$ARCHDIR,;t t
 s,@MEXFLAGS@,$MEXFLAGS,;t t
 s,@MEXEXT@,$MEXEXT,;t t
 s,@TOAST_SHARED_BUILD@,$TOAST_SHARED_BUILD,;t t
@@ -11382,11 +11384,11 @@ s,@LOCAL_TCL@,$LOCAL_TCL,;t t
 s,@LOCAL_TK@,$LOCAL_TK,;t t
 s,@LOCAL_TIX@,$LOCAL_TIX,;t t
 s,@LOCAL_BLT@,$LOCAL_BLT,;t t
+s,@ARCHDIR@,$ARCHDIR,;t t
 s,@MAKE_THREAD@,$MAKE_THREAD,;t t
 s,@MAKE_MPI@,$MAKE_MPI,;t t
 s,@CCVERSION@,$CCVERSION,;t t
 s,@OBJDIR@,$OBJDIR,;t t
-s,@ARCHDIR@,$ARCHDIR,;t t
 s,@MEXFLAGS@,$MEXFLAGS,;t t
 s,@MEXEXT@,$MEXEXT,;t t
 s,@TOAST_SHARED_BUILD@,$TOAST_SHARED_BUILD,;t t
