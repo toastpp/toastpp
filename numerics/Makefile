@@ -103,7 +103,7 @@ liblbfgs::
 	mkdir sample; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/Makefile.in ./sample; \
 	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/sample.c ./sample;\
-	if test "$(ARCHDIR)" = "darwin"; then \
+	if test "$(ARCHDIR)" = "darwin*"; then \
 		./configure CC=$(CC) CXX=$(CXX) F77=$(F77) FFLAGS=$(FFLAGS) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) --exec-prefix=/Thisisaveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeryloooooooooooooooooooooooooooooooongstring; \
 	else \
 		./configure; \
