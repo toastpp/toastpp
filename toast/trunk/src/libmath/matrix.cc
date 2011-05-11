@@ -113,6 +113,13 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     for (niter = 0; niter < maxit; niter++) {
         A.Ax (d, q);
 	alpha = dnew / (d & q);
+	
+	// check failure
+	if (!alpha || isnan(alpha)) {
+	    cerr << "*** PCG fails to converge" << endl;
+	    break;
+	}
+
 	x += d * alpha;
 	r -= q * alpha;
 	dold = dnew;
@@ -128,6 +135,13 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 	    d *= beta;
 	    d += r;
 	}
+
+	// check failure
+	if (!beta || isnan(beta)) {
+	    cerr << "*** PCG fails to converge" << endl;
+	    break;
+	}
+
 	// check convergence
 	err = l2norm (r);
 	//cerr << niter << " " << err/bnorm << endl;

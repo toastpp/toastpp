@@ -2093,40 +2093,43 @@ void LU (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
     SuperLUStat_t stat;
 
     doublecomplex *cdat = (doublecomplex*)A.ValPtr();
-    toast_zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
+    zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
 			    cdat, A.colidx, A.rowptr, SLU_NR, SLU_Z, SLU_GE);
 
     doublecomplex *bdat = (doublecomplex*)b.data_buffer();
     doublecomplex *xdat = (doublecomplex*)x.data_buffer();
-    toast_zCreate_Dense_Matrix (&B, n, 1, bdat, n, SLU_DN, SLU_Z, SLU_GE);
-    toast_zCreate_Dense_Matrix (&X, n, 1, xdat, n, SLU_DN, SLU_Z, SLU_GE);
+    zCreate_Dense_Matrix (&B, n, 1, bdat, n, SLU_DN, SLU_Z, SLU_GE);
+    zCreate_Dense_Matrix (&X, n, 1, xdat, n, SLU_DN, SLU_Z, SLU_GE);
 
-    toast_get_perm_c (0, &smA, perm_c);
+    get_perm_c (0, &smA, perm_c);
 
-    toast_set_default_options(&options);
+    set_default_options(&options);
     options.Fact = DOFACT;
     options.Equil = NO;
     options.ColPerm = NATURAL;
     options.Trans = NOTRANS;
     options.IterRefine = NOREFINE;
-    
 
-    toast_zgssvx (&options, &smA, perm_c, perm_r, etree, &equed, &R, &C,
+    StatInit (&stat);
+
+    zgssvx (&options, &smA, perm_c, perm_r, etree, &equed, &R, &C,
 		  &L, &U, 0, 0, &B, &X, &recip_pivot_growth, &rcond,
 		  &ferr, &berr, &mem_usage, &stat, &info);
+
+    StatFree (&stat);
 
     //toast_zgssvx (&fact, &trans, &refact, &smA, 0, perm_c, perm_r, etree,
     //    &equed, &R, &C, &L, &U, 0, 0, &B, &X,
     //    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
 
-    toast_Destroy_SuperMatrix_Store (&B);
-    toast_Destroy_SuperMatrix_Store (&X);
+    Destroy_SuperMatrix_Store (&B);
+    Destroy_SuperMatrix_Store (&X);
     delete []perm_c;
     delete []perm_r;
     delete []etree;
-    toast_Destroy_SuperMatrix_Store (&smA);
-    toast_Destroy_SuperNode_Matrix (&L);
-    toast_Destroy_CompCol_Matrix (&U);
+    Destroy_SuperMatrix_Store (&smA);
+    Destroy_SuperNode_Matrix (&L);
+    Destroy_CompCol_Matrix (&U);
 }
 
 template<class MT>
