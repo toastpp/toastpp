@@ -7,8 +7,9 @@ VPATH = $(TSRC)/libstoast
 
 all:: $(LIB)
 
-SRCS = 	solution.cc mwsolution.cc source.cc fwdsolver.cc \
-	fwdsolver_mw.cc jacobian.cc of.cc regul.cc pscaler.cc pparse.cc \
+SRCS = 	solution.cc mwsolution.cc source.cc fwdsolver.cc fwdsolver_zslu.cc \
+	fwdsolver_cslu.cc fwdsolver_mw.cc jacobian.cc of.cc regul.cc \
+        pscaler.cc pparse.cc \
 	raster.cc raster_px.cc raster_bl.cc raster_cp.cc lsearch.cc
 
 # Only build projector classes if FDOT support is required
@@ -20,9 +21,8 @@ ifdef MAKE_MPI
 SRCS += jacobian_mpi.cc
 endif
 
-
 OBJS = ${SRCS:.cc=.o} 
-HDRS = ${SRCS:.cc=.h}
+HDRS := $(wildcard *.h)
 
 %.o : %.cc $(HDRS)
 	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(FEINC) $(SHLIB_CFLAGS) -c $<
