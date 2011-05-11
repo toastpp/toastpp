@@ -359,6 +359,12 @@ void TDGFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qve
     //cerr << "Solve time = " << solver_time << endl;
 }
 
+template<class T>
+void TDGFwdSolver<T>::SetLinSolver (char *solver, double tol)
+{
+    xERROR(Not implemented for this template type);
+}
+
 template<>
 void TDGFwdSolver<toast::complex>::SetLinSolver (char *solver, double tol)
 {
@@ -382,7 +388,7 @@ void TDGFwdSolver<toast::complex>::SetLinSolver (char *solver, double tol)
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
-template class STOASTLIB TDGFwdSolver<double>;
+//template class STOASTLIB TDGFwdSolver<double>;
 template class STOASTLIB TDGFwdSolver<toast::complex>;
 
 
