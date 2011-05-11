@@ -301,7 +301,7 @@ int main (int argc, char *argv[])
     bool specify_QM = false, specify_mesh = false, specify_prm = false, specify_nodal_sphorder = false, specify_prefix = false;
     double freq = 100, g=0;
     int srctp = 1;
-    RVector dirVec;
+    RVector *dirVec;
     char file_extn[200];
     int nM=1;
     RCompRowMatrix qvec, mvec;
@@ -361,14 +361,6 @@ int main (int argc, char *argv[])
 		xASSERT(srctp ==0 || srctp == 1 || srctp == 2, Unknown source angular profile);
 		cout << "Angular profile of the source (0. Directed 1. Cosine 2. Uncollided line source ): "<<srctp<<endl;
     	}
-	if(!str.compare(string("-dir")))
-	{
-		int count = ind+1;
-		for(int i=0; i < dirVec.Dim(); i++)
-			dirVec[i] = strtod(argv[count++], NULL);
-		dirVec = dirVec*1/(double)length(dirVec); // normalize the direction vector just in case
-    		cout<< "The direction vector for the source for directed or laser case (default: Element normal pointing inwards): "<<dirVec<<endl; 
-	}
 	if(!str.compare(string("-prefix")))
 	{
 		strcpy(file_extn, argv[ind+1]);
@@ -467,6 +459,24 @@ int main (int argc, char *argv[])
 	  }
 	  xASSERT(specify_nm, -nM should be specified as QM file has not been specified.);
 	}
+ 	ind=1;
+	while(ind < argc)
+	{
+		string str = argv[ind];
+		string::iterator it;
+		for(it = str.begin(); it < str.end(); it++)
+			*it = tolower(*it);
+
+		if(!str.compare(string("-dir")))
+		{
+			dirVec = new RVector[nQ];
+			for(int i=0; i < nQ; i++) dirVec[i].New(mesh.Dimension());
+			dirVec = dirVec*1/(double)length(dirVec); // normalize the direction vector just in case
+    			cout<< "The direction vector for the source for directed or laser case (default: Element normal pointing inwards): "<<dirVec<<endl; 
+		}
+		ind++;
+	}
+
 	if(nQ < NUM_THREADS)
 		NUM_THREADS = nQ;	
 

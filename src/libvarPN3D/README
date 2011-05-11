@@ -9,24 +9,36 @@ PN_varOrd documentation
 
 Inputs:
 	-nt(default=1)			Number of threads to be used in this computation (System dependant).
+	
 	-mesh				A standard TOAST format mesh which can be either in 2D or 3D.
+	
 	-qm(optional) 			A standard TOAST format QM file giving the source spatial distributions.
+	
 	-g(default=0)   		The parameter 'g' in Henyey-Greenstein phase function -1 <= g <= 1.
+	
 	-freq(default=100)   		Modulation frequency in MHz.
+	
 	-sap(default=1)			Source angular profile (0. Directed 1. Cosine 2. Uncollided line source).
-	-dir				Direction vector along which the source has to be pointed in 2D or 3D.
+	
+	-dir				File containing direction vectors along which the sources are to be pointed (2 components for 2D and 3 for 3D).
 					NOTE:
 					    If unspecified the edge normal (pointing inwards for boundary sources) is chosen as the direction. 
 											
 	-prefix				String input which is prefixed to the output files.
+	
 	-BCType(default='v')		Boundary conditions to be used ('v' for vacuum and 'r' for reflective boundary conditions).
+	
 	-ri_external(default=1.0)	Refractive index of the medium outside the tissue.
+	
 	-prm 				An input text file containing the absorption, scattering and refractive index for each element
 						in that particular order.
+	
 	-nodal_sphorder			An input text file containing the order of spherical harmonics to be used on each node.
+	
 	-nq(optional)			Specify the number of sources when a QM file has not been provided.
 					NOTE:
 						When this option is used, enter source node numbers in 0-based index when prompted.
+	
 	-nm(optional) 			Specify the number of detectors when a QM file has not been provided.
 					NOTE:
 						Enter the detector node numbers in 0-based index when prompted.
