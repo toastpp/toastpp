@@ -1552,7 +1552,8 @@ MATHLIB TCompRowMatrix<MT> kron (const TCompRowMatrix<MT> &A,
     int na = A.nRows(), ma = A.nCols(), va = A.nVal();
     int nb = B.nRows(), mb = B.nCols(), vb = B.nVal();
     int n = na*nb, m = ma*mb, v = va*vb;
-    MT a_ij, b_ij;
+    MT a_ij;
+    MT b_ij;
     const MT *Aval = A.ValPtr();
     const MT *Bval = B.ValPtr();
 

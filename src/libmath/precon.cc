@@ -8,7 +8,7 @@
 // ==========================================================================
 
 #define MATHLIB_IMPLEMENTATION
-
+#include <pthread.h>
 #include "mathlib.h"
 #ifdef HAVE_ILU
 #include "ilutoast.h"
@@ -17,6 +17,7 @@
 
 using namespace std;
 using namespace toast;
+pthread_mutex_t sid_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // ==========================================================================
 // class TPreconditioner
@@ -418,19 +419,11 @@ void TPrecon_ILU<MT>::Apply (const TVector<MT> &rh, TVector<MT> &s)
 template<>
 void TPrecon_ILU<toast::complex>::Apply (const TVector<toast::complex> &rh, TVector<toast::complex> &s)
 {
-	/*for(int j=0; j < A.nr; j++)
-	{
-		rhs[j].r = rh[j].re;
-		rhs[j].i = rh[j].im;
-	}*/
+	pthread_mutex_lock(&sid_mutex);
 	memcpy(rhs, rh.data_buffer(), A.nr*sizeof(ilu_doublecomplex));
 	ZGNLAMGsol(&PRE, &param, rhs, sol);
 	memcpy(s.data_buffer(), sol, A.nr*sizeof(ilu_doublecomplex));
-	/*for(int j=0; j < A.nr; j++)
-	{
-		s[j].re = sol[j].r;
-		s[j].im = sol[j].i;
-	}*/
+	pthread_mutex_unlock(&sid_mutex);
 }
 
 #endif // HAVE_ILU
