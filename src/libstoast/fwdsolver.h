@@ -6,9 +6,7 @@
 #ifndef __FWDSOLVER_H
 #define __FWDSOLVER_H
 
-#include "slu_zdefs.h"
-#include "supermatrix.h"
-//#include "zsp_defs.h"
+//#include "supermatrix.h"
 #include "toasttype.h"
 #include "mathlib.h"
 
@@ -47,30 +45,6 @@ template<class T>
 STOASTLIB TVector<T> ProjectAll (const QMMesh *mesh,
     const TCompRowMatrix<T> &mvec, const TVector<T> *phi,
     DataScale dscale = DATA_LIN);
-
-// =========================================================================
-
-class STOASTLIB SuperLU_data {
-public:
-    SuperLU_data();
-    ~SuperLU_data();
-    void Setup (int n, CCompRowMatrix *CF);
-    void Solve (SuperMatrix *B, SuperMatrix *X);
-    SuperMatrix smFW, L, U;
-    //char fact;
-    //char refact;
-    //char equed;
-    int *perm_c;
-    int *perm_r;
-    int *etree;
-    double *R, *C;
-    superlu_options_t options;
-    
-private:
-    void Deallocate ();
-    bool allocated;
-    bool used_LU;
-};
 
 // =========================================================================
 
@@ -405,12 +379,16 @@ public:
     TCompRowMatrix<T> *FL;  ///< lower triangle of system matrix decomposition
     TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
-    RCompRowMatrix *B;      ///< mass matrix; only used for time-domain problems
-    mutable SuperLU_data lu_data; ///< parameters for LU solver
+    TCompRowMatrix<T> *B;  ///< mass matrix; only used for time-domain problems
+    //mutable SuperLU_data<T> lu_data; ///< parameters for LU solver
+    void *SuperLU;          ///< SuperLU solver engine
     double iterative_tol;   ///< iterative solver tolerance
     int iterative_maxit;   ///< iterative solver max iterations (0 for auto)
 
 protected:
+    void Setup ();
+    void SetupType ();
+    void DeleteType ();
 
     /**
      * \brief Unfold real and imaginary parts of a complex vector.

@@ -1,6 +1,8 @@
 #define __FWDSOLVER_CC
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
+#include "fwdsolver_zslu.h"
+#include "fwdsolver_cslu.h"
 #ifdef TOAST_MPI
 #include "toast_mpi.h"
 #endif
@@ -10,145 +12,33 @@ using namespace toast;
 
 // =========================================================================
 
-SuperLU_data::SuperLU_data ()
+template<class T>
+TFwdSolver<T>::TFwdSolver (LSOLVER linsolver, double tol)
 {
-    //fact = 'N';
-    //refact = equed = 'N';
-    perm_c = 0;
-    perm_r = 0;
-    etree  = 0;
-    R      = 0;
-    C      = 0;
-    allocated = false;
-    used_LU = false;
-    
-    toast_set_default_options(&options);
-    options.Fact = DOFACT;
-    options.Equil = NO;
-    options.ColPerm = NATURAL;
-    options.Trans = NOTRANS;
-    options.IterRefine = NOREFINE;
-    }
-
-SuperLU_data::~SuperLU_data ()
-{
-    Deallocate();
-    if (used_LU) {
-	toast_Destroy_SuperNode_Matrix (&L);
-	toast_Destroy_CompCol_Matrix (&U);
-    }
-}
-
-void SuperLU_data::Deallocate ()
-{
-    if (allocated) {
-	delete []perm_c;
-	delete []perm_r;
-	delete []etree;
-	delete []R;
-	delete []C;
-	toast_Destroy_SuperMatrix_Store (&smFW);
-	allocated = false;
-    }
-}
-
-void SuperLU_data::Setup (int n, CCompRowMatrix *CF)
-{
-    Deallocate();
-    doublecomplex *cdat = (doublecomplex*)CF->ValPtr();
-    toast_zCreate_CompCol_Matrix (&smFW, CF->nRows(), CF->nCols(),
-        CF->nVal(), cdat, CF->colidx, CF->rowptr, SLU_NR, SLU_Z, SLU_GE);
-    perm_c = new int[n];
-    perm_r = new int[n];
-    etree  = new int[n];
-    R      = new double[n];
-    C      = new double[n];
-    toast_get_perm_c (0, &smFW, perm_c);
-    //fact = refact = 'N';
-    options.Fact = DOFACT;
-    allocated = true;
-}
-
-void SuperLU_data::Solve (SuperMatrix *B, SuperMatrix *X)
-{
-    int info;
-    mem_usage_t mem_usage;
-    char equed = 'N';
-    //char trans = 'N';
-    double R = 0.0;
-    double C = 0.0;
-    double ferr, berr;
-    double recip_pivot_growth, rcond;
-    SuperLUStat_t stat;
-    StatInit (&stat);
-
-    toast_zgssvx (&options, &smFW, perm_c, perm_r, etree, &equed, &R, &C,
-		  &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
-		  &ferr, &berr, &mem_usage, &stat, &info);
-    //toast_zgssvx (&fact, &trans, &refact, &smFW, 0, perm_c, perm_r,
-    //	    etree, &equed, &R, &C, &L, &U, 0, 0, B, X,
-    //	    &recip_pivot_growth, &rcond, &ferr, &berr, &mem_usage, &info);
-
-    options.Fact = SamePattern_SameRowPerm;
-    //fact = 'F';
-    //refact = 'Y';
-    used_LU = true;
-    StatFree (&stat);
+    Setup ();
+    solvertp = linsolver;
+    iterative_tol = tol;
 }
 
 // =========================================================================
 
 template<class T>
-TFwdSolver<T>::TFwdSolver (LSOLVER linsolver, double tol)
-{
-    dscale   = DATA_LIN;
-    solvertp = linsolver;
-    iterative_tol = tol;
-    iterative_maxit = 0;
-    F  = 0;
-    FL = 0;
-    Fd = 0;
-    B  = 0;
-    precon = 0;
-    meshptr = 0;
-    pphi = 0;
-
-    SETUP_MPI();
-}
-
-template<class T>
 TFwdSolver<T>::TFwdSolver (const char *solver, double tol)
 {
-    dscale   = DATA_LIN;
+    Setup ();
     SetLinSolver (solver, tol);
-    iterative_maxit = 0;
-    F  = 0;
-    FL = 0;
-    Fd = 0;
-    B  = 0;
-    precon = 0;
-    meshptr = 0;
-    pphi = 0;
-
-    SETUP_MPI();
 }
+
+// =========================================================================
 
 template<class T>
 TFwdSolver<T>::TFwdSolver (ParamParser &pp)
 {
-    dscale   = DATA_LIN;
-    iterative_maxit = 0;
+    Setup ();
     ReadParams (pp);
-    F  = 0;
-    FL = 0;
-    Fd = 0;
-    B  = 0;
-    precon = 0;
-    meshptr = 0;
-    pphi = 0;
-
-    SETUP_MPI();
 }
+
+// =========================================================================
 
 template<class T>
 TFwdSolver<T>::~TFwdSolver ()
@@ -160,8 +50,72 @@ TFwdSolver<T>::~TFwdSolver ()
     if (precon) delete precon;
     if (pphi)   delete []pphi;
 
+    DeleteType ();
     CLEANUP_MPI();
 }
+
+// =========================================================================
+
+template<class T>
+void TFwdSolver<T>::Setup ()
+{
+    // set initial and default parameters
+    SuperLU = 0;
+    dscale = DATA_LIN;
+    solvertp = LSOLVER_ITERATIVE;
+    iterative_tol = 1e-6;
+    iterative_maxit = 0;
+    F  = 0;
+    FL = 0;
+    Fd = 0;
+    B  = 0;
+    precon = 0;
+    meshptr = 0;
+    pphi = 0;
+
+    SetupType ();
+    SETUP_MPI();
+}
+
+// =========================================================================
+
+template<class T>
+void TFwdSolver<T>::SetupType ()
+{
+}
+
+template<>
+void TFwdSolver<toast::complex>::SetupType ()
+{
+    SuperLU = new ZSuperLU ();
+}
+
+template<>
+void TFwdSolver<scomplex>::SetupType ()
+{
+    SuperLU = new CSuperLU ();
+}
+
+// =========================================================================
+
+template<class T>
+void TFwdSolver<T>::DeleteType ()
+{
+}
+
+template<>
+void TFwdSolver<toast::complex>::DeleteType ()
+{
+    delete (ZSuperLU*)SuperLU;
+}
+
+template<>
+void TFwdSolver<scomplex>::DeleteType ()
+{
+    delete (CSuperLU*)SuperLU;
+}
+
+// =========================================================================
 
 template<class T>
 void TFwdSolver<T>::SetDataScaling (DataScale scl)
@@ -256,7 +210,8 @@ void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-	lu_data.Setup(meshptr->nlen(), F);
+	//lu_data.Setup(F);
+	((ZSuperLU*)SuperLU)->Reset (F);
     } else {
 	if (precon) delete precon;
 	precon = new CPrecon_Diag;
@@ -281,7 +236,7 @@ void TFwdSolver<scomplex>::Allocate (const QMMesh &mesh)
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-        // direct solver does not work yet with single complex
+        ((CSuperLU*)SuperLU)->Reset (F);
 	// lu_data.Setup(meshptr->nlen(), F);
     } else {
 	if (precon) delete precon;
@@ -433,14 +388,14 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
     if (!B) { // allocate on the fly
 	int *rowptr, *colidx, nzero, n = mesh->nlen();
 	mesh->SparseRowStructure (rowptr, colidx, nzero);
-	B = new RCompRowMatrix (n, n, rowptr, colidx);
+	B = new TCompRowMatrix<T> (n, n, rowptr, colidx);
 	delete []rowptr;
 	delete []colidx;
     } else {
 	B->Zero();
     }
 
-    AddToSysMatrix (*mesh, *B, 0, ASSEMBLE_FF);
+    AddToSysMatrix (*mesh, *B, (RVector*)0, ASSEMBLE_FF);
 }
 
 template<>
@@ -472,10 +427,10 @@ void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
 {
     // single complex version
     AssembleSystemMatrix (sol, omega);
-    if (solvertp == LSOLVER_DIRECT)
-	lu_data.options.Fact = DOFACT;
-	//lu_data.fact = 'N';
-    else
+    if (solvertp == LSOLVER_DIRECT) {
+	//lu_data.Setup (F);
+	((CSuperLU*)SuperLU)->Reset (F);
+    } else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
 }
@@ -486,8 +441,8 @@ void TFwdSolver<toast::complex>::Reset (const Solution &sol, double omega)
     // complex version
     AssembleSystemMatrix (sol, omega);
     if (solvertp == LSOLVER_DIRECT)
-	lu_data.options.Fact = DOFACT;
-	//lu_data.fact = 'N';
+	//lu_data.Setup (F);
+	((ZSuperLU*)SuperLU)->Reset (F);
     else
 	precon->Reset (F);
     if (B) AssembleMassMatrix();
@@ -536,7 +491,7 @@ void TFwdSolver<scomplex>::CalcField (const TVector<scomplex> &qvec,
     TVector<scomplex> &cphi, IterativeSolverResult *res) const
 {
     if (solvertp == LSOLVER_DIRECT) {
-        xERROR(Not implemented yet);
+        ((CSuperLU*)SuperLU)->CalcField (qvec, cphi, res);
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -558,18 +513,19 @@ void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
     clock_t time0 = tm.tms_utime;
 #endif
     if (solvertp == LSOLVER_DIRECT) {
-        SuperMatrix B, X;
-	int n = meshptr->nlen();
-
-	doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
-	doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
-	toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
-	toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
-
-	lu_data.Solve (&B, &X);
-
-	toast_Destroy_SuperMatrix_Store (&B);
-	toast_Destroy_SuperMatrix_Store (&X);
+	((ZSuperLU*)SuperLU)->CalcField (qvec, cphi, res);
+        //SuperMatrix B, X;
+	//int n = meshptr->nlen();
+	//
+	//doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
+	//doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
+	//zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
+	//zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
+	//
+	//lu_data.Solve (&B, &X);
+	//
+	//Destroy_SuperMatrix_Store (&B);
+	//Destroy_SuperMatrix_Store (&X);
     } else {
         double tol = iterative_tol;
 	int it = IterativeSolve (*F, qvec, cphi, tol, precon, iterative_maxit);
@@ -653,6 +609,36 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
     delete []phi_single;
 
 #endif
+}
+
+template<>
+void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
+    CVector *phi, IterativeSolverResult *res) const
+{
+    cerr << "In CalcFields" << endl;
+
+    // calculate the fields for all sources
+    static IterativeSolverResult s_res_single;
+    IterativeSolverResult *res_single = 0;
+    if (res) {
+        res_single = &s_res_single;
+	res->it_count = 0;
+	res->rel_err = 0.0;
+    }
+
+    int i, nq = qvec.nRows();
+
+    if (solvertp == LSOLVER_DIRECT) {
+	//((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
+	for (i = 0; i < nq; i++)
+	    CalcField (qvec.Row(i), phi[i], res);
+    } else {
+        CVector *qv = new CVector[nq];
+	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
+        IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
+            precon, res);
+	delete []qv;
+    }
 }
 
 // =========================================================================
@@ -1190,6 +1176,11 @@ void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
 // class and friend instantiations
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
+
+//template class STOASTLIB SuperLU_data<float>;
+//template class STOASTLIB SuperLU_data<double>;
+//template class STOASTLIB SuperLU_data<toast::complex>;
+//template class STOASTLIB SuperLU_data<scomplex>;
 
 template class STOASTLIB TFwdSolver<float>;
 template class STOASTLIB TFwdSolver<double>;
