@@ -382,8 +382,8 @@ void TDGFwdSolver<toast::complex>::SetLinSolver (char *solver, double tol)
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
-template class STOASTLIB TFwdSolver<double>;
-template class STOASTLIB TFwdSolver<toast::complex>;
+template class STOASTLIB TDGFwdSolver<double>;
+template class STOASTLIB TDGFwdSolver<toast::complex>;
 
 
 #endif // NEED_EXPLICIT_INSTANTIATION
