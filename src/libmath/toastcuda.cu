@@ -644,7 +644,7 @@ void Tstep_loop (int n, int nq, int nm,
 	    cusp::default_monitor<T> monitor(qi,maxit,tol);
 	    cusp::krylov::bicgstab(dK1,ddphi[i],qi,monitor,M);
 	    for (j = 0; j < nm; j++)
-		proj[idx++] = cusp::blas::dot (ddphi[i],dmvec[j]);
+	    	proj[idx++] = cusp::blas::dot (ddphi[i],dmvec[j]);
 	}
     }
 }

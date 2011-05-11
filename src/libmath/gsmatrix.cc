@@ -596,6 +596,10 @@ void IterativeSolve (const CGenericSparseMatrix &A, const CVector *b,
     case ITMETHOD_BICGSTAB:
         A.bicgstab (b, x, nrhs, tol, maxit, precon, res);
 	break;
+    case ITMETHOD_GMRES:
+	for (int i = 0; i < nrhs; i++)
+	    GMRES (A, b[i], x[i], tol, precon, 10, 0);
+	break;
     default:
         xERROR(Not implemented);
     }
