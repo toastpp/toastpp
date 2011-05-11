@@ -131,6 +131,28 @@ void ReadSphOrder(const char* fname, IVector &sphorder)
 	
 }
 
+
+void ReadDirections(const char*fname, const int nQ, RVector* &dirVec)
+{
+    cin.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
+    ifstream ifs;
+    ifs.open (fname);
+    xASSERT (ifs.is_open(), Direction vectors file not found.);
+    for(int i=0; i < nQ; i++)
+    {
+	for(int j=0; j < dirVec[i].Dim(); j++)
+	{
+		try{
+			ifs>>dirVec[i][j];
+		}
+		catch(std::ifstream::failure e){
+                	cerr << e.what();
+        	}
+	
+	}
+    } 
+    ifs.close();	
+}
 void WriteData (const RVector &data, char *fname)
 {
     ofstream ofs (fname);

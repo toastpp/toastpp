@@ -10,6 +10,8 @@ void ReadParams(const char* fname, RVector &muabs, RVector &muscat, RVector &ref
 
 void ReadSphOrder(const char* fname, IVector &sphorder);
 
+void ReadDirections(const char* fname, const int nQ, RVector* &dirVec);
+
 void WriteData (const RVector &data, char *fname);
 
 void WriteDataBlock (const QMMesh &mesh, const RVector &data, char *fname);
