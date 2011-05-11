@@ -18,7 +18,10 @@
 #ifndef SCOMPLEX_INCLUDE
 #define SCOMPLEX_INCLUDE
 
+/* hack to avoid conflict with ILUPACK complex definition */
+#ifndef __F2C__
 typedef struct { float r, i; } complex;
+#endif
 
 
 /* Macro definitions */
