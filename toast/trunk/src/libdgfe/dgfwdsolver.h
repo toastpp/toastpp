@@ -116,8 +116,14 @@ public:
     TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
     RCompRowMatrix *B;      ///< mass matrix; only used for time-domain problems
-    mutable SuperLU_data lu_data; ///< parameters for LU solver
+    //mutable SuperLU_data lu_data; ///< parameters for LU solver
+    void *SuperLU;          ///< SuperLU solver engine
     double iterative_tol;   
+
+protected:
+    void Setup ();
+    void SetupType ();
+    void DeleteType ();
 };
 
 // ==========================================================================
