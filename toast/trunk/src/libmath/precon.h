@@ -127,25 +127,15 @@ public:
     TPrecon_ILU() {}
     PreconType Type() { return PRECON_ILU; }
     void Reset (const TMatrix<MT> *){ xERROR('NOT IMPLEMENTED'); }
-	void Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow);
-    //void Reset (CCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow);
-    //void Reset (SCCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
-    //void Reset (RCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
-    //void Reset (FCompRowMatrix &, int matching, char *ordering, double droptol, int condest, int elbow){xERROR('NOT IMPLEMENTED'); };
+    void Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow);
     void Apply (const TVector<MT> &r, TVector<MT> &s);
-    //void Apply (const SCVector &r, SCVector &s){xERROR('NOT IMPLEMENTED'); };
-    //void Apply (const RVector &r, RVector &s){xERROR('NOT IMPLEMENTED'); };
-    //void Apply (const FVector &r, FVector &s){xERROR('NOT IMPLEMENTED'); };
     void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const{ xERROR('NOT IMPLEMENTED');};
     ~TPrecon_ILU();
 private:
-    int dim;                   // problem dimension
-    //ilu_doublecomplex *rhs, *sol, *buff;
     ilu_doublecomplex *rhs, *sol;
     Zmat A;
     ZAMGlevelmat  PRE;
     ZILUPACKparam param;
-    //char dummy[100]; 
 };
 
 #endif // HAVE_ILU
