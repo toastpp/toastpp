@@ -2,21 +2,21 @@ include $(TOASTDIR)/Makefile.incl
 
 LIBNAME = libvarPN3D
 LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
-EXE = rte3D_varOrd rte3D_varOrd_adjoint rte3D_varOrd_phys_precon rte3D_varOrd_parallel rte3D_varOrd_parallel_rbc  
+EXE = PN_varOrd  
 
 VPATH = $(TSRC)/libvarPN3D
 
 all:: $(EXE)
 
-LIBSRCS = rte3D_math.cc phaseFunc.cc source.cc pparse.cc 
-EXESRCS = rte3D_varOrd.cc rte3D_varOrd_phys_precon.cc rte3D_varOrd_parallel.cc rte3D_varOrd_parallel_rbc.cc  
+LIBSRCS = PN_spatint.cc PN_angint.cc PN_boundint.cc phaseFunc.cc source.cc detector.cc pparse.cc toast_io.cc sphericalHarmonic_algebra.cc toast.cc 
+EXESRCS = PN_varOrd.cc  
  
 
 
 LIBOBJS = ${LIBSRCS:.cc=.o}
 EXEOBJS = ${EXESRCS:.cc=.o}
 
-HDRS = phaseFunc.h pparse.h rte3D.h rte3D_math.h source.h toast.h
+HDRS = phaseFunc.h pparse.h PN_spatint.h PN_angint.h PN_boundint.h quad_unitSphere.h source.h detector.h toast_io.h sphericalHarmonic_algebra.h toast.h 
 
 %.o : %.cc $(HDRS)
 	$(CXX) $(FLAGS) -I$(ILUPACKDIR)/include $(SHLIB_CFLAGS) -c $<
@@ -27,20 +27,8 @@ $(LIB): $(LIBOBJS)
 	$(RANLIB) $(LIB)
 
 #$(EXE) : $(EXEOBJS) $(LIBOBJS)
-rte3D_varOrd: rte3D_varOrd.o $(LIBOBJS)
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
-
-rte3D_varOrd_phys_precon: rte3D_varOrd_phys_precon.o $(LIBOBJS)
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -L$(ILUPACKLIBDIR) -lilupack
-
-rte3D_varOrd_adjoint: rte3D_varOrd_adjoint.o $(LIBOBJS)
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
-
-rte3D_varOrd_parallel: rte3D_varOrd_parallel.o $(LIBOBJS) 
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread 
-
-rte3D_varOrd_parallel_rbc: rte3D_varOrd_parallel_rbc.o $(LIBOBJS) 
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread 
+PN_varOrd: PN_varOrd.o $(LIBOBJS)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread -L$(ILUPACKLIBDIR) -lilupack
 
 clean:: 
 	$(RM) *.o

@@ -1,4 +1,4 @@
-function [] = generateInputFile_parallel_rbc(hMesh, fname, output_file_prefix, num_threads, nQ, nM, specify_QM, source_types, source_profiles, source_widRadii,source_nodes, meas_profiles, meas_widRadii, meas_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, refout, sphOrder)
+function [] = generateInputFile_parallel_rbc(hMesh, fname, output_file_prefix, nQ, nM, specify_QM, source_types, source_profiles, source_widRadii,source_nodes, meas_profiles, meas_widRadii, meas_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, refout, sphOrder)
 %function [] = generateInputFile(hMesh, fname, output_file_prefix,  ns, specify_QM, source_types, source_profiles, source_widRadii,source_nodes, g, MHz_freq, is_cosine, directionVector, mua, mus, ref, sphOrder)
 % This MATLAB script generates the input file required to run variable order P_{N} code
 % Surya sprerapa@cs.ucl.ac.uk 11/01/2011
@@ -9,8 +9,6 @@ function [] = generateInputFile_parallel_rbc(hMesh, fname, output_file_prefix, n
 %	fname -> output file name
 %    
 %       output_file_prefix -> prefix for output files
-%
-%	num_threads -> number of threads used for the computation
 %
 %	nQ -> number of sources 
 %
@@ -64,7 +62,6 @@ function [] = generateInputFile_parallel_rbc(hMesh, fname, output_file_prefix, n
 [vtx, idx] = toastMeshData(hMesh); 
 fid =  fopen(fname, 'w');
 fprintf(fid, '%s\n', output_file_prefix);
-fprintf(fid, '%d\n', num_threads);
 if(specify_QM == 0)
 	fprintf(fid, '%d\n', nQ);
 	for i = 1 : nQ

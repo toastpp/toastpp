@@ -1,29 +1,66 @@
-Variable order PN approximation 
+PN_varOrd documentation
+	This command runs the variable order spherical harmonic expansion with finite elements in 2D and 3D based on the spatial mesh provided. 
+	Notes: 1. It has been coarse-grain-parallelized using pthreads to solve parallely for multiple sources.
+	       2. Uses P1 solution on the same mesh as a preconditioner making it faster compared to using Jacobi preconditioning.
+	       3. Has the capability to handle both 2D and 3D geometries.
+	       4. Can handle cosine, directed and laser source profiles.
+	       5. Highly memory optimized to run for 3D applications.
+	       6. Handles both vacuum and reflective boundary conditions.
 
-Usage
-
-1. $TOASTVER/bin/rte3D_varOrd <mesh file name>  <    <input file name>
-
-2. $TOASTVER/bin/rte3D_varOrd <mesh file name > <QM file name> < <input file name>
-
-Input files can be generated using the MATLAB script 'generateInputFile.m' script contained in this folder
+Inputs:
+	-nt(default=1)			Number of threads to be used in this computation (System dependant).
+	-mesh				A standard TOAST format mesh which can be either in 2D or 3D.
+	-qm(optional) 			A standard TOAST format QM file giving the source spatial distributions.
+	-g(default=0)   		The parameter 'g' in Henyey-Greenstein phase function -1 <= g <= 1.
+	-freq(default=100)   		Modulation frequency in MHz.
+	-sap(default=1)			Source angular profile (0. Directed 1. Cosine 2. Uncollided line source).
+	-dir				Direction vector along which the source has to be pointed in 2D or 3D.
+					NOTE:
+					    If unspecified the edge normal (pointing inwards for boundary sources) is chosen as the direction. 
+											
+	-prefix				String input which is prefixed to the output files.
+	-BCType(default='v')		Boundary conditions to be used ('v' for vacuum and 'r' for reflective boundary conditions).
+	-ri_external(default=1.0)	Refractive index of the medium outside the tissue.
+	-prm 				An input text file containing the absorption, scattering and refractive index for each element
+						in that particular order.
+	-nodal_sphorder			An input text file containing the order of spherical harmonics to be used on each node.
+	-nq(optional)			Specify the number of sources when a QM file has not been provided.
+					NOTE:
+						When this option is used, enter source node numbers in 0-based index when prompted.
+	-nm(optional) 			Specify the number of detectors when a QM file has not been provided.
+					NOTE:
+						Enter the detector node numbers in 0-based index when prompted.
 
 Outputs:
-	<file_prefix>_arg.nim -> The phase of the photons
-	<file_prefix>_lnmod.nim -> The photon density in log scale
-	<file_prefix>_RHS.sol -> Matrix comprised of discretized source vectors
-	<file_prefix>_Phi.sol -> radiance
-	<file_prefix>_time.txt -> Time taken to solve for all the sources
+	<prefix>_re.nim		This file contains real part of photon density.
+				Read this file using Matlab TOAST with the command "toastReadNIM"
+	
+	<prefix>_im.nim		This file contains the imaginary part of photon density. 
+				Read as above.
 
-NOTES: 
+	<prefix>_time.txt	This file contains the time taken to solve for all the sources.
+	
+	<prefix>_Phi_re.sol	This is an ASCII file containing the real part of radiance (required for Jacobian construction).
 
-1. Currently works only in 'element' basis. Hence mua, mus, ref needs to be specified for each element
+	<prefix>_Phi_im.sol	This is an ASCII file containing the imaginary part of radiance (required for Jacobian construction).
 
-2. The files 'genmat_angint_3D_PN.cc' and 'genmat_angint_sdm_3D_PN.cc' and 'spints.cc' are not part of the 
-core variable order PN code. They contain time and memory efficient implementations of the angular matrices
-and will be integrated and tested into the core program at a later date.
- 
-3.This code currently works for only boundary sources. If interior sources are required uncomment
-'genmat_intsourcevalvector_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource[0], dirVec, is_cosine, pts, wts, ctxt.Ylm);' in the source and comment 'genmat_source_3D(ctxt.nodal_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, ns, dirVec, is_cosine, pts, wts, ctxt.b1, ctxt.Ylm);' compile ('make' from 'src' level) and run. Similar compilation should be done when using QM files.
+	<prefix>_RHS_re.sol	This is an ASCII file containing the real part of the source vector (required for Jacobian construction).
 
- 
+	<prefix>_RHS_im.sol	This is an ASCII file containing the imaginary part of the source vector (required for Jacobian construction).
+	
+	<prefix>_Det_re.sol 	This is an ASCII file containing the real part of the detector vector (required for Jacobian construction).
+
+	<prefix>_Det_im.sol 	This is an ASCII file containing the imaginary part of the detector vector (required for Jacobian construction).
+
+Warning:
+	Internal sources SHOULD NOT be specified using QM file. Use -nq and -nm options instead and DO NOT provide -qm option.
+
+Usage:
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 0 -nt 1 -freq 100 -BCType 'v' -ri_external 1.4 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 -dir -1 0 
+	
+Author:
+   Surya 10/05/2011.
+
+Email:
+   suryam08@gmail.com
+   Please print the output to a file and attach it with the email when seeking for help.    
