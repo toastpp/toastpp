@@ -297,7 +297,7 @@ int main (int argc, char *argv[])
     char cbuf[200];
     int el;
     int ind = 1;
-    char mesh_fname[400], QM_fname[400], prm_fname[400], sphorder_fname[400];
+    char mesh_fname[400], QM_fname[400], prm_fname[400], sphorder_fname[400], dirs_fname[400];
     bool specify_QM = false, specify_mesh = false, specify_prm = false, specify_nodal_sphorder = false, specify_prefix = false;
     double freq = 100, g=0;
     int srctp = 1;
@@ -331,7 +331,6 @@ int main (int argc, char *argv[])
 		muscat.New(qmmesh.elen());
 		ref.New(qmmesh.elen());
 		sphOrder.New(qmmesh.nlen());
-		dirVec.New(qmmesh.Dimension());
 		specify_mesh = true;
 	}
 	if(!str.compare(string("-qm")))
@@ -459,6 +458,10 @@ int main (int argc, char *argv[])
 	  }
 	  xASSERT(specify_nm, -nM should be specified as QM file has not been specified.);
 	}
+
+	dirVec = new RVector[nQ];
+	for(int i=0; i < nQ; i++) dirVec[i].New(qmmesh.Dimension());
+
  	ind=1;
 	while(ind < argc)
 	{
@@ -469,10 +472,14 @@ int main (int argc, char *argv[])
 
 		if(!str.compare(string("-dir")))
 		{
-			dirVec = new RVector[nQ];
-			for(int i=0; i < nQ; i++) dirVec[i].New(mesh.Dimension());
-			dirVec = dirVec*1/(double)length(dirVec); // normalize the direction vector just in case
-    			cout<< "The direction vector for the source for directed or laser case (default: Element normal pointing inwards): "<<dirVec<<endl; 
+			strcpy(dirs_fname, argv[ind+1]);
+			ReadDirections(dirs_fname, nQ, dirVec);
+			for(int i=0; i < nQ; i++)
+			{
+				dirVec[i] = dirVec[i]*1/(double)length(dirVec[i]); // normalize the direction vector just in case
+				cout<< "The direction vector for the source for directed or uncollided case (default: Element normal pointing inwards): "<<dirVec[i]<<endl;
+			}
+    			 
 		}
 		ind++;
 	}
@@ -519,7 +526,7 @@ int main (int argc, char *argv[])
       genmat_source(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, nQ, dirVec, srctp, pts, wts, ctxt.b1, ctxt.Ylm);
       genmat_detector(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Detector, qmmesh, Ndetector, nM, pts, wts, ctxt.Ylm);
       genmat_intsource(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource, nQ, dirVec, srctp, pts, wts, ctxt.Ylm, delta);
-      if(srctp == 2) genmat_intsourcelaser(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource, nQ, dirVec, pts, wts, muabs, muscat, delta, g);
+      if(srctp == 2) genmat_intsourceuncollided(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource, nQ, dirVec, pts, wts, muabs, muscat, delta, g);
     }
     else 
     {
@@ -675,6 +682,8 @@ int main (int argc, char *argv[])
     delete []Phisum;
     delete []Source;
     delete []Detector;
+    delete []b2;
+    delete []detect;
     delete []result;
     delete []Xmat;
     delete []Aintx;
@@ -691,7 +700,8 @@ int main (int argc, char *argv[])
     delete []apu1scx;
     delete []apu1ssx;
     delete []apu1cx;
-
+    delete []dirVec;
+    delete []thread_id;
 }
 
 void *solveForSource(void *thread_id)

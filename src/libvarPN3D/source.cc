@@ -5,7 +5,7 @@ using namespace std;
 void genmat_toastsourcevalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const RCompRowMatrix qvec, const int iq, RVector& dirVec, const int srctp,  const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
 void genmat_sourcevalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, RVector& dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm);
 void genmat_intsourcevalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, const Mesh& mesh, const int Nsource, RVector& dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm, const RVector &delta);
-void genmat_intsourcelaservalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, Mesh& mesh, const int Nsource, RVector& dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g);
+void genmat_intsourceuncollidedvalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, Mesh& mesh, const int Nsource, RVector& dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g);
 
 void SelectSourceProfile (ParamParser &pp, int &qtype, double &qwidth, SourceMode &srctp)
 {
@@ -236,16 +236,16 @@ RVector QVec_Point (const Mesh &mesh, const Point &cnt, SourceMode mode)
 
 /* Computes the source vectors for all the boundary sources when a QM file has been specified
 */
-void genmat_toastsource(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, RVector& dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
+void genmat_toastsource(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh, const RCompRowMatrix qvec, const int ns, RVector* &dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
 {
    int sysdim = mesh.nlen();       
    int fullsysdim = sum(node_angN);  
    if(srctp ==2)
-	cerr<<" Not implemented for laser sources. Try using point sources instead"<<endl;
+	cerr<<" Not implemented for uncollided sources. Try using point sources instead"<<endl;
    RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_toastsourcevalvector(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec, srctp,  pts, wts, Ylm);
+     genmat_toastsourcevalvector(sphOrder, node_angN, offset, Svec, mesh, qvec,i, dirVec[i], srctp,  pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
    }
 }
@@ -350,7 +350,7 @@ void genmat_toastsourcevalvector(const IVector& sphOrder, const IVector& node_an
 
 /** Computes source vectors for point sources on the boundary 
 **/
-void genmat_source(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const IVector& Nsource, const int ns, RVector& dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
+void genmat_source(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const IVector& Nsource, const int ns, RVector* &dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, const RCompRowMatrix& b1, RDenseMatrix* &Ylm)
 {
    int sysdim = mesh.nlen();         // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);       // full size of angles X space nodes
@@ -358,7 +358,7 @@ void genmat_source(const IVector& sphOrder, const IVector& node_angN, const IVec
    RCompRowMatrix Svec;
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_sourcevalvector(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec, srctp, pts, wts, Ylm);
+     genmat_sourcevalvector(sphOrder, node_angN, offset, Svec, mesh, Nsource[i], dirVec[i], srctp, pts, wts, Ylm);
      b1.AB(Svec, Source[i]);
    }
 }
@@ -456,14 +456,14 @@ void genmat_sourcevalvector(const IVector& sphOrder, const IVector& node_angN, c
    delete []colidx;
 }
 
-void genmat_intsource(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const IVector& Nsource, const int ns, RVector& dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm, const RVector &delta)
+void genmat_intsource(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* & Source, const Mesh& mesh,  const IVector& Nsource, const int ns, RVector* &dirVec, const int srctp, const RDenseMatrix& pts, const RVector& wts, RDenseMatrix* &Ylm, const RVector &delta)
 {
    int sysdim = mesh.nlen();         // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);       // full size of angles X space nodes
 
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_intsourcevalvector(sphOrder, node_angN, offset, Source[i], mesh, Nsource[i], dirVec, srctp, pts, wts, Ylm, delta);
+     genmat_intsourcevalvector(sphOrder, node_angN, offset, Source[i], mesh, Nsource[i], dirVec[i], srctp, pts, wts, Ylm, delta);
    }
 }
 
@@ -566,20 +566,20 @@ void genmat_intsourcevalvector(const IVector& sphOrder, const IVector& node_angN
    delete []colidx;
 
 }
-void genmat_intsourcelaser(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* &Source, Mesh& mesh, const IVector& Nsource, const int ns, RVector& dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g)
+void genmat_intsourceuncollided(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix* &Source, Mesh& mesh, const IVector& Nsource, const int ns, RVector* &dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g)
 {
    int sysdim = mesh.nlen();         // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);       // full size of angles X space nodes
 
    for (int i = 0; i < ns; i++) {
      Source[i].New(fullsysdim,1);
-     genmat_intsourcelaservalvector(sphOrder, node_angN, offset, Source[i], mesh, Nsource[i], dirVec, pts, wts, mua, mus, delta, g);
+     genmat_intsourceuncollidedvalvector(sphOrder, node_angN, offset, Source[i], mesh, Nsource[i], dirVec[i], pts, wts, mua, mus, delta, g);
    }
 
 }
-void genmat_intsourcelaservalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, Mesh& mesh, const int Nsource, RVector& dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g)
+void genmat_intsourceuncollidedvalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, Mesh& mesh, const int Nsource, RVector& dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g)
 {
-   xASSERT(length(dirVec) != 0, dirVec should be defined for laser sources);  
+   xASSERT(length(dirVec) != 0, dirVec should be defined for uncollided sources);  
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);   // full size of angles X space nodes
    NodeList &nlist=mesh.nlist;
@@ -607,7 +607,6 @@ void genmat_intsourcelaservalvector(const IVector& sphOrder, const IVector& node
 	dirMat(0, i) = dirVec[i];
    }
    Point p3 = mesh.BndIntersect(p1, p2);
-   cout<<"Dir Mat: "<<dirMat(0, 0)<<" "<<dirMat(0, 1)<<endl;
    cout<<"The intersection point on the mesh boundary along this direction is: "<<p2<<endl;
 
    double len = p1.Dist(p3);
