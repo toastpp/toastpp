@@ -190,7 +190,7 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     dASSERT (A->nRows() == m && A->nCols() == n, "Invalid vector sizes");
 
     doublecomplex *rhsbuf = (doublecomplex*)qvec.ValPtr();
-    complex *x = new complex[n*nrhs];
+    toast::complex *x = new toast::complex[n*nrhs];
     for (i = 0; i < nrhs; i++)
 	memcpy (x+(i*n), phi[i].data_buffer(), n*sizeof(toast::complex));
     doublecomplex *xbuf   = (doublecomplex*)x;
@@ -201,7 +201,7 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     engine->Solve (&B, &X);
     
     for (i = 0; i < nrhs; i++)
-	memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(complex));
+      memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(toast::complex));
 
     Destroy_SuperMatrix_Store (&B);
     Destroy_SuperMatrix_Store (&X);
