@@ -13,7 +13,7 @@ OBJS = ${SRCS:.cc=.o}
 HDRS = nonconformingMesh.h dgfwdsolver.h dgSource.h
 
 %.o : %.cc $(HDRS)
-	$(CXX) -fPIC $(STOASTINC) -c $<
+	$(CXX) $(CCFLAGS) -fPIC $(STOASTINC) -c $<
 
 # make static version of library
 $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
