@@ -19,6 +19,8 @@ Inputs:
 	-freq(default=100)   		Modulation frequency in MHz.
 	
 	-sap(default=1)			Source angular profile (0. Directed 1. Cosine 2. Uncollided line source).
+					NOTE:
+					    This angular profile is set for all the sources.
 	
 	-dir				File containing direction vectors along which the sources are to be pointed (2 components for 2D and 3 for 3D).
 					NOTE:
@@ -60,16 +62,32 @@ Outputs:
 
 	<prefix>_RHS_im.sol	This is an ASCII file containing the imaginary part of the source vector (required for Jacobian construction).
 	
-	<prefix>_Det_re.sol 	This is an ASCII file containing the real part of the detector vector (required for Jacobian construction).
+	<prefix>_Det_re.sol 	This is an ASCII file containing the real part of the measurement vector (required for Jacobian construction).
 
-	<prefix>_Det_im.sol 	This is an ASCII file containing the imaginary part of the detector vector (required for Jacobian construction).
+	<prefix>_Det_im.sol 	This is an ASCII file containing the imaginary part of the measurement vector (required for Jacobian construction).
 
 Warning:
 	Internal sources SHOULD NOT be specified using QM file. Use -nq and -nm options instead and DO NOT provide -qm option.
 
-Usage:
-	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 0 -nt 1 -freq 100 -BCType 'v' -ri_external 1.4 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 -dir -1 0 
+Examples:
+	1. Uncollided line source with default directions using 2 sources 0 measurements and 2 threads 
+
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 2 -nt 2 -freq 100 -BCType 'v' -ri_external 1.0 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 
+
+	2. In the above example if you wish to set direction instead of the defaults add a file with -dir option
+
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 2 -nt 2 -freq 100 -BCType 'v' -ri_external 1.0 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 -dir circle25_32_dir.dir
+
+
+	3. In the above example if you wish to use reflecting boundary conditions instead of vaccuum boundary conditions, change -BCType to 'r'.
+
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 2 -nt 2 -freq 100 -BCType 'r' -ri_external 1.0 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 -dir circle25_32_dir.dir
+
+
+	4. 3D case study using a QM file, 8 threads, cosine sources, reflective boundary conditions and g=0.9.
 	
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/3D/meshes/cyl3.msh -qm  $TOASTDIR/test/3D/meshes/cyl_3ring.qm -sap 1 -nt 8 -freq 100 -BCType 'r' -ri_external 1.0 -prefix "test" -prm input_cyl3.prm -nodal_sphorder cyl3_P7.sph -g 0.9
+
 Author:
    Surya 10/05/2011.
 
