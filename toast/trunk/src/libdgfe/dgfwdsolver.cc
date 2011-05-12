@@ -1,51 +1,69 @@
 #define __DGFWDSOLVER_CC
 #include "dgfwdsolver.h"
 #include "nonconformingMesh.h"
-#include "fwdsolver_zslu.h"
-#include "fwdsolver_cslu.h"
 #ifdef TOAST_MPI
 #include "toast_mpi.h"
 #endif
 using namespace std;
 using namespace toast;
 
-// =========================================================================
-
 template<class T>
 TDGFwdSolver<T>::TDGFwdSolver (LSOLVER linsolver, double tol)
 {
-    Setup ();
     solvertp = linsolver;
     iterative_tol = tol;
+    F  = 0;
+    FL = 0;
+    Fd = 0;
+    B  = 0;
+    precon = 0;
+    meshptr = 0;
+
+    SETUP_MPI();
 }
 template<>
 TDGFwdSolver<toast::complex>::TDGFwdSolver (LSOLVER linsolver, double tol)
 {
-    Setup ();
     solvertp = linsolver;
     iterative_tol = tol;
+    F  = 0;
+    FL = 0;
+    Fd = 0;
+    B  = 0;
+    precon = 0;
+    meshptr = 0;
+
+    SETUP_MPI();
 }
 
-
-// =========================================================================
 
 template<class T>
 TDGFwdSolver<T>::TDGFwdSolver (char *solver, double tol)
 {
-    Setup ();
     SetLinSolver (solver, tol);
-}
+    F  = 0;
+    FL = 0;
+    Fd = 0;
+    B  = 0;
+    precon = 0;
+    meshptr = 0;
 
-// =========================================================================
+    SETUP_MPI();
+}
 
 template<class T>
 TDGFwdSolver<T>::TDGFwdSolver (ParamParser &pp)
 {
-    Setup ();
     ReadParams (pp);
-}
+    F  = 0;
+    FL = 0;
+    Fd = 0;
+    B  = 0;
+    precon = 0;
+    meshptr = 0;
 
-// =========================================================================
+    SETUP_MPI();
+}
 
 template<class T>
 TDGFwdSolver<T>::~TDGFwdSolver ()
@@ -56,10 +74,8 @@ TDGFwdSolver<T>::~TDGFwdSolver ()
     if (B)      delete B;
     if (precon) delete precon;
 
-    DeleteType ();
     CLEANUP_MPI();
 }
-#ifdef UNDEF
 template<>
 TDGFwdSolver<toast::complex>::~TDGFwdSolver ()
 {
@@ -69,69 +85,10 @@ TDGFwdSolver<toast::complex>::~TDGFwdSolver ()
     if (B)      delete B;
     if (precon) delete precon;
 
-    DeleteType ();
     CLEANUP_MPI();
 }
-#endif
 
 // =========================================================================
-
-template<class T>
-void TDGFwdSolver<T>::Setup ()
-{
-    // set initial and default parameters
-    SuperLU = 0;
-    F  = 0;
-    FL = 0;
-    Fd = 0;
-    B  = 0;
-    precon = 0;
-    meshptr = 0;
-
-    SetupType ();
-    SETUP_MPI();
-}
-
-// =========================================================================
-
-template<class T>
-void TDGFwdSolver<T>::SetupType ()
-{
-}
-
-template<>
-void TDGFwdSolver<toast::complex>::SetupType ()
-{
-    SuperLU = new ZSuperLU ();
-}
-
-template<>
-void TDGFwdSolver<scomplex>::SetupType ()
-{
-    SuperLU = new CSuperLU ();
-}
-
-// =========================================================================
-
-template<class T>
-void TDGFwdSolver<T>::DeleteType ()
-{
-}
-
-template<>
-void TDGFwdSolver<toast::complex>::DeleteType ()
-{
-    delete (ZSuperLU*)SuperLU;
-}
-
-template<>
-void TDGFwdSolver<scomplex>::DeleteType ()
-{
-    delete (CSuperLU*)SuperLU;
-}
-
-// =========================================================================
-
 template<> 
 void TDGFwdSolver<double>::Allocate (NonconformingMesh &mesh)
 {
@@ -186,8 +143,11 @@ void TDGFwdSolver<toast::complex>::Allocate (NonconformingMesh &mesh)
 
     // allocate factorisations and preconditioners
     if (solvertp == LSOLVER_DIRECT) {
-	//lu_data.Setup(dim*(meshptr->elen()), F);
-	((ZSuperLU*)SuperLU)->Reset (F);
+#ifdef ENABLE_DIRECTSOLVER
+	lu_data.Setup(dim*(meshptr->elen()), F);
+#else
+	xERROR(Direct solver not supported);
+#endif
     } else {
 	if (precon) delete precon;
 	precon = new CPrecon_Diag;
@@ -332,22 +292,26 @@ void TDGFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qve
     clock_t time0 = tm.tms_utime;
 #endif
     if (solvertp == LSOLVER_DIRECT) {
+
+#ifdef ENABLE_DIRECTSOLVER
 	cout<<"entered DIRECT solver block ..." <<endl;
-	IterativeSolverResult res;
-	((ZSuperLU*)SuperLU)->CalcField (qvec, cphi, &res);
-        //SuperMatrix B, X;
-	//int nNode = meshptr->elist[0]->nNode();
-	//int n = nNode*meshptr->elen();
-	//
-	//doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
-	//doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
-	//toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
-	//toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
+        SuperMatrix B, X;
+	int nNode = meshptr->elist[0]->nNode();
+	int n = nNode*meshptr->elen();
 
-	//lu_data.Solve (&B, &X);
+	doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
+	doublecomplex *xbuf   = (doublecomplex*)cphi.data_buffer();
+	toast_zCreate_Dense_Matrix (&B, n, 1, rhsbuf, n, SLU_DN, SLU_Z,SLU_GE);
+	toast_zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
-	//toast_Destroy_SuperMatrix_Store (&B);
-	//toast_Destroy_SuperMatrix_Store (&X);
+	lu_data.Solve (&B, &X);
+
+	toast_Destroy_SuperMatrix_Store (&B);
+	toast_Destroy_SuperMatrix_Store (&X);
+#else
+	xERROR(Direct solver not supported);
+#endif
+
     } else {
         double tol = iterative_tol;
 	IterativeSolve (*F, qvec, cphi, tol, precon);
@@ -357,12 +321,6 @@ void TDGFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qve
     solver_time += (double)(tm.tms_utime-time0)/(double)HZ;
 #endif
     //cerr << "Solve time = " << solver_time << endl;
-}
-
-template<class T>
-void TDGFwdSolver<T>::SetLinSolver (char *solver, double tol)
-{
-    xERROR(Not implemented for this template type);
 }
 
 template<>
@@ -388,8 +346,8 @@ void TDGFwdSolver<toast::complex>::SetLinSolver (char *solver, double tol)
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
-//template class STOASTLIB TDGFwdSolver<double>;
-template class STOASTLIB TDGFwdSolver<toast::complex>;
+template class STOASTLIB TFwdSolver<double>;
+template class STOASTLIB TFwdSolver<toast::complex>;
 
 
 #endif // NEED_EXPLICIT_INSTANTIATION
