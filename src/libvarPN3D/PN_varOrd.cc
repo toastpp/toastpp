@@ -524,14 +524,14 @@ int main (int argc, char *argv[])
    if(!specify_QM)	
    {
       genmat_source(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Source, qmmesh, Nsource, nQ, dirVec, srctp, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_detector(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Detector, qmmesh, Ndetector, nM, BCType, pts, wts, ctxt.Ylm);
+      genmat_detector(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, Detector, qmmesh, Ndetector, nM, pts, wts, ctxt.Ylm);
       genmat_intsource(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource, nQ, dirVec, srctp, pts, wts, ctxt.Ylm, delta);
       if(srctp == 2) genmat_intsourceuncollided(ctxt.hifi_sphOrder, ctxt.node_angN, ctxt.offset, b2, qmmesh, Nsource, nQ, dirVec, pts, wts, muabs, muscat, delta, g);
     }
     else 
     {
       genmat_toastsource(ctxt.hifi_sphOrder,  ctxt.node_angN, ctxt.offset, Source, qmmesh, qvec, nQ, dirVec, srctp, pts, wts, ctxt.b1, ctxt.Ylm);
-      genmat_toastdetector(ctxt.hifi_sphOrder,  ctxt.node_angN, ctxt.offset, Detector, qmmesh, mvec, nM, BCType, pts, wts, ctxt.Ylm);
+      genmat_toastdetector(ctxt.hifi_sphOrder,  ctxt.node_angN, ctxt.offset, Detector, qmmesh, mvec, nM, pts, wts, ctxt.Ylm);
     }
 
     cout << "calculating the radiance\n";
