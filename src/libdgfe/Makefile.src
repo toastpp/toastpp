@@ -13,7 +13,7 @@ OBJS = ${SRCS:.cc=.o}
 HDRS = nonconformingMesh.h dgfwdsolver.h dgSource.h
 
 %.o : %.cc $(HDRS)
-	$(CXX) $(CCFLAGS) -fPIC $(STOASTINC) -c $<
+	$(CXX) -fPIC $(STOASTINC) -c $<
 
 # make static version of library
 $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
@@ -24,7 +24,7 @@ $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
 # make shared version of library
 $(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
 	@$(RM) $@
-	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lstoast -lfe -lmath $(MATHLIB)
+	$(SHLIB_LD) -o $@ $^
 	
 clean:: 
 	$(RM) *.o
