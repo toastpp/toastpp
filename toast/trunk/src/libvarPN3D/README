@@ -67,7 +67,8 @@ Outputs:
 	<prefix>_Det_im.sol 	This is an ASCII file containing the imaginary part of the measurement vector (required for Jacobian construction).
 
 Warning:
-	Internal sources SHOULD NOT be specified using QM file. Use -nq and -nm options instead and DO NOT provide -qm option.
+	1. Internal sources SHOULD NOT be specified using QM file. Use -nq and -nm options instead and DO NOT provide -qm option.
+	2. The forward solution computed using this code with reflection boundary conditions is not ready to be used in reconstruction yet. 
 
 Examples:
 	1. Uncollided line source with default directions using 2 sources 0 measurements and 2 threads 
