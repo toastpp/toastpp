@@ -88,6 +88,11 @@ Examples:
 	
 	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/3D/meshes/cyl3.msh -qm  $TOASTDIR/test/3D/meshes/cyl_3ring.qm -sap 1 -nt 8 -freq 100 -BCType 'r' -ri_external 1.0 -prefix "test" -prm input_cyl3.prm -nodal_sphorder cyl3_P7.sph -g 0.9
 
+	5. In the above example using a directed source instead of cosine profile, change -sap option to 0
+
+	 $TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/3D/meshes/cyl3.msh -qm  $TOASTDIR/test/3D/meshes/cyl_3ring.qm -sap 0 -nt 8 -freq 100 -BCType 'r' -ri_external 1.0 -prefix "test" -prm input_cyl3.prm -nodal_sphorder cyl3_P7.sph -g 0.9
+
+
 Author:
    Surya 10/05/2011.
 
