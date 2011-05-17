@@ -2,7 +2,7 @@ include $(TOASTDIR)/Makefile.incl
 
 VPATH = $(TSRC)/displace
 
-BINS = teststrain head displace displace_ui volume_ui initdisp recon tc_volchange elem_refinement pv_materials partialsize
+BINS = teststrain displace displace_ui volume_ui initdisp recon tc_volchange elem_refinement pv_materials partialsize
 
 all::$(BINS)
 
