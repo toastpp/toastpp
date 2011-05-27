@@ -2,7 +2,12 @@
 include ../make.inc
 
 LIBNAME = libsuperlu
-LIB = $(LIBNAME)$(LIB_SUFFIX)
+ifeq ($(SUPERLU_LOCAL_STATIC),1)
+	LIB = $(LIBNAME).a
+else
+	LIB = $(LIBNAME)$(LIB_SUFFIX)
+endif
+
 VPATH = $(TOASTDIR)/numerics/SuperLU_4.1/SRC
 
 #######################################################################
@@ -115,7 +120,7 @@ ZLUSRC = \
 	ilu_zcolumn_dfs.o ilu_zpanel_dfs.o ilu_zcopy_to_ucol.o \
 	ilu_zpivotL.o zdiagonal.o
 
-OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(ALLAUX) $(SCLAUX) $(DZLAUX)
+OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(ALLAUX) $(LAAUX) $(SCLAUX) $(DZLAUX)
 
 #all:    single double complex complex16
 all:	$(LIB)
