@@ -16,13 +16,13 @@ CSRC = icamax.f caxpy.f ccopy.f cdotc.f cdotu.f cgbmv.f cgemm.f cgemv.f cgerc.f 
 ZSRC = izamax.f xerbla.f zaxpy.f zcopy.f zdotc.f zdotu.f zdrot.f zdscal.f zgbmv.f zgemm.f zgemv.f zgerc.f zgeru.f zhbmv.f zhemm.f zhemv.f zher.f zher2.f zher2k.f zherk.f zhpmv.f zhpr.f zhpr2.f zrotg.f zscal.f zswap.f zsymm.f zsyr2k.f zsyrk.f ztbmv.f ztbsv.f ztpmv.f ztpsv.f ztrmm.f ztrmv.f ztrsm.f ztrsv.f
 
 
-TOAST_SSRC = toast_sasum.f toast_isamax.f toast_scopy.f toast_sscal.f toast_sger.f toast_snrm2.f toast_ssymv.f toast_sdot.f toast_saxpy.f toast_ssyr2.f toast_srot.f toast_sgemv.f toast_strsv.f toast_sgemm.f toast_strsm.f toast_ssyrk.f
+TOAST_SSRC = toast_sasum.f toast_isamax.f toast_scopy.f toast_sscal.f toast_sger.f toast_snrm2.f toast_ssymv.f toast_sdot.f toast_saxpy.f toast_ssyr2.f toast_srot.f toast_sgemv.f toast_strsv.f toast_sgemm.f toast_strsm.f toast_ssyrk.f toast_sswap.f
 
-TOAST_DSRC = toast_dasum.f toast_idamax.f toast_dcopy.f toast_dscal.f toast_dger.f toast_dnrm2.f toast_dsymv.f toast_ddot.f toast_daxpy.f toast_dsyr2.f toast_drot.f toast_dgemv.f toast_dtrsv.f toast_dgemm.f toast_dtrsm.f toast_dsyrk.f
+TOAST_DSRC = toast_dasum.f toast_idamax.f toast_dcopy.f toast_dscal.f toast_dger.f toast_dnrm2.f toast_dsymv.f toast_ddot.f toast_daxpy.f toast_dsyr2.f toast_drot.f toast_dgemv.f toast_dtrsv.f toast_dgemm.f toast_dtrsm.f toast_dsyrk.f toast_dswap.f
 
-TOAST_CSRC = toast_scasum.f toast_icamax.f toast_ccopy.f toast_cscal.f toast_scnrm2.f toast_caxpy.f toast_cgemv.f toast_ctrsv.f toast_cgemm.f toast_ctrsm.f toast_cgerc.f toast_chemv.f toast_cher2.f toast_csyrk.f
+TOAST_CSRC = toast_scasum.f toast_icamax.f toast_ccopy.f toast_cscal.f toast_scnrm2.f toast_caxpy.f toast_cgemv.f toast_ctrsv.f toast_cgemm.f toast_ctrsm.f toast_cgerc.f toast_chemv.f toast_cher2.f toast_csyrk.f toast_cswap.f
 
-TOAST_ZSRC = toast_dzasum.f toast_izamax.f toast_zcopy.f toast_zscal.f toast_dznrm2.f toast_zdotc.f toast_zdotu.f toast_zaxpy.f toast_zgemv.f toast_ztrsv.f toast_zgemm.f toast_ztrsm.f toast_zgerc.f toast_zhemv.f toast_zher2.f toast_zsyrk.f
+TOAST_ZSRC = toast_dzasum.f toast_izamax.f toast_zcopy.f toast_zscal.f toast_dznrm2.f toast_zdotc.f toast_zdotu.f toast_zaxpy.f toast_zgemv.f toast_ztrsv.f toast_zgemm.f toast_ztrsm.f toast_zgerc.f toast_zhemv.f toast_zher2.f toast_zsyrk.f toast_zswap.f
 
 USRC = lsame.f
 
