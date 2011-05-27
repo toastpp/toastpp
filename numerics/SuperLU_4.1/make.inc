@@ -26,7 +26,7 @@ PLAT = _linux
 #SuperLUroot	= $(HOME)/Codes/SuperLU_4.1
 SuperLUroot	= $(TOASTDIR)/numerics/SuperLU_4.1
 #SUPERLULIB   	= $(SuperLUroot)/lib/libsuperlu_4.1.a
-SUPERLULIB	= superlu$(PLAT).a
+#SUPERLULIB	= superlu$(PLAT).a
 TMGLIB       	= libtmglib.a
 
 ## BLASLIB   	= $(SuperLUroot)/lib/libblas.a
