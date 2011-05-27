@@ -284,7 +284,31 @@ ZLASRC = \
    zunmtr.o zupgtr.o \
    zupmtr.o izmax1.o dzsum1.o
 
-OBJS = $(ALLAUX) $(SCLAUX) $(DZLAUX) $(SLASRC) $(CLASRC) $(DLASRC) $(ZLASRC)
+
+TOAST_ALLAUX = toast_lsame.o toast_xerbla.o
+
+TOAST_SCLAUX = \
+   toast_slamch.o
+
+TOAST_DZLAUX = \
+   toast_dlamch.o
+
+TOAST_SLASRC = \
+   toast_slacon.o
+
+TOAST_DLASRC = \
+   toast_dlacon.o
+
+TOAST_CLASRC = \
+   toast_clacon.o toast_icmax1.o toast_scsum1.o
+
+TOAST_ZLASRC = \
+   toast_dzsum1.o toast_izmax1.o toast_zlacon.o
+
+
+OBJS = $(ALLAUX) $(SCLAUX) $(DZLAUX) $(SLASRC) $(CLASRC) $(DLASRC) $(ZLASRC) \
+   $(TOAST_ALLAUX) $(TOAST_SCLAUX) $(TOAST_DZLAUX) $(TOAST_SLASRC) $(TOAST_DLASRC) $(TOAST_CLASRC) $(TOAST_ZLASRC)
+
 
 # all: single complex double complex16
 #
