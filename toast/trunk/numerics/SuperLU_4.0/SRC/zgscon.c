@@ -108,7 +108,7 @@ zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
 	return;
     }
 
-    work = doublecomplexCalloc( 3*L->nrow );
+    work = toast_doublecomplexCalloc( 3*L->nrow );
 
 
     if ( !work )
@@ -127,18 +127,18 @@ zgscon(char *norm, SuperMatrix *L, SuperMatrix *U,
 
 	if (kase == kase1) {
 	    /* Multiply by inv(L). */
-	    sp_ztrsv("L", "No trans", "Unit", L, U, &work[0], stat, info);
+	    toast_sp_ztrsv("L", "No trans", "Unit", L, U, &work[0], stat, info);
 
 	    /* Multiply by inv(U). */
-	    sp_ztrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
+	    toast_sp_ztrsv("U", "No trans", "Non-unit", L, U, &work[0], stat, info);
 	    
 	} else {
 
 	    /* Multiply by inv(U'). */
-	    sp_ztrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);
+	    toast_sp_ztrsv("U", "Transpose", "Non-unit", L, U, &work[0], stat, info);
 
 	    /* Multiply by inv(L'). */
-	    sp_ztrsv("L", "Transpose", "Unit", L, U, &work[0], stat, info);
+	    toast_sp_ztrsv("L", "Transpose", "Unit", L, U, &work[0], stat, info);
 	    
 	}
 

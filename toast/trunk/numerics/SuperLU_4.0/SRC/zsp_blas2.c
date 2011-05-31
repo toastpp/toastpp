@@ -78,7 +78,7 @@ void zmatvec(int, int, int, doublecomplex*, doublecomplex*, doublecomplex*);
  * </pre>
  */
 int
-sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L, 
+toast_sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L, 
          SuperMatrix *U, doublecomplex *x, SuperLUStat_t *stat, int *info)
 {
 #ifdef _CRAY
@@ -119,7 +119,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
     Uval = Ustore->nzval;
     solve_ops = 0;
 
-    if ( !(work = doublecomplexCalloc(L->nrow)) )
+    if ( !(work = toast_doublecomplexCalloc(L->nrow)) )
 	ABORT("Malloc fails for work in sp_ztrsv().");
     
     if ( lsame_(trans, "N") ) {	/* Form x := inv(A)*x. */

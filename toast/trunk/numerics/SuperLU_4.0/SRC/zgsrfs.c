@@ -127,7 +127,7 @@
  * </pre>
  */
 void
-zgsrfs(trans_t trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
+toast_zgsrfs(trans_t trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
        int *perm_c, int *perm_r, char *equed, double *R, double *C,
        SuperMatrix *B, SuperMatrix *X, double *ferr, double *berr,
        SuperLUStat_t *stat, int *info)
@@ -326,7 +326,7 @@ zgsrfs(trans_t trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 
 	    if (berr[j] > eps && berr[j] * 2. <= lstres && count < ITMAX) {
 		/* Update solution and try again. */
-		zgstrs (trans, L, U, perm_c, perm_r, &Bjcol, stat, info);
+		toast_zgstrs (trans, L, U, perm_c, perm_r, &Bjcol, stat, info);
 		
 #ifdef _CRAY
 		CAXPY(&A->nrow, &done, work, &ione,
@@ -408,7 +408,7 @@ zgsrfs(trans_t trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 		        zd_mult(&work[i], &work[i], R[i]);
                     }
 
-		zgstrs (transt, L, U, perm_c, perm_r, &Bjcol, stat, info);
+		toast_zgstrs (transt, L, U, perm_c, perm_r, &Bjcol, stat, info);
 		
 		for (i = 0; i < A->nrow; ++i) {
 		    zd_mult(&work[i], &work[i], rwork[i]);
@@ -419,7 +419,7 @@ zgsrfs(trans_t trans, SuperMatrix *A, SuperMatrix *L, SuperMatrix *U,
 		    zd_mult(&work[i], &work[i], rwork[i]);
 		}
 		
-		zgstrs (trans, L, U, perm_c, perm_r, &Bjcol, stat, info);
+		toast_zgstrs (trans, L, U, perm_c, perm_r, &Bjcol, stat, info);
 		
 		if ( notran && colequ )
 		    for (i = 0; i < A->ncol; ++i) {

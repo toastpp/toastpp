@@ -341,7 +341,6 @@ toast_zgssvx(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_
        mem_usage_t *mem_usage, SuperLUStat_t *stat, int *info )
 {
 
-
     DNformat  *Bstore, *Xstore;
     doublecomplex    *Bmat, *Xmat;
     int       ldb, ldx, nrhs;
@@ -484,7 +483,6 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 	}
 	utime[EQUIL] = SuperLU_timer_() - t0;
     }
-
     if ( nrhs > 0 ) {
         /* Scale the right hand side if equilibration was performed. */
         if ( notran ) {
@@ -564,7 +562,7 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
         zgscon(norm, L, U, anorm, rcond, stat, info);
         utime[RCOND] = SuperLU_timer_() - t0;
     }
-    
+
     if ( nrhs > 0 ) {
         /* Compute the solution matrix X. */
         for (j = 0; j < nrhs; j++)  /* Save a copy of the right hand sides */
@@ -572,14 +570,16 @@ printf("dgssvx: Fact=%4d, Trans=%4d, equed=%c\n",
 	        Xmat[i + j*ldx] = Bmat[i + j*ldb];
     
         t0 = SuperLU_timer_();
-        zgstrs (trant, L, U, perm_c, perm_r, X, stat, info);
+fprintf (stderr, "start zgstrs\n");
+        toast_zgstrs (trant, L, U, perm_c, perm_r, X, stat, info);
+fprintf (stderr, "end zgstrs\n");
         utime[SOLVE] = SuperLU_timer_() - t0;
     
         /* Use iterative refinement to improve the computed solution and compute
            error bounds and backward error estimates for it. */
         t0 = SuperLU_timer_();
         if ( options->IterRefine != NOREFINE ) {
-            zgsrfs(trant, AA, L, U, perm_c, perm_r, equed, R, C, B,
+            toast_zgsrfs(trant, AA, L, U, perm_c, perm_r, equed, R, C, B,
                    X, ferr, berr, stat, info);
         } else {
             for (j = 0; j < nrhs; ++j) ferr[j] = berr[j] = 1.0;

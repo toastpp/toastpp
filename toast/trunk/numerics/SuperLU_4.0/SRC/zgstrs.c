@@ -87,10 +87,13 @@ void zmatvec(int, int, int, doublecomplex*, doublecomplex*, doublecomplex*);
  */
 
 void
-zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
+toast_zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
         int *perm_c, int *perm_r, SuperMatrix *B,
         SuperLUStat_t *stat, int *info)
 {
+
+
+fprintf (stderr, "flag1\n");
 
 #ifdef _CRAY
     _fcd ftcs1, ftcs2, ftcs3, ftcs4;
@@ -133,8 +136,11 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 	return;
     }
 
+
+fprintf (stderr, "flag2\n");
+
     n = L->nrow;
-    work = doublecomplexCalloc(n * nrhs);
+    work = toast_doublecomplexCalloc(n * nrhs);
     if ( !work ) ABORT("Malloc fails for local work[].");
     soln = toast_doublecomplexMalloc(n);
     if ( !soln ) ABORT("Malloc fails for local soln[].");
@@ -147,6 +153,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
     solve_ops = 0;
     
     if ( trans == NOTRANS ) {
+
+fprintf (stderr, "flag3\n");
+
 	/* Permute right hand sides to form Pr*B */
 	for (i = 0; i < nrhs; i++) {
 	    rhs_work = &Bmat[i*ldb];
@@ -156,6 +165,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 	
 	/* Forward solve PLy=Pb. */
 	for (k = 0; k <= Lstore->nsuper; k++) {
+
+fprintf (stderr, "flag4\n");
+
 	    fsupc = L_FST_SUPC(k);
 	    istart = L_SUB_START(fsupc);
 	    nsupr = L_SUB_START(fsupc+1) - istart;
@@ -166,6 +178,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 	    solve_ops += 8 * nrow * nsupc * nrhs;
 	    
 	    if ( nsupc == 1 ) {
+
+fprintf (stderr, "flag5\n");
+
 		for (j = 0; j < nrhs; j++) {
 		    rhs_work = &Bmat[j*ldb];
 	    	    luptr = L_NZ_START(fsupc);
@@ -177,6 +192,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 		    }
 		}
 	    } else {
+
+fprintf (stderr, "flag6\n");
+
 	    	luptr = L_NZ_START(fsupc);
 #ifdef USE_VENDOR_BLAS
 #ifdef _CRAY
@@ -190,13 +208,16 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 			&Lval[luptr+nsupc], &nsupr, &Bmat[fsupc], &ldb, 
 			&beta, &work[0], &n );
 #else
-		ztrsm_("L", "L", "N", "U", &nsupc, &nrhs, &alpha,
+		toast_ztrsm_("L", "L", "N", "U", &nsupc, &nrhs, &alpha,
 		       &Lval[luptr], &nsupr, &Bmat[fsupc], &ldb);
 		
-		zgemm_( "N", "N", &nrow, &nrhs, &nsupc, &alpha, 
+		toast_zgemm_( "N", "N", &nrow, &nrhs, &nsupc, &alpha, 
 			&Lval[luptr+nsupc], &nsupr, &Bmat[fsupc], &ldb, 
 			&beta, &work[0], &n );
 #endif
+
+fprintf (stderr, "flag7\n");
+
 		for (j = 0; j < nrhs; j++) {
 		    rhs_work = &Bmat[j*ldb];
 		    work_col = &work[j*n];
@@ -229,6 +250,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 	    } /* else ... */
 	} /* for L-solve */
 
+
+fprintf (stderr, "flag8\n");
+
 #ifdef DEBUG
   	printf("After L-solve: y=\n");
 	zprint_soln(n, nrhs, Bmat);
@@ -246,6 +270,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 
 	    solve_ops += 4 * nsupc * (nsupc + 1) * nrhs;
 
+
+fprintf (stderr, "flag9\n");
+
 	    if ( nsupc == 1 ) {
 		rhs_work = &Bmat[0];
 		for (j = 0; j < nrhs; j++) {
@@ -261,13 +288,16 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 		CTRSM( ftcs1, ftcs2, ftcs3, ftcs3, &nsupc, &nrhs, &alpha,
 		       &Lval[luptr], &nsupr, &Bmat[fsupc], &ldb);
 #else
-		ztrsm_("L", "U", "N", "N", &nsupc, &nrhs, &alpha,
+		toast_ztrsm_("L", "U", "N", "N", &nsupc, &nrhs, &alpha,
 		       &Lval[luptr], &nsupr, &Bmat[fsupc], &ldb);
 #endif
 #else		
 		for (j = 0; j < nrhs; j++)
 		    zusolve ( nsupr, nsupc, &Lval[luptr], &Bmat[fsupc+j*ldb] );
 #endif		
+
+fprintf (stderr, "flag10\n");
+
 	    }
 
 	    for (j = 0; j < nrhs; ++j) {
@@ -282,6 +312,9 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
 		}
 	    }
 	    
+
+fprintf (stderr, "flag11\n");
+
 	} /* for U-solve */
 
 #ifdef DEBUG
@@ -310,20 +343,23 @@ zgstrs (trans_t trans, SuperMatrix *L, SuperMatrix *U,
         if (trans == TRANS) {
 	    for (k = 0; k < nrhs; ++k) {
 	        /* Multiply by inv(U'). */
-	        sp_ztrsv("U", "T", "N", L, U, &Bmat[k*ldb], stat, info);
+	        toast_sp_ztrsv("U", "T", "N", L, U, &Bmat[k*ldb], stat, info);
 	    
 	        /* Multiply by inv(L'). */
-	        sp_ztrsv("L", "T", "U", L, U, &Bmat[k*ldb], stat, info);
+	        toast_sp_ztrsv("L", "T", "U", L, U, &Bmat[k*ldb], stat, info);
 	    }
          } else { /* trans == CONJ */
             for (k = 0; k < nrhs; ++k) {                
                 /* Multiply by conj(inv(U')). */
-                sp_ztrsv("U", "C", "N", L, U, &Bmat[k*ldb], stat, info);
+                toast_sp_ztrsv("U", "C", "N", L, U, &Bmat[k*ldb], stat, info);
                 
                 /* Multiply by conj(inv(L')). */
-                sp_ztrsv("L", "C", "U", L, U, &Bmat[k*ldb], stat, info);
+                toast_sp_ztrsv("L", "C", "U", L, U, &Bmat[k*ldb], stat, info);
 	    }
          }
+
+fprintf (stderr, "flag12\n");
+
 	/* Compute the final solution X := Pr'*X (=inv(Pr)*X) */
 	for (i = 0; i < nrhs; i++) {
 	    rhs_work = &Bmat[i*ldb];

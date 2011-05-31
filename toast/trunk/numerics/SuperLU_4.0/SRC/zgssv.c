@@ -213,7 +213,7 @@ zgssv(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
     t = SuperLU_timer_();
     if ( *info == 0 ) {
         /* Solve the system A*X=B, overwriting B with X. */
-        zgstrs (trans, L, U, perm_c, perm_r, B, stat, info);
+        toast_zgstrs (trans, L, U, perm_c, perm_r, B, stat, info);
     }
     utime[SOLVE] = SuperLU_timer_() - t;
 
