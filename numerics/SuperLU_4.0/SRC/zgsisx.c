@@ -637,7 +637,7 @@ zgsisx(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
 		Xmat[i + j*ldx] = Bmat[i + j*ldb];
 
 	t0 = SuperLU_timer_();
-	zgstrs (trant, L, U, perm_c, perm_r, X, stat, &info1);
+	toast_zgstrs (trant, L, U, perm_c, perm_r, X, stat, &info1);
 	utime[SOLVE] = SuperLU_timer_() - t0;
 
 	/* Transform the solution matrix X to a solution of the original

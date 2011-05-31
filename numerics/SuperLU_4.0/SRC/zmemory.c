@@ -673,7 +673,7 @@ doublecomplex *toast_doublecomplexMalloc(int n)
     return (buf);
 }
 
-doublecomplex *doublecomplexCalloc(int n)
+doublecomplex *toast_doublecomplexCalloc(int n)
 {
     doublecomplex *buf;
     register int i;

@@ -6,7 +6,18 @@ LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
 SUPERLUDIR = SuperLU_4.1
 
-COMPONENT = blas fspblas superlu lapack arpack liblbfgs
+COMPONENT = blas fspblas lapack arpack liblbfgs
+
+ifeq ($(BUILD_SUPERLU),1)
+	COMPONENT += superlu
+endif
+
+ifeq ($(SUPERLU_LOCAL_STATIC),1)
+	SUPERLU_NAME = libsuperlu.a
+else
+	SUPERLU_NAME = libsuperlu$(LIB_SUFFIX)
+endif
+
 ifeq ($(BUILD_FDOT),1)
 	COMPONENT += mesa
 endif
@@ -43,7 +54,7 @@ superlu::lapack
 	cp $(NUMERICSDIR)/$(SUPERLUDIR)/make.inc .; \
 	cp $(NUMERICSDIR)/$(SUPERLUDIR)/SRC/Makefile SRC; \
 	$(MAKE) superlulib; \
-	cp SRC/libsuperlu$(LIB_SUFFIX) $(LIBDIR); \
+	cp SRC/$(SUPERLU_NAME) $(LIBDIR); \
 	cp $(NUMERICSDIR)/$(SUPERLUDIR)/SRC/*.h $(INCDIR)
 
 blzpack::
