@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT ARCHDIR MAKE_THREAD MAKE_MPI CCVERSION OBJDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT OGLLIB ENABLE_CUDA CUDA_INSTALL_PATH LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT AWK CC CFLAGS ac_ct_CC F77 FFLAGS ac_ct_F77 FLIBS LN_S SET_MAKE RANLIB ac_ct_RANLIB YACC CXXCPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS LOCAL_TCL LOCAL_TK LOCAL_TIX LOCAL_BLT ARCHDIR MAKE_THREAD MAKE_MPI CCVERSION OBJDIR MEXFLAGS MEXEXT TOAST_SHARED_BUILD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS MAKE_LIB LIB_SUFFIX SHLIB_SUFFIX STLIB_SUFFIX BLAS_LIB_SUFFIX LAPACK_LIB_SUFFIX MATH_LIBS DL_LIBS BLASLIB LAPACKLIB SUPERLULIB BUILD_SUPERLU SUPERLU_LOCAL_STATIC TCLPATH XVIEWINC GUIFLAGS GUILIBS TASKLIB TOAST_SHARED ILUPACKDIR RPATH TOAST_FDOT OGLLIB ENABLE_CUDA CUDA_INSTALL_PATH LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -879,7 +879,7 @@ Optional Packages:
   --with-lapack=LIB       Linker command to bind LAPACK package, e.g.
                               '-llapack' or '/usr/lib/liblapack.a'
   --with-superlu=LIB      Linker command to bind SuperLU package, e.g.
-                              '-lsuperlu' (default) or '/usr/lib/libsuperlu.a'
+                              'libsuperlu.a' (default) or '-lsuperlu'
   --with-tcl=PATH         Path to Tcl installation directory
                               Default is auto-search for Tcl
   --with-tk=PATH          Path to Tk installation directory
@@ -8273,9 +8273,19 @@ if test "${with_superlu+set}" = set; then
   withval="$with_superlu"
   SUPERLULIB=$withval
 else
-  SUPERLULIB="-lsuperlu"
+  SUPERLULIB='$(TOASTDIR)/lib/libsuperlu.a'
 fi;
-
+# Note: Changed this to default to static library to avoid linking problems
+# in mex files.
+if test "$SUPERLULIB" = '$(TOASTDIR)/lib/libsuperlu.a' -o "$SUPERLULIB" = '-lsuperlu' ; then
+    BUILD_SUPERLU=1
+    if test "$SUPERLULIB" = '$(TOASTDIR)/lib/libsuperlu.a' ; then
+       SUPERLU_LOCAL_STATIC=1
+       SUPERLULIB=$TOASTDIR/lib/libsuperlu.a
+    fi
+else
+    BUILD_SUPERLU=0
+fi
 
 # ========================================================================
 # ========================================================================
@@ -9696,6 +9706,8 @@ fi
 
 
 
+
+
 #AC_SUBST(TASKDIR)
 
 
@@ -10394,6 +10406,8 @@ s,@DL_LIBS@,$DL_LIBS,;t t
 s,@BLASLIB@,$BLASLIB,;t t
 s,@LAPACKLIB@,$LAPACKLIB,;t t
 s,@SUPERLULIB@,$SUPERLULIB,;t t
+s,@BUILD_SUPERLU@,$BUILD_SUPERLU,;t t
+s,@SUPERLU_LOCAL_STATIC@,$SUPERLU_LOCAL_STATIC,;t t
 s,@TCLPATH@,$TCLPATH,;t t
 s,@XVIEWINC@,$XVIEWINC,;t t
 s,@GUIFLAGS@,$GUIFLAGS,;t t
@@ -11406,6 +11420,8 @@ s,@DL_LIBS@,$DL_LIBS,;t t
 s,@BLASLIB@,$BLASLIB,;t t
 s,@LAPACKLIB@,$LAPACKLIB,;t t
 s,@SUPERLULIB@,$SUPERLULIB,;t t
+s,@BUILD_SUPERLU@,$BUILD_SUPERLU,;t t
+s,@SUPERLU_LOCAL_STATIC@,$SUPERLU_LOCAL_STATIC,;t t
 s,@TCLPATH@,$TCLPATH,;t t
 s,@XVIEWINC@,$XVIEWINC,;t t
 s,@GUIFLAGS@,$GUIFLAGS,;t t

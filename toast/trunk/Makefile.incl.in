@@ -92,11 +92,18 @@ CUDA_INSTALL_PATH = @CUDA_INSTALL_PATH@
 NVCC = $(CUDA_INSTALL_PATH)/bin/nvcc
 
 # =======================================================================
+# SuperLU support
+
+SUPERLULIB = @SUPERLULIB@
+BUILD_SUPERLU = @BUILD_SUPERLU@
+SUPERLU_LOCAL_STATIC = @SUPERLU_LOCAL_STATIC@
+
+# =======================================================================
 # Libraries
 
 #LIBS     = @DL_LIBS@ @LIBS@ @MATH_LIBS@
 LIBS      = @DL_LIBS@ @LIBS@ -lm
-TLIBS     = -lfe -lmath @SUPERLULIB@ -larpack $(LAPACKLIB) $(BLASLIB) \
+TLIBS     = -lfe -lmath $(SUPERLULIB) -larpack $(LAPACKLIB) $(BLASLIB) \
 		$(SPBLASLIB) @TASKLIB@ $(FLIBS) $(ILUPACKLIB)
 MATHLIB   = -L$(TLIB) -larpack @SUPERLULIB@ $(SPBLASLIB) $(LAPACKLIB) $(BLASLIB)
 FELIB     = -L$(TLIB) $(TLIBS)

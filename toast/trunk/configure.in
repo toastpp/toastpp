@@ -111,9 +111,19 @@ AC_ARG_WITH(lapack,
 
 AC_ARG_WITH(superlu,
     [  --with-superlu=LIB      Linker command to bind SuperLU package, e.g.]
-    [                          '-lsuperlu' (default) or '/usr/lib/libsuperlu.a'],
-    SUPERLULIB=$withval, SUPERLULIB="-lsuperlu")
-
+    [                          'libsuperlu.a' (default) or '-lsuperlu'],
+    SUPERLULIB=$withval, SUPERLULIB='$(TOASTDIR)/lib/libsuperlu.a')
+# Note: Changed this to default to static library to avoid linking problems
+# in mex files.
+if test "$SUPERLULIB" = '$(TOASTDIR)/lib/libsuperlu.a' -o "$SUPERLULIB" = '-lsuperlu' ; then
+    BUILD_SUPERLU=1
+    if test "$SUPERLULIB" = '$(TOASTDIR)/lib/libsuperlu.a' ; then
+       SUPERLU_LOCAL_STATIC=1
+       SUPERLULIB=$TOASTDIR/lib/libsuperlu.a
+    fi
+else
+    BUILD_SUPERLU=0
+fi
 
 # ========================================================================
 # ========================================================================
@@ -647,6 +657,8 @@ AC_SUBST(DL_LIBS)
 AC_SUBST(BLASLIB)
 AC_SUBST(LAPACKLIB)
 AC_SUBST(SUPERLULIB)
+AC_SUBST(BUILD_SUPERLU)
+AC_SUBST(SUPERLU_LOCAL_STATIC)
 AC_SUBST(TCLPATH)
 AC_SUBST(X_CFLAGS)
 AC_SUBST(XVIEWINC)
