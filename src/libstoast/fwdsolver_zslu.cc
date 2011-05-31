@@ -115,14 +115,25 @@ void ZSuperLU_engine::Solve (SuperMatrix *B, SuperMatrix *X)
     char equed = 'N';
     double R = 0.0;
     double C = 0.0;
-    double ferr, berr;
+    static int nrhs_max = 1;
+    static double *ferr = new double[nrhs_max];
+    static double *berr = new double[nrhs_max];
     double recip_pivot_growth, rcond;
+    int nrhs = B->ncol;
+    if (nrhs > nrhs_max) {
+        nrhs_max = nrhs;
+	delete []ferr;   ferr = new double[nrhs_max];
+	delete []berr;   berr = new double[nrhs_max];
+    }
+
+
     SuperLUStat_t stat;
     StatInit (&stat);
-
+    
     zgssvx (&options, &A, perm_c, perm_r, etree, &equed, &R, &C,
-		  &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
-		  &ferr, &berr, &mem_usage, &stat, &info);
+    		  &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
+    		  ferr, berr, &mem_usage, &stat, &info);
+
     options.Fact = FACTORED;
     StatFree (&stat);
 }
@@ -180,7 +191,8 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     IterativeSolverResult *res) const
 {
     SuperMatrix B, X;
-    int i;
+    int i, r;
+    const idxtype *rptr, *cidx;
     int m = qvec.nCols();
     int n = phi[0].Dim();
     int nnz = qvec.rowptr[m];
@@ -189,21 +201,25 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     dASSERT (A, "Matrix not defined");
     dASSERT (A->nRows() == m && A->nCols() == n, "Invalid vector sizes");
 
-    doublecomplex *rhsbuf = (doublecomplex*)qvec.ValPtr();
+    // write sparse source vector array into dense matrix
+    CDenseMatrix qd(qvec);
+    doublecomplex *qbuf = (doublecomplex*)qd.valptr();
+    zCreate_Dense_Matrix (&B, m, nrhs, qbuf, m, SLU_DN, SLU_Z, SLU_GE);
+
     toast::complex *x = new toast::complex[n*nrhs];
     for (i = 0; i < nrhs; i++)
 	memcpy (x+(i*n), phi[i].data_buffer(), n*sizeof(toast::complex));
-    doublecomplex *xbuf   = (doublecomplex*)x;
-    zCreate_CompRow_Matrix (&B, m, nrhs, nnz, rhsbuf, qvec.colidx, qvec.rowptr,
-        SLU_NR, SLU_Z,SLU_GE);
+    doublecomplex *xbuf = (doublecomplex*)x;
     zCreate_Dense_Matrix (&X, n, nrhs, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
     engine->Solve (&B, &X);
     
     for (i = 0; i < nrhs; i++)
-      memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(toast::complex));
+        memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(toast::complex));
 
     Destroy_SuperMatrix_Store (&B);
     Destroy_SuperMatrix_Store (&X);
+
+    delete []x;
 }
 
