@@ -46,7 +46,7 @@
 *     ..
 *     .. Executable Statements ..
 *
-      SCSUM1 = 0.0E0
+      TOAST_SCSUM1 = 0.0E0
       STEMP = 0.0E0
       IF( N.LE.0 )
      $   RETURN
@@ -62,7 +62,7 @@
 *
          STEMP = STEMP + ABS( CX( I ) )
    10 CONTINUE
-      SCSUM1 = STEMP
+      TOAST_SCSUM1 = STEMP
       RETURN
 *
 *     CODE FOR INCREMENT EQUAL TO 1
@@ -74,7 +74,7 @@
 *
          STEMP = STEMP + ABS( CX( I ) )
    30 CONTINUE
-      SCSUM1 = STEMP
+      TOAST_SCSUM1 = STEMP
       RETURN
 *
 *     End of SCSUM1

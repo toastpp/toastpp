@@ -34,8 +34,8 @@
 *
 *     Test if the characters are equal
 *
-      LSAME = CA.EQ.CB
-      IF( LSAME )
+      TOAST_LSAME = CA.EQ.CB
+      IF( TOAST_LSAME )
      $   RETURN
 *
 *     Now test for equivalence if both characters are alphabetic.
@@ -78,7 +78,7 @@
          IF( INTA.GE.225 .AND. INTA.LE.250 ) INTA = INTA - 32
          IF( INTB.GE.225 .AND. INTB.LE.250 ) INTB = INTB - 32
       END IF
-      LSAME = INTA.EQ.INTB
+      TOAST_LSAME = INTA.EQ.INTB
 *
 *     RETURN
 *

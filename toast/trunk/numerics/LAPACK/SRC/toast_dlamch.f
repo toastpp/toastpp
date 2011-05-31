@@ -60,7 +60,7 @@
       EXTERNAL           LSAME
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DLAMC2
+      EXTERNAL           TOAST_DLAMC2
 *     ..
 *     .. Save statement ..
       SAVE               FIRST, EPS, SFMIN, BASE, T, RND, EMIN, RMIN,
@@ -73,7 +73,8 @@
 *
       IF( FIRST ) THEN
          FIRST = .FALSE.
-         CALL DLAMC2( BETA, IT, LRND, EPS, IMIN, RMIN, IMAX, RMAX )
+         CALL TOAST_DLAMC2( BETA, IT, LRND, EPS, IMIN, RMIN, IMAX,
+     $                      RMAX )
          BASE = BETA
          T = IT
          IF( LRND ) THEN
@@ -119,7 +120,7 @@
          RMACH = RMAX
       END IF
 *
-      DLAMCH = RMACH
+      TOAST_DLAMCH = RMACH
       RETURN
 *
 *     End of DLAMCH
@@ -128,7 +129,7 @@
 *
 ************************************************************************
 *
-      SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )
+      SUBROUTINE TOAST_DLAMC1( BETA, T, RND, IEEE1 )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -186,8 +187,8 @@
       DOUBLE PRECISION   A, B, C, F, ONE, QTR, SAVEC, T1, T2
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
-      EXTERNAL           DLAMC3
+      DOUBLE PRECISION   TOAST_DLAMC3
+      EXTERNAL           TOAST_DLAMC3
 *     ..
 *     .. Save statement ..
       SAVE               FIRST, LIEEE1, LBETA, LRND, LT
@@ -220,8 +221,8 @@
    10    CONTINUE
          IF( C.EQ.ONE ) THEN
             A = 2*A
-            C = DLAMC3( A, ONE )
-            C = DLAMC3( C, -A )
+            C = TOAST_DLAMC3( A, ONE )
+            C = TOAST_DLAMC3( C, -A )
             GO TO 10
          END IF
 *+       END WHILE
@@ -232,13 +233,13 @@
 *           fl( a + b ) .gt. a.
 *
          B = 1
-         C = DLAMC3( A, B )
+         C = TOAST_DLAMC3( A, B )
 *
 *+       WHILE( C.EQ.A )LOOP
    20    CONTINUE
          IF( C.EQ.A ) THEN
             B = 2*B
-            C = DLAMC3( A, B )
+            C = TOAST_DLAMC3( A, B )
             GO TO 20
          END IF
 *+       END WHILE
@@ -250,22 +251,22 @@
 *
          QTR = ONE / 4
          SAVEC = C
-         C = DLAMC3( C, -A )
+         C = TOAST_DLAMC3( C, -A )
          LBETA = C + QTR
 *
 *        Now determine whether rounding or chopping occurs,  by adding a
 *        bit  less  than  beta/2  and a  bit  more  than  beta/2  to  a.
 *
          B = LBETA
-         F = DLAMC3( B / 2, -B / 100 )
-         C = DLAMC3( F, A )
+         F = TOAST_DLAMC3( B / 2, -B / 100 )
+         C = TOAST_DLAMC3( F, A )
          IF( C.EQ.A ) THEN
             LRND = .TRUE.
          ELSE
             LRND = .FALSE.
          END IF
-         F = DLAMC3( B / 2, B / 100 )
-         C = DLAMC3( F, A )
+         F = TOAST_DLAMC3( B / 2, B / 100 )
+         C = TOAST_DLAMC3( F, A )
          IF( ( LRND ) .AND. ( C.EQ.A ) )
      $      LRND = .FALSE.
 *
@@ -275,8 +276,8 @@
 *        zero, and SAVEC is odd. Thus adding B/2 to A should not  change
 *        A, but adding B/2 to SAVEC should change SAVEC.
 *
-         T1 = DLAMC3( B / 2, A )
-         T2 = DLAMC3( B / 2, SAVEC )
+         T1 = TOAST_DLAMC3( B / 2, A )
+         T2 = TOAST_DLAMC3( B / 2, SAVEC )
          LIEEE1 = ( T1.EQ.A ) .AND. ( T2.GT.SAVEC ) .AND. LRND
 *
 *        Now find  the  mantissa, t.  It should  be the  integer part of
@@ -295,8 +296,8 @@
          IF( C.EQ.ONE ) THEN
             LT = LT + 1
             A = A*LBETA
-            C = DLAMC3( A, ONE )
-            C = DLAMC3( C, -A )
+            C = TOAST_DLAMC3( A, ONE )
+            C = TOAST_DLAMC3( C, -A )
             GO TO 30
          END IF
 *+       END WHILE
@@ -315,7 +316,8 @@
 *
 ************************************************************************
 *
-      SUBROUTINE DLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX, RMAX )
+      SUBROUTINE TOAST_DLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX,
+     $                         RMAX )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -388,11 +390,11 @@
      $                   SIXTH, SMALL, THIRD, TWO, ZERO
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
-      EXTERNAL           DLAMC3
+      DOUBLE PRECISION   TOAST_DLAMC3
+      EXTERNAL           TOAST_DLAMC3
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DLAMC1, DLAMC4, DLAMC5
+      EXTERNAL           TOAST_DLAMC1, TOAST_DLAMC4, TOAST_DLAMC5
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          ABS, MAX, MIN
@@ -433,10 +435,10 @@
 *
          B = TWO / 3
          HALF = ONE / 2
-         SIXTH = DLAMC3( B, -HALF )
-         THIRD = DLAMC3( SIXTH, SIXTH )
-         B = DLAMC3( THIRD, -HALF )
-         B = DLAMC3( B, SIXTH )
+         SIXTH = TOAST_DLAMC3( B, -HALF )
+         THIRD = TOAST_DLAMC3( SIXTH, SIXTH )
+         B = TOAST_DLAMC3( THIRD, -HALF )
+         B = TOAST_DLAMC3( B, SIXTH )
          B = ABS( B )
          IF( B.LT.LEPS )
      $      B = LEPS
@@ -447,11 +449,11 @@
    10    CONTINUE
          IF( ( LEPS.GT.B ) .AND. ( B.GT.ZERO ) ) THEN
             LEPS = B
-            C = DLAMC3( HALF*LEPS, ( TWO**5 )*( LEPS**2 ) )
-            C = DLAMC3( HALF, -C )
-            B = DLAMC3( HALF, C )
-            C = DLAMC3( HALF, -B )
-            B = DLAMC3( HALF, C )
+            C = TOAST_DLAMC3( HALF*LEPS, ( TWO**5 )*( LEPS**2 ) )
+            C = TOAST_DLAMC3( HALF, -C )
+            B = TOAST_DLAMC3( HALF, C )
+            C = TOAST_DLAMC3( HALF, -B )
+            B = TOAST_DLAMC3( HALF, C )
             GO TO 10
          END IF
 *+       END WHILE
@@ -468,13 +470,13 @@
          RBASE = ONE / LBETA
          SMALL = ONE
          DO 20 I = 1, 3
-            SMALL = DLAMC3( SMALL*RBASE, ZERO )
+            SMALL = TOAST_DLAMC3( SMALL*RBASE, ZERO )
    20    CONTINUE
-         A = DLAMC3( ONE, SMALL )
-         CALL DLAMC4( NGPMIN, ONE, LBETA )
-         CALL DLAMC4( NGNMIN, -ONE, LBETA )
-         CALL DLAMC4( GPMIN, A, LBETA )
-         CALL DLAMC4( GNMIN, -A, LBETA )
+         A = TOAST_DLAMC3( ONE, SMALL )
+         CALL TOAST_DLAMC4( NGPMIN, ONE, LBETA )
+         CALL TOAST_DLAMC4( NGNMIN, -ONE, LBETA )
+         CALL TOAST_DLAMC4( GPMIN, A, LBETA )
+         CALL TOAST_DLAMC4( GNMIN, -A, LBETA )
          IEEE = .FALSE.
 *
          IF( ( NGPMIN.EQ.NGNMIN ) .AND. ( GPMIN.EQ.GNMIN ) ) THEN
@@ -542,12 +544,12 @@
 *
          LRMIN = 1
          DO 30 I = 1, 1 - LEMIN
-            LRMIN = DLAMC3( LRMIN*RBASE, ZERO )
+            LRMIN = TOAST_DLAMC3( LRMIN*RBASE, ZERO )
    30    CONTINUE
 *
 *        Finally, call DLAMC5 to compute EMAX and RMAX.
 *
-         CALL DLAMC5( LBETA, LT, LEMIN, IEEE, LEMAX, LRMAX )
+         CALL TOAST_DLAMC5( LBETA, LT, LEMIN, IEEE, LEMAX, LRMAX )
       END IF
 *
       BETA = LBETA
@@ -574,7 +576,7 @@
 *
 ************************************************************************
 *
-      DOUBLE PRECISION FUNCTION DLAMC3( A, B )
+      DOUBLE PRECISION FUNCTION TOAST_DLAMC3( A, B )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -602,7 +604,7 @@
 *
 *     .. Executable Statements ..
 *
-      DLAMC3 = A + B
+      TOAST_DLAMC3 = A + B
 *
       RETURN
 *
@@ -612,7 +614,7 @@
 *
 ************************************************************************
 *
-      SUBROUTINE DLAMC4( EMIN, START, BASE )
+      SUBROUTINE TOAST_DLAMC4( EMIN, START, BASE )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -650,8 +652,8 @@
       DOUBLE PRECISION   A, B1, B2, C1, C2, D1, D2, ONE, RBASE, ZERO
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
-      EXTERNAL           DLAMC3
+      DOUBLE PRECISION   TOAST_DLAMC3
+      EXTERNAL           TOAST_DLAMC3
 *     ..
 *     .. Executable Statements ..
 *
@@ -660,7 +662,7 @@
       RBASE = ONE / BASE
       ZERO = 0
       EMIN = 1
-      B1 = DLAMC3( A*RBASE, ZERO )
+      B1 = TOAST_DLAMC3( A*RBASE, ZERO )
       C1 = A
       C2 = A
       D1 = A
@@ -672,14 +674,14 @@
      $    ( D2.EQ.A ) ) THEN
          EMIN = EMIN - 1
          A = B1
-         B1 = DLAMC3( A / BASE, ZERO )
-         C1 = DLAMC3( B1*BASE, ZERO )
+         B1 = TOAST_DLAMC3( A / BASE, ZERO )
+         C1 = TOAST_DLAMC3( B1*BASE, ZERO )
          D1 = ZERO
          DO 20 I = 1, BASE
             D1 = D1 + B1
    20    CONTINUE
-         B2 = DLAMC3( A*RBASE, ZERO )
-         C2 = DLAMC3( B2 / RBASE, ZERO )
+         B2 = TOAST_DLAMC3( A*RBASE, ZERO )
+         C2 = TOAST_DLAMC3( B2 / RBASE, ZERO )
          D2 = ZERO
          DO 30 I = 1, BASE
             D2 = D2 + B2
@@ -696,7 +698,7 @@
 *
 ************************************************************************
 *
-      SUBROUTINE DLAMC5( BETA, P, EMIN, IEEE, EMAX, RMAX )
+      SUBROUTINE TOAST_DLAMC5( BETA, P, EMIN, IEEE, EMAX, RMAX )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -753,8 +755,8 @@
       DOUBLE PRECISION   OLDY, RECBAS, Y, Z
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
-      EXTERNAL           DLAMC3
+      DOUBLE PRECISION   TOAST_DLAMC3
+      EXTERNAL           TOAST_DLAMC3
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MOD
@@ -838,7 +840,7 @@
          Z = Z*RECBAS
          IF( Y.LT.ONE )
      $      OLDY = Y
-         Y = DLAMC3( Y, Z )
+         Y = TOAST_DLAMC3( Y, Z )
    20 CONTINUE
       IF( Y.GE.ONE )
      $   Y = OLDY
@@ -846,7 +848,7 @@
 *     Now multiply by BETA**EMAX to get RMAX.
 *
       DO 30 I = 1, EMAX
-         Y = DLAMC3( Y*BETA, ZERO )
+         Y = TOAST_DLAMC3( Y*BETA, ZERO )
    30 CONTINUE
 *
       RMAX = Y
