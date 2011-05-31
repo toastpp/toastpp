@@ -142,7 +142,11 @@ void TFwdSolver<float>::Allocate (const QMMesh &mesh)
     // allocate system matrix
     mesh.SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
+#ifdef TOAST_MPI
+    F = new FCompRowMatrixMPI (n, n, rowptr, colidx);
+#else
     F = new FCompRowMatrix (n, n, rowptr, colidx);
+#endif
     delete []rowptr;
     delete []colidx;
 
@@ -173,7 +177,11 @@ void TFwdSolver<double>::Allocate (const QMMesh &mesh)
     // allocate system matrix
     mesh.SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
+#ifdef TOAST_MPI
+    F = new RCompRowMatrixMPI (n, n, rowptr, colidx);
+#else
     F = new RCompRowMatrix (n, n, rowptr, colidx);
+#endif
     delete []rowptr;
     delete []colidx;
 
@@ -204,7 +212,11 @@ void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
     // allocate system matrix
     mesh.SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
+#ifdef TOAST_MPI
+    F = new CCompRowMatrixMPI (n, n, rowptr, colidx);
+#else
     F = new CCompRowMatrix (n, n, rowptr, colidx);
+#endif
     delete []rowptr;
     delete []colidx;
 
@@ -230,7 +242,11 @@ void TFwdSolver<scomplex>::Allocate (const QMMesh &mesh)
     // allocate system matrix
     mesh.SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
+#ifdef TOAST_MPI
+    F = new SCCompRowMatrixMPI (n, n, rowptr, colidx);
+#else
     F = new SCCompRowMatrix (n, n, rowptr, colidx);
+#endif
     delete []rowptr;
     delete []colidx;
 
@@ -615,8 +631,6 @@ template<>
 void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
     CVector *phi, IterativeSolverResult *res) const
 {
-    cerr << "In CalcFields" << endl;
-
     // calculate the fields for all sources
     static IterativeSolverResult s_res_single;
     IterativeSolverResult *res_single = 0;
@@ -629,9 +643,10 @@ void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
     int i, nq = qvec.nRows();
 
     if (solvertp == LSOLVER_DIRECT) {
-	//((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
-	for (i = 0; i < nq; i++)
-	    CalcField (qvec.Row(i), phi[i], res);
+	((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
+        //for (i = 0; i < nq; i++) {
+	//    CalcField (qvec.Row(i), phi[i], res);
+	//}
     } else {
         CVector *qv = new CVector[nq];
 	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);

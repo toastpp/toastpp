@@ -375,7 +375,11 @@ public:
     const QMMesh *meshptr;  ///< pointer to the associated FEM mesh
     LSOLVER solvertp;       ///< linear solver type
     IterativeMethod method; ///< iterative solver method, if applicable
+#ifdef TOAST_MPI
+    TCompRowMatrixMPI<T> *F;  ///< Distributed FEM system matrix
+#else
     TCompRowMatrix<T> *F;   ///< FEM system matrix
+#endif
     TCompRowMatrix<T> *FL;  ///< lower triangle of system matrix decomposition
     TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
