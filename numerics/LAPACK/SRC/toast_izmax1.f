@@ -55,10 +55,10 @@
 *     ..
 *     .. Executable Statements ..
 *
-      IZMAX1 = 0
+      TOAST_IZMAX1 = 0
       IF( N.LT.1 )
      $   RETURN
-      IZMAX1 = 1
+      TOAST_IZMAX1 = 1
       IF( N.EQ.1 )
      $   RETURN
       IF( INCX.EQ.1 )
@@ -72,7 +72,7 @@
       DO 20 I = 2, N
          IF( CABS1( CX( IX ) ).LE.SMAX )
      $      GO TO 10
-         IZMAX1 = I
+         TOAST_IZMAX1 = I
          SMAX = CABS1( CX( IX ) )
    10    CONTINUE
          IX = IX + INCX
@@ -86,7 +86,7 @@
       DO 40 I = 2, N
          IF( CABS1( CX( I ) ).LE.SMAX )
      $      GO TO 40
-         IZMAX1 = I
+         TOAST_IZMAX1 = I
          SMAX = CABS1( CX( I ) )
    40 CONTINUE
       RETURN

@@ -60,7 +60,7 @@
       EXTERNAL           LSAME
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           SLAMC2
+      EXTERNAL           TOAST_SLAMC2
 *     ..
 *     .. Save statement ..
       SAVE               FIRST, EPS, SFMIN, BASE, T, RND, EMIN, RMIN,
@@ -73,7 +73,8 @@
 *
       IF( FIRST ) THEN
          FIRST = .FALSE.
-         CALL SLAMC2( BETA, IT, LRND, EPS, IMIN, RMIN, IMAX, RMAX )
+         CALL TOAST_SLAMC2( BETA, IT, LRND, EPS, IMIN, RMIN, IMAX,
+     $                      RMAX )
          BASE = BETA
          T = IT
          IF( LRND ) THEN
@@ -119,7 +120,7 @@
          RMACH = RMAX
       END IF
 *
-      SLAMCH = RMACH
+      TOAST_SLAMCH = RMACH
       RETURN
 *
 *     End of SLAMCH
@@ -128,7 +129,7 @@
 *
 ************************************************************************
 *
-      SUBROUTINE SLAMC1( BETA, T, RND, IEEE1 )
+      SUBROUTINE TOAST_SLAMC1( BETA, T, RND, IEEE1 )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -186,8 +187,8 @@
       REAL               A, B, C, F, ONE, QTR, SAVEC, T1, T2
 *     ..
 *     .. External Functions ..
-      REAL               SLAMC3
-      EXTERNAL           SLAMC3
+      REAL               TOAST_SLAMC3
+      EXTERNAL           TOAST_SLAMC3
 *     ..
 *     .. Save statement ..
       SAVE               FIRST, LIEEE1, LBETA, LRND, LT
@@ -220,8 +221,8 @@
    10    CONTINUE
          IF( C.EQ.ONE ) THEN
             A = 2*A
-            C = SLAMC3( A, ONE )
-            C = SLAMC3( C, -A )
+            C = TOAST_SLAMC3( A, ONE )
+            C = TOAST_SLAMC3( C, -A )
             GO TO 10
          END IF
 *+       END WHILE
@@ -232,13 +233,13 @@
 *           fl( a + b ) .gt. a.
 *
          B = 1
-         C = SLAMC3( A, B )
+         C = TOAST_SLAMC3( A, B )
 *
 *+       WHILE( C.EQ.A )LOOP
    20    CONTINUE
          IF( C.EQ.A ) THEN
             B = 2*B
-            C = SLAMC3( A, B )
+            C = TOAST_SLAMC3( A, B )
             GO TO 20
          END IF
 *+       END WHILE
@@ -250,22 +251,22 @@
 *
          QTR = ONE / 4
          SAVEC = C
-         C = SLAMC3( C, -A )
+         C = TOAST_SLAMC3( C, -A )
          LBETA = C + QTR
 *
 *        Now determine whether rounding or chopping occurs,  by adding a
 *        bit  less  than  beta/2  and a  bit  more  than  beta/2  to  a.
 *
          B = LBETA
-         F = SLAMC3( B / 2, -B / 100 )
-         C = SLAMC3( F, A )
+         F = TOAST_SLAMC3( B / 2, -B / 100 )
+         C = TOAST_SLAMC3( F, A )
          IF( C.EQ.A ) THEN
             LRND = .TRUE.
          ELSE
             LRND = .FALSE.
          END IF
-         F = SLAMC3( B / 2, B / 100 )
-         C = SLAMC3( F, A )
+         F = TOAST_SLAMC3( B / 2, B / 100 )
+         C = TOAST_SLAMC3( F, A )
          IF( ( LRND ) .AND. ( C.EQ.A ) )
      $      LRND = .FALSE.
 *
@@ -275,8 +276,8 @@
 *        zero, and SAVEC is odd. Thus adding B/2 to A should not  change
 *        A, but adding B/2 to SAVEC should change SAVEC.
 *
-         T1 = SLAMC3( B / 2, A )
-         T2 = SLAMC3( B / 2, SAVEC )
+         T1 = TOAST_SLAMC3( B / 2, A )
+         T2 = TOAST_SLAMC3( B / 2, SAVEC )
          LIEEE1 = ( T1.EQ.A ) .AND. ( T2.GT.SAVEC ) .AND. LRND
 *
 *        Now find  the  mantissa, t.  It should  be the  integer part of
@@ -295,8 +296,8 @@
          IF( C.EQ.ONE ) THEN
             LT = LT + 1
             A = A*LBETA
-            C = SLAMC3( A, ONE )
-            C = SLAMC3( C, -A )
+            C = TOAST_SLAMC3( A, ONE )
+            C = TOAST_SLAMC3( C, -A )
             GO TO 30
          END IF
 *+       END WHILE
@@ -315,7 +316,8 @@
 *
 ************************************************************************
 *
-      SUBROUTINE SLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX, RMAX )
+      SUBROUTINE TOAST_SLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX,
+     $                         RMAX )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -388,11 +390,11 @@
      $                   SIXTH, SMALL, THIRD, TWO, ZERO
 *     ..
 *     .. External Functions ..
-      REAL               SLAMC3
-      EXTERNAL           SLAMC3
+      REAL               TOAST_SLAMC3
+      EXTERNAL           TOAST_SLAMC3
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           SLAMC1, SLAMC4, SLAMC5
+      EXTERNAL           TOAST_SLAMC1, TOAST_SLAMC4, TOAST_SLAMC5
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          ABS, MAX, MIN
@@ -421,7 +423,7 @@
 *
 *        SLAMC1 returns the parameters  LBETA, LT, LRND and LIEEE1.
 *
-         CALL SLAMC1( LBETA, LT, LRND, LIEEE1 )
+         CALL TOAST_SLAMC1( LBETA, LT, LRND, LIEEE1 )
 *
 *        Start to find EPS.
 *
@@ -433,10 +435,10 @@
 *
          B = TWO / 3
          HALF = ONE / 2
-         SIXTH = SLAMC3( B, -HALF )
-         THIRD = SLAMC3( SIXTH, SIXTH )
-         B = SLAMC3( THIRD, -HALF )
-         B = SLAMC3( B, SIXTH )
+         SIXTH = TOAST_SLAMC3( B, -HALF )
+         THIRD = TOAST_SLAMC3( SIXTH, SIXTH )
+         B = TOAST_SLAMC3( THIRD, -HALF )
+         B = TOAST_SLAMC3( B, SIXTH )
          B = ABS( B )
          IF( B.LT.LEPS )
      $      B = LEPS
@@ -447,11 +449,11 @@
    10    CONTINUE
          IF( ( LEPS.GT.B ) .AND. ( B.GT.ZERO ) ) THEN
             LEPS = B
-            C = SLAMC3( HALF*LEPS, ( TWO**5 )*( LEPS**2 ) )
-            C = SLAMC3( HALF, -C )
-            B = SLAMC3( HALF, C )
-            C = SLAMC3( HALF, -B )
-            B = SLAMC3( HALF, C )
+            C = TOAST_SLAMC3( HALF*LEPS, ( TWO**5 )*( LEPS**2 ) )
+            C = TOAST_SLAMC3( HALF, -C )
+            B = TOAST_SLAMC3( HALF, C )
+            C = TOAST_SLAMC3( HALF, -B )
+            B = TOAST_SLAMC3( HALF, C )
             GO TO 10
          END IF
 *+       END WHILE
@@ -468,13 +470,13 @@
          RBASE = ONE / LBETA
          SMALL = ONE
          DO 20 I = 1, 3
-            SMALL = SLAMC3( SMALL*RBASE, ZERO )
+            SMALL = TOAST_SLAMC3( SMALL*RBASE, ZERO )
    20    CONTINUE
-         A = SLAMC3( ONE, SMALL )
-         CALL SLAMC4( NGPMIN, ONE, LBETA )
-         CALL SLAMC4( NGNMIN, -ONE, LBETA )
-         CALL SLAMC4( GPMIN, A, LBETA )
-         CALL SLAMC4( GNMIN, -A, LBETA )
+         A = TOAST_SLAMC3( ONE, SMALL )
+         CALL TOAST_SLAMC4( NGPMIN, ONE, LBETA )
+         CALL TOAST_SLAMC4( NGNMIN, -ONE, LBETA )
+         CALL TOAST_SLAMC4( GPMIN, A, LBETA )
+         CALL TOAST_SLAMC4( GNMIN, -A, LBETA )
          IEEE = .FALSE.
 *
          IF( ( NGPMIN.EQ.NGNMIN ) .AND. ( GPMIN.EQ.GNMIN ) ) THEN
@@ -542,12 +544,12 @@
 *
          LRMIN = 1
          DO 30 I = 1, 1 - LEMIN
-            LRMIN = SLAMC3( LRMIN*RBASE, ZERO )
+            LRMIN = TOAST_SLAMC3( LRMIN*RBASE, ZERO )
    30    CONTINUE
 *
 *        Finally, call SLAMC5 to compute EMAX and RMAX.
 *
-         CALL SLAMC5( LBETA, LT, LEMIN, IEEE, LEMAX, LRMAX )
+         CALL TOAST_SLAMC5( LBETA, LT, LEMIN, IEEE, LEMAX, LRMAX )
       END IF
 *
       BETA = LBETA
@@ -574,7 +576,7 @@
 *
 ************************************************************************
 *
-      REAL             FUNCTION SLAMC3( A, B )
+      REAL             FUNCTION TOAST_SLAMC3( A, B )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -602,7 +604,7 @@
 *
 *     .. Executable Statements ..
 *
-      SLAMC3 = A + B
+      TOAST_SLAMC3 = A + B
 *
       RETURN
 *
@@ -612,7 +614,7 @@
 *
 ************************************************************************
 *
-      SUBROUTINE SLAMC4( EMIN, START, BASE )
+      SUBROUTINE TOAST_SLAMC4( EMIN, START, BASE )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -650,8 +652,8 @@
       REAL               A, B1, B2, C1, C2, D1, D2, ONE, RBASE, ZERO
 *     ..
 *     .. External Functions ..
-      REAL               SLAMC3
-      EXTERNAL           SLAMC3
+      REAL               TOAST_SLAMC3
+      EXTERNAL           TOAST_SLAMC3
 *     ..
 *     .. Executable Statements ..
 *
@@ -660,7 +662,7 @@
       RBASE = ONE / BASE
       ZERO = 0
       EMIN = 1
-      B1 = SLAMC3( A*RBASE, ZERO )
+      B1 = TOAST_SLAMC3( A*RBASE, ZERO )
       C1 = A
       C2 = A
       D1 = A
@@ -672,14 +674,14 @@
      $    ( D2.EQ.A ) ) THEN
          EMIN = EMIN - 1
          A = B1
-         B1 = SLAMC3( A / BASE, ZERO )
-         C1 = SLAMC3( B1*BASE, ZERO )
+         B1 = TOAST_SLAMC3( A / BASE, ZERO )
+         C1 = TOAST_SLAMC3( B1*BASE, ZERO )
          D1 = ZERO
          DO 20 I = 1, BASE
             D1 = D1 + B1
    20    CONTINUE
-         B2 = SLAMC3( A*RBASE, ZERO )
-         C2 = SLAMC3( B2 / RBASE, ZERO )
+         B2 = TOAST_SLAMC3( A*RBASE, ZERO )
+         C2 = TOAST_SLAMC3( B2 / RBASE, ZERO )
          D2 = ZERO
          DO 30 I = 1, BASE
             D2 = D2 + B2
@@ -696,7 +698,7 @@
 *
 ************************************************************************
 *
-      SUBROUTINE SLAMC5( BETA, P, EMIN, IEEE, EMAX, RMAX )
+      SUBROUTINE TOAST_SLAMC5( BETA, P, EMIN, IEEE, EMAX, RMAX )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -753,8 +755,8 @@
       REAL               OLDY, RECBAS, Y, Z
 *     ..
 *     .. External Functions ..
-      REAL               SLAMC3
-      EXTERNAL           SLAMC3
+      REAL               TOAST_SLAMC3
+      EXTERNAL           TOAST_SLAMC3
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MOD
@@ -838,7 +840,7 @@
          Z = Z*RECBAS
          IF( Y.LT.ONE )
      $      OLDY = Y
-         Y = SLAMC3( Y, Z )
+         Y = TOAST_SLAMC3( Y, Z )
    20 CONTINUE
       IF( Y.GE.ONE )
      $   Y = OLDY
@@ -846,7 +848,7 @@
 *     Now multiply by BETA**EMAX to get RMAX.
 *
       DO 30 I = 1, EMAX
-         Y = SLAMC3( Y*BETA, ZERO )
+         Y = TOAST_SLAMC3( Y*BETA, ZERO )
    30 CONTINUE
 *
       RMAX = Y
