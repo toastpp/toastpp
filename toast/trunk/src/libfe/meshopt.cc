@@ -76,7 +76,8 @@ FELIB int SortBndToEnd (Mesh &mesh, int *perm)
 
 FELIB int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len)
 {
-    int i, *rowptr, *colidx, nzero, nfirst, maskval, nds = mesh.nlen();
+    int i, nzero, nfirst, maskval, nds = mesh.nlen();
+	idxtype *rowptr, *colidx;
     int iperm0 = 0;
     int *mask = new int[nds];
     int *riord = new int[nds];
@@ -124,7 +125,8 @@ FELIB int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
 {
     int i, j, k, idx, iflag, nofsub, nds = mesh.nlen();
     int iwsiz = 4*nds, *iwork = new int[iwsiz]; // work space
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+	int nzero;
 
     mesh.SparseRowStructure (rowptr, colidx, nzero);
 

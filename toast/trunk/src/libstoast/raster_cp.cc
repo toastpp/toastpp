@@ -110,13 +110,13 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 	if (!(i % 100))
 	    cerr << i << '/' << blen << endl;
     }
-    int *rowptr = new int[blen+1];
-    int *colidx = new int[nz_tot];
+    idxtype *rowptr = new idxtype[blen+1];
+    idxtype *colidx = new idxtype[nz_tot];
     double *val = new double[nz_tot];
     rowptr[0] = 0;
     for (i = j = 0; i < blen; i++) {
 	if (g_rownz[i]) {
-	    memcpy (colidx+j, g_colidx[i], g_rownz[i]*sizeof(int));
+	    memcpy (colidx+j, g_colidx[i], g_rownz[i]*sizeof(idxtype));
 	    memcpy (val+j, g_val[i], g_rownz[i]*sizeof(double));
 	    j += g_rownz[i];
 	    delete []g_val[i];
@@ -171,13 +171,13 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 	if (!(j % 1000))
 	    cerr << j << '/' << glen << endl;
     }
-    rowptr = new int[glen+1];
-    colidx = new int[nz_tot];
+    rowptr = new idxtype[glen+1];
+    colidx = new idxtype[nz_tot];
     val = new double[nz_tot];
     rowptr[0] = 0;
     for (j = i = 0; j < glen; j++) {
 	if (gi_rownz[j]) {
-	    memcpy (colidx+i, gi_colidx[j], gi_rownz[j]*sizeof(int));
+	    memcpy (colidx+i, gi_colidx[j], gi_rownz[j]*sizeof(idxtype));
 	    memcpy (val+i, gi_val[j], gi_rownz[j]*sizeof(double));
 	    i += gi_rownz[j];
 	    delete []gi_val[j];

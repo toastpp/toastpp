@@ -481,7 +481,7 @@ public:
      */
     inline int Sol2Basis (int j) const { return sol2basis[j]; }
 
-    void NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const;
+    void NeighbourGraph (idxtype *&rowptr, idxtype *&colidx, int &nzero) const;
     void NeighbourGraph (ICompRowMatrix &NG) const;
     IVector NeighbourShift (const ICompRowMatrix &NG, int i, int j) const;
     RVector RNeighbourShift (const ICompRowMatrix &NG, int i, int j) const;

@@ -175,7 +175,7 @@ public:
     Point NeighbourBarycentre (int node);
     // returns the barycentre position of the neighbours of 'node'.
 
-    void SparseRowStructure (int *&rowptr, int *&colidx, int &nzero) const;
+    void SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const;
     // generate row and column index lists for a system matrix in
     // compressed row format corresponding to the mesh
     // See SparseLib++ documentation, "Compressed row storage" for format

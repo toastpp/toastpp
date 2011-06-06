@@ -378,7 +378,7 @@ Point Mesh::NeighbourBarycentre (int node)
     return bc;
 }
 
-void Mesh::SparseRowStructure (int *&rowptr, int *&colidx, int &nzero) const
+void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) const
 {
     // M.S. 1.10.99: Check that this works for higher-order element types
     // (TRI6 and TET10)
@@ -488,8 +488,8 @@ void Mesh::SparseRowStructure (int *&rowptr, int *&colidx, int &nzero) const
     }
     //if (pair[0].n1 == 0 && pair[0].n2 == 0) pair[0].n1 = -1, nzero--;
 
-    colidx = new int[nzero];
-    rowptr = new int[nlen()+1];
+    colidx = new idxtype[nzero];
+    rowptr = new idxtype[nlen()+1];
     
     for (i = pi = ri = ci = 0; i < npair; i++) {
 	if (pair[i].n1 < 0) continue;
@@ -510,7 +510,8 @@ void Mesh::SparseRowStructure (int *&rowptr, int *&colidx, int &nzero) const
 void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
 {
     dASSERT(nnode <= nlen(), Paramter out of range);
-    int i, nzero, *rowptr, *colidx;
+    int i, nzero;
+	idxtype *rowptr, *colidx;
     SparseRowStructure (rowptr, colidx, nzero);
 
     for (i = 0; i < nnode; i++)
@@ -2135,8 +2136,8 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     int nzero = 0;
     for (i = 0; i < rlen; i++)
         if (elref[i] >= 0) nzero += mesh.elist[elref[i]]->nNode();
-    int *rowptr = new int[rlen+1];
-    int *colidx = new int[nzero];
+    idxtype *rowptr = new idxtype[rlen+1];
+    idxtype *colidx = new idxtype[nzero];
     double *data = new double[nzero];
     rowptr[0] = 0;
 
@@ -2314,7 +2315,8 @@ RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh, const IVector &gdim,
 {
     const double EPS = 1e-8;
     int i, n, d, i0[3], idx, idx0, dim = mesh.Dimension();
-    int nzero, *rowptr, *colidx;
+    int nzero;
+	idxtype *rowptr, *colidx;
     int nx = gdim[0], ny = gdim[1], nz = (dim > 2 ? gdim[2] : 1);
     int pix;
     int rlen = nx*ny*nz;
@@ -2398,8 +2400,8 @@ RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh, const IVector &gdim,
     for (nzero = mesh.nlen(), d = 0; d < dim; d++) nzero *= 2;
     // assuming linear interpolation between nearest pixels
 
-    rowptr = new int[mesh.nlen()+1];
-    colidx = new int[nzero];
+    rowptr = new idxtype[mesh.nlen()+1];
+    colidx = new idxtype[nzero];
     data   = new double[nzero];
     rowptr[0] = 0;
 
@@ -2549,14 +2551,14 @@ RGenericSparseMatrix *NodeMapMatrix2 (const Mesh &mesh, const IVector &gdim,
 	for (i = 0; i < nn; i++)
 	    ngno[nd[i]] += egno[el];
     }
-    int *rowptr = new int[nlen+1];
-    int *rowp = new int[nlen];
+    idxtype *rowptr = new idxtype[nlen+1];
+    idxtype *rowp = new idxtype[nlen];
     rowptr[0] = 0;
     for (i = 0; i < nlen; i++)
 	rowptr[i+1] = rowptr[i]+ngno[i];
-    memcpy (rowp, rowptr, nlen*sizeof(int));
+    memcpy (rowp, rowptr, nlen*sizeof(idxtype));
     nzero = rowptr[nlen];
-    int *colidx = new int[nzero];
+    idxtype *colidx = new idxtype[nzero];
     double *data = new double[nzero];
 
     double dx = ((*bbmax)[0]-(*bbmin)[0])/(double)(nx-1);
@@ -2801,7 +2803,7 @@ RGenericSparseMatrix *Grid2LinPixMatrix (const IVector &gdim,
     }
 
     // pass 1: find sparsity structure of map matrix
-    int *rowptr = new int[blen+1];
+    idxtype *rowptr = new idxtype[blen+1];
     rowptr[idx=0] = 0;
 
     // loop over coarse pixel grid
@@ -2873,7 +2875,7 @@ RGenericSparseMatrix *Grid2LinPixMatrix (const IVector &gdim,
     //cerr << "Grid2LinPixMatrix: found " << nzero << " nonzeros" << endl;
 
     // pass 2: construct map matrix
-    int *colidx = new int[nzero];
+    idxtype *colidx = new idxtype[nzero];
     double *val = new double[nzero];
 
     // loop over coarse pixel grid
@@ -3028,11 +3030,11 @@ RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
     }
 
     int nzero;
-    int *rowptr = new int[ng+1];
+    idxtype *rowptr = new idxtype[ng+1];
     rowptr[0] = 0;
     for (i = 0; i < ng; i++) rowptr[i+1] = rowptr[i]+rowentry[i];
     nzero = rowptr[ng];
-    int *colidx = new int[nzero];
+    idxtype *colidx = new idxtype[nzero];
     double *val = new double[nzero];
 
     // pass 2: generate matrix
@@ -3266,7 +3268,7 @@ RGenericSparseMatrix *LinPix2GridMatrix (const IVector &gdim,
 	    }
 	}
     }
-    int *rowptr = new int[glen+1];
+    idxtype *rowptr = new idxtype[glen+1];
     rowptr[0] = 0;
     for (i = 0; i < glen; i++)
         rowptr[i+1] = rowptr[i] + rowlen[i];
@@ -3274,7 +3276,7 @@ RGenericSparseMatrix *LinPix2GridMatrix (const IVector &gdim,
     //cerr << "LinPix2GridMatrix: found " << nzero << " nonzeros" << endl;
 
     // pass 2: construct map matrix
-    int *colidx = new int[nzero];
+    idxtype *colidx = new idxtype[nzero];
     double *val = new double[nzero];
     for (i = 0; i < glen; i++) rowlen[i] = 0;
 

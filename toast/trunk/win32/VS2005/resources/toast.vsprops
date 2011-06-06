@@ -8,12 +8,12 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="&quot;$(ToastRootDir)&quot;;&quot;$(ToastRootDir)include&quot;;&quot;$(ToastSrcDir)libmath&quot;;&quot;$(ToastSrcDir)libfe&quot;;&quot;$(ToastSrcDir)libstoast&quot;;&quot;$(ToastSrcDir)libbemdiff&quot;;&quot;$(ToastSrcDir)libbem&quot;;&quot;$(ToastRootDir)numerics\ILUPACK\include&quot;"
+		AdditionalIncludeDirectories="&quot;$(ToastRootDir)&quot;;&quot;$(ToastRootDir)include&quot;;&quot;$(ToastSrcDir)libmath&quot;;&quot;$(ToastSrcDir)libfe&quot;;&quot;$(ToastSrcDir)libstoast&quot;;&quot;$(ToastSrcDir)libbemdiff&quot;;&quot;$(ToastSrcDir)libbem&quot;;&quot;$(ToastRootDir)numerics\SuperLU_4.1\SRC&quot;;&quot;$(ToastRootDir)numerics\ILUPACK\include&quot;"
 		PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="$(BlasLib) SuperLU_40.lib"
+		AdditionalDependencies="$(BlasLib) superlu_41.lib"
 		AdditionalLibraryDirectories="&quot;$(ToastLibDir)&quot;;&quot;$(ToastAuxLibDir)&quot;"
 	/>
 	<Tool

@@ -7,7 +7,7 @@
 #include "camera.h"
 
 #if (defined(WIN32)||defined(WIN64))
-#include <windows.h>
+//#include <windows.h>
 #endif
 #include "GL/gl.h"
 #include "GL/osmesa.h"

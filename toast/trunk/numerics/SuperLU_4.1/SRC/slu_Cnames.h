@@ -22,8 +22,9 @@
 
 
 // Force use of TOAST version of BLAS libraries (32-bit integer)
+#ifndef WIN32
 #define TOAST_BLAS_32INT
-
+#endif
 
 
 #define ADD_       0

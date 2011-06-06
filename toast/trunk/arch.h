@@ -19,6 +19,7 @@
 
 // avoid annoying warnings
 #define hypot(x,y) _hypot((x),(y))
+#define isnan(x) _isnan((x))
 #define getpid() _getpid()
 #define getcwd(buffer,maxlen) _getcwd(buffer,maxlen)
 #define unlink(fname) _unlink(fname)

@@ -9,7 +9,9 @@
 #include "util.h"
 #include "colamd.h"
 
-extern int  genmmd_(int *, int *, int *, int *, int *, int *, int *, 
+typedef int idxtype;
+
+extern int  genmmd_(int *, idxtype *, idxtype *, int *, int *, int *, int *, 
 		    int *, int *, int *, int *, int *);
 
 void

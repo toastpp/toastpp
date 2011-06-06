@@ -276,8 +276,8 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     d = s;
     delta_new = r & d;                 // r^t M^-1 r
     delta_0 = delta_new;
-
-    while (i_count < itmax && delta_new > cg_tol*cg_tol*delta_0) {
+	
+	while (i_count < itmax && delta_new > cg_tol*cg_tol*delta_0) {
         delta_d = d & d;
 
 	if (!alpha) { // initialise step length
@@ -520,7 +520,8 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     RCompRowMatrix &ata_L, RVector &ata_d)
 {
     int i, i0, i1, k, row, col;
-    int *rowptr, *rowptr2, *colidx, *colidx2, nzero, nzero2;
+    int nzero, nzero2;
+	idxtype *rowptr, *rowptr2, *colidx, *colidx2;
     int slen = raster.SLen();
     int n    = slen*2; // mua and kappa
     int nr   = a.nRows();
@@ -532,8 +533,8 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     // duplicate the nonzero structure in both rows and columns
     LOGOUT ("Building ATA sparsity pattern");
     nzero2 = nzero*4;
-    rowptr2 = new int[n+1];
-    colidx2 = new int[nzero2];
+    rowptr2 = new idxtype[n+1];
+    colidx2 = new idxtype[nzero2];
     for (i = 0; i <= slen; i++)
         rowptr2[i] = rowptr[i]*2;
     for (i = 1; i <= slen; i++)
@@ -568,10 +569,10 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
 
     // sanity check: test symmetry
     for (i = 0; i < n; i++) {
-        int c1 = rowptr2[i];
-	int c2 = rowptr2[i+1];
+        idxtype c1 = rowptr2[i];
+	idxtype c2 = rowptr2[i+1];
 	for (int j = c1; j < c2; j++) {
-  	    int c = colidx2[j];
+  	    idxtype c = colidx2[j];
 	    double v = valptr2[j];
 	    if (v != ata(c,i))
 	        LOGOUT ("JTJ not symmetric!");
