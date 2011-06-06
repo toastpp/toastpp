@@ -282,6 +282,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\libstoast\fwdsolver_cslu.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libstoast\fwdsolver_zslu.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\libstoast\GLProjector.cc"
 				>
 				<FileConfiguration
@@ -373,6 +381,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\libstoast\fwdsolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libstoast\fwdsolver_cslu.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libstoast\fwdsolver_zslu.h"
 				>
 			</File>
 			<File

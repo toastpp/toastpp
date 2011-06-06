@@ -432,7 +432,7 @@ IVector &Raster::GetGridIndices (int grididx) const
 
 // ==========================================================================
 
-void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
+void Raster::NeighbourGraph (idxtype *&rowptr, idxtype *&colidx, int &nzero) const
 {
     // Produces a graph in the solution basis (i.e. supported voxels only)
 
@@ -498,8 +498,8 @@ void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
     exit (1);
 #endif
 
-    int *browptr = new int[blen+1];
-    int *bcolidx;
+    idxtype *browptr = new idxtype[blen+1];
+    idxtype *bcolidx;
     browptr[0] = 0;
     int bnzero = 0;
 
@@ -533,7 +533,7 @@ void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
 	    }
 	}
 
-	bcolidx = new int[bnzero];
+	bcolidx = new idxtype[bnzero];
 	for (j = c = 0; j < ny; j++) {
 	    for (i = 0; i < nx; i++) {
 	        for (s = 0; s < stencil2D_len; s++) {
@@ -566,7 +566,7 @@ void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
 	    }
 	}
 
-	bcolidx = new int[bnzero];
+	bcolidx = new idxtype[bnzero];
 	for (k = c = 0; k < nz; k++) {
 	    for (j = 0; j < ny; j++) {
 	        for (i = 0; i < nx; i++) {
@@ -588,7 +588,7 @@ void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
     // now we need to remove rows and columns with unsupported
     // raster points, i.e. transform basis -> solution
     nzero = 0;
-    rowptr = new int[slen+1];
+    rowptr = new idxtype[slen+1];
     rowptr[0] = 0;
     for (i = r = 0; i < blen; i++) {
         if (basis2sol[i] >= 0) {
@@ -601,7 +601,7 @@ void Raster::NeighbourGraph (int *&rowptr, int *&colidx, int &nzero) const
 	    rowptr[++r] = nzero;
 	}
     }
-    colidx = new int[nzero];
+    colidx = new idxtype[nzero];
     for (i = k = r = 0; i < blen; i++) {
         if (basis2sol[i] >= 0) {
 	    for (j = browptr[i]; j < browptr[i+1]; j++) {
@@ -694,9 +694,10 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
     exit (1);
 #endif
 
-    int *browptr = new int[glen+1];
-    int *bcolidx, *bconnect;
-    int *rowptr, *colidx, *connect, nzero;
+    idxtype *browptr = new idxtype[glen+1];
+    idxtype *bcolidx;
+    idxtype *rowptr, *colidx;
+	int nzero, *bconnect, *connect;
     browptr[0] = 0;
     int bnzero = 0;
 
@@ -730,7 +731,7 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
 	    }
 	}
 
-	bcolidx = new int[bnzero];
+	bcolidx = new idxtype[bnzero];
 	bconnect = new int[bnzero];
 	for (j = c = 0; j < ny; j++) {
 	    for (i = 0; i < nx; i++) {
@@ -769,7 +770,7 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
 	    }
 	}
 
-	bcolidx = new int[bnzero];
+	bcolidx = new idxtype[bnzero];
 	bconnect = new int[bnzero];
 	for (k = c = 0; k < nz; k++) {
 	    for (j = 0; j < ny; j++) {
@@ -798,7 +799,7 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
     // now we need to remove rows and columns with unsupported
     // raster points, i.e. transform basis -> solution
     nzero = 0;
-    rowptr = new int[slen+1];
+    rowptr = new idxtype[slen+1];
     rowptr[0] = 0;
     for (i = r = 0; i < glen; i++) {
         if (basis2sol[i] >= 0) {
@@ -811,7 +812,7 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
 	    rowptr[++r] = nzero;
 	}
     }
-    colidx = new int[nzero];
+    colidx = new idxtype[nzero];
     connect = new int[nzero];
     for (i = k = r = 0; i < glen; i++) {
         if (basis2sol[i] >= 0) {

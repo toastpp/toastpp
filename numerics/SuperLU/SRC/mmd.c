@@ -1,4 +1,4 @@
-
+typedef int idxtype;
 typedef int shortint;
 
 /* *************************************************************** */
@@ -48,7 +48,7 @@ typedef int shortint;
 
 /* *************************************************************** */
 
-/* Subroutine */ int genmmd_(int *neqns, int *xadj, shortint *adjncy, 
+/* Subroutine */ int genmmd_(int *neqns, idxtype *xadj, idxtype *adjncy, 
 	shortint *invp, shortint *perm, int *delta, shortint *dhead, 
 	shortint *qsize, shortint *llist, shortint *marker, int *maxint, 
 	int *nofsub)
@@ -58,12 +58,12 @@ typedef int shortint;
 
     /* Local variables */
     static int mdeg, ehead, i, mdlmt, mdnode;
-    extern /* Subroutine */ int mmdelm_(int *, int *, shortint *, 
+    extern /* Subroutine */ int mmdelm_(int *, idxtype *, idxtype *, 
 	    shortint *, shortint *, shortint *, shortint *, shortint *, 
 	    shortint *, int *, int *), mmdupd_(int *, int *, 
-	    int *, shortint *, int *, int *, shortint *, shortint 
+	    idxtype *, idxtype *, int *, int *, shortint *, shortint 
 	    *, shortint *, shortint *, shortint *, shortint *, int *, 
-	    int *), mmdint_(int *, int *, shortint *, shortint *, 
+	    int *), mmdint_(int *, idxtype *, idxtype *, shortint *, 
 	    shortint *, shortint *, shortint *, shortint *, shortint *), 
 	    mmdnum_(int *, shortint *, shortint *, shortint *);
     static int nextmd, tag, num;
@@ -235,7 +235,7 @@ L1000:
 
 /* *************************************************************** */
 
-/* Subroutine */ int mmdint_(int *neqns, int *xadj, shortint *adjncy, 
+/* Subroutine */ int mmdint_(int *neqns, idxtype *xadj, idxtype *adjncy, 
 	shortint *dhead, shortint *dforw, shortint *dbakw, shortint *qsize, 
 	shortint *llist, shortint *marker)
 {
@@ -319,7 +319,7 @@ L1000:
 
 /* *************************************************************** */
 
-/* Subroutine */ int mmdelm_(int *mdnode, int *xadj, shortint *adjncy,
+/* Subroutine */ int mmdelm_(int *mdnode, idxtype *xadj, idxtype *adjncy,
 	 shortint *dhead, shortint *dforw, shortint *dbakw, shortint *qsize, 
 	shortint *llist, shortint *marker, int *maxint, int *tag)
 {
@@ -566,8 +566,8 @@ L1800:
 
 /* *************************************************************** */
 
-/* Subroutine */ int mmdupd_(int *ehead, int *neqns, int *xadj, 
-	shortint *adjncy, int *delta, int *mdeg, shortint *dhead, 
+/* Subroutine */ int mmdupd_(int *ehead, int *neqns, idxtype *xadj, 
+	idxtype *adjncy, int *delta, int *mdeg, shortint *dhead, 
 	shortint *dforw, shortint *dbakw, shortint *qsize, shortint *llist, 
 	shortint *marker, int *maxint, int *tag)
 {

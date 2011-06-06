@@ -1157,7 +1157,7 @@ RVector GenericSigma::GetFullHessf (const RVector &x, const RVector &f) const
     return RVector();
 }
 
-int GenericSigma::GetHessianRow (const RVector &x, int row, int *colidx,
+int GenericSigma::GetHessianRow (const RVector &x, int row, idxtype *colidx,
     double *val) const
   // DEFINITELY need to check with Martin !
 {
@@ -1792,7 +1792,7 @@ RVector GenericScaleSpace::GetFullHessf (const RVector &x, const RVector &f) con
 }
 
 
-int GenericScaleSpace::GetHessianRow (const RVector &x, int i, int *colidx,
+int GenericScaleSpace::GetHessianRow (const RVector &x, int i, idxtype *colidx,
     double *val) const
 {
     colidx[0] = i;  // diagonal only
@@ -1827,7 +1827,7 @@ RVector NullRegularisation::GetHess1f(const RVector &x,const RVector &f) const
 {
     return RVector (x.Dim());
 }
-int NullRegularisation::GetHessianRow (const RVector &x, int i, int *colidx,
+int NullRegularisation::GetHessianRow (const RVector &x, int i, idxtype *colidx,
     double *val) const
 {
     return 0;
@@ -1911,7 +1911,7 @@ void Tikhonov0::SetHessianFromKappa (RCompRowMatrix &Hess, const RVector &kappa)
 }
 
 
-int Tikhonov0::GetHessianRow (const RVector &x, int i, int *colidx,
+int Tikhonov0::GetHessianRow (const RVector &x, int i, idxtype *colidx,
     double *val) const
 {
     colidx[0] = i;  // diagonal only
@@ -1968,7 +1968,8 @@ void Tikhonov1::CreateHessian (const Raster *raster,
 
     int slen = raster->SLen();
     int dim  = raster->Dim();
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+	int nzero;
     int row, col, i, i0, i1, cnt_idx, cntj, j;
     raster->NeighbourGraph (rowptr, colidx, nzero);
     double valsum, *valptr = new double[nzero];
@@ -2046,7 +2047,7 @@ RVector Tikhonov1::GetHess1f(const RVector &x,const RVector &f) const
     return grad * tau;
 }
 
-int Tikhonov1::GetHessianRow (const RVector &x, int i, int *colidx,
+int Tikhonov1::GetHessianRow (const RVector &x, int i, idxtype *colidx,
     double *val) const
 {
     int j, nz = Laplacian->SparseRow (i%pdim, colidx, val);
@@ -2062,7 +2063,7 @@ int Tikhonov1::GetHessianRow (const RVector &x, int i, int *colidx,
 void Tikhonov1::SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p)
 {
     int i, j, nz;
-    int *colidx = new int[pdim];
+    idxtype *colidx = new idxtype[pdim];
     double *val = new double[pdim];
 
     //RVector dx (x - *x0);
@@ -2293,7 +2294,7 @@ RVector TVSigmaOLD::GetHess1f(const RVector &x,const RVector &f) const
 }
 
 
-int TVSigmaOLD::GetHessianRow (const RVector &x, int row, int *colidx,
+int TVSigmaOLD::GetHessianRow (const RVector &x, int row, idxtype *colidx,
     double *val) const
   // DEFINITELY need to check with Martin !
 {

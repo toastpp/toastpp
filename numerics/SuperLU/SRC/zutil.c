@@ -26,7 +26,7 @@
 
 void
 toast_zCreate_CompCol_Matrix(SuperMatrix *A, int m, int n, int nnz, 
-		       doublecomplex *nzval, int *rowind, int *colptr,
+		       doublecomplex *nzval, idxtype *rowind, idxtype *colptr,
 		       Stype_t stype, Dtype_t dtype, Mtype_t mtype)
 {
     NCformat *Astore;

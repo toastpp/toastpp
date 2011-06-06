@@ -35,8 +35,8 @@ Raster_Pixel::Raster_Pixel (const IVector &_bdim, const IVector &_gdim,
     }
 
     // formulate basis->solution mapping in sparse matrix
-    int *rowptr = new int[slen+1];
-    int *colidx = new int[slen];
+    idxtype *rowptr = new idxtype[slen+1];
+    idxtype *colidx = new idxtype[slen];
     double *val = new double[slen];
     for (i = 0; i <= slen; i++) rowptr[i] = i; // each row has one entry
     for (i = 0; i < slen; i++) val[i] = 1.0;

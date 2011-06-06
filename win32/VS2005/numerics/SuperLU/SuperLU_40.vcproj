@@ -97,7 +97,68 @@
 			OutputDirectory="$(ToastObjDir)"
 			IntermediateDirectory="$(ToastObjDir)"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(SolutionDir)resources\toast.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(ToastRootDir)numerics\SuperLU_40\SRC&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SUPERLU_40_EXPORTS"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(ToastLibDir)$(ProjectName).lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy $(ToastRootDir)numerics\SuperLU_4.0\SRC\slu_zdefs.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.0\SRC\slu_Cnames.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.0\SRC\slu_util.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.0\SRC\slu_dcomplex.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.0\SRC\supermatrix.h $(ToastIncDir)&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_fdot|Win32"
+			ConfigurationType="4"
+			InheritedPropertySheets="..\..\resources\toastlib.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>

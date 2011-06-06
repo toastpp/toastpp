@@ -8,16 +8,19 @@
 // ==========================================================================
 
 #define MATHLIB_IMPLEMENTATION
-#include <pthread.h>
 #include "mathlib.h"
 #ifdef HAVE_ILU
+#include <pthread.h>
 #include "ilutoast.h"
 #include <ilupack.h>
 #endif // HAVE_ILU
 
 using namespace std;
 using namespace toast;
+
+#ifdef HAVE_ILU
 pthread_mutex_t sid_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif // HAVE_ILU
 
 // ==========================================================================
 // class TPreconditioner

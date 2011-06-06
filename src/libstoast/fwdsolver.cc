@@ -79,11 +79,6 @@ void TFwdSolver<T>::Setup ()
 
 // =========================================================================
 
-template<class T>
-void TFwdSolver<T>::SetupType ()
-{
-}
-
 template<>
 void TFwdSolver<toast::complex>::SetupType ()
 {
@@ -96,12 +91,12 @@ void TFwdSolver<scomplex>::SetupType ()
     SuperLU = new CSuperLU ();
 }
 
-// =========================================================================
-
 template<class T>
-void TFwdSolver<T>::DeleteType ()
+void TFwdSolver<T>::SetupType ()
 {
 }
+
+// =========================================================================
 
 template<>
 void TFwdSolver<toast::complex>::DeleteType ()
@@ -113,6 +108,11 @@ template<>
 void TFwdSolver<scomplex>::DeleteType ()
 {
     delete (CSuperLU*)SuperLU;
+}
+
+template<class T>
+void TFwdSolver<T>::DeleteType ()
+{
 }
 
 // =========================================================================
@@ -168,7 +168,8 @@ void TFwdSolver<float>::Allocate (const QMMesh &mesh)
 template<>
 void TFwdSolver<double>::Allocate (const QMMesh &mesh)
 {
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+	int nzero;
     int n = mesh.nlen();
     int nq = mesh.nQ;
 
@@ -203,7 +204,8 @@ void TFwdSolver<double>::Allocate (const QMMesh &mesh)
 template<>
 void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
 {
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+	int nzero;
     int n = mesh.nlen();
     int nq = mesh.nQ;
 
@@ -402,7 +404,8 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
     xASSERT(mesh, No mesh information available);
 
     if (!B) { // allocate on the fly
-	int *rowptr, *colidx, nzero, n = mesh->nlen();
+	idxtype *rowptr, *colidx;
+	int nzero, n = mesh->nlen();
 	mesh->SparseRowStructure (rowptr, colidx, nzero);
 	B = new TCompRowMatrix<T> (n, n, rowptr, colidx);
 	delete []rowptr;
@@ -557,6 +560,35 @@ void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
     //cerr << "Solve time = " << solver_time << endl;
 }
 
+template<>
+void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
+    CVector *phi, IterativeSolverResult *res) const
+{
+    // calculate the fields for all sources
+    static IterativeSolverResult s_res_single;
+    IterativeSolverResult *res_single = 0;
+    if (res) {
+        res_single = &s_res_single;
+	res->it_count = 0;
+	res->rel_err = 0.0;
+    }
+
+    int i, nq = qvec.nRows();
+
+    if (solvertp == LSOLVER_DIRECT) {
+	((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
+        //for (i = 0; i < nq; i++) {
+	//    CalcField (qvec.Row(i), phi[i], res);
+	//}
+    } else {
+        CVector *qv = new CVector[nq];
+	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
+        IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
+            precon, res);
+	delete []qv;
+    }
+}
+
 template<class T>
 void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
     TVector<T> *phi, IterativeSolverResult *res) const
@@ -625,35 +657,6 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
     delete []phi_single;
 
 #endif
-}
-
-template<>
-void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
-    CVector *phi, IterativeSolverResult *res) const
-{
-    // calculate the fields for all sources
-    static IterativeSolverResult s_res_single;
-    IterativeSolverResult *res_single = 0;
-    if (res) {
-        res_single = &s_res_single;
-	res->it_count = 0;
-	res->rel_err = 0.0;
-    }
-
-    int i, nq = qvec.nRows();
-
-    if (solvertp == LSOLVER_DIRECT) {
-	((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
-        //for (i = 0; i < nq; i++) {
-	//    CalcField (qvec.Row(i), phi[i], res);
-	//}
-    } else {
-        CVector *qv = new CVector[nq];
-	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
-        IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
-            precon, res);
-	delete []qv;
-    }
 }
 
 // =========================================================================

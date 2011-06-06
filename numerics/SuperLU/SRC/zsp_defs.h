@@ -24,6 +24,9 @@
 #include "supermatrix.h"
 #include "dcomplex.h"
 
+// TEMPORARY!!! This is copied over from mathdef.h
+// Need a better way to include.
+typedef int idxtype;
 
 /* No of marker arrays used in the symbolic factorization,
    each of size n */
@@ -134,7 +137,7 @@ toast_zgssvx(char *, char *, char *, SuperMatrix *, factor_param_t *,
 /* Supernodal LU factor related */
 extern void
 toast_zCreate_CompCol_Matrix(SuperMatrix *, int, int, int, doublecomplex *,
-		       int *, int *, Stype_t, Dtype_t, Mtype_t);
+		       idxtype *, idxtype *, Stype_t, Dtype_t, Mtype_t);
 extern void
 toast_zCopy_CompCol_Matrix(SuperMatrix *, SuperMatrix *);
 extern void

@@ -84,7 +84,7 @@ public:
 
   //    virtual void SetHessian (RCompRowMatrix &Hess, const RVector &x) =0;
 
-    virtual int GetHessianRow (const RVector &x, int i, int *colidx,
+    virtual int GetHessianRow (const RVector &x, int i, idxtype *colidx,
         double *val) const = 0;
     // returns single row i of the 2nd derivative matrix
     // d^2 psi / dx_i dx_j in sparse vector format. Return value is
@@ -109,7 +109,8 @@ protected:
     const Raster *raster;
     const RVector *x0;
     int slen, glen, dim;
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+	int nzero;
     RCompRowMatrix Hs1p; // will hold sparse matrix structure for 1 Hessian
 };
 #ifdef REG_1ST_ORDER
@@ -185,7 +186,7 @@ public:
     RVector GetFullHessf (const RVector &x, const RVector &f) const;
   //    void SetHessian (RCompRowMatrix &Hess, const RVector &x) ;
 
-    int GetHessianRow (const RVector &x, int i, int *colidx, double *val)const;
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)const;
 
     RVector GetHessianDiag (const RVector &x) const ;
 
@@ -680,7 +681,7 @@ public:
     RVector GetFullHessf (const RVector &x, const RVector &f) const;
   //    void SetHessian (RCompRowMatrix &Hess, const RVector &x) ;
 
-    int GetHessianRow (const RVector &x, int i, int *colidx, double *val) const;
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val) const;
 
     RVector GetHessianDiag (const RVector &x) const ;
 
@@ -720,7 +721,7 @@ public:
 
     void SetHessian (RCompRowMatrix &Hess, const RVector &x) {}
     void SetHessianFromKappa(RCompRowMatrix &Hess, const RVector &kappa) {}
-    int GetHessianRow (const RVector &x, int i, int *colidx, double *val)
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
         const;
     RVector GetHessianDiag (const RVector &x) const;
 
@@ -746,7 +747,7 @@ public:
     RVector GetHess1f   (const RVector &x, const RVector &f) const;
     void SetHessian (RCompRowMatrix &Hess, const RVector &x);
     void SetHessianFromKappa(RCompRowMatrix &Hess, const RVector &kappa);
-    int GetHessianRow (const RVector &x, int i, int *colidx, double *val)
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
         const;
     RVector GetHessianDiag (const RVector &x) const;
 
@@ -779,7 +780,7 @@ public:
     void SetHessianFromKappa(RCompRowMatrix &Hess, const RVector &kappa) {
       //      CreateHessian(raster,kappa,Hess);
     };
-    int GetHessianRow (const RVector &x, int i, int *colidx, double *val)
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
         const;
     RVector GetHessianDiag (const RVector &x) const;
     void SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p);
@@ -817,7 +818,7 @@ public:
       //      CreateHessian(raster,_kap,Hess);
     };
     void OLDSetHessian (const RVector &x) const;
-    int GetHessianRow (const RVector &x, int i, int *colidx, double *val)
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
         const;
     RVector GetHessianDiag (const RVector &x) const;
   /* undefined functions */
