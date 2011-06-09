@@ -327,15 +327,15 @@ public:
         RGenericSparseMatrix &M, const RVector &modulus,
 	const RVector &pratio);
 
-    friend void AddToRHS_elasticity (const Mesh &mesh, RVector &rhs,
+    friend FELIB void AddToRHS_elasticity (const Mesh &mesh, RVector &rhs,
         const RVector *coeff, int mode);
     // Adds a component to an rhs vector, given the specified mode
 
-    friend void AddToRHS_thermal_expansion (const Mesh &mesh, RVector &rhs,
+    friend FELIB void AddToRHS_thermal_expansion (const Mesh &mesh, RVector &rhs,
         const RVector &modulus, const RVector &pratio,
 	const RVector &thermal_expansion, double deltaT);
 
-    friend void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
+    friend FELIB void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
         RGenericSparseMatrix &M, double E, double nu, int *nf);
 
     /**
