@@ -34,6 +34,12 @@
 #define VERBOSE_LEVEL 1
 // Log file verbosity level
 
+#ifdef TOAST_THREAD
+#define THREAD_LEVEL 2 // 0=none, 1=fine-grain, 2=coarse-grain
+#else
+#define THREAD_LEVEL 0
+#endif
+
 #include "blasnames.h"
 
 #if (!defined(WIN32))&&(!defined(WIN64))

@@ -879,7 +879,7 @@ Optional Packages:
   --with-lapack=LIB       Linker command to bind LAPACK package, e.g.
                               '-llapack' or '/usr/lib/liblapack.a'
   --with-superlu=LIB      Linker command to bind SuperLU package, e.g.
-                              'libsuperlu.a' (default) or '-lsuperlu'
+                              'libsuperlu.a' or '-lsuperlu (default)'
   --with-tcl=PATH         Path to Tcl installation directory
                               Default is auto-search for Tcl
   --with-tk=PATH          Path to Tk installation directory
@@ -8273,7 +8273,7 @@ if test "${with_superlu+set}" = set; then
   withval="$with_superlu"
   SUPERLULIB=$withval
 else
-  SUPERLULIB='$(TOASTDIR)/lib/libsuperlu.a'
+  SUPERLULIB='-lsuperlu'
 fi;
 # Note: Changed this to default to static library to avoid linking problems
 # in mex files.

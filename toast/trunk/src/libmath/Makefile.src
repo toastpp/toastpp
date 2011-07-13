@@ -39,7 +39,8 @@ endif
 
 ifdef MAKE_THREAD
 SRCS += \
-	task.cc	
+	task.cc \
+	vector_MT.cc
 endif
 
 ifdef MAKE_MPI
@@ -56,7 +57,7 @@ endif
 #endif
 
 OBJS = ${SRCS:.cc=.o} 
-HDRS = ${SRCS:.cc=.h}
+HDRS := $(wildcard *.h)
 
 #--------------------------------------------------------------------
 # CUDA support

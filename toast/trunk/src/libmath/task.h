@@ -92,12 +92,17 @@ public:
     // to each task
     // Function returns when complete sequence is processed
 
+    inline void LockUserMutex() { pthread_mutex_lock (&user_lock); }
+    inline void UnlockUserMutex() { pthread_mutex_unlock (&user_lock); }
+
 private:
     tpool_t *tpool;              // pool properties
+    pthread_mutex_t user_lock;   // user-space mutex
 };
 
 #ifndef __TASK_CC
 #ifndef OLD_PARALLEL
+void TPool_Init (int nt);
 extern ThreadPool *g_tpool;
 #endif
 #endif

@@ -111,8 +111,8 @@ AC_ARG_WITH(lapack,
 
 AC_ARG_WITH(superlu,
     [  --with-superlu=LIB      Linker command to bind SuperLU package, e.g.]
-    [                          'libsuperlu.a' (default) or '-lsuperlu'],
-    SUPERLULIB=$withval, SUPERLULIB='$(TOASTDIR)/lib/libsuperlu.a')
+    [                          'libsuperlu.a' or '-lsuperlu (default)'],
+    SUPERLULIB=$withval, SUPERLULIB='-lsuperlu')
 # Note: Changed this to default to static library to avoid linking problems
 # in mex files.
 if test "$SUPERLULIB" = '$(TOASTDIR)/lib/libsuperlu.a' -o "$SUPERLULIB" = '-lsuperlu' ; then

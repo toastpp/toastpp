@@ -979,7 +979,7 @@ MT TCompRowMatrix<MT>::GetNext (int &r, int &c) const
 
 // ==========================================================================
 
-#ifdef TOAST_THREAD
+#if THREAD_LEVEL==1
 
 template<class MT>
 void Ax_engine (void *arg, int r0, int r1)
@@ -1062,7 +1062,7 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 	b[r++] = br;
     }
 }
-#endif // TOAST_THREAD
+#endif // THREAD_LEVEL==1
 
 #ifdef UNDEF// USE_SPBLAS
 // warning: SPBLAS appears to have a size limit to the matrix and fails with

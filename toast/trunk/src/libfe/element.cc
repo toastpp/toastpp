@@ -20,6 +20,7 @@ Element::Element ()
     Node = 0;
     bndside = 0;
     sdnbhr = 0;
+    sdnbhridx = 0;
     region = -1;
     subdivdata = 0;
 }
@@ -29,6 +30,7 @@ Element::Element (const Element& el)   // copy constructor
     Node = 0;	// this must be done by derived class
     bndside = 0;
     sdnbhr = 0;
+    sdnbhridx = 0;
     region = -1;
     subdivdata = 0;
 }
@@ -37,6 +39,7 @@ Element::~Element ()
 {
     if (bndside) delete []bndside;
     if (sdnbhr)  delete []sdnbhr;
+    if (sdnbhridx) delete []sdnbhridx;
     if (subdivdata) delete subdivdata;
 }
 
@@ -180,6 +183,13 @@ Element *Element::SideNeighbour (int side) const
     return sdnbhr[side];
 }
 
+int Element::SideNeighbourIndex (int side) const
+{
+    dASSERT(side >= 0 && side < nSide(), Invalid value for argument side.);
+    dASSERT(sdnbhridx, Neighbour support not initialised);
+    return sdnbhridx[side];
+}
+
 RDenseMatrix Element::Elgeom (const NodeList& nlist) const
 {
     RDenseMatrix tmp(nNode(), Dimension());
@@ -266,8 +276,11 @@ int Element::BndSideList (const NodeList &nlist, int *list)
 void Element::InitNeighbourSupport ()
 {
     if (!sdnbhr) sdnbhr = new Element*[nSide()];
-    for (int i = 0; i < nSide(); i++)
+    if (!sdnbhridx) sdnbhridx = new int[nSide()];
+    for (int i = 0; i < nSide(); i++) {
 	sdnbhr[i] = NULL;
+	sdnbhridx[i] = -1;
+    }
 }
 
 void Element::InitSubdivisionSupport ()
