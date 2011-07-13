@@ -44,6 +44,9 @@ fwdfem_cw : fwdfem_cw.o
 fwdfem_tpsf : fwdfem_tpsf.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
+fwdfem_tpsf_single : fwdfem_tpsf_single.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
 fwdfem_tpsf_cuda : fwdfem_tpsf_cuda.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(STOASTLIB)
 
@@ -149,6 +152,9 @@ test1 : test1.o
 test_sla : test_sla.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
 
+test_superlu : test_superlu.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
 testmat : testmat.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
 
@@ -162,6 +168,12 @@ test_block : test_block.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
 
 test_basis : test_basis.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+test_adaptive : test_adaptive.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+test_intersection : test_intersection.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 multigrid : multigrid.o

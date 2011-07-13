@@ -39,6 +39,10 @@ BLASDEF 	= -DUSE_VENDOR_BLAS
 ## This BLAS causes single-precision to fail the test in SuperLU
 #BLASLIB 	= -L/usr/lib -lblas
 
+HAVE_LAPACK     = TRUE
+# If TRUE, SuperLU doesn't include the LAPACK auxiliary routines
+# dlamch and slamch
+
 #LIBS		= $(SUPERLULIB) $(BLASLIB)
 
 #

@@ -161,7 +161,8 @@ void TFwdSolver<float>::Allocate (const QMMesh &mesh)
 	delete []colidx;
     } else {
 	if (precon) delete precon;
-	precon = new FPrecon_Diag;
+	//precon = new FPrecon_Diag;
+	precon = new FPrecon_Null;
     }
 }
 
@@ -197,7 +198,8 @@ void TFwdSolver<double>::Allocate (const QMMesh &mesh)
 	delete []colidx;
     } else {
 	if (precon) delete precon;
-	precon = new RPrecon_Diag;
+	//precon = new RPrecon_Diag;
+	precon = new RPrecon_Null;
     }
 }
 
@@ -228,7 +230,8 @@ void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
 	((ZSuperLU*)SuperLU)->Reset (F);
     } else {
 	if (precon) delete precon;
-	precon = new CPrecon_Diag;
+	//precon = new CPrecon_Diag;
+	precon = new CPrecon_Null;
     }
 }
 
@@ -258,7 +261,8 @@ void TFwdSolver<scomplex>::Allocate (const QMMesh &mesh)
 	// lu_data.Setup(meshptr->nlen(), F);
     } else {
 	if (precon) delete precon;
-	precon = new SCPrecon_Diag;
+	//precon = new SCPrecon_Diag;
+	precon = new SCPrecon_Null;
     }
 }
 
@@ -560,6 +564,33 @@ void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
     //cerr << "Solve time = " << solver_time << endl;
 }
 
+#if THREAD_LEVEL==2
+
+template<class T>
+void CalcFields_engine (void *context, int q0, int q1)
+{
+    struct CALCFIELDS_THREADDATA {
+	TCompRowMatrix<T> *F;
+	const TCompRowMatrix<T> *qvec;
+	TVector<T> *phi;
+	TPreconditioner<T> *precon;
+	double tol;
+	int maxit;
+    } *thdata = (CALCFIELDS_THREADDATA*)context;
+    double tol = thdata->tol;
+
+    IterativeSolve (*thdata->F, thdata->qvec->Row(q0), thdata->phi[q0],
+		    tol, thdata->precon, thdata->maxit);
+}
+#ifdef NEED_EXPLICIT_INSTANTIATION
+template void CalcFields_engine<double> (void *context, int q0, int q1);
+template void CalcFields_engine<float> (void *context, int q0, int q1);
+template void CalcFields_engine<complex> (void *context, int q0, int q1);
+template void CalcFields_engine<scomplex> (void *context, int q0, int q1);
+#endif
+
+#endif // THREAD_LEVEL==2
+
 template<>
 void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
     CVector *phi, IterativeSolverResult *res) const
@@ -581,11 +612,31 @@ void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
 	//    CalcField (qvec.Row(i), phi[i], res);
 	//}
     } else {
+#if THREAD_LEVEL==2
+	dASSERT(g_tpool, ThreadPool not initialised);
+	static struct {
+	    TCompRowMatrix<toast::complex> *F;
+	    const TCompRowMatrix<toast::complex> *qvec;
+	    TVector<toast::complex> *phi;
+	    TPreconditioner<toast::complex> *precon;
+	    double tol;
+	    int maxit;
+	} thdata;
+	thdata.F      = F;
+	thdata.qvec   = &qvec;
+	thdata.phi    = phi;
+	thdata.precon = precon;
+	thdata.tol    = iterative_tol;
+	thdata.maxit  = iterative_maxit;
+	g_tpool->ProcessSequence (CalcFields_engine<toast::complex>, &thdata,
+				  0, nq, 1);
+#else
         CVector *qv = new CVector[nq];
 	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
         IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
             precon, res);
 	delete []qv;
+#endif // THREAD_LEVEL==2
     }
 }
 
@@ -618,11 +669,30 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	    LOGOUT1_PROGRESS(i);
 	}
     } else {
+#if THREAD_LEVEL==2
+	dASSERT(g_tpool, ThreadPool not initialised);
+	static struct {
+	    TCompRowMatrix<T> *F;
+	    const TCompRowMatrix<T> *qvec;
+	    TVector<T> *phi;
+	    TPreconditioner<T> *precon;
+	    double tol;
+	    int maxit;
+	} thdata;
+	thdata.F      = F;
+	thdata.qvec   = &qvec;
+	thdata.phi    = phi;
+	thdata.precon = precon;
+	thdata.tol    = iterative_tol;
+	thdata.maxit  = iterative_maxit;
+	g_tpool->ProcessSequence (CalcFields_engine<T>, &thdata, 0, nq, 1);
+#else
         TVector<T> *qv = new TVector<T>[nq];
 	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
         IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
             precon, res);
 	delete []qv;
+#endif
     }
 
 #else

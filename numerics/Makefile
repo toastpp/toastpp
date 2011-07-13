@@ -54,8 +54,7 @@ superlu::lapack
 	cp $(NUMERICSDIR)/$(SUPERLUDIR)/make.inc .; \
 	cp $(NUMERICSDIR)/$(SUPERLUDIR)/SRC/Makefile SRC; \
 	$(MAKE) superlulib; \
-	cp SRC/$(SUPERLU_NAME) $(LIBDIR); \
-	cp $(NUMERICSDIR)/$(SUPERLUDIR)/SRC/*.h $(INCDIR)
+	cp SRC/$(SUPERLU_NAME) $(LIBDIR)
 
 blzpack::
 	mkdir -p $(TOASTOBJ)/blzpack/src/double; \

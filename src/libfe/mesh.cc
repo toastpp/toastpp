@@ -1492,6 +1492,7 @@ void Mesh::PopulateNeighbourLists ()
 		if (j == n) {
 		    isbnd = false;
 		    elist[sd[i].el]->sdnbhr[sd[i].sd] = elist[sd[i-1].el];
+		    elist[sd[i].el]->sdnbhridx[sd[i].sd] = sd[i-1].el;
 		}
 	    }
 	}
@@ -1502,6 +1503,7 @@ void Mesh::PopulateNeighbourLists ()
 		if (j == n) {
 		    isbnd = false;
 		    elist[sd[i].el]->sdnbhr[sd[i].sd] = elist[sd[i+1].el];
+		    elist[sd[i].el]->sdnbhridx[sd[i].sd] = sd[i+1].el;
 		}
 	    }
 	}

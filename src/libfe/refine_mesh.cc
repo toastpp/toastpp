@@ -198,6 +198,7 @@ void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 	}
     }
 
+    /*
     // jiggle nodes
     Point *pt = new Point[mesh->nlen()];
     for (i = 0; i < mesh->nlen(); i++)
@@ -206,7 +207,7 @@ void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 	for (j = 0; j < 2; j++)
 	    mesh->nlist[i][j] += (pt[i][j]-mesh->nlist[i][j]) * 0.5;
     delete []pt;
-
+    */
     mesh->Setup();
 }
 
@@ -214,4 +215,38 @@ void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 
 void Tetrahedron4Mesh (Mesh *mesh, bool *elrefine)
 {
+}
+
+void JiggleMesh (Mesh *mesh, double scale, int iterations)
+{
+    int it, i, j;
+
+    for (it = 0; it < iterations; it++) {
+	Point *pt = new Point[mesh->nlen()];
+	for (i = 0; i < mesh->nlen(); i++)
+	    pt[i] = mesh->NeighbourBarycentre(i);
+	for (i = 0; i < mesh->nlen(); i++)
+	    for (j = 0; j < 2; j++)
+		mesh->nlist[i][j] += (pt[i][j]-mesh->nlist[i][j]) * scale;
+	mesh->Setup();
+	
+	bool ok = true;
+	for (i = 0; i < mesh->elen(); i++) {
+	    if (mesh->ElSize(i) <= 0.0) {
+		ok = false;
+		break;
+	    }
+	}
+	if (!ok) {
+	    std::cerr << "Jiggle: Negative element size detected. Reverting"
+		      << std::endl;
+	    for (i = 0; i < mesh->nlen(); i++)
+		for (j = 0; j < 2; j++)
+		    mesh->nlist[i][j] -= (pt[i][j]-mesh->nlist[i][j]) * scale;
+	    mesh->Setup();
+	    
+	}
+	delete []pt;
+	if (!ok) break;
+    }
 }

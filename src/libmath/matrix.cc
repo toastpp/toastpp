@@ -104,7 +104,8 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     int niter, dim = x.Dim();
     if (!maxit) maxit = dim+1;
     TVector<MT> r(dim), d(dim), q(dim);
-    r = b - (A*x);
+    A.Ax (x, r);
+    r = b - r;
     if (precon) precon->Apply (r, d);
     else d = r;
     dnew = r & d;

@@ -319,6 +319,16 @@ public:
     Element *SideNeighbour (int side) const;
 
     /**
+     * \brief Returns the list index of the element connected at 'side', or
+     *   -1 if this is a boundary side.
+     * \param side side index (>= 0)
+     * \return Element list index (>- 0) or -1
+     * \note This function is only supported if Mesh::PopulateNeighbourLists
+     *   has been called before.
+     */
+    int SideNeighbourIndex (int side) const;
+
+    /**
      * \brief Maps a point from local element coordinates to global
      *   coordinates.
      * \param nlist mesh node list
@@ -1020,6 +1030,12 @@ public:
     Element **sdnbhr;
     // List of side neighbours for the element.
     // A NULL entry indicates no neighbour (boundary side)
+    // Note: this list is only created if Mesh::PopulateNeighbourLists is
+    // called.
+
+    int *sdnbhridx;
+    // list of side neighbour indices for the element
+    // A -1 entry indicates no neighbour (boundary side)
     // Note: this list is only created if Mesh::PopulateNeighbourLists is
     // called.
 

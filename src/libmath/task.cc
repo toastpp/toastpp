@@ -131,6 +131,8 @@ ThreadPool::ThreadPool (int num_threads)
     tpool->threads = new pthread_t[num_threads];
     if (pthread_mutex_init (&(tpool->queue_lock), NULL))
         cerr << "ThreadPool: pthread_mutex_init failed\n";
+    if (pthread_mutex_init (&user_lock, NULL))
+        cerr << "ThreadPool: pthread_mutex_init failed\n";
     if (pthread_cond_init (&(tpool->queue_not_empty), NULL))
         cerr << "ThreadPool: pthread_cond_init failed\n";
     if (pthread_cond_init (&(tpool->thread_done), NULL))
@@ -204,4 +206,10 @@ void ThreadPool::ProcessSequence (void (*routine)(void*,int,int), void *arg,
 
 #ifndef OLD_PARALLEL
 ThreadPool *g_tpool = 0;
+
+void TPool_Init (int nt)
+{
+    g_tpool = new ThreadPool (nt);
+}
+
 #endif

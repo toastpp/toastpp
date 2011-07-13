@@ -120,7 +120,11 @@ ZLUSRC = \
 	ilu_zcolumn_dfs.o ilu_zpanel_dfs.o ilu_zcopy_to_ucol.o \
 	ilu_zpivotL.o zdiagonal.o
 
-OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(ALLAUX) $(LAAUX) $(SCLAUX) $(DZLAUX)
+OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(ALLAUX) $(LAAUX)
+
+ifndef HAVE_LAPACK
+OBJS += $(SCLAUX) $(DZLAUX)
+endif
 
 #all:    single double complex complex16
 all:	$(LIB)

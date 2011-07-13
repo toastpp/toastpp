@@ -55,6 +55,8 @@ int main (int argc, char *argv[]) {
 
 #ifdef TOAST_MPI
     MPI_Init (&argc, &argv);
+#elif TOAST_THREAD
+    TPool_Init (NUMTHREAD);
 #endif
 
     const double c0 = 0.3;
