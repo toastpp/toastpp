@@ -147,13 +147,13 @@ void Mesh::Copy (const Mesh &mesh)
 
 RDenseMatrix Mesh::ElGeom (int el) const
 {
-    dASSERT(el >= 0 && el < elist.Len(), Element index out of range.);
+    dASSERT(el >= 0 && el < elist.Len(), "Element index out of range.");
     return elist[el]->Elgeom (nlist);
 }
 
 double Mesh::ElSize (int el) const
 {
-    dASSERT (el >= 0 && el < elist.Len(), Element index out of range.);
+    dASSERT (el >= 0 && el < elist.Len(), "Element index out of range.");
     return elist[el]->Size ();
 }
 
@@ -163,7 +163,7 @@ Point Mesh::ElCentre (int el) const
     Point cnt(dim);
     for (i = 0; i < elist[el]->nNode(); i++) {
 	nd = elist[el]->Node[i];
-	dASSERT (nlist[nd].Dim() == dim, Inconsistent node dimensions.);
+	dASSERT (nlist[nd].Dim() == dim, "Inconsistent node dimensions.");
 	cnt += nlist[nd];
     }
     cnt /= elist[el]->nNode();
@@ -176,7 +176,7 @@ Point Mesh::ElSideCentre (int el, int sd) const
     Point cnt (dim);
     for (i = 0; i < elist[el]->nSideNode (sd); i++) {
 	nd = elist[el]->Node[elist[el]->SideNode (sd, i)];
-	dASSERT (nlist[nd].Dim() == dim, Inconsistent node dimensions.);
+	dASSERT (nlist[nd].Dim() == dim, "Inconsistent node dimensions.");
 	cnt += nlist[nd];
     }
     cnt /= elist[el]->nSideNode (sd);
@@ -310,7 +310,7 @@ void Mesh::ScaleMesh (double scale)
 void Mesh::ScaleMesh (const RVector &scale)
 {
     int i, j, dim = Dimension();
-    dASSERT(scale.Dim() == Dimension(), Wrong vector dimension);
+    dASSERT(scale.Dim() == Dimension(), "Wrong vector dimension");
     for (i = 0; i < nlen(); i++) {
         for (j = 0; j < dim; j++) nlist[i][j] *= scale[j];
     }
@@ -332,7 +332,7 @@ double Mesh::ParamAverage (const ParameterType prmtp) const
 int Mesh::MaxNodeDiff (int mode) const
 {
     dASSERT(mode == BW_TOTAL || mode == BW_INTERNAL || mode == BW_AUTO,
-	Unknown mode id.);
+	"Unknown mode id.");
     int nlen = nlist.Len(), elen = elist.Len();
     int el, n, node, nodmin, nodmax, diff = 0;
     if (mode == BW_AUTO)
@@ -408,7 +408,7 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
 		n2 = elist[el]->Node[nd2];
 		pair[p].n1 = n1;
 		pair[p].n2 = n2;
-		dASSERT(p < npair, Something went wrong ...);
+		dASSERT(p < npair, "Something went wrong ...");
 		p++;
 	    }
 	}
@@ -494,22 +494,22 @@ void Mesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero) c
     for (i = pi = ri = ci = 0; i < npair; i++) {
 	if (pair[i].n1 < 0) continue;
 	if ((i == 0) || (pair[i].n1 > pair[pi].n1)) {
-	    dASSERT(ri < nlen()+1, ri index out of range);
+	    dASSERT(ri < nlen()+1, "ri index out of range");
 	    rowptr[ri++] = ci;
 	}
 	pi = i;
-	dASSERT(ci < nzero, ci index out of range);
+	dASSERT(ci < nzero, "ci index out of range");
 	colidx[ci++] = pair[i].n2;
     }
-    dASSERT(ci == nzero, ci index out of sync);
-    dASSERT(ri == nlen(), ri index out of sync);
+    dASSERT(ci == nzero, "ci index out of sync");
+    dASSERT(ri == nlen(), "ri index out of sync");
     rowptr[ri] = nzero;
     delete []pair;
 }
 
 void Mesh::NeighbourCount (int *plist, int nnode, bool include_self) const
 {
-    dASSERT(nnode <= nlen(), Paramter out of range);
+    dASSERT(nnode <= nlen(), "Parameter out of range");
     int i, nzero;
 	idxtype *rowptr, *colidx;
     SparseRowStructure (rowptr, colidx, nzero);
@@ -554,7 +554,7 @@ void Mesh::SysMatrixStructure (int *_nz, int **_row_ind, int **_col_ind)
 		if (n2 >= nnode) continue;
 		if (n1 < n2) pair[p].n1 = n1, pair[p].n2 = n2;
 		else         pair[p].n1 = n2, pair[p].n2 = n1;
-		dASSERT(p < npair, Something went wrong ...);
+		dASSERT(p < npair, "Something went wrong ...");
 		p++;
 	    }
 	}
@@ -878,7 +878,7 @@ void Mesh::InitSubdivisionSupport ()
 
 int Mesh::RefineElement (int el)
 {
-    dASSERT(el >= 0 && el < elen(), Element index out of range);
+    dASSERT(el >= 0 && el < elen(), "Element index out of range");
     Element *pel = elist[el];
     pel->Subdivide (this);
 	return 0;
@@ -1106,8 +1106,8 @@ void Mesh::NodeNeighbourList (int **_nnbhrs, int ***_nbhrs) const
 
 bool Mesh::ElConnected (int el1, int el2, int *sd1, int *sd2)
 {
-    dASSERT (el1 >= 0 && el1 < elen(), Argument 1: index out of range);
-    dASSERT (el2 >= 0 && el2 < elen(), Argument 2: index out of range);
+    dASSERT (el1 >= 0 && el1 < elen(), "Argument 1: index out of range");
+    dASSERT (el2 >= 0 && el2 < elen(), "Argument 2: index out of range");
 
     Element *pel1 = elist[el1];
     Element *pel2 = elist[el2];
@@ -1167,7 +1167,7 @@ double Mesh::Size (Point *centre) const
 
 // ***********************************************
 
-void Mesh::BoundingBox (Point &mmin, Point &mmax) const
+void Mesh::BoundingBox (Point &mmin, Point &mmax, double pad) const
 {
     int d, n, dim = nlist[0].Dim();
     mmin.New (dim);
@@ -1181,6 +1181,11 @@ void Mesh::BoundingBox (Point &mmin, Point &mmax) const
 	    if (nlist[n][d] > mmax[d]) mmax[d] = nlist[n][d];
 	}
     }
+    if (pad)
+        for (d = 0; d < dim; d++) {
+	    mmin[d] -= pad;
+	    mmax[d] += pad;
+	}
 }
 
 Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
@@ -1192,8 +1197,8 @@ Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
     // single intersection between pt1 and pt2.
     // Works in 2D and 3D, but is fairly inefficient
 
-    xASSERT (ElFind (pt1) >= 0, First point must be inside mesh);
-    xASSERT (ElFind (pt2) <  0, Second point must be outside mesh);
+    xASSERT (ElFind (pt1) >= 0, "First point must be inside mesh");
+    xASSERT (ElFind (pt2) <  0, "Second point must be outside mesh");
 
     const double acc = 1e-6;
     int i;
@@ -1276,14 +1281,14 @@ int Mesh::CheckConsistency () const
     for (i = 1; i < nlist.Len(); i++)
 	if (nlist[i].Dim() != dim) {
 	    errorid = 1;
-	    dERROR(Inconsistent node dimensions.);
+	    dERROR("Inconsistent node dimensions.");
 	}
 
     for (el = 0; el < elist.Len(); el++)
 	for (vx = 0; vx < elist[el]->nNode(); vx++)
 	    if (elist[el]->Node[vx] < 0 || elist[el]->Node[vx] >= nlist.Len()) {
 		errorid = 2;
-		dERROR(Node reference out of range.);
+		dERROR("Node reference out of range.");
 	    }
 
     for (el = 0; el < elist.Len(); el++)
@@ -1291,7 +1296,7 @@ int Mesh::CheckConsistency () const
 	    for (vxx = vx+1; vxx < elist[el]->nNode(); vxx++)
 		if (elist[el]->Node[vx] == elist[el]->Node[vxx]) {
 		    errorid = 3;
-		    dERROR(Dublicate node reference in single element.);
+		    dERROR("Duplicate node reference in single element.");
 		}
 
     checklist = new char[nlist.Len()];
@@ -1304,7 +1309,7 @@ int Mesh::CheckConsistency () const
     delete checklist;
     if (err) {
 	errorid = 4;
-	dERROR(Node list contains nodes not used by any element.);
+	dERROR("Node list contains nodes not used by any element.");
     }
 
     for (nd = 0; nd < nlist.Len()-1; nd++)
@@ -1315,7 +1320,7 @@ int Mesh::CheckConsistency () const
 		    ident = 0;
 	    if (ident) {
 		errorid = 5;
-		dERROR(Nodes with identical coordinates found.);
+		dERROR("Nodes with identical coordinates found.");
 	    }
 	}
     return errorid;
@@ -1548,18 +1553,18 @@ FELIB istream& operator>> (istream& i, Mesh& mesh)
     } while (i.good() && strncmp (cbuf, "MeshData 5.0", 12));
     if (!i.good()) {
         if (mesh.trap_load_error)
-	    xERROR(Mesh file not found or invalid);
+	    xERROR("Mesh file not found or invalid");
 	return i;
     }
     i >> mesh.nlist >> mesh.elist >> mesh.plist;
     //cout << "Parameter list type " << (mesh.plist.pltype() == PLIST_BY_ELEMENT ? "by element" : "by node (default) " ) <<endl;
     if( mesh.plist.pltype() == PLIST_BY_ELEMENT) {
       xASSERT(mesh.elist.Len() == mesh.plist.Len(),
-	    Element list and parameter list sizes differ.);
+	    "Element list and parameter list sizes differ.");
     }
     else {
       xASSERT(mesh.nlist.Len() == mesh.plist.Len(),
-	    Node list and parameter list sizes differ.);
+	    "Node list and parameter list sizes differ.");
     }
     for (int nd = 0; nd < mesh.nlist.Len(); nd++)
 	switch (mesh.nlist[nd].BndTp()) {
@@ -1971,7 +1976,7 @@ void AddToRHS_elasticity (const Mesh &mesh, RVector &rhs, const RVector *coeff,
 			    rhs[js*3+d] += (*coeff)[is*3+d] * ff;
 			break;
 		    default:
-		        xERROR(Assembly mode not supported);
+		        xERROR("Assembly mode not supported");
 			return;
 		    }
 		}
@@ -2009,7 +2014,7 @@ void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
 	D(2,2) = (1.0-2.0*nu)/(2.0*(1.0-nu));
 	D = D * (E*(1.0-nu)/((1.0+nu)*(1.0-2.0*nu)));
     } else {
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
     
     for (el = 0; el < mesh.elen(); el++) {
@@ -2058,7 +2063,7 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     Point p(dim), loc(dim);
     bool local_elref;
 
-    dASSERT(gdim.Dim() == dim, Parameter 3 wrong dimension);
+    dASSERT(gdim.Dim() == dim, "Parameter 3 wrong dimension");
 
     // bounding box of grid region  
     Point mesh_bbmin, mesh_bbmax;
@@ -2067,8 +2072,8 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
 	if (!bbmin) bbmin = &mesh_bbmin;
 	if (!bbmax) bbmax = &mesh_bbmax;
     }
-    dASSERT(bbmin->Dim() == dim, Parameter 4 wrong dimension);
-    dASSERT(bbmax->Dim() == dim, Parameter 5 wrong dimension);
+    dASSERT(bbmin->Dim() == dim, "Parameter 4 wrong dimension");
+    dASSERT(bbmax->Dim() == dim, "Parameter 5 wrong dimension");
 
     // grid size and spacing
     RVector W(dim), dW(dim);
@@ -2326,7 +2331,7 @@ RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh, const IVector &gdim,
     Point p(dim);
     bool local_elref;
 
-    dASSERT(gdim.Dim() == dim, Parameter 2 wrong dimension);
+    dASSERT(gdim.Dim() == dim, "Parameter 2 wrong dimension");
 
     // bounding box of grid region  
     Point mesh_bbmin, mesh_bbmax;
@@ -2335,8 +2340,8 @@ RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh, const IVector &gdim,
 	if (!bbmin) bbmin = &mesh_bbmin;
 	if (!bbmax) bbmax = &mesh_bbmax;
     }
-    dASSERT(bbmin->Dim() == dim, Parameter 4 wrong dimension);
-    dASSERT(bbmax->Dim() == dim, Parameter 5 wrong dimension);
+    dASSERT(bbmin->Dim() == dim, "Parameter 4 wrong dimension");
+    dASSERT(bbmax->Dim() == dim, "Parameter 5 wrong dimension");
 
     // grid size and spacing
     RVector W(dim), dW(dim);
@@ -2622,8 +2627,8 @@ int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
 
     // Sanity checks
     for (i = 0; i < dim; i++) {
-	xASSERT(gdim[i] >= 2, Invalid grid dimension);
-	xASSERT((*bbmax)[i] > (*bbmin)[i], Invalid bounding box);
+	xASSERT(gdim[i] >= 2, "Invalid grid dimension");
+	xASSERT((*bbmax)[i] > (*bbmin)[i], "Invalid bounding box");
     }
 
     int nx = gdim[0], ny = gdim[1], nz = (dim > 2 ? gdim[2] : 1);
@@ -2683,6 +2688,36 @@ int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
     no_overlap:;
     }
     return elref;
+}
+
+void GenerateVoxelPositions (const Mesh &mesh, const IVector &gdim,
+    const Point *bbmin, const Point *bbmax, RDenseMatrix &pos)
+{
+    int i, j, k, idx;
+    int dim = gdim.Dim();
+    int nx = gdim[0];
+    int ny = gdim[1];
+    int nz = (dim > 2 ? gdim[2] : 1);
+    int nvox = nx*ny*nz;
+
+    double dx = ((*bbmax)[0]-(*bbmin)[0])/(nx-1);
+    double dy = ((*bbmax)[1]-(*bbmin)[1])/(ny-1);
+    double dz = (dim > 2 ? ((*bbmax)[2]-(*bbmin)[2])/(nz-1) : 0);
+    double x, y, z;
+
+    pos.New (nvox,dim);
+    for (idx = k = 0; k < nz; k++) {
+        if (dim > 2) z = (*bbmin)[2] + dz*k;
+	for (j = 0; j < ny; j++) {
+	    y = (*bbmin)[1] + dy*j;
+	    for (i = 0; i < nx; i++) {
+	        pos(idx,0) = (*bbmin)[0] + dx*i;
+		pos(idx,1) = y;
+		if (dim > 2) pos(idx,2) = z;
+		idx++;
+	    }
+	}
+    }
 }
 
 void SubsampleLinPixel (const RVector &gf, RVector &bf, const IVector &gdim,

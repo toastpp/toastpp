@@ -21,7 +21,7 @@ void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth)
 	cout << "[1|2|3] >> ";
 	cin  >> mtype;
 	cout << mtype<<endl;
-	xASSERT(mtype == 1 || mtype == 2 || mtype == 3, Unidentified measurement profile.);
+	xASSERT(mtype == 1 || mtype == 2 || mtype == 3, "Unidentified measurement profile.");
 	mtype -= 1;
     }
     if (mtype > 0 && !pp.GetReal ("MEASUREMENTWIDTH", mwidth)) {

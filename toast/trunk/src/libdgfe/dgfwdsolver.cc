@@ -146,7 +146,7 @@ void TDGFwdSolver<toast::complex>::Allocate (NonconformingMesh &mesh)
 #ifdef ENABLE_DIRECTSOLVER
 	lu_data.Setup(dim*(meshptr->elen()), F);
 #else
-	xERROR(Direct solver not supported);
+	xERROR("Direct solver not supported");
 #endif
     } else {
 	if (precon) delete precon;
@@ -159,7 +159,7 @@ void TDGFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
     // real version
-    xASSERT(omega==0, Nonzero omega parameter not allowed here);
+    xASSERT(omega==0, "Nonzero omega parameter not allowed here");
 
     RVector prm(meshptr->nlen());
 
@@ -309,7 +309,7 @@ void TDGFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qve
 	toast_Destroy_SuperMatrix_Store (&B);
 	toast_Destroy_SuperMatrix_Store (&X);
 #else
-	xERROR(Direct solver not supported);
+	xERROR("Direct solver not supported");
 #endif
 
     } else {

@@ -164,7 +164,7 @@ public:
     inline int nVal() const { return nval; }
 
     inline MT &Val (int i)
-    { dASSERT(i >= 0 && i < nval, Index out of range);
+    { dASSERT(i >= 0 && i < nval, "Index out of range");
       return val[i];
     }
     // return i-th value of data vector

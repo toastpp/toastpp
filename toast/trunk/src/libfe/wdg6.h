@@ -41,7 +41,7 @@ public:
     RDenseMatrix LocalShapeD (const Point &loc) const;
 
     double IntF (int i) const
-    { xERROR (Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
     RSymMatrix IntFF () const;
     // Return integral over element of product of shape functions:
@@ -52,7 +52,7 @@ public:
 
     double IntFFF (int i, int j, int k) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return 0.0; // dummy
     }
     // returns a single element of integral over element of product of three
@@ -60,7 +60,7 @@ public:
     // IntFFF = Int_el { F_i(r) * F_j(r) * F_k(r) } dr
 
     void IntFFF (double &iii, double &iij, double &ijk) const
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
     // returns the values of the FFF tensor for:
     //   all indices equal (iii)
     //   two indices equal (iij)
@@ -68,7 +68,7 @@ public:
 
     RSymMatrix IntPFF (const RVector& P) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return RSymMatrix(); // dummy
     }
     // Returns integral over element of product of two shape functions and a
@@ -78,14 +78,14 @@ public:
 
     double IntPFF (int i, int j, const RVector& P) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return 0.0; // dummy
     }
     // Returns a single element of IntPFF
 
     double IntFDD (int i, int j, int k) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return 0.0; // dummy
     }
     // returns a single element of integral over element:
@@ -94,7 +94,7 @@ public:
 
     RSymMatrix IntPDD (const RVector& P) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return RSymMatrix(); // dummy
     }
     // Returns integral over element of product of two shape derivatives and a
@@ -104,20 +104,20 @@ public:
 
     double IntPDD (int i, int j, const RVector &P) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return 0.0; // dummy
     }
     // Returns a single element of IntPDD
 
     RSymMatrix BndIntPFF (const RVector &P) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return RSymMatrix(); // dummy
     }
 
     double BndIntPFF (int i, int j, const RVector &P) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return 0.0; // dummy
     }
     // Returns a single element of BndIntPFF
@@ -141,7 +141,7 @@ protected:
 
     RSymMatrix ComputeBndIntFF (const NodeList& nlist) const
     {
-        xERROR(Not implemented.);
+        ERROR_UNDEF;
 	return RSymMatrix(); // dummy
     }
     // Returns line integral of product of two shape functions along sides of

@@ -216,8 +216,8 @@ void Triangle6::Initialise (const NodeList &nlist)
 
 int Triangle6::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 3, Side index out of range);
-    dASSERT(node >= 0 && node < 3, Node index out of range);
+    dASSERT(side >= 0 && side < 3, "Side index out of range");
+    dASSERT(node >= 0 && node < 3, "Node index out of range");
     static int SN[3][3] = {{0,1,3},{1,2,4},{2,0,5}};
     return SN[side][node];
 }
@@ -228,7 +228,7 @@ Point Triangle6::Local (const NodeList &nlist, const Point& glob) const
     // so maybe should be used for Triangle3, but requires realignment of
     // local element
 
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
 
     Point loc(2);
     double scale = 1.0/(a0+a1+a2);
@@ -248,7 +248,7 @@ Point Triangle6::NodeLocal (int node) const
         case 3:  nloc[0] = 0.5; nloc[1] = 0.0; break;
         case 4:  nloc[0] = nloc[1] = 0.5; break;
         case 5:  nloc[0] = 0.0; nloc[1] = 0.5; break;
-        default: xERROR(Node index out of range); break;
+        default: xERROR("Node index out of range"); break;
     }
     return nloc;
 }
@@ -260,7 +260,7 @@ RVector Triangle6::DirectionCosine (int side, RDenseMatrix &/*jacin*/)
     case 0: cosin[0] = -b2, cosin[1] = -c2; break;
     case 1: cosin[0] = -b0, cosin[1] = -c0; break;
     case 2: cosin[0] = -b1, cosin[1] = -c1; break;
-    default: xERROR(Side index out of range);
+    default: xERROR("Side index out of range");
     }
     return cosin/length(cosin);
 }
@@ -273,13 +273,13 @@ const RVector &Triangle6::LNormal (int side) const
     static const RVector *lnm[3] = {
       &lnm0, &lnm1, &lnm2
     };
-    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Triangle6::LContains (const Point& loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 2, Local point must be 2D.);
+    dASSERT(loc.Dim() == 2, "Local point must be 2D.");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -318,7 +318,7 @@ bool Triangle6::GContains (const Point& glob, const NodeList& nlist) const
 
 RVector Triangle6::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RVector fun(6);
     double L0 = 1.0-loc[0]-loc[1];
     double L1 = loc[0];
@@ -334,7 +334,7 @@ RVector Triangle6::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Triangle6::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RDenseMatrix der(2,6);
     double lx = loc[0], ly = loc[1];
     der(0,0) = der(1,0) = 4.0*(lx+ly) - 3.0;
@@ -354,7 +354,7 @@ RDenseMatrix Triangle6::LocalShapeD (const Point &loc) const
 RVector Triangle6::GlobalShapeF (const NodeList& nlist, const Point& glob)
     const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
     RVector fun(6);
     double scale = 1.0/(2.0*size);
     double L0 = scale * (a0 + b0*glob[0] + c0*glob[1]);
@@ -372,7 +372,7 @@ RVector Triangle6::GlobalShapeF (const NodeList& nlist, const Point& glob)
 RDenseMatrix Triangle6::GlobalShapeD (const NodeList &nlist,
     const Point &glob) const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
     RDenseMatrix der(2,6);
     double scale = 1.0/(2.0*size);
     double L0 = scale * (a0 + b0*glob[0] + c0*glob[1]);
@@ -692,7 +692,7 @@ double Triangle6::IntFDD (int i, int j, int k) const
 		    intfd5d5(i,5)*(c2*c2))/size;
 	}
     }
-    xERROR(Index out of range);
+    xERROR("Index out of range");
     return 0;
 }
 
@@ -840,7 +840,7 @@ double Triangle6::IntFd (int i, int j, int k) const
     switch (k) {
     case 0:  p0 = b0, p1 = b1, p2 = b2; break;
     case 1:  p0 = c0, p1 = c1, p2 = c2; break;
-    default: xERROR (Index out of range); return 0.0;
+    default: xERROR ("Index out of range"); return 0.0;
     }
 
     switch (i) {
@@ -852,7 +852,7 @@ double Triangle6::IntFd (int i, int j, int k) const
 	case 3: return (-p0 + 2.0*p1) * scale;
 	case 4: return (-p1 - p2) * scale;
 	case 5: return (-p0 + 2.0*p2) * scale;
-	default: xERROR (Index out of range); return 0.0;
+	default: xERROR ("Index out of range"); return 0.0;
 	}
     case 1:
 	switch (j) {
@@ -862,7 +862,7 @@ double Triangle6::IntFd (int i, int j, int k) const
 	case 3: return (2.0*p0 - p1) * scale;
 	case 4: return (-p1 + 2.0*p2) * scale;
 	case 5: return (-p0 - p2) * scale;
-	default: xERROR (Index out of range); return 0.0;
+	default: xERROR ("Index out of range"); return 0.0;
 	}
     case 2:
 	switch (j) {
@@ -872,7 +872,7 @@ double Triangle6::IntFd (int i, int j, int k) const
 	case 3: return (-p0 - p1) * scale;
 	case 4: return (2.0*p1 - p2) * scale;
 	case 5: return (2.0*p0 - p2) * scale;
-	default: xERROR (Index out of range); return 0.0;
+	default: xERROR ("Index out of range"); return 0.0;
 	}
     case 3:
 	switch (j) {
@@ -882,7 +882,7 @@ double Triangle6::IntFd (int i, int j, int k) const
 	case 3: return (p0 + p1) * scale8;
 	case 4: return (p1 + 2.0*p2) * scale4;
 	case 5: return (p0 + 2.0*p2) * scale4;
-	default: xERROR (Index out of range); return 0.0;
+	default: xERROR ("Index out of range"); return 0.0;
 	}
     case 4:
 	switch (j) {
@@ -892,7 +892,7 @@ double Triangle6::IntFd (int i, int j, int k) const
 	case 3: return (2.0*p0 + p1) * scale4;
 	case 4: return (p1 + p2) * scale8;
 	case 5: return (2.0*p0 + p2) * scale4;
-	default: xERROR (Index out of range); return 0.0;
+	default: xERROR ("Index out of range"); return 0.0;
 	}
     case 5:
 	switch (j) {
@@ -902,9 +902,9 @@ double Triangle6::IntFd (int i, int j, int k) const
 	case 3: return (p0 + 2.0*p1) * scale4;
 	case 4: return (2.0*p1 + p2) * scale4;
 	case 5: return (p0 + p2) * scale8;
-	default: xERROR (Index out of range); return 0.0;
+	default: xERROR ("Index out of range"); return 0.0;
 	}
-    default: xERROR (Index out of range); return 0.0;
+    default: xERROR ("Index out of range"); return 0.0;
     }
 }
 
@@ -1026,8 +1026,8 @@ double Triangle6::ComputeSize (const NodeList &nlist) const
 
 RVector Triangle6::IntFD (int i, int j) const
 {
-    dASSERT(i >= 0 && i < 6, Parameter 1 index out of range);
-    dASSERT(j >= 0 && j < 6, Parameter 2 index out of range);
+    dASSERT(i >= 0 && i < 6, "Parameter 1 index out of range");
+    dASSERT(j >= 0 && j < 6, "Parameter 2 index out of range");
     RVector fd(2);
     fd[0] = intfd_0(i,j);
     fd[1] = intfd_1(i,j);
@@ -1117,8 +1117,8 @@ RSymMatrix Triangle6::ComputeIntDD (const NodeList &nlist) const
 
 double Triangle6::BndIntFSide (int i, int sd)
 {
-    dASSERT(sd >= 0 && sd < 3, Side index out of range);
-    dASSERT(i >= 0 && i < 6, Node index out of range);
+    dASSERT(sd >= 0 && sd < 3, "Side index out of range");
+    dASSERT(i >= 0 && i < 6, "Node index out of range");
 
     double f = bndintf(sd,i);
     if (!f) return f;
@@ -1140,7 +1140,7 @@ double Triangle6::BndIntFFSide (int i, int j, int sd)
     case 2:
 	return hypot (c1, b1) * sym_bndintff_sd2(i,j);
     default:
-	xERROR(Invalid side index);
+	xERROR("Invalid side index");
 	return 0.0;
     }
 }
@@ -1169,7 +1169,7 @@ RVector Triangle6::BndIntFDelta (int side, const Surface *surf,
     const RVector &pos, const NodeList &nlist) const
 {
     double d0, d1, s, g;
-    dASSERT(surf->Dimension() == 2, Wrong surface dimension);
+    dASSERT(surf->Dimension() == 2, "Wrong surface dimension");
     Surface2D *surf2D = (Surface2D*)surf;
     int n0 = Node[SideNode (side, 0)];
     int n1 = Node[SideNode (side, 1)];
@@ -1195,7 +1195,7 @@ RVector Triangle6::BndIntFCos (int side, const Surface *surf,
     const RVector &cntcos, double sigma, double sup, const NodeList &nlist)
     const
 {
-    dASSERT(surf->Dimension() == 2, Wrong surface dimension);
+    dASSERT(surf->Dimension() == 2, "Wrong surface dimension");
     Surface2D *surf2D = (Surface2D*)surf;
     double d0, s, g, tmp;
     bool flip;

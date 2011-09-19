@@ -118,14 +118,14 @@ public:
     double BndIntFF (int i, int j);
     RSymMatrix BndIntFF () const;
     RSymMatrix BndIntPFF (const RVector &P) const
-    { xERROR(Not implemented); return RSymMatrix(); }
+    { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
 
     int GlobalIntersection (const NodeList &nlist, const Point &p1,
         const Point &p2, Point **list)
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
     int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
 protected:
     void ComputeIntFF () const;

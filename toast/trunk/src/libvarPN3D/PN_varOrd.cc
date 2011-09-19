@@ -343,7 +343,7 @@ int main (int argc, char *argv[])
 	if(!str.compare(string("-g")))
 	{
 		g = strtod(argv[ind+1], NULL);
-		xASSERT(g>=-1 && g<=1, g should strictly belong to [-1 1]);
+		xASSERT(g>=-1 && g<=1, "g should strictly belong to [-1 1]");
 		cout<< "g (WARNING !! This g is considered constant throughout the domain): "<< g<<endl;
     		
 	}
@@ -357,7 +357,7 @@ int main (int argc, char *argv[])
 	if(!str.compare(string("-sap")))
 	{
 		srctp = atoi(argv[ind+1]);
-		xASSERT(srctp ==0 || srctp == 1 || srctp == 2, Unknown source angular profile);
+		xASSERT(srctp ==0 || srctp == 1 || srctp == 2, "Unknown source angular profile");
 		cout << "Angular profile of the source (0. Directed 1. Cosine 2. Uncollided line source ): "<<srctp<<endl;
     	}
 	if(!str.compare(string("-prefix")))
@@ -370,7 +370,7 @@ int main (int argc, char *argv[])
 	{
 		BCType = argv[ind+1][0];
 		BCType = tolower(BCType);
-		xASSERT(BCType == 'v' || BCType == 'r', Boundary condition type should be either v (vacuum) or r (reflection));
+		xASSERT(BCType == 'v' || BCType == 'r', "Boundary condition type should be either v (vacuum) or r (reflection)");
 		cout<<(BCType == 'v' ? "Vacuum" : "Reflection")<<" boundary conditions being applied"<<endl;
 	}
 	if(!str.compare(string("-ri_external")))
@@ -397,10 +397,10 @@ int main (int argc, char *argv[])
 
 	ind++;
     }
-    xASSERT(specify_mesh, A valid mesh file should be specified.);
-    xASSERT(specify_prm, A valid text file containing the optical parameters (mua, mus, n) for each spatial element should be specified.);
-    xASSERT(specify_nodal_sphorder, A valid text file containing spherical harmonic order for each node should be specified.);
-    xASSERT(specify_prefix, Output files prefix needs to be specified.);
+    xASSERT(specify_mesh, "A valid mesh file should be specified.");
+    xASSERT(specify_prm, "A valid text file containing the optical parameters (mua, mus, n) for each spatial element should be specified.");
+    xASSERT(specify_nodal_sphorder, "A valid text file containing spherical harmonic order for each node should be specified.");
+    xASSERT(specify_prefix, "Output files prefix needs to be specified.");
   
     IVector Nsource;
     IVector Ndetector;
@@ -423,7 +423,7 @@ int main (int argc, char *argv[])
 			{
 				cout<<"Entered a node number for source number "<<i+1<<endl;
 				cin >> Nsource[i];
-				xASSERT(Nsource[i]>=0 && Nsource[i] < qmmesh.nlen(), This node does not exist.);
+				xASSERT(Nsource[i]>=0 && Nsource[i] < qmmesh.nlen(), "This node does not exist.");
 				cout<<nlist[Nsource[i]]<<endl;
 			}
 			specify_nq = true;
@@ -431,7 +431,7 @@ int main (int argc, char *argv[])
 		}
 		ind++;
 	 }
-	 xASSERT(specify_nq, -nQ should be specified as QM file has not been specified.);
+	 xASSERT(specify_nq, "-nQ should be specified as QM file has not been specified.");
 	 ind=1;
 	 while(ind < argc)
 	 {
@@ -448,7 +448,7 @@ int main (int argc, char *argv[])
 			{
 				cout<<"Entered a node number for detector number "<<i+1<<endl;
 				cin >> Ndetector[i];
-				xASSERT(Ndetector[i]>=0 && Ndetector[i] < qmmesh.nlen(), This node does not exist.);
+				xASSERT(Ndetector[i]>=0 && Ndetector[i] < qmmesh.nlen(), "This node does not exist.");
 				cout<<nlist[Ndetector[i]]<<endl;
 			}
 			specify_nm = true;
@@ -456,7 +456,7 @@ int main (int argc, char *argv[])
 		}
 		ind++;
 	  }
-	  xASSERT(specify_nm, -nM should be specified as QM file has not been specified.);
+	  xASSERT(specify_nm, "-nM should be specified as QM file has not been specified.");
 	}
 
 	dirVec = new RVector[nQ];

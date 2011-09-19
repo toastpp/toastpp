@@ -119,15 +119,17 @@ public:
     double Mua()    const { return mua; }
     double Kappa()  const { return kappa; }
     double N()      const { return n; }
-    double C()      const { return lspeed(n); }
+    double C() const { return lspeed(n); }
     double CMua()   const { return C()*Mua(); }
     double CKappa() const { return C()*Kappa(); }
     double Mus()    const { return MuaKappaToMus (mua, kappa); }
     double CMus()   const { return C()*Mus(); }
-    double A()      const;
+    double A() const;
     double bndA (double n2 = 1.0) const;
-    double C2A()    const { return C()/(2.0*A()); }
+    double C2A() const { return C()/(2.0*A()); }
     double Param (ParameterType prmtp) const;
+
+    static double C2A (ReflectionType rt, double n);
 
     // set parameters
     void SetMua    (const double _mua) { mua = _mua; }

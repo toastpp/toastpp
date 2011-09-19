@@ -17,14 +17,19 @@
 #include "ilupack.h"
 #endif // HAVE_ILU
 
+/// \defgroup iterative linear solver preconditioner types
+//@{
 typedef enum {
-    PRECON_NULL,
-    PRECON_DIAG,
-    PRECON_ICH,
-    PRECON_DILU,
-    PRECON_CG_MULTIGRID,
-    PRECON_ILU
+    PRECON_NULL,                     ///< no preconditioner
+    PRECON_DIAG,                     ///< diagonal (Jacobi) preconditioner
+    PRECON_ICH,                      ///< incomplete Choleski
+    PRECON_DILU,                     ///< diagonal incomplete LU
+    PRECON_CG_MULTIGRID,             ///< multigrid
+    PRECON_ILU,                      ///< incomplete LU
+    PRECON_CUSP_AINV,                ///< approximate inverse (CUDA/CUSP only)
+    PRECON_CUSP_SMOOTHED_AGGREGATION ///< smoothed aggregation (CUDA/CUSP only)
 } PreconType;
+//@}
 
 // ==========================================================================
 // class TPreconditioner
@@ -59,7 +64,8 @@ public:
     PreconType Type() { return PRECON_NULL; }
     void Reset (const TMatrix<MT>*) {}
     void Apply (const TVector<MT> &r, TVector<MT> &s) { s = r; }
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
+    { ERROR_UNDEF; };
 
 };
 
@@ -90,7 +96,8 @@ public:
     PreconType Type() { return PRECON_ICH; }
     void Reset (const TMatrix<MT> *A);
     void Apply (const TVector<MT> &r, TVector<MT> &s);
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
+    { ERROR_UNDEF; };
 
 private:
     TCompRowMatrix<MT> L;
@@ -108,7 +115,8 @@ public:
     PreconType Type() { return PRECON_DILU; }
     void Reset (const TMatrix<MT> *);
     void Apply (const TVector<MT> &r, TVector<MT> &s);
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
+    { ERROR_UNDEF; };
 
 private:
     int dim;                   // problem dimension
@@ -126,10 +134,11 @@ template<class MT> class TPrecon_ILU: public TPreconditioner<MT> {
 public:
     TPrecon_ILU() {}
     PreconType Type() { return PRECON_ILU; }
-    void Reset (const TMatrix<MT> *){ xERROR('NOT IMPLEMENTED'); }
+    void Reset (const TMatrix<MT> *){ ERROR_UNDEF; }
     void Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow);
     void Apply (const TVector<MT> &r, TVector<MT> &s);
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const{ xERROR('NOT IMPLEMENTED');};
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const
+    { ERROR_UNDEF; };
     ~TPrecon_ILU();
 private:
     ilu_doublecomplex *rhs, *sol;
@@ -160,7 +169,8 @@ public:
     // coarsest grid
 
     void Apply (const TVector<MT> &r, TVector<MT> &s);
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const{ xERROR('NOT IMPLEMENTED');};
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
+    { ERROR_UNDEF; };
 
 
 private:

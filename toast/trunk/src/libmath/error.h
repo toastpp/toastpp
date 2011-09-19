@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifndef VERBOSE_LEVEL
 #ifdef FEM_DEBUG
@@ -29,50 +30,28 @@
 #define __PRETTY_FUNCTION__ ""
 #endif
 
-#define ERROR_ABSTRACT Error_Abstract(__FILE__,__LINE__)
+#define ERROR_UNDEF Error_Undef(__PRETTY_FUNCTION__,__FILE__,__LINE__)
 
 // unconditional error checking
-#define xERROR(msg) Error(__PRETTY_FUNCTION__, #msg ,__FILE__,__LINE__)
-#define xASSERT(cond,msg) if (!(cond)) xERROR( #msg )
+#define xERROR(msg, ...) Error(__PRETTY_FUNCTION__,__FILE__,__LINE__, msg, ##__VA_ARGS__)
+#define xASSERT(cond, msg, ...) if (!(cond)) xERROR(msg, ##__VA_ARGS__ )
 #define xRANGE_CHECK(cond) if (!(cond)) xERROR("Index out of range.");
 
 // error checking in debug environment
 #ifdef FEM_DEBUG
-#define dERROR(msg) Error(__PRETTY_FUNCTION__, #msg ,__FILE__,__LINE__)
-#define dASSERT(cond,msg) if (!(cond)) dERROR( #msg )
-#define dASSERT_1PRM(cond,fmt,p1) if (!(cond)) {\
-    sprintf (logbuf,fmt,p1);\
-    Error(__PRETTY_FUNCTION__, logbuf ,__FILE__,__LINE__);\
-}
-#define dASSERT_2PRM(cond,fmt,p1,p2) if (!(cond)) {\
-    sprintf (logbuf,fmt,p1,p2);\
-    Error(__PRETTY_FUNCTION__, logbuf ,__FILE__,__LINE__);\
-}
+#define dERROR(msg, ...) Error(__PRETTY_FUNCTION__,__FILE__,__LINE__, msg, ##__VA_ARGS__)
+#define dASSERT(cond, msg, ...) if (!(cond)) dERROR(msg, ##__VA_ARGS__)
 #define RANGE_CHECK(cond) if (!(cond)) dERROR("Index out of range.");
 #else
-#define dERROR(msg)
-#define dASSERT(cond,msg)
-#define dASSERT_1PRM(cond,fmt,p1)
-#define dASSERT_2PRM(cond,fmt,p1,p2)
+#define dERROR(msg,...)
+#define dASSERT(cond,msg,...)
 #define RANGE_CHECK(cond)
 #endif
 
 // output to log file for different verbose levels
 #define LOGOUT_ON LogoutOn()
 #define LOGOUT_OFF LogoutOff()
-#define LOGOUT(msg) LogOut(msg)
-#define LOGOUT_1PRM(fmt,p1) {\
-    sprintf(logbuf,fmt,p1); LogOut(logbuf);\
-}
-#define LOGOUT_2PRM(fmt,p1,p2) {\
-    sprintf(logbuf,fmt,p1,p2); LogOut(logbuf);\
-}
-#define LOGOUT_3PRM(fmt,p1,p2,p3) {\
-    sprintf(logbuf,fmt,p1,p2,p3); LogOut(logbuf);\
-}
-#define LOGOUT_4PRM(fmt,p1,p2,p3,p4) {\
-    sprintf(logbuf,fmt,p1,p2,p3,p4); LogOut(logbuf);\
-}
+#define LOGOUT(msg, ...) LogOut(msg, ##__VA_ARGS__)
 #define LOGOUT_ENTER LogOut_Enter(__FUNCTION__)
 #define LOGOUT_OPEN(msg) LogOut_Enter(msg)
 #define LOGOUT_EXIT LogOut_Exit()
@@ -81,19 +60,7 @@
 #define LOGOUT_PROGRESS(count) LogOut_Progress(count)
 
 #if (VERBOSE_LEVEL >= 1)
-#define LOGOUT1(msg) LogOut(msg)
-#define LOGOUT1_1PRM(fmt,p1) {\
-    sprintf(logbuf,fmt,p1); LogOut(logbuf);\
-}
-#define LOGOUT1_2PRM(fmt,p1,p2) {\
-    sprintf(logbuf,fmt,p1,p2); LogOut(logbuf);\
-}
-#define LOGOUT1_3PRM(fmt,p1,p2,p3) {\
-    sprintf(logbuf,fmt,p1,p2,p3); LogOut(logbuf);\
-}
-#define LOGOUT1_4PRM(fmt,p1,p2,p3,p4) {\
-    sprintf(logbuf,fmt,p1,p2,p3,p4); LogOut(logbuf);\
-}
+#define LOGOUT1(msg,...) LogOut(msg, ##__VA_ARGS__)
 #define LOGOUT1_ENTER LogOut_Enter(__FUNCTION__)
 #define LOGOUT1_OPEN(msg) LogOut_Enter(msg)
 #define LOGOUT1_EXIT LogOut_Exit()
@@ -101,11 +68,7 @@
     LogOut_InitProgressbar(name,len,maxcount)
 #define LOGOUT1_PROGRESS(count) LogOut_Progress(count)
 #else
-#define LOGOUT1(msg)
-#define LOGOUT1_1PRM(fmt,p1)
-#define LOGOUT1_2PRM(fmt,p1,p2)
-#define LOGOUT1_3PRM(fmt,p1,p2,p3)
-#define LOGOUT1_4PRM(fmt,p1,p2,p3,p4)
+#define LOGOUT1(msg,...)
 #define LOGOUT1_ENTER
 #define LOGOUT1_OPEN(msg)
 #define LOGOUT1_EXIT
@@ -114,16 +77,7 @@
 #endif
 
 #if (VERBOSE_LEVEL >= 2)
-#define LOGOUT2(msg) LogOut(msg)
-#define LOGOUT2_1PRM(fmt,p1) {\
-    sprintf(logbuf,fmt,p1); LogOut(logbuf);\
-}
-#define LOGOUT2_2PRM(fmt,p1,p2) {\
-    sprintf(logbuf,fmt,p1,p2); LogOut(logbuf);\
-}
-#define LOGOUT2_3PRM(fmt,p1,p2,p3) {\
-    sprintf(logbuf,fmt,p1,p2,p3); LogOut(logbuf);\
-}
+#define LOGOUT2(msg,...) LogOut(msg, ##__VA_ARGS__)
 #define LOGOUT2_ENTER LogOut_Enter(__FUNCTION__)
 #define LOGOUT2_OPEN(msg) LogOut_Enter(msg)
 #define LOGOUT2_EXIT LogOut_Exit()
@@ -131,9 +85,7 @@
     LogOut_InitProgressbar(name,len,maxcount)
 #define LOGOUT2_PROGRESS(count) LogOut_Progress(count)
 #else
-#define LOGOUT2(msg)
-#define LOGOUT2_1PRM(fmt,p1)
-#define LOGOUT2_2PRM(fmt,p1,p2)
+#define LOGOUT2(msg,...)
 #define LOGOUT2_ENTER
 #define LOGOUT2_OPEN(msg)
 #define LOGOUT2_EXIT
@@ -162,15 +114,15 @@ void OutputProgramInfo (std::ostream &os);
 // error routines
 MATHLIB void SetErrorhandler (void (*ErrorFunc)(char*));
 MATHLIB void Error (const char *name, const char *file, int line);
-MATHLIB void Error (const char *name, const char *msg, const char *file, int line);
-void Error_Abstract (const char *file, int line);
+MATHLIB void Error (const char *name, const char *file, int line, const char *msg, ...);
+void Error_Undef (const char *name, const char *file, int line);
 
 // log file output routines
 void LogoutOn();                   // turn on output to log file
 void LogoutOff();                  // turn off output to log file
 MATHLIB void LogfileOpen (const char *fname, bool rewind = false);
 void LogfileClose ();              // close an open log file
-MATHLIB void LogOut (const char *msg);           // write message `msg' to log file
+MATHLIB void LogOut (const char *msg, ...);  // write message `msg' to log file
 void LogOut_Enter (const char *routine); // write `enter' note to log file
 void LogOut_Exit ();               // write `leave routine' note to log file
 MATHLIB void LogOut_InitProgressbar (const char *name, int len, int maxcount);

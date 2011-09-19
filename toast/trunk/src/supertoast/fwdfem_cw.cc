@@ -48,6 +48,11 @@ void SelectSourceProfile (ParamParser &pp, int &qtype, double &qwidth,
 void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth);
 void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol);
 
+#ifdef USE_CUDA_FLOAT
+#include "toastcuda.h"
+void cuda_Init (ParamParser &pp);
+#endif
+
 // =========================================================================
 // MAIN 
 
@@ -76,12 +81,23 @@ int main (int argc, char *argv[]) {
 	cout << "Writing log to fwdfem.out" << endl;
     }
 
+#ifdef TOAST_THREAD
+    int nth = 0;
+    pp.GetInt("NTHREAD", nth);
+    Task_Init (nth);
+    pp.PutInt("NTHREAD", nth);
+#endif
+
+#ifdef USE_CUDA_FLOAT
+    cuda_Init (pp);
+#endif
+
     QMMesh mesh;
     int nQ, nM, nQM;
     RCompRowMatrix qvec, mvec;
     RVector *dphi;
     int i, j, cmd;
-    double t0, dt;
+    double t0, wt0, dt;
 
     RFwdSolver FWS (pp);
     FWS.WriteParams (pp);
@@ -128,6 +144,7 @@ int main (int argc, char *argv[]) {
     // build the measurement vectors
     mvec.New (nM, n);
     LOGOUT1_INIT_PROGRESSBAR ("Meas. vectors", 50, nM);
+    RVector c2a = sol.GetParam(OT_C2A);
     for (i = 0; i < nM; i++) {
 	RVector m(n);
 	switch (mprof) {
@@ -141,8 +158,8 @@ int main (int argc, char *argv[]) {
 	    m = QVec_Cosine (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
-	mvec.SetRow (i, m);
+	//for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
+	mvec.SetRow (i, m*c2a);
 	LOGOUT1_PROGRESS(i);
     }
 
@@ -152,22 +169,25 @@ int main (int argc, char *argv[]) {
     cout << endl << endl << "----------" << endl;
 
     cout << "Assembling and pre-processing system matrix" << endl;
-    t0 = clock();
+    t0 = clock(), wt0 = walltic();
     FWS.Reset (sol, 0);
-    dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
-    pp.PutReal("T(assembly): ", dt);
-    cout << "T(assembly): " << dt << endl;
+    dt = walltoc(wt0);
+    cout << "T(assembly): " << dt << " real, "
+	 <<  ((double)clock()-t0)/(double)CLOCKS_PER_SEC << " cpu" << endl;
+    pp.PutReal("T(assembly)", dt);
 
     // solve for fields
     cout << "Computing fields" << endl;
     IterativeSolverResult res;
-    t0 = clock();
+    t0 = clock(), wt0 = walltic();
     FWS.CalcFields (qvec, dphi, &res);
-    dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
-    pp.PutReal("T(solve): ", dt);
+    dt = walltoc(wt0);
+    cout << "T(solve): " << dt << " real, "
+	 <<  ((double)clock()-t0)/(double)CLOCKS_PER_SEC << " cpu" << endl;
+    pp.PutReal("T(solve)", dt);
     if (FWS.LinSolver() != LSOLVER_DIRECT) {
-        cout << "Max iterations: " << res.it_count << endl;
-	cout << "Max rel. error: " << res.rel_err << endl;
+        cout << "Tot. iterations: " << res.it_count << endl;
+	cout << "Max. rel. error: " << res.rel_err << endl;
     }
     cout << "T(solve): " << dt << endl << endl;
 
@@ -248,7 +268,7 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order)
 
     for (el = 0; el < mesh.elen(); el++) {
 	pel = mesh.elist[el];
-	xASSERT (pel->Type() == ELID_TRI3, Element type not supported);
+	xASSERT (pel->Type() == ELID_TRI3, "Element type not supported");
 	nnode = pel->nNode();
 	node  = pel->Node;
 	for (sd = 0; sd < pel->nSide(); sd++) {
@@ -698,3 +718,13 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
 	param[OT_C2A][i] = c0/(2*param[2][i]*A_Keijzer(param[OT_C2A][i]));
     msol.SetParam (OT_C2A, param[OT_C2A]);
 }
+
+#ifdef USE_CUDA_FLOAT
+void cuda_Init (ParamParser &pp)
+{
+    int dev;
+    if (!pp.GetInt ("CUDA_DEVICE", dev))
+        dev = 0;
+    cuda_Init (dev);
+}
+#endif

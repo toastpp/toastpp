@@ -549,10 +549,10 @@ int main (int argc, char *argv[])
 
     // ==================================================================
     // Start the solver
-    LOGOUT_1PRM ("**** SOLVER started: CPU %f", toc(clock0));
+    LOGOUT("**** SOLVER started: CPU %f", toc(clock0));
     solver->Solve (FWS, *raster, pscaler, OF, data, sd, bsol, msol, qvec, mvec,
         omega);
-    LOGOUT_1PRM ("**** SOLVER finished: CPU %f", toc(clock0));
+    LOGOUT("**** SOLVER finished: CPU %f", toc(clock0));
     delete solver;
 
     // cleanup
@@ -563,9 +563,9 @@ int main (int argc, char *argv[])
     //double total_time = (double)(tme.tms_utime-clock0)/(double)HZ;
     double total_time = toc(clock0);
     LOGOUT ("Final timings:");
-    LOGOUT_1PRM ("Total: %f", total_time);
+    LOGOUT("Total: %f", total_time);
 #ifdef DO_PROFILE
-    LOGOUT_1PRM ("Solver: %f", solver_time);
+    LOGOUT("Solver: %f", solver_time);
 #endif
 
     MPI_Finalize();

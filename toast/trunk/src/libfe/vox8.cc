@@ -51,8 +51,8 @@ void Voxel8::PostInitialisation (const NodeList &nlist)
 
 int Voxel8::SideNode (int side, int node) const
 {
-    dASSERT (side >= 0 && side < 6, Side index out of range);
-    dASSERT (node >= 0 && node < 4, Node index out of range);
+    dASSERT (side >= 0 && side < 6, "Side index out of range");
+    dASSERT (node >= 0 && node < 4, "Node index out of range");
     static int SN[6][4] = {{0,1,3,2},{7,5,4,6},{0,4,5,1},
                            {7,6,2,3},{0,2,6,4},{7,3,1,5}};
     return SN[side][node];
@@ -60,7 +60,7 @@ int Voxel8::SideNode (int side, int node) const
 
 Point Voxel8::Local (const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
 
     Point loc(3);
     loc[0] = (glob[0]-x0)/dx;
@@ -81,7 +81,7 @@ Point Voxel8::NodeLocal (int node) const
     case 5: nloc[0] = nloc[2] = 1.0; break;
     case 6: nloc[1] = nloc[2] = 1.0; break;
     case 7: nloc[0] = nloc[1] = nloc[2] = 1.0; break;
-    default: xERROR (Node index out of range);
+    default: xERROR ("Node index out of range");
     }
     return nloc;
 }
@@ -97,13 +97,13 @@ const RVector &Voxel8::LNormal (int side) const
     static const RVector *lnm[6] = {
         &lnm0, &lnm1, &lnm2, &lnm3, &lnm4, &lnm5
     };
-    dASSERT (side >= 0 && side < 6, Argument 1 index out of range);
+    dASSERT (side >= 0 && side < 6, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Voxel8::LContains (const Point &loc, bool pad) const
 {
-    dASSERT (loc.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 3, "Argument 1 invalid dimension");
 
     if (pad) {
         const double EPS = 1e-8;
@@ -127,7 +127,7 @@ bool Voxel8::GContains (const Point &glob, const NodeList&) const
 
 RVector Voxel8::LocalShapeF (const Point &loc) const
 {
-    dASSERT (loc.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 3, "Argument 1 invalid dimension");
     RVector fun(8);
     double iloc0 = 1.0-loc[0], iloc1 = 1.0-loc[1], iloc2 = 1.0-loc[2];
 
@@ -144,7 +144,7 @@ RVector Voxel8::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Voxel8::LocalShapeD (const Point &loc) const
 {
-    dASSERT (loc.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 3, "Argument 1 invalid dimension");
 
     double iloc0 = 1.0-loc[0], iloc1 = 1.0-loc[1], iloc2 = 1.0-loc[2];
     RDenseMatrix der(3,8);
@@ -2095,7 +2095,7 @@ static RVector coeff(864,"-18 -18 -18 18 -6 -6 -6 18 -6 6 6 -2 -6 -6 18 6 -2 6 -
     case 0: return (coeff[(17*jj-jj*jj)*12+(24*(ii-jj))+(k*3)+0]/864.0*dy*dz); //look up correct coeff;
     case 1: return (coeff[(17*jj-jj*jj)*12+(24*(ii-jj))+(k*3)+1]/864.0*dx*dz); //look up correct coeff;
     case 2: return (coeff[(17*jj-jj*jj)*12+(24*(ii-jj))+(k*3)+2]/864.0*dx*dy); //look up correct coeff;
-    default: xERROR(Invalid coefficient); return 0;
+    default: xERROR("Invalid coefficient"); return 0;
     }
 }
 

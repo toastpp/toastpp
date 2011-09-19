@@ -95,9 +95,9 @@ template<class MT>
 MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon, int maxit)
 {
-    dASSERT(A.rows == A.cols, Matrix not square);
-    dASSERT(b.Dim() == A.rows, Dimension mismatch);
-    dASSERT(x.Dim() == A.rows, Dimension mismatch);
+    dASSERT(A.rows == A.cols, "Matrix not square");
+    dASSERT(b.Dim() == A.rows, "Dimension mismatch");
+    dASSERT(x.Dim() == A.rows, "Dimension mismatch");
 
     double dnew, dold, alpha, beta;
     double err, bnorm;
@@ -159,12 +159,13 @@ MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
 {
     int i, it;
     double tol0 = tol;    
+    if (res) res->it_count = 0;
 
     for (i = 0; i < nrhs; i++) {
         tol = tol0;
 	it = PCG (A, b[i], x[i], tol, precon, maxit);
 	if (res) {
-	    if (!i || it > res->it_count) res->it_count = it;
+	    res->it_count += it;
 	    if (!i || tol > res->rel_err) res->rel_err = tol;
 	}
     }
@@ -250,7 +251,7 @@ int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 
 	bden = rho;
 	rho = z & rd;
-	xASSERT (rho != 0.0, BiCG solver fails);
+	xASSERT (rho != 0.0, "BiCG solver fails");
 	if (!niter) {
 	    p = z;
 	    pd = zd;
@@ -306,7 +307,7 @@ int BiPCG<toast::complex> (const CMatrix &A, const CVector &b, CVector &x,
 	for (rho = 0.0, i = 0; i < dim; i++)
 	    rho += z[i].re*rd[i].re + z[i].im*rd[i].im;
 	    // is this equivalent to rho = re(conj(z) & rd) ?
-	xASSERT(rho != 0.0, BiCG solver fails);
+	xASSERT(rho != 0.0, "BiCG solver fails");
 	if (!niter) {
 	    p = z;
 	    pd = zd;
@@ -408,6 +409,12 @@ MATHLIB int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
     //cerr << "BICGSTAB: " << niter << " iterations" << endl;
+    if (err > tol*bnorm)
+        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
+	     << " iterations" << endl;
+    else if (VERBOSE_LEVEL >= 2)
+        cerr << "BiCGSTAB converged after " << niter
+	     << " iterations (Residual " << err/bnorm << ")" << endl;
     tol = err/bnorm;
     return niter;
 }
@@ -427,7 +434,7 @@ MATHLIB int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
         rhop = rho;
         for (rho = 0.0, i = 0; i < dim; i++)
 	    rho += rd[i].re*r[i].re + rd[i].im*r[i].im;
-	xASSERT(rho != 0.0, Bi-CGSTAB fails);
+	xASSERT(rho != 0.0, "Bi-CGSTAB fails");
 	if (!niter) {
 	    p = r;
 	} else {
@@ -470,6 +477,12 @@ MATHLIB int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
     //cerr << "BICGSTAB: " << niter << " iterations" << endl;
+    if (err > tol*bnorm)
+        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
+	     << " iterations" << endl;
+    else if (VERBOSE_LEVEL >= 2)
+        cerr << "BiCGSTAB converged after " << niter
+	     << " iterations (Residual " << err/bnorm << ")" << endl;
     tol = err/bnorm;
     return niter;
 }
@@ -489,7 +502,7 @@ MATHLIB int BiCGSTAB<scomplex> (const SCMatrix &A, const SCVector &b,
         rhop = rho;
         for (rho = 0.0, i = 0; i < dim; i++)
 	    rho += rd[i].re*r[i].re + rd[i].im*r[i].im;
-	xASSERT(rho != 0.0, Bi-CGSTAB fails);
+	xASSERT(rho != 0.0, "Bi-CGSTAB fails");
 	if (!niter) {
 	    p = r;
 	} else {
@@ -532,6 +545,12 @@ MATHLIB int BiCGSTAB<scomplex> (const SCMatrix &A, const SCVector &b,
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
     //cerr << "BICGSTAB: " << niter << " iterations" << endl;
+    if (err > tol*bnorm)
+        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
+	     << " iterations" << endl;
+    else if (VERBOSE_LEVEL >= 2)
+        cerr << "BiCGSTAB converged after " << niter
+	     << " iterations (Residual " << err/bnorm << ")" << endl;
     tol = err/bnorm;
     return niter;
 }
@@ -545,12 +564,13 @@ MATHLIB void BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> *b,
 {
     int i, it;
     double tol0 = tol;    
+    if (res) res->it_count = 0;
 
     for (i = 0; i < nrhs; i++) {
         tol = tol0;
 	it = BiCGSTAB (A, b[i], x[i], tol, precon, maxit);
 	if (res) {
-	    if (!i || it > res->it_count) res->it_count = it;
+	    res->it_count += it;
 	    if (!i || tol > res->rel_err) res->rel_err = tol;
 	}
     }
@@ -624,6 +644,9 @@ MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
     //cerr << "BICGSTAB: " << niter << " iterations" << endl;
+    if (err > tol*bnorm)
+        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
+	     << " iterations" << endl;
     tol = err/bnorm;
     return niter;
 }
@@ -694,6 +717,12 @@ MATHLIB int BiCGSTAB (void (* MVM)( TVector<MT> &),  const TVector<MT> &b,
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
     //cerr << "BICGSTAB: " << niter << " iterations" << endl;
+    if (err > tol*bnorm)
+        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
+	     << " iterations" << endl;
+    else if (VERBOSE_LEVEL >= 2)
+        cerr << "BiCGSTAB converged after " << niter
+	     << " iterations (Residual " << err/bnorm << ")" << endl;
     tol = err/bnorm;
     return niter;
 }
@@ -705,18 +734,18 @@ MATHLIB int BiCGSTAB (void (* MVM)( TVector<MT> &),  const TVector<MT> &b,
 
 template<class MT>
 MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
-    double &tol, TPreconditioner<MT> *precon, int restart,
+    double &tol, TPreconditioner<MT> *precon, int restart, int maxit,
     void (*clbk)(void*))
 {
-    return gmres (restart, A, b, x, precon, tol, clbk);
+    return gmres (restart, A, b, x, precon, tol, maxit, clbk);
 }
 
 template<class MT>
 MATHLIB int GMRES (TVector<MT> (*Av_clbk)(const TVector<MT> &v, void *context),
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,
-    TPreconditioner<MT> *precon, int restart, int *iter, double *res)
+    TPreconditioner<MT> *precon, int restart, int maxit, int *iter, double *res)
 {
-    int it = gmres (restart, Av_clbk, b, x, precon, tol, context);
+    int it = gmres (restart, Av_clbk, b, x, precon, tol, maxit, context);
     if (iter) *iter = it;
     if (res) *res = tol;
     return 0;
@@ -809,20 +838,23 @@ template MATHLIB int BiCGSTAB (void (* MVM)(RVector &),  const RVector &b,
     RVector &x, double &tol, RPreconditioner *precon, int maxit);
 
 template MATHLIB int GMRES (const FMatrix &A, const FVector &b, FVector &x,
-    double &tol, FPreconditioner *precon, int maxit, void(*clbk)(void*));
+    double &tol, FPreconditioner *precon, int restart, int maxit,
+    void(*clbk)(void*));
 template MATHLIB int GMRES (const RMatrix &A, const RVector &b, RVector &x,
-    double &tol, RPreconditioner *precon, int maxit, void(*clbk)(void*));
+    double &tol, RPreconditioner *precon, int restart, int maxit,
+    void(*clbk)(void*));
 template MATHLIB int GMRES (const CMatrix &A, const CVector &b, CVector &x,
-    double &tol, CPreconditioner *precon, int maxit, void(*clbk)(void*));
+    double &tol, CPreconditioner *precon, int restart, int maxit,
+    void(*clbk)(void*));
 template MATHLIB int GMRES (const SCMatrix &A, const SCVector &b, SCVector &x,
-    double &tol, SCPreconditioner *precon, int maxit,
+    double &tol, SCPreconditioner *precon, int restart, int maxit,
     void(*clbk)(void*));
 
 template MATHLIB int GMRES (RVector (*Av_clbk)(const RVector &v, void *context),
     void *context, const RVector &b, RVector &x, double tol,
-    RPreconditioner *precon, int restart, int *iter, double *res);
+    RPreconditioner *precon, int restart, int maxit, int *iter, double *res);
 template MATHLIB int GMRES (CVector (*Av_clbk)(const CVector &v, void *context),
     void *context, const CVector &b, CVector &x, double tol,
-    CPreconditioner *precon, int restart, int *iter, double *res);
+    CPreconditioner *precon, int restart, int maxit, int *iter, double *res);
 
 #endif // NEED_EXPLICIT_INSTANTIATION

@@ -140,6 +140,7 @@ int main (void)
     // now refine elements
     for (r = 0; r < res; r++) {
 
+        cout << "Starting refinement level " << r+1 << " of " << res << endl;
         nlen = mesh.nlen();
         elen = mesh.elen();
         NodeList newnl (elen*6); // max number of new nodes
@@ -229,7 +230,10 @@ int main (void)
 	mesh.nlist.Append (newnl_len);
 	for (i = 0; i < newnl_len; i++)
 	    mesh.nlist[nlen+i].Copy (newnl[i]);
+	cout << "Mesh now has " << mesh.nlen() << " nodes, " << mesh.elen()
+	     << " elements" << endl;
     }
+    cout << "Finished refinement" << endl;
 
     mesh.plist.New (mesh.nlen());
     mesh.plist.SetMua (hmua);

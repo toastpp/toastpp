@@ -29,7 +29,7 @@ void SelectSourceProfile (ParamParser &pp, int &qtype, double &qwidth, SourceMod
 	cout << "[1|2] >> ";
 	cin  >> cmd;
 	cout<<cmd<<endl;
-	xASSERT(cmd == 1 || cmd == 2, Unidentified source type.);
+	xASSERT(cmd == 1 || cmd == 2, "Unidentified source type.");
 	switch (cmd) {
 	    case 1: srctp = SRCMODE_NEUMANN;   typeok = true; break;
 	    case 2: srctp = SRCMODE_ISOTROPIC; typeok = true; break;
@@ -56,7 +56,7 @@ void SelectSourceProfile (ParamParser &pp, int &qtype, double &qwidth, SourceMod
 	cout << "[1|2|3] >> ";
 	cin  >> qtype;
 	cout<<qtype<<endl;
-	xASSERT(qtype == 1 || qtype == 2 || qtype == 3, Unidentified source profile.);
+	xASSERT(qtype == 1 || qtype == 2 || qtype == 3, "Unidentified source profile.");
 	qtype -= 1;
     }
     if (qtype > 0 && !pp.GetReal ("SOURCEWIDTH", qwidth)) {
@@ -579,7 +579,7 @@ void genmat_intsourceuncollided(const IVector& sphOrder, const IVector& node_ang
 }
 void genmat_intsourceuncollidedvalvector(const IVector& sphOrder, const IVector& node_angN, const IVector& offset, RCompRowMatrix& Svec, Mesh& mesh, const int Nsource, RVector& dirVec, const RDenseMatrix& pts, const RVector& wts, const RVector &mua, const RVector &mus, const RVector &delta, const double g)
 {
-   xASSERT(length(dirVec) != 0, dirVec should be defined for uncollided sources);  
+   xASSERT(length(dirVec) != 0, "dirVec should be defined for uncollided sources");  
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
    int fullsysdim = sum(node_angN);   // full size of angles X space nodes
    NodeList &nlist=mesh.nlist;

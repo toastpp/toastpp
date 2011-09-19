@@ -8,22 +8,28 @@
 
 #include <cuda_runtime.h>
 #include <iostream>
-#include <fstream>
-#include <cusp/blas.h>
 #include <cusp/csr_matrix.h>
 #include <cusp/krylov/cg.h>
 #include <cusp/krylov/bicgstab.h>
 #include <cusp/precond/diagonal.h>
+#include <cusp/precond/ainv.h>
+#include <cusp/precond/smoothed_aggregation.h>
 
 #define MATHLIB DLLEXPORT
 
 using namespace std;
+
+static CuspPreconType g_precontp = CUSP_PRECON_IDENTITY;
 
 // ===========================================================
 
 void cuda_EchoDeviceProperties ()
 {
     struct cudaDeviceProp prop;
+    int dev, devno;
+    cudaGetDevice (&dev);
+    cudaGetDeviceCount (&devno);
+    cout << "Device no: " << dev << " of " << devno << endl;
     cudaGetDeviceProperties (&prop, 0);
     cout << "Device: " << prop.name << endl;
     cout << "Global mem: " << prop.totalGlobalMem << endl;
@@ -48,6 +54,93 @@ void cuda_EchoDeviceProperties ()
     cout << "Can map host memory: " << prop.canMapHostMemory << endl;
     cout << "Compute mode: " << prop.computeMode << endl;
 }
+
+// ===========================================================
+
+bool cuda_SetDevice (int device)
+{
+    return (cudaSetDevice (device) == cudaSuccess);
+}
+
+// ===========================================================
+
+void cuda_Init (int device)
+{
+    cuda_SetDevice (device);
+    cuda_EchoDeviceProperties ();
+}
+
+// ===========================================================
+
+void cuda_SetCuspPrecon (CuspPreconType precontp)
+{
+    g_precontp = precontp;
+}
+
+// ===========================================================
+
+template<typename ValueType, typename MemorySpace, typename IndexType=int>
+class dynamic_preconditioner
+: public cusp::linear_operator<ValueType,MemorySpace,IndexType>
+{
+public:
+    template<typename Matrix> dynamic_preconditioner (Matrix &matrix,
+        CuspPreconType precontp) : precontp(precontp)
+    {
+        switch (precontp) {
+	case CUSP_PRECON_IDENTITY:
+	    precon_ident = new cusp::identity_operator<ValueType,MemorySpace>
+	    (matrix.num_rows,matrix.num_cols);
+	    break;
+	case CUSP_PRECON_DIAGONAL:
+	    precon_diag = new cusp::precond::diagonal<ValueType,MemorySpace>
+	      (matrix);
+	    break;
+	case CUSP_PRECON_AINV:
+	    precon_ainv = new cusp::precond::bridson_ainv<ValueType,MemorySpace>
+	      (matrix, 0.01, 1000, false,1);
+	    break;
+	case CUSP_PRECON_SMOOTHED_AGGREGATION:
+	    precon_smagg = new cusp::precond::smoothed_aggregation<IndexType,
+	      ValueType,MemorySpace> (matrix);
+	    break;
+	}
+    }
+
+    ~dynamic_preconditioner ()
+    {
+        switch (precontp) {
+	case CUSP_PRECON_IDENTITY: delete precon_ident; break;
+	case CUSP_PRECON_DIAGONAL: delete precon_diag;  break;
+	case CUSP_PRECON_AINV:     delete precon_ainv;  break;
+	case CUSP_PRECON_SMOOTHED_AGGREGATION:
+	    delete precon_smagg; break;
+	}
+    }
+
+    template<typename VectorType1, typename VectorType2>
+    void operator()(const VectorType1 &x, VectorType2 &y) const
+    {
+        switch (precontp) {
+	case CUSP_PRECON_IDENTITY:
+	    (*precon_ident)(x,y); break;
+	case CUSP_PRECON_DIAGONAL:
+	    (*precon_diag)(x,y); break;
+	case CUSP_PRECON_AINV:
+	    (*precon_ainv)(x,y); break;
+	case CUSP_PRECON_SMOOTHED_AGGREGATION:
+	    (*precon_smagg)(x,y); break;
+	}
+    }
+
+private:
+    CuspPreconType precontp;
+    cusp::identity_operator<ValueType,MemorySpace> *precon_ident;
+    cusp::precond::diagonal<ValueType,MemorySpace> *precon_diag;
+    cusp::precond::bridson_ainv<ValueType,MemorySpace> *precon_ainv;
+    cusp::precond::smoothed_aggregation<IndexType,ValueType,MemorySpace>
+      *precon_smagg;
+};
 
 // ===========================================================
 
@@ -181,9 +274,13 @@ void cuda_CG (const T *A_val, const int *A_rowptr,
 
     cusp::default_monitor<T> monitor(db,maxit,tol);
 
-    cusp::precond::diagonal<T, cusp::device_memory> M(dA);
+    // set preconditioner
+    dynamic_preconditioner<T,cusp::device_memory> *M =
+        new dynamic_preconditioner<T, cusp::device_memory>(dA, g_precontp);
 
-    cusp::krylov::cg(dA,dx,db,monitor,M);
+    cusp::krylov::cg(dA,dx,db,monitor,*M);
+
+    delete M;
 
     // Copy result back to host memory
     cusp::array1d<T,cusp::host_memory>x = dx;
@@ -213,7 +310,8 @@ void cuda_CG (const T *A_val, const int *A_rowptr,
 	 << ")" << endl;
 
     if (!maxit) maxit = m+1;
-      
+    if (res) res->it_count = 0;
+
     // Copy toast to cusp matrix format
     int i, iq, nz = A_rowptr[m];
     cusp::csr_matrix<int,T,cusp::host_memory> A(m,n,nz);
@@ -228,8 +326,9 @@ void cuda_CG (const T *A_val, const int *A_rowptr,
     // Copy to device memory
     cusp::csr_matrix<int,T,cusp::device_memory>dA = A;
 
-    //cusp::identity_operator<T,cusp::device_memory> M(m,m);
-    cusp::precond::diagonal<T, cusp::device_memory> M(dA);
+    // set preconditioner
+    dynamic_preconditioner<T,cusp::device_memory> *M =
+        new dynamic_preconditioner<T, cusp::device_memory>(dA, g_precontp);
 
     for (iq = 0; iq < nrhs; iq++) {
         const T *bq_val = b_val[iq];
@@ -243,7 +342,7 @@ void cuda_CG (const T *A_val, const int *A_rowptr,
 
 	cusp::default_monitor<T> monitor(db,maxit,tol);
 
-	cusp::krylov::cg(dA,dx,db,monitor,M);
+	cusp::krylov::cg(dA,dx,db,monitor,*M);
 
 	// Copy result back to host memory
 	cusp::array1d<T,cusp::host_memory>x = dx;
@@ -261,10 +360,12 @@ void cuda_CG (const T *A_val, const int *A_rowptr,
 	        it_count = maxit;
 	    }
 	    rel_error = monitor.residual_norm() * tol/monitor.tolerance();
-	    if (!iq || it_count > res->it_count) res->it_count = it_count;
+	    res->it_count += it_count;
 	    if (!iq || rel_error > res->rel_error) res->rel_error = rel_error;
 	}
     }
+
+    delete M;
 }
 
 // ===========================================================
@@ -302,10 +403,13 @@ void cuda_BiCGSTAB (const T *A_val, const int *A_rowptr,
 
     cusp::default_monitor<T> monitor(db,maxit,tol);
 
-    //cusp::identity_operator<T,cusp::device_memory> M(m,m);
-    cusp::precond::diagonal<T, cusp::device_memory> M(dA);
+    // set preconditioner
+    dynamic_preconditioner<T,cusp::device_memory> *M =
+        new dynamic_preconditioner<T, cusp::device_memory>(dA, g_precontp);
 
-    cusp::krylov::bicgstab(dA,dx,db,monitor,M);
+    cusp::krylov::bicgstab(dA,dx,db,monitor,*M);
+
+    delete M;
 
     // Copy result back to host memory
     cusp::array1d<T,cusp::host_memory>x = dx;
@@ -335,7 +439,8 @@ void cuda_BiCGSTAB (const T *A_val, const int *A_rowptr,
 	 << ")" << endl;
 
     if (!maxit) maxit = m+1;
-      
+    if (res) res->it_count = 0;
+
     // Copy toast to cusp matrix format
     int i, iq, nz = A_rowptr[m];
     cusp::csr_matrix<int,T,cusp::host_memory> A(m,n,nz);
@@ -350,8 +455,9 @@ void cuda_BiCGSTAB (const T *A_val, const int *A_rowptr,
     // Copy to device memory
     cusp::csr_matrix<int,T,cusp::device_memory>dA = A;
 
-    //cusp::identity_operator<T,cusp::device_memory> M(m,m);
-    cusp::precond::diagonal<T, cusp::device_memory> M(dA);
+    // set preconditioner
+    dynamic_preconditioner<T,cusp::device_memory> *M =
+        new dynamic_preconditioner<T, cusp::device_memory>(dA, g_precontp);
 
     for (iq = 0; iq < nrhs; iq++) {
         const T *bq_val = b_val[iq];
@@ -365,7 +471,7 @@ void cuda_BiCGSTAB (const T *A_val, const int *A_rowptr,
 
 	cusp::default_monitor<T> monitor(db,maxit,tol);
 
-	cusp::krylov::bicgstab(dA,dx,db,monitor,M);
+	cusp::krylov::bicgstab(dA,dx,db,monitor,*M);
 
 	// Copy result back to host memory
 	cusp::array1d<T,cusp::host_memory>x = dx;
@@ -383,10 +489,12 @@ void cuda_BiCGSTAB (const T *A_val, const int *A_rowptr,
 	        it_count = maxit;
 	    }
 	    rel_error = monitor.residual_norm() * tol/monitor.tolerance();
-	    if (!iq || it_count > res->it_count) res->it_count = it_count;
+	    res->it_count += it_count;
 	    if (!iq || rel_error > res->rel_error) res->rel_error = rel_error;
 	}
     }
+
+    delete M;
 }
 
 // ===========================================================
@@ -451,10 +559,13 @@ void cuda_BiCGSTAB_cplx (const T *A_val, const int *A_rowptr,
 
     cusp::default_monitor<TR> monitor(db,maxit,tol);
 
-    //cusp::identity_operator<TR,cusp::device_memory> M(m_real,m_real);
-    cusp::precond::diagonal<TR, cusp::device_memory> M(dA);
+    // set preconditioner
+    dynamic_preconditioner<TR,cusp::device_memory> *M =
+        new dynamic_preconditioner<TR, cusp::device_memory>(dA, g_precontp);
 
-    cusp::krylov::bicgstab(dA,dx,db,monitor,M);
+    cusp::krylov::bicgstab(dA,dx,db,monitor,*M);
+
+    delete M;
 
     cusp::array1d<TR,cusp::host_memory>x = dx;
     for (i = 0; i < n; i++) {
@@ -487,6 +598,7 @@ void cuda_BiCGSTAB_cplx (const T *A_val, const int *A_rowptr,
     // | A_im   A_re | | x_im |  =  | b_im |  
 
     if (!maxit) maxit = m+1;
+    if (res) res->it_count = 0;
 
     int i, j, iq, k, p0, p1, np;
     int nz = A_rowptr[m];
@@ -524,8 +636,9 @@ void cuda_BiCGSTAB_cplx (const T *A_val, const int *A_rowptr,
     // Copy to device memory
     cusp::csr_matrix<int,TR,cusp::device_memory>dA = A;
 
-    //cusp::identity_operator<TR,cusp::device_memory> M(m,m);
-    cusp::precond::diagonal<TR, cusp::device_memory> M(dA);
+    // set preconditioner
+    dynamic_preconditioner<TR,cusp::device_memory> *M =
+        new dynamic_preconditioner<TR, cusp::device_memory>(dA, g_precontp);
 
     for (iq = 0; iq < nrhs; iq++) {
         const T *bq_val = b_val[iq];
@@ -541,7 +654,7 @@ void cuda_BiCGSTAB_cplx (const T *A_val, const int *A_rowptr,
 
 	cusp::default_monitor<TR> monitor(db,maxit,tol);
 
-	cusp::krylov::bicgstab(dA,dx,db,monitor,M);
+	cusp::krylov::bicgstab(dA,dx,db,monitor,*M);
 
 	// Copy result back to host memory
 	cusp::array1d<TR,cusp::host_memory>x = dx;
@@ -561,10 +674,12 @@ void cuda_BiCGSTAB_cplx (const T *A_val, const int *A_rowptr,
 	        it_count = maxit;
 	    }
 	    rel_error = monitor.residual_norm() * tol/monitor.tolerance();
-	    if (!iq || it_count > res->it_count) res->it_count = it_count;
+	    res->it_count += it_count;
 	    if (!iq || rel_error > res->rel_error) res->rel_error = rel_error;
 	}
     }
+
+    delete M;
 }
 
 // ===========================================================
@@ -602,7 +717,8 @@ void Tstep_loop (int n, int nq, int nm,
     cusp::csr_matrix<int,T,cusp::device_memory>dK1 = K1;
 
     // preconditioner
-    cusp::precond::diagonal<T, cusp::device_memory> M(dK1);
+    //cusp::precond::diagonal<T, cusp::device_memory> M(dK1);
+    cusp::precond::bridson_ainv<T, cusp::device_memory> M(dK1);
 
     // copy field vectors
     cusp::array1d<T,cusp::device_memory> ddphi[nq];

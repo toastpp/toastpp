@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
     Mesh mesh;
 
     for (i = 1; i < argc; i++) {
-        xASSERT (argv[i][0] == '-', Error parsing command line);
+        xASSERT (argv[i][0] == '-', "Error parsing command line");
 	switch (argv[i][1]) {
 	case 'i':
 	    do_stdin = false;
@@ -46,7 +46,7 @@ int main (int argc, char *argv[])
 	    Usage();
 	    exit(0);
 	default:
-	    xERROR(Error parsing command line);
+	    xERROR("Error parsing command line");
 	    break;
 	}
     }

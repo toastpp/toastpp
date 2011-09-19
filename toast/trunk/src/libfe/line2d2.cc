@@ -79,7 +79,7 @@ void Line2D2::Initialise (const NodeList& nlist)
     a1 = -x0; b1 = 1;
 
     Element_Unstructured_2D::Initialise (nlist);
-    dASSERT(size > 0, Element size not positive);
+    dASSERT(size > 0, "Element size not positive");
 
 #ifdef LINE2D2_STORE_INTFF
     intff.New(2);
@@ -112,15 +112,15 @@ void Line2D2::Initialise (const NodeList& nlist)
 
 int Line2D2::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 1, Argument 1 index out of range);
-    dASSERT(node >= 0 && node < 1, Argument 2  index out of range);
+    dASSERT(side >= 0 && side < 1, "Argument 1 index out of range");
+    dASSERT(node >= 0 && node < 1, "Argument 2  index out of range");
     static int SN[2][1] = {{0}, {1}};
     return SN[side][node];
 }
 
 Point Line2D2::Local (const NodeList &nlist, const Point& glob) const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
 
     Point loc(2);
     double scale = 1.0/(a0+a1);
@@ -131,7 +131,7 @@ Point Line2D2::Local (const NodeList &nlist, const Point& glob) const
 
 Point Line2D2::NodeLocal (int node) const
 {
-    dASSERT(node >= 0 && node < 2, Argument 1 index out of range);
+    dASSERT(node >= 0 && node < 2, "Argument 1 index out of range");
     Point n(2);  // note: initialised to zero
     if (node == 1)      n[0] = 1.0;
     return n;
@@ -162,7 +162,7 @@ Point Line2D2::NodeLocal (int node) const
 //    static const RVector *lnm[3] = {
 //      &lnm0, &lnm1, &lnm2
 //    };
-//    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
+//    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
 //    return *lnm[side];
 //}
 
@@ -174,7 +174,7 @@ double Line2D2::ComputeSize (const NodeList &nlist) const
 
 bool Line2D2::LContains (const Point& loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -186,7 +186,7 @@ bool Line2D2::LContains (const Point& loc, bool pad) const
 
 //bool Line2D2::GContains (const Point& glob, const NodeList& nlist) const
 //{
-//    dASSERT(glob.Dim() == 2, Argument 1 invalid dimension);
+//    dASSERT(glob.Dim() == 2, "Argument 1 invalid dimension");
 //    double xx = glob[0], yy = glob[1];
 
     // check bounding box
@@ -214,7 +214,7 @@ bool Line2D2::LContains (const Point& loc, bool pad) const
 
 RVector Line2D2::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     static RVector fun(2);
     fun[0] = 1.0 - loc[0];
     fun[1] = loc[0];
@@ -223,7 +223,7 @@ RVector Line2D2::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Line2D2::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     static const RDenseMatrix der (1, 2, "-1 1");
     return der;
 }
@@ -231,7 +231,7 @@ RDenseMatrix Line2D2::LocalShapeD (const Point &loc) const
 RVector Line2D2::GlobalShapeF (const NodeList& nlist, const Point& glob)
     const
 {  // assume glob is on line. Otherwise drop perpendicular ?
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
     RVector fun(2);
     double scale = 1.0/(size);
     fun[0] = scale * (a0 + b0*glob[0]);
@@ -242,7 +242,7 @@ RVector Line2D2::GlobalShapeF (const NodeList& nlist, const Point& glob)
 RDenseMatrix Line2D2::GlobalShapeD (const NodeList &nlist,
     const Point &glob) const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
     RDenseMatrix der (1,2);
     double scale = 1.0/(size);
     der(0,0) = b0*scale;
@@ -321,7 +321,7 @@ double Line2D2::IntPFF (int i, int j, const RVector &P) const
 	}
 
     default:
-        xERROR(Index out of range);
+        xERROR("Index out of range");
         return 0.0; // dummy
     }
 }
@@ -339,7 +339,7 @@ double Line2D2::IntFd (int i, int j, int k) const
     case 1:
 	return ( b1) * scale;
     default:
-	xERROR(Invalid index);
+	xERROR("Invalid index");
 	return 0;
     }
 }
@@ -362,17 +362,17 @@ double Line2D2::IntFdd (int i, int j, int k, int l, int m) const
 
     double fac1, fac2;
 
-    dASSERT (l < 2 && m < 2, Invalid index);
+    dASSERT (l < 2 && m < 2, "Invalid index");
 
     switch (j) {
     case 0: fac1 = (b0 ); break;
     case 1: fac1 = ( b1); break;
-    default: xERROR (Invalid index); return 0;
+    default: xERROR ("Invalid index"); return 0;
     }
     switch (k) {
     case 0: fac2 = (b0 ); break;
     case 1: fac2 = ( b1); break;
-    default: xERROR (Invalid index); return 0;
+    default: xERROR ("Invalid index"); return 0;
     }
     return fac1 * fac2 / (2.0*size);
 }
@@ -405,7 +405,7 @@ RSymMatrix Line2D2::Intdd () const
 
 //int Line2D2::GetBndSubsampleAbsc (int side, const Point *&absc) const
 //{
-//    dASSERT (side >= 0 && side < 3, Argument 1 index out of range);
+//    dASSERT (side >= 0 && side < 3, "Argument 1 index out of range");
 //    return Triangle_GetBndSubsampleAbsc (side, absc);
 //}
 
@@ -424,9 +424,9 @@ void Line2D2::ComputeIntFD (const NodeList &nlist)
 
 RVector Line2D2::IntFD (int i, int j) const
 {
-    dASSERT(intfd_0 && intfd_1, FD matrix not initialised);
-    dASSERT(i >= 0 && i < 2, Parameter 1 index out of range);
-    dASSERT(j >= 0 && j < 2, Parameter 2 index out of range);
+    dASSERT(intfd_0 && intfd_1, "FD matrix not initialised");
+    dASSERT(i >= 0 && i < 2, "Parameter 1 index out of range");
+    dASSERT(j >= 0 && j < 2, "Parameter 2 index out of range");
 
     // note that Int{F_i D_j} is independent of i
 
@@ -533,7 +533,7 @@ RVector Line2D2::BndIntFCos (int side, const Surface *surf,
     const RVector &cntcos, double sigma, double sup, const NodeList &nlist)
     const
 {
-    dASSERT(surf->Dimension() == 2, Wrong surface dimension);
+    dASSERT(surf->Dimension() == 2, "Wrong surface dimension");
     Surface2D *surf2D = (Surface2D*)surf;
     double s, d0, tmp;
     bool flip;
@@ -590,7 +590,7 @@ RVector Line2D2::BndIntFCos (int side, const RVector &cntcos, double a,
 RVector Line2D2::BndIntFDelta (int side, const Surface *surf,
     const RVector &pos, const NodeList &nlist) const
 {
-    dASSERT(surf->Dimension() == 2, Wrong surface dimension);
+    dASSERT(surf->Dimension() == 2, "Wrong surface dimension");
     Surface2D *surf2D = (Surface2D*)surf;
     double s, d0, d1;
     int n0 = Node[SideNode (side, 0)];
@@ -666,7 +666,7 @@ int Line2D2::Intersection (const Point &p1, const Point &p2, Point **list)
     int pindx = 0;
     Point *s;
 
-    dASSERT(p1.Dim() == 2 && p2.Dim() == 2, Points must be 2D.);
+    dASSERT(p1.Dim() == 2 && p2.Dim() == 2, "Points must be 2D.");
     s = new Point[2];
     s[0].New(2), s[1].New(2);
 
@@ -734,7 +734,7 @@ int Line2D2::Intersection (const Point &p1, const Point &p2, Point **list)
 	    if (smax+EPS < pmin || smin-EPS > pmax) pindx=0;
 	}
     }
-    xASSERT(pindx == 0 || pindx == 2, Something went wrong...);
+    xASSERT(pindx == 0 || pindx == 2, "Something went wrong...");
     if (!pindx) {
 	s[0].New(0), s[1].New(0);
 	delete s;

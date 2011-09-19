@@ -34,7 +34,7 @@ int main (void)
     switch (dimension) {
     case 2:  Convert2DMesh (mesh); break;
     case 3:  Convert3DMesh (mesh); break;
-    default: xERROR (Invalid mesh dimension); break;
+    default: xERROR ("Invalid mesh dimension"); break;
     }
 
     mesh.Setup();
@@ -58,7 +58,7 @@ void Convert2DMesh (Mesh &mesh)
     for (el = 0; el < elen; el++) {
         if (!(el % 1000)) cerr << "Processing el " << el << endl;
         Element *pel = mesh.elist[el];
-	xASSERT (pel->Type() == ELID_TRI3OLD, Unsupported element type);
+	xASSERT (pel->Type() == ELID_TRI3OLD, "Unsupported element type");
 
 	// check node orientation
 	double x0 = mesh.nlist[pel->Node[0]][0];
@@ -157,7 +157,7 @@ void Convert2DMesh (Mesh &mesh)
 
 void Convert3DMesh (Mesh &mesh)
 {
-    xERROR (Not implemented);
+    ERROR_UNDEF;
 #ifdef UNDEF
     const int edgend[6][2] = {{0,1},{0,2},{0,3},{1,2},{1,3},{2,3}};
     int el, elen, nlen, edge, i, j;
@@ -173,7 +173,7 @@ void Convert3DMesh (Mesh &mesh)
     for (el = 0; el < elen; el++) {
         if (!(el % 1000)) cerr << "Processing el " << el << endl;
         Element *pel = mesh.elist[el];
-	xASSERT (pel->Type() == ELID_TET4, Unsupported element type);
+	xASSERT (pel->Type() == ELID_TET4, "Unsupported element type");
 
 	Element *qel = new Tetrahedron10;
 	for (edge = 0; edge < 6; edge++) {

@@ -96,7 +96,7 @@ public:
     double IntPFF (int i, int j, const RVector& P) const;
     double IntFDD (int i, int j, int k) const;
     RSymMatrix IntPDD (const RVector& P) const
-    { xERROR(Not implemented); return RSymMatrix(); }
+    { ERROR_UNDEF; return RSymMatrix(); }
     double IntPDD (int i, int j, const RVector &P) const;
 
     double IntFd (int i, int j, int k) const;
@@ -126,7 +126,7 @@ public:
     double BndIntFFSide (int i, int j, int sd);
 
     RSymMatrix BndIntPFF (const RVector &P) const
-    { xERROR(Not implemented); return RSymMatrix(); }
+    { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
 
     /**

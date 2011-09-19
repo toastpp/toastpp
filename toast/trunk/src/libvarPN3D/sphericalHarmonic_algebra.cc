@@ -7,7 +7,7 @@ double dfactorial[] = {1.000000e+000, 1.000000e+000, 2.000000e+000, 3.000000e+00
 /** factorial
 **/
 double factorial(int n){
-     xASSERT(n >= 0, Factorial is defined only for non-negative integers);
+     xASSERT(n >= 0, "Factorial is defined only for non-negative integers");
      if(n <= 100) return(fac[n]);
      else return(n * factorial(n-1));
 }
@@ -22,7 +22,7 @@ double doublefactorial(int n){
 /** Computes C^{n} where C is a 'complex' number and 'n' is a positive integer
 **/
 toast::complex cpowi(toast::complex &c, const int m){
-        xASSERT(m >= 0, cpowi is defined only for non-negative exponents);
+        xASSERT(m >= 0, "cpowi is defined only for non-negative exponents");
 	toast::complex ans(1, 0);
 	for(int i = 0; i < m; i++) ans = ans*c;
 

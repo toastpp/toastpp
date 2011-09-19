@@ -383,11 +383,12 @@ public:
     TCompRowMatrix<T> *FL;  ///< lower triangle of system matrix decomposition
     TVector<T> *Fd;         ///< diagonal of Cholesky factorisation
     TPreconditioner<T> *precon; ///< preconditioner instance
-    TCompRowMatrix<T> *B;  ///< mass matrix; only used for time-domain problems
+    TCompRowMatrix<T> *B;   ///< mass matrix; only used for time-domain problems
     //mutable SuperLU_data<T> lu_data; ///< parameters for LU solver
     void *SuperLU;          ///< SuperLU solver engine
     double iterative_tol;   ///< iterative solver tolerance
-    int iterative_maxit;   ///< iterative solver max iterations (0 for auto)
+    int iterative_maxit;    ///< iterative solver max iterations (0 for auto)
+    PreconType precontp;    ///< preconditioner
 
 protected:
     void Setup ();

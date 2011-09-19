@@ -69,8 +69,15 @@ void SetReflectionFunction (ReflectionType rt, double A)
         ReflectionTerm = A_Const;
 	break;
     default:
-        xERROR(Panic);
+        xERROR("Panic");
     }
+}
+
+double Parameter::C2A (ReflectionType rt, double n)
+{
+    typedef double(*A_FUNC)(double);
+    A_FUNC A_func[3] = {A_Keijzer, A_Contini, A_Const};
+    return c0/(2.0*n*A_func[rt](n));
 }
 
 Parameter &Parameter::operator= (const Parameter &prm)
@@ -110,7 +117,7 @@ double Parameter::Param (ParameterType prmtp) const
     case PRM_XI:     return 1.0/CKappa();
     case PRM_A:      return A();
     case PRM_C2A:    return C2A();
-    default:         xERROR(Function not supported for this parameter type);
+    default:         xERROR("Function not supported for this parameter type");
                      return 0.0; // dummy
     }
 }
@@ -124,10 +131,10 @@ void Parameter::SetParam (ParameterType prmtp, const double val)
     case PRM_CMUA:   SetCMua (val); return;
     case PRM_CKAPPA: SetCKappa (val); return;
     case PRM_MUS:    SetMus (val); return;
-    case PRM_CMUS:   xERROR(Set c_mus not implemented.); return;
+    case PRM_CMUS:   xERROR("Set c_mus not implemented."); return;
     case PRM_C:      SetC (val); return;
     case PRM_A:      SetA (val); return;
-    default:         xERROR(Function not supported for this parameter type);
+    default:         xERROR("Function not supported for this parameter type");
     }
 }
 
@@ -148,10 +155,10 @@ ostream& operator<< (ostream& os, Parameter& prm)
 void Parameter::get (istream &is, ParameterType p1, ParameterType p2,
 		     ParameterType p3)
 {
-    dASSERT(p1 == PRM_MUA || p1 == PRM_CMUA, Invalid parameter type 1.);
+    dASSERT(p1 == PRM_MUA || p1 == PRM_CMUA, "Invalid parameter type 1.");
     dASSERT(p2 == PRM_KAPPA || p2 == PRM_CKAPPA || p2 == PRM_MUS ||
-	   p2 == PRM_CMUS, Invalid parameter type 2.);
-    dASSERT(p3 == PRM_N || p3 == PRM_C, Invalid parameter type 3.);
+	   p2 == PRM_CMUS, "Invalid parameter type 2.");
+    dASSERT(p3 == PRM_N || p3 == PRM_C, "Invalid parameter type 3.");
     double v1, v2, v3;
     is >> v1 >> v2 >> v3;
     SetParam (p1, v1);
@@ -162,10 +169,10 @@ void Parameter::get (istream &is, ParameterType p1, ParameterType p2,
 void Parameter::put (ostream &os, ParameterType p1, ParameterType p2,
 		     ParameterType p3)
 {
-    dASSERT(p1 == PRM_MUA || p1 == PRM_CMUA, Invalid parameter type 1.);
+    dASSERT(p1 == PRM_MUA || p1 == PRM_CMUA, "Invalid parameter type 1.");
     dASSERT(p2 == PRM_KAPPA || p2 == PRM_CKAPPA || p2 == PRM_MUS ||
-	   p2 == PRM_CMUS, Invalid parameter type 2.);
-    dASSERT(p3 == PRM_N || p3 == PRM_C, Invalid parameter type 3.);
+	   p2 == PRM_CMUS, "Invalid parameter type 2.");
+    dASSERT(p3 == PRM_N || p3 == PRM_C, "Invalid parameter type 3.");
     os << Param(p1) << ' ' << Param(p2) << ' ' << Param(p3);
 }
 
@@ -201,7 +208,7 @@ void ParameterList::New (const int _size)
     if (size) delete []list;
     if ((size = _size) != 0) {
 	list = new Parameter[size];
-	dASSERT(list, Memory allocation failed.);
+	dASSERT(list, "Memory allocation failed.");
     } else list = 0;
 }
 
@@ -220,14 +227,14 @@ void ParameterList::SetList (int no, Parameter *prms)
 void ParameterList::Swap (const int rec1, const int rec2)
 {
     dASSERT(rec1 >= 0 && rec1 < size && rec2 >= 0 && rec2 < size,
-	   Index out of range.);
+	   "Index out of range.");
     ::Swap (list[rec1], list[rec2]);
 }
 
 void ParameterList::Append (int number)
 {
     Parameter *tmplist = new Parameter[size+number];
-    dASSERT(tmplist, Memory allocation failed);
+    dASSERT(tmplist, "Memory allocation failed");
     for (int i = 0; i < size; i++) tmplist[i] = list[i];
     if (size) delete []list;
     list = tmplist;
@@ -238,7 +245,7 @@ void ParameterList::Remove (const int rec)
 {
     int i;
 
-    dASSERT (rec >= 0 && rec < size, Index out of range);
+    dASSERT (rec >= 0 && rec < size, "Index out of range");
     Parameter *tmplist = new Parameter[size-1];
     for (i = 0; i < rec; i++) tmplist[i] = list[i];
     for (i = rec+1; i < size; i++) tmplist[i-1] = list[i];
@@ -256,13 +263,13 @@ RVector ParameterList::Param (ParameterType prmtp) const
 
 void ParameterList::Param (ParameterType prmtp, RVector &prmvec) const
 {
-    dASSERT(prmvec.Dim() == size, Wrong size vector.);
+    dASSERT(prmvec.Dim() == size, "Wrong size vector.");
     for (int i = 0; i < size; i++) prmvec[i] = list[i].Param (prmtp);
 }
 
 void ParameterList::SetParam (ParameterType prmtp, const RVector &prmvec)
 {
-    dASSERT(prmvec.Dim() == size, Vector has wrong size.);
+    dASSERT(prmvec.Dim() == size, "Vector has wrong size.");
     for (int i = 0; i < size; i++) list[i].SetParam (prmtp, prmvec[i]);
 }
 
@@ -274,7 +281,7 @@ void ParameterList::SetParam (ParameterType prmtp, double prm)
 #ifdef FEM_DEBUG
 Parameter& ParameterList::operator[] (const int rec) const
 {
-    dASSERT(rec >= 0 && rec < size, Index out of range.);
+    dASSERT(rec >= 0 && rec < size, "Index out of range.");
     return list[rec];
 }
 #endif
@@ -295,28 +302,28 @@ istream& operator>> (istream& is, ParameterList& plist)
     do {   // read parameter list header
 	is.getline (cbuf, 256);
 	if (!strncasecmp (cbuf, "Size", 4)) {
-	    xASSERT(sscanf (cbuf+4, "%d", &size) == 1, Parse error.);
+	    xASSERT(sscanf (cbuf+4, "%d", &size) == 1, "Parse error.");
 	} else if (!strncasecmp (cbuf, "Param1", 6)) {
-	    xASSERT(sscanf (cbuf+6, "%s", valstr) == 1, Parse error.);
+	    xASSERT(sscanf (cbuf+6, "%s", valstr) == 1, "Parse error.");
 	    if (!strcasecmp (valstr, "MUA")) p1 = PRM_MUA;
 	    else if (!strcasecmp (valstr, "CMUA")) p1 = PRM_CMUA;
-	    else xERROR(Parse error.);
+	    else xERROR("Parse error.");
 	} else if (!strncasecmp (cbuf, "Param2", 6)) {
-	    xASSERT(sscanf (cbuf+6, "%s", valstr) == 1, Parse error.);
+	    xASSERT(sscanf (cbuf+6, "%s", valstr) == 1, "Parse error.");
 	    if (!strcasecmp (valstr, "KAPPA")) p2 = PRM_KAPPA;
 	    else if (!strcasecmp (valstr, "CKAPPA")) p2 = PRM_CKAPPA;
 	    else if (!strcasecmp (valstr, "MUS")) p2 = PRM_MUS;
 	    else if (!strcasecmp (valstr, "CMUS")) p2 = PRM_CMUS;
-	    else xERROR(Parse error.);
+	    else xERROR("Parse error.");
 	} else if (!strncasecmp (cbuf, "Param3", 6)) {
-	    xASSERT(sscanf (cbuf+6, "%s", valstr) == 1, Parse error.);
+	    xASSERT(sscanf (cbuf+6, "%s", valstr) == 1, "Parse error.");
 	    if (!strcasecmp (valstr, "N")) p3 = PRM_N;
 	    else if (!strcasecmp (valstr, "C")) p3 = PRM_C;
-	    else xERROR(Parse error.);
+	    else xERROR("Parse error.");
 	}
     } while (strncasecmp (cbuf, "Data", 4));
 
-    xASSERT(size > 0, No parameter list found or zero list size);
+    xASSERT(size > 0, "No parameter list found or zero list size");
     plist.New (size);
     plist.plist_type = plist_type;
     for (i = 0; i < size; i++) plist[i].get (is, p1, p2, p3);  // read data
@@ -328,15 +335,15 @@ void ParameterList::SetOutputParameterTypes (const ParameterType p1,
 {
     if (p1 == PRM_MUA || p1 == PRM_CMUA)
 	output_prmtp_p1 = p1;
-    else xERROR(Invalid parameter type for P1);
+    else xERROR("Invalid parameter type for P1");
 
     if (p2 == PRM_KAPPA || p2 == PRM_CKAPPA || p2 == PRM_MUS || p2 == PRM_CMUS)
 	output_prmtp_p2 = p2;
-    else xERROR(Invalid parameter type for P2);
+    else xERROR("Invalid parameter type for P2");
 
     if (p3 == PRM_N || p3 == PRM_C)
 	output_prmtp_p3 = p3;
-    else xERROR(Invalid parameter type for P3);
+    else xERROR("Invalid parameter type for P3");
 }
 
 ostream& operator<< (ostream& os, const ParameterList& plist)
@@ -347,7 +354,7 @@ ostream& operator<< (ostream& os, const ParameterList& plist)
     switch (plist.output_prmtp_p1) {
         case PRM_MUA: os << "MUA" << endl; break;
         case PRM_CMUA: os << "CMUA" << endl; break;
-        default: xERROR(Invalid parameter 1 setting);
+        default: xERROR("Invalid parameter 1 setting");
     }
     os << "Param2 ";
     switch (plist.output_prmtp_p2) {
@@ -355,13 +362,13 @@ ostream& operator<< (ostream& os, const ParameterList& plist)
         case PRM_CKAPPA: os << "CKAPPA" << endl; break;
         case PRM_MUS: os << "MUS" << endl; break;
         case PRM_CMUS: os << "CMUS" << endl; break;
-        default: xERROR(Invalid parameter 2 setting);
+        default: xERROR("Invalid parameter 2 setting");
     }
     os << "Param3 ";
     switch (plist.output_prmtp_p3) {
         case PRM_N: os << "N" << endl; break;
         case PRM_C: os << "C" << endl; break;
-        default: xERROR(Invalid parameter 3 setting);
+        default: xERROR("Invalid parameter 3 setting");
     }
     os << "Data" << endl;
     for (int i = 0; i < plist.Len(); i++) {

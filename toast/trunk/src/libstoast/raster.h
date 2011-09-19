@@ -110,6 +110,18 @@ public:
     inline int *BElref() const { return belref; }
 
     /**
+     * \brief Returns the positions of all basis points in a matrix.
+     * \param [out] pos matrix of basis point positions (blen x dim)
+     */
+    void BasisVoxelPositions (RDenseMatrix &pos) const;
+
+    /**
+     * \brief Returns the positions of all solution points in a matrix.
+     * \param [out] pos matrix of solution point positions (slen x dim)
+     */
+    void SolutionVoxelPositions (RDenseMatrix &pos) const;
+
+    /**
      * \brief Map a real-valued field from mesh to grid representation.
      * \param [in] mvec field vector in mesh representation
      * \param [out] bvec field vector in grid representation
@@ -403,7 +415,7 @@ public:
      *   method will throw an error.
      */
     virtual const RGenericSparseMatrix &Mesh2BasisMatrix() const
-    {   xERROR(Method not supported);
+    {   ERROR_UNDEF;
 	static RCompRowMatrix dummy;
 	return dummy; }
 
@@ -414,7 +426,7 @@ public:
      *   method will throw an error.
      */
     virtual const RGenericSparseMatrix &Basis2MeshMatrix() const
-    {   xERROR(Method not supported);
+    {   ERROR_UNDEF;
 	static RCompRowMatrix dummy;
 	return dummy; }
 

@@ -61,15 +61,15 @@ void Triangle6_ip::Initialise (const NodeList &nlist)
 
 int Triangle6_ip::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 3, Side index out of range);
-    dASSERT(node >= 0 && node < 3, Node index out of range);
+    dASSERT(side >= 0 && side < 3, "Side index out of range");
+    dASSERT(node >= 0 && node < 3, "Node index out of range");
     static int SN[3][3] = {{0,1,3},{1,2,4},{2,0,5}};
     return SN[side][node];
 }
 
 Point Triangle6_ip::Local (const NodeList &nlist, const Point& glob) const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
     static const double EPS = 1e-6;
     static const int MAXIT = 10;
 
@@ -110,7 +110,7 @@ Point Triangle6_ip::NodeLocal (int node) const
         case 3:  nloc[0] = 0.5; nloc[1] = 0.0; break;
         case 4:  nloc[0] = nloc[1] = 0.5; break;
         case 5:  nloc[0] = 0.0; nloc[1] = 0.5; break;
-        default: xERROR(Node index out of range); break;
+        default: xERROR("Node index out of range"); break;
     }
     return nloc;
 }
@@ -123,7 +123,7 @@ RVector Triangle6_ip::DirectionCosine (int side, RDenseMatrix &/*jacin*/)
     case 0: cosin[0] = -b2, cosin[1] = -c2; break;
     case 1: cosin[0] = -b0, cosin[1] = -c0; break;
     case 2: cosin[0] = -b1, cosin[1] = -c1; break;
-    default: xERROR(Side index out of range);
+    default: xERROR("Side index out of range");
     }
     return cosin/length(cosin);
 }
@@ -136,13 +136,13 @@ const RVector &Triangle6_ip::LNormal (int side) const
     static const RVector *lnm[3] = {
       &lnm0, &lnm1, &lnm2
     };
-    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Triangle6_ip::LContains (const Point& loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -159,7 +159,7 @@ bool Triangle6_ip::GContains (const Point& glob, const NodeList& nlist) const
 
 RVector Triangle6_ip::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RVector fun(6);
     double L0 = 1.0-loc[0]-loc[1];
     double L1 = loc[0];
@@ -175,7 +175,7 @@ RVector Triangle6_ip::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Triangle6_ip::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RDenseMatrix der(2,6);
     double lx = loc[0], ly = loc[1];
     der(0,0) = der(1,0) = 4.0*(lx+ly) - 3.0;
@@ -317,7 +317,7 @@ double Triangle6_ip::BndIntPFF (int i, int j, const RVector &P) const
     np = QRule_lin_6 (&wght, &absc);
 
 #ifndef TRI6IP_STORE_COORDS
-    xERROR(Requires definition of TRI6IP_STORE_COORDS);
+    xERROR("Requires definition of TRI6IP_STORE_COORDS");
     double n0x, n0y, n1x, n1y, n2x, n2y, n3x, n3y, n4x, n4y, n5x, n5y;
 #endif
 
@@ -498,11 +498,11 @@ RSymMatrix Triangle6_ip::ComputeBndIntFF (const NodeList &nlist) const
 double Triangle6_ip::Jacobian (const Point &loc, RDenseMatrix &J) const
 {
 #ifndef TRI6IP_STORE_COORDS
-    xERROR(Requires definition of TRI6IP_STORE_COORDS);
+    xERROR("Requires definition of TRI6IP_STORE_COORDS");
     double n0x, n0y, n1x, n1y, n2x, n2y, n3x, n3y, n4x, n4y, n5x, n5y;
 #endif
-    dASSERT (loc.Dim() == 2, Parameter 1 wrong dimension);
-    dASSERT(J.nRows() == 2 && J.nCols() == 2, Parameter 2 wrong dimension);
+    dASSERT (loc.Dim() == 2, "Parameter 1 wrong dimension");
+    dASSERT(J.nRows() == 2 && J.nCols() == 2, "Parameter 2 wrong dimension");
     RDenseMatrix der = LocalShapeD (loc);
 
     for (int i = 0; i < 2; i++) {
@@ -529,7 +529,7 @@ double Triangle6_ip::IJacobian (const Point &loc, RDenseMatrix &IJ) const
 double Triangle6_ip::DetJ (const Point &loc, const NodeList *nlist) const
 {
 #ifndef TRI6IP_STORE_COORDS
-    dASSERT (nlist != 0, Node list required);
+    dASSERT (nlist != 0, "Node list required");
     double n0x = (*nlist)[Node[0]][0], n0y = (*nlist)[Node[0]][1];
     double n1x = (*nlist)[Node[1]][0], n1y = (*nlist)[Node[1]][1];
     double n2x = (*nlist)[Node[2]][0], n2y = (*nlist)[Node[2]][1];
@@ -537,7 +537,7 @@ double Triangle6_ip::DetJ (const Point &loc, const NodeList *nlist) const
     double n4x = (*nlist)[Node[4]][0], n4y = (*nlist)[Node[4]][1];
     double n5x = (*nlist)[Node[5]][0], n5y = (*nlist)[Node[5]][1];
 #endif
-    dASSERT (loc.Dim() == 2, Parameter 1 wrong dimension);
+    dASSERT (loc.Dim() == 2, "Parameter 1 wrong dimension");
     RDenseMatrix der = LocalShapeD (loc);
     double j00, j01, j10, j11;
 

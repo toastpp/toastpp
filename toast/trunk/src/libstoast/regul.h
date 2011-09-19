@@ -740,7 +740,7 @@ public:
     ~Tikhonov0();
     PRIOR Type() const {return PRIOR_DIAG; } 
 
-    const char *GetName() const { return "Tikhonov0"; }
+    const char *GetName() const { return "TK0"; }
     double GetValue (const RVector &x) const;
     RVector GetGradient (const RVector &x) const;
     RVector GetKappa    (const RVector &x) const;
@@ -750,6 +750,8 @@ public:
     int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
         const;
     RVector GetHessianDiag (const RVector &x) const;
+    void SetTau (double _tau);
+    void SetTau (const RVector &_tau);
 
   /* undefined functions */
     void SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p) {}
@@ -757,9 +759,14 @@ public:
     void SetFullHess (RCompRowMatrix &Hess, const RVector &x, const int p) {}
     RVector GetFullHessf (const RVector &x, const RVector &f) const { return RVector(); }
 
+    void ReadParams (ParamParser *pp);
+    void WriteParams (ParamParser *pp);
+
 private:
-    double tau;
+    RVector tauvec;
+    bool use_tauvec;
     const  RVector *xs;
+    char *kaprefimg_name;
 };
 
 // =========================================================================

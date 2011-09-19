@@ -50,7 +50,7 @@ TPreconditioner<MT> *TPreconditioner<MT>::Create (PreconType type)
         //return new TPrecon_CG_Multigrid<MT>;
 	//break;
     default:
-        xERROR (Unknown preconditioner type);
+        xERROR ("Unknown preconditioner type");
 	return 0;
     }
 }
@@ -79,17 +79,17 @@ void TPrecon_Diag<MT>::ResetFromDiagonal (const TVector<MT> &diag)
 template<class MT>
 void TPrecon_Diag<MT>::Apply (const TVector<MT> &r, TVector<MT> &s) 
 {
-    dASSERT(r.Dim() == idiag.Dim(), Dimension mismatch);
-    dASSERT(s.Dim() == idiag.Dim(), Dimension mismatch);
+    dASSERT(r.Dim() == idiag.Dim(), "Dimension mismatch");
+    dASSERT(s.Dim() == idiag.Dim(), "Dimension mismatch");
     s = r * idiag;
 }
 
 template<class MT>
 void TPrecon_Diag<MT>::Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s) const
  {
-    dASSERT(r.nRows() == idiag.Dim(), Dimension mismatch);
-    dASSERT(s.nRows() == r.nRows(), Dimension mismatch);
-    dASSERT(s.nCols() == r.nCols(), Dimension mismatch);
+    dASSERT(r.nRows() == idiag.Dim(), "Dimension mismatch");
+    dASSERT(s.nRows() == r.nRows(), "Dimension mismatch");
+    dASSERT(s.nCols() == r.nCols(), "Dimension mismatch");
     int nr = r.nRows();
     int nc = r.nCols();
     for(int i=0; i < nr; i++)
@@ -106,7 +106,7 @@ void TPrecon_IC<MT>::Reset (const TMatrix<MT> *A)
 {
     // *** This assumes A is of type TCompRowMatrix ***
 
-    xASSERT(A->isSparse(), Sparse matrix type required for IC preconditioner);
+    xASSERT(A->isSparse(), "Sparse matrix type required for IC preconditioner");
     const TCompRowMatrix<MT> *spA = (const TCompRowMatrix<MT>*)A;
 
     int nrows = A->nRows(), ncols = A->nCols();
@@ -120,6 +120,7 @@ void TPrecon_IC<MT>::Reset (const TMatrix<MT> *A)
 	delete []colidx;
     }
     IncompleteCholeskyFactorize (*spA, L, d, true);
+    L.SetColAccess();
 }
 
 template<class MT>
@@ -189,7 +190,7 @@ template<class MT>
 void TPrecon_CG_Multigrid<MT>::Reset (const TMatrix<MT> *_A)
 {
     xASSERT(_A->StorageType() == MATRIX_COMPROW,
-	    Only implemented for CompRow matrix type);
+	    "Only implemented for CompRow matrix type");
     A = (TCompRowMatrix<MT>*)_A;
 }
 
@@ -265,7 +266,7 @@ SCPreconditionerMixed *SCPreconditionerMixed::Create (PreconType type)
         //return new TPrecon_CG_Multigrid<MT>;
 	//break;
     default:
-        xERROR (Unknown preconditioner type);
+        xERROR ("Unknown preconditioner type");
 	return 0;
     }
 }
@@ -279,8 +280,8 @@ void SCPreconMixed_Diag::Reset (const SCCompRowMatrixMixed *A)
 
 void SCPreconMixed_Diag::Apply (const CVector &r, CVector &s)
 {
-    dASSERT(r.Dim() == idiag.Dim(), Dimension mismatch);
-    dASSERT(s.Dim() == idiag.Dim(), Dimension mismatch);
+    dASSERT(r.Dim() == idiag.Dim(), "Dimension mismatch");
+    dASSERT(s.Dim() == idiag.Dim(), "Dimension mismatch");
     s = r * idiag;
 }
 
@@ -341,7 +342,7 @@ void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s)
 template<class MT>
 void TPrecon_ILU<MT>::Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow)
 {
-	xERROR(NOT IMPLEMENTED);
+    ERROR_UNDEF;
 }
 
 template<>
@@ -416,7 +417,7 @@ TPrecon_ILU<MT>::~TPrecon_ILU ()
 template<class MT>
 void TPrecon_ILU<MT>::Apply (const TVector<MT> &rh, TVector<MT> &s)
 {
-	xERROR(NOT IMPLEMENTED);
+    ERROR_UNDEF;
 }
 
 template<>

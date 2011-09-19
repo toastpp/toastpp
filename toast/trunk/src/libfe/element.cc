@@ -78,18 +78,18 @@ void Element::Initialise (const NodeList& nlist)
 
 void Element::operator= (const Element& el)
 {
-    dASSERT(Type() == el.Type(), Assignment of incompatible element types.);
+    dASSERT(Type() == el.Type(), "Assignment of incompatible element types.");
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
 void Element::MapToSide (int side, Point &loc) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
 }
 
 Point Element::Global (const NodeList &nlist, const Point& loc) const
 {
-    dASSERT(loc.Dim() == Dimension(), Wrong point dimension);
+    dASSERT(loc.Dim() == Dimension(), "Wrong point dimension");
 
     int i, j;
     Point glob(loc.Dim());
@@ -161,7 +161,7 @@ int Element::IsSide (int nn, int *nd)
 
 bool Element::IsSideNode (int side, int node)
 {
-    dASSERT(side >= 0 && side < nSide(), Invalid value for argument side.);
+    dASSERT(side >= 0 && side < nSide(), "Invalid value for argument side.");
     for (int i = 0; i < nSideNode (side); i++)
 	if (Node[SideNode (side, i)] == node) return true;
     return false;
@@ -169,7 +169,7 @@ bool Element::IsSideNode (int side, int node)
 
 Point Element::SideCentre (int side) const
 {
-    dASSERT(side >= 0 && side < nSide(), Invalid value for argument side.);
+    dASSERT(side >= 0 && side < nSide(), "Invalid value for argument side.");
     Point cnt = NodeLocal (SideNode (side, 0));
     int nnode = nSideNode (side);
     for (int i = 1; i < nnode; i++) cnt += NodeLocal (SideNode (side, i));
@@ -178,15 +178,15 @@ Point Element::SideCentre (int side) const
 
 Element *Element::SideNeighbour (int side) const
 {
-    dASSERT(side >= 0 && side < nSide(), Invalid value for argument side.);
-    dASSERT(sdnbhr, Neighbour support not initialised);
+    dASSERT(side >= 0 && side < nSide(), "Invalid value for argument side.");
+    dASSERT(sdnbhr, "Neighbour support not initialised");
     return sdnbhr[side];
 }
 
 int Element::SideNeighbourIndex (int side) const
 {
-    dASSERT(side >= 0 && side < nSide(), Invalid value for argument side.);
-    dASSERT(sdnbhridx, Neighbour support not initialised);
+    dASSERT(side >= 0 && side < nSide(), "Invalid value for argument side.");
+    dASSERT(sdnbhridx, "Neighbour support not initialised");
     return sdnbhridx[side];
 }
 
@@ -330,21 +330,21 @@ ostream &operator<< (ostream& o, const Element &el)
 RVector Element::BndIntFX (int, double (*)(const Point&),
     const NodeList &) const
 {
-    xERROR(Function not implemented);
+    ERROR_UNDEF;
     return RVector(); // dummy
 }
 
 RVector Element::BndIntFCos (int, const Surface*, const RVector&, double,
     double, const NodeList&) const
 {
-    xERROR(Function not implemented);
+    ERROR_UNDEF;
     return RVector(); // dummy
 }
 
 RVector Element::BndIntFDelta (int, const Surface*, const RVector&,
     const NodeList&) const
 {
-    xERROR(Function not implemented);
+    ERROR_UNDEF;
     return RVector(); // dummy
 }
 
@@ -365,7 +365,7 @@ RDenseMatrix Element::ElasticStrainDisplacement (const RVector &loc,
 	}
 	return B;
     } else {
-        xERROR(Not implemented);
+        ERROR_UNDEF;
 	return RDenseMatrix();
     }
 }

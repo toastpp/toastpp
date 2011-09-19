@@ -4,33 +4,24 @@
 
 #include "stoastlib.h"
 #include "util.h"
-#include "pscaler.h"
-#include "fwdsolver.h"
-#include "of.h"
 #include "solverpcg.h"
-#include "jacobian.h"
 #include "supertoast.h"
 #include "supertoast_util.h"
 #include "timing.h"
 #include <time.h>
 
 using namespace std;
+using namespace toast;
 
 #define PCG_RESET_INTERVAL 10
 #define DJTJ_LIMIT 1e-8
 //#define RESCALE_HESSIAN
 
-//#define OUTPUT_PMDF
-
 // ==========================================================================
 // external references
 
-extern int bWriteGrad;
-extern int bWriteJ;
 extern int g_imgfmt;
 extern double clock0;
-
-void WriteImage (const RVector &nim, int imgno, char *nimname);
 
 // ==========================================================================
 // local prototypes
@@ -53,6 +44,7 @@ SolverPCG::SolverPCG (ParamParser *_pp): Solver (_pp)
 {
     itmax = 50;
     cg_tol = 1e-8;
+    cg_delta = 1e-5;
     alpha = 0.0; // "auto"
     precon = PCG_PRECON_NONE;
 }
@@ -68,7 +60,7 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     const int reset_count = PCG_RESET_INTERVAL;
 
     // initialisations
-    int i;
+    int i, res;
     const QMMesh *mesh = FWS.MeshPtr();
     int dim  = raster.Dim();
     int ndat = data.Dim();
@@ -78,8 +70,8 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     int slen = raster.SLen();
     int n    = slen*2;
     bool pvalid;
-    double delta_new, delta_old, delta_mid, delta_0, delta_d, beta;
-    double of, of_value, of_prior, fmin;
+    double delta_new, delta_old, delta_mid, delta_0, delta_d, beta, alpha0;
+    double of, ofp, of_value, of_prior, fmin;
     double gamma = 1.0;
     RVector r(n), r0(n), s(n), d(n), M(n);
     RVector proj(ndat);
@@ -118,15 +110,7 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     FWS.CalcFields (mvec, aphi);
     proj = FWS.ProjectAll_real (mvec, dphi);
 
-#ifdef OUTPUT_INITIAL_PROJECTION
-    ofstream ofs1 ("init_fmod.fem");
-    RVector proj1(proj, 0, ndat/2);
-    ofs1 << proj1 << endl;
-    ofstream ofs2 ("init_farg.fem");
-    RVector proj2(proj, ndat/2, ndat/2);
-    ofs2 << proj2 << endl;
-#endif
-
+    // initialise regularisation instance
     reg = Regularisation::Create (pp, &x0, &raster);
 
     // Set up the context data for the line search callback
@@ -145,75 +129,15 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     // r = -f'(x)
     OF.get_gradient (raster, FWS, proj, dphi, mvec, 0/* &bsol*/, r);
 
-#ifdef OUTPUT_PMDF
-    {
-	RVector r1(r,0,slen);
-	RVector r2(r,slen,slen);
-	RVector rg(glen);
-	raster.Map_SolToGrid (r1, rg);
-	WritePPM (rg, raster.GDim(), 0, 0, "images/grad_direct_cmua.ppm");
-	raster.Map_SolToGrid (r2, rg);
-	WritePPM (rg, raster.GDim(), 0, 0, "images/grad_direct_ckappa.ppm");
-	RVector kap = bsol.GetParam (Solution::CKAPPA);
-	RVector b = (data-proj)/sd;
-	RDenseMatrix J(ndat,n);
-	GenerateJacobian (&raster, mesh, mvec, dphi, aphi, FWS.datatype, J);
-	J->RowScale (inv(sd)); // data space rescaling
-	// what about solution space rescaling?
-	J.ATx (b,r);
-	r = -r;
-	raster.Map_SolToGrid (r1, rg);
-	WritePPM (rg, raster.GDim(), 0, 0, "images/grad_pmdf_cmua.ppm");
-	raster.Map_SolToGrid (r2, rg);
-	WritePPM (rg, raster.GDim(), 0, 0, "images/grad_pmdf_ckappa.ppm");
-
-	int nqm = raster.mesh().nQMref[0];
-	RVector *rga = new RVector[nqm];
-	for (i = 0; i < nqm; i++) rga[i].New(glen);
-	for (i = 0; i < nqm; i++) {
-	    for (j = 0; j < 2*slen; j++) r[j] = J(i,j);
-	    raster.Map_SolToGrid (r1, rga[i]);
-	}
-	WritePPMArray (rga, raster.GDim(), nqm, 2,0,0,"images/pmdf_mod_mua");
-	for (i = 0; i < nqm; i++) {
-	    for (j = 0; j < 2*slen; j++) r[j] = J(i,j);
-	    raster.Map_SolToGrid (r2, rga[i]);
-	}
-	WritePPMArray (rga, raster.GDim(), nqm, 2,0,0,"images/pmdf_mod_kappa");
-	for (i = 0; i < nqm; i++) {
-	    for (j = 0; j < 2*slen; j++) r[j] = J(i+ndat/2,j);
-	    raster.Map_SolToGrid (r1, rga[i]);
-	}
-	WritePPMArray (rga, raster.GDim(), nqm, 2,0,0,"images/pmdf_arg_mua");
-	for (i = 0; i < nqm; i++) {
-	    for (j = 0; j < 2*slen; j++) r[j] = J(i+ndat/2,j);
-	    raster.Map_SolToGrid (r2, rga[i]);
-	}
-	WritePPMArray (rga, raster.GDim(), nqm, 2,0,0,"images/pmdf_arg_kappa");
-	delete []rga;
-    }
-    exit (0);
-#endif
-
     pscaler->ScaleGradient (bsol.GetActiveParams(), r);
     r += reg->GetGradient (x0);
     r0 = r;
-
-    if (bWriteGrad) {
-        RVector r_mua (r, 0, slen);
-	RVector r_mus (r, slen, slen);
-	RVector rim(blen);
-	raster.Map_SolToBasis (r_mua, rim);
-	WriteImage (rim, 0, "grad_mua.raw");
-	raster.Map_SolToBasis (r_mus, rim);
-	WriteImage (rim, 0, "grad_mus.raw");
-    }
-
     r = -r;
 
     of_value = OF.get_posterior (&proj);
     of_prior = reg->GetValue (x0);
     of = of_value + of_prior;
+    ofp = of * 10+cg_delta; // make sure stopping criterion is not satisfied
 
     if (precon != PCG_PRECON_NONE) {
         // calculate preconditioner M
@@ -223,7 +147,6 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
             FWS.GetDataScaling(), J);
 	J.RowScale (inv(sd));
 	pscaler->ScaleJacobian (bsol.GetActiveParams(), J);
-	//if (bWriteJ) WriteJacobian (&J, raster, *mesh);
 	switch (precon) {
 	case PCG_PRECON_FULLJTJ:
 	    // Full Hessian preconditioner setup
@@ -241,21 +164,21 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 	    // Diagonal Hessian preconditioner setup
 	    LOGOUT ("Calculating diagonal of JTJ");
 	    ATA_diag (J, M);
-	    LOGOUT_2PRM ("Range: %f to %f", vmin(M), vmax(M));
+	    LOGOUT("Range: %f to %f", vmin(M), vmax(M));
 #ifdef DJTJ_LIMIT
 	    M.Clip (DJTJ_LIMIT, 1e50);
-	    LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
+	    LOGOUT("Cutoff at %f", DJTJ_LIMIT);
 #endif // DJTJ_LIMIT
 	    LOGOUT ("Using preconditioner DIAGJTJ");
 	    break;
 	}
-	LOGOUT_1PRM ("Precon reset interval: %d", reset_count);
+	LOGOUT("Precon reset interval: %d", reset_count);
     } else {
 	LOGOUT ("Using preconditioner NONE");
     }
 
-    LOGOUT_3PRM ("Iteration 0  CPU %f  OF %f  (prior %f)",
-        toc(clock0), of, of_prior);
+    LOGOUT("Iteration 0  CPU %f  OF %g [LH %g PR %g]", toc(clock0),
+	   of, of_value, of_prior);
 
     // apply preconditioner
     switch (precon) {
@@ -276,37 +199,42 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     d = s;
     delta_new = r & d;                 // r^t M^-1 r
     delta_0 = delta_new;
-	
-	while (i_count < itmax && delta_new > cg_tol*cg_tol*delta_0) {
+
+    while (i_count < itmax                       // iteration limit
+	   && delta_new > cg_tol*cg_tol*delta_0  // convergence criterion
+	   && (ofp-of)/of > cg_delta) {          // stopping criterion
         delta_d = d & d;
 
 	if (!alpha) { // initialise step length
 	    alpha = of / l2norm (d);
-	    LOGOUT_1PRM ("Initial step length reset to %f", alpha);
+	    LOGOUT("Initial step length reset to %f", alpha);
 	}
 
 	// line search. this replaces the Secant method of the Shewchuk code
-	if (LineSearch (x, d, alpha, of, of_clbk, &alpha, &fmin, &ofdata)==0) {
-	    x += d*alpha; // update scaled solution
-	    bsol.SetActiveParams (pscaler->Unscale(x));
-	    raster.Map_SolToMesh (bsol, msol, true);
-	    switch (g_imgfmt) {
-	    case IMGFMT_NIM:
-	        msol.WriteImg_mua (i_count+1, "recon_mua.nim");
-		msol.WriteImg_mus (i_count+1, "recon_mus.nim");
-		break;
-	    case IMGFMT_RAW:
-	        Solution rsol(OT_NPARAM, blen);
-		raster.Map_SolToBasis (bsol, rsol, true);
-		rsol.WriteImg_mua (i_count+1, "recon_mua.raw");
-		rsol.WriteImg_mus (i_count+1, "recon_mus.raw");
+	alpha0 = alpha;
+	res = LineSearch (x, d, alpha0, of, of_clbk, &alpha, &fmin, &ofdata);
+	if (res != 0) {
+	    LOGOUT ("** Line search failed. Resetting.");
+	    d = r;
+	    res = LineSearch (x, d, alpha0, of, of_clbk, &alpha, &fmin,&ofdata);
+	    if (res != 0) {
+	        LOGOUT ("** Line search failed after reset. Terminating.");
 		break;
 	    }
+	}
 
-	} else {
-	    LOGOUT ("** Line search failed. Resetting.");
-	    k_count = reset_count-1; // force reset
-	    i_count--; // don't increment iteration counter
+	x += d*alpha; // update scaled solution
+	bsol.SetActiveParams (pscaler->Unscale(x));
+	raster.Map_SolToMesh (bsol, msol, true);
+	if (g_imgfmt != IMGFMT_RAW) {
+	    msol.WriteImg_mua (i_count+1, "recon_mua.nim");
+	    msol.WriteImg_mus (i_count+1, "recon_mus.nim");
+	}
+	if (g_imgfmt != IMGFMT_NIM) {
+	    Solution rsol(OT_NPARAM, blen);
+	    raster.Map_SolToBasis (bsol, rsol, true);
+	    rsol.WriteImg_mua (i_count+1, "recon_mua.raw");
+	    rsol.WriteImg_mus (i_count+1, "recon_mus.raw");
 	}
 
 	// r = -f'(x)
@@ -320,27 +248,18 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 	pscaler->ScaleGradient (bsol.GetActiveParams(), r);
 	r += reg->GetGradient(x);
 
-	if (bWriteGrad) {
-	    RVector r_mua (r, 0, slen);
-	    RVector r_mus (r, slen, slen);
-	    RVector rim(blen);
-	    raster.Map_SolToBasis (r_mua, rim);
-	    WriteImage (rim, i_count+1, "grad_mua.raw");
-	    raster.Map_SolToBasis (r_mus, rim);
-	    WriteImage (rim, i_count+1, "grad_mus.raw");
-	}
-
 #ifdef RESCALE_HESSIAN
 	RVector x1(x);
 	RVector S(x1-x0);
 	RVector Y(r-r0);
 	gamma = (Y&S) / (Y&Y);
-	LOGOUT_1PRM ("Hessian scale ", gamma);
+	LOGOUT("Hessian scale ", gamma);
 	x0 = x1;
 	r0 = r;
 #endif
 
 	r = -r;
+	ofp = of;
 	of_value = OF.get_posterior (&proj);
 	of_prior = reg->GetValue(x);
 	of = of_value + of_prior;
@@ -368,10 +287,10 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 	    case PCG_PRECON_DIAGJTJ:
 	        LOGOUT ("Calculating diagonal of JTJ ...");
 		ATA_diag (J, M);
-		LOGOUT_2PRM ("Range %f to %f", vmin(M), vmax(M));
+		LOGOUT("Range %f to %f", vmin(M), vmax(M));
 #ifdef DJTJ_LIMIT
 		M.Clip (DJTJ_LIMIT, 1e50);
-		LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
+		LOGOUT("Cutoff at %f", DJTJ_LIMIT);
 #endif // DJTJ_LIMIT
 	    }
 	}
@@ -401,13 +320,22 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
 	    d = s + d * beta;
 	}
 	i_count++;
-	LOGOUT_4PRM ("Iteration %d  CPU %f  OF %f  (prior %f)",
-	    i_count, toc(clock0), of, of_prior);
+	LOGOUT ("Iteration %d  CPU %f  OF %g [LH %g PR %g]",
+		i_count, toc(clock0), of, of_value, of_prior);
 
 #ifdef DO_PROFILE
-	LOGOUT_1PRM ("Solver time: %f", solver_time);
+	LOGOUT("Solver time: %f", solver_time);
 #endif
     }
+
+    if (delta_new <= cg_tol*cg_tol*delta_0)
+        LOGOUT ("PCG solver convergence criterion satisfied");
+    else if ((ofp-of)/of <= cg_delta)
+        LOGOUT ("PCG solver stopped (insufficient improvement)");
+    else if (i_count >= itmax)
+        LOGOUT ("PCG solver iteration limit reached");
+    else
+        LOGOUT ("PCG solver terminated");
 }
 
 void SolverPCG::ReadParams (ParamParser &pp)
@@ -415,17 +343,42 @@ void SolverPCG::ReadParams (ParamParser &pp)
     char cbuf[256];
     bool def = false;
 
-    // 1. === NONLINEAR SOLVER CONVERGENCE CRITERION ===
-
-    if (!pp.GetReal ("NONLIN_TOL", cg_tol) ||
-	cg_tol <= 0.0) do {
-	    cout << "\nSelect convergence criterion for "
-		 << "PCG nonlinear solver (>0):\n>> ";
+    // === CONVERGENCE CRITERION ===
+    if (!pp.GetReal ("NONLIN_TOL", cg_tol) || cg_tol <= 0.0) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Enter the convergence criterion epsilon:\n";
+	cout << "<r_k,d_k> < epsilon^2 * <r_0,d_0>\n";
+	cout << "for gradient r and preconditioned gradient d\n";
+        do {
+	    cout << "\nNONLIN_TOL (float, >0):\n>> ";
 	    cin >> cg_tol;
 	} while (cg_tol <= 0.0);
+    }
 
-    // 2. === PRECONDITIONER ===
+    // === STOPPING CRITERION ===
+    if (!pp.GetReal ("NONLIN_DELTA", cg_delta)) {
+        cout << "\nCG nonlinear solver ------------------------------------\n";
+	cout << "Enter stopping criterion delta. This stops the\n";
+	cout << "reconstruction if [f(x_{k-1})-f(x)]/f(x) < delta\n";
+	do {
+	    cout << "\nNONLIN_DELTA (float, >=0):\n>> ";
+	    cin >> cg_delta;
+	} while (cg_delta < 0.0);
+    }
 
+    // === MAX ITERATION COUNT ===
+    if (!(pp.GetInt ("PCG_ITMAX", itmax) ||
+	  pp.GetInt ("NONLIN_ITMAX", itmax)) || itmax <= 0) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Enter the maximum number of iterations to be performed if\n";
+	cout << "the convergence criterion is not satisfied:\n";
+	do {
+  	    cout << "\nNONLIN_ITMAX (int, >0):\n>> ";
+	    cin >> itmax;
+	} while (itmax <= 0);
+    }
+
+    // === PRECONDITIONER ===
     if (pp.GetString ("PCG_PRECON", cbuf)) {
 	if (!strcasecmp (cbuf, "NONE"))
 	    precon = PCG_PRECON_NONE,      def = true;
@@ -436,45 +389,45 @@ void SolverPCG::ReadParams (ParamParser &pp)
 	else if (!strcasecmp (cbuf, "FULLJTJ"))
 	    precon = PCG_PRECON_FULLJTJ,   def = true;
     }
-    while (!def) {
-	int cmd;
-	cout << "\nSelect PCG preconditioner:\n";
+    if (!def) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Select the preconditioner for the nonlinear CG solver:\n\n";
 	cout << "(0) None\n";
 	cout << "(1) Diagonal of Hessian\n";
 	cout << "(2) Sparse Hessian\n";
 	cout << "(3) Full Hessian\n";
-	cout << "[0|1|2|3] >> ";
-	cin >> cmd;
-	switch (cmd) {
-	case 0: precon = PCG_PRECON_NONE,      def = true; break;
-	case 1: precon = PCG_PRECON_DIAGJTJ,   def = true; break;
-	case 2: precon = PCG_PRECON_SPARSEJTJ, def = true; break;
-	case 3: precon = PCG_PRECON_FULLJTJ,   def = true; break;
+	while (!def) {
+	    cout << "\nPCG_PRECON [0|1|2|3] >> ";
+	    int cmd;
+	    cin >> cmd;
+	    switch (cmd) {
+	    case 0: precon = PCG_PRECON_NONE,      def = true; break;
+	    case 1: precon = PCG_PRECON_DIAGJTJ,   def = true; break;
+	    case 2: precon = PCG_PRECON_SPARSEJTJ, def = true; break;
+	    case 3: precon = PCG_PRECON_FULLJTJ,   def = true; break;
+	    }
 	}
     }
 
-    // 3. === MAX ITERATION COUNT ===
-
-    if (!pp.GetInt ("PCG_ITMAX", itmax) || itmax <= 0) {
+    // === INITIAL STEP LENGTH FOR LINE SEARCH ===
+    if (!pp.GetReal ("LS_INIT_STEPLENGTH", alpha) || alpha < 0.0) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Select the initial step length for the line search\n";
 	do {
-	    cout << "\nMax number of PCG iterations (>0):\n";
-	    cout << ">> ";
-	    cin >> itmax;
-	} while (itmax <= 0);
+	    cout << "\nNONLIN_ITMAX (float, >=0, 0=auto):\n>> ";
+	    cin >> alpha;
+	} while (alpha < 0.0);
     }
-
-    // 4. === INITIAL STEP LENGTH FOR LINE SEARCH ===
-    
-    if (!pp.GetReal ("LS_INIT_STEPLENGTH", alpha) || alpha < 0.0) do {
-	cout << "\nSelect initial step length for line search (0=auto):\n>> ";
-	cin >> alpha;
-    } while (alpha < 0.0);
 }
+
+// ==========================================================================
 
 void SolverPCG::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "PCG");
     pp.PutReal ("NONLIN_TOL", cg_tol);
+    pp.PutReal ("NONLIN_DELTA", cg_delta);
+    pp.PutInt ("NONLIN_ITMAX", itmax);
 
     switch (precon) {
     case PCG_PRECON_NONE:
@@ -491,7 +444,6 @@ void SolverPCG::WriteParams (ParamParser &pp)
 	break;
     }
 
-    pp.PutInt ("PCG_ITMAX", itmax);
     pp.PutReal ("LS_INIT_STEPLENGTH", alpha);
 }
 
@@ -520,8 +472,8 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     RCompRowMatrix &ata_L, RVector &ata_d)
 {
     int i, i0, i1, k, row, col;
+    idxtype *rowptr, *rowptr2, *colidx, *colidx2;
     int nzero, nzero2;
-	idxtype *rowptr, *rowptr2, *colidx, *colidx2;
     int slen = raster.SLen();
     int n    = slen*2; // mua and kappa
     int nr   = a.nRows();
@@ -590,7 +542,7 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
 	if (!i || ata_ii < ata_min) ata_min = ata_ii;
 	if (!i || ata_ii > ata_max) ata_max = ata_ii;
     }
-    LOGOUT_2PRM ("ATA diagonal range %f to %f", ata_min, ata_max);
+    LOGOUT("ATA diagonal range %f to %f", ata_min, ata_max);
 
 
 #ifdef RESCALE_JTJ
@@ -604,7 +556,7 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     sum *= JTJ_SCALE;
     for (i = 0; i < n; i++)
         ata(i,i) += sum;
-    LOGOUT_1PRM ("Added %f to ATA diagonal", sum);
+    LOGOUT("Added %f to ATA diagonal", sum);
 #endif
 
     ata.CalculateIncompleteCholeskyFillin (rowptr, colidx);
@@ -641,7 +593,7 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
     sum *= JTJ_SCALE;
     for (i = 0; i < n; i++)
         ata(i,i) += sum;
-    LOGOUT_1PRM ("Added %f to ATA diagonal", sum);
+    LOGOUT("Added %f to ATA diagonal", sum);
 #endif
 
     LOGOUT ("Calculating CH decomposition of ATA ...");

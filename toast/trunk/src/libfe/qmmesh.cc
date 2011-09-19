@@ -126,7 +126,7 @@ void QMMesh::InitM ()
 		}
 	    }
 
-	    xASSERT(el >= 0, No element found to place measurement.);
+	    xASSERT(el >= 0, "No element found to place measurement.");
 	    // the following searches a boundary side in el.
 	    // This can go wrong if el contains more than 1 boundary side
 	    bndsd = -1;
@@ -138,10 +138,10 @@ void QMMesh::InitM ()
 		}
 		if (isbnd) bndsd = is;
 	    }
-	    xASSERT (bndsd >= 0, Element contains no boundary side);
+	    xASSERT (bndsd >= 0, "Element contains no boundary side");
 	} else {
 	    PullToBoundary (M[i], M[i], el, bndsd);
-	    xASSERT(el >= 0, No element found to place measurement.);
+	    xASSERT(el >= 0, "No element found to place measurement.");
 	}
 	Point loc = elist[el]->Local (nlist, M[i]);
 	RDenseMatrix lder = elist[el]->LocalShapeD (loc);
@@ -304,21 +304,21 @@ void QMMesh::LoadQM (istream &is)
     // read header
     is.getline (cbuf, 256);
     if (strncmp (cbuf, "QM file", 7)) {
-        xERROR(QM file not found or invalid format);
+        xERROR("QM file not found or invalid format");
 	return;
     }
     is.getline (cbuf, 256);
-    xASSERT(!strncmp (cbuf, "Dimension", 9), Unknown QM file format.);
+    xASSERT(!strncmp (cbuf, "Dimension", 9), "Unknown QM file format.");
     sscanf (cbuf+9, "%d", &dim);
-    xASSERT(dim == Dimension(), QM dimension does not match mesh);
+    xASSERT(dim == Dimension(), "QM dimension does not match mesh");
 
     // read source list
     do {
 	is.getline (cbuf, 256);
     } while ((ok = is.good ()) && strncmp (cbuf, "SourceList", 10));
-    xASSERT(ok, SourceList not found.);
+    xASSERT(ok, "SourceList not found.");
     nitem = sscanf (cbuf+10, "%d%s %s", &nQ, flagstr, normflagstr);
-    xASSERT(nitem >= 1, Number of sources not found.);
+    xASSERT(nitem >= 1, "Number of sources not found.");
     fixed_q_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
     external_q_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
     bool specified_q_normals = (nitem > 2 && strcasecmp (normflagstr, "default")!=0 ) || (nitem<=2);
@@ -346,7 +346,7 @@ void QMMesh::LoadQM (istream &is)
 	    nitem = sscanf (cbuf, "%lf%lf%lf%lf%lf%lf", crd+0, crd+1, crd+2,
 		    nrm+0, nrm+1, nrm+2);
 	}
-	xASSERT(nitem >= dim, Parse error while reading source list);
+	xASSERT(nitem >= dim, "Parse error while reading source list");
 	for (j = 0; j < dim; j++)    Q[i][j] = crd[j];
 	for (j = 0; j < dim; j++)
 	{
@@ -358,7 +358,7 @@ void QMMesh::LoadQM (istream &is)
 	    RVector n;
 	    if (specified_q_normals)
 	    {
-		xASSERT(l2norm(QN[i]) > 0.0, No normals for sources specified);
+		xASSERT(l2norm(QN[i])>0.0, "No normals for sources specified");
 		n=QN[i];
 	    }else{
 		n = -Q[i];
@@ -372,9 +372,9 @@ void QMMesh::LoadQM (istream &is)
     do {
 	is.getline (cbuf, 256);
     } while ((ok = is.good ()) && strncmp (cbuf, "MeasurementList", 15));
-    xASSERT(ok, MeasurementList not found.);
+    xASSERT(ok, "MeasurementList not found.");
     nitem = sscanf (cbuf+15, "%d%s %s", &nM, flagstr, normflagstr);
-    xASSERT(nitem >= 1, Number of measurements not found.);
+    xASSERT(nitem >= 1, "Number of measurements not found.");
     fixed_m_pos = (nitem > 1 && !strcasecmp (flagstr, "fixed"));
     external_m_pos = (nitem > 1 && !strcasecmp (flagstr, "external"));
     bool specified_m_normals = (nitem > 2 && strcasecmp (normflagstr, "default")) || (nitem<=2);
@@ -402,21 +402,22 @@ void QMMesh::LoadQM (istream &is)
 	    nitem = sscanf (cbuf, "%lf%lf%lf%lf%lf%lf", crd+0, crd+1, crd+2,
 		    nrm+0, nrm+1, nrm+2);
 	}
-	xASSERT(nitem >= dim, Parse error while reading measurement list);
+	xASSERT(nitem >= dim, "Parse error while reading measurement list");
 	for (j = 0; j < dim; j++) M[i][j] = crd[j];
 	// Normal vectors specified
 	for (j = 0; j < dim; j++)
 	{
 	    MN[i][j] = nrm[j];
 	}
-	if (external_m_pos && specified_m_normals) xASSERT( l2norm(MN[i]) > 0, No normals specified for measurements );
+	if (external_m_pos && specified_m_normals) xASSERT( l2norm(MN[i]) > 0,
+	    "No normals specified for measurements");
     }
 
     // read link list
     do {
 	is.getline (cbuf, 256);
     } while ((ok = is.good ()) && strncmp (cbuf, "LinkList", 8));
-    xASSERT(ok, LinkList not found.);
+    xASSERT(ok, "LinkList not found.");
     nQMref = new int[nQ];
     Qofs   = new int[nQ];
     QMref  = new int*[nQ];

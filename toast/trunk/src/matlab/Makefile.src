@@ -19,6 +19,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastGetQM.cc \
 	toastGridElref.cc \
 	toastGradient.cc \
+	toastGradientCW.cc \
 	toastImageGradient.cc \
 	toastIntFG.cc \
 	toastIntGradFGradG.cc \

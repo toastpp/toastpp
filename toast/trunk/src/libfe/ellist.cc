@@ -41,7 +41,7 @@ void ElementList::New (int length)
 
 void ElementList::Insert (PElement pel, int pos)
 {
-    dASSERT(pos >= 0 && pos <= Length, Index out of range.);
+    dASSERT(pos >= 0 && pos <= Length, "Index out of range.");
     PElement *TmpList = new PElement[Length+1];
     memcpy (TmpList, List, pos * sizeof (PElement));
     memcpy (TmpList+pos+1, List+pos, (Length-pos) * sizeof (PElement));
@@ -58,7 +58,7 @@ void ElementList::Append (PElement pel)
 
 void ElementList::Delete (int rec)
 {
-    dASSERT(rec >= 0 && rec < Length, Index out of range.);
+    dASSERT(rec >= 0 && rec < Length, "Index out of range.");
     delete List[rec];
     PElement *TmpList = new PElement[--Length];
     memcpy (TmpList, List, rec * sizeof (PElement));
@@ -95,11 +95,11 @@ void ElementList::RemoveNodeRef (int nd)
 
 Element *ElementList::SideNeighbour (int el, int side)
 {
-    dASSERT(el >= 0 && el < Length, Element index out of range);
-    dASSERT(side >= 0 && side < List[el]->nSide(), Side index out of range);
+    dASSERT(el >= 0 && el < Length, "Element index out of range");
+    dASSERT(side >= 0 && side < List[el]->nSide(), "Side index out of range");
 
     Element *pel = List[el];
-    dASSERT(pel->sdnbhr, Element neighour lists not available);
+    dASSERT(pel->sdnbhr, "Element neighour lists not available");
 
     return pel->sdnbhr[side];
 }
@@ -109,9 +109,9 @@ int ElementList::EdgeAdjacentElement (int el, int side)
     const int max_sidenode = 10;
     int i, i1, i2, nn, nd[max_sidenode];
 
-    dASSERT(side >= 0 && side < List[el]->nSide(), Index out of range.);
+    dASSERT(side >= 0 && side < List[el]->nSide(), "Index out of range.");
     nn = List[el]->nSideNode (side);
-    dASSERT(nn <= max_sidenode, Nodes per side limit exceeded);
+    dASSERT(nn <= max_sidenode, "Nodes per side limit exceeded");
     for (i = 0; i < nn; i++)
         nd[i] = List[el]->Node[List[el]->SideNode (side, i)];
 
@@ -127,7 +127,7 @@ int ElementList::VertexAdjacentElement (int el, int nd, int min_el)
 {
     int n, i;
 
-    dASSERT(nd >= 0 && nd < List[el]->nNode(), Index out of range.);
+    dASSERT(nd >= 0 && nd < List[el]->nNode(), "Index out of range.");
     n = List[el]->Node[nd];
     for (i = min_el; i < Length; i++)
 	if (i != el && List[i]->IsNode (n)) return i;
@@ -137,7 +137,7 @@ int ElementList::VertexAdjacentElement (int el, int nd, int min_el)
 #ifdef FEM_DEBUG // otherwise inline
 PElement& ElementList::operator[] (int rec) const
 {
-    dASSERT(rec >= 0 && rec < Length, Index out of range.);
+    dASSERT(rec >= 0 && rec < Length, "Index out of range.");
     return List[rec];
 }
 #endif // FEM_DEBUG
@@ -174,7 +174,7 @@ istream& operator>> (istream& i, ElementList& elist)
 	    case ELID_TRI3D3: elist.List[el] = new Triangle3D3; break;
 	    case ELID_TRI3D6: elist.List[el] = new Triangle3D6; break;
 	    case ELID_LINE2D2: elist.List[el] = new Line2D2; break;
-	    default: xERROR(Unknown element type.);
+	    default: xERROR("Unknown element type.");
 	}
 	i >> *elist.List[el];
     }

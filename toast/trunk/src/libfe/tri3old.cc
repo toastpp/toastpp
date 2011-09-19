@@ -88,7 +88,7 @@ void Triangle3old::Initialise (const NodeList& nlist)
     djac = n0x*(n1y-n2y) + n1x*(n2y-n0y) + n2x*(n0y-n1y); // determinant
 
     Element_Unstructured_2D::Initialise (nlist);
-    dASSERT(size > 0, Element size not positive);
+    dASSERT(size > 0, "Element size not positive");
 
 #ifdef TRI3_STORE_INTFF
     intff.New(3);
@@ -121,8 +121,8 @@ void Triangle3old::Initialise (const NodeList& nlist)
 
 int Triangle3old::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
-    dASSERT(node >= 0 && node < 2, Argument 2  index out of range);
+    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
+    dASSERT(node >= 0 && node < 2, "Argument 2  index out of range");
     static int SN[3][2] = {{0,1}, {1,2}, {2,0}};
     return SN[side][node];
 }
@@ -134,7 +134,7 @@ double Triangle3old::SideSize (int sd, const NodeList &nlist) const
 
 Point Triangle3old::Local (const NodeList &nlist, const Point& glob) const
 {
-    dASSERT(glob.Dim() == 2, Argument 2 dimension must be 2);
+    dASSERT(glob.Dim() == 2, "Argument 2 dimension must be 2");
 #ifndef TRI3_STORE_COORDS
     double n0x, n0y, n1x, n1y, n2x, n2y;
     n0x = nlist[Node[0]][0], n0y = nlist[Node[0]][1];
@@ -149,7 +149,7 @@ Point Triangle3old::Local (const NodeList &nlist, const Point& glob) const
 
 Point Triangle3old::NodeLocal (int node) const
 {
-    dASSERT(node >= 0 && node < 3, Argument 1 index out of range);
+    dASSERT(node >= 0 && node < 3, "Argument 1 index out of range");
     Point n(2);  // note: initialised to zero
     if (node == 1)      n[0] = 1.0;
     else if (node == 2) n[1] = 1.0;
@@ -167,9 +167,9 @@ RVector Triangle3old::DirectionCosine (int side, RDenseMatrix &jacin)
         {0,-1},{0.70710678,0.70710678},{-1,0}
     };
 
-    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
     dASSERT(jacin.nCols() == 2 && jacin.nRows() == 2,
-	Argument 2 invalid dimension);
+	"Argument 2 invalid dimension");
 
     RVector cosin(2);
     cosin[0] = jacin(0,0)*local_dc[side][0] + jacin(0,1)*local_dc[side][1];
@@ -185,7 +185,7 @@ const RVector &Triangle3old::LNormal (int side) const
     static const RVector *lnm[3] = {
       &lnm0, &lnm1, &lnm2
     };
-    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
     return *lnm[side];
 }
 
@@ -196,7 +196,7 @@ double Triangle3old::ComputeSize (const NodeList &nlist) const
 
 bool Triangle3old::LContains (const Point& loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -208,7 +208,7 @@ bool Triangle3old::LContains (const Point& loc, bool pad) const
 
 bool Triangle3old::GContains (const Point& glob, const NodeList& nlist) const
 {
-    dASSERT(glob.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(glob.Dim() == 2, "Argument 1 invalid dimension");
     double xx = glob[0], yy = glob[1];
 
     // check bounding box
@@ -255,7 +255,7 @@ bool Triangle3old::GContains (const Point& glob, const NodeList& nlist) const
 
 RVector Triangle3old::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     static RVector fun(3);
     fun[0] = 1.0 - loc[0] - loc[1];
     fun[1] = loc[0];
@@ -265,7 +265,7 @@ RVector Triangle3old::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Triangle3old::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     static const RDenseMatrix der (2, 3, "-1 1 0   -1 0 1");
     return der;
 }
@@ -273,7 +273,7 @@ RDenseMatrix Triangle3old::LocalShapeD (const Point &loc) const
 RVector Triangle3old::GlobalShapeF (const NodeList& nlist, const Point& glob)
     const
 {
-    dASSERT(glob.Dim() == 2, Argument 2 invalid dimension);
+    dASSERT(glob.Dim() == 2, "Argument 2 invalid dimension");
 #ifndef TRI3_STORE_COORDS
     double n0x, n0y, n1x, n1y, n2x, n2y;
     n0x = nlist[Node[0]][0], n0y = nlist[Node[0]][1];
@@ -294,7 +294,7 @@ RVector Triangle3old::GlobalShapeF (const NodeList& nlist, const Point& glob)
 RDenseMatrix Triangle3old::GlobalShapeD (const NodeList &nlist,
     const Point &glob) const
 {
-    dASSERT(glob.Dim() == 2, Argument 2 invalid dimension);
+    dASSERT(glob.Dim() == 2, "Argument 2 invalid dimension");
 #ifndef TRI3_STORE_COORDS
     double n0x, n0y, n1x, n1y, n2x, n2y;
     n0x = nlist[Node[0]][0], n0y = nlist[Node[0]][1];
@@ -321,7 +321,7 @@ int Triangle3old::QuadRule (int order, const double **wght, const Point **absc)
     case 3: return QRule_tri_3_6 (wght, absc);
     case 4: return QRule_tri_4_6 (wght, absc);
     case 6: return QRule_tri_6_12 (wght, absc);
-    default: xERROR(Not implemented); return 0;
+    default: ERROR_UNDEF; return 0;
     }
 }
 
@@ -404,7 +404,7 @@ double Triangle3old::IntPFF (int i, int j, const RVector &P) const
 	    return size*i30 * (P[Node[0]] + P[Node[1]] + 3.0*P[Node[2]]);
 	}
     default:
-        xERROR(Index out of range);
+        xERROR("Index out of range");
         return 0.0; // dummy
     }
 }
@@ -418,7 +418,7 @@ RSymMatrix Triangle3old::Intdd () const
     double c0 = 0;
     double c1 = 0;
     double c2 = 0;
-    xERROR (Function only available with precomputed shape parameters);
+    xERROR ("Function only available with precomputed shape parameters");
 #else
     double b0 = n1y - n2y;
     double b1 = n2y - n0y;
@@ -458,7 +458,7 @@ int Triangle3old::GetLocalSubsampleAbsc (const Point *&absc) const
 
 int Triangle3old::GetBndSubsampleAbsc (int side, const Point *&absc) const
 {
-    dASSERT (side >= 0 && side < 3, Argument 1 index out of range);
+    dASSERT (side >= 0 && side < 3, "Argument 1 index out of range");
     return Triangle_GetBndSubsampleAbsc (side, absc);
 }
 
@@ -498,9 +498,9 @@ void Triangle3old::ComputeIntFD (const NodeList &nlist)
 
 RVector Triangle3old::IntFD (int i, int j) const
 {
-    dASSERT(intfd_0 && intfd_1, FD matrix not initialised);
-    dASSERT(i >= 0 && i < 3, Parameter 1 index out of range);
-    dASSERT(j >= 0 && j < 3, Parameter 2 index out of range);
+    dASSERT(intfd_0 && intfd_1, "FD matrix not initialised");
+    dASSERT(i >= 0 && i < 3, "Parameter 1 index out of range");
+    dASSERT(j >= 0 && j < 3, "Parameter 2 index out of range");
 
     // note that Int{F_i D_j} is independent of i
 
@@ -603,7 +603,7 @@ RVector Triangle3old::BndIntFCos (int side, const Surface *surf,
     const RVector &cntcos, double sigma, double sup, const NodeList &nlist)
     const
 {
-    dASSERT(surf->Dimension() == 2, Wrong surface dimension);
+    dASSERT(surf->Dimension() == 2, "Wrong surface dimension");
     Surface2D *surf2D = (Surface2D*)surf;
     double s, d0, tmp;
     bool flip;
@@ -660,7 +660,7 @@ RVector Triangle3old::BndIntFCos (int side, const RVector &cntcos, double a,
 RVector Triangle3old::BndIntFDelta (int side, const Surface *surf,
     const RVector &pos, const NodeList &nlist) const
 {
-    dASSERT(surf->Dimension() == 2, Wrong surface dimension);
+    dASSERT(surf->Dimension() == 2, "Wrong surface dimension");
     Surface2D *surf2D = (Surface2D*)surf;
     double s, d0, d1;
     int n0 = Node[SideNode (side, 0)];
@@ -736,7 +736,7 @@ int Triangle3old::Intersection (const Point &p1, const Point &p2, Point **list)
     int pindx = 0;
     Point *s;
 
-    dASSERT(p1.Dim() == 2 && p2.Dim() == 2, Points must be 2D.);
+    dASSERT(p1.Dim() == 2 && p2.Dim() == 2, "Points must be 2D.");
     s = new Point[2];
     s[0].New(2), s[1].New(2);
 
@@ -804,7 +804,7 @@ int Triangle3old::Intersection (const Point &p1, const Point &p2, Point **list)
 	    if (smax+EPS < pmin || smin-EPS > pmax) pindx=0;
 	}
     }
-    xASSERT(pindx == 0 || pindx == 2, Something went wrong...);
+    xASSERT(pindx == 0 || pindx == 2, "Something went wrong...");
     if (!pindx) {
 	s[0].New(0), s[1].New(0);
 	delete s;
@@ -903,14 +903,14 @@ static Point Triangle_SurfToLocal (int side, const Point &p)
     // Convert 1-D coordinate [0..1] into 2-D triangular surface coordinate
     // for the given side
 
-    dASSERT(p.Dim() == 1, Arg 2 wrong vector dimension);
+    dASSERT(p.Dim() == 1, "Arg 2 wrong vector dimension");
 
     Point loc(2);
     switch (side) {
     case 0:  loc[0] = p[0];                     break;
     case 1:  loc[0] = 1.0 - (loc[1] = p[0]);    break;
     case 2:  loc[1] = 1.0 - p[0];               break;
-    default: xERROR (Arg 1 index out of range); break;
+    default: xERROR ("Arg 1 index out of range"); break;
     }
     return loc;
 }

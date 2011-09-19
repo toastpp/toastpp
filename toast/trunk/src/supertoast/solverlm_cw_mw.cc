@@ -20,6 +20,7 @@ using namespace toast;
 // external references
 
 extern int g_imgfmt;
+extern char g_prefix[256];
 extern double clock0;
 extern double g_refind;
 
@@ -47,7 +48,7 @@ RDenseMatrix mul (const RMatrix &A, const RMatrix &B)
     int ac = A.nCols();
     int br = B.nRows();
     int bc = B.nCols();
-    xASSERT (ac == br, Incompatible dimensions);
+    xASSERT (ac == br, "Incompatible dimensions");
     RDenseMatrix tmp (ar, bc);
     for (i = 0; i < ar; i++) {
 	for (j = 0; j < bc; j++) {
@@ -1163,7 +1164,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
     int glen = raster.GLen();
     int nprm = bsol.nActive();
     int n    = bsol.ActiveDim();
-    double of, fmin, errstart, err0, err00, err1;
+    double of, of_value, of_prior, fmin, errstart, err0, err00, err1;
     double lambda = lambda0, alpha = -1.0;
 
     RVector r(n), s(n), d(n);
@@ -1246,18 +1247,19 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		      &prmscl, reg, &RHess, &M, &lambda, &msol, &extcoef};
     // set the components for the implicit definition of the Jacobian
     
-    of  = ObjectiveFunction::get_value (data, proj, sd, cov);
-    of += reg->GetValue (x1);
+    of_value = ObjectiveFunction::get_value (data, proj, sd, cov);
+    of_prior = reg->GetValue (x1);
+    of = of_value + of_prior;
     // actually this will be 0 since x = x0 = x1 here
     err0 = errstart = of;
     
     err00 = 0; // this is previous error
     
     //    test_biscale();
-    LOGOUT_1PRM("Starting error: %f", errstart);
+    LOGOUT("Starting error: %f", errstart);
     
-    LOGOUT_2PRM("Iteration 0  CPU %f  OF %g",
-		toc(clock0), err0);
+    LOGOUT("Iteration 0  CPU %f  OF %g [LH %g PR %g]", toc(clock0),
+	   of, of_value, of_prior);
 
     if (precon == LM_PRECON_GMRES_JACOBIANFREE ||
 	precon == LM_PRECON_GMRES_DIRECT) {
@@ -1334,13 +1336,13 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    r *= prmscl;  // apply param scaling dy/dx -> dy/d(log x)
 	}
 
-	LOGOUT_1PRM("Gradient norm: %f", l2norm(r));
+	LOGOUT("Gradient norm: %f", l2norm(r));
 	
 	// add prior to gradient
 	RVector gpsi = reg->GetGradient (x);
 	gpsi *= M; // apply Hessian normalisation
 	r -= gpsi;
-	LOGOUT_1PRM("Gradient norm with penalty: %f", l2norm(r));
+	LOGOUT("Gradient norm with penalty: %f", l2norm(r));
 	cerr << "T(reg_gradient)=" << toc() << endl;
 	tic();
 
@@ -1348,7 +1350,7 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	i_count = 0;
 	err00 = err0;
 	while (i_count < itmax && KeepGoing) {
-	    LOGOUT_1PRM ("LM iteration %d", i_count);
+	    LOGOUT("LM iteration %d", i_count);
 
 	    if (Gradient_descent) {
 
@@ -1415,7 +1417,8 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		static double alpha_ls = stepsize;
 		//if (alpha < 0.0) alpha = stepsize; // initialise step length
 		if (LineSearch (x, d, alpha_ls, err0, of_clbk, &alpha_ls,
-				&fmin, &ofdata) != 0) {
+				&fmin, &ofdata) != 0 ||
+		    fabs(err00-fmin) <= gn_tol) {
 		    LOGOUT ("No decrease in line search");
 		    lambda *= lambda_scale;
 		    if (lambda_scale == 1.0) {
@@ -1478,21 +1481,46 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		    proj_i = FWS.ProjectAll (mvec, dphi+i*nq);
 		}
 
-		switch (g_imgfmt) {
-		case IMGFMT_NIM:
+		if (g_imgfmt != IMGFMT_RAW) {
 		    for (i = 0; i < msol.nParam(); i++) {
 			char fname[256];
 			if (msol.IsActive(i)) {
 			    if (i < msol.nmuaChromo) 
-				sprintf (fname,"reconChromophore_%d.nim",i+1);
+			        sprintf (fname,"%sreconChromophore_%d.nim",
+				    g_prefix,i+1);
 			    if (i == msol.nmuaChromo)
-				sprintf (fname,"reconScatPrefactor_A.nim");
+			        sprintf (fname,"%sreconScatPrefactor_A.nim",
+				    g_prefix);
 			    if (i == msol.nmuaChromo + 1) 
-				sprintf (fname,"reconScatPower_b.nim");
+			        sprintf (fname,"%sreconScatPower_b.nim",
+				    g_prefix);
 			    msol.WriteImgGeneric (inr+1, fname, i);
 			}
 		    }
-		    break;
+		}
+		if (g_imgfmt != IMGFMT_NIM) {
+		    Solution gsol(msol.nParam(), blen);
+		    raster.Map_SolToBasis (bsol, gsol, true);
+		    for (i = 0; i < msol.nParam(); i++) {
+			char fname[256];
+			if (msol.IsActive(i)) {
+			    if (i < msol.nmuaChromo)
+				sprintf (fname, "%sreconChromophore_%d.raw",
+				    g_prefix,i+1);
+			    else if (i == msol.nmuaChromo)
+			        sprintf (fname, "%sreconScatPrefactor_A.raw",
+				    g_prefix);
+			    else if (i == msol.nmuaChromo+1)
+			        sprintf (fname,"%sreconScatPower_b.raw",
+				    g_prefix);
+			    else
+				xERROR("Invalid parameter index during output");
+			    gsol.WriteImgGeneric (inr+1, fname, i);
+			}
+		    }
+		}
+
+#ifdef UNDEF
 		case IMGFMT_PGM:
 		case IMGFMT_PPM: {
 		    char cbuf[256];
@@ -1510,14 +1538,8 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 		    sprintf (cbuf, "recon_mus_%03d.ppm", inr);
 		    WritePixmap (vb, raster.BDim(), &smin, &smax, cbuf, col);
 		    } break;
-		case IMGFMT_RAW:
-		    Solution rsol(OT_NPARAM, blen);
-		    raster.Map_SolToBasis (bsol, rsol, true);
-		    // need to unscale here
-		    rsol.WriteImg_mua (inr+1, "recon_mua.raw");
-		    rsol.WriteImg_mus (inr+1, "recon_mus.raw");
-		    break;
 		}
+#endif
 		lambda /= lambda_scale;
 		KeepGoing = false;
 	    } else {          // reject update
@@ -1527,23 +1549,33 @@ void SolverLM_CW_MW::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	        lambda *= lambda_scale;
 	    }
 	    if (lambda) {
-		LOGOUT_1PRM("LM param lambda: %g", lambda);
+		LOGOUT("LM param lambda: %g", lambda);
 	    }
 	    cerr << "T(update)=" << toc() << endl;
 	    tic();
 
 	    i_count++;
 	}
-	LOGOUT_3PRM("Iteration %d  CPU %f  OF %g",
-	    inr+1, toc(clock0), err0);
+        of_prior = reg->GetValue (x);
+	LOGOUT("Iteration %d  CPU %f  OF %g [LH %g PR %g]",
+	       inr+1, toc(clock0), err0, err0-of_prior, of_prior);
     } // end of NR loop;
+
+    if (err0 <= gn_tol*errstart)
+        LOGOUT ("LM solver convergence criterion satisfied");
+    else if (fabs(err00-err0) <= gn_tol)
+        LOGOUT ("LM solver stopped (insufficient improvement)");
+    else if (nrmax && inr == nrmax)
+        LOGOUT ("LM solver iteration limit reached");
+    else
+        LOGOUT ("LM solver terminated");
 
     // final residuals
     double rd = ObjectiveFunction::get_value (data, proj, sd, cov);
     double rp = reg->GetValue (x);
     double tau = reg->GetTau();
-    LOGOUT_4PRM("Residuals  TAU %g  DATA %g  PRIOR/TAU %g  IT %d", tau, rd,
-		rp/tau, inr);
+    LOGOUT("Residuals  TAU %g  DATA %g  PRIOR/TAU %g  IT %d", tau, rd,
+	   rp/tau, inr);
     delete J;
 }
 

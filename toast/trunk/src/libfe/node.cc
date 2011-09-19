@@ -45,7 +45,7 @@ void Node::Copy (const Node &nd)
 
 Node &Node::operator= (const Node& nd)
 {
-    dASSERT(size == nd.Dim(), Nodes have different dimension.);
+    dASSERT(size == nd.Dim(), "Nodes have different dimension.");
     Point::operator=(nd);
     bndtp  = nd.bndtp;
     region = nd.region;
@@ -79,7 +79,7 @@ FELIB void Swap (Node &n1, Node &n2)
 
 FELIB double Dist (const Node &n1, const Node &n2)
 {
-    dASSERT(n1.Dim() == n2.Dim(), Node dimensions do not match);
+    dASSERT(n1.Dim() == n2.Dim(), "Node dimensions do not match");
     double diff, sum = 0.0;
     for (int i = 0; i < n1.Dim(); i++) {
         diff = n1[i] - n2[i];
@@ -96,13 +96,13 @@ istream& operator>> (istream& is, Node& nd)
     int dim, i;
 
     is >> bndid >> c;
-    dASSERT(c == '[', Parse error reading node);
+    dASSERT(c == '[', "Parse error reading node");
 
     dim = 0;
     while (dim < 3 && is >> crd[dim]) dim++;
     is.clear();
     is >> c;
-    dASSERT (dim >= 2 && c == ']', Parse error reading node.);
+    dASSERT (dim >= 2 && c == ']', "Parse error reading node.");
 
     nd.New (dim);
     for (i = 0; i < dim; i++) nd[i] = crd[i];
@@ -128,13 +128,13 @@ FELIB istream& operator>> (istream& is, Node& nd)
     std::istringstream iss (cbuf);
 
     iss >> bndid >> c;
-    dASSERT(c == '[', Parse error reading node);
+    dASSERT(c == '[', "Parse error reading node");
 
     dim = 0;
     while (dim < 3 && iss >> crd[dim]) dim++;
     iss.clear();
     iss >> c;
-    dASSERT (dim >= 2 && c == ']', Parse error reading node.);
+    dASSERT (dim >= 2 && c == ']', "Parse error reading node.");
 
     nd.New (dim);
     for (i = 0; i < dim; i++) nd[i] = crd[i];

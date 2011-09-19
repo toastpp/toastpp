@@ -36,7 +36,7 @@ void Wedge6::Initialise (const NodeList &nlist)
 
 int Wedge6::nSideNode (int side) const
 {
-    dASSERT(side >= 0 && side < 5, Invalid side number.);
+    dASSERT(side >= 0 && side < 5, "Invalid side number.");
     if (side <= 2) return 4;
     return 3;
 }
@@ -47,8 +47,9 @@ int Wedge6::SideNode (int side, int node) const
 {
     static const int SN[5][4] =
 	{{0,1,4,3},{0,2,5,3},{1,2,5,4},{0,1,2,-1},{3,4,5,-1}};
-    dASSERT(side >= 0 && side < 5, Invalid side parameter.);
-    dASSERT(node >= 0 && node < 4 && SN[side][node] >= 0, Invalid node param.);
+    dASSERT(side >= 0 && side < 5, "Invalid side parameter.");
+    dASSERT(node >= 0 && node < 4 && SN[side][node] >= 0,
+	    "Invalid node param.");
     return SN[side][node];
 }
 
@@ -59,7 +60,7 @@ int Wedge6::SideNode (int side, int node) const
 
 Point Wedge6::Local (const NodeList& nlist, const Point& glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid dimension of global point.);
+    dASSERT(glob.Dim() == 3, "Invalid dimension of global point.");
 
     double x1, y1, z1, x2, y2, z2, x3, y3, x, y, z;
     static RDenseMatrix b(2,2);		// make static to avoid construction
@@ -88,7 +89,7 @@ Point Wedge6::Local (const NodeList& nlist, const Point& glob) const
 
 Point Wedge6::NodeLocal (int node) const
 {
-    dASSERT(node >= 0 && node < 6, Invalid value for argument 'node'.);
+    dASSERT(node >= 0 && node < 6, "Invalid value for argument 'node'.");
     Point n(3);
     switch (node) {
 	case 0: n[0] = 1;    n[1] = 0;         n[2] = -1; break;
@@ -106,7 +107,7 @@ Point Wedge6::NodeLocal (int node) const
 RVector Wedge6::DirectionCosine (int side, RDenseMatrix& jacin)
 {
     dASSERT(jacin.nCols() == 3 && jacin.nRows() == 3,
-	Invalid dimension of matrix jacin.);
+	"Invalid dimension of matrix jacin.");
 
     double amod;
     RVector work(3);
@@ -133,7 +134,7 @@ const RVector &Wedge6::LNormal (int side) const
     static const RVector *lnm[5] = {
       &lnm0, &lnm1, &lnm2, &lnm3, &lnm4
     };
-    dASSERT(side >= 0 && side < 5, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 5, "Argument 1 index out of range");
     return *lnm[side];
 }
 
@@ -158,9 +159,9 @@ double Wedge6::ComputeSize (const NodeList &nlist) const
 
 bool Wedge6::LContains (const Point& loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 3, Invalid dimension of local point.);
+    dASSERT(loc.Dim() == 3, "Invalid dimension of local point.");
     if (pad) {
-        xERROR(Not implemented);
+        ERROR_UNDEF;
 	return false;
     } else {
         if (loc[2] < -1.0 || loc[2] > 1.0) return false;
@@ -173,7 +174,7 @@ bool Wedge6::LContains (const Point& loc, bool pad) const
 
 RVector Wedge6::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Evaluation point must be 3D);
+    dASSERT(loc.Dim() == 3, "Evaluation point must be 3D");
     RVector fun(6);
     fun[0] = (1.0+2.0*loc[0]) * (1.0-loc[2]) / 6.0;
     fun[1] = (1.0-loc[0]-sqrt3*loc[1]) * (1.0-loc[2]) / 6.0;
@@ -188,7 +189,7 @@ RVector Wedge6::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Wedge6::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Evaluation point must be 3D);
+    dASSERT(loc.Dim() == 3, "Evaluation point must be 3D");
     RDenseMatrix der(3,6);
     der(0,0) =  (1.0-loc[2]) / 3.0;
     der(1,0) =  0.0;
@@ -289,9 +290,9 @@ int Wedge6::QuadRule (const double **wght, const Point **absc) const
 
 double Wedge6::UnitLength (Point& loc, RDenseMatrix& geom, int side)
 {
-    dASSERT(side >= 0 && side < 5, Invalid side number.);
+    dASSERT(side >= 0 && side < 5, "Invalid side number.");
     dASSERT(geom.Dim(ROW) == 6 && geom.Dim(COL) == 3,
-	Invalid geometry matrix dimension.);
+	"Invalid geometry matrix dimension.");
 
     double g1, g2, g3;
 
@@ -300,7 +301,7 @@ double Wedge6::UnitLength (Point& loc, RDenseMatrix& geom, int side)
     switch (side) {
 	case 0:
 	case 1:
-	    xERROR(Sides 0 and 1 not implemented yet.);
+	    xERROR("Sides 0 and 1 not implemented yet.");
 	    break;
 	case 2:  // eta=const
 	    g1 = jac[0][1]*jac[2][2] - jac[0][2]*jac[2][1];
@@ -322,7 +323,7 @@ double Wedge6::UnitLength (Point& loc, RDenseMatrix& geom, int side)
 void Wedge6::ConvLineQuadrature (Point** absc, double* labsc,
     int nqp, int side, double* coeff)
 {
-    xERROR(Not implemented.);
+    ERROR_UNDEF;
 }
 
 #endif
@@ -332,7 +333,7 @@ void Wedge6::ConvLineQuadrature (Point** absc, double* labsc,
 int Wedge6::GlobalIntersection (const NodeList &nlist,
     const Point &p1, const Point &p2, Point **list)
 {
-    xERROR(Not implemented.);
+    ERROR_UNDEF;
     return 0; // dummy
 }
 
@@ -340,6 +341,6 @@ int Wedge6::GlobalIntersection (const NodeList &nlist,
 
 int Wedge6::Intersection (const Point &p1, const Point &p2, Point **list)
 {
-    xERROR(Not implemented.);
+    ERROR_UNDEF;
     return 0; // dummy
 }

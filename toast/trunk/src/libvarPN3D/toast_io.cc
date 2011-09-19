@@ -9,15 +9,15 @@ void ReadMesh(const char* fname, QMMesh &qmmesh)
     cout << "MESH: " << fname << endl;
     ifstream ifs;
     ifs.open (fname);
-    xASSERT (ifs.is_open(), Mesh file not found.);
+    xASSERT (ifs.is_open(), "Mesh file not found.");
     ifs >> qmmesh;
-    xASSERT (ifs.good(), Problem reading mesh.);
+    xASSERT (ifs.good(), "Problem reading mesh.");
     ifs.close ();
     cout << "* " << qmmesh.elen() << " elements, " << qmmesh.nlen()
 	 << " nodes\n";
     int dimension = qmmesh.nlist[0].Dim();
     for (int i = 1; i < qmmesh.nlist.Len(); i++)
-	xASSERT(qmmesh.nlist[i].Dim() == dimension, Inconsistent node dimensions.);
+	xASSERT(qmmesh.nlist[i].Dim() == dimension, "Inconsistent node dimensions.");
     qmmesh.Setup();
 
 }
@@ -32,9 +32,9 @@ void ReadQM(const char* fname, QMMesh &qmmesh, int &nQ, int &nM,  RCompRowMatrix
     cout << "QM: " <<  fname<< endl;
     ifstream ifs;
     ifs.open (fname);
-    xASSERT (ifs.is_open(), QM file not found.);
+    xASSERT (ifs.is_open(), "QM file not found.");
     qmmesh.LoadQM (ifs);
-    xASSERT (ifs.good(), Problem reading QM.);
+    xASSERT (ifs.good(), "Problem reading QM.");
     ifs.close ();
     nQ = qmmesh.nQ;
     nM = qmmesh.nM;
@@ -83,7 +83,7 @@ void ReadParams(const char* fname, RVector &muabs, RVector &muscat, RVector &ref
     cin.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
     ifstream ifs;
     ifs.open (fname);
-    xASSERT (ifs.is_open(), Optical parameter file not found.);
+    xASSERT (ifs.is_open(), "Optical parameter file not found.");
 
     for(int i =0; i < size; i++)
     {
@@ -116,7 +116,7 @@ void ReadSphOrder(const char* fname, IVector &sphorder)
     cin.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
     ifstream ifs;
     ifs.open (fname);
-    xASSERT (ifs.is_open(), Nodal spherical harmonic order specification file not found.);
+    xASSERT (ifs.is_open(), "Nodal spherical harmonic order specification file not found.");
     for(int i =0; i < size; i++)
     {
 	try{
@@ -137,7 +137,7 @@ void ReadDirections(const char*fname, const int nQ, RVector* &dirVec)
     cin.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
     ifstream ifs;
     ifs.open (fname);
-    xASSERT (ifs.is_open(), Direction vectors file not found.);
+    xASSERT (ifs.is_open(), "Direction vectors file not found.");
     for(int i=0; i < nQ; i++)
     {
 	for(int j=0; j < dirVec[i].Dim(); j++)

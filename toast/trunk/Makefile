@@ -22,6 +22,10 @@ matlab::
 	cd src; \
 	$(MAKE) matlab;
 
+python::
+	cd src; \
+	$(MAKE) python;
+
 gui::
 	cd $(GUIDIR); \
 	echo "making" all "in $(GUIDIR)"; \

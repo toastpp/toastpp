@@ -29,15 +29,15 @@ void Quad4::Initialise (const NodeList &nlist)
 
 int Quad4::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 4, Argument 1 index out of range);
-    dASSERT(node >= 0 && node < 2, Argument 2 index out of range);
+    dASSERT(side >= 0 && side < 4, "Argument 1 index out of range");
+    dASSERT(node >= 0 && node < 2, "Argument 2 index out of range");
     static int SN[4][2] = {{0,1},{1,2},{2,3},{3,0}};
     return SN[side][node];
 }
 
 Point Quad4::Local (const NodeList &nlist, const Point &glob) const
 {
-    dASSERT(glob.Dim() == 2, Argument 2 dimension must be 2);
+    dASSERT(glob.Dim() == 2, "Argument 2 dimension must be 2");
     static Point loc(2);
     loc[0] = (glob[0]-n0[0])/len;
     loc[1] = (glob[1]-n0[1])/len;
@@ -57,7 +57,7 @@ Point Quad4::NodeLocal (int node) const
 
 bool Quad4::LContains (const Point &loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[0]-EPS <= 1.0 &&
@@ -70,7 +70,7 @@ bool Quad4::LContains (const Point &loc, bool pad) const
 
 bool Quad4::GContains (const Point &glob, const NodeList &nlist) const
 {
-    dASSERT(glob.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(glob.Dim() == 2, "Argument 1 invalid dimension");
     const double EPS = 1e-8;
     return (glob[0]+EPS >= n0[0] && glob[0]-EPS <= n0[0]+len &&
 	    glob[1]+EPS >= n0[1] && glob[1]+EPS <= n0[1]+len);
@@ -78,7 +78,7 @@ bool Quad4::GContains (const Point &glob, const NodeList &nlist) const
 
 RVector Quad4::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     static RVector fun(4);
     fun[0] = (1.0-loc[0])*(1.0-loc[1]);
     fun[1] = loc[0]*(1.0-loc[1]);
@@ -89,7 +89,7 @@ RVector Quad4::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Quad4::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
     static RDenseMatrix der(2,4);
     der(0,0) = loc[1]-1.0;
     der(1,0) = loc[0]-1.0;

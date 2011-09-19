@@ -124,9 +124,9 @@ MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
 {
     TIC; // timing
 
-    dASSERT(A.nRows() == A.nCols(), Matrix not square);
-    dASSERT(b.Dim() == A.nRows(), Dimension mismatch);
-    dASSERT(x.Dim() == A.nRows(), Dimension mismatch);
+    dASSERT(A.nRows() == A.nCols(), "Matrix not square");
+    dASSERT(b.Dim() == A.nRows(), "Dimension mismatch");
+    dASSERT(x.Dim() == A.nRows(), "Dimension mismatch");
 
     double dnew, dold, alpha, beta;
     double err, bnorm;
@@ -254,9 +254,9 @@ template<class MT>
 MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon, int maxit)
 {
-    dASSERT(A.nRows() == A.nCols(), Matrix not square);
-    dASSERT(b.Dim() == A.nRows(), Dimension mismatch);
-    dASSERT(x.Dim() == A.nRows(), Dimension mismatch);
+    dASSERT(A.nRows() == A.nCols(), "Matrix not square");
+    dASSERT(b.Dim() == A.nRows(), "Dimension mismatch");
+    dASSERT(x.Dim() == A.nRows(), "Dimension mismatch");
 
     double dnew, dold, d0, alpha, beta = 0.0, dq;
     int niter, dim = x.Dim();
@@ -339,7 +339,7 @@ MATHLIB int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
 
 	bden = rho;
 	rho = z & rd;
-	xASSERT (rho != 0.0, BiCG solver fails);
+	xASSERT (rho != 0.0, "BiCG solver fails");
 	if (!niter) {
 	    p = z;
 	    pd = zd;
@@ -393,7 +393,7 @@ MATHLIB int BiCG<toast::complex> (const CGenericSparseMatrix &A, const CVector &
 	bden = rho;
 	for (rho = 0.0, i = 0; i < dim; i++)
 	    rho += z[i].re*rd[i].re + z[i].im*rd[i].im;
-	xASSERT(rho != 0.0, BiCG solver fails);
+	xASSERT(rho != 0.0, "BiCG solver fails");
 	if (!niter) {
 	    p = z;
 	    pd = zd;
@@ -453,7 +453,7 @@ MATHLIB int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b
 		else x[i] -= val[k]*x[j];
 	    }
 	    if (aii != (MT)0) x[i] /= aii;
-	    else xERROR(Zero diagonal element in matrix);
+	    else xERROR("Zero diagonal element in matrix");
 	}
 	// stopping criteria
 	if (l2norm (x-xp) / l2norm(x) < tol) break; // no improvement
@@ -485,13 +485,13 @@ MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT>
         //niter = BiCGSTAB (A, b, x, tol, precon, maxit);
 	break;
     case ITMETHOD_GMRES:
-        niter = GMRES (A, b, x, tol, precon, 10, 0);
+        niter = GMRES (A, b, x, tol, precon, 20, maxit, 0);
 	break;
     case ITMETHOD_GAUSSSEIDEL:
         niter = GaussSeidel (A, b, x, tol, maxit);
 	break;
     default:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
     return niter;
 }
@@ -508,22 +508,22 @@ MATHLIB int IterativeSolve (const SCGenericSparseMatrix &A, const SCVector &b,
         //niter = CG (A, b, x, tol, precon, maxit);
 	break;
     case ITMETHOD_BICG:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
         //niter = BiCG (A, b, x, tol, precon, maxit);
 	break;
     case ITMETHOD_BICGSTAB:
         niter = A.bicgstab (b, x, tol, precon, maxit);
 	break;
     case ITMETHOD_GMRES:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
         //niter = GMRES (A, b, x, tol, precon, 10, 0);
 	break;
     case ITMETHOD_GAUSSSEIDEL:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
         //niter = GaussSeidel (A, b, x, tol, maxit);
 	break;
     default:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
     return niter;
 }
@@ -545,10 +545,10 @@ int IterativeSolve<toast::complex> (const CGenericSparseMatrix &A, const CVector
         niter = BiCGSTAB (A, b, x, tol, precon, maxit);
 	break;
     case ITMETHOD_GMRES:
-        niter = GMRES (A, b, x, tol, precon, 10, 0);
+        niter = GMRES (A, b, x, tol, precon, 20, maxit, 0);
 	break;
     default:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
     return niter;
 }
@@ -569,7 +569,7 @@ MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
         A.bicgstab (b, x, nrhs, tol, maxit, precon, res);
 	break;
     default:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
 }
 
@@ -583,7 +583,7 @@ void IterativeSolve (const SCGenericSparseMatrix &A, const SCVector *b,
         A.bicgstab (b, x, nrhs, tol, maxit, precon, res);
 	break;
     default:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
 }
 
@@ -597,11 +597,13 @@ void IterativeSolve (const CGenericSparseMatrix &A, const CVector *b,
         A.bicgstab (b, x, nrhs, tol, maxit, precon, res);
 	break;
     case ITMETHOD_GMRES:
-	for (int i = 0; i < nrhs; i++)
-	    GMRES (A, b[i], x[i], tol, precon, 10, 0);
+        for (int i = 0; i < nrhs; i++) {
+  	    double err = tol;
+	    GMRES (A, b[i], x[i], err, precon, 20, maxit, 0);
+	}
 	break;
     default:
-        xERROR(Not implemented);
+        ERROR_UNDEF;
     }
 }
 
@@ -615,10 +617,10 @@ int ComplexBiCGSolve (const TGenericSparseMatrix<MT>& Are,
     double &tol, int maxit)
 {
     dASSERT(Are.nRows() == Aim.nRows() && Are.nCols() == Aim.nCols(),
-	   Matrix dimensions differ.);
+	   "Matrix dimensions differ.");
     dASSERT(bre.Dim() == bim.Dim() && xre.Dim() == xim.Dim(),
-	   Vector dimensions differ.);
-    dASSERT(Are.nRows() == bre.Dim(), Matrix and vector incompatible.);
+	   "Vector dimensions differ.");
+    dASSERT(Are.nRows() == bre.Dim(), "Matrix and vector incompatible.");
 
     const double EPS = 1e-10;
     int i, k = 0, dim = bre.Dim();

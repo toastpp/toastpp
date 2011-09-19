@@ -6,6 +6,9 @@
 #ifdef TOAST_MPI
 #include "toast_mpi.h"
 #endif
+#ifdef USE_CUDA_FLOAT
+#include "toastcuda.h"
+#endif
 
 using namespace std;
 using namespace toast;
@@ -63,6 +66,7 @@ void TFwdSolver<T>::Setup ()
     SuperLU = 0;
     dscale = DATA_LIN;
     solvertp = LSOLVER_ITERATIVE;
+    precontp = PRECON_NULL;
     iterative_tol = 1e-6;
     iterative_maxit = 0;
     F  = 0;
@@ -120,7 +124,7 @@ void TFwdSolver<T>::DeleteType ()
 template<class T>
 void TFwdSolver<T>::SetDataScaling (DataScale scl)
 {
-    xASSERT(scl != DATA_DEFAULT, Invalid input argument);
+    xASSERT(scl != DATA_DEFAULT, "Invalid input argument");
     dscale = scl;
 }
 
@@ -161,8 +165,11 @@ void TFwdSolver<float>::Allocate (const QMMesh &mesh)
 	delete []colidx;
     } else {
 	if (precon) delete precon;
-	//precon = new FPrecon_Diag;
-	precon = new FPrecon_Null;
+	switch (precontp) {
+	case PRECON_DIAG: precon = new FPrecon_Diag; break;
+	case PRECON_ICH:  precon = new FPrecon_IC;   break;
+	default:          precon = new FPrecon_Null; break;
+	}
     }
 }
 
@@ -198,8 +205,11 @@ void TFwdSolver<double>::Allocate (const QMMesh &mesh)
 	delete []colidx;
     } else {
 	if (precon) delete precon;
-	//precon = new RPrecon_Diag;
-	precon = new RPrecon_Null;
+	switch (precontp) {
+	case PRECON_DIAG: precon = new RPrecon_Diag; break;
+	case PRECON_ICH:  precon = new RPrecon_IC;   break;
+	default:          precon = new RPrecon_Null; break;
+	}
     }
 }
 
@@ -230,8 +240,13 @@ void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
 	((ZSuperLU*)SuperLU)->Reset (F);
     } else {
 	if (precon) delete precon;
-	//precon = new CPrecon_Diag;
-	precon = new CPrecon_Null;
+	switch (precontp) {
+	case PRECON_DIAG: precon = new CPrecon_Diag; break;
+	case PRECON_ICH:  precon = new CPrecon_IC;   break;
+	// NOTE: IC preconditioner shouldn't really work for symmetric
+	// complex problem, but it seems to anyway
+	default:          precon = new CPrecon_Null; break;
+	}
     }
 }
 
@@ -261,8 +276,11 @@ void TFwdSolver<scomplex>::Allocate (const QMMesh &mesh)
 	// lu_data.Setup(meshptr->nlen(), F);
     } else {
 	if (precon) delete precon;
-	//precon = new SCPrecon_Diag;
-	precon = new SCPrecon_Null;
+	switch (precontp) {
+	case PRECON_DIAG: precon = new SCPrecon_Diag; break;
+	case PRECON_ICH:  precon = new SCPrecon_IC;   break;
+	default:          precon = new SCPrecon_Null; break;
+	}
     }
 }
 
@@ -271,7 +289,7 @@ void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
     // real version
-    xASSERT(omega==0, Nonzero omega parameter not allowed here);
+    xASSERT(omega==0, "Nonzero omega parameter not allowed here");
 
     RVector prm(meshptr->nlen());
 
@@ -313,7 +331,7 @@ void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
     // real version
-    xASSERT(omega==0, Nonzero omega parameter not allowed here);
+    xASSERT(omega==0, "Nonzero omega parameter not allowed here");
 
     RVector prm(meshptr->nlen());
 
@@ -405,7 +423,7 @@ template<class T>
 void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
 {
     if (!mesh) mesh = meshptr;
-    xASSERT(mesh, No mesh information available);
+    xASSERT(mesh, "No mesh information available");
 
     if (!B) { // allocate on the fly
 	idxtype *rowptr, *colidx;
@@ -564,29 +582,57 @@ void TFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec,
     //cerr << "Solve time = " << solver_time << endl;
 }
 
+// ==========================================================================
+// CalcFields
+
 #if THREAD_LEVEL==2
 
 template<class T>
-void CalcFields_engine (void *context, int q0, int q1)
-{
-    struct CALCFIELDS_THREADDATA {
-	TCompRowMatrix<T> *F;
-	const TCompRowMatrix<T> *qvec;
-	TVector<T> *phi;
-	TPreconditioner<T> *precon;
-	double tol;
-	int maxit;
-    } *thdata = (CALCFIELDS_THREADDATA*)context;
-    double tol = thdata->tol;
+struct CALCFIELDS_THREADDATA {
+    TCompRowMatrix<T> *F;
+    const TCompRowMatrix<T> *qvec;
+    TVector<T> *phi;
+    TPreconditioner<T> *precon;
+    double tol;
+    int maxit;
+    IterativeSolverResult *res;
+};
 
-    IterativeSolve (*thdata->F, thdata->qvec->Row(q0), thdata->phi[q0],
-		    tol, thdata->precon, thdata->maxit);
+template<class T>
+void *CalcFields_engine (task_data *td)
+{
+    int itask = td->proc;
+    int ntask = td->np;
+    CALCFIELDS_THREADDATA<T> *thdata = (CALCFIELDS_THREADDATA<T>*)td->data;
+    int nq = thdata->qvec->nRows();
+    int q0 = (itask*nq)/ntask;
+    int q1 = ((itask+1)*nq)/ntask;
+    int q, it, itsum = 0;
+    double tol, err_max = 0.0;
+
+    IterativeSolverResult single_res, local_res = {0, 0.0};
+    IterativeSolverResult *sres = (thdata->res ? &single_res : NULL);
+    for (q = q0; q < q1; q++) {
+        tol = thdata->tol;
+	it = IterativeSolve (*thdata->F, thdata->qvec->Row(q), thdata->phi[q],
+			tol, thdata->precon, thdata->maxit);
+	itsum += it;
+	if (tol > err_max) err_max = tol;
+    }
+    if (thdata->res) {
+        Task::UserMutex_lock();
+	thdata->res->it_count += itsum;
+	if (err_max > thdata->res->rel_err) thdata->res->rel_err = err_max;
+	Task::UserMutex_unlock();
+    }
+    
+    return NULL;
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
-template void CalcFields_engine<double> (void *context, int q0, int q1);
-template void CalcFields_engine<float> (void *context, int q0, int q1);
-template void CalcFields_engine<complex> (void *context, int q0, int q1);
-template void CalcFields_engine<scomplex> (void *context, int q0, int q1);
+template void *CalcFields_engine<double> (task_data *td);
+template void *CalcFields_engine<float> (task_data *td);
+template void *CalcFields_engine<toast::complex> (task_data *td);
+template void *CalcFields_engine<scomplex> (task_data *td);
 #endif
 
 #endif // THREAD_LEVEL==2
@@ -613,23 +659,21 @@ void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
 	//}
     } else {
 #if THREAD_LEVEL==2
-	dASSERT(g_tpool, ThreadPool not initialised);
-	static struct {
-	    TCompRowMatrix<toast::complex> *F;
-	    const TCompRowMatrix<toast::complex> *qvec;
-	    TVector<toast::complex> *phi;
-	    TPreconditioner<toast::complex> *precon;
-	    double tol;
-	    int maxit;
-	} thdata;
+
+        //dASSERT(g_tpool, ThreadPool not initialised);
+        static CALCFIELDS_THREADDATA<toast::complex> thdata;
 	thdata.F      = F;
 	thdata.qvec   = &qvec;
 	thdata.phi    = phi;
 	thdata.precon = precon;
 	thdata.tol    = iterative_tol;
 	thdata.maxit  = iterative_maxit;
+	thdata.res    = res;
+#ifdef UNDEF
 	g_tpool->ProcessSequence (CalcFields_engine<toast::complex>, &thdata,
 				  0, nq, 1);
+#endif
+	Task::Multiprocess (CalcFields_engine<toast::complex>, &thdata);
 #else
         CVector *qv = new CVector[nq];
 	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
@@ -670,22 +714,19 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	}
     } else {
 #if THREAD_LEVEL==2
-	dASSERT(g_tpool, ThreadPool not initialised);
-	static struct {
-	    TCompRowMatrix<T> *F;
-	    const TCompRowMatrix<T> *qvec;
-	    TVector<T> *phi;
-	    TPreconditioner<T> *precon;
-	    double tol;
-	    int maxit;
-	} thdata;
+        //dASSERT(g_tpool, ThreadPool not initialised);
+        static CALCFIELDS_THREADDATA<T> thdata;
 	thdata.F      = F;
 	thdata.qvec   = &qvec;
 	thdata.phi    = phi;
 	thdata.precon = precon;
 	thdata.tol    = iterative_tol;
 	thdata.maxit  = iterative_maxit;
+	thdata.res    = res;
+#ifdef UNDEF
 	g_tpool->ProcessSequence (CalcFields_engine<T>, &thdata, 0, nq, 1);
+#endif
+	Task::Multiprocess (CalcFields_engine<T>, &thdata);
 #else
         TVector<T> *qv = new TVector<T>[nq];
 	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
@@ -1026,6 +1067,61 @@ void TFwdSolver<T>::ReadParams (ParamParser &pp)
 	    cout << "\nLinear solver iteration limit (0=auto):\n>> ";
 	    cin >> iterative_maxit;
 	}
+
+	precontp = (PreconType)-1; // undefined
+	if (pp.GetString ("LINSOLVER_PRECON", cbuf)) {
+	    if (!strcasecmp (cbuf, "NONE")) 
+	        precontp = PRECON_NULL;
+	    else if (!strcasecmp (cbuf, "DIAG"))
+	        precontp = PRECON_DIAG;
+#ifdef USE_CUDA_FLOAT
+	    else if (!strcasecmp (cbuf, "CUSP_AINV"))
+	        precontp = PRECON_CUSP_AINV;
+	    else if (!strcasecmp (cbuf, "CUSP_SMOOTHED_AGGREGATION"))
+	        precontp = PRECON_CUSP_SMOOTHED_AGGREGATION;
+#else
+	    else if (!strcasecmp (cbuf, "ICH"))
+	        precontp = PRECON_ICH;
+	    else if (!strcasecmp (cbuf, "DILU"))
+	        precontp = PRECON_DILU;
+#endif
+	}
+	while (precontp == (PreconType)-1) {
+	    int cmd;
+	    cout << "\nSelect preconditioner for linear solver:\n";
+	    cout << "(0) None\n";
+	    cout << "(1) Diagonal\n";
+#ifdef USE_CUDA_FLOAT
+	    cout << "(2) Approximate inverse\n";
+	    cout << "(3) Smoothed aggregate\n";
+#else
+	    cout << "(2) Incomplete Choleski\n";
+	    cout << "(3) Diagonal incomplete LU\n";
+#endif
+	    cin >> cmd;
+	    switch (cmd) {
+	    case 0: precontp = PRECON_NULL; break;
+	    case 1: precontp = PRECON_DIAG; break;
+#ifdef USE_CUDA_FLOAT
+	    case 2: precontp = PRECON_CUSP_AINV; break;
+	    case 3: precontp = PRECON_CUSP_SMOOTHED_AGGREGATION; break;
+#else
+	    case 2: precontp = PRECON_ICH; break;
+	    case 3: precontp = PRECON_DILU; break;
+#endif
+	    }
+	}
+#ifdef USE_CUDA_FLOAT
+	CuspPreconType cpt;
+	switch (precontp) {
+	case PRECON_DIAG: cpt = CUSP_PRECON_DIAGONAL; break;
+	case PRECON_CUSP_AINV: cpt = CUSP_PRECON_AINV; break;
+	case PRECON_CUSP_SMOOTHED_AGGREGATION:
+	    cpt = CUSP_PRECON_SMOOTHED_AGGREGATION; break;
+	default: cpt = CUSP_PRECON_IDENTITY; break;
+	}
+	cuda_SetCuspPrecon (cpt);
+#endif
     }
 }
 
@@ -1061,6 +1157,21 @@ void TFwdSolver<T>::WriteParams (ParamParser &pp)
 	}
 	pp.PutReal ("LINSOLVER_TOL", iterative_tol);
 	pp.PutInt ("LINSOLVER_MAXIT", iterative_maxit);
+	switch (precontp) {
+	case PRECON_NULL:
+	    pp.PutString ("LINSOLVER_PRECON", "NONE"); break;
+	case PRECON_DIAG:
+	    pp.PutString ("LINSOLVER_PRECON", "DIAG"); break;
+	case PRECON_ICH:
+	    pp.PutString ("LINSOLVER_PRECON", "ICH"); break;
+	case PRECON_DILU:
+	    pp.PutString ("LINSOLVER_PRECON", "DILU"); break;
+	case PRECON_CUSP_AINV:
+	    pp.PutString ("LINSOLVER_PRECON", "CUSP_AINV"); break;
+	case PRECON_CUSP_SMOOTHED_AGGREGATION:
+	    pp.PutString ("LINSOLVER_PRECON", "CUSP_SMOOTHED_AGGREGATION");
+	    break;
+	}
     }
 }
 

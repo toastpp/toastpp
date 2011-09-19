@@ -113,7 +113,7 @@ MATHLIB int BiCGSTAB (void (*MVM)(TVector<MT> &),  const TVector<MT> &b,
 template<class MT>
 MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon = 0, int restart = 10,
-    void (*clbk)(void*) = 0);
+    int maxit = 0, void (*clbk)(void*) = 0);
 // GMRES (generalised minimum residual) linear solver
 // Solves Ax = b for given tolerance and preconditioner
 
@@ -139,8 +139,8 @@ MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 template<class MT>
 MATHLIB int GMRES (TVector<MT> (*Mv_clbk)(const TVector<MT> &v, void *context),
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,
-    TPreconditioner<MT> *precon = 0, int restart = 10, int *iter = 0,
-    double *res = 0);
+    TPreconditioner<MT> *precon = 0, int restart = 10, int maxit = 0,
+    int *iter = 0, double *res = 0);
 
 template<class MT>
 MATHLIB std::ostream &operator<< (std::ostream &os, const TMatrix<MT> &mat);
@@ -281,7 +281,7 @@ public:
      * \sa Row, SparseRow
      */
     virtual void SetRow (int r, const TVector<MT> &row)
-    { xERROR(Operation not implemented); }
+    { ERROR_UNDEF; }
 
     /**
      * \brief Returns a row of the matrix in sparse format.
@@ -358,11 +358,11 @@ public:
     { TVector<MT> b; ATx (x, b); return b; }
 
     virtual void Transpone ()
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
     // Replace matrix with its transpose
 
     virtual MT RowMult (int r, MT *x) const
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
     // inner product of row r with full vector given by x
     // where dimension(x) >= ncols
 
@@ -495,7 +495,7 @@ TVector<MT> TMatrix<MT>::ColNorm () const
 template<class MT>
 void TMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT (cols == x.Dim(), Argument 1: vector has wrong size);
+    dASSERT (cols == x.Dim(), "Argument 1: vector has wrong size");
     if (b.Dim() != rows) b.New(rows);
     for (int i = 0; i < rows; i++) b[i] = Row(i) & x;
 }
@@ -505,7 +505,7 @@ void TMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 template<class MT>
 void TMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT (rows == x.Dim(), Argument 1: vector has wrong size);
+    dASSERT (rows == x.Dim(), "Argument 1: vector has wrong size");
     if (b.Dim() != cols) b.New(cols);
     for (int i = 0; i < cols; i++) b[i] = Col(i) & x;
 }
@@ -545,7 +545,7 @@ template<class MT>
 int TMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon, int maxit) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return 0;
 }
 
@@ -572,7 +572,7 @@ void TMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
     double tol, int maxit, TPreconditioner<MT> *precon,
     IterativeSolverResult *res) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
 }
 
 // --------------------------------------------------------------------------
@@ -595,7 +595,7 @@ template<class MT>
 int TMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon, int maxit) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return 0;
 }
 
@@ -622,7 +622,7 @@ void TMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x, int nrhs,
     double tol, int maxit, TPreconditioner<MT> *precon,
     IterativeSolverResult *res) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
 }
 
 // --------------------------------------------------------------------------

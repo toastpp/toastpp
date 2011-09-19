@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "numerics/cuda/spmv/spmv_device.h"
-#include "numerics/cuda/spmv/sparse_conversions.h"
+#include "spmv/spmv_device.h"
+#include "spmv/sparse_conversions.h"
 
 // Sparse matrix format. Options: CSR, ELL, HYB
 #define MATFORMAT HYB
@@ -39,7 +39,7 @@ void Ax_spmv(int nr, int nc, T *Av, int *Ar, int *Ac,
     delete_device_matrix(ell_loc);
     delete_host_matrix(ell);
 
-#elif MATFORMAT = HYB
+#elif MATFORMAT == HYB
 
     // map from CSR to HYB format
     hyb_matrix<int,T> hyb = csr_to_hyb(csr,hyb_ell_nbr);

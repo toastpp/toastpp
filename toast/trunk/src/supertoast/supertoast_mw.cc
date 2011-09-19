@@ -20,7 +20,7 @@ using namespace toast;
 #define MAXREGION 100
 
 // Multi-Wavelength Related Parameters
-#define MAX_NOFWLENGTH 50
+const int MAX_NOFWLENGTH = 50;
 
 // Verbose timing output
 //#define DO_PROFILE
@@ -42,6 +42,7 @@ double g_param_cmuamin, g_param_cmuamax;
 double g_param_ckappamin, g_param_ckappamax;
 double g_refind;
 char g_meshname[256];
+char g_prefix[256] = "\0";
 int g_imgfmt = IMGFMT_NIM;
 
 SourceMode srctp = SRCMODE_NEUMANN;   // source type
@@ -67,7 +68,10 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
     const RVector &wlength);
 void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
     int whichWavel);
-void SelectData (DataScale dscale, int len, double &freq, RVector &data);
+void SelectData (DataScale dscale, int nqm, int nlambda,
+    const RVector &wlength,  double &freq, RVector &data);
+void SelectRefdata (DataScale dscale, int nqm, int nlambda,
+    const RVector &wlength, RVector &data, bool &refEqualinitial);
 void SelectBasis (IVector &gdim, IVector &bdim);
 int  SelectImageFormat ();
 PARAM_SCALE SelectParamScaling ();
@@ -86,10 +90,12 @@ int main (int argc, char *argv[])
         pp.LogOpen (argv[2]);
 	cout << "Writing log to " << argv[2] << endl;
     } else {
-	pp.LogOpen ("gridbasis.out");
-	cout << "Writing log to gridbasis.out" << endl;
+	pp.LogOpen ("supertoast_mw.out");
+	cout << "Writing log to supertoast_mw.out" << endl;
     }
     OutputProgramInfo ();
+    pp.GetString("PREFIX", g_prefix);
+    pp.PutString("PREFIX", g_prefix);
 
 #ifdef TOAST_MPI
     // Initialise MPI
@@ -97,11 +103,18 @@ int main (int argc, char *argv[])
     int mpi_status = MPI_Init (&argc, &argv);
     MPI_Comm_rank (MPI_COMM_WORLD, &mpi_rank);
     MPI_Comm_size (MPI_COMM_WORLD, &mpi_size);
-    LOGOUT_1PRM("Initialising MPI session. MPI status = %d", mpi_status);
-    LOGOUT_2PRM("Processor %d of %d", mpi_rank, mpi_size);
+    LOGOUT("Initialising MPI session. MPI status = %d", mpi_status);
+    LOGOUT("Processor %d of %d", mpi_rank, mpi_size);
 
     cerr << "processor " << mpi_rank << " of " << mpi_size << endl;
 #endif // TOAST_MPI
+
+#ifdef TOAST_THREAD
+    int nth = 0;
+    pp.GetInt("NTHREAD", nth);
+    Task_Init (nth);
+    pp.PutInt("NTHREAD", nth);
+#endif
 
     const double c0 = 0.3;
 
@@ -170,7 +183,7 @@ int main (int argc, char *argv[])
     istringstream iss(cbuf);
     while (iss >> val) {
 	wlength[nofwavel++] = val;
-	xASSERT(nofwavel <= MAX_NOFWLENGTH, Max wavelength count exceeded);
+	xASSERT(nofwavel <= MAX_NOFWLENGTH, "Max wavelength count exceeded");
     }
 
     if (!pp.GetReal ("WAVELENGTH_SCALE", wscale))
@@ -210,7 +223,7 @@ int main (int argc, char *argv[])
     MWsolution msol(nprm, n, nofwavel, extcoef, wlength*wscale);
 
     SelectInitialParams (mesh, msol, wlength);
-    SelectData (FWS.GetDataScaling(), nQM * nofwavel, omega, data);
+    SelectData (FWS.GetDataScaling(), nQM, nofwavel, wlength, omega, data);
     omega *= 2.0*Pi*1e-6; // convert from MHz to rad/ps
     sdmode = SelectSDMode();
 
@@ -237,23 +250,24 @@ int main (int argc, char *argv[])
 
     // build the measurement vectors
     mvec.New (nM, n);
+    RVector c2a = msol.GetC2A();
     for (i = 0; i < nM; i++) {
-	CVector m(n);
+	RVector m(n);
 	switch (mprof) {
 	case 0:
-	    SetReal (m, QVec_Point (mesh, mesh.M[i], SRCMODE_NEUMANN));
+	    m = QVec_Point (mesh, mesh.M[i], SRCMODE_NEUMANN);
 	    break;
 	case 1:
-	    SetReal (m, QVec_Gaussian (mesh, mesh.M[i], mwidth,
-				       SRCMODE_NEUMANN));
+	    m = QVec_Gaussian (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	case 2:
-	    SetReal (m, QVec_Cosine (mesh, mesh.M[i], mwidth,
-				     SRCMODE_NEUMANN));
+	    m = QVec_Cosine (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
-	mvec.SetRow (i, m);
+	CVector cm(n);
+	SetReal (cm,m*c2a);
+	//for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
+	mvec.SetRow (i, cm);
     }
 
 
@@ -362,39 +376,37 @@ int main (int argc, char *argv[])
     // convert chromophores, Scatter Params and N to cmua, ckappa, n
     msol.RegisterChange();
 
-    switch (g_imgfmt) {
-    case IMGFMT_NIM:
+    if (g_imgfmt != IMGFMT_RAW) {
 	for (i = 0; i < msol.nParam(); i++) {
 	    char fname[256];
 	    if (msol.IsActive(i)) {
 		if (i < msol.nmuaChromo) 
-		    sprintf (fname,"reconChromophore_%d.nim",i+1);
+		    sprintf (fname,"%sreconChromophore_%d.nim",g_prefix,i+1);
 		if (i == msol.nmuaChromo)
-		    sprintf (fname,"reconScatPrefactor_A.nim");
+		    sprintf (fname,"%sreconScatPrefactor_A.nim",g_prefix);
 		if (i == msol.nmuaChromo + 1) 
-		    sprintf (fname,"reconScatPower_b.nim");
+		    sprintf (fname,"%sreconScatPower_b.nim",g_prefix);
 		WriteNimHeader (meshname, n, fname, "N/A");  
 		msol.WriteImgGeneric (0, fname, i);
 	    }
 	}
-	break;
-    case IMGFMT_RAW:
+    }
+    if (g_imgfmt != IMGFMT_NIM) {
 	Solution gsol(nprm, raster->BLen());
 	raster->Map_SolToBasis (bsol, gsol, true);
 	for (i = 0; i < msol.nParam(); i++) {
 	    if (msol.IsActive(i)) {
 		char fname[256];
 		if (i < msol.nmuaChromo) 
-		    sprintf (fname,"reconChromophore_%d.raw",i+1);
+		    sprintf (fname,"%sreconChromophore_%d.raw",g_prefix,i+1);
 		if (i == msol.nmuaChromo)
-		    sprintf (fname,"reconScatPrefactor_A.raw");
-		if (i == msol.nmuaChromo) 
-		    sprintf (fname,"reconScatPower_b.raw");
+		    sprintf (fname,"%sreconScatPrefactor_A.raw",g_prefix);
+		if (i == msol.nmuaChromo + 1) 
+		    sprintf (fname,"%sreconScatPower_b.raw",g_prefix);
 		WriteRimHeader (raster->BDim(), fname);
 		gsol.WriteImgGeneric (0, fname, i);
 	    }
 	}
-	break;
     }
 
     if (bOutputUpdate) {
@@ -408,33 +420,11 @@ int main (int argc, char *argv[])
 
     if (useref) {
 	RVector refdata(nQM*2*nofwavel);
-        RVector refdata_mod(refdata,0,nQM*nofwavel);
-	RVector refdata_arg(refdata,nQM*nofwavel,nQM*nofwavel);
 	RVector proj(nQM*2*nofwavel);
 	bool refEqualinitial;
 
-	if (!pp.GetString ("REFDATA_MOD", cbuf)) {
-	    cout << "Logamp data reference file (all wavelengths): ";
-	    cin  >> cbuf;
-	}
-	ReadDataFile (cbuf, refdata_mod);
-	pp.PutString ("REFDATA_MOD", cbuf);
-
-	if (!pp.GetString ("REFDATA_ARG", cbuf)) {
-	    cout << "Phase data reference file (all wavelengths): ";
-	    cin  >> cbuf;
-	}
-	ReadDataFile (cbuf, refdata_arg);
-	pp.PutString ("REFDATA_ARG", cbuf);
-
-	if (!pp.GetBool ("REFEQUALINITIAL", refEqualinitial)) {
-	    cout << "\nAre reference optical properties equal to initial "
-		 << "guess\n[1|0] >> ";
-	    cin >> cmd;
-	    refEqualinitial = (cmd != 0);
-	}
-	pp.PutBool ("REFEQUALINITIAL", refEqualinitial);
-	
+	SelectRefdata (FWS.GetDataScaling(), nQM, nofwavel, wlength, refdata,
+	    refEqualinitial);
 	data -= refdata;
 	
 	for (i = 0; i < nofwavel; i++) {
@@ -553,9 +543,9 @@ int main (int argc, char *argv[])
 
     double total_time = toc(clock0);
     LOGOUT ("Final timings:");
-    LOGOUT_1PRM ("Total: %f", total_time);
+    LOGOUT("Total: %f", total_time);
 #ifdef DO_PROFILE
-    LOGOUT_1PRM ("Solver: %f", solver_time);
+    LOGOUT("Solver: %f", solver_time);
 #endif
 
 #ifdef TOAST_MPI
@@ -796,12 +786,14 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
 	    //	param[p] = mesh.plist.Param(prmtp[p]);
 	    //} else
 	    if (!strncasecmp (cbuf, "HOMOG", 5)) {
-		sscanf (cbuf+5, "%lf", &prm);
+	        if (sscanf (cbuf+5, "%lf", &prm) != 1)
+		    xERROR("Parse error on initial parameters!");
 		param[p] = prm;
 	    } else if (!strncasecmp (cbuf, "REGION_HOMOG", 12)) {
 		valstr = strtok (cbuf+12, " \t");
 		for (n = 0; n < MAXREGION && valstr; n++) {
-		    sscanf (valstr, "%lf", reg_prm+n);
+		    if (sscanf (valstr, "%lf", reg_prm+n) != 1)
+		        xERROR("Parse error on initial parameters!");
 		    valstr = strtok (NULL, " \t");
 		}
 		nreg = ScanRegions (mesh, nregnode);
@@ -909,12 +901,14 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 	    if (!strcasecmp (cbuf, "MESH")) {
 		param[p] = mesh.plist.Param(prmtp[p]);
 	    } else if (!strncasecmp (cbuf, "HOMOG", 5)) {
-		sscanf (cbuf+5, "%lf", &prm);
+	        if (sscanf (cbuf+5, "%lf", &prm) != 1)
+		    xERROR("Parse error on reference parameters!");
 		param[p] = prm;
 	    } else if (!strncasecmp (cbuf, "REGION_HOMOG", 12)) {
 		valstr = strtok (cbuf+12, " \t");
 		for (n = 0; n < MAXREGION && valstr; n++) {
-		    sscanf (valstr, "%lf", reg_prm+n);
+		    if (sscanf (valstr, "%lf", reg_prm+n) != 1)
+		        xERROR("Parse error on reference parameters!");
 		    valstr = strtok (NULL, " \t");
 		}
 		nreg = ScanRegions (mesh, nregnode);
@@ -986,46 +980,55 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 
 // ============================================================================
 
-void SelectData (DataScale dscale, int len, double &freq, RVector &data)
+void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
+    double &freq, RVector &data)
 {
-    char cbuf[256];
-    RVector pdata;
-    
+    char cbuf[256], tag[256];
+    RVector adata, pdata;
+    int i, len = nqm*nlambda;
+
     data.New (len*2);
 
-    switch (dscale) {
-    case DATA_LIN:
-	if (!pp.GetString ("DATA_REAL", cbuf)) {
-	    cout << "\nData file 1 (real, all wavelengths):\n>> ";
-	    cin >> cbuf;
+    for (i = 0; i < nlambda; i++) {
+        adata.Relink (data, i*nqm, nqm);
+	pdata.Relink (data, i*nqm+len, nqm);
+
+	switch (dscale) {
+	case DATA_LIN:
+ 	    sprintf (tag, "DATA_REAL_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nData file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, adata);
+	    
+ 	    sprintf (tag, "DATA_IMAG_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nData file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, pdata);
+	    break;
+	case DATA_LOG:
+ 	    sprintf (tag, "DATA_MOD_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nData file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, adata);
+
+ 	    sprintf (tag, "DATA_ARG_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nData file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, pdata);
+	    break;
 	}
-	pdata.Relink (data,0,len);
-	ReadDataFile (cbuf, pdata);
-	pp.PutString ("DATA_REAL", cbuf);
-	if (!pp.GetString ("DATA_IMAG", cbuf)) {
-	    cout << "\nData file 2 (imag, all wavelengths):\n>> ";
-	    cin >> cbuf;
-	}
-	pdata.Relink (data,len,len);
-	ReadDataFile (cbuf, pdata);
-	pp.PutString ("DATA_IMAG", cbuf);
-	break;
-    case DATA_LOG:
-	if (!pp.GetString ("DATA_MOD", cbuf)) {
-	    cout << "\nData file 1 (log amp, all wavelengths):\n>> ";
-	    cin >> cbuf;
-	}
-	pdata.Relink (data,0,len);
-	ReadDataFile (cbuf, pdata);
-	pp.PutString ("DATA_MOD", cbuf);
-	if (!pp.GetString ("DATA_ARG", cbuf)) {
-	    cout << "\nData file 2 (phase, all wavelenghts):\n>> ";
-	    cin >> cbuf;
-	}
-	pdata.Relink (data,len,len);
-	ReadDataFile (cbuf, pdata);
-	pp.PutString ("DATA_ARG", cbuf);
-	break;
     }
 
     if (!pp.GetReal ("FREQ", freq) || freq < 0.0) do {
@@ -1033,6 +1036,68 @@ void SelectData (DataScale dscale, int len, double &freq, RVector &data)
 	cin >> freq;
     } while (freq < 0.0);
     pp.PutReal ("FREQ", freq);
+}
+
+// ============================================================================
+
+void SelectRefdata (DataScale dscale, int nqm, int nlambda,
+    const RVector &wlength, RVector &data, bool &refEqualinitial)
+{
+    char cbuf[256], tag[256];
+    RVector adata, pdata;
+    int i, cmd, len = nqm*nlambda;
+
+    data.New (len*2);
+
+    for (i = 0; i < nlambda; i++) {
+        adata.Relink (data, i*nqm, nqm);
+	pdata.Relink (data, i*nqm+len, nqm);
+
+	switch (dscale) {
+	case DATA_LIN:
+ 	    sprintf (tag, "REFDATA_REAL_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nReference data file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, adata);
+	    
+ 	    sprintf (tag, "REFDATA_IMAG_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nReference data file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, pdata);
+	    break;
+	case DATA_LOG:
+ 	    sprintf (tag, "REFDATA_MOD_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nReference data file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, adata);
+
+ 	    sprintf (tag, "REFDATA_ARG_WAVEL_%0.0f", wlength[i]);
+	    if (!pp.GetString (tag, cbuf)) {
+	        cout << "\nReference data file for " << tag << ":\n>> ";
+		cin >> cbuf;
+	    }
+	    pp.PutString (tag, cbuf);
+	    ReadDataFile (cbuf, pdata);
+	    break;
+	}
+    }
+
+    if (!pp.GetBool ("REFEQUALINITIAL", refEqualinitial)) {
+        cout << "\nAre reference optical properties equal to initial "
+	     << "guess\n[1|0] >> ";
+	cin >> cmd;
+	refEqualinitial = (cmd != 0);
+    }
+    pp.PutBool ("REFEQUALINITIAL", refEqualinitial);
 }
 
 // ============================================================================
@@ -1159,23 +1224,25 @@ PARAM_SCALE SelectParamScaling ()
 
 int SelectImageFormat ()
 {
-    static const char *fmtstr[4] = {"RAW", "NIM", "PGM", "PPM"};
+    static const char *fmtstr[4] = {"RAW", "NIM", "RAW+NIM"};
     char cbuf[256];
     int fmt = 0;
 
     if (pp.GetString ("IMAGEFORMAT", cbuf)) {
-	if      (!strcasecmp (cbuf, "RAW")) fmt = IMGFMT_RAW;
-	else if (!strcasecmp (cbuf, "NIM")) fmt = IMGFMT_NIM;
-	else if (!strcasecmp (cbuf, "PGM")) fmt = IMGFMT_PGM;
-	else if (!strcasecmp (cbuf, "PPM")) fmt = IMGFMT_PPM;
+	if      (!strcasecmp (cbuf, "RAW"))     fmt = IMGFMT_RAW;
+	else if (!strcasecmp (cbuf, "NIM"))     fmt = IMGFMT_NIM;
+	else if (!strcasecmp (cbuf, "RAW+NIM")) fmt = IMGFMT_RAW_NIM;
+	//else if (!strcasecmp (cbuf, "PGM"))     fmt = IMGFMT_PGM;
+	//else if (!strcasecmp (cbuf, "PPM"))     fmt = IMGFMT_PPM;
     }
-    while (fmt < 1 || fmt > 4) {
+    while (fmt < 1 || fmt > 3) {
 	cout << "\nOutput image format:\n";
 	cout << "(1) Raw data\n";
 	cout << "(2) NIM (nodal image\n";
-	cout << "(3) PGM (portable grayscale map) - 2D only\n";
-	cout << "(4) PPM (portable pixmap) - 2D only\n";
-	cout << "[1|2|3|4] >> ";
+	cout << "(3) Both (RAW+NIM)\n";
+	//cout << "(3) PGM (portable grayscale map) - 2D only\n";
+	//cout << "(4) PPM (portable pixmap) - 2D only\n";
+	cout << "[1|2|3] >> ";
 	cin  >> fmt;
     }
     pp.PutString ("IMAGEFORMAT", fmtstr[fmt-1]);

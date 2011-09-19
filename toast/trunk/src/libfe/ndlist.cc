@@ -50,7 +50,7 @@ void NodeList::New (int length)
     size = length;
     if (size) {
 	list = new Node[size];
-	dASSERT (list, Memory allocation failed.);
+	dASSERT (list, "Memory allocation failed.");
     } else list = 0;
 }
 
@@ -62,7 +62,7 @@ void NodeList::Clear()
 void NodeList::Append (int number)
 {
     Node *TmpList = new Node[size+number];
-    dASSERT(TmpList, Memory allocation failed.);
+    dASSERT(TmpList, "Memory allocation failed.");
     for (int i = 0; i < size; i++) {
 	TmpList[i].New (list[i].Dim());
 	TmpList[i] = list[i];
@@ -81,10 +81,10 @@ void NodeList::SetList (int no, Node *nds)
 
 void NodeList::Remove (int nd)
 {
-    dASSERT(nd >= 0 && nd < size, Index out of range.);
+    dASSERT(nd >= 0 && nd < size, "Index out of range.");
     int i;
     Node *TmpList = new Node[size-1];
-    dASSERT(TmpList, Memory allocation failed.);
+    dASSERT(TmpList, "Memory allocation failed.");
     for (i = 0; i < nd; i++) TmpList[i].Copy(list[i]);
     for (i = nd+1; i < size; i++) TmpList[i-1].Copy(list[i]);
     delete []list;
@@ -122,14 +122,14 @@ int NodeList::NumberOf (BYTE bndtype) const
 void NodeList::Swap (int nd1, int nd2)
 {
     dASSERT(nd1 >= 0 && nd1 < size && nd2 >= 0 && nd2 < size,
-	Index out of range.);
+	"Index out of range.");
     ::Swap (list[nd1], list[nd2]);
 }
 
 #ifdef FEM_DEBUG
 Node& NodeList::operator[] (int rec) const
 {
-    dASSERT(rec >= 0 && rec < size, Index out of range.);
+    dASSERT(rec >= 0 && rec < size, "Index out of range.");
     return list[rec];
 }
 #endif

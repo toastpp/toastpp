@@ -1137,7 +1137,7 @@ void SolverLM_MW_MPI::Solve (CFwdSolverMW &FWS, const Raster &raster,
     err00 = 0; // this is previous error
     
     //    test_biscale();
-    LOGOUT_1PRM("Starting error: %f", errstart);
+    LOGOUT("Starting error: %f", errstart);
     
     // LM iteration loop
     for (inr = 0; (!nrmax || inr < nrmax) &&
@@ -1187,13 +1187,13 @@ void SolverLM_MW_MPI::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	cerr << "T(gradient)=" << walltoc() << endl;
 	walltic();
 	
-	LOGOUT_1PRM("Gradient norm: %f", l2norm(r));
+	LOGOUT("Gradient norm: %f", l2norm(r));
 	
 	// add prior to gradient
 	RVector gpsi = reg->GetGradient (x);
 	gpsi *= M; // apply Hessian normalisation
 	r -= gpsi;
-	LOGOUT_1PRM("Gradient norm with penalty: %f", l2norm(r));
+	LOGOUT("Gradient norm with penalty: %f", l2norm(r));
 	cerr << "T(prior_grad)=" << walltoc() << endl;
 	walltic();
 	
@@ -1201,7 +1201,7 @@ void SolverLM_MW_MPI::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	i_count = 0;
 	err00 = err0;
 	while (i_count < itmax && KeepGoing) {
-	    LOGOUT_1PRM ("LM iteration %d", i_count);
+	    LOGOUT("LM iteration %d", i_count);
 
 	    // solve Hh = r
 
@@ -1237,7 +1237,7 @@ void SolverLM_MW_MPI::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	    }
 	    d = h;
 	    double stepsize = alpha0;
-	    LOGOUT_1PRM ("Step size: %f", stepsize);
+	    LOGOUT("Step size: %f", stepsize);
 	    cerr << "T(solve_H)=" << walltoc() << endl;
 	    walltic();
 
@@ -1342,23 +1342,22 @@ void SolverLM_MW_MPI::Solve (CFwdSolverMW &FWS, const Raster &raster,
 		// then this is the end of it
 	        lambda *= lambda_scale;
 	    }
-	    LOGOUT_2PRM("error0: %f, error1: %f", err0, err1);
-	    LOGOUT_2PRM("lambda: %g, alpha: %f", lambda, alpha);
+	    LOGOUT("error0: %f, error1: %f", err0, err1);
+	    LOGOUT("lambda: %g, alpha: %f", lambda, alpha);
 
 	    cerr << "T(update)=" << walltoc() << endl;
 	    walltic();
 
 	    i_count++;
 	}
-	LOGOUT_3PRM("Iteration %d  CPU %f  OF %f",
-	    inr+1, toc(clock0), err0);
+	LOGOUT("Iteration %d  CPU %f  OF %f", inr+1, toc(clock0), err0);
     } // end of NR loop;
 
     // final residuals
     double rd = ObjectiveFunction::get_value (data, proj, sd, cov);
     double rp = reg->GetValue (x);
     double tau = reg->GetTau();
-    LOGOUT_4PRM("Residuals  TAU %g  DATA %g  PRIOR/TAU %g  IT %d", tau, rd,
+    LOGOUT("Residuals  TAU %g  DATA %g  PRIOR/TAU %g  IT %d", tau, rd,
 		rp/tau, inr);
 }
 

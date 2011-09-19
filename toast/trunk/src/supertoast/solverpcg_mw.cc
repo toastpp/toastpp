@@ -17,12 +17,11 @@ using namespace toast;
 #define DJTJ_LIMIT 1e-8
 //#define RESCALE_HESSIAN
 
-//#define OUTPUT_PMDF
-
 // ==========================================================================
 // external references
 
 extern int g_imgfmt;
+extern char g_prefix[256];
 extern double clock0;
 
 // ==========================================================================
@@ -52,6 +51,7 @@ SolverPCG_MW::SolverPCG_MW (ParamParser *_pp): Solver_MW (_pp)
 {
     itmax = 50;
     cg_tol = 1e-8;
+    cg_delta = 1e-5;
     alpha = 0.0; // "auto"
     precon = PCG_PRECON_NONE;
 }
@@ -67,7 +67,7 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     const int reset_count = PCG_RESET_INTERVAL;
 
     // initialisations
-    int i;
+    int i, res;
     const QMMesh *mesh = FWS.MeshPtr();
     int dim  = raster.Dim();
     int ndat = data.Dim();
@@ -79,8 +79,8 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     int n    = bsol.ActiveDim();
     int nofwavel = msol.nofwavel;
     bool pvalid;
-    double delta_new, delta_old, delta_mid, delta_0, delta_d, beta;
-    double of, of_value, of_prior, fmin;
+    double delta_new, delta_old, delta_mid, delta_0, delta_d, beta, alpha0;
+    double of, ofp, of_value, of_prior, fmin;
     double gamma = 1.0;
     RVector r(n), r0(n), s(n), d(n), M(n);
     RVector proj(ndat);
@@ -106,6 +106,18 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     CVector *dphi = new CVector[mesh->nQ];
     for (i = 0; i < mesh->nQ; i++) dphi[i].New (nlen);
 
+    // Start of Shewchuk implementation
+
+    int i_count = 0; // iteration counter
+    int k_count = 0; // reset counter
+
+    LOGOUT("Generating fields and gradient");
+    proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
+
+    //ofstream ofs ("dbg_rec.dat");
+    //ofs << proj << endl;
+    //exit (0);
+
     // initialise regularisation instance
     reg = Regularisation::Create (pp, &x0, &raster);
 
@@ -122,35 +134,20 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     ofdata.data = &data;
     ofdata.sd = &sd;
 
-    // Start of Shewchuk implementation
-
-    int i_count = 0; // iteration counter
-    int k_count = 0; // reset counter
-
-    CVector cproj(ndat/2);
-    LOGOUT("Generating fields and gradient");
-    proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
-    //for (i = 0; i < nofwavel; i++) {
-    //	FWS.Reset (*msol.swsol[i], omega);
-    //	FWS.CalcFields (qvec, dphi);
-    //	RVector proj_i (proj, i*mesh->nQM, mesh->nQM);
-    //	proj_i = FWS.ProjectAll (mvec, dphi);
-    //}
-
     // r = -f'(x)
     MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd, omega);
     pscaler->ScaleGradient (bsol.GetActiveParams(), r);
     r += reg->GetGradient (x0);
     r0 = r;
-
     r = -r;
 
     of_value = ObjectiveFunction::get_value (data, proj, sd);
     of_prior = reg->GetValue (x0);
     of = of_value + of_prior;
+    ofp = of * 10+cg_delta; // make sure stopping criterion is not satisfied
 
-    LOGOUT_3PRM ("Iteration 0  CPU %f  OF %g  (prior %g)",
-        toc(clock0), of, of_prior);
+    LOGOUT("Iteration 0  CPU %f  OF %g [LH %g PR %g]", toc(clock0),
+	   of, of_value, of_prior);
 
     // apply preconditioner
     switch (precon) {
@@ -172,67 +169,79 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     delta_new = r & d;                 // r^t M^-1 r
     delta_0 = delta_new;
 
-    while (i_count < itmax && delta_new > cg_tol*cg_tol*delta_0) {
+    while (i_count < itmax                       // iteration limit
+	   && delta_new > cg_tol*cg_tol*delta_0  // convergence criterion
+	   && (ofp-of)/of > cg_delta) {          // stopping criterion
         delta_d = d & d;
 
 	if (!alpha) { // initialise step length
 	    alpha = of / l2norm (d);
-	    LOGOUT_1PRM ("Initial step length reset to %f", alpha);
+	    LOGOUT("Initial step length reset to %f", alpha);
 	}
+
 	// line search. this replaces the Secant method of the Shewchuk code
-	if (LineSearch (x, d, alpha, of, of_clbk, &alpha, &fmin, &ofdata)==0) {
-	    x += d*alpha; // update scaled solution
-	    bsol.SetActiveParams (pscaler->Unscale(x));
-	    raster.Map_SolToMesh (bsol, msol, true);
-	    msol.RegisterChange();
-	    switch (g_imgfmt) {
-	    case IMGFMT_NIM:
-		for (i = 0; i < msol.nParam(); i++) {
-		    char fname[256];
-		    if (msol.IsActive(i)) {
-			if (i < msol.nmuaChromo) 
-			    sprintf (fname,"reconChromophore_%d.nim",i+1);
-			else if (i == msol.nmuaChromo)
-			    sprintf (fname,"reconScatPrefactor_A.nim");
-			else if (i == msol.nmuaChromo + 1) 
-			    sprintf (fname,"reconScatPower_b.nim");
-			msol.WriteImgGeneric (i_count+1, fname, i);
-		    }
-		}
-		break;
-	    case IMGFMT_RAW:
-	        Solution gsol(msol.nParam(), blen);
-		raster.Map_SolToBasis (bsol, gsol, true);
-		for (i = 0; i < msol.nParam(); i++) {
-		    char fname[256];
-		    if (msol.IsActive(i)) {
-			if (i < msol.nmuaChromo) 
-			    sprintf (fname,"reconChromophore_%d.raw",i+1);
-			else if (i == msol.nmuaChromo)
-			    sprintf (fname,"reconScatPrefactor_A.raw");
-			else if (i == msol.nmuaChromo + 1) 
-			    sprintf (fname,"reconScatPower_b.raw");
-			gsol.WriteImgGeneric (i_count+1, fname, i);
-		    }
-		}
+	alpha0 = alpha;
+	res = LineSearch (x, d, alpha0, of, of_clbk, &alpha, &fmin, &ofdata);
+	if (res != 0) {
+	    LOGOUT ("** Line search failed. Resetting.");
+	    d = r;
+	    res = LineSearch (x, d, alpha0, of, of_clbk, &alpha, &fmin,&ofdata);
+	    if (res != 0) {
+	        LOGOUT ("** Line search failed after reset. Terminating.");
 		break;
 	    }
+	}
 
-	} else {
-	    LOGOUT ("** Line search failed. Resetting.");
-	    k_count = reset_count-1; // force reset
-	    i_count--; // don't increment iteration counter
+	x += d*alpha; // update scaled solution
+	bsol.SetActiveParams (pscaler->Unscale(x));
+	raster.Map_SolToMesh (bsol, msol, true);
+	msol.RegisterChange();
+
+	// output parameter images
+	if (g_imgfmt != IMGFMT_RAW) {
+	    for (i = 0; i < msol.nParam(); i++) {
+	        char fname[256];
+		if (msol.IsActive(i)) {
+		    if (i < msol.nmuaChromo) 
+		        sprintf (fname,"%sreconChromophore_%d.nim",
+				 g_prefix,i+1);
+		    else if (i == msol.nmuaChromo)
+		        sprintf (fname,"%sreconScatPrefactor_A.nim",
+				 g_prefix);
+		    else if (i == msol.nmuaChromo + 1) 
+		        sprintf (fname,"%sreconScatPower_b.nim",
+				 g_prefix);
+		    else
+		        xERROR("Invalid parameter index during output");
+		    msol.WriteImgGeneric (i_count+1, fname, i);
+		}
+	    }
+	}
+	if (g_imgfmt != IMGFMT_NIM) {
+	    Solution gsol(msol.nParam(), blen);
+	    raster.Map_SolToBasis (bsol, gsol, true);
+	    for (i = 0; i < msol.nParam(); i++) {
+	        char fname[256];
+		if (msol.IsActive(i)) {
+		    if (i < msol.nmuaChromo) 
+		        sprintf (fname,"%sreconChromophore_%d.raw",
+				 g_prefix,i+1);
+		    else if (i == msol.nmuaChromo)
+		        sprintf (fname,"%sreconScatPrefactor_A.raw",
+				 g_prefix);
+		    else if (i == msol.nmuaChromo + 1) 
+		        sprintf (fname,"%sreconScatPower_b.raw",
+				 g_prefix);
+		    else
+		        xERROR("Invalid parameter index during output");
+		    gsol.WriteImgGeneric (i_count+1, fname, i);
+		}
+	    }
 	}
 
 	// r = -f'(x)
 	LOGOUT ("Generating fields and gradient");
 	proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
-	//for (i = 0; i < nofwavel; i++) {
-	//    FWS.Reset (*msol.swsol[i], omega);
-	//    FWS.CalcFields (qvec, dphi);
-	//    RVector proj_i (proj, i*mesh->nQM, mesh->nQM);
-	//    proj_i = FWS.ProjectAll (mvec, dphi);
-	//}
 
 	MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd,
 			 omega);
@@ -244,12 +253,13 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	RVector S(x1-x0);
 	RVector Y(r-r0);
 	gamma = (Y&S) / (Y&Y);
-	LOGOUT_1PRM ("Hessian scale ", gamma);
+	LOGOUT("Hessian scale ", gamma);
 	x0 = x1;
 	r0 = r;
 #endif
 
 	r = -r;
+	ofp = of;
 	of_value = ObjectiveFunction::get_value (data, proj, sd);
 	of_prior = reg->GetValue(x);
 	of = of_value + of_prior;
@@ -283,13 +293,22 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	    d = s + d * beta;
 	}
 	i_count++;
-	LOGOUT_4PRM ("Iteration %d  CPU %f  OF %g  (prior %g)",
-	    i_count, toc(clock0), of, of_prior);
+	LOGOUT ("Iteration %d  CPU %f  OF %g [LH %g PR %g]",
+		i_count, toc(clock0), of, of_value, of_prior);
 
 #ifdef DO_PROFILE
-	LOGOUT_1PRM ("Solver time: %f", solver_time);
+	LOGOUT("Solver time: %f", solver_time);
 #endif
     }
+
+    if (delta_new <= cg_tol*cg_tol*delta_0)
+        LOGOUT ("PCG solver convergence criterion satisfied");
+    else if ((ofp-of)/of <= cg_delta)
+        LOGOUT ("PCG solver stopped (insufficient improvement)");
+    else if (i_count >= itmax)
+        LOGOUT ("PCG solver iteration limit reached");
+    else
+        LOGOUT ("PCG solver terminated");
 }
 
 void SolverPCG_MW::ReadParams (ParamParser &pp)
@@ -297,17 +316,42 @@ void SolverPCG_MW::ReadParams (ParamParser &pp)
     char cbuf[256];
     bool def = false;
 
-    // 1. === NONLINEAR SOLVER CONVERGENCE CRITERION ===
-
-    if (!pp.GetReal ("NONLIN_TOL", cg_tol) ||
-	cg_tol <= 0.0) do {
-	    cout << "\nSelect convergence criterion for "
-		 << "PCG nonlinear solver (>0):\n>> ";
+    // === SOLVER CONVERGENCE CRITERION ===
+    if (!pp.GetReal ("NONLIN_TOL", cg_tol) || cg_tol <= 0.0) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Enter the convergence criterion epsilon:\n";
+	cout << "<r_k,d_k> < epsilon^2 * <r_0,d_0>\n";
+	cout << "for gradient r and preconditioned gradient d\n";
+        do {
+	    cout << "\nNONLIN_TOL (float, >0):\n>> ";
 	    cin >> cg_tol;
 	} while (cg_tol <= 0.0);
+    }
 
-    // 2. === PRECONDITIONER ===
+    // === STOPPING CRITERION ===
+    if (!pp.GetReal ("NONLIN_DELTA", cg_delta)) {
+        cout << "\nCG nonlinear solver ------------------------------------\n";
+	cout << "Enter stopping criterion delta. This stops the\n";
+	cout << "reconstruction if [f(x_{k-1})-f(x)]/f(x) < delta\n";
+	do {
+	    cout << "\nNONLIN_DELTA (float, >=0):\n>> ";
+	    cin >> cg_delta;
+	} while (cg_delta < 0.0);
+    }
 
+    // === MAX ITERATION COUNT ===
+    if (!(pp.GetInt ("PCG_ITMAX", itmax) ||
+	  pp.GetInt ("NONLIN_ITMAX", itmax)) || itmax <= 0) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Enter the maximum number of iterations to be performed if\n";
+	cout << "the convergence criterion is not satisfied:\n";
+	do {
+  	    cout << "\nNONLIN_ITMAX (int, >0):\n>> ";
+	    cin >> itmax;
+	} while (itmax <= 0);
+    }
+
+    // === PRECONDITIONER ===
     if (pp.GetString ("PCG_PRECON", cbuf)) {
 	if (!strcasecmp (cbuf, "NONE"))
 	    precon = PCG_PRECON_NONE,      def = true;
@@ -318,45 +362,43 @@ void SolverPCG_MW::ReadParams (ParamParser &pp)
 	else if (!strcasecmp (cbuf, "FULLJTJ"))
 	    precon = PCG_PRECON_FULLJTJ,   def = true;
     }
-    while (!def) {
-	int cmd;
-	cout << "\nSelect PCG preconditioner:\n";
+    if (!def) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Select the preconditioner for the nonlinear CG solver:\n\n";
 	cout << "(0) None\n";
 	cout << "(1) Diagonal of Hessian\n";
 	cout << "(2) Sparse Hessian\n";
 	cout << "(3) Full Hessian\n";
-	cout << "[0|1|2|3] >> ";
-	cin >> cmd;
-	switch (cmd) {
-	case 0: precon = PCG_PRECON_NONE,      def = true; break;
-	case 1: precon = PCG_PRECON_DIAGJTJ,   def = true; break;
-	case 2: precon = PCG_PRECON_SPARSEJTJ, def = true; break;
-	case 3: precon = PCG_PRECON_FULLJTJ,   def = true; break;
+	while (!def) {
+	    cout << "\nPCG_PRECON [0|1|2|3] >> ";
+	    int cmd;
+	    cin >> cmd;
+	    switch (cmd) {
+	    case 0: precon = PCG_PRECON_NONE,      def = true; break;
+	    case 1: precon = PCG_PRECON_DIAGJTJ,   def = true; break;
+	    case 2: precon = PCG_PRECON_SPARSEJTJ, def = true; break;
+	    case 3: precon = PCG_PRECON_FULLJTJ,   def = true; break;
+	    }
 	}
     }
 
-    // 3. === MAX ITERATION COUNT ===
-
-    if (!pp.GetInt ("PCG_ITMAX", itmax) || itmax <= 0) {
+    // === INITIAL STEP LENGTH FOR LINE SEARCH ===
+    if (!pp.GetReal ("LS_INIT_STEPLENGTH", alpha) || alpha < 0.0) {
+        cout << "\nPCG nonlinear solver -----------------------------------\n";
+	cout << "Select the initial step length for the line search\n";
 	do {
-	    cout << "\nMax number of PCG iterations (>0):\n";
-	    cout << ">> ";
-	    cin >> itmax;
-	} while (itmax <= 0);
+	    cout << "\nNONLIN_ITMAX (float, >=0, 0=auto):\n>> ";
+	    cin >> alpha;
+	} while (alpha < 0.0);
     }
-
-    // 4. === INITIAL STEP LENGTH FOR LINE SEARCH ===
-    
-    if (!pp.GetReal ("LS_INIT_STEPLENGTH", alpha) || alpha < 0.0) do {
-	cout << "\nSelect initial step length for line search (0=auto):\n>> ";
-	cin >> alpha;
-    } while (alpha < 0.0);
 }
 
 void SolverPCG_MW::WriteParams (ParamParser &pp)
 {
     pp.PutString ("SOLVER", "PCG");
     pp.PutReal ("NONLIN_TOL", cg_tol);
+    pp.PutReal ("NONLIN_DELTA", cg_delta);
+    pp.PutInt ("NONLIN_ITMAX", itmax);
 
     switch (precon) {
     case PCG_PRECON_NONE:
@@ -373,7 +415,6 @@ void SolverPCG_MW::WriteParams (ParamParser &pp)
 	break;
     }
 
-    pp.PutInt ("PCG_ITMAX", itmax);
     pp.PutReal ("LS_INIT_STEPLENGTH", alpha);
 }
 
@@ -402,7 +443,8 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     RCompRowMatrix &ata_L, RVector &ata_d)
 {
     int i, i0, i1, k, row, col;
-    int *rowptr, *rowptr2, *colidx, *colidx2, nzero, nzero2;
+    idxtype *rowptr, *rowptr2, *colidx, *colidx2;
+    int nzero, nzero2;
     int slen = raster.SLen();
     int n    = slen*2; // mua and kappa
     int nr   = a.nRows();
@@ -414,8 +456,8 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     // duplicate the nonzero structure in both rows and columns
     LOGOUT ("Building ATA sparsity pattern");
     nzero2 = nzero*4;
-    rowptr2 = new int[n+1];
-    colidx2 = new int[nzero2];
+    rowptr2 = new idxtype[n+1];
+    colidx2 = new idxtype[nzero2];
     for (i = 0; i <= slen; i++)
         rowptr2[i] = rowptr[i]*2;
     for (i = 1; i <= slen; i++)
@@ -450,10 +492,10 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
 
     // sanity check: test symmetry
     for (i = 0; i < n; i++) {
-        int c1 = rowptr2[i];
-	int c2 = rowptr2[i+1];
+        idxtype c1 = rowptr2[i];
+	idxtype c2 = rowptr2[i+1];
 	for (int j = c1; j < c2; j++) {
-  	    int c = colidx2[j];
+  	    idxtype c = colidx2[j];
 	    double v = valptr2[j];
 	    if (v != ata(c,i))
 	        LOGOUT ("JTJ not symmetric!");
@@ -471,7 +513,7 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
 	if (!i || ata_ii < ata_min) ata_min = ata_ii;
 	if (!i || ata_ii > ata_max) ata_max = ata_ii;
     }
-    LOGOUT_2PRM ("ATA diagonal range %f to %f", ata_min, ata_max);
+    LOGOUT("ATA diagonal range %f to %f", ata_min, ata_max);
 
 
 #ifdef RESCALE_JTJ
@@ -485,7 +527,7 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     sum *= JTJ_SCALE;
     for (i = 0; i < n; i++)
         ata(i,i) += sum;
-    LOGOUT_1PRM ("Added %f to ATA diagonal", sum);
+    LOGOUT("Added %f to ATA diagonal", sum);
 #endif
 
     ata.CalculateIncompleteCholeskyFillin (rowptr, colidx);
@@ -522,7 +564,7 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
     sum *= JTJ_SCALE;
     for (i = 0; i < n; i++)
         ata(i,i) += sum;
-    LOGOUT_1PRM ("Added %f to ATA diagonal", sum);
+    LOGOUT("Added %f to ATA diagonal", sum);
 #endif
 
     LOGOUT ("Calculating CH decomposition of ATA ...");
@@ -533,6 +575,306 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
 }
 
 // ==========================================================================
+// note: threaded version disabled for now
+// Doesn't seem to provide any runtime benefit in the current form
+// Also may be responsible for occasional (non-reproducible) CTDs
+
+#if 0 // THREAD_LEVEL==2
+
+struct SINGLEGRADIENT_THREADDATA {
+    const QMMesh *mesh;
+    const Raster *raster;
+    CFwdSolverMW *fws;
+    const CCompRowMatrix *mvec;
+    const RVector *proj;
+    const RVector *data;
+    const RVector *sd;
+    CVector *dphi;
+    RVector *grad;
+};
+
+void *single_gradient_data_engine (task_data *td)
+{
+#ifdef UNDEF
+    int itask = td->proc;
+    int ntask = td->np;
+    SINGLEGRADIENT_THREADDATA *thdata = (SINGLEGRADIENT_THREADDATA*)td->data;
+    const QMMesh *mesh = thdata->mesh;
+    const Raster *raster = thdata->raster;
+    CFwdSolverMW *fws = thdata->fws;
+    const CCompRowMatrix *mvec = thdata->mvec;
+    const RVector *proj = thdata->proj;
+    const RVector *data = thdata->data;
+    const RVector *sd = thdata->sd;
+    CVector *dphi = thdata->dphi;
+    RVector *grad = thdata->grad;
+    int i, j, q, m, n, idx, ofs_mod, ofs_arg;
+    int nq = mesh->nQ;
+    int q0 = (itask*nq)/ntask;
+    int q1 = ((itask+1)*nq)/ntask;
+    int glen = raster->GLen();
+    int slen = raster->SLen();
+    int dim  = raster->Dim();
+    toast::complex term;
+    CVector wqa (mesh->nlen());
+    RVector wqb (mesh->nlen());
+    CVector dgrad (slen);
+    RVector grad_cmua_loc (slen);
+    RVector grad_ckap_loc (slen);
+    RVector grad_cmua(*grad, 0, slen);     // mua part of grad
+    RVector grad_ckap (*grad, slen, slen); // kappa part of grad
+    const IVector &gdim = raster->GDim();
+    const RVector &gsize = raster->GSize();
+    const int *elref = raster->Elref();
+    for (q = 0, ofs_mod = 0; q < q0; q++)
+	ofs_mod += mesh->nQMref[q];
+    ofs_arg = ofs_mod + mesh->nQM;
+
+    for (q = q0; q < q1; q++) {
+        // expand field and gradient
+	CVector cdfield (glen);
+	CVector *cdfield_grad = new CVector[dim];
+	raster->Map_MeshToGrid (dphi[q], cdfield);
+	ImageGradient (gdim, gsize, cdfield, cdfield_grad, elref);
+        n = mesh->nQMref[q];
+	RVector y_mod (*data, ofs_mod, n);
+	RVector s_mod (*sd, ofs_mod, n);
+	RVector ypm_mod (*proj, ofs_mod, n);
+	//RVector b_mod(n);
+	//b_mod = (y_mod-ypm_mod)/s_mod;
+
+	RVector y_arg (*data, ofs_arg, n);
+	RVector s_arg (*sd, ofs_arg, n);
+	RVector ypm_arg (*proj, ofs_arg, n);
+	//RVector b_arg(n);
+	//b_arg = (y_arg-ypm_arg)/s_arg;
+
+	//RVector ype(n);
+	//ype = 1.0;  // will change if data type is normalised
+
+	CVector cproj(n);
+	cproj = fws->ProjectSingle (q, *mvec, dphi[q], DATA_LIN);
+	wqa = toast::complex(0,0);
+	wqb = 0.0;
+
+	for (m = idx = 0; m < mesh->nM; m++) {
+	    if (!mesh->Connected (q, m)) continue;
+	    //const CVector qs = mvec->Row(m);
+	    //double rp = cproj[idx].re;
+	    //double ip = cproj[idx].im;
+	    //double dn = 1.0/(rp*rp + ip*ip);
+	    
+	    // amplitude term (re(log))
+	    term.re = -2.0 * (y_mod[idx]-ypm_mod[idx])/(s_mod[idx]*s_mod[idx]);
+	    // log phase term (im(log))
+	    term.im = +2.0 * (y_arg[idx]-ypm_arg[idx])/(s_arg[idx]*s_arg[idx]);
+
+	    wqa += mvec->Row(m) * (term/cproj[idx]);
+	    //wqa += qs * toast::complex (term.re*rp*dn, -term.re*ip*dn);
+	    //wqa += qs * toast::complex (-term.im*ip*dn, -term.im*rp*dn);
+
+	    //wqb += Re(qs) * (term * ypm[idx]);
+	    idx++;
+	}
+
+	// adjoint field and gradient
+	CVector wphia (mesh->nlen());
+	fws->CalcField (wqa, wphia);
+
+	CVector cafield(glen);
+	CVector *cafield_grad = new CVector[dim];
+	raster->Map_MeshToGrid (wphia, cafield);
+	ImageGradient (gdim, gsize, cafield, cafield_grad, elref);
+
+	// absorption contribution
+	raster->Map_GridToSol (cdfield * cafield, dgrad);
+	grad_cmua_loc -= Re(dgrad);
+
+	// diffusion contribution
+	// multiply complex field gradients
+	CVector gk(glen);
+	for (i = 0; i < glen; i++)
+	    for (j = 0; j < dim; j++)
+	        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
+	raster->Map_GridToSol (gk, dgrad);
+	grad_ckap_loc -= Re(dgrad);
+
+	ofs_mod += n; // step to next source
+	ofs_arg += n;
+
+	delete []cdfield_grad;
+	delete []cafield_grad;
+    }
+
+    // assemble into global gradient vector
+    Task::UserMutex_lock();
+    grad_cmua += grad_cmua_loc;
+    grad_ckap += grad_ckap_loc;
+    Task::UserMutex_unlock();
+#endif
+
+    int i, j, q, m, n, idx, ofs_mod, ofs_arg;
+    int itask = td->proc;
+    int ntask = td->np;
+    SINGLEGRADIENT_THREADDATA *thdata = (SINGLEGRADIENT_THREADDATA*)td->data;
+    const QMMesh *mesh = thdata->mesh;
+    const Raster *raster = thdata->raster;
+    CFwdSolverMW *fws = thdata->fws;
+    const CCompRowMatrix *mvec = thdata->mvec;
+    const RVector *proj = thdata->proj;
+    const RVector *data = thdata->data;
+    const RVector *sd = thdata->sd;
+    CVector *dphi = thdata->dphi;
+    int nq = mesh->nQ;
+    int q0 = (itask*nq)/ntask;
+    int q1 = ((itask+1)*nq)/ntask;
+    int glen = raster->GLen();
+    int slen = raster->SLen();
+    int dim  = raster->Dim();
+    toast::complex term;
+    const IVector &gdim = raster->GDim();
+    const RVector &gsize = raster->GSize();
+    const int *elref = raster->Elref();
+    RVector *grad = thdata->grad;
+    RVector grad_cmua_loc (slen);
+    RVector grad_ckap_loc (slen);
+    RVector grad_cmua(*grad, 0, slen);     // mua part of grad
+    RVector grad_ckap (*grad, slen, slen); // kappa part of grad
+    CVector wqa (mesh->nlen());
+    RVector wqb (mesh->nlen());
+    CVector dgrad (slen);
+    ofs_mod = 0;         // data offset for Mod data
+    ofs_arg = mesh->nQM;  // data offset for Arg data
+    for (i = 0; i < q0; i++) {
+	ofs_mod += mesh->nQMref[i];
+	ofs_arg += mesh->nQMref[i];
+    }
+    
+    for (q = q0; q < q1; q++) {
+
+        // expand field and gradient
+        CVector cdfield (glen);
+        CVector *cdfield_grad = new CVector[dim];
+	raster->Map_MeshToGrid (dphi[q], cdfield);
+	ImageGradient (gdim, gsize, cdfield, cdfield_grad, elref);
+
+        n = mesh->nQMref[q];
+
+	RVector y_mod (*data, ofs_mod, n);
+	RVector s_mod (*sd, ofs_mod, n);
+	RVector ypm_mod (*proj, ofs_mod, n);
+	RVector b_mod(n);
+	b_mod = (y_mod-ypm_mod)/s_mod;
+
+	RVector y_arg (*data, ofs_arg, n);
+	RVector s_arg (*sd, ofs_arg, n);
+	RVector ypm_arg (*proj, ofs_arg, n);
+	RVector b_arg(n);
+	b_arg = (y_arg-ypm_arg)/s_arg;
+
+	RVector ype(n);
+	ype = 1.0;  // will change if data type is normalised
+
+	CVector cproj(n);
+	cproj = fws->ProjectSingle (q, *mvec, dphi[q], DATA_LIN);
+	wqa = toast::complex(0,0);
+	wqb = 0.0;
+
+	for (m = idx = 0; m < mesh->nM; m++) {
+	    if (!mesh->Connected (q, m)) continue;
+	    const CVector qs = mvec->Row(m);
+	    double rp = cproj[idx].re;
+	    double ip = cproj[idx].im;
+	    double dn = 1.0/(rp*rp + ip*ip);
+
+	    // amplitude term
+	    term.re = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
+	    wqa += qs * toast::complex (term.re*rp*dn, -term.re*ip*dn);
+
+	    // phase term
+	    term.im = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
+	    wqa += qs * toast::complex (-term.im*ip*dn, -term.im*rp*dn);
+
+	    //wqb += Re(qs) * (term * ypm[idx]);
+	    idx++;
+	}
+
+	// adjoint field and gradient
+	CVector wphia (mesh->nlen());
+	fws->CalcField (wqa, wphia);
+
+	CVector cafield(glen);
+	CVector *cafield_grad = new CVector[dim];
+	raster->Map_MeshToGrid (wphia, cafield);
+	ImageGradient (gdim, gsize, cafield, cafield_grad, elref);
+
+	// absorption contribution
+	raster->Map_GridToSol (cdfield * cafield, dgrad);
+	grad_cmua_loc -= Re(dgrad);
+
+	// diffusion contribution
+	// multiply complex field gradients
+	CVector gk(glen);
+	for (i = 0; i < glen; i++)
+	    for (j = 0; j < dim; j++)
+	        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
+	raster->Map_GridToSol (gk, dgrad);
+	grad_ckap_loc -= Re(dgrad);
+
+	ofs_mod += n; // step to next source
+	ofs_arg += n;
+
+	delete []cdfield_grad;
+	delete []cafield_grad;
+    }
+
+    // assemble into global gradient vector
+    Task::UserMutex_lock();
+    grad_cmua += grad_cmua_loc;
+    grad_ckap += grad_ckap_loc;
+    Task::UserMutex_unlock();
+
+}
+
+RVector single_gradient_data (const Raster &raster,
+    CFwdSolverMW &FWS, const RVector &proj, CVector *dphi,
+    const CCompRowMatrix &mvec, const RVector &data,
+    const RVector &sd)
+{
+    const QMMesh &mesh = *FWS.meshptr;
+    RVector grad(raster.SLen()*2);
+    
+    struct SINGLEGRADIENT_THREADDATA {
+	const QMMesh *mesh;
+	const Raster *raster;
+	CFwdSolverMW *fws;
+	const CCompRowMatrix *mvec;
+	const RVector *proj;
+	const RVector *data;
+	const RVector *sd;
+	CVector *dphi;
+	RVector *grad;
+    } thdata;
+    thdata.mesh = &mesh;
+    thdata.raster = &raster;
+    thdata.fws = &FWS;
+    thdata.mvec = &mvec;
+    thdata.proj = &proj;
+    thdata.data = &data;
+    thdata.sd = &sd;
+    thdata.dphi = dphi;
+    thdata.grad = &grad;
+
+    //cerr << "tick1" << endl;
+    Task::Multiprocess (single_gradient_data_engine, &thdata);
+    //cerr << "tick2" << endl;
+
+    // hack: make this general
+    double c = 0.3/1.4;
+    return grad*c; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
+}
+
+#else
 
 RVector single_gradient_data (const Raster &raster,
     CFwdSolverMW &FWS, const RVector &proj, CVector *dphi,
@@ -544,7 +886,7 @@ RVector single_gradient_data (const Raster &raster,
     int glen = raster.GLen();
     int slen = raster.SLen();
     int dim  = raster.Dim();
-    double term;
+    toast::complex term;
     const IVector &gdim = raster.GDim();
     const RVector &gsize = raster.GSize();
     const int *elref = raster.Elref();
@@ -555,8 +897,8 @@ RVector single_gradient_data (const Raster &raster,
     ofs_mod = 0;         // data offset for Mod data
     ofs_arg = mesh.nQM;  // data offset for Arg data
     RVector grad_cmua(grad, 0, slen);       // mua part of grad
-    RVector grad_ckappa (grad, slen, slen); // kappa part of grad
-    
+    RVector grad_ckap (grad, slen, slen); // kappa part of grad
+
     double tm_mesh2grid = 0.0;
     double tm_grid2sol = 0.0;
     double tm_gradient = 0.0;
@@ -606,12 +948,12 @@ RVector single_gradient_data (const Raster &raster,
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
-	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
+	    term.re = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
+	    wqa += qs * toast::complex (term.re*rp*dn, -term.re*ip*dn);
 
 	    // phase term
-	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
+	    term.im = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
+	    wqa += qs * toast::complex (-term.im*ip*dn, -term.im*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -648,7 +990,7 @@ RVector single_gradient_data (const Raster &raster,
 	raster.Map_GridToSol (gk, dgrad);
 
 	tm_grid2sol += toc();
-	grad_ckappa -= Re(dgrad);
+	grad_ckap -= Re(dgrad);
 
 	ofs_mod += n; // step to next source
 	ofs_arg += n;
@@ -662,6 +1004,8 @@ RVector single_gradient_data (const Raster &raster,
     double c = 0.3/1.4;
     return grad*c; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
 }
+
+#endif
 
 // ==========================================================================
 

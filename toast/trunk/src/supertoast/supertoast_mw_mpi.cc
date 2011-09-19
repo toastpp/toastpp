@@ -95,8 +95,8 @@ int main (int argc, char *argv[])
     int mpi_status = MPI_Init (&argc, &argv);
     MPI_Comm_rank (MPI_COMM_WORLD, &mpi_rank);
     MPI_Comm_size (MPI_COMM_WORLD, &mpi_size);
-    LOGOUT_1PRM("Initialising MPI session. MPI status = %d", mpi_status);
-    LOGOUT_2PRM("Processor %d of %d", mpi_rank, mpi_size);
+    LOGOUT("Initialising MPI session. MPI status = %d", mpi_status);
+    LOGOUT("Processor %d of %d", mpi_rank, mpi_size);
 
     cerr << "processor " << mpi_rank << " of " << mpi_size << endl;
 #endif // TOAST_MPI
@@ -539,9 +539,9 @@ int main (int argc, char *argv[])
 
     double total_time = toc(clock0);
     LOGOUT ("Final timings:");
-    LOGOUT_1PRM ("Total: %f", total_time);
+    LOGOUT("Total: %f", total_time);
 #ifdef DO_PROFILE
-    LOGOUT_1PRM ("Solver: %f", solver_time);
+    LOGOUT("Solver: %f", solver_time);
 #endif
 
 #ifdef TOAST_MPI

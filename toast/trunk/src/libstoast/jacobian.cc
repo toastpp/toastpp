@@ -5,6 +5,7 @@
 
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
+#include "timing.h"
 
 using namespace toast;
 
@@ -415,10 +416,132 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 // This computes a 'raw' Jacobian dy/dx without any data or parameter scaling
 // (y: cw intensity, x: mua and/or kappa)
 
+#if THREAD_LEVEL==2
+
+struct GENJAC_CW_GRID_THREADDATA {
+    const Raster *raster;
+    const QMMesh *mesh;
+    const RVector *dphi;
+    const RVector *aphi;
+    RDenseMatrix *Jmua;
+    RDenseMatrix *Jkap;
+};
+
+void *GenerateJacobian_cw_grid_engine (task_data *td)
+{
+    int itask = td->proc;
+    int ntask = td->np;
+    GENJAC_CW_GRID_THREADDATA *thdata = (GENJAC_CW_GRID_THREADDATA*)td->data;
+    int nq  = thdata->mesh->nQ;
+    int nm  = thdata->mesh->nM;
+    int nqm = thdata->mesh->nQM;
+    int q0  = (itask*nq)/ntask;
+    int q1  = ((itask+1)*nq)/ntask;
+    int q, m;
+    const IVector &gdim = thdata->raster->GDim();
+    const RVector &gsize = thdata->raster->GSize();
+    int dim  = thdata->raster->Dim();
+    int glen = thdata->raster->GLen();
+    int slen = thdata->raster->SLen();
+    RVector cdfield(glen);                   // a single forward field
+    RVector *cafield = new RVector[nm];      // array of all adjoint fields
+    RVector *cdfield_grad = 0;
+    RVector **cafield_grad = 0;
+    RVector pmdf(glen);                      // a single row of J
+    RVector pmdf_basis(slen);                // PMDF mapped into solution basis
+
+    double *Jmua_ptr = 0;
+    double *Jkap_ptr = 0;
+    if (thdata->Jmua) {
+	Jmua_ptr = thdata->Jmua->valptr()+thdata->mesh->Qofs[q0]*slen;
+    }
+    if (thdata->Jkap) {
+	Jkap_ptr = thdata->Jkap->valptr()+thdata->mesh->Qofs[q0]*slen;
+	cdfield_grad = new RVector[dim];
+	cafield_grad = new RVector*[nm];
+    }
+
+    // resample all measurement fields to fine grid
+    // note: this should be done in a separate parallel kernel
+    for (m = 0; m < nm; m++) {
+        cafield[m].New (glen);
+	thdata->raster->Map_MeshToGrid (thdata->aphi[m], cafield[m]);
+
+	if (thdata->Jkap) {
+	    cafield_grad[m] = new RVector[dim];
+	    ImageGradient (gdim, gsize, cafield[m], cafield_grad[m]);
+	}
+    }
+
+    for (q = q0; q < q1; q++) {
+        // resample field for source i to fine grid
+	thdata->raster->Map_MeshToGrid (thdata->dphi[q], cdfield);
+
+	// generate gradient
+	if (thdata->Jkap)
+	    ImageGradient (gdim, gsize, cdfield, cdfield_grad,
+                thdata->raster->Elref());
+
+	// loop over detectors
+	for (m = 0; m < nm; m++) {
+	    if (!thdata->mesh->Connected (q,m)) continue;
+
+	    // absorption component
+	    if (thdata->Jmua) {
+		pmdf = PMDF_mua (cdfield, cafield[m]);
+
+		// map into solution basis
+		thdata->raster->Map_GridToSol (pmdf, pmdf_basis);
+		memcpy (Jmua_ptr, pmdf_basis.data_buffer(),
+			slen*sizeof(double));
+		Jmua_ptr += slen;
+	    }
+
+	    // diffusion component
+	    if (thdata->Jkap) {
+		pmdf = PMDF_kap (cdfield_grad, cafield_grad[m], dim);
+
+		// map into solution basis
+		thdata->raster->Map_GridToSol (pmdf, pmdf_basis);
+		memcpy (Jkap_ptr, pmdf_basis.data_buffer(),
+			slen*sizeof(double));
+		Jkap_ptr += slen;
+	    }
+	}
+    }
+    
+    delete []cafield;
+    if (cdfield_grad)
+	delete []cdfield_grad;
+    if (cafield_grad) {
+	for (m = 0; m < nm; m++)
+	    delete []cafield_grad[m];
+	delete []cafield_grad;
+    }
+}
+
+#endif // THREAD_LEVEL
+
 void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap)
 {
+    double t0 = walltic();
+
+#if THREAD_LEVEL==2
+    int slen = raster->SLen();
+    int nqm  = mesh->nQM;
+    if (Jmua) Jmua->New (nqm, slen);
+    if (Jkap) Jkap->New (nqm, slen);
+    static GENJAC_CW_GRID_THREADDATA thdata;
+    thdata.raster = raster;
+    thdata.mesh   = mesh;
+    thdata.dphi   = dphi;
+    thdata.aphi   = aphi;
+    thdata.Jmua   = Jmua;
+    thdata.Jkap   = Jkap;
+    Task::Multiprocess (GenerateJacobian_cw_grid_engine, &thdata);
+#else
     int i, j, k, idx, dim, nQ, nM, nQM, slen, glen;
     const IVector &gdim = raster->GDim();
     const IVector &bdim = raster->BDim();
@@ -508,6 +631,9 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 	    delete []cafield_grad[i];
 	delete []cafield_grad;
     }
+#endif // !THREAD_LEVEL
+
+    std::cerr << "T(Jacobian) = " << walltoc(t0) << std::endl;
 }
 
 
@@ -573,8 +699,8 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 template<class T>
 TVector<T> IntFG (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g)
 {
-    dASSERT(f.Dim() == mesh.nlen(), Wrong vector size);
-    dASSERT(g.Dim() == mesh.nlen(), Wrong vector size);
+    dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
+    dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
     int el, nnode, *node, i, j, k, nj, nk, bs;
     T sum;
@@ -607,8 +733,8 @@ template<class T>
 TVector<T> IntGradFGradG (const Mesh &mesh,
     const TVector<T> &f, const TVector<T> &g)
 {
-    dASSERT(f.Dim() == mesh.nlen(), Wrong vector size);
-    dASSERT(g.Dim() == mesh.nlen(), Wrong vector size);
+    dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
+    dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
     int el, nnode, *node, i, j, k, nj, nk, bs;
     T sum;

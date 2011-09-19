@@ -89,7 +89,7 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order)
 
     for (el = 0; el < mesh.elen(); el++) {
 	pel = mesh.elist[el];
-	xASSERT (pel->Type() == ELID_TRI3, Element type not supported);
+	xASSERT (pel->Type() == ELID_TRI3, "Element type not supported");
 	nnode = pel->nNode();
 	node  = pel->Node;
 	for (sd = 0; sd < pel->nSide(); sd++) {

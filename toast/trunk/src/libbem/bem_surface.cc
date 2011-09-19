@@ -50,7 +50,7 @@ BEM_Surface::BEM_Surface (Mesh &mesh)
 	// sanity check
 
 
-	xASSERT(mesh.Dimension() == 3, Wrong mesh dimension);
+	xASSERT(mesh.Dimension() == 3, "Wrong mesh dimension");
 
 	int i, j, k, *bndellist, *bndsdlist;
 	int nlen = mesh.nlen();
@@ -81,8 +81,8 @@ BEM_Surface::BEM_Surface (Mesh &mesh)
 		IVector fem_idx(nnd);
 		for (j = 0; j < nnd; j++) {
 			fem_idx[j] = bndidx[fem_el->Node[fem_el->SideNode(side,j)]];
-			dASSERT(fem_idx[j] >= 0, Index mismatch);
-			dASSERT(fem_idx[j] < nNd, Index mismatch);
+			dASSERT(fem_idx[j] >= 0, "Index mismatch");
+			dASSERT(fem_idx[j] < nNd, "Index mismatch");
 		}
 
 		// map from FEM to BEM ordering
