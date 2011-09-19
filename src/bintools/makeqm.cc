@@ -52,7 +52,7 @@ int main (void)
 	outline_from_mesh = false;
 	break;
     default:
-	xERROR(Invalid command.);
+	xERROR("Invalid command.");
     }
 
 
@@ -97,7 +97,7 @@ int main (void)
 	    cin  >> width;
 	    break;
 	default:
-	    xERROR(Invalid command);
+	    xERROR("Invalid command");
 	    break;
 	}
 	if (which) {

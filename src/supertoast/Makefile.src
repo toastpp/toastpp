@@ -56,12 +56,12 @@ supertoast : supertoast.o supertoast_util.o util.o solver.o solverlm.o \
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
 supertoast_mw : supertoast_mw.o supertoast_util.o util.o solver_mw.o \
-	solverlm_mw.o solverpcg_mw.o
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+	solverlm_mw.o solverpcg_mw.o solverlbfgs_mw.o solverlm2_mw.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
 supertoast_cw_mw : supertoast_cw_mw.o supertoast_util.o util.o solver_cw.o \
-	solverlm_cw_mw.o \
-	solverpcg_cw_mw.o solverlbfgs_cw_mw.o
+	solverlm_cw_mw.o solverpcg_cw_mw.o solverlbfgs_cw_mw.o \
+	solverlm2_cw_mw.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
 supertoast_mpi : supertoast_mpi.o supertoast_util.o util.o solver.o \

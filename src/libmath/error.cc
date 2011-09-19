@@ -23,17 +23,18 @@ using namespace std;
 
 const char *TOAST_VERSION = "15";
 
+#define ECHOLOG // echo log file entries on screen
+
 #define EXPIRED_MSG "Sorry, the license for this program has expired.\n\
 Please contact S.Arridge@cs.ucl.ac.uk or martins@medphys.ucl.ac.uk\n"
 
 MATHLIB ofstream logfile;   // global log file handler
+MATHLIB char logbuf[256];
 
 void DefaultErrorhandler (char *msg)
 {
-    cerr << msg << endl;
-#ifdef __BORLANDC__
-    while  (!kbhit ());
-#endif
+    if (msg)
+        cerr << msg << endl;
     exit (1);
 }
 static void (*Errorhandler)(char*) = DefaultErrorhandler;
@@ -51,19 +52,25 @@ MATHLIB void Error (const char *name, const char *file, int line)
     Errorhandler (cbuf);
 }
 
-MATHLIB void Error (const char *name, const char *msg, const char *file, int line)
+MATHLIB void Error (const char *name, const char *file, int line, const char *msg, ...)
 {
-    char cbuf[500];
-    sprintf (cbuf, "#########################\nERROR IN LIBFE3:\n%s\n%s\n%s, %d\n#########################\n",
-	msg, name, file, line);
-    Errorhandler (cbuf);
+    cerr << "#########################" << endl;
+    cerr << "ERROR IN LIBFE3:" << endl;
+    va_list ap;
+    va_start (ap,msg);
+    vsnprintf (logbuf, 255, msg, ap);
+    va_end(ap);
+    cerr << logbuf << endl;
+    cerr << name << endl << file << ", " << line << endl;
+    cerr << "#########################" << endl;
+    Errorhandler (NULL);
 }
 
-void Error_Abstract (const char *file, int line)
+void Error_Undef (const char *name, const char *file, int line)
 {
     char cbuf[500];
-    sprintf (cbuf, "#########################\nERROR IN LIBFE3:\nAbstract function called\n%s, %d\n#########################\n",
-	file, line);
+    sprintf (cbuf, "#########################\nERROR IN LIBFE3:\nFunction not implemented:\n%s\n%s, %d\n#########################\n",
+	     name, file, line);
     Errorhandler (cbuf);
 }
 // ==========================================================================
@@ -72,7 +79,6 @@ void Error_Abstract (const char *file, int line)
 const int MAXLOGLEVELDEPTH = 10;
 static char levelstr[MAXLOGLEVELDEPTH][50];
 static int logleveldepth = 0;
-MATHLIB char logbuf[256];
 static int progress_len;
 static int progress_maxlen;
 static int progress_maxcount;
@@ -88,11 +94,18 @@ void LogoutOff()
     logout_on = 0;
 }
 
-void LogOut (const char *msg)
+void LogOut (const char *msg, ...)
 {
     if (logout_on) {
+        va_list ap;
+	va_start(ap,msg);
+	vsnprintf (logbuf, 255, msg, ap);
+	va_end(ap);
 	for (int i = 0; i < logleveldepth; i++) logfile << "| ";
-	logfile << msg << endl;
+	logfile << logbuf << endl;
+#ifdef ECHOLOG
+	cout << logbuf << endl;
+#endif
     }
 }
 
@@ -229,7 +242,7 @@ void LogfileOpen (const char *fname, bool rewind)
         logfile.open (fname);
 	logfile_isfile = 1;
     } else {
-        xERROR(Function not supported);
+        xERROR("Function not supported");
         //logfile.attach (1);  // log to stdout
 	logfile_isfile = 0;
     }

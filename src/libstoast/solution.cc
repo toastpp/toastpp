@@ -50,7 +50,7 @@ void Solution::Set (const RVector &prm)
 #ifdef FEM_DEBUG
     int len = 0;
     for (i = 0; i < nprm; i++) if (active[i]) len += param[i].Dim();
-    xASSERT (len == prm.Dim(), Invalid parameter vector length);
+    xASSERT (len == prm.Dim(), "Invalid parameter vector length");
 #endif
 
     for (i = idx = 0; i < nprm; i++) {

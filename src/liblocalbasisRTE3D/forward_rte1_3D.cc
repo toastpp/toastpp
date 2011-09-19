@@ -932,16 +932,16 @@ int main (int argc, char *argv[])
     cout << "Reading mesh " << argv[1] << endl;
     ifstream ifs;
     ifs.open (argv[1]);
-    xASSERT (ifs.is_open(), Mesh file not found.);
+    xASSERT (ifs.is_open(), "Mesh file not found.");
     ifs >> qmmesh;
-    xASSERT (ifs.good(), Problem reading mesh.);
+    xASSERT (ifs.good(), "Problem reading mesh.");
     ifs.close ();
     cout << "Spatial mesh has " << qmmesh.elen() << " elements, " << qmmesh.nlen()
 	 << " nodes\n";
     int dimension = nlist[0].Dim();
     for (int i = 1; i < nlist.Len(); i++)
-	xASSERT(nlist[i].Dim() == dimension, Inconsistent node dimensions.);
-    xASSERT(dimension >= 2 && dimension <= 3, Mesh dimension must be 2 or 3.);
+	xASSERT(nlist[i].Dim() == dimension, "Inconsistent node dimensions.");
+    xASSERT(dimension >= 2 && dimension <= 3, "Mesh dimension must be 2 or 3.");
     qmmesh.Setup();
 
 
@@ -976,9 +976,9 @@ int main (int argc, char *argv[])
     else {
     cout << "QM file " << argv[3] << endl;
     ifs.open (argv[3]);
-    xASSERT (ifs.is_open(), QM file not found.);
+    xASSERT (ifs.is_open(), "QM file not found.");
     qmmesh.LoadQM (ifs);
-    xASSERT (ifs.good(), Problem reading QM.);
+    xASSERT (ifs.good(), "Problem reading QM.");
     ifs.close ();
     ns = qmmesh.nQ;
     nM = qmmesh.nM;
@@ -1187,7 +1187,7 @@ int main (int argc, char *argv[])
 **/
 inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
 {
-    dASSERT_2PRM(x.Dim() == A.nCols(),
+    dASSERT(x.Dim() == A.nCols(),
     "Parameter 1 invalid size (expected %d, actual %d)",
     A.nCols(), x.Dim());
     if (res.Dim() != A.nRows()) res.New(A.nRows());

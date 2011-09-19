@@ -25,7 +25,7 @@ Regularisation::Regularisation (const Raster *_raster, double _tau,
 	pdim = Hs1p.nCols();
 	nset = _x0->Dim() / pdim;
 
-	xASSERT (nset*pdim == _x0->Dim(), Invalid parameter dimensions);
+	xASSERT (nset*pdim == _x0->Dim(), "Invalid parameter dimensions");
 	x0 = new RVector (*_x0);
     }
     //LOGOUT("Leaving Regularisation constructor");
@@ -206,11 +206,11 @@ GenericSigma::GenericSigma (const Raster *_raster, const RVector *_x0,
     }
     
     if(sdx > 0.0) {
-	LOGOUT_1PRM("Smoothing Kappa ",sdx);
+	LOGOUT("Smoothing Kappa ",sdx);
 	cout << "Smoothing Kappa "<< sdx << endl;
     }
     if(sdf > 0.0) {
-	LOGOUT_1PRM("Smoothing image argument ",sdf);
+	LOGOUT("Smoothing image argument ",sdf);
 	cout << "Smoothing image argument " << sdf << endl;
     }
     sdr = fT = 0.0;
@@ -242,11 +242,11 @@ GenericSigma::GenericSigma (const Raster *_raster, const RVector *_x0,
     }
     
     if(sdx > 0.0) {
-	LOGOUT_1PRM("Smoothing Kappa ",sdx);
+	LOGOUT("Smoothing Kappa ",sdx);
 	cout << "Smoothing Kappa "<< sdx << endl;
     }
     if(sdf > 0.0) {
-	LOGOUT_1PRM("Smoothing image argument ",sdf);
+	LOGOUT("Smoothing image argument ",sdf);
 	cout << "Smoothing image argument " << sdf << endl;
     }
     if( KRefTensFlag) {
@@ -325,7 +325,7 @@ void GenericSigma::ReadParams (ParamParser *pp)
     // Build diffusivity fields from image
     if (krefimg_name) {
 	ifstream ifs(krefimg_name);
-	xASSERT (ifs.good(), Diffusivity image not found);
+	xASSERT (ifs.good(), "Diffusivity image not found");
 	RVector krefimg;
 	ifs >> krefimg;
 
@@ -366,7 +366,7 @@ RVector *GenericSigma::MakeKref (const RVector &gimgref_all, double sdr,
     int slen = raster->SLen();
     int glen = raster->GLen();
     int nprm = gimgref_all.Dim() / glen;
-    xASSERT (gimgref_all.Dim() == glen*nprm, Invalid image size);
+    xASSERT (gimgref_all.Dim() == glen*nprm, "Invalid image size");
     // create a "reference kappa". Can only do 2D for now.
     RVector simgref_all(slen*nprm);
     RVector *kref_all = new RVector(slen*nprm);
@@ -546,7 +546,7 @@ void GenericSigma::CreateDerivativeOperators ()
 double GenericSigma::GetValue (const RVector &x) const
 {
     //LOGOUT("Entering GenericSigma::GetValue");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector dx (x - *x0);
     double result=0.0;
@@ -560,7 +560,7 @@ double GenericSigma::GetValue (const RVector &x) const
 	    spdx = raster->SmoothImage(pdx,sdf);
 	    cout << "Smooth in GetValue " << sdf << endl;
         }
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	for (row = 0; row < slen; row++) {
 	    i0 = rowptr[row]; i1 = rowptr[row+1];
 	    for (i = i0; i < i1; i++) { // find neighbours
@@ -597,7 +597,7 @@ double GenericSigma::GetValue (const RVector &x) const
 double GenericSigma::GetValue (const RVector &x) const
 {
     //LOGOUT("Entering GenericSigma::GetValue");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector dx (x - *x0);
     double result=0.0;
@@ -611,7 +611,7 @@ double GenericSigma::GetValue (const RVector &x) const
 	    spdx = raster->SmoothImage(pdx,sdf);
 	    cout << "Smooth in GetValue " << sdf << endl;
         }
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	if(KRefTensFlag) {
 	  RVector *dp = new RVector [dim];  // for the gradients
 	  for (idim = 0; idim < dim; idim++)
@@ -657,7 +657,7 @@ RVector GenericSigma::GetKappa (const RVector &x) const
 {
     //LOGOUT("Entering GenericSigma::GetKappa");
     //cout << "Entering GenericSigma::GetKappa\n";
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  xx(x), ktot(x.Dim());
 
@@ -682,7 +682,7 @@ RVector GenericSigma::GetKappa (const RVector &x) const
 		  ncount ++;
 		}
 	    } // end of neighbours of this pixel
-	    dASSERT (ncount >0, Found a pixel with no neighbours);  
+	    dASSERT (ncount >0, "Found a pixel with no neighbours");  
 	    pkap[row] *= (kref ? (*kref)[row+p*pdim] : 1.0)/ncount; // average of edges.
 	} // end of pixels	
     } // end of parameter
@@ -697,7 +697,7 @@ RVector GenericSigma::GetKappa (const RVector &x) const
 {
     //LOGOUT("Entering GenericSigma::GetKappa");
     //cout << "Entering GenericSigma::GetKappa\n";
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  xx(x), ktot(x.Dim());
 
@@ -744,7 +744,7 @@ RVector GenericSigma::GetKappa (const RVector &x) const
 	       ncount ++;
 	      }
 	    } // end of neighbours of this pixel
-	    dASSERT (ncount >0, Found a pixel with no neighbours);  
+	    dASSERT (ncount >0, "Found a pixel with no neighbours");  
 	    //#define KAPPA_IS_ROW_AVERAGE
 #ifdef KAPPA_IS_ROW_AVERAGE
 	    for(int ik = 0; ik < ncount; ik++)
@@ -769,7 +769,7 @@ RVector GenericSigma::GetKappa (const RVector &x) const
 {
     //LOGOUT("Entering GenericSigma::GetKappa");
     //cout << "Entering GenericSigma::GetKappa\n";
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  xx(x), ktot(x.Dim());
 
@@ -838,7 +838,7 @@ RVector GenericSigma::GetKappa (const RVector &x) const
 	       ncount ++;
 	      }
 	    } // end of neighbours of this pixel
-	    dASSERT (ncount >0, Found a pixel with no neighbours);  
+	    dASSERT (ncount >0, "Found a pixel with no neighbours");  
 	    //#define KAPPA_IS_ROW_AVERAGE
 #ifdef KAPPA_IS_ROW_AVERAGE
 	    for(int ik = 0; ik < ncount; ik++)
@@ -1091,8 +1091,8 @@ void GenericSigma::SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int 
 RVector GenericSigma::GetHess1f(const RVector &x,const RVector &f) const
 {
     LOGOUT("Entering GenericSigma::GetHess1f");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
-    dASSERT (f.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
+    dASSERT (f.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
     
     RVector dx (x - *x0), grad(x.Dim());
 
@@ -1320,11 +1320,11 @@ GenericScaleSpace::GenericScaleSpace (const Raster *_raster,
     }
 
     if(sdx > 0.0) {
-      LOGOUT_1PRM("Smoothing Kappa ",sdx);
+      LOGOUT("Smoothing Kappa ",sdx);
       cout << "Smoothing Kappa "<< sdx << endl;
     }
     if(sdf > 0.0) {
-      LOGOUT_1PRM("Smoothing image argument ",sdf);
+      LOGOUT("Smoothing image argument ",sdf);
       cout << "Smoothing image argument " << sdf << endl;
     }
     // allocate space for diffusion Tensor
@@ -1351,7 +1351,7 @@ double GenericScaleSpace::GetValue (const RVector &x) const
 {
 
     //LOGOUT("Entering GenericSigma::GetValue");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     static int dimflag = raster->Dim();
     static int ngim =  (dimflag == 3 ? 10 : 6);
@@ -1374,7 +1374,7 @@ double GenericScaleSpace::GetValue (const RVector &x) const
 
 	spdx_jet = raster->ImageJet(pdx, sdf, iflgs);
 	cout << "Smooth in GetValue " << sdf << endl;
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	for (i = 0; i < pdx.Dim() ; i++) {
 	  for(int k = 0; k < dimflag; k++)
 	    pgrad[k] = spdx_jet[k+1][i];  // gradient of image
@@ -1401,7 +1401,7 @@ RVector GenericScaleSpace::GetKappa    (const RVector &x) const
 {
     //LOGOUT("Entering GenericScaleSpace::GetKappa");
     //cout << "Entering GenericScaleSpace::GetKappa\n";
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  ktot(x.Dim());
     static int dimflag = raster->Dim();
@@ -1426,7 +1426,7 @@ RVector GenericScaleSpace::GetKappa    (const RVector &x) const
 
 	spdx_jet = raster->ImageJet(pdx, sdx, iflgs);
 	cout << "Smooth in GetKappa " << sdx << endl;
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	for (i = 0; i < pdx.Dim() ; i++) {
 	  for(int k = 0; k < dimflag; k++)
 	    pgrad[k] = spdx_jet[k+1][i];  // gradient of image
@@ -1453,7 +1453,7 @@ RVector GenericScaleSpace::GetHess1f(const RVector &x,const RVector &f) const
 
     //LOGOUT("Entering GenericScaleSpace::GetHess1f");
     //cout << "Entering GenericScaleSpace::GetHess1f\n";
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  h(x.Dim());
     static int dimflag = raster->Dim();
@@ -1480,7 +1480,7 @@ RVector GenericScaleSpace::GetHess1f(const RVector &x,const RVector &f) const
 	spdx_jet = raster->ImageJet(pdx, sdx, iflgsx);
 	spf_jet = raster->ImageJet(pf, sdf, iflgsf);
 	cout << "Smooth in GetHess1f " << sdx << endl;
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	for (i = 0; i < pdx.Dim() ; i++) {
 	  for(k = 0; k < dimflag; k++) {
 	    pgradx[k] = spdx_jet[k+1][i];  // gradient of image
@@ -1552,7 +1552,7 @@ RVector GenericScaleSpace::GetHess1f_KappaSet(const RVector &f) const
 
     //LOGOUT("Entering GenericScaleSpace::GetHess1f");
     //    cout << "Entering GenericScaleSpace::GetHess1f\n";
-    //dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    //dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  h(f.Dim());
     static int dimflag = raster->Dim();
@@ -1573,7 +1573,7 @@ RVector GenericScaleSpace::GetHess1f_KappaSet(const RVector &f) const
 
     int i,k;
     for (int p = 0; p < local_nset; p++) { // loop over parameter sets
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	//	cout << "parameter loop : p = " << p << endl;
 	RVector pf (ff, p*pdim, pdim);
 	RVector ph (h, p*pdim, pdim);
@@ -1629,7 +1629,7 @@ RVector GenericScaleSpace::GetHess1f_KappaNotSet(const RVector &x,const RVector 
 
     //LOGOUT("Entering GenericScaleSpace::GetHess1f");
     //    cout << "Entering GenericScaleSpace::GetHess1f\n";
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     RVector  h(x.Dim());
     static int dimflag = raster->Dim();
@@ -1655,7 +1655,7 @@ RVector GenericScaleSpace::GetHess1f_KappaNotSet(const RVector &x,const RVector 
 
     int i,k;
     for (int p = 0; p < local_nset; p++) { // loop over parameter sets
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	//	cout << "parameter loop : p = " << p << endl;
 	RVector pdx (x, p*pdim, pdim);
 	RVector pf (ff, p*pdim, pdim);
@@ -1730,7 +1730,7 @@ void GenericScaleSpace::SetHess1 (RCompRowMatrix &Hess, const RVector &x, const 
     KappaTens[p] = new RDenseMatrix [pdim];
 
   // assume that x is "full vector" from which we select parameter set p
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);  
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");  
 
     static int dimflag = raster->Dim();
     static int ngim =  (dimflag == 3 ? 10 : 6);
@@ -1752,7 +1752,7 @@ void GenericScaleSpace::SetHess1 (RCompRowMatrix &Hess, const RVector &x, const 
 
     int i,k;
 
-    //LOGOUT_1PRM("parameter loop : p = %d",p);
+    //LOGOUT("parameter loop : p = %d",p);
     RVector pdx (x, p*pdim, pdim);
     RVector *spdx_jet;
 
@@ -1851,28 +1851,44 @@ Tikhonov0::Tikhonov0 (double _tau, const RVector *_x0, const RVector *_xs)
     if (_xs)
 	xs = new RVector(*_xs);
     else
-	xs = NULL;
-    //x0  = _x0;
-    //xs  = _xs;
+	xs = x0;
+    use_tauvec = false;
+    kaprefimg_name = NULL;
 }
 
 Tikhonov0::~Tikhonov0()
 {
-    if (xs) delete xs;
+    if (xs && xs != x0) delete xs;
+    if (kaprefimg_name) delete []kaprefimg_name;
+}
+
+void Tikhonov0::SetTau (double _tau)
+{
+    tau = _tau;
+    use_tauvec = false;
+}
+
+void Tikhonov0::SetTau (const RVector &_tau)
+{
+    xASSERT(_tau.Dim() == x0->Dim(), "Wrong vector size (expected %d, got %d)",
+	    x0->Dim(), _tau.Dim());
+    xASSERT(vmax(_tau) >= 0.0, "Negative tau element detected");
+    tauvec = _tau;
+    use_tauvec = true;
 }
 
 double Tikhonov0::GetValue (const RVector &x) const
 {
     RVector dx ((x - *x0) / *xs);
 
-    cerr << "TK0 value: " << (dx & dx) * tau << endl;
-
-    return (dx & dx) * tau;
+    if (use_tauvec) return ((dx*tauvec) & dx) * tau;
+    else            return (dx & dx) * tau;
 }
 
 RVector Tikhonov0::GetGradient (const RVector &x) const
 {
-    return (x - *x0) / sqr (*xs) * (2.0*tau);
+  if (use_tauvec) return ((x - *x0)*tauvec) / sqr (*xs) * (2.0*tau);
+    else            return (x - *x0) / sqr (*xs) * (2.0*tau);
 }
 
 RVector Tikhonov0::GetKappa    (const RVector &x) const
@@ -1884,7 +1900,8 @@ RVector Tikhonov0::GetKappa    (const RVector &x) const
 
 RVector Tikhonov0::GetHess1f(const RVector &x,const RVector &f) const
 {
-    return f*(2.0*tau)/sqr(*xs);
+    if (use_tauvec) return (f*(2.0*tau)) * (tauvec/sqr(*xs));
+    else return f*(2.0*tau)/sqr(*xs);
 }
 
 void Tikhonov0::SetHessian (RCompRowMatrix &Hess, const RVector &x)
@@ -1915,13 +1932,62 @@ int Tikhonov0::GetHessianRow (const RVector &x, int i, idxtype *colidx,
     double *val) const
 {
     colidx[0] = i;  // diagonal only
-    val[0] = 2.0*tau / ((*xs)[i] * (*xs)[i]);
+    if (use_tauvec) val[0] = (2.0*tau)*tauvec[i] / ((*xs)[i] * (*xs)[i]);
+    else val[0] = 2.0*tau / ((*xs)[i] * (*xs)[i]);
     return 1;
 }
 
 RVector Tikhonov0::GetHessianDiag (const RVector &x) const
 {
-    return (2.0*tau)/sqr(*xs);
+    if (use_tauvec) return (2.0*tau)*(tauvec/sqr(*xs));
+    else            return (2.0*tau)/sqr(*xs);
+}
+
+void Tikhonov0::ReadParams (ParamParser *pp)
+{
+    int cmd;
+    char cbuf[256];
+
+    Regularisation::ReadParams (pp);
+
+    // === Image for reference kappa ===
+    if (!pp->GetString ("PRIOR_KAPREFIMG", cbuf)) {
+	for (cmd = -1; cmd <0 || cmd > 1; ) {
+	    cout << "\nImage for reference diffusivity:\n";
+	    cout << "(0) None\n";
+	    cout << "(1) From file\n";
+	    cout << "[0|1] >> ";
+	    cin >> cmd;
+	}
+	switch (cmd) {
+	case 0:
+	    cbuf[0] = '\0';
+	    break;
+	case 1:
+	    cout << "Image data file name:\n>> ";
+	    cin >> cbuf;
+	    break;
+	}
+    }
+    if (kaprefimg_name) {
+	delete []kaprefimg_name;
+	kaprefimg_name = NULL;
+    }
+    if (cbuf[0] && strcasecmp (cbuf, "NONE")) {
+	RVector vtau;
+	ifstream ifs (cbuf);
+	ifs >> vtau;
+	SetTau (vtau);
+	kaprefimg_name = new char[strlen(cbuf)+1];
+	strcpy (kaprefimg_name, cbuf);
+    }
+}
+
+void Tikhonov0::WriteParams (ParamParser *pp)
+{
+    Regularisation::WriteParams (pp);
+
+    pp->PutString ("PRIOR_KAPREFIMG", kaprefimg_name ? kaprefimg_name : "NONE");
 }
 
 // ==========================================================================
@@ -1946,7 +2012,7 @@ Tikhonov1::Tikhonov1 (double _tau, const RVector *_x0,
     //CreateHessStruct1param (*Laplacian); // MS 080307
     pdim      = Laplacian->nCols();
     nset      = x0->Dim() / pdim;
-    xASSERT (nset*pdim == x0->Dim(), Invalid parameter dimensions);
+    xASSERT (nset*pdim == x0->Dim(), "Invalid parameter dimensions");
     if(_kap==0)   {// kappa is not needed if Hessian is explicitly created.
       delete kappa;
       kappa = 0;
@@ -2004,7 +2070,7 @@ void Tikhonov1::CreateHessian (const Raster *raster,
 
 double Tikhonov1::GetValue (const RVector &x) const
 {
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector dx (x - *x0), Lx(x.Dim());
     for (int i = 0; i < nset; i++) { // loop over parameter sets
@@ -2017,7 +2083,7 @@ double Tikhonov1::GetValue (const RVector &x) const
 
 RVector Tikhonov1::GetGradient (const RVector &x) const
 {
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector dx (x - *x0), grad(x.Dim());
     for (int i = 0; i < nset; i++) { // loop over parameter sets
@@ -2035,8 +2101,8 @@ RVector Tikhonov1::GetKappa    (const RVector &x) const
 }
 RVector Tikhonov1::GetHess1f(const RVector &x,const RVector &f) const
 {
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
-    dASSERT (f.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
+    dASSERT (f.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector  grad(x.Dim());
     for (int i = 0; i < nset; i++) { // loop over parameter sets
@@ -2132,7 +2198,7 @@ TVSigmaOLD::TVSigmaOLD (double _tau, double _beta, double _sd,
     pdim      = TVhess->nCols();
     nset      = x0->Dim() / pdim;
 
-    xASSERT (nset*pdim == x0->Dim(), Invalid parameter dimensions);
+    xASSERT (nset*pdim == x0->Dim(), "Invalid parameter dimensions");
     //    nset = 1;
 
     //LOGOUT("Leaving TVSigmaOLD constructor");
@@ -2151,7 +2217,7 @@ void TVSigmaOLD::OLDSetHessian (const RVector &x) const
   // in TVSigmaOLD, Hessian is not constant : depends on x
   // need to think about this. It will need TWO hessian matrices !
 {
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector dx (x - *x0);
 
@@ -2184,7 +2250,7 @@ void TVSigmaOLD::OLDSetHessian (const RVector &x) const
 double TVSigmaOLD::GetValue (const RVector &x) const
 {
     //LOGOUT("Entering TVSigmaOLD::GetValue");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
 
     RVector dx (x - *x0);
     double result=0.0;
@@ -2195,7 +2261,7 @@ double TVSigmaOLD::GetValue (const RVector &x) const
 	RVector pdx (dx, p*pdim, pdim);
 	if(sd > 0.0 && !SmoothKappaOnly)
 	  pdx = raster->SmoothImage(pdx,sd);
-	//LOGOUT_1PRM("parameter loop : p = %d",p);
+	//LOGOUT("parameter loop : p = %d",p);
 	for (row = 0; row < slen; row++) {
 	    i0 = rowptr[row]; i1 = rowptr[row+1];
 	    for (i = i0; i < i1; i++) { // find neighbours
@@ -2217,7 +2283,7 @@ double TVSigmaOLD::GetValue (const RVector &x) const
 RVector TVSigmaOLD::GetGradient (const RVector &x) const
 {
     //LOGOUT("Entering TVSigmaOLD::GetGradient");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
     
     RVector dx (x - *x0), grad(x.Dim());
 
@@ -2253,7 +2319,7 @@ RVector TVSigmaOLD::GetGradient (const RVector &x) const
 RVector TVSigmaOLD::GetKappa    (const RVector &x) const
 {
     //LOGOUT("Entering TVSigmaOLD::GetKappa");
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
     
     RVector dx (x - *x0), ktot(x.Dim());
 
@@ -2276,7 +2342,7 @@ RVector TVSigmaOLD::GetKappa    (const RVector &x) const
 		  ncount ++;
 		}
 	    } // end of neighbours of this pixel
-	    dASSERT (ncount >0, Found a pixel with no neighbours);  
+	    dASSERT (ncount >0, "Found a pixel with no neighbours");  
 	    pkap[row] *= (*kappa)[row]/ncount; // average of edges.
 	} // end of pixels	
     } // end of parameter
@@ -2286,8 +2352,8 @@ RVector TVSigmaOLD::GetKappa    (const RVector &x) const
 }
 RVector TVSigmaOLD::GetHess1f(const RVector &x,const RVector &f) const
 {
-    dASSERT (x.Dim() == x0->Dim(), Invalid coefficient vector dimension);
-    dASSERT (f.Dim() == x0->Dim(), Invalid coefficient vector dimension);
+    dASSERT (x.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
+    dASSERT (f.Dim() == x0->Dim(), "Invalid coefficient vector dimension");
   LOGOUT("Hess1f is not implemented for TV");
   cerr << "Hess1f is not implemented for TV\n";
   return RVector (x.Dim());

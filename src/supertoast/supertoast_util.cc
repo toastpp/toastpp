@@ -15,7 +15,7 @@ void ReadDataFile (char *fname, RVector &data)
         ifs >> c;
     } while (ifs.good() && c != '[');
     if (!ifs.good())
-	xERROR(Data file not found or invalid);
+	xERROR("Data file not found or invalid");
     for (i = 0; i < n; i++)
         ifs >> data[i];
 }

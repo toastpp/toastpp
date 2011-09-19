@@ -14,8 +14,7 @@ BINS =  getnim \
 	mkmesh_cyl \
 	mkmesh_sphere \
 	opt2 \
-	quad2linmesh \
-	test_adaptive
+	quad2linmesh
 
 TOASTLIB = -L$(TLIB) -lsuperlu -lfe -lmath -lblzpack -larpack -llapack $(BLASLIB) $(SPBLASLIB) $(FLIBS)
 

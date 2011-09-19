@@ -20,7 +20,7 @@ int main (int argc, char *argv[])
 
     // command line parser
     for (i = 1; i < argc; i++) {
-	xASSERT(argv[i][0] == '-', Error parsing command line);
+	xASSERT(argv[i][0] == '-', "Error parsing command line");
 	switch (argv[i][1]) {
 	case 'H':
 	case 'h':
@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
 
     // check image header
     cin.getline(cbuf, 256);
-    xASSERT(!strcmp(cbuf,"NIM") || !strcmp(cbuf,"RIM"), Unknown image format);
+    xASSERT(!strcmp(cbuf,"NIM") || !strcmp(cbuf,"RIM"), "Unknown image format");
     isnim = (!strcmp (cbuf, "NIM"));
 
     cerr << "Searching for: ";
@@ -68,8 +68,8 @@ int main (int argc, char *argv[])
 	}
     } while (!cin.fail() && strcasecmp(cbuf, "EndHeader"));
 
-    xASSERT(!strcasecmp (cbuf, "EndHeader"), Unexpected end of file);
-    xASSERT(imsize > 0, Could not determine image size);
+    xASSERT(!strcasecmp (cbuf, "EndHeader"), "Unexpected end of file");
+    xASSERT(imsize > 0, "Could not determine image size");
 
     imgbuf = new double[imsize];
 
@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
 	cin.getline(cbuf,256);
 	if (cin.fail() || strncasecmp (cbuf, "Image", 5)) {
 	    if (imgno < 0 && img > 0) imgno = --img;
-	    else xERROR(Requested image not found in stream);
+	    else xERROR("Requested image not found in stream");
 	} else {
 	    for (i = 0; i < imsize; i++)
 		cin >> imgbuf[i];

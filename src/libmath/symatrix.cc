@@ -80,19 +80,19 @@ int TSymMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 template<class MT>
 void TSymMatrix<MT>::ColScale (const TVector<MT> &scale)
 {
-    xERROR (Operation not permitted for symmetric matrix);
+    xERROR ("Operation not permitted for symmetric matrix");
 }
 
 template<class MT>
 void TSymMatrix<MT>::RowScale (const TVector<MT> &scale)
 {
-    xERROR (Operation not permitted for symmetric matrix);
+    xERROR ("Operation not permitted for symmetric matrix");
 }
 
 template<class MT>
 void TSymMatrix<MT>::AddDiag (const TVector<MT> &d)
 {
-    dASSERT_2PRM(this->rows == d.Dim(),
+    dASSERT(this->rows == d.Dim(),
         "Argument 1 wrong size (expected %d, actual %d)", this->rows, d.Dim());
 
     int i, incr = 0;
@@ -119,7 +119,7 @@ void TSymMatrix<MT>::AddDiag (const MT &d)
 template<class MT>
 void TSymMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT(this->cols == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(this->cols == x.Dim(), "Argument 1: vector has wrong dimension");
 
     int r, c, incr;
     MT *row;
@@ -154,7 +154,7 @@ TSymMatrix<MT> &TSymMatrix<MT>::operator= (const MT &mt)
 template<class MT>
 TSymMatrix<MT> TSymMatrix<MT>::operator+ (const TSymMatrix<MT> &m) const
 {
-    dASSERT(this->rows == m.rows, Matrices have different size.);
+    dASSERT(this->rows == m.rows, "Matrices have different size.");
     TSymMatrix<MT> tmp(*this);
     for (int i = 0; i < nz; i++) tmp.val[i] += m.val[i];
     return tmp;
@@ -163,7 +163,7 @@ TSymMatrix<MT> TSymMatrix<MT>::operator+ (const TSymMatrix<MT> &m) const
 template<class MT>
 TSymMatrix<MT> TSymMatrix<MT>::operator- (const TSymMatrix<MT> &m) const
 {
-    dASSERT(this->rows == m.rows, Matrices have different size.);
+    dASSERT(this->rows == m.rows, "Matrices have different size.");
     TSymMatrix<MT> tmp(*this);
     for (int i = 0; i < nz; i++) tmp.val[i] -= m.val[i];
     return tmp;
@@ -237,7 +237,7 @@ MATHLIB bool CHdecomp<double> (TSymMatrix<double> &a, bool recover)
 	if (sum > 0.0) {
 	    *Ai = sqrt (sum);
 	} else {
-	    if (!recover) xERROR(Matrix not positive definite);
+	    if (!recover) xERROR("Matrix not positive definite");
 	    ok = false;  // set 'bad' flag
 	    *Ai = EPS;   // force diagonal element positive
 	}

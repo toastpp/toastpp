@@ -84,7 +84,7 @@ int TDiagMatrix<MT>::SparseRow (int r, idxtype *colidx, MT *v) const
 template<class MT>
 void TDiagMatrix<MT>::ColScale (const TVector<MT> &scale)
 {
-    dASSERT(scale.Dim() == this->cols, Argument 1: wrong size);
+    dASSERT(scale.Dim() == this->cols, "Argument 1: wrong size");
     int nz = min (this->cols, this->nval);
     for (int i = 0; i < nz; i++)
 	this->val[i] *= scale[i];
@@ -93,7 +93,7 @@ void TDiagMatrix<MT>::ColScale (const TVector<MT> &scale)
 template<class MT>
 void TDiagMatrix<MT>::RowScale (const TVector<MT> &scale)
 {
-    dASSERT(scale.Dim() == this->rows, Argument 1: wrong size);
+    dASSERT(scale.Dim() == this->rows, "Argument 1: wrong size");
     int nz = min (this->rows, this->nval);
     for (int i = 0; i < nz; i++)
 	this->val[i] *= scale[i];
@@ -142,8 +142,8 @@ template<class MT>
 MT &TDiagMatrix<MT>::operator() (int r, int c)
 {
     static MT zero = (MT)0;
-    dASSERT(r >= 0 && r < this->rows, Argument 1 out of range);
-    dASSERT(c >= 0 && c < this->cols, Argument 2 out of range);
+    dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
+    dASSERT(c >= 0 && c < this->cols, "Argument 2 out of range");
     if (r == c) return this->val[r];
     else return zero;
 }
@@ -152,7 +152,7 @@ template<class MT>
 TDiagMatrix<MT> TDiagMatrix<MT>::operator+ (const TDiagMatrix<MT> &mat) const
 {
     dASSERT(this->rows == mat.rows && this->cols == mat.cols,
-	    Matrices have different size.);
+	    "Matrices have different size.");
     TDiagMatrix<MT> tmp(this->rows, this->cols);
     for (int i = 0; i < this->nval; i++)
 	tmp.val[i] = this->val[i] + mat.val[i];
@@ -163,7 +163,7 @@ template<class MT>
 TDiagMatrix<MT> TDiagMatrix<MT>::operator- (const TDiagMatrix<MT> &mat) const
 {
     dASSERT(this->rows == mat.rows && this->cols == mat.cols,
-	    Matrices have different size.);
+	    "Matrices have different size.");
     TDiagMatrix<MT> tmp(this->rows, this->cols);
     for (int i = 0; i < this->nval; i++)
 	tmp.val[i] = this->val[i] - mat.val[i];
@@ -182,8 +182,8 @@ bool TDiagMatrix<MT>::Exists (int r, int c) const
 template<class MT>
 int TDiagMatrix<MT>::Get_index (int r, int c) const
 {
-    dASSERT(r >= 0 && r < this->rows, Argument 1 out of range);
-    dASSERT(c >= 0 && c < this->cols, Argument 2 out of range);
+    dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
+    dASSERT(c >= 0 && c < this->cols, "Argument 2 out of range");
     if (r == c) return r;
     else return -1;
 }
@@ -197,7 +197,7 @@ MT TDiagMatrix<MT>::GetNext (int &r, int &c) const
 	    return this->val[0];
 	} else return (MT)0;
     } else { // next nonzero
-	dASSERT(r == c, Inconsistent index combination);
+	dASSERT(r == c, "Inconsistent index combination");
 	if (r < this->nval-1) {
 	    r++, c++;
 	    return this->val[r];
@@ -211,7 +211,7 @@ MT TDiagMatrix<MT>::GetNext (int &r, int &c) const
 template<class MT>
 void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
 	    "Parameter 1 invalid size (expected %d, actual %d)",
 	    this->cols, x.Dim());
 
@@ -226,7 +226,7 @@ template<class MT>
 void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2)
     const
 {
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
 	    "Parameter 1 invalid size (expected %d, actual %d)",
 	    this->cols, x.Dim());
 
@@ -241,7 +241,7 @@ void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2)
 template<class MT>
 void TDiagMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT_2PRM(x.Dim() == this->rows,
+    dASSERT(x.Dim() == this->rows,
 	    "Parameter 1 invalid size (expected %d, actual %d",
 	    this->rows, x.Dim());
 

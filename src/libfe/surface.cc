@@ -62,18 +62,18 @@ int BndNodeParams (const Mesh &mesh, RDenseMatrix &pvecs)
 
 void Surface::SetCamera (const Point &cam)
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
 }
 
 bool Surface::RayIntersect (const RVector &dir, Point &pi) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return false;
 }
 
 bool Surface::Inside (const Point &p) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return false;
 }
 
@@ -88,7 +88,7 @@ Surface_Circle::Surface_Circle (): Surface2D ()
 Surface_Circle::Surface_Circle (double _radius, const Point &_centre)
   : Surface2D ()
 {
-    dASSERT(_centre.Dim() == 2, Circle centre must be 2D point);
+    dASSERT(_centre.Dim() == 2, "Circle centre must be 2D point");
     centre.New (2);
     centre = _centre;
     radius = _radius;
@@ -110,21 +110,21 @@ void Surface_Circle::Scale (double scale)
 void Surface_Circle::Scale (const RVector &scale)
 {
     double EPS = 1e-8;
-    dASSERT(scale.Dim() == 2, Wrong scale dimension);
+    dASSERT(scale.Dim() == 2, "Wrong scale dimension");
     if (fabs (scale[0]-scale[1]) < EPS) Scale (scale[0]);
-    else xERROR(Anisotropic scaling for circular surfaces is not defined);
+    else xERROR("Anisotropic scaling for circular surfaces is not defined");
 }
 
 void Surface_Circle::Point2Param (const Point &p, RVector &prm) const
 {
-    dASSERT(p.Dim() == 2, Arg 1 dimension 2 required);
-    dASSERT(prm.Dim() == 1, Arg 2 dimension 1 required);
+    dASSERT(p.Dim() == 2, "Arg 1 dimension 2 required");
+    dASSERT(prm.Dim() == 1, "Arg 2 dimension 1 required");
     prm[0] = atan2 (p[1]-centre[1], p[0]-centre[0]);
 }
 
 Point Surface_Circle::Param2Point (const RVector &param) const
 {
-    dASSERT(param.Dim() == 1, Parameter dimension 1 expected);
+    dASSERT(param.Dim() == 1, "Parameter dimension 1 expected");
     Point p(2);
     p[0] = radius * cos(param[0]) + centre[0];
     p[1] = radius * sin(param[0]) + centre[1];
@@ -135,7 +135,7 @@ RVector Surface_Circle::DParam (const RVector &param1, const RVector &param2)
     const
 {
     dASSERT(param1.Dim() == 1 && param2.Dim() == 1,
-	    Invalid parameter dimensions);
+	    "Invalid parameter dimensions");
     double dphi = param1[0] - param2[0];
     if      (dphi >  Pi) dphi -= 2.0*Pi;
     else if (dphi < -Pi) dphi += 2.0*Pi;
@@ -153,7 +153,7 @@ double Surface_Circle::ChordDiff (const RVector &param1, const RVector &param2)
 
 RVector Surface_Circle::Normal (const RVector &param) const
 {
-    dASSERT(param.Dim() == 1, Arg 1 invalid vector dimension);
+    dASSERT(param.Dim() == 1, "Arg 1 invalid vector dimension");
     RVector nml(2);
     nml[0] = cos(param[0]);
     nml[1] = sin(param[0]);
@@ -184,7 +184,7 @@ Surface_Sphere::Surface_Sphere (): Surface3D ()
 Surface_Sphere::Surface_Sphere (double _radius, const Point &_centre)
   : Surface3D ()
 {
-    dASSERT(_centre.Dim() == 3, Arg 2 invalid vector dimension);
+    dASSERT(_centre.Dim() == 3, "Arg 2 invalid vector dimension");
     centre.New (3);
     centre = _centre;
     radius = _radius;
@@ -207,23 +207,23 @@ void Surface_Sphere::Scale (double scale)
 void Surface_Sphere::Scale (const RVector &scale)
 {
     double EPS = 1e-8;
-    dASSERT(scale.Dim() == 3, Arg 1 wrong vector dimension);
+    dASSERT(scale.Dim() == 3, "Arg 1 wrong vector dimension");
     if (fabs (scale[0]-scale[1]) < EPS &&
 	fabs (scale[0]-scale[2]) < EPS) Scale (scale[0]);
-    else xERROR(Anisotropic scaling for sphere surfaces is not defined);
+    else xERROR("Anisotropic scaling for sphere surfaces is not defined");
 }
 
 void Surface_Sphere::Point2Param (const Point &p, RVector &prm) const
 {
-    dASSERT(p.Dim() == 3, Arg 1 dimension 3 required);
-    dASSERT(prm.Dim() == 2, Arg 2 dimension 2 required);
+    dASSERT(p.Dim() == 3, "Arg 1 dimension 3 required");
+    dASSERT(prm.Dim() == 2, "Arg 2 dimension 2 required");
     prm[0] = atan2 (p[1]-centre[1], p[0]-centre[0]); // azimuth
     prm[1] = acos ((p[2]-centre[2])/radius);  // polar
 }
 
 Point Surface_Sphere::Param2Point (const RVector &param) const
 {
-    dASSERT(param.Dim() == 2, Arg 1 wrong vector dimension);
+    dASSERT(param.Dim() == 2, "Arg 1 wrong vector dimension");
     Point p(3);
     double rsintheta = radius * sin(param[1]);
     p[0] = rsintheta * cos(param[0]);
@@ -235,8 +235,8 @@ Point Surface_Sphere::Param2Point (const RVector &param) const
 double Surface_Sphere::ChordDist (const RVector &param1, const RVector &param2)
     const
 {
-    dASSERT(param1.Dim() == 2, Arg 1 wrong vector dimension);
-    dASSERT(param2.Dim() == 2, Arg 2 wrong vector dimension);
+    dASSERT(param1.Dim() == 2, "Arg 1 wrong vector dimension");
+    dASSERT(param2.Dim() == 2, "Arg 2 wrong vector dimension");
 
     RVector p1(3), p2(3);
     double sint1 = sin(param1[1]);
@@ -253,7 +253,7 @@ double Surface_Sphere::ChordDist (const RVector &param1, const RVector &param2)
 
 RVector Surface_Sphere::Normal (const RVector &param) const
 {
-    dASSERT(param.Dim() == 2, Arg 1 invalid vector dimension);
+    dASSERT(param.Dim() == 2, "Arg 1 invalid vector dimension");
     RVector nml(3);
 
     double sinth = sin(param[1]);
@@ -265,7 +265,7 @@ RVector Surface_Sphere::Normal (const RVector &param) const
 
 void Surface_Sphere::SetCamera (const Point &_cam)
 {
-    dASSERT(_cam.Dim() == 3, Arg 1 wrong vector dimension);
+    dASSERT(_cam.Dim() == 3, "Arg 1 wrong vector dimension");
     cam.New(3), rcam.New(3);
     cam = _cam;
     rcam = cam-centre; // cam pos in relative coords
@@ -276,7 +276,7 @@ void Surface_Sphere::SetCamera (const Point &_cam)
 
 bool Surface_Sphere::RayIntersect (const RVector &dir, Point &pi) const
 {
-    dASSERT(dir.Dim() == 3, Arg 2 wrong vector dimension);
+    dASSERT(dir.Dim() == 3, "Arg 2 wrong vector dimension");
     RVector ndir = dir/length(dir);
     double b = 2.0 * (rcam[0]*ndir[0] + rcam[1]*ndir[1] + rcam[2]*ndir[2]);
     
@@ -327,10 +327,10 @@ Surface_Cone::Surface_Cone (): Surface3D ()
 Surface_Cone::Surface_Cone (const Point &_tip, const RVector &_dir,
     double _sap, double _height) : Surface3D ()
 {
-    dASSERT(_tip.Dim() == 3, Arg 1 invalid vector dimension);
-    dASSERT(_dir.Dim() == 3, Arg 2 invalid vector dimension);
-    dASSERT(_sap > 0.0 && _sap < 0.5*M_PI, Arg 3 invalid value);
-    dASSERT(_height > 0.0, Arg 4 invalid value);
+    dASSERT(_tip.Dim() == 3, "Arg 1 invalid vector dimension");
+    dASSERT(_dir.Dim() == 3, "Arg 2 invalid vector dimension");
+    dASSERT(_sap > 0.0 && _sap < 0.5*M_PI, "Arg 3 invalid value");
+    dASSERT(_height > 0.0, "Arg 4 invalid value");
 
     tip.New (3); tip = _tip;
     dir.New (3); dir = _dir / length(_dir);
@@ -363,8 +363,8 @@ void Surface_Cone::Scale (const RVector &scale)
 
 void Surface_Cone::Point2Param (const Point &p, RVector &prm) const
 {
-    dASSERT(p.Dim() == 3, Arg 1 dimension 3 required);
-    dASSERT(prm.Dim() == 2, Arg 2 dimension 2 required);
+    dASSERT(p.Dim() == 3, "Arg 1 dimension 3 required");
+    dASSERT(prm.Dim() == 2, "Arg 2 dimension 2 required");
     RVector param(2);
     Point ps = IRot * (p-tip); // global -> local
     prm[0] = atan2 (ps[1], ps[0]); // azimuth
@@ -373,7 +373,7 @@ void Surface_Cone::Point2Param (const Point &p, RVector &prm) const
 
 Point Surface_Cone::Param2Point (const RVector &param) const
 {
-    dASSERT(param.Dim() == 2, Arg 1 wrong vector dimension);
+    dASSERT(param.Dim() == 2, "Arg 1 wrong vector dimension");
     Point p(3);
     p[2] = param[1]*height;
     p[0] = p[2] * cos (param[0]);

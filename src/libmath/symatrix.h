@@ -50,7 +50,7 @@ public:
     // Create a 0 x 0 matrix
 
     TSymMatrix (int r, int c): TMatrix<MT> (r, c) {
-        dASSERT(r==c, Symmetric matrix must be square);
+        dASSERT(r==c, "Symmetric matrix must be square");
 	Alloc(r); Zero();
     }
     // Create r x c matrix filled with 0's
@@ -75,7 +75,7 @@ public:
     // Matrix element storage method
 
     inline void New (int r, int c) {
-        dASSERT(r==c, Symmetric matrix must be square);
+        dASSERT(r==c, "Symmetric matrix must be square");
 	New_dirty(r); Zero();
     }
     // Resize matrix and zero all elements
@@ -88,7 +88,7 @@ public:
     // Resize to n x n square matrix and zero all elements
 
     inline void Zero (int r, int c) {
-        dASSERT(r==c, Symmetric matrix must be square);
+        dASSERT(r==c, "Symmetric matrix must be square");
 	New_dirty(r); Zero();
     }
     // Resize to r x c matrix and zero all elements. r==c is required
@@ -101,25 +101,28 @@ public:
     // Resize to n x n square matrix and set to identity
 
     inline void Identity (int r, int c) {
-        dASSERT(r==c, Symmetric matrix must be square);
+        dASSERT(r==c, "Symmetric matrix must be square");
 	New_dirty(r); Identity();
     }
     // Resize to r x c matrix and set to identity. r==c is required
 
     inline MT Get (int r, int c) const {
-        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
+        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+		 "Index out of range");
 	return val[Idx(r,c)];
     }
     // Retrieve value of an element
 
     inline const MT operator() (int r, int c) const {
-        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
+        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+		 "Index out of range");
 	return val[Idx(r,c)];
     }
     // Retrieve value of an element (alternative syntax to 'Get')
 
     inline MT &operator() (int r, int c) {
-        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
+        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+		 "Index out of range");
 	return val[Idx(r,c)];
     }
     // Retrieve reference to element
@@ -171,14 +174,14 @@ public:
     // *this - m
 
     TSymMatrix<MT> &operator+= (const TSymMatrix<MT> &m) {
-        dASSERT(this->rows == m.rows, Matrices have different size);
+        dASSERT(this->rows == m.rows, "Matrices have different size");
 	for (int i = 0; i < nz; i++) val[i] += m.val[i];
 	return *this;
     }
     // *this = *this + m
 
     TSymMatrix<MT> &operator-= (const TSymMatrix<MT> &m) {
-        dASSERT(this->rows == m.rows, Matrices have different size);
+        dASSERT(this->rows == m.rows, "Matrices have different size");
 	for (int i = 0; i < nz; i++) val[i] -= m.val[i];
 	return *this;
     }

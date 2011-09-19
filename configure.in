@@ -416,6 +416,7 @@ AC_ARG_ENABLE(debug,
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
     TOAST_DEBUG=1
+    FFLAGS="-g -DFEM_DEBUG"
     CFLAGS="-g -DFEM_DEBUG"
     CXXFLAGS="-g -DFEM_DEBUG"
 #   CXXFLAGS="${CXXFLAGS} -DFEM_DEBUG"
@@ -500,7 +501,8 @@ TOAST_SHARED="--enable-shared"
 AC_ARG_ENABLE(shared,
     [  --disable-shared        do not build shared TOAST libraries],
     [isok=yes], [isok=no])
-if test "$isok" = "no" -a "${SHLIB_SUFFIX}" != "" -a "${TOAST_DEBUG}" = 0; then
+#if test "$isok" = "no" -a "${SHLIB_SUFFIX}" != "" -a "${TOAST_DEBUG}" = 0; then
+if test "$isok" = "no" -a "${SHLIB_SUFFIX}" != ""; then
     TOAST_SHARED_BUILD=1
     LIB_SUFFIX=${SHLIB_SUFFIX}
     MAKE_LIB="${SHLIB_LD} -o \${LIB} \${OBJS} ${SHLIB_LD_LIBS} \${FLIBS} -L\${TLIB}"
@@ -518,6 +520,18 @@ fi
 # Set static flag if user explicitly wants shared libraries disabled
 if test "$isok" = "yes"; then
     LDFLAGS="${LDFLAGS} -static"
+fi
+
+# =========================================================================
+# Check whether user wants to apply vectorizer
+
+AC_ARG_ENABLE(vectorizer,
+    [  --enable-vectorizer     enable vectorizer flags],
+    [isok=$enableval], [isok=no])
+if test "$isok" = "yes" ; then
+    CFLAGS="${CFLAGS} -ftree-vectorize -msse2 -ffast-math -ftree-vectorizer-verbose=2"
+    CXXFLAGS="${CXXFLAGS} -ftree-vectorize -msse2 -ffast-math -ftree-vectorizer-verbose=2"
+    FFLAGS="${FFLAGS} -ftree-vectorize -msse2 -ffast-math -ftree-vectorizer-verbose=2"
 fi
 
 # =========================================================================
@@ -596,6 +610,19 @@ if test "${TOAST_SHARED_BUILD}" = "1" ; then
 else
     OBJDIR="${CCVERSION}_static"
 fi
+
+if test "${MAKE_THREAD}" = "yes" ; then
+    OBJDIR="${OBJDIR}_smp"
+fi
+
+if test "${ENABLE_CUDA}" = "yes" ; then
+    OBJDIR="${OBJDIR}_cuda"
+fi
+
+if test "${TOAST_DEBUG}" = "1" ; then
+    OBJDIR="${OBJDIR}_dbg"
+fi
+
 AC_SUBST(OBJDIR)
 
 # =========================================================================
@@ -717,6 +744,8 @@ echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
 
 rm -f toast.env
 ln -s ${TOASTENV} toast.env
+
+ln -f -s ${TOASTDIR}/numerics/cuda/cusp_v0.2.0 ${TOASTDIR}/numerics/cuda/cusp
 
 # write out the distribution configuration shell scripts
 AC_SUBST(ARCHDIR)

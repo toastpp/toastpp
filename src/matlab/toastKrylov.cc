@@ -149,7 +149,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int iter;
     double res, time;
     tic();
-    GMRES (JTJx_clbk, &hdata, g, z, tol, &precon, 30, &iter, &res);
+    GMRES (JTJx_clbk, &hdata, g, z, tol, &precon, 30, 0, &iter, &res);
     //GMRES (JTJx_clbk, &hdata, g, z, tol, (RPreconditioner*)0, 30, &iter, &res);
     time = toc();
 

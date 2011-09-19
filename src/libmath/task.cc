@@ -9,50 +9,62 @@
 #elif defined (__sgi)
 #include <sys/sysmp.h>
 #endif
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
-#include <sys/times.h>
+#include "mathlib.h"
 #include "task.h"
+#include "timing.h"
 
 // comment this out to autodetect number of processors
 // #define FIXEDNUMPROC 2
+
+using namespace std;
 
 // initialisation of static members
 
 int Task::nthread = Task::nProcessor();
 double Task::ttime = 0.0;
+double Task::wtime = 0.0;
+
+pthread_mutex_t Task::user_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void Task_Init (int nth)
+{
+    if (!nth) nth = Task::nProcessor();
+    Task::SetThreadCount (nth);
+    cout << "Default thread count set to " << nth << endl;
+}
 
 int Task::nProcessor ()
 {
 #if defined (FIXEDNUMPROC)
-    cerr << "fixednumproc" << endl;
+    //cerr << "fixednumproc" << endl;
     return FIXEDNUMPROC;
 #elif defined (__linux)
-    cerr << "linux" << endl;
+    //cerr << "linux" << endl;
     return get_nprocs();
 #elif defined (__sgi)
-    cerr << "sgi" << endl;
+    //cerr << "sgi" << endl;
     return sysmp (MP_NAPROCS);
 #elif defined (sun)
-    cerr << "sunos" << endl;
+    //cerr << "sunos" << endl;
     return sysconf(_SC_NPROCESSORS_ONLN);
 #else
-    cerr << "unknown" << endl;
+    //cerr << "unknown" << endl;
     return 1;
 #endif
 }
 
 void Task::Multiprocess (void *func(task_data*), void *data, int np)
 {
-    struct tms tm1, tm2;
-
     if (!np) np = nthread;
     int p;
     task_data *td = new task_data[np];
     pthread_t *thread = new pthread_t[np];
 
     cerr << "Multiprocess: Branch into " << np << " threads\n";
-    times (&tm1);
+    double t0 = tic();
+    double w0 = walltic();
 
     // create worker threads
     for (p = 1; p < np; p++) {
@@ -72,10 +84,10 @@ void Task::Multiprocess (void *func(task_data*), void *data, int np)
     for (p = 1; p < np; p++)
         pthread_join (thread[p], NULL);
 
-    times (&tm2);
-    ttime += (double)(tm2.tms_utime - tm1.tms_utime)/(double)CLOCKS_PER_SEC;
+    ttime += toc(t0);
+    wtime += walltoc(w0);
     cerr << "Multiprocess: Threads joined\n";
-
+    
     delete []td;
     delete []thread;
 }
@@ -213,3 +225,93 @@ void TPool_Init (int nt)
 }
 
 #endif
+
+
+
+// ===========================================================================
+// class ThreadPoo2
+
+ThreadPool2 *ThreadPool2::g_tpool2 = NULL;
+
+ThreadPool2::ThreadPool2 (int num_threads)
+{
+    nthread = num_threads;
+    td = new THREAD_DATA[nthread];
+
+    tg.task = NULL;
+    pthread_mutex_init (&tg.mutex, NULL);
+
+    for (int i = 0; i < nthread; i++) {
+        td[i].tg = &tg;
+	td[i].nth = i;
+	td[i].wakeup = false;
+	td[i].done = false;
+	pthread_mutex_init (&td[i].done_mutex, NULL);
+	pthread_mutex_init (&td[i].wakeup_mutex, NULL);
+	pthread_cond_init (&td[i].wakeup_cond, NULL);
+	pthread_cond_init (&td[i].done_cond, NULL);
+	pthread_mutex_lock (&td[i].done_mutex);
+
+        if (pthread_create (&td[i].thread, NULL,
+	    (void*(*)(void*))tpool_thread, (void*)(td+i)))
+	        cerr << "TreadPool: pthread_create failed" << endl;
+    }
+
+}
+
+ThreadPool2::~ThreadPool2 ()
+{
+    // should destroy threads and mutexes here
+}
+
+void ThreadPool2::Initialise (int num_threads)
+{
+    g_tpool2 = new ThreadPool2 (num_threads);
+}
+
+void ThreadPool2::Invoke (void(*func)(int,void*), void *context)
+{
+    int i;
+
+    // set the task function
+    tg.task = func;
+    tg.context = context;
+
+    // wake the threads
+    for (i = 0; i < nthread; i++) {
+	td[i].wakeup = true;
+	pthread_cond_signal (&td[i].wakeup_cond);
+    }
+    for (i = 0; i < nthread; i++) {
+        while (!td[i].done)
+  	    pthread_cond_wait (&td[i].done_cond, &td[i].done_mutex);
+
+	td[i].done = false;
+    }
+    //cerr << "threads done" << endl;
+}
+
+void *ThreadPool2::tpool_thread (void *context)
+{
+    THREAD_DATA *td = (THREAD_DATA*)context;
+    THREAD_GLOBAL *tg = td->tg;
+    pthread_mutex_lock (&td->wakeup_mutex);
+    //cerr << "worker: locked wakeup" << endl;
+
+    // worker loop
+    for (;;) {
+	// wait for a task
+	while (!td->wakeup)
+	    pthread_cond_wait (&td->wakeup_cond, &td->wakeup_mutex);
+	td->wakeup = false;
+
+	// process the task
+	if (tg->task)
+	    (*(tg->task))(td->nth, tg->context);
+
+	// signal finished
+	td->done = true;
+	pthread_cond_signal (&td->done_cond);
+    }
+    return NULL;
+}

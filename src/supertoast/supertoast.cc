@@ -99,10 +99,16 @@ int main (int argc, char *argv[])
         pp.LogOpen (argv[2]);
 	cout << "Writing log to " << argv[2] << endl;
     } else {
-	pp.LogOpen ("gridbasis.out");
-	cout << "Writing log to gridbasis.out" << endl;
+	pp.LogOpen ("supertoast.out");
+	cout << "Writing log to supertoast.out" << endl;
     }
     OutputProgramInfo ();
+
+#ifdef TOAST_THREAD
+    int nth = 0;
+    pp.GetInt("NTHREAD", nth);
+    Task_Init (nth);
+#endif
 
     const double c0 = 0.3;
 
@@ -205,23 +211,24 @@ int main (int argc, char *argv[])
 
     // build the measurement vectors
     mvec.New (nM, n);
+    RVector c2a = msol.GetParam(OT_C2A);
     for (i = 0; i < nM; i++) {
-	CVector m(n);
+	RVector m(n);
 	switch (mprof) {
 	case 0:
-	    SetReal (m, QVec_Point (mesh, mesh.M[i], SRCMODE_NEUMANN));
+	    m = QVec_Point (mesh, mesh.M[i], SRCMODE_NEUMANN);
 	    break;
 	case 1:
-	    SetReal (m, QVec_Gaussian (mesh, mesh.M[i], mwidth,
-				       SRCMODE_NEUMANN));
+	    m = QVec_Gaussian (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	case 2:
-	    SetReal (m, QVec_Cosine (mesh, mesh.M[i], mwidth,
-				     SRCMODE_NEUMANN));
+	    m = QVec_Cosine (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
-	mvec.SetRow (i, m);
+	CVector cm(n);
+	SetReal (cm, m*c2a);
+	//for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
+	mvec.SetRow (i, cm);
     }
 
 
@@ -333,22 +340,20 @@ int main (int argc, char *argv[])
     cout << "Assembling and pre-processing system matrix" << endl;
     FWS.Reset (msol, omega);
 
-    switch (g_imgfmt) {
-    case IMGFMT_NIM:
+    if (g_imgfmt != IMGFMT_RAW) {
         WriteNimHeader (meshname, n, "recon_mua.nim", "MUA");
 	WriteNimHeader (meshname, n, "recon_mus.nim", "MUS");
 	// write out the initial images
 	msol.WriteImg_mua (0, "recon_mua.nim");
 	msol.WriteImg_mus (0, "recon_mus.nim");
-	break;
-    case IMGFMT_RAW:
+    }
+    if (g_imgfmt != IMGFMT_NIM) {
         Solution rsol (OT_NPARAM, raster->BLen());
 	raster->Map_SolToBasis (bsol, rsol, true);
 	WriteRimHeader (raster->BDim(), "recon_mua.raw");
 	WriteRimHeader (raster->BDim(), "recon_mus.raw");
 	rsol.WriteImg_mua (0, "recon_mua.raw");
 	rsol.WriteImg_mus (0, "recon_mus.raw");
-	break;
     }
 
     if (bOutputUpdate) {
@@ -483,10 +488,10 @@ int main (int argc, char *argv[])
 
     // ==================================================================
     // Start the solver
-    LOGOUT_1PRM ("**** SOLVER started: CPU %f", toc(clock0));
+    LOGOUT("**** SOLVER started: CPU %f", toc(clock0));
     solver->Solve (FWS, *raster, pscaler, OF, data, sd, bsol, msol, qvec, mvec,
         omega);
-    LOGOUT_1PRM ("**** SOLVER finished: CPU %f", toc(clock0));
+    LOGOUT("**** SOLVER finished: CPU %f", toc(clock0));
     delete solver;
 
     // cleanup
@@ -496,10 +501,10 @@ int main (int argc, char *argv[])
     //times (&tme);
     //double total_time = (double)(tme.tms_utime-clock0)/(double)HZ;
     double total_time = toc(clock0);
-    LOGOUT ("Final timings:");
-    LOGOUT_1PRM ("Total: %f", total_time);
+    LOGOUT("Final timings:");
+    LOGOUT("Total: %f", total_time);
 #ifdef DO_PROFILE
-    LOGOUT_1PRM ("Solver: %f", solver_time);
+    LOGOUT("Solver: %f", solver_time);
 #endif
 
     return 0;
@@ -1068,23 +1073,25 @@ PARAM_SCALE SelectParamScaling ()
 
 int SelectImageFormat ()
 {
-    static const char *fmtstr[4] = {"RAW", "NIM", "PGM", "PPM"};
+    static const char *fmtstr[4] = {"RAW", "NIM", "RAW+NIM"};
     char cbuf[256];
     int fmt = 0;
 
     if (pp.GetString ("IMAGEFORMAT", cbuf)) {
-	if      (!strcasecmp (cbuf, "RAW")) fmt = IMGFMT_RAW;
-	else if (!strcasecmp (cbuf, "NIM")) fmt = IMGFMT_NIM;
-	else if (!strcasecmp (cbuf, "PGM")) fmt = IMGFMT_PGM;
-	else if (!strcasecmp (cbuf, "PPM")) fmt = IMGFMT_PPM;
+	if      (!strcasecmp (cbuf, "RAW"))     fmt = IMGFMT_RAW;
+	else if (!strcasecmp (cbuf, "NIM"))     fmt = IMGFMT_NIM;
+	else if (!strcasecmp (cbuf, "RAW+NIM")) fmt = IMGFMT_RAW_NIM;
+	//else if (!strcasecmp (cbuf, "PGM")) fmt = IMGFMT_PGM;
+	//else if (!strcasecmp (cbuf, "PPM")) fmt = IMGFMT_PPM;
     }
-    while (fmt < 1 || fmt > 4) {
+    while (fmt < 1 || fmt > 3) {
 	cout << "\nOutput image format:\n";
 	cout << "(1) Raw data\n";
 	cout << "(2) NIM (nodal image\n";
-	cout << "(3) PGM (portable grayscale map) - 2D only\n";
-	cout << "(4) PPM (portable pixmap) - 2D only\n";
-	cout << "[1|2|3|4] >> ";
+	cout << "(3) Both (RAW+NIM)\n";
+	//cout << "(3) PGM (portable grayscale map) - 2D only\n";
+	//cout << "(4) PPM (portable pixmap) - 2D only\n";
+	cout << "[1|2|3] >> ";
 	cin  >> fmt;
     }
     pp.PutString ("IMAGEFORMAT", fmtstr[fmt-1]);

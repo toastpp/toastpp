@@ -81,17 +81,17 @@ public:
     // Returns row r as a vector
 
     TVector<MT> Col (int c) const
-    { xERROR(Not implemented); return TVector<MT>(); }
+    { ERROR_UNDEF; return TVector<MT>(); }
     // Returns column c as a vector
 
     int SparseRow (int r, idxtype *ci, MT *rv) const;
 
     void RowScale (const TVector<MT> &scale)
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
     // scales the rows with 'scale'
 
     void ColScale (const TVector<MT> &scale)
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
     // scales the columns with 'scale'
 
     MT GetNext (int &r, int &c) const;

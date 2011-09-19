@@ -107,8 +107,7 @@ void SolverLIN::Solve (CFwdSolver &FWS, const Raster &raster,
 	RPrecon_Diag precon;
 	precon.Reset (&JJT);
 	niter = PCG (JJT, b, JTdy, tol, &precon);
-	LOGOUT_2PRM ("Converged to tolerance %f after %d iterations",
-		     tol, niter);
+	LOGOUT("Converged to tolerance %f after %d iterations", tol, niter);
     }
     dx = ATx (*J, JTdy);
     RVector x = dx; // need to add baseline params here

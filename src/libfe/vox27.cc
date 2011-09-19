@@ -43,8 +43,8 @@ void Voxel27::Initialise (const NodeList &nlist)
 
 int Voxel27::SideNode (int side, int node) const
 {
-    dASSERT (side >= 0 && side < 6, Side index out of range);
-    dASSERT (node >= 0 && node < 9, Node index out of range);
+    dASSERT (side >= 0 && side < 6, "Side index out of range");
+    dASSERT (node >= 0 && node < 9, "Node index out of range");
     static int SN[6][9] = {{0,1,3,2,8,10,11,9,20},
 			   {7,5,4,6,14,12,13,15,25},
 			   {0,4,5,1,16,12,17,8,21},
@@ -56,7 +56,7 @@ int Voxel27::SideNode (int side, int node) const
 
 Point Voxel27::Local (const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
 
     Point loc(3);
     loc[0] = (glob[0]-x0)/dx;
@@ -77,7 +77,7 @@ Point Voxel27::NodeLocal (int node) const
     case 5: nloc[0] = nloc[2] = 1.0; break;
     case 6: nloc[1] = nloc[2] = 1.0; break;
     case 7: nloc[0] = nloc[1] = nloc[2] = 1.0; break;
-    default: xERROR (Node index out of range);
+    default: xERROR ("Node index out of range");
     }
     return nloc;
 }
@@ -93,13 +93,13 @@ const RVector &Voxel27::LNormal (int side) const
     static const RVector *lnm[6] = {
         &lnm0, &lnm1, &lnm2, &lnm3, &lnm4, &lnm5
     };
-    dASSERT (side >= 0 && side < 6, Argument 1 index out of range);
+    dASSERT (side >= 0 && side < 6, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Voxel27::LContains (const Point &loc, bool pad) const
 {
-    dASSERT (loc.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 3, "Argument 1 invalid dimension");
 
     if (pad) {
         const double EPS = 1e-8;
@@ -122,7 +122,7 @@ bool Voxel27::GContains (const Point &glob, const NodeList&) const
 
 RVector Voxel27::LocalShapeF (const Point &loc) const
 {
-    dASSERT (loc.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 3, "Argument 1 invalid dimension");
     double x = loc[0], y = loc[1], z = loc[2];
     double ux0 = 1.0-3.0*x+2.0*x*x, ux1 = 2.0*x*x-x, ux2 = 4.0*x-4.0*x*x;
     double uy0 = 1.0-3.0*y+2.0*y*y, uy1 = 2.0*y*y-y, uy2 = 4.0*y-4.0*y*y;
@@ -161,7 +161,7 @@ RVector Voxel27::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Voxel27::LocalShapeD (const Point &loc) const
 {
-    dASSERT (loc.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 3, "Argument 1 invalid dimension");
 
     double iloc0 = 1.0-loc[0], iloc1 = 1.0-loc[1], iloc2 = 1.0-loc[2];
     RDenseMatrix der(3,27);

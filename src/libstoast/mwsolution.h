@@ -25,6 +25,9 @@ public:
   RVector GetJacobianCoeff_b (int wavelind) const;
   // del(cKappa)/del(b)
 
+  RVector GetC2A () const;
+  // refractive index parameter c/(2A)
+
   Solution **swsol; // single wavelength mesh basis solutions
 
   RDenseMatrix extcoef;

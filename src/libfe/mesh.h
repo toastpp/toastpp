@@ -42,6 +42,9 @@ FELIB RGenericSparseMatrix *Grid2LinPixMatrix (const IVector &gdim,
 FELIB RGenericSparseMatrix *LinPix2GridMatrix (const IVector &gdim,
     const IVector &bdim, const int *elref = 0);
 
+FELIB void GenerateVoxelPositions (const Mesh &mesh, const IVector &gdim,
+     const Point *bbmin, const Point *bbmax, RDenseMatrix &pos);
+
 FELIB void SubsampleLinPixel (const RVector &gf, RVector &bf,
     const IVector &gdim, const IVector &bdim, const int *elref = 0);
 
@@ -256,9 +259,10 @@ public:
     // returns mesh size (= half length of longest bounding box size) and mesh
     // centre if `centre' is supplied.
 
-    void BoundingBox (Point &mmin, Point &mmax) const;
+    void BoundingBox (Point &mmin, Point &mmax, double pad = 0.0) const;
     // returns bounding box of mesh such that for each node N
     // min[i] <= N[i] <= max[i], where i=0..1 or 0..2
+    // If pad > 0, the bounding box is enlarged by this margin in all directions
 
     Point BndIntersect (const Point &pt1, const Point &pt2);
     // this calculates the point of intersection of the mesh boundary and the
@@ -401,6 +405,12 @@ public:
         const Point *bbmin, const Point *bbmax);
     // Generate element index list for pixels in grid defined by gdim.
     // This list is required by GridMapMatrix and NodeMapMatrix
+
+    friend FELIB void GenerateVoxelPositions (const Mesh &mesh,
+        const IVector &gdim, const Point *bbmin, const Point *bbmax,
+	RDenseMatrix &pos);
+    // Return the positions of the voxel vertices of a regular grid, defined
+    // by (gdim,bbmin,bbmax), in dense matrix pos
 
     friend FELIB void SubsampleLinPixel (const RVector &gf, RVector &bf,
         const IVector &gdim, const IVector &bdim, const int *elref);

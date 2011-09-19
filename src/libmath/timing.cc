@@ -112,6 +112,6 @@ double walltoc (double walltic)
 #else
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return g_tv.tv_sec + g_tv.tv_usec*1e-6 - walltic;
+    return tv.tv_sec + tv.tv_usec*1e-6 - walltic;
 #endif
 }

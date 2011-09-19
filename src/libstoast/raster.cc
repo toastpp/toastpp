@@ -27,20 +27,22 @@ Raster::Raster (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
     dim = bdim.Dim();
     meshptr = mesh;
     xASSERT(dim == gdim.Dim(),
-	    Basis and grid have incompatible dimensions);
+	    "Basis and grid have incompatible dimensions");
     xASSERT(dim == meshptr->Dimension(),
-	    Basis and mesh have incompatible dimensions);
+	    "Basis and mesh have incompatible dimensions");
 
     // set up bounding box
     if (bb) {
 	xASSERT(bb->nCols() == dim && bb->nRows() == 2,
-		Invalid bounding box dimensions);
+		"Invalid bounding box dimensions");
 	bbmin = bb->Row(0);
 	bbmax = bb->Row(1);
     } else {
-	meshptr->BoundingBox (bbmin, bbmax);
+      meshptr->BoundingBox (bbmin, bbmax, 0 /*-1e-8*/);
     }
     bbsize = bbmax-bbmin;
+    Point bbmin_pad = bbmin /*- 2e8*/;
+    Point bbmax_pad = bbmax /*+ 2e8*/;
 
     for (i = 0, blen = glen = 1; i < dim; i++) {
 	blen *= bdim[i];
@@ -77,7 +79,7 @@ Raster::Raster (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
 
     // set up transformations between mesh and high-res grid
     B     = GridMapMatrix (*meshptr, gdim, &bbmin, &bbmax, gelref);
-    BI    = NodeMapMatrix (*meshptr, gdim, &bbmin, &bbmax, gelref);
+    BI    = NodeMapMatrix (*meshptr, gdim, &bbmin_pad, &bbmax_pad, gelref);
     ((RCompRowMatrix*)BI)->Shrink();
 
     // set up power-2 padding
@@ -99,6 +101,30 @@ Raster::~Raster()
     delete []gelref;
     delete B;
     delete BI;
+}
+
+// ==========================================================================
+
+void Raster::BasisVoxelPositions (RDenseMatrix &pos) const
+{
+    GenerateVoxelPositions (*meshptr, bdim, &bbmin, &bbmax, pos);
+}
+
+// ==========================================================================
+
+void Raster::SolutionVoxelPositions (RDenseMatrix &pos) const
+{
+    RDenseMatrix bpos;
+    GenerateVoxelPositions (*meshptr, bdim, &bbmin, &bbmax, bpos);
+    pos.New (slen,dim);
+    int i, j, k;
+    for (j = k = 0; j < blen; j++) {
+        if (basis2sol[j] >= 0) {
+	    for (i = 0; i < dim; i++)
+	        pos(k,i) = bpos(j,i);
+	    k++;
+	}
+    }
 }
 
 // ==========================================================================
@@ -377,7 +403,7 @@ void Raster::Map_MeshToSol (const Solution &msol, Solution &ssol, bool mapall)
 
 int Raster::GetSolIdx (int basisidx) const
 {
-    dASSERT (basisidx >= 0 && basisidx < blen, Argument 1 index out of range);
+    dASSERT (basisidx >= 0 && basisidx < blen, "Argument 1 index out of range");
     return basis2sol[basisidx];
 }
 
@@ -385,7 +411,7 @@ int Raster::GetSolIdx (int basisidx) const
 
 int Raster::GetSolIdx (const IVector &crd) const
 {
-    dASSERT (crd.Dim() == dim, Argument 1 unexpected size);
+    dASSERT (crd.Dim() == dim, "Argument 1 unexpected size");
     if (dim == 2)
 	return basis2sol[crd[0] + bdim[0]*crd[1]];
     else
@@ -396,7 +422,7 @@ int Raster::GetSolIdx (const IVector &crd) const
 
 int Raster::GetBasisIdx (int solidx) const
 {
-    dASSERT (solidx >= 0 && solidx < slen, Argument 1 index out of range);
+    dASSERT (solidx >= 0 && solidx < slen, "Argument 1 index out of range");
     return sol2basis[solidx];
 }
 
@@ -907,7 +933,7 @@ RVector Raster::SmoothImage(const RVector &x, double sd) const
 
     for(int k = 0; k < sx.Dim(); k++)
         max = (sx[k] > max ? sx[k] : max);
-    LOGOUT_1PRM("Max solbasis (on input)= ",max);
+    LOGOUT("Max solbasis (on input)= ",max);
     //    cout << "Max solbasis (on input) = " << max << endl;
     RVector gsx(glen);            // image in grid coordinates
     //    cout << "smoothing image \n";
@@ -1074,7 +1100,7 @@ RVector Raster::SmoothImage(const RVector &x, double sd) const
     for(int k = 0 ; k < sx.Dim(); k++)
         max = (sx[k] > max ? sx[k] : max);
     //    cout << "Max solbasis (after smoothing) = " << max << endl;
-    LOGOUT_1PRM("Max solbasis (after smoothing) = ", max);
+    LOGOUT("Max solbasis (after smoothing) = ", max);
     delete [] data;
     delete [] nn;
     delete [] w0;
@@ -1110,7 +1136,7 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
 
     for(int k = 0; k < x.Dim(); k++)
         max = (x[k] > max ? x[k] : max);
-    LOGOUT_1PRM("Max solbasis (on input)= ",max);
+    LOGOUT("Max solbasis (on input)= ",max);
     //    cout << "Max solbasis (on input) = " << max << endl;
     RVector gsx(glen);            // image in grid coordinates
     //    cout << "smoothing image \n";
@@ -1323,7 +1349,7 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
         max = (gx[ng][k] > max ? gx[ng][k] : max);
     //    cout << "Max solbasis (after smoothing) = " << max << endl;
     } // end of images loop
-    LOGOUT_1PRM("Max solbasis (after smoothing) = ", max);
+    LOGOUT("Max solbasis (after smoothing) = ", max);
     delete []data;
     delete []data0;
     delete []nn;

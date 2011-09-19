@@ -26,7 +26,7 @@ class SCCompRowMatrixMixed;
 
 int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
     double &tol, const SCPreconditionerMixed *precon = 0, int restart = 10,
-    void (*clbk)(void*) = 0);
+    int maxit = 0, void (*clbk)(void*) = 0);
 // Specialised GMRES solver using a single-precision complex compressed row
 // matrix, and double precision complex vectors.
 

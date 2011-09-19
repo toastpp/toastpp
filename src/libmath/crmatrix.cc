@@ -373,7 +373,7 @@ MATHLIB TCompRowMatrix<MT> cath (const TCompRowMatrix<MT> &A,
     nr = A.nRows();
     nc = A.nCols()+B.nCols();
     jofs = A.nCols();
-    xASSERT (nr == B.nRows(), Matrix row dimensions do not match);
+    xASSERT (nr == B.nRows(), "Matrix row dimensions do not match");
 
     nzA = A.nVal();
     nzB = B.nVal();
@@ -420,7 +420,7 @@ MATHLIB TCompRowMatrix<MT> catv (const TCompRowMatrix<MT> &A,
     nrB = B.nRows();
     nr = nrA+nrB;
     nc = A.nCols();
-    xASSERT (nc == B.nCols(), Matrix column dimensions do not match);
+    xASSERT (nc == B.nCols(), "Matrix column dimensions do not match");
     
     nzA = A.nVal();
     nzB = B.nVal();
@@ -564,7 +564,7 @@ template<class MT> TCompRowMatrix<MT>  TCompRowMatrix<MT>::operator*
 (const TDiagMatrix<MT> &D) const
 {
     // check that matrices are compatible
-    dASSERT (D.nRows() == this->cols, Incompatible operators);
+    dASSERT (D.nRows() == this->cols, "Incompatible operators");
 
     TCompRowMatrix<MT> res(*this);
     for (int i = 0; i < this->rows; i++) {
@@ -582,7 +582,7 @@ TCompRowMatrix<MT> TCompRowMatrix<MT>::operator+ (const TCompRowMatrix<MT> &m)
 {
     // check that matrices are compatible
     dASSERT (m.rows == this->rows && m.cols == this->cols,
-	     Incompatible operators);
+	     "Incompatible operators");
 
     // create the index lists of the result
     idxtype *rrowptr = new idxtype[this->rows+1];
@@ -655,7 +655,7 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator+= (
 {
     // check that matrices are compatible
     dASSERT (m.rows == this->rows && m.cols == this->cols,
-	     Incompatible operators);
+	     "Incompatible operators");
 
     // create the index lists of the result
     idxtype *rrowptr = new idxtype[this->rows+1];
@@ -726,20 +726,20 @@ template<class MT>
 MT &TCompRowMatrix<MT>::operator() (int r, int c)
 {
     static MT dummy;
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
-    xERROR(Attempt to access non-existing entry);
+    xERROR("Attempt to access non-existing entry");
     return dummy;
 }
 
 template<class MT>
 MT TCompRowMatrix<MT>::Get (int r, int c) const
 {
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     const static MT zero = (MT)0;
     for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
@@ -750,8 +750,8 @@ MT TCompRowMatrix<MT>::Get (int r, int c) const
 template<class MT>
 bool TCompRowMatrix<MT>::Exists (int r, int c) const
 {
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return true;
@@ -808,7 +808,7 @@ void TCompRowMatrix<MT>::Put_sorted (int r, int c, MT v)
 {
     int i0 = rowptr[r];
     int i1 = rowptr[r+1];
-    dASSERT (i0 != i1, Entry does not exist);
+    dASSERT (i0 != i1, "Entry does not exist");
     int im  = (i0+i1)/2;
     int cim = colidx[im];
     if (cim == c) { this->val[im] = v; return; }
@@ -818,7 +818,7 @@ void TCompRowMatrix<MT>::Put_sorted (int r, int c, MT v)
 	im = (i0+i1)/2;
 	if ((cim = colidx[im]) == c) { this->val[im] = v; return; }
     } 
-    xERROR (Entry does not exist);
+    xERROR ("Entry does not exist");
 }
 
 template<class MT>
@@ -856,8 +856,8 @@ int TCompRowMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 template<class MT>
 void TCompRowMatrix<MT>::SetRow (int r, const TVector<MT> &row)
 {
-    dASSERT(r >= 0 && r < this->rows, Argument 1 out of range);
-    dASSERT(row.Dim() == this->cols, Argument 2 invalid dimension);
+    dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
+    dASSERT(row.Dim() == this->cols, "Argument 2 invalid dimension");
 
     // deflate row
     MT *rval = new MT[this->cols];
@@ -946,7 +946,7 @@ void TCompRowMatrix<MT>::RemoveRow (int nR)
 template<class MT>
 void TCompRowMatrix<MT>::ColScale (const TVector<MT> &scale)
 {
-    dASSERT (scale.Dim() == this->cols, Argument 1: wrong size);
+    dASSERT (scale.Dim() == this->cols, "Argument 1: wrong size");
     for (int i = 0; i < this->nval; i++)
         this->val[i] *= scale[colidx[i]];
 }
@@ -954,7 +954,7 @@ void TCompRowMatrix<MT>::ColScale (const TVector<MT> &scale)
 template<class MT>
 void TCompRowMatrix<MT>::RowScale (const TVector<MT> &scale)
 {
-    dASSERT (scale.Dim() == this->rows, Argument 1: wrong size);
+    dASSERT (scale.Dim() == this->rows, "Argument 1: wrong size");
     for (int r = 0; r < this->rows; r++)
 	for (int i = rowptr[r]; i < rowptr[r+1]; i++)
 	    this->val[i] *= scale[r];
@@ -981,18 +981,23 @@ MT TCompRowMatrix<MT>::GetNext (int &r, int &c) const
 
 #if THREAD_LEVEL==1
 
+#ifdef OLD_AX_ENGINE
 template<class MT>
-void Ax_engine (void *arg, int r0, int r1)
+void *Ax_engine (void *context)
 {
     typedef struct {
+        pthread_t ht;
 	const TCompRowMatrix<MT> *A;
 	const TVector<MT> *x;
 	TVector<MT> *b;
-    } AX_DATA;
-    AX_DATA *ax_data = (AX_DATA*)arg;
-    const TCompRowMatrix<MT> *A = ax_data->A;
-    const TVector<MT> *x = ax_data->x;
-    TVector<MT> *b = ax_data->b;
+        int ith;
+    } THDATA;
+    THDATA *thdata = (THDATA*)context;
+    const TCompRowMatrix<MT> *A = thdata->A;
+    const TVector<MT> *x = thdata->x;
+    TVector<MT> *b = thdata->b;
+    int r0 = (thdata->ith*b->Dim())/NUMTHREAD;
+    int r1 = ((thdata->ith+1)*b->Dim())/NUMTHREAD;
     MT br;
     const MT *A_val = A->ValPtr();
     const MT *x_val = x->data_buffer();
@@ -1006,40 +1011,79 @@ void Ax_engine (void *arg, int r0, int r1)
 	    br += A_val[i] * x_val[colidx[i]];
 	b_val[r++] = br;
     }
+    return NULL;
 }
+#else
+template<class MT>
+void Ax_engine (int ith, void *context)
+{
+    typedef struct {
+	const TCompRowMatrix<MT> *A;
+	const TVector<MT> *x;
+	TVector<MT> *b;
+    } THDATA;
+    THDATA *thdata = (THDATA*)context;
+    const TCompRowMatrix<MT> *A = thdata->A;
+    const TVector<MT> *x = thdata->x;
+    TVector<MT> *b = thdata->b;
+    TVector<MT> b_local(b->Dim());
+
+    MT br;
+    const MT *A_val = A->ValPtr();
+    const MT *x_val = x->data_buffer();
+    MT *b_val = b->data_buffer();
+    MT *b_local_val = b_local.data_buffer();
+    int r, i = ith, i2;
+    int stride = ThreadPool2::Pool()->NumThread();
+    int *colidx = A->colidx;
+
+    for (r = 0; r < A->nRows();) {
+	i2 = A->rowptr[r+1];
+	for (br = (MT)0; i < i2; i += stride)
+	    br += A_val[i] * x_val[colidx[i]];
+	b_local_val[r++] = br;
+    }
+
+    // add contribution to global b
+    ThreadPool2::Pool()->MutexLock();
+    for (r = 0; r < A->nRows(); r++)
+        b_val[r] += b_local_val[r];
+    ThreadPool2::Pool()->MutexUnlock();
+
+    //ThreadPool2::Pool()->MutexLock();
+    //cerr << "Ax done, thread " << ith << endl;
+    //ThreadPool2::Pool()->MutexUnlock();
+}
+#endif
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
-template void Ax_engine<double> (void *arg, int r, int r1);
-template void Ax_engine<float> (void *arg, int r, int r1);
-template void Ax_engine<complex> (void *arg, int r, int r1);
-template void Ax_engine<scomplex> (void *arg, int r, int r1);
-template void Ax_engine<int> (void *arg, int r, int r1);
+template void Ax_engine<double> (int ith, void *context);
+template void Ax_engine<float> (int ith, void *context);
+template void Ax_engine<complex> (int ith, void *context);
+template void Ax_engine<scomplex> (int ith, void *context);
+template void Ax_engine<int> (int ith, void *context);
 #endif
 
 template<class MT>
 void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    int grain = 3000;
-    dASSERT(g_tpool, ThreadPool not initialised);
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
 	"Parameter 1 invalid size (expected %d, actual %d)",
         this->cols, x.Dim());
     if (b.Dim() != this->rows) b.New(this->rows);
 
-    int r, i, i2;
-    MT br;
-    
-    typedef struct {
+    static struct {
 	const TCompRowMatrix<MT> *A;
 	const TVector<MT> *x;
 	TVector<MT> *b;
-    } AX_DATA;
-    AX_DATA ax_data;
-    ax_data.A = this;
-    ax_data.x = &x;
-    ax_data.b = &b;
+    } thdata;
 
-    g_tpool->ProcessSequence (Ax_engine<MT>, &ax_data, 0, this->rows, grain);
+    thdata.A = this;
+    thdata.x = &x;
+    thdata.b = &b;
+    
+    b.Clear();
+    ThreadPool2::Pool()->Invoke (Ax_engine<MT>, &thdata);
 }
 
 #else
@@ -1047,7 +1091,7 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 template<class MT>
 void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
 	"Parameter 1 invalid size (expected %d, actual %d)",
         this->cols, x.Dim());
     if (b.Dim() != this->rows) b.New(this->rows);
@@ -1071,7 +1115,7 @@ template<>
 void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
     const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);
 
@@ -1096,7 +1140,7 @@ template<>
 void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
     const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);
 
@@ -1109,7 +1153,7 @@ template<>
 void TCompRowMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b)
     const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);
 
@@ -1124,7 +1168,7 @@ template<>
 void TCompRowMatrix<scomplex>::Ax (const TVector<scomplex> &x,
     TVector<scomplex> &b) const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);
 
@@ -1140,7 +1184,7 @@ template<class MT>
 void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
     int r1, int r2) const
 {
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
         "Parameter 1 invalid size (expected %d, actual %d)",
 	this->cols, x.Dim());
 
@@ -1166,14 +1210,14 @@ void TCompRowMatrix<MT>::Ax_cplx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
     // Specialisation MT=double only (see below)
-    xERROR(Method Ax_cplx not defined for return type);
+    xERROR("Method Ax_cplx not defined for return type");
 }
 
 template<>
 MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
-    dASSERT(x.Dim() == cols, Invalid size - vector x);
+    dASSERT(x.Dim() == cols, "Invalid size - vector x");
 
     if (b.Dim() != rows) b.New (rows);
 
@@ -1202,7 +1246,7 @@ MATHLIB void TCompRowMatrix<double>::Ax_cplx (const TVector<toast::complex> &x,
 template<class MT>
 void TCompRowMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT_2PRM(x.Dim() == this->rows,
+    dASSERT(x.Dim() == this->rows,
         "Parameter 1 invalid size (expected %d, actual %d)",
 		 this->rows, x.Dim());
 
@@ -1222,8 +1266,8 @@ template<> // specialisation:: complex
 MATHLIB void TCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
-    dASSERT(x.Dim() == rows, Invalid size - vector x);
-    dASSERT(b.Dim() == cols, Invalid size - vector b);
+    dASSERT(x.Dim() == rows, "Invalid size - vector x");
+    dASSERT(b.Dim() == cols, "Invalid size - vector b");
 
     if (!col_access) SetColAccess(); // should not be necessary!
     int i, c;
@@ -1241,15 +1285,15 @@ void TCompRowMatrix<MT>::ATx_cplx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
     // Specialisation MT=double only (see below)
-    xERROR(Method ATx_cplx not defined for return type);
+    xERROR("Method ATx_cplx not defined for return type");
 }
 
 template<>
 MATHLIB void TCompRowMatrix<double>::ATx_cplx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
-    dASSERT(x.Dim() == rows, Invalid size - vector x);
-    dASSERT(b.Dim() == cols, Invalid size - vector b);
+    dASSERT(x.Dim() == rows, "Invalid size - vector x");
+    dASSERT(b.Dim() == cols, "Invalid size - vector b");
 
     if (!col_access) SetColAccess(); // should not be necessary!
     int i, c;
@@ -1593,7 +1637,7 @@ MATHLIB TCompRowMatrix<MT> kron (const TCompRowMatrix<MT> &A,
 template<class MT>
 MT TCompRowMatrix<MT>::RowMult (int r, MT *x) const
 {
-    dASSERT(r >= 0 && r < this->rows, Argument 1 out of range);
+    dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
 
     MT sum = (MT)0;
     int imax = rowptr[r+1];
@@ -1757,8 +1801,8 @@ double TCompRowMatrix<MT>::LargestInCol (int c, int i) const
 template<class MT>
 void TCompRowMatrix<MT>::ReplaceRow (int row, int nz, int *rcolidx, MT *rval)
 {
-    dASSERT(row >= 0 && row < this->rows, Row index out of range);
-    dASSERT(nz >= 0 && nz <= this->cols, Nonzero count out of range);
+    dASSERT(row >= 0 && row < this->rows, "Row index out of range");
+    dASSERT(nz >= 0 && nz <= this->cols, "Nonzero count out of range");
 
     int i, rp0, rp1, nz_old, dnz;
     rp0 = rowptr[row];
@@ -1793,7 +1837,7 @@ void TCompRowMatrix<MT>::ReplaceRow (int row, int nz, int *rcolidx, MT *rval)
 template<class MT>
 void TCompRowMatrix<MT>::ReplaceRow (int row, const TVector<MT>& vec)
 {
-    dASSERT(vec.Dim() == this->rows, Invalid row vector size);
+    dASSERT(vec.Dim() == this->rows, "Invalid row vector size");
 
     int i, nz;
     int *rcolidx = new int[this->rows];
@@ -1839,7 +1883,7 @@ void BlockExpand (int *rowptr, int *colidx, int n,
 template<class MT>
 MT TCompRowMatrix<MT>::row_mult (int r1, int r2, int from, int to) const
 {
-    dASSERT(sorted, Requires sorted CompRowMatrix);
+    dASSERT(sorted, "Requires sorted CompRowMatrix");
 
     MT sum = (MT)0;
     int i1, i2, c1, c2;
@@ -1938,7 +1982,7 @@ template<class MT>
 void TCompRowMatrix<MT>::SymbolicCholeskyFactorize (idxtype *&frowptr,
     idxtype *&fcolidx) const
 {
-    dASSERT(this->rows == this->cols, Requires square matrix);
+    dASSERT(this->rows == this->cols, "Requires square matrix");
     symbolic_cholesky_factor (this->rows, rowptr, colidx, frowptr, fcolidx);
     // implemented in cr_cholesky.cc
 }
@@ -2009,7 +2053,7 @@ MATHLIB bool CholeskyFactorize (const TCompRowMatrix<MT> &A, TCompRowMatrix<MT> 
 		    ajk_set = true;
 #endif
 		}
-		dASSERT(ajk_set, Cholesky factor not column-sorted);
+		dASSERT(ajk_set, "Cholesky factor not column-sorted");
 		fullcol[r] -= ajk * Lval[Lvofs[i]];
 	    }
 	}
@@ -2017,7 +2061,7 @@ MATHLIB bool CholeskyFactorize (const TCompRowMatrix<MT> &A, TCompRowMatrix<MT> 
 	if (fullcol[c] > MT(0)) {   /* problem here, if using complex */
 	    d[c] = sqrt (fullcol[c]);
 	} else {
-	    if (!recover) xERROR(Matrix not positive definite);
+	    if (!recover) xERROR("Matrix not positive definite");
 	    ok = false;
 	    d[c] = EPS;
 	}
@@ -2051,7 +2095,7 @@ MATHLIB bool IncompleteCholeskyFactorize (const TCompRowMatrix<MT> &A,
 	if (diag > x) {       /* problem here, if using complex */
 	    d[i] = sqrt (diag-x);
 	} else {
-	    if (!recover) xERROR(Matrix not positive definite);
+	    if (!recover) xERROR("Matrix not positive definite");
 	    ok = false;
 	    d[i] = EPS; // force positive
 	}
@@ -2228,9 +2272,9 @@ template<class MT>
 MATHLIB void CholeskySolve (const TCompRowMatrix<MT> &L,
     const TVector<MT> &d, const TVector<MT> &b, TVector<MT> &x)
 {
-    dASSERT(d.Dim() == L.nCols(), Incompatible dimensions);
-    dASSERT(d.Dim() == b.Dim(), Incompatible dimensions);
-    dASSERT(d.Dim() == x.Dim(), Incompatible dimensions);
+    dASSERT(d.Dim() == L.nCols(), "Incompatible dimensions");
+    dASSERT(d.Dim() == b.Dim(), "Incompatible dimensions");
+    dASSERT(d.Dim() == x.Dim(), "Incompatible dimensions");
     L.CholeskySubst (d, b.data_buffer(), x.data_buffer());
 }
 
@@ -2248,8 +2292,8 @@ MATHLIB void CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
     const TDenseMatrix<MT> &BT, TDenseMatrix<MT> &XT, int n)
 {
     int i, m = L.nCols();
-    dASSERT(m == BT.nCols(), Incompatible dimensions);
-    dASSERT(m == XT.nCols(), Incompatible dimensions);
+    dASSERT(m == BT.nCols(), "Incompatible dimensions");
+    dASSERT(m == XT.nCols(), "Incompatible dimensions");
 
     if (n) {
         if (n > BT.nRows()) n = BT.nRows();
@@ -2306,7 +2350,7 @@ int ILUSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &
 #ifdef HAVE_ILU
     return ILUSolveZGNL (A, b, x, tol, droptol, maxit);
 #else
-    xERROR(ILUPACK support not configured);
+    xERROR("ILUPACK support not configured");
 	return 0;
 #endif
 }
@@ -2329,7 +2373,7 @@ int ILUSymSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex
 #ifdef HAVE_ILU
     return ILUSolveZSYM (A, b, x, tol, droptol, maxit);
 #else
-    xERROR(ILUPACK support not configured);
+    xERROR("ILUPACK support not configured");
 	return 0;
 #endif
 }
@@ -2704,6 +2748,132 @@ MATHLIB void BiCGSTAB<complex> (const CCompRowMatrix &A, const CVector *b,
 // ==========================================================================
 
 template<class MT>
+int TCompRowMatrix<MT>::pcg (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, TPreconditioner<MT> *precon, int maxit) const
+{
+    return TMatrix<MT>::pcg (b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<float>::pcg (const FVector &b, FVector &x,
+    double &tol, TPreconditioner<float> *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<double>::pcg (const RVector &b, RVector &x,
+    double &tol, TPreconditioner<double> *precon, int maxit) const
+{
+    return PCG (*this, b, x, tol, precon, maxit);
+}
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::pcg (const TVector<MT> *b, TVector<MT> *x, int nrhs,
+    double tol, int maxit, TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    TMatrix<MT>::pcg (b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<float>::pcg (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<float> *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<double>::pcg (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<double> *precon,
+    IterativeSolverResult *res) const
+{
+    PCG (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+// ==========================================================================
+
+template<class MT>
+int TCompRowMatrix<MT>::bicgstab (const TVector<MT> &b, TVector<MT> &x,
+    double &tol, TPreconditioner<MT> *precon, int maxit) const
+{
+    //return TMatrix<MT>::bicgstab (b, x, tol, precon, maxit);
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+#ifdef UNDEF
+template<>
+int TCompRowMatrix<float>::bicgstab (const FVector &b, FVector &x,
+    double &tol, TPreconditioner<float> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<scomplex>::bicgstab (const SCVector &b, SCVector &x,
+    double &tol, TPreconditioner<scomplex> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<double>::bicgstab (const RVector &b, RVector &x,
+    double &tol, TPreconditioner<double> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+
+template<>
+int TCompRowMatrix<complex>::bicgstab (const CVector &b, CVector &x,
+    double &tol, TPreconditioner<complex> *precon, int maxit) const
+{
+    return BiCGSTAB (*this, b, x, tol, precon, maxit);
+}
+#endif
+
+// ==========================================================================
+
+template<class MT>
+void TCompRowMatrix<MT>::bicgstab (const TVector<MT> *b, TVector<MT> *x,
+    int nrhs, double tol, int maxit, TPreconditioner<MT> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+    //TMatrix<MT>::bicgstab (b, x, nrhs, tol, maxit, precon, res);
+}
+
+#ifdef UNDEF
+template<>
+void TCompRowMatrix<float>::bicgstab (const FVector *b, FVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<float> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
+    double tol, int maxit, TPreconditioner<double> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+
+template<>
+void TCompRowMatrix<scomplex>::bicgstab (const SCVector *b, SCVector *x,
+    int nrhs, double tol, int maxit, TPreconditioner<scomplex> *precon,
+    IterativeSolverResult *res) const
+{
+    BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
+}
+#endif
+
+// ==========================================================================
+
+template<class MT>
 void TCompRowMatrix<MT>::ExportHB (ostream &os)
 {
     int i, clines, ilines, vlines, tlines;
@@ -2902,7 +3072,7 @@ template<class MT>
 int ML_matvec (ML_Operator *Amat, int in_length, double p[],
     int out_length, double ap[])
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return 0;
 }
 
@@ -2925,7 +3095,7 @@ int ML_getrow (ML_Operator *Amat, int N_requested_rows,
     int requested_rows[], int allocated_space, int columns[],
     double values[], int row_lenghts[])
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return 0;
 }
 

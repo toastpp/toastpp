@@ -84,8 +84,8 @@ void Tetrahedron10_ip::Initialise (const NodeList &nlist)
 
 int Tetrahedron10_ip::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 4, Side index out of range);
-    dASSERT(node >= 0 && node < 6, Node index out of range);
+    dASSERT(side >= 0 && side < 4, "Side index out of range");
+    dASSERT(node >= 0 && node < 6, "Node index out of range");
     static int SN[4][6] = {{0,1,2,4,7,5},{0,3,1,6,8,4},
 			   {0,2,3,5,9,6},{1,3,2,8,9,7}};
     return SN[side][node];
@@ -93,7 +93,7 @@ int Tetrahedron10_ip::SideNode (int side, int node) const
 
 Point Tetrahedron10_ip::Local (const NodeList &nlist, const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
     static const double EPS = 1e-4;
     static const int MAXIT = 10;
 
@@ -139,7 +139,7 @@ Point Tetrahedron10_ip::NodeLocal (int node) const
     case 7: nloc[0] = nloc[1] = 0.5; nloc[2] = 0.0; break;
     case 8: nloc[0] = nloc[2] = 0.5; nloc[1] = 0.0; break;
     case 9: nloc[0] = 0.0; nloc[1] = nloc[2] = 0.5; break;
-    default: xERROR(Node index out of range);
+    default: xERROR("Node index out of range");
     }
     return nloc;
 }
@@ -153,7 +153,7 @@ RVector Tetrahedron10_ip::DirectionCosine (int side, RDenseMatrix &jacin)
     case 1: cosin[0] = -b2, cosin[1] = -c2, cosin[2] = -d2; break;
     case 2: cosin[0] = -b1, cosin[1] = -c1, cosin[2] = -d1; break;
     case 3: cosin[0] = -b0, cosin[1] = -c0, cosin[2] = -d0; break;
-    default: xERROR(Side index out of range);
+    default: xERROR("Side index out of range");
     }
     return cosin/length(cosin);
 }
@@ -168,13 +168,13 @@ const RVector &Tetrahedron10_ip::LNormal (int side) const
     static const RVector *lnm[4] = {
       &lnm0, &lnm1, &lnm2, &lnm3
     };
-    dASSERT(side >= 0 && side < 4, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 4, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Tetrahedron10_ip::LContains (const Point &loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 3, Local point must be 3D);
+    dASSERT(loc.Dim() == 3, "Local point must be 3D");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 && loc[2]+EPS >= 0.0 &&
@@ -187,7 +187,7 @@ bool Tetrahedron10_ip::LContains (const Point &loc, bool pad) const
 
 RVector Tetrahedron10_ip::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Invalid point dimension);
+    dASSERT(loc.Dim() == 3, "Invalid point dimension");
     RVector fun(10);
     double L0 = 1.0-loc[0]-loc[1]-loc[2];
     double L1 = loc[0];
@@ -208,7 +208,7 @@ RVector Tetrahedron10_ip::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Tetrahedron10_ip::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Invalid point dimension);
+    dASSERT(loc.Dim() == 3, "Invalid point dimension");
     RDenseMatrix der(3,10);
     double lx = loc[0], ly = loc[1], lz = loc[2];
 
@@ -752,13 +752,13 @@ RSymMatrix Tetrahedron10_ip::ComputeBndIntFF (const NodeList &nlist) const
 double Tetrahedron10_ip::Jacobian (const Point &loc, RDenseMatrix &J) const
 {
 #ifndef TET10IP_STORE_COORDS
-    xERROR(Requires definition of TRI6IP_STORE_COORDS);
+    xERROR("Requires definition of TRI6IP_STORE_COORDS");
     double n0x, n0y, n0z, n1x, n1y, n1z, n2x, n2y, n2z, n3x, n3y, n3z;
     double n4x, n4y, n4z, n5x, n5y, n5z, n6x, n6y, n6z, n7x, n7y, n7z;
     double n8x, n8y, n8z, n9x, n9y, n9z;
 #endif
-    dASSERT (loc.Dim() == 3, Parameter 1 wrong dimension);
-    dASSERT(J.nRows() == 3 && J.nCols() == 3, Parameter 2 wrong dimension);
+    dASSERT (loc.Dim() == 3, "Parameter 1 wrong dimension");
+    dASSERT(J.nRows() == 3 && J.nCols() == 3, "Parameter 2 wrong dimension");
     double t1 = 4.0*loc[0];
     double t2 = 4.0*loc[1];
     double t3 = 4.0*loc[2];
@@ -789,7 +789,7 @@ double Tetrahedron10_ip::Jacobian (const Point &loc, RDenseMatrix &J) const
 
 double Tetrahedron10_ip::IJacobian (const Point &loc, RDenseMatrix &IJ) const
 {
-    dASSERT(IJ.nRows() == 3 && IJ.nCols() == 3, Parameter 2 wrong dimension);
+    dASSERT(IJ.nRows() == 3 && IJ.nCols() == 3, "Parameter 2 wrong dimension");
     static RDenseMatrix J(3,3);
     double d = Jacobian (loc, J);
     double id = 1.0/d;
@@ -808,7 +808,7 @@ double Tetrahedron10_ip::IJacobian (const Point &loc, RDenseMatrix &IJ) const
 double Tetrahedron10_ip::DetJ (const Point &loc, const NodeList *nlist) const
 {
 #ifndef TET10IP_STORE_COORDS
-    dASSERT (nlist != 0, Node list required);
+    dASSERT (nlist != 0, "Node list required");
     double n0x = (*nlist)[Node[0]][0], n0y = (*nlist)[Node[0]][1],
            n0z = (*nlist)[Node[0]][2];
     double n1x = (*nlist)[Node[1]][0], n1y = (*nlist)[Node[1]][1],
@@ -830,7 +830,7 @@ double Tetrahedron10_ip::DetJ (const Point &loc, const NodeList *nlist) const
     double n9x = (*nlist)[Node[9]][0], n9y = (*nlist)[Node[9]][1],
            n9z = (*nlist)[Node[9]][2];
 #endif
-    dASSERT (loc.Dim() == 3, Parameter 1 wrong dimension);
+    dASSERT (loc.Dim() == 3, "Parameter 1 wrong dimension");
     double t1 = 4.0*loc[0];
     double t2 = 4.0*loc[1];
     double t3 = 4.0*loc[2];

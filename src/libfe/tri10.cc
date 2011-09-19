@@ -388,15 +388,15 @@ void Triangle10::Initialise (const NodeList &nlist)
 
 int Triangle10::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 3, Side index out of range);
-    dASSERT(node >= 0 && node < 4, Node index out of range);
+    dASSERT(side >= 0 && side < 3, "Side index out of range");
+    dASSERT(node >= 0 && node < 4, "Node index out of range");
     static int SN[3][4] = {{0,1,3,4},{1,2,5,6},{2,0,7,8}};
     return SN[side][node];
 }
 
 Point Triangle10::Local (const NodeList &nlist, const Point &glob) const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
 
     Point loc(2);
     double scale = 1.0/(a0+a1+a2);
@@ -408,7 +408,7 @@ Point Triangle10::Local (const NodeList &nlist, const Point &glob) const
 
 Point Triangle10::NodeLocal (int node) const
 {
-    dASSERT(node >= 0 && node < 10, Node index out of range);
+    dASSERT(node >= 0 && node < 10, "Node index out of range");
     static Point2D nloc[10] = {
         Point2D(0,0), Point2D(1,0), Point2D(0,1),
 	Point2D(1.0/3.0,0),       Point2D(2.0/3.0,0),
@@ -426,7 +426,7 @@ RVector Triangle10::DirectionCosine (int side, RDenseMatrix &/*jacin*/)
     case 0: cosin[0] = -b2, cosin[1] = -c2; break;
     case 1: cosin[0] = -b0, cosin[1] = -c0; break;
     case 2: cosin[0] = -b1, cosin[1] = -c1; break;
-    default: xERROR(Side index out of range);
+    default: xERROR("Side index out of range");
     }
     return cosin/length(cosin);
 }
@@ -439,13 +439,13 @@ const RVector &Triangle10::LNormal (int side) const
     static const RVector *lnm[3] = {
       &lnm0, &lnm1, &lnm2
     };
-    dASSERT(side >= 0 && side < 3, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 3, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Triangle10::LContains (const Point& loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 2, Local point must be 2D.);
+    dASSERT(loc.Dim() == 2, "Local point must be 2D.");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -484,7 +484,7 @@ bool Triangle10::GContains (const Point& glob, const NodeList& nlist) const
 
 RVector Triangle10::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RVector fun(10);
     double L0 = 1.0-loc[0]-loc[1];
     double L1 = loc[0];
@@ -507,7 +507,7 @@ RVector Triangle10::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Triangle10::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RDenseMatrix der (2,10);
     double xi = loc[0], eta = loc[1];
     double s = 1.0-xi-eta;
@@ -543,7 +543,7 @@ RDenseMatrix Triangle10::LocalShapeD (const Point &loc) const
 RVector Triangle10::GlobalShapeF (const NodeList& nlist, const Point& glob)
     const
 {
-    dASSERT(glob.Dim() == 2, Invalid point dimension);
+    dASSERT(glob.Dim() == 2, "Invalid point dimension");
     RVector fun(10);
     double scale = 1.0/(2.0*size);
     double L0 = scale * (a0 + b0*glob[0] + c0*glob[1]);
@@ -1258,7 +1258,7 @@ double Triangle10::IntFDD (int i, int j, int k) const
 		    intfd9d9f[i] * (b2*b2+c2*c2))/size;
 	}
     }
-    xERROR (Index out of range);
+    xERROR ("Index out of range");
     return 0.0;
 }
 
@@ -1785,7 +1785,7 @@ double Triangle10::IntPDD (int j, int k, const RVector &P) const
 	}
 	}
     }
-    xERROR (Index out of range);
+    xERROR ("Index out of range");
     return 0.0;
 #ifdef UNDEF
     double res = 0.0;
@@ -2200,8 +2200,8 @@ RSymMatrix Triangle10::ComputeIntDD (const NodeList &nlist) const
 
 double Triangle10::BndIntFSide (int i, int sd)
 {
-    dASSERT(sd >= 0 && sd < 3, Side index out of range);
-    dASSERT(i >= 0 && i < 10, Node index out of range);
+    dASSERT(sd >= 0 && sd < 3, "Side index out of range");
+    dASSERT(i >= 0 && i < 10, "Node index out of range");
 
     double f = bndintf(sd,i);
     if (!f) return f;
@@ -2223,7 +2223,7 @@ double Triangle10::BndIntFFSide (int i, int j, int sd)
     case 2:
 	return hypot (c1, b1) * sym_bndintff_sd2(i,j);
     default:
-	xERROR(Invalid side index);
+	xERROR("Invalid side index");
 	return 0.0;
     }
 }
@@ -2252,11 +2252,11 @@ RSymMatrix Triangle10::ComputeBndIntFF (const NodeList &nlist) const
 double Triangle10::Jacobian (const Point &loc, RDenseMatrix &J) const
 {
 #ifndef TRI10_STORE_COORDS
-    xERROR(Requires definition of TRI10_STORE_COORDS);
+    xERROR("Requires definition of TRI10_STORE_COORDS");
     double n0x, n0y, n1x, n1y, n2x, n2y, n3x, n3y, n4x, n4y,
            n5x, n5y, n6x, n6y, n7x, n7y, n8x, n8y, n9x, n9y;
 #endif
-    dASSERT(J.nRows() == 2 && J.nCols() == 2, Parameter 3 wrong dimension);
+    dASSERT(J.nRows() == 2 && J.nCols() == 2, "Parameter 3 wrong dimension");
     RDenseMatrix der = LocalShapeD (loc);
 
     for (int i = 0; i < 2; i++) {
@@ -2288,7 +2288,7 @@ double Triangle10::IJacobian (const Point &loc, RDenseMatrix &IJ) const
 double Triangle10::DetJ (const Point &loc, const NodeList *nlist) const
 {
 #ifndef TRI10_STORE_COORDS
-    dASSERT (nlist != 0, Node list required);
+    dASSERT (nlist != 0, "Node list required");
     double n0x = (*nlist)[Node[0]][0], n0y = (*nlist)[Node[0]][1];
     double n1x = (*nlist)[Node[1]][0], n1y = (*nlist)[Node[1]][1];
     double n2x = (*nlist)[Node[2]][0], n2y = (*nlist)[Node[2]][1];
@@ -2300,7 +2300,7 @@ double Triangle10::DetJ (const Point &loc, const NodeList *nlist) const
     double n8x = (*nlist)[Node[8]][0], n8y = (*nlist)[Node[8]][1];
     double n9x = (*nlist)[Node[9]][0], n9y = (*nlist)[Node[9]][1];
 #endif
-    dASSERT (loc.Dim() == 2, Parameter 1 wrong dimension);
+    dASSERT (loc.Dim() == 2, "Parameter 1 wrong dimension");
     RDenseMatrix der = LocalShapeD (loc);
     double j00, j01, j10, j11;
 

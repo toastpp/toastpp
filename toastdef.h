@@ -31,7 +31,7 @@
 // This defines the date after which the CHECK_EXPIRY macro will
 // terminate a program.
 
-#define VERBOSE_LEVEL 1
+#define VERBOSE_LEVEL 2
 // Log file verbosity level
 
 #ifdef TOAST_THREAD

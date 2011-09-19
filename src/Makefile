@@ -33,7 +33,13 @@ matlab::
 #			cp $(TOASTDIR)/src/matlab/Makefile2.src ./Makefile; \
 #			echo "making" all "in matlab..."; \
 #			$(MAKE) $(MFLAGS) all); \
-	fi; \
+	fi;
+
+python::
+	if test -d python ; then \
+		cd python; \
+		$(MAKE) all; \
+	fi
 
 doc::
 	cd doc; \

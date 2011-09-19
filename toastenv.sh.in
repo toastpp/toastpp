@@ -14,7 +14,8 @@ else
     echo "Using TOASTDIR = $TOASTDIR"
     export TOASTVER=$TOASTDIR/@ARCHDIR@
     export TOAST_SCRIPT_PATH=$TOASTDIR/script
-
+    export PYTHONPATH=$TOAST_SCRIPT_PATH/python/lib/python2.6/site-packages
+# NEED TO MAKE THIS GENERAL!!!
     IFS=:
 
 # Add $TOASTVER/bin to path

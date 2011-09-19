@@ -34,7 +34,7 @@ using namespace toast;
 template<class VT>
 void TVector<VT>::Link (const TVector<VT> &vec)
 {
-    dASSERT (!base_nref, Data block present. Use Unlink first.);
+    dASSERT (!base_nref, "Data block present. Use Unlink first.");
     base_nref = vec.base_nref;      // link to vec's data block
     if (base_nref) {
 	base_size = vec.base_size;  // use vec's base size pointer
@@ -53,8 +53,9 @@ void TVector<VT>::Link (const TVector<VT> &vec)
 template<class VT>
 void TVector<VT>::Link (const TVector<VT> &vec, int ofs, int dim)
 {
-    dASSERT(ofs >= 0 && dim >= 0, Invalid arguments);
-    dASSERT(ofs+dim <= vec.size, Reference exceeds index range of base vector.);
+    dASSERT(ofs >= 0 && dim >= 0, "Invalid arguments");
+    dASSERT(ofs+dim <= vec.size,
+	    "Reference exceeds index range of base vector.");
     base_nref = vec.base_nref;	 // link to vec's data block
     if (base_nref) {
 	base_size = vec.base_size; // use vec's base size pointer
@@ -121,7 +122,7 @@ void TVector<VT>::ShiftRight (int n)
 template<class VT>
 TVector<VT> TVector<VT>::operator+ (const TVector<VT> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) tmp.data[i] = data[i] + v.data[i];
     return tmp;
@@ -130,7 +131,7 @@ TVector<VT> TVector<VT>::operator+ (const TVector<VT> &v) const
 template<>
 MATHLIB TVector<double> TVector<double>::operator+ (const TVector<double> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     static int incr = 1;
     static double scale = 1.0;
     TVector<double> tmp(*this);
@@ -145,7 +146,7 @@ MATHLIB TVector<double> TVector<double>::operator+ (const TVector<double> &v) co
 template<>
 MATHLIB TVector<float> TVector<float>::operator+(const TVector<float> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     static int incr = 1;
     static float scale = 1.0f;
     TVector<float> tmp(*this);
@@ -178,7 +179,7 @@ MATHLIB TVector<VT> operator+ (const VT &s, const TVector<VT> &v)
 template<class VT>
 TVector<VT> TVector<VT>::operator- (const TVector<VT> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) tmp.data[i] = data[i] - v.data[i];
     return tmp;
@@ -187,7 +188,7 @@ TVector<VT> TVector<VT>::operator- (const TVector<VT> &v) const
 template<>
 MATHLIB TVector<double> TVector<double>::operator- (const TVector<double> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     static int incr = 1;
     static double scale = -1.0;
     TVector<double> tmp(*this);
@@ -197,7 +198,7 @@ MATHLIB TVector<double> TVector<double>::operator- (const TVector<double> &v) co
 template<>
 MATHLIB TVector<float> TVector<float>::operator- (const TVector<float> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     static int incr = 1;
     static float scale = -1.0f;
     TVector<float> tmp(*this);
@@ -234,7 +235,7 @@ TVector<VT> TVector<VT>::operator- () const
 template<class VT>
 TVector<VT> TVector<VT>::operator* (const TVector<VT> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) tmp.data[i] = data[i] * v.data[i];
     return tmp;
@@ -260,10 +261,10 @@ MATHLIB TVector<VT> operator* (const VT &s, const TVector<VT> &v)
 template<class VT>
 TVector<VT> TVector<VT>::operator/ (const TVector<VT> &v) const
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) {
-        dASSERT (v.data[i], Attempt to divide by zero);
+        dASSERT (v.data[i], "Attempt to divide by zero");
         tmp.data[i] = data[i] / v.data[i];
     }
     return tmp;
@@ -272,7 +273,7 @@ TVector<VT> TVector<VT>::operator/ (const TVector<VT> &v) const
 template<class VT>
 TVector<VT> TVector<VT>::operator/ (const VT &s) const
 {
-    dASSERT(s, Attempt to divide by zero);
+    dASSERT(s, "Attempt to divide by zero");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) tmp.data[i] = data[i] / s;
     return tmp;
@@ -283,7 +284,7 @@ TVector<VT> operator/ (const VT &s, const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
     for (int i = 0; i < v.size; i++) {
-        dASSERT (v.data[i], Attempt to divide by zero);
+        dASSERT (v.data[i], "Attempt to divide by zero");
         tmp.data[i] = s / v.data[i];
     }
     return tmp;  
@@ -293,7 +294,7 @@ TVector<VT> operator/ (const VT &s, const TVector<VT> &v)
 template<class VT>
 TVector<VT> &TVector<VT>::operator+= (const TVector<VT> &v)
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     for (int i = 0; i < size; i++) data[i] += v.data[i];
     return *this;
 }
@@ -303,7 +304,7 @@ TVector<VT> &TVector<VT>::operator+= (const TVector<VT> &v)
 template<class VT>
 TVector<VT> &TVector<VT>::operator-= (const TVector<VT> &v)
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     for (int i = 0; i < size; i++) data[i] -= v.data[i];
     return *this;
 }
@@ -313,7 +314,7 @@ TVector<VT> &TVector<VT>::operator-= (const TVector<VT> &v)
 template<class VT>
 TVector<VT> &TVector<VT>::operator*= (const TVector<VT> &v)
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     for (int i = 0; i < size; i++) data[i] *= v.data[i];
     return *this;
 }
@@ -323,9 +324,9 @@ TVector<VT> &TVector<VT>::operator*= (const TVector<VT> &v)
 template<class VT>
 TVector<VT> &TVector<VT>::operator/= (const TVector<VT> &v)
 {
-    dASSERT(size == v.size, Vectors have different size.);
+    dASSERT(size == v.size, "Vectors have different size.");
     for (int i = 0; i < size; i++) {
-        dASSERT (v.data[i], Attempt to divide by zero);
+        dASSERT (v.data[i], "Attempt to divide by zero");
         data[i] /= v.data[i];
     }
     return *this;
@@ -440,7 +441,7 @@ void TVector<VT>::ReadIndexed (istream &is, int n)
     if (n >= 0) New (n);
     for (i = 0; i < nvals; i++) {
         is >> index;
-	dASSERT (index >=0 && index < size, Index out of range);
+	dASSERT (index >=0 && index < size, "Index out of range");
 	is >> data[index];
     }
 }
@@ -476,7 +477,7 @@ TVector<VT> inv (const TVector<VT> &v)
     const static VT one = (VT)1;
     TVector<VT> tmp(v.size);
     for (int i = 0; i < v.size; i++) {
-        dASSERT (v[i], Attempt to divide by zero);
+        dASSERT (v[i], "Attempt to divide by zero");
         tmp[i] = one/v[i];
     }
     return tmp;
@@ -641,7 +642,7 @@ TVector<VT> atanh (const TVector<VT> &v)
 template<class VT>
 VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
 {
-    dASSERT (v1.size == v2.size, Vector dimensions incompatible);
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     VT d = (VT)0;
     for (int i = 0; i < v1.size; i++) d += v1[i] * v2[i];
     return d;
@@ -650,7 +651,7 @@ VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
 template<>
 double dot (const TVector<double> &v1, const TVector<double> &v2)
 {
-    dASSERT (v1.size == v2.size, Vector dimensions incompatible);
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     static int incr = 1;
     int size = v1.size;
     return ddot_(size, v1.data, incr, v2.data, incr);
@@ -658,7 +659,7 @@ double dot (const TVector<double> &v1, const TVector<double> &v2)
 template<>
 float dot (const TVector<float> &v1, const TVector<float> &v2)
 {
-    dASSERT (v1.size == v2.size, Vector dimensions incompatible);
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     static int incr = 1;
     int size = v1.size;
     return sdot_(size, v1.data, incr, v2.data, incr);
@@ -666,7 +667,7 @@ float dot (const TVector<float> &v1, const TVector<float> &v2)
 template<>
 toast::complex dot (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
 {
-    dASSERT (v1.size == v2.size, Vector dimensions incompatible);
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     static int incr = 1;
     int size = v1.size;
     dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
@@ -687,7 +688,7 @@ VT doth (const TVector<VT> &v1, const TVector<VT> &v2)
 template<>
 toast::complex doth (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
 {
-    dASSERT (v1.size == v2.size, Vector dimensions incompatible);
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
 #ifdef USE_BLAS_LEVEL1
     static int incr = 1;
     int size = v1.size;
@@ -1383,7 +1384,7 @@ void SelfConj (const CVector &vec)
 }
 CVector Hadamard (const CVector &a, const CVector &b)
 {
-    dASSERT(a.Dim() == b.Dim(), Dimension mismatch);
+    dASSERT(a.Dim() == b.Dim(), "Dimension mismatch");
     CVector tmp(a.Dim());
     for (int i = 0; i < a.Dim(); i++) tmp[i] = hadamard(a[i],b[i]);
     return tmp;
@@ -1391,13 +1392,13 @@ CVector Hadamard (const CVector &a, const CVector &b)
 
 MATHLIB void SetReal (CVector &z, const RVector &zre)
 {
-    dASSERT(z.Dim() == zre.Dim(), Dimension mismatch);
+    dASSERT(z.Dim() == zre.Dim(), "Dimension mismatch");
     for (int i = 0; i < z.Dim(); i++) z[i].re = zre[i];
 }
 
 MATHLIB void SetImag (CVector &z, const RVector &zim)
 {
-    dASSERT(z.Dim() == zim.Dim(), Dimension mismatch);
+    dASSERT(z.Dim() == zim.Dim(), "Dimension mismatch");
     for (int i = 0; i < z.Dim(); i++) z[i].im = zim[i];
 }
 

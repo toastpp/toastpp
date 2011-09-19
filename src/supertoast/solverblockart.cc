@@ -125,7 +125,7 @@ void SolverBlockART::Solve (CFwdSolver &FWS, const Raster &raster,
     err  = err0;
     errp = 1e10;
 
-    LOGOUT_2PRM ("Iteration 0  CPU %f  OF %f", toc(clock0), err0);
+    LOGOUT("Iteration 0  CPU %f  OF %f", toc(clock0), err0);
 
     ART_DATA art_data = {J, tau};
 
@@ -184,8 +184,7 @@ void SolverBlockART::Solve (CFwdSolver &FWS, const Raster &raster,
 		rsol.WriteImg_mus (iter+1, "recon_mus.raw");
 		break;
 	    }
-	    LOGOUT_3PRM ("Iteration %d  CPU %f  OF %f",
-	        iter+1, toc(clock0), err);
+	    LOGOUT("Iteration %d  CPU %f  OF %f", iter+1, toc(clock0), err);
 
 	    // test for convergence
 	    if (err < err0*tol) {

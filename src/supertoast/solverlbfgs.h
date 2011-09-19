@@ -22,6 +22,8 @@ private:
     int history; // number of previous steps to be stored
     double epsilon; // convergence limit
     // stopping criterion is: ||g|| < epsilon * max(1,||x||)
+    double delta;   // stopping criterion:
+    // (f(x_past) - f(x))/f(x) < delta
 };
 
 #endif // !__SOLVERBFGS_H

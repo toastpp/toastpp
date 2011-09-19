@@ -59,13 +59,13 @@ scomplex sqrt (const scomplex& z)
 
 scomplex pow (const scomplex& /*zb*/, const scomplex& /*ze*/)
 {
-    xERROR(Function not implemented!);
+    ERROR_UNDEF;
     return (scomplex(0,0));
 }
 
 scomplex pow (const scomplex& /*zb*/, double /*e*/)
 {
-    xERROR(Function not implemented!);
+    ERROR_UNDEF;
     return (scomplex(0,0));
 }
 

@@ -124,8 +124,8 @@ GUILIBS   = -ltoasttcl @GUILIBS@
 GLLIB     = -L/usr/lib -L/usr/X11R6/lib -lglut -lGLU -lGL -lXmu -lXext -lX11 \
 	-lXi -ltogl
 
-ifeq ($(ENABLE_CUDA),1)
-	LIBS += -L$(CUDA_INSTALL_PATH)/lib -lcudart -lcublas
+ifeq ($(ENABLE_CUDA),yes)
+	LIBS += -L$(CUDA_INSTALL_PATH)/lib64 -lcudart -lcublas
 	CUDAINC = -I$(CUDA_INSTALL_PATH)/include -I$(TOASTDIR)/numerics/cuda
 endif
 

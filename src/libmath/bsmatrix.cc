@@ -185,7 +185,7 @@ void CHdecomp (TBandSymMatrix<MT> &A)
     for (i = 0; i < n; i++) {
 	for (x = (MT)0, j = 0; j < w; j++)
 	    x += A[i][j] * A[i][j];
-	xASSERT(A[i][w] > x, Matrix not positive definite.);
+	xASSERT(A[i][w] > x, "Matrix not positive definite.");
 	A[i][w] = sqrt (A[i][w] - x);
 	for (k = 1; k <= w && i+k < n; k++) {
 	    x = (MT)0;

@@ -1037,7 +1037,7 @@ TVector<VT>::TVector ()
 template<class VT>
 TVector<VT>::TVector (int dim)
 {
-    dASSERT(dim >= 0, Parameter 1 must be >= 0);
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
     Allocate (dim);
 }
@@ -1048,7 +1048,7 @@ TVector<VT>::TVector (int dim)
 template<class VT>
 TVector<VT>::TVector (int dim, const VT s)
 {
-    dASSERT(dim >= 0, Parameter 1 must be >= 0);
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
     Allocate (dim);
     *this = s;
@@ -1060,7 +1060,7 @@ TVector<VT>::TVector (int dim, const VT s)
 template<class VT>
 TVector<VT>::TVector (int dim, VT *values)
 {
-    dASSERT(dim >= 0, Parameter 1 must be >= 0);
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
     Allocate (dim);
     memcpy (data, values, dim*sizeof(VT));
@@ -1072,7 +1072,7 @@ TVector<VT>::TVector (int dim, VT *values)
 template<class VT>
 TVector<VT>::TVector (int dim, const char *init)
 {
-    dASSERT(dim >= 0, Parameter 1 must be >= 0);
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
     Allocate (dim);
     std::istringstream iss(init);
@@ -1097,9 +1097,10 @@ TVector<VT>::TVector (const TVector<VT> &v)
 template<class VT>
 TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
 {
-    dASSERT(ofs >= 0 && ofs < v.Dim(), Parameter 1 index out of range);
-    dASSERT(dim >= 0, Parameter 3 must be >= 0);
-    dASSERT(ofs+dim <= v.Dim(), Data block of reference vector must be contained in original vector);
+    dASSERT(ofs >= 0 && ofs < v.Dim(), "Parameter 1 index out of range");
+    dASSERT(dim >= 0, "Parameter 3 must be >= 0");
+    dASSERT(ofs+dim <= v.Dim(),
+	"Data block of reference vector must be contained in original vector");
     base_nref = 0;
     Link (v, ofs, dim);
 }
@@ -1110,10 +1111,10 @@ TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
 template<class VT>
 inline void TVector<VT>::Allocate (int dim)
 {
-    dASSERT(!base_nref, Data block present. Use Unlink first.);
+    dASSERT(!base_nref, "Data block present. Use Unlink first.");
     if (dim) {
 	char *base = (char*)malloc (2*sizeof(int) + dim*sizeof(VT));
-	dASSERT(base, Memory allocation failed.);
+	dASSERT(base, "Memory allocation failed.");
 	memset (base, 0, 2*sizeof(int) + dim*sizeof(VT));
 	base_nref = (int*)base;			 // 1st int: refcount
 	base_size = base_nref + 1;		 // 2nd int: array size
@@ -1212,7 +1213,7 @@ inline TVector<VT> &TVector<VT>::operator= (VT s)
 template<class VT>
 inline VT &TVector<VT>::operator[] (int i) const
 {
-    dASSERT(i >= 0 && i < size, Index out of range);
+    dASSERT(i >= 0 && i < size, "Index out of range");
     return data[i];
 }
 
@@ -1308,7 +1309,7 @@ inline TVector<VT> &TVector<VT>::operator/= (const TVector<VT> &v)
 template<class VT>
 inline TVector<VT> &TVector<VT>::operator/= (const VT &s)
 {
-    dASSERT (s, Attempt to divide by zero);
+    dASSERT (s, "Attempt to divide by zero");
     *this *= ((VT)1/s);
     return *this;
 }

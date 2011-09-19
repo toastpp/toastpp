@@ -15,14 +15,14 @@
 
 template<class MT>
 int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, TPreconditioner<MT> *precon, double &elim,
+    TVector<MT> &x, TPreconditioner<MT> *precon, double &elim, int maxit, 
     void (*clbk)(void*) = 0);
 // Solve Ax = b with generalised minimal residual method
 
 template<class MT>
 int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
     void *context), const TVector<MT> &b, TVector<MT> &x,
-    TPreconditioner<MT> *precon, double &elim, void *context);
+    TPreconditioner<MT> *precon, double &elim, int maxit, void *context);
 // This "matrix-less" version of gmres can be used whenever matrix A is
 // not available in explicit form. The user provides a callback function
 // (Av_clbk) which is called whenever the product of the matrix with a

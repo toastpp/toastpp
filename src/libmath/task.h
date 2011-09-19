@@ -26,6 +26,8 @@ typedef struct {
     void *data;
 } task_data;
 
+void Task_Init (int nth);
+
 class Task {
 public:
     Task() {}
@@ -40,21 +42,28 @@ public:
     static int GetThreadCount () { return nthread; }
     // return current thread count setting
 
-    static double GetThreadTiming () { return ttime; }
+    static double GetThreadCPUTiming () { return ttime; }
     // returns user time [sec] spent by threads inside Multiprocess().
     // Note that the interpretation of this time is platform-dependent:
     // For Linux, this is the time spent by the master thread. For Sun and
     // SGI, it is the sum of all threads.
+
+    static double GetThreadWallTiming () { return wtime; }
+    // Wall clock (real) time spent inside Multiprocess()
 
     static void Multiprocess (void *func(task_data*), void *data, int np = 0);
     // run function 'func' in parallel. User data 'data' are passed to
     // each instance of 'func'. 'np' is the number of threads to create. If
     // np==0 then nthread is used
 
+    inline static void UserMutex_lock() { pthread_mutex_lock (&user_mutex); }
+    inline static void UserMutex_unlock() {pthread_mutex_unlock (&user_mutex);}
 
 private:
     static int nthread;
-    static double ttime; // accumulated time spent multiprocessing
+    static double ttime; // accumulated cpu time spent multiprocessing
+    static double wtime; // accumulated wall clock time spent multiprocessing
+    static pthread_mutex_t user_mutex;
 };
 
 // ===========================================================================
@@ -98,6 +107,50 @@ public:
 private:
     tpool_t *tpool;              // pool properties
     pthread_mutex_t user_lock;   // user-space mutex
+};
+
+
+// ===========================================================================
+// class ThreadPool2
+
+typedef struct {
+    void(*task)(int,void*);
+    void *context;
+    pthread_mutex_t mutex;  // general-purpose mutex to be used by workers
+} THREAD_GLOBAL;
+
+typedef struct {
+    int nth;                      // thread index
+    pthread_t thread;             // thread handle
+    pthread_mutex_t wakeup_mutex; // locked by worker during task processing
+    pthread_mutex_t done_mutex;
+    pthread_cond_t wakeup_cond;
+    pthread_cond_t done_cond;
+    bool wakeup;
+    bool done;
+    THREAD_GLOBAL *tg;           // pointer to global pool data
+} THREAD_DATA;
+
+class ThreadPool2 {
+public:
+    ThreadPool2 (int num_threads);
+    ~ThreadPool2 ();
+    static void Initialise (int num_threads);
+    static ThreadPool2 *Pool() { return g_tpool2; }
+
+    void MutexLock() { pthread_mutex_lock (&tg.mutex); }
+    void MutexUnlock() { pthread_mutex_unlock (&tg.mutex); }
+    inline int NumThread() const { return nthread; }
+
+    void Invoke (void(*func)(int,void*), void *context);
+
+private:
+    int nthread;                   // number of threads
+    THREAD_GLOBAL tg;              // global pool data
+    THREAD_DATA *td;               // array of worker threads
+    static ThreadPool2 *g_tpool2;
+
+    static void *tpool_thread (void *context);
 };
 
 #ifndef __TASK_CC

@@ -3,12 +3,23 @@
 
 //void cuda_vecadd (float *a, float *b, float *c, int n);
 
+bool cuda_SetDevice (int device);
 void cuda_EchoDeviceProperties ();
-
+void cuda_Init (int device);
+ 
 struct SolverResult {
     int it_count;
     double rel_error;
 };
+
+typedef enum {
+    CUSP_PRECON_IDENTITY,
+    CUSP_PRECON_DIAGONAL,
+    CUSP_PRECON_AINV,
+    CUSP_PRECON_SMOOTHED_AGGREGATION
+} CuspPreconType;
+
+void cuda_SetCuspPrecon (CuspPreconType precontp);
 
 // ===========================================================================
 // single precision

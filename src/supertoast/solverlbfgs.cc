@@ -6,8 +6,6 @@
 #include "stoastlib.h"
 #include "solverlbfgs.h"
 #include "lbfgs.h"
-#include "fwdsolver.h"
-#include "jacobian.h"
 #include "util.h"
 #include "timing.h"
 
@@ -40,6 +38,7 @@ SolverLBFGS::SolverLBFGS (ParamParser *_pp): Solver (_pp)
 {
     itmax = 50;
     epsilon = 1e-6;
+    delta = 1e-5;
     history = 5;
 }
 
@@ -80,10 +79,12 @@ static lbfgsfloatval_t evaluate (void *instance,
     proj = fws->ProjectAll_real (*mvec, dphi);
     bsol->SetActiveParams (pscaler->Unscale(x));
 
-    of->get_gradient (*raster, *fws, proj, dphi, *mvec, bsol, r);
-    pscaler->ScaleGradient (bsol->GetActiveParams(), r);
-    r += reg->GetGradient(x);
-    memcpy (g, r.data_buffer(), n*sizeof(double));
+    if (g) {
+        of->get_gradient (*raster, *fws, proj, dphi, *mvec, bsol, r);
+	pscaler->ScaleGradient (bsol->GetActiveParams(), r);
+	r += reg->GetGradient(x);
+	memcpy (g, r.data_buffer(), n*sizeof(double));
+    }
 
     f = of->get_posterior (&proj);
     f += reg->GetValue (x);
@@ -107,26 +108,26 @@ static int progress (void *instance, const lbfgsfloatval_t *x_lbfgs,
     Solution *bsol = ldata->bsol;
     const Raster *raster = ldata->raster;
     const Scaler *pscaler = ldata->pscaler;
+    Regularisation *reg = ldata->reg;
 
     RVector x(n, (double*)x_lbfgs);
     bsol->SetActiveParams (pscaler->Unscale(x));
     raster->Map_SolToMesh (*bsol, *msol, true);
 
-    switch (g_imgfmt) {
-    case IMGFMT_NIM:
+    if (g_imgfmt != IMGFMT_RAW) {
 	msol->WriteImg_mua (k, "recon_mua.nim");
 	msol->WriteImg_mus (k, "recon_mus.nim");
-	break;
-    case IMGFMT_RAW:
+    }
+    if (g_imgfmt != IMGFMT_NIM) {
 	int blen = raster->BLen();
 	Solution rsol(OT_NPARAM, blen);
 	raster->Map_SolToBasis (*bsol, rsol, true);
 	rsol.WriteImg_mua (k, "recon_mua.raw");
 	rsol.WriteImg_mus (k, "recon_mus.raw");
-	break;
     }
-    LOGOUT_3PRM ("Iteration %d  CPU %f  OF %f",
-		 k, toc(clock0), fx);
+    double pr = reg->GetValue (x);
+    LOGOUT ("Iteration %d  CPU %f  OF %g [LH %g PR %g]",
+	    k, toc(clock0), fx, fx-pr, pr);
     return 0;
 }
 
@@ -149,11 +150,12 @@ void SolverLBFGS::Solve (CFwdSolver &FWS, const Raster &raster,
     int n = raster.SLen()*2;
     int ret;
     lbfgs_parameter_t param;
-    double f;
 
     lbfgs_parameter_init (&param);
     param.m = history;
     param.epsilon = epsilon;
+    param.delta = delta;
+    param.past = 1;
     param.max_iterations = itmax;
 
     RVector x0 = pscaler->Scale (bsol.GetActiveParams());
@@ -177,6 +179,12 @@ void SolverLBFGS::Solve (CFwdSolver &FWS, const Raster &raster,
     lbfgsfloatval_t *x_lbfgs = (lbfgsfloatval_t*)x.data_buffer();
     lbfgsfloatval_t fx;
 
+    // initial objective function
+    double of = (double)evaluate (&ldata, x_lbfgs, 0, x.Dim(), 0);
+    double fp = reg->GetValue (x);
+    LOGOUT("Iteration 0  CPU %f  OF %g [LH %g PR %g]", toc(clock0),
+	   of, of-fp, fp);
+
     ret = lbfgs (n, x_lbfgs, &fx, evaluate, progress, &ldata, &param);
 
     delete reg;
@@ -186,30 +194,51 @@ void SolverLBFGS::Solve (CFwdSolver &FWS, const Raster &raster,
 
 void SolverLBFGS::ReadParams (ParamParser &pp)
 {
-    // === MAX ITERATION COUNT ===
-    if (!(pp.GetInt ("LBFGS_ITMAX", itmax) ||
-	  pp.GetInt ("NONLIN_ITMAX", itmax)) || itmax <= 0) {
-	do {
-	    cout << "\nMax number of LBFGS iterations (>0):\n";
-	    cout << ">> ";
-	    cin >> itmax;
-	} while (itmax <= 0);
-    }
-
     // === CONVERGENCE LIMIT ===
     if (!(pp.GetReal ("LBFGS_TOL", epsilon) ||
 	  pp.GetReal ("NONLIN_TOL", epsilon)) || epsilon <= 0) {
+        cout << "\nL-BFGS nonlinear solver --------------------------------\n";
+        cout << "Enter the convergence criterion epsilon:\n";
+	cout << "|g(x)| / max(1,|x|) < epsilon\n";
+	cout << "with parameter vector x and gradient g.\n";
 	    do {
-		cout << "\nTolerance limit for LBFGS solver (>0):\n>> ";
+		cout << "\nNONLIN_TOL (float, >0):\n>> ";
 		cin >> epsilon;
 	    } while (epsilon <= 0);
     }
 
+    // === STOPPING CRITERION ===
+    if (!pp.GetReal ("NONLIN_DELTA", delta)) {
+        cout << "\nL-BFGS nonlinear solver --------------------------------\n";
+        cout << "Enter the stopping criterion delta. This stops the\n";
+	cout << "reconstruction if [f(x_(k-1))-f(x)]/f(x) < delta\n";
+        do {
+	    cout << "\nNONLIN_DELTA (float, >=0):\n>> ";
+	    cin >> delta;
+	} while (delta < 0.0);
+    }
+
+    // === MAX ITERATION COUNT ===
+    if (!(pp.GetInt ("LBFGS_ITMAX", itmax) ||
+	  pp.GetInt ("NONLIN_ITMAX", itmax)) || itmax <= 0) {
+        cout << "\nL-BFGS nonlinear solver --------------------------------\n";
+        cout << "Enter the maximum number of iterations to be performed if\n";
+	cout << "the convergence and tolerance limits are not satisfied:\n";
+	do {
+	    cout << "\nNONLIN_ITMAX (int, >0):\n>> ";
+	    cin >> itmax;
+	} while (itmax <= 0);
+    }
+
     // === NUMBER OF PREVIOUS VECTORS TO STORE ===
     if (!pp.GetInt ("LBFGS_HISTORY", history) || history <= 0) {
+        cout << "\nL-BFGS nonlinear solver --------------------------------\n";
+        cout << "Enter the number of corrections to approximate the inverse\n";
+	cout << "Hessian matrix. Larger values require more memory, but can\n";
+	cout << "improve convergence rates. Values less than 3 are not\n";
+	cout << "recommended.\n";
 	do {
-	    cout << "\nNumber of LBFGS basis vectors to store (>0):\n";
-	    cout << ">> ";
+	    cout << "\nLBFGS_HISTORY (int, >=3):\n>> ";
 	    cin >> history;
 	} while (history <= 0);
     }
@@ -222,5 +251,6 @@ void SolverLBFGS::WriteParams (ParamParser &pp)
     pp.PutString ("SOLVER", "LBFGS");
     pp.PutInt ("NONLIN_ITMAX", itmax);
     pp.PutReal ("NONLIN_TOL", epsilon);
+    pp.PutReal ("NONLIN_DELTA", delta);
     pp.PutInt ("LBFGS_HISTORY", history);
 }

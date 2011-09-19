@@ -173,7 +173,7 @@ int main (int argc, char *argv[])
     FWS.AssembleMassMatrix (&mesh);
     dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
     dwc = time(NULL)-wc0;
-    LOGOUT1_2PRM("Assembly: wallclock=%d, processor=%f", dwc, dt);
+    LOGOUT1("Assembly: wallclock=%d, processor=%f", dwc, dt);
     cout << "Assembly: wallclock=" << dwc << ", processor=" << dt << endl;
 
     RCompRowMatrix *smat = FWS.F;
@@ -243,7 +243,7 @@ int main (int argc, char *argv[])
 
     dt = ((double)clock()-t0)/(double)CLOCKS_PER_SEC;
     dwc = time(NULL)-wc0;
-    LOGOUT1_2PRM("Solution: wallclock=%d, processor=%f", dwc, dt);
+    LOGOUT1("Solution: wallclock=%d, processor=%f", dwc, dt);
     cout << "Solution: wallclock=" << dwc << ", processor=" << dt << endl;
 
     ofstream ofs("tpsf.dat");

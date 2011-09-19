@@ -78,7 +78,7 @@ $(PTXDIR)/%.ptx : $(VPATH)/%.cu
 	mkdir -p $(PTXDIR)
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) -o $@ -ptx $<
 
-ifeq ($(ENABLE_CUDA),1)
+ifeq ($(ENABLE_CUDA),yes)
 OBJS += ${CUSRCS:.cu=.o}
 CUBINS = ${CUSRCS:%.cu=$(CUBINDIR)/%.cubin}
 PTXBINS = ${CUSRCS:%.cu=$(CUBINDIR)/%.ptx}

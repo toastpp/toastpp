@@ -179,22 +179,22 @@ void SolverPCG_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    // Diagonal Hessian preconditioner setup
 	    LOGOUT ("Calculating diagonal of JTJ");
 	    ATA_diag (J, M);
-	    LOGOUT_2PRM ("Range: %f to %f", vmin(M), vmax(M));
+	    LOGOUT("Range: %f to %f", vmin(M), vmax(M));
 #ifdef DJTJ_LIMIT
 	    M.Clip (DJTJ_LIMIT, 1e50);
-	    LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
+	    LOGOUT("Cutoff at %f", DJTJ_LIMIT);
 #endif // DJTJ_LIMIT
 	    LOGOUT ("Using preconditioner DIAGJTJ");
 	    break;
 	}
-	LOGOUT_1PRM ("Precon reset interval: %d", reset_count);
+	LOGOUT("Precon reset interval: %d", reset_count);
     } else {
 	LOGOUT ("Using preconditioner NONE");
     }
 #endif
 
 
-    LOGOUT_3PRM ("Iteration 0  CPU %f  OF %g  (prior %g)",
+    LOGOUT("Iteration 0  CPU %f  OF %g  (prior %g)",
         toc(clock0), of, of_prior);
 
     // apply preconditioner
@@ -222,7 +222,7 @@ void SolverPCG_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 
 	if (!alpha) { // initialise step length
 	    alpha = of / l2norm (d);
-	    LOGOUT_1PRM ("Initial step length reset to %f", alpha);
+	    LOGOUT("Initial step length reset to %f", alpha);
 	}
 	// line search. this replaces the Secant method of the Shewchuk code
 	if (LineSearch (x, d, alpha, of, of_clbk, &alpha, &fmin, &ofdata)==0) {
@@ -290,7 +290,7 @@ void SolverPCG_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	RVector S(x1-x0);
 	RVector Y(r-r0);
 	gamma = (Y&S) / (Y&Y);
-	LOGOUT_1PRM ("Hessian scale ", gamma);
+	LOGOUT("Hessian scale ", gamma);
 	x0 = x1;
 	r0 = r;
 #endif
@@ -324,10 +324,10 @@ void SolverPCG_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    case PCG_PRECON_DIAGJTJ:
 	        LOGOUT ("Calculating diagonal of JTJ ...");
 		ATA_diag (J, M);
-		LOGOUT_2PRM ("Range %f to %f", vmin(M), vmax(M));
+		LOGOUT("Range %f to %f", vmin(M), vmax(M));
 #ifdef DJTJ_LIMIT
 		M.Clip (DJTJ_LIMIT, 1e50);
-		LOGOUT_1PRM ("Cutoff at %f", DJTJ_LIMIT);
+		LOGOUT("Cutoff at %f", DJTJ_LIMIT);
 #endif // DJTJ_LIMIT
 	    }
 	}
@@ -358,11 +358,11 @@ void SolverPCG_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	    d = s + d * beta;
 	}
 	i_count++;
-	LOGOUT_4PRM ("Iteration %d  CPU %f  OF %g  (prior %g)",
+	LOGOUT("Iteration %d  CPU %f  OF %g  (prior %g)",
 	    i_count, toc(clock0), of, of_prior);
 
 #ifdef DO_PROFILE
-	LOGOUT_1PRM ("Solver time: %f", solver_time);
+	LOGOUT("Solver time: %f", solver_time);
 #endif
     }
 }
@@ -546,7 +546,7 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
 	if (!i || ata_ii < ata_min) ata_min = ata_ii;
 	if (!i || ata_ii > ata_max) ata_max = ata_ii;
     }
-    LOGOUT_2PRM ("ATA diagonal range %f to %f", ata_min, ata_max);
+    LOGOUT("ATA diagonal range %f to %f", ata_min, ata_max);
 
 
 #ifdef RESCALE_JTJ
@@ -560,7 +560,7 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     sum *= JTJ_SCALE;
     for (i = 0; i < n; i++)
         ata(i,i) += sum;
-    LOGOUT_1PRM ("Added %f to ATA diagonal", sum);
+    LOGOUT("Added %f to ATA diagonal", sum);
 #endif
 
     ata.CalculateIncompleteCholeskyFillin (rowptr, colidx);
@@ -597,7 +597,7 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
     sum *= JTJ_SCALE;
     for (i = 0; i < n; i++)
         ata(i,i) += sum;
-    LOGOUT_1PRM ("Added %f to ATA diagonal", sum);
+    LOGOUT("Added %f to ATA diagonal", sum);
 #endif
 
     LOGOUT ("Calculating CH decomposition of ATA ...");

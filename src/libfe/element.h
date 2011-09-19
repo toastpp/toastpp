@@ -289,7 +289,7 @@ public:
      * \sa Local, NodeLocal
      */
     virtual Point SurfToLocal (int side, const Point &p) const
-    { xERROR(Not implemented); return Point(); }
+    { ERROR_UNDEF; return Point(); }
 
     /**
      * \brief Translates a point to an element surface.
@@ -384,7 +384,7 @@ public:
      * \sa Size
      */
     virtual double SideSize (int side, const NodeList &nlist) const
-    { xERROR (Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
     /**
      * \brief Checks if a local point coordinate is inside the element.
@@ -436,7 +436,7 @@ public:
     int SubdivisionLevel () const;
 
     virtual void Subdivide (Mesh *mesh)
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
 
     /**
      * \brief Returns the values of the shape functions at a local point.
@@ -498,7 +498,7 @@ public:
      *   etc.
      */
     virtual int QuadRule (int order, const double **wght, const Point **absc)
-        const { xERROR(Not implemented); return 0; }
+        const { ERROR_UNDEF; return 0; }
 
     /**
      * \brief Integral of a shape function over the element.
@@ -614,7 +614,7 @@ public:
      * \sa IntDD, IntFDD, IntPDD
      */
     virtual RVector IntFD (int i, int j) const
-    { xERROR(Not implemented); return RVector(); }
+    { ERROR_UNDEF; return RVector(); }
 
     /**
      * \brief Integral of a product of a shape function and two shape function
@@ -671,7 +671,7 @@ public:
      * \sa BndIntFSide, BndIntFF, BndIntFFSide
      */
     virtual RVector BndIntF () const
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
     /**
      * \brief Surface integral of a shape function over one of the sides of
@@ -684,7 +684,7 @@ public:
      * \sa BndIntF, BndIntFF, BndIntFFSide
      */
     virtual double BndIntFSide (int i, int sd)
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
     /**
      * \brief Boundary integral of all products of two shape functions over
@@ -729,7 +729,7 @@ public:
      * \sa BndIntFF()const, BndIntFF(int,int)
      */
     virtual double BndIntFFSide (int i, int j,int sd)
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
     /**
      * \brief Surface integrals of all products of a nodal function and two
@@ -774,7 +774,7 @@ public:
      *   \f]
      */
     virtual double Intd (int i, int k) const
-    { xERROR(Not implemented); return 0.0; }
+    { ERROR_UNDEF; return 0.0; }
 
     /**
      * \brief Integral of the product of a shape function and a partial shape
@@ -788,7 +788,7 @@ public:
      *   \frac{\partial u_j(\vec{r})}{\partial x_k} d\vec{r} \f]
      */
     virtual double IntFd (int i, int j, int k) const
-    { xERROR(Not implemented); return 0.0; }
+    { ERROR_UNDEF; return 0.0; }
 
     /**
      * \brief Integral of the product of a nodal function and a partial shape
@@ -801,7 +801,7 @@ public:
      *   \f[ \sum_i P_i \int_\Omega u_i(\vec{r}) \frac{\partial u_j(\vec{r})}{\partial x_k} d\vec{r} \f]
      */
     virtual double IntPd (const RVector &P, int j, int k) const
-    { xERROR(Not implemented); return 0.0; }
+    { ERROR_UNDEF; return 0.0; }
 
     /**
      * \brief Integral of the product of two partial shape function
@@ -814,7 +814,7 @@ public:
      *   dimension d x d.
      */
     virtual RSymMatrix Intdd() const
-    { xERROR(Not implemented); return RSymMatrix(); }
+    { ERROR_UNDEF; return RSymMatrix(); }
 
     /**
      * \brief Integral of the product of a shape function and two partial
@@ -828,35 +828,35 @@ public:
      *   \f[ \int_\Omega u_i(\vec{r}) \frac{\partial u_j(\vec{r})}{\partial x_l} \frac{\partial u_k(\vec{r})}{\partial x_m} \f]
      */
     virtual double IntFdd (int i, int j, int k, int l, int m) const
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
 
     virtual double IntPdd (const RVector &p, int j, int k, int l, int m) const
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
     // Int f(r) du_j/dx_l du_k/dx_m dr
     // where f(r) is given as a nodal vector
 
   virtual double IntFfd (int i, int j, int k, int l) const
-    { xERROR(Not implemented); return 0; }
+    { ERROR_UNDEF; return 0; }
     // Int [u_i u_j du_k/dx_l] dr
 
    virtual double IntPfd (const RVector &p, int j, int k, int l) const
-    { xERROR(Not implemented here); return 0; }
+    { ERROR_UNDEF; return 0; }
     // Int f(r) u_j du_k/dx_l dr
     // where f(r) is given as a nodal vector
 
     //------------- integrate functions on unit sphere --------------
     virtual double IntUnitSphereP (const NodeList& nlist, const RVector& P) const
-    { xERROR(Not implemented); return 0.0; }
+    { ERROR_UNDEF; return 0.0; }
     // Returns integral of f(r) over unitsphere patch 
     // only implemented for Tri3D3, Tri3D6
 
      virtual double IntUnitSphereFF (const NodeList& nlist, const int i, const int j) const
-    { xERROR(Not implemented); return 0.0; }
+    { ERROR_UNDEF; return 0.0; }
     // Returns integral of u_i(r)*u_j(r) over unitsphere patch 
     // only implemented for Tri3D3, Tri3D6
 
      virtual double IntUnitSpherePFF (const NodeList& nlist, const int i, const int j, const RVector& P) const
-    { xERROR(Not implemented); return 0.0; }
+    { ERROR_UNDEF; return 0.0; }
     // Returns integral of f(r)* u_i(r)*u_j(r) over unitsphere patch 
     // only implemented for Tri3D3, Tri3D6
 
@@ -878,7 +878,7 @@ public:
 
     virtual RVector BndIntFCos (int side, const RVector &cntcos, double a,
         const NodeList &nlist) const
-    { xERROR(Not implemented); return RVector(); }
+    { ERROR_UNDEF; return RVector(); }
     // Calculate integral of product of cosine (centered at 'cntcos' and
     // support radius a) with shape functions along 'side'
 
@@ -917,7 +917,7 @@ public:
     // Return value is the number of samples returned in 'absc'
 
     virtual RDenseMatrix StrainDisplacementMatrix (const Point &glob) const
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // Returns the strain displacement matrix of the element at global point
     // 'glob'
     // In 3D, the matrix is of dimension 6 x 3n (n: number of nodes):
@@ -932,14 +932,14 @@ public:
 
     virtual RDenseMatrix ElasticityStiffnessMatrix (const RDenseMatrix &D)
         const
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // Returns the element elasticity stiffness matrix K, given
     // strain matrix D: K = \int_el B^T D B dr
     // where B is strain displacement matrix
 
     virtual RDenseMatrix ElasticityStiffnessMatrix (double E,
         double nu) const
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // Returns the element elasticity stiffness matrix K for isotropic case,
     // given material properties E (Young's modulus) and nu (Poisson's ratio)
     // Strain matrix is calculated as
@@ -958,23 +958,23 @@ public:
     // only implemented for 2D yet
 
     virtual RDenseMatrix IsotropicElasticityMatrix (double E, double nu) const
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // returns a 6x6 symmetric elasticity matrix for isotropic materials,
     // given Young's modulus E and Poisson's ratio nu
 
     virtual RVector InitialStrainVector (double E, double nu, const RVector &e0)
-    { xERROR(Not implemented); return RVector(); }
+    { ERROR_UNDEF; return RVector(); }
     // returns a element strain vector (rhs) for initial nodal strain given
     // in e0
 
     virtual RVector ThermalExpansionVector (double E, double nu,
         double alpha, double dT)
-    { xERROR(Not implemented); return RVector(); }
+    { ERROR_UNDEF; return RVector(); }
     // returns element strain vector (rhs) given element thermal expansion
     // coefficient alpha and temperature change dT
 
     virtual RVector DThermalExpansionVector (double E, double nu)
-    { xERROR(Not implemented); return RVector(); }
+    { ERROR_UNDEF; return RVector(); }
     // returns derivative of thermal expansion vector with respect to
     // expansion coefficient (assuming temperature change 1)
 
@@ -990,15 +990,15 @@ public:
     // within the element. Returns the length of the list
 
     virtual RDenseMatrix LocaltoGlobalMat () const 
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // abstract - local to global matrix
 
     virtual RDenseMatrix GlobaltoLocalMat () const 
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // abstract - global to local matrix
 
     virtual RDenseMatrix FTAMat () const 
-    { xERROR(Not implemented); return RDenseMatrix(); }
+    { ERROR_UNDEF; return RDenseMatrix(); }
     // abstract - transform k-space matrix
 
     friend std::istream& operator>> (std::istream& i, Element &el);
@@ -1014,16 +1014,16 @@ public:
 
     virtual void SplitSide (Mesh *mesh, int side, int newnode,
         Element *nbr1, Element *nbr2, Element *el1, Element *el2)
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
 
     virtual void Bisect (Mesh *mesh, int side, int newnode,
         Element *nbr1, Element *nbr2, Element *el1, Element *el2)
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
 
     virtual void MergeAndResplit (Mesh *mesh, int side, int newnode,
         Element *nbr1, Element *nbr2, Element *el1, Element *el2)
 
-    { xERROR(Not implemented); }
+    { ERROR_UNDEF; }
 
     ElementSubdivisionData *subdivdata;
 

@@ -118,7 +118,7 @@ void Triangle3D3::Initialise (const NodeList& nlist)
 
     // I really don't know if this next line works ...
     Element_Unstructured_2D::Initialise (nlist);
-    dASSERT(size > 0, Element size not positive);
+    dASSERT(size > 0, "Element size not positive");
 
 #ifdef TRI3_STORE_INTFF
     intff.New(3);
@@ -160,7 +160,7 @@ void Triangle3D3::Initialise (const NodeList& nlist)
 
 Point Triangle3D3::Local (const NodeList &nlist, const Point& glob3D) const
 {
-    dASSERT(glob3D.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT(glob3D.Dim() == 3, "Argument 1 invalid dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 
@@ -200,7 +200,7 @@ RVector Triangle3D3::DirectionCosine (int side, RDenseMatrix &jacin)
 bool Triangle3D3::GContains (const Point& glob3D, const NodeList& nlist) const
 {
   /* done */
-    dASSERT(glob3D.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT(glob3D.Dim() == 3, "Argument 1 invalid dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 
@@ -232,7 +232,7 @@ bool Triangle3D3::GContains (const Point& glob3D, const NodeList& nlist) const
 RVector Triangle3D3::GlobalShapeF (const NodeList& nlist, const Point& glob3D)
     const
 {
-    dASSERT(glob3D.Dim() == 3, Invalid point dimension);
+    dASSERT(glob3D.Dim() == 3, "Invalid point dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 #ifdef DEBUG_TRI3D3 
@@ -249,7 +249,7 @@ RVector Triangle3D3::GlobalShapeF (const NodeList& nlist, const Point& glob3D)
 RDenseMatrix Triangle3D3::GlobalShapeD (const NodeList &nlist,
     const Point &glob3D) const
 {
-    dASSERT(glob3D.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT(glob3D.Dim() == 3, "Argument 1 invalid dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 
@@ -332,7 +332,7 @@ RDenseMatrix  Triangle3D3::FTAMat () const
 
 RVector Triangle3D3::LocalShapeQF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RVector fun(6);
     double L0 = 1.0-loc[0]-loc[1];
     double L1 = loc[0];
@@ -348,7 +348,7 @@ RVector Triangle3D3::LocalShapeQF (const Point &loc) const
 
 RDenseMatrix Triangle3D3::LocalShapeQD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 2, Invalid point dimension);
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
     RDenseMatrix der(2,6);
     double lx = loc[0], ly = loc[1];
     der(0,0) = der(1,0) = 4.0*(lx+ly) - 3.0;

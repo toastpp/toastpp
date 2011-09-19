@@ -199,13 +199,15 @@ public:
     // Resize to r x c matrix and set to identity
 
     inline MT Get (int r, int c) const {
-        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
+        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+		 "Index out of range");
 	return val[r*this->cols + c];
     }
     // Retrieve value of an element
 
     inline void Set (int r, int c, MT v) {
-        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
+        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+		 "Index out of range");
 	val[r*this->cols + c] = v;
     }
     // Write value into element
@@ -215,7 +217,8 @@ public:
     // Retrieve value of an element (alternative syntax to 'Get')
 
     inline MT &operator() (int r, int c) {
-        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
+        dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+		 "Index out of range");
 	return val[r*this->cols + c];
     }
     // Retrieve reference to element
@@ -224,7 +227,7 @@ public:
     // Return pointer to data array
 
     inline TVector<MT> Row (int r) const {
-        dASSERT (r >= 0 && r < this->rows, Index out of range);
+        dASSERT (r >= 0 && r < this->rows, "Index out of range");
 	return TVector<MT>(this->cols, val+r*this->cols);
     }
     // Retrieve a row
@@ -420,7 +423,7 @@ protected:
     int rc;  // rows*cols = number of entries in data array
 
 private:
-    inline void Alloc (int r, int c) { if (rc = r*c) val = new MT[rc]; }
+    inline void Alloc (int r, int c) { if ((rc = r*c)) val = new MT[rc]; }
     // allocate data array of length r*c
 
     inline void Unlink () { if (rc) delete []val, rc = 0; }

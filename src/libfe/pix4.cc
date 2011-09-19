@@ -37,15 +37,15 @@ void Pixel4::Initialise (const NodeList &nlist)
 
 int Pixel4::SideNode (int side, int node) const
 {
-    dASSERT (side >= 0 && side < 4, Side index out of range);
-    dASSERT (node >= 0 && node < 2, Node index out of range);
+    dASSERT (side >= 0 && side < 4, "Side index out of range");
+    dASSERT (node >= 0 && node < 2, "Node index out of range");
     static int SN[4][2] = {{0,1},{3,2},{2,0},{1,3}};
     return SN[side][node];
 }
 
 Point Pixel4::Local (const Point &glob) const
 {
-    dASSERT (glob.Dim() == 2, Invalid point dimension);
+    dASSERT (glob.Dim() == 2, "Invalid point dimension");
 
     Point loc(2);
     loc[0] = (glob[0]-x0)/dx;
@@ -61,7 +61,7 @@ Point Pixel4::NodeLocal (int node) const
     case 1: nloc[0] = 1.0; break;
     case 2: nloc[1] = 1.0; break;
     case 3: nloc[0] = nloc[1] = 1.0; break;
-    default: xERROR (Node index out of range);
+    default: xERROR ("Node index out of range");
     }
     return nloc;
 }
@@ -73,13 +73,13 @@ const RVector &Pixel4::LNormal (int side) const
     static const RVector lnm2 = RVector (2, "-1  0");
     static const RVector lnm3 = RVector (2, " 1  0");
     static const RVector *lnm[4] = { &lnm0, &lnm1, &lnm2, &lnm3 };
-    dASSERT (side >= 0 && side < 4, Argument 1 index out of range);
+    dASSERT (side >= 0 && side < 4, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Pixel4::LContains (const Point &loc, bool pad) const
 {
-    dASSERT (loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 2, "Argument 1 invalid dimension");
 
     if (pad) {
         const double EPS = 1e-10;
@@ -103,7 +103,7 @@ bool Pixel4::GContains (const Point &glob, const NodeList&) const
 
 RVector Pixel4::LocalShapeF (const Point &loc) const
 {
-    dASSERT (loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 2, "Argument 1 invalid dimension");
     RVector fun(4);
     double iloc0 = 1.0-loc[0], iloc1 = 1.0-loc[1];
 
@@ -116,7 +116,7 @@ RVector Pixel4::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Pixel4::LocalShapeD (const Point &loc) const
 {
-    dASSERT (loc.Dim() == 2, Argument 1 invalid dimension);
+    dASSERT (loc.Dim() == 2, "Argument 1 invalid dimension");
 
     double xm = 1.0-loc[0], ym = 1.0-loc[1];
     RDenseMatrix der (2,4);

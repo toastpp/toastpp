@@ -20,7 +20,7 @@ double TriangleArea (const Point &p1, const Point &p2, const Point &p3)
 {
     // returns the area of a triangle given by three vertex points in space
     dASSERT(p1.Dim() == 3 && p2.Dim() == 3 && p3.Dim() == 3,
-	   Wrong vertex dimension);
+	   "Wrong vertex dimension");
     double a = p1.Dist(p2);
     double b = p2.Dist(p3);
     double c = p3.Dist(p1);
@@ -168,8 +168,8 @@ void Tetrahedron4::Initialise (const NodeList &nlist)
 
 int Tetrahedron4::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 4, Side index out of range);
-    dASSERT(node >= 0 && node < 3, Node index out of range);
+    dASSERT(side >= 0 && side < 4, "Side index out of range");
+    dASSERT(node >= 0 && node < 3, "Node index out of range");
     static int SN[4][3] = {{0,1,2},{0,3,1},{0,2,3},{1,3,2}};
     return SN[side][node];
 }
@@ -181,7 +181,7 @@ double Tetrahedron4::SideSize (int sd, const NodeList &nlist) const
 
 Point Tetrahedron4::Local (const NodeList &nlist, const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
 
     Point loc(3);
     double scale = 1.0/(a0+a1+a2+a3);
@@ -199,14 +199,14 @@ Point Tetrahedron4::NodeLocal (int node) const
     case 1: nloc[0] = 1.0; nloc[1] = nloc[2] = 0.0; break;
     case 2: nloc[0] = nloc[2] = 0.0; nloc[1] = 1.0; break;
     case 3: nloc[0] = nloc[1] = 0.0; nloc[2] = 1.0; break;
-    default: xERROR(Node index out of range);
+    default: xERROR("Node index out of range");
     }
     return nloc;
 }
 
 Point Tetrahedron4::SurfToLocal (int side, const Point &p) const
 {
-    dASSERT(p.Dim() == 2, Arg 2 wrong vector dimension);
+    dASSERT(p.Dim() == 2, "Arg 2 wrong vector dimension");
 
     Point loc(3);
     switch (side) {
@@ -215,14 +215,14 @@ Point Tetrahedron4::SurfToLocal (int side, const Point &p) const
     case 2: loc[0] = 0.0;  loc[1] = p[0]; loc[2] = p[1]; break;
     case 3: loc[0] = p[0]; loc[1] = p[1];
             loc[2] = 1.0-p[0]-p[1];                      break;
-    default: xERROR(Arg 1 index out of range);
+    default: xERROR("Arg 1 index out of range");
     }
     return loc;
 }
 
 void Tetrahedron4::MapToSide (int side, Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Arg 2 wrong vector dimension);
+    dASSERT(loc.Dim() == 3, "Arg 2 wrong vector dimension");
     switch (side) {
     case 0: loc[2] = 0.0; break;
     case 1: loc[1] = 0.0; break;
@@ -230,7 +230,7 @@ void Tetrahedron4::MapToSide (int side, Point &loc) const
     case 3: { double a = (1.0-loc[0]-loc[1]-loc[2])/3.0;
               loc[0] += a, loc[1] += a, loc[2] += a;
             } break;
-    default: xERROR (Side index out of range);
+    default: xERROR ("Side index out of range");
     }
 }
 
@@ -242,7 +242,7 @@ RVector Tetrahedron4::DirectionCosine (int side, RDenseMatrix &jacin)
     case 1: cosin[0] = -b2, cosin[1] = -c2, cosin[2] = -d2; break;
     case 2: cosin[0] = -b1, cosin[1] = -c1, cosin[2] = -d1; break;
     case 3: cosin[0] = -b0, cosin[1] = -c0, cosin[2] = -d0; break;
-    default: xERROR(Side index out of range);
+    default: xERROR("Side index out of range");
     }
     return cosin/length(cosin);
 }
@@ -257,13 +257,13 @@ const RVector &Tetrahedron4::LNormal (int side) const
     static const RVector *lnm[4] = {
       &lnm0, &lnm1, &lnm2, &lnm3
     };
-    dASSERT(side >= 0 && side < 4, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 4, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Tetrahedron4::LContains (const Point &loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 3, Local point must be 3D);
+    dASSERT(loc.Dim() == 3, "Local point must be 3D");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -276,7 +276,7 @@ bool Tetrahedron4::LContains (const Point &loc, bool pad) const
 
 RVector Tetrahedron4::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Invalid point dimension);
+    dASSERT(loc.Dim() == 3, "Invalid point dimension");
     RVector fun(4);
     fun[0] = 1.0-loc[0]-loc[1]-loc[2];
     fun[1] = loc[0];
@@ -287,7 +287,7 @@ RVector Tetrahedron4::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Tetrahedron4::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Invalid point dimension);
+    dASSERT(loc.Dim() == 3, "Invalid point dimension");
     static const RDenseMatrix der(3, 4,
        "-1 1 0 0 \
         -1 0 1 0 \
@@ -298,7 +298,7 @@ RDenseMatrix Tetrahedron4::LocalShapeD (const Point &loc) const
 RVector Tetrahedron4::GlobalShapeF (const NodeList &nlist, const Point &glob)
     const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
     RVector fun(4);
     double scale = 1.0/(6.0*size);
     fun[0] = scale * (a0 + b0*glob[0] + c0*glob[1] + d0*glob[2]);
@@ -311,7 +311,7 @@ RVector Tetrahedron4::GlobalShapeF (const NodeList &nlist, const Point &glob)
 RDenseMatrix Tetrahedron4::GlobalShapeD (const NodeList &nlist,
     const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
     RDenseMatrix der(3,4);
     double scale = 1.0/(6.0*size);
     der(0,0) = b0*scale;
@@ -403,7 +403,7 @@ double Tetrahedron4::IntFDD (int i, int j, int k) const
 	case 3: return (b3*b3+c3*c3+d3*d3) * scale;
 	}
     }
-    xERROR(Index out of range);
+    xERROR("Index out of range");
     return 0;
 }
 
@@ -449,7 +449,7 @@ double Tetrahedron4::IntFd (int i, int j, int k) const
 	}
 	break;
     }
-    xERROR(Index out of range);
+    xERROR("Index out of range");
     return 0.0;
 }
 
@@ -583,7 +583,7 @@ double Tetrahedron4::IntFdd (int i, int j, int k, int l, int m) const
 		 break;}  break; 
 	}
     }
-    xERROR(Index out of range);
+    xERROR("Index out of range");
     return 0;
 }
 
@@ -628,30 +628,30 @@ double Tetrahedron4::Intd (int i, int k) const
 	case 0: return b0*fac;
 	case 1: return c0*fac;
 	case 2: return d0*fac;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     case 1:
 	switch(k) {
 	case 0: return b1*fac;
 	case 1: return c1*fac;
 	case 2: return d1*fac;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     case 2:
 	switch(k) {
 	case 0: return b2*fac;
 	case 1: return c2*fac;
 	case 2: return d2*fac;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     case 3:
 	switch(k) {
 	case 0: return b3*fac;
 	case 1: return c3*fac;
 	case 2: return d3*fac;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
-    default: xERROR(Invalid index); return 0;
+    default: xERROR("Invalid index"); return 0;
     }
 }
 
@@ -667,31 +667,31 @@ double Tetrahedron4::IntFfd (int i, int j, int k, int l) const
 	case 0: return b0/coeff;
 	case 1: return c0/coeff;
 	case 2: return d0/coeff;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     case 1:
 	switch (l) {
 	case 0: return b1/coeff;
 	case 1: return c1/coeff;
 	case 2: return d1/coeff;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     case 2:
 	switch (l) {
 	case 0: return b2/coeff;
 	case 1: return c2/coeff;
 	case 2: return d2/coeff;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     case 3:
 	switch (l) {
 	case 0: return b3/coeff;
 	case 1: return c3/coeff;
 	case 2: return d3/coeff;
-	default: xERROR(Invalid index); return 0;
+	default: xERROR("Invalid index"); return 0;
 	}
     default:
-	xERROR(Invalid index); return 0;
+	xERROR("Invalid index"); return 0;
     }
 }
 
@@ -1114,16 +1114,16 @@ double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
 {
     // computes \int_s du_i/dx_j u_k ds over side sd
     int nd;
-    dASSERT (sd >= 0 && sd < 4, Argument 1: index out of range);
-    dASSERT (j >= 0 && j < 3, Argument 3: index out of range);
+    dASSERT (sd >= 0 && sd < 4, "Argument 1: index out of range");
+    dASSERT (j >= 0 && j < 3, "Argument 3: index out of range");
     int nsdnd = nSideNode(sd);
 #ifdef FEM_DEBUG
     for (nd = 0; nd < nsdnd; nd++)
 	if (i == SideNode (sd,nd)) break;
-    dASSERT (nd < nsdnd, Argument 2: node index not found in side);
+    dASSERT (nd < nsdnd, "Argument 2: node index not found in side");
     for (nd = 0; nd < nsdnd; nd++)
 	if (k == SideNode (sd,nd)) break;
-    dASSERT (nd < nsdnd, Argument 4: node index not found in side);
+    dASSERT (nd < nsdnd, "Argument 4: node index not found in side");
 #endif
     double intf = IntF(k);
     intf *= 1.0/(6.0*size);

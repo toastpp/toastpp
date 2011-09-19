@@ -162,7 +162,7 @@ void Triangle3D6::Initialise (const NodeList& nlist)
 
 Point Triangle3D6::Local (const NodeList &nlist, const Point& glob3D) const
 {
-    dASSERT(glob3D.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT(glob3D.Dim() == 3, "Argument 1 invalid dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 
@@ -202,7 +202,7 @@ RVector Triangle3D6::DirectionCosine (int side, RDenseMatrix &jacin)
 bool Triangle3D6::GContains (const Point& glob3D, const NodeList& nlist) const
 {
   /* done */
-    dASSERT(glob3D.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT(glob3D.Dim() == 3, "Argument 1 invalid dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 
@@ -234,7 +234,7 @@ bool Triangle3D6::GContains (const Point& glob3D, const NodeList& nlist) const
 RVector Triangle3D6::GlobalShapeF (const NodeList& nlist, const Point& glob3D)
     const
 {
-    dASSERT(glob3D.Dim() == 3, Invalid point dimension);
+    dASSERT(glob3D.Dim() == 3, "Invalid point dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 #ifdef DEBUG_TRI3D6 
@@ -259,7 +259,7 @@ RVector Triangle3D6::GlobalShapeF (const NodeList& nlist, const Point& glob3D)
 RDenseMatrix Triangle3D6::GlobalShapeD (const NodeList &nlist,
     const Point &glob3D) const
 {
-    dASSERT(glob3D.Dim() == 3, Argument 1 invalid dimension);
+    dASSERT(glob3D.Dim() == 3, "Argument 1 invalid dimension");
     RVector glob(2);
     glob = Map3Dto2D * (glob3D - nlist[Node[0]]);
 

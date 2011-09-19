@@ -42,13 +42,13 @@ MATHLIB toast::complex sqrt (const toast::complex& z)
 
 toast::complex pow (const toast::complex& /*zb*/, const toast::complex& /*ze*/)
 {
-    xERROR(Function not implemented!);
+    ERROR_UNDEF;
     return (toast::complex(0,0));
 }
 
 toast::complex pow (const toast::complex& /*zb*/, double /*e*/)
 {
-    xERROR(Function not implemented!);
+    ERROR_UNDEF;
     return (toast::complex(0,0));
 }
 

@@ -23,7 +23,7 @@ int main (int argc, char *argv[])
 
     // command line parser
     for (i = 1; i < argc; i++) {
-        xASSERT(argv[i][0] == '-', Error parsing command line);
+        xASSERT(argv[i][0] == '-', "Error parsing command line");
 	switch (argv[i][1]) {
 	case 'H':
 	    DisplayInfo ();

@@ -6,8 +6,9 @@
 
 #define IMGFMT_RAW 1
 #define IMGFMT_NIM 2
-#define IMGFMT_PGM 3
-#define IMGFMT_PPM 4
+#define IMGFMT_RAW_NIM 3
+#define IMGFMT_PGM 4
+#define IMGFMT_PPM 5
 
 void WritePixmap (const RVector &img, const IVector &gdim,
     double *scalemin, double *scalemax, const char *fname, bool colour);

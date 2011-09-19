@@ -21,12 +21,12 @@ TDenseMatrix<MT>::TDenseMatrix (const TDenseMatrix<MT> &m,
     if (i1 == END) i1 = m.nRows();
     if (j1 == END) j1 = m.nCols();
 
-    dASSERT(i0 >= 0, Argument 2 out of range);
-    dASSERT(i1 >= i0, Argument 4 >= argument 2 required);
-    dASSERT(m.nRows() >= i1, Argument 4 out of range);
-    dASSERT(j0 >= 0, Argument 3 out of range);
-    dASSERT(j1 >= j0, Argument 5 >= argument 3 required);
-    dASSERT(m.nCols() >= j1, Argument 5 out of range);
+    dASSERT(i0 >= 0, "Argument 2 out of range");
+    dASSERT(i1 >= i0, "Argument 4 >= argument 2 required");
+    dASSERT(m.nRows() >= i1, "Argument 4 out of range");
+    dASSERT(j0 >= 0, "Argument 3 out of range");
+    dASSERT(j1 >= j0, "Argument 5 >= argument 3 required");
+    dASSERT(m.nCols() >= j1, "Argument 5 out of range");
 
     int i, j;
     this->rows = i1-i0;
@@ -113,7 +113,7 @@ template<class MT>
 void TDenseMatrix<MT>::SetRow (int r, const TVector<MT> &rval)
 {
     RANGE_CHECK(r >= 0 && r < this->rows);
-    dASSERT(rval.Dim() == this->cols, Argument 2: wrong size);
+    dASSERT(rval.Dim() == this->cols, "Argument 2: wrong size");
     memcpy (val + (r*this->cols), rval.data_buffer(),
 	    this->cols*sizeof(MT));
 }
@@ -121,7 +121,7 @@ void TDenseMatrix<MT>::SetRow (int r, const TVector<MT> &rval)
 template<class MT>
 void TDenseMatrix<MT>::ColScale (const TVector<MT> &scale)
 {
-    dASSERT (scale.Dim() == this->cols, Argument 1: wrong size);
+    dASSERT (scale.Dim() == this->cols, "Argument 1: wrong size");
     for (int r = 0; r < this->rows; r++)
         for (int c = 0; c < this->cols; c++)
 	    val[r*this->cols+c] *= scale[c];
@@ -130,7 +130,7 @@ void TDenseMatrix<MT>::ColScale (const TVector<MT> &scale)
 template<class MT>
 void TDenseMatrix<MT>::RowScale (const TVector<MT> &scale)
 {
-    dASSERT (scale.Dim() == this->rows, Argument 1: wrong size);
+    dASSERT (scale.Dim() == this->rows, "Argument 1: wrong size");
     for (int r = 0; r < this->rows; r++)
 	for (int c = 0; c < this->cols; c++)
 	    val[r*this->cols+c] *= scale[r];
@@ -217,7 +217,7 @@ void TDenseMatrix<MT>::Identity ()
 template<class MT>
 void TDenseMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT(this->cols == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(this->cols == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != this->rows) b.New (this->rows);  // resize
 
     int r, c;
@@ -234,7 +234,7 @@ template<>
 MATHLIB void TDenseMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
     const
 {
-    dASSERT(cols == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(cols == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != rows) b.New (rows);  // resize
 
     // we need to transpose and flip the row and column dimensions
@@ -249,7 +249,7 @@ MATHLIB void TDenseMatrix<double>::Ax (const TVector<double> &x, TVector<double>
 template<>
 void TDenseMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b) const
 {
-    dASSERT(cols == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(cols == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != rows) b.New (rows);  // resize;
 
     // we need to transpose and flip the row and column dimensions
@@ -265,7 +265,7 @@ template<>
 void TDenseMatrix<toast::complex>::Ax (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
-    dASSERT(cols == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(cols == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != rows) b.New (rows);  // resize;
 
     // we need to transpose and flip the row and column dimensions
@@ -285,7 +285,7 @@ void TDenseMatrix<toast::complex>::Ax (const TVector<toast::complex> &x,
 template<class MT>
 void TDenseMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT(this->rows == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(this->rows == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != this->cols) b.New (this->cols);  // resize
     
     int r, c;
@@ -302,7 +302,7 @@ template<>
 MATHLIB void TDenseMatrix<double>::ATx (const TVector<double> &x, TVector<double> &b)
     const
 {
-    dASSERT(rows == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(rows == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != cols) b.New (cols);  // resize
     
     static char trans = 'N';
@@ -316,7 +316,7 @@ template<>
 void TDenseMatrix<float>::ATx (const TVector<float> &x, TVector<float> &b)
     const
 {
-    dASSERT(rows == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(rows == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != cols) b.New (cols);  // resize
     
     static char trans = 'N';
@@ -330,7 +330,7 @@ template<>
 void TDenseMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
-    dASSERT(rows == x.Dim(), Argument 1: vector has wrong dimension);
+    dASSERT(rows == x.Dim(), "Argument 1: vector has wrong dimension");
     if (b.Dim() != cols) b.New (cols);  // resize
     
     static char trans = 'N';
@@ -349,7 +349,7 @@ template<class MT>
 void TDenseMatrix<MT>::AB (const TDenseMatrix<MT> &A,
     const TDenseMatrix<MT> &B)
 {
-    dASSERT(A.cols == B.rows, Matrix sizes do not match for this operation.);
+    dASSERT(A.cols == B.rows, "Matrix sizes do not match for this operation.");
 
     int r, c, i, rAcols, Acols = A.cols, Bcols = B.cols;
     if (this->rows != A.rows || this->cols != B.cols)
@@ -368,7 +368,7 @@ template<>
 MATHLIB void TDenseMatrix<double>::AB (const TDenseMatrix<double> &A,
     const TDenseMatrix<double> &B)
 {
-    dASSERT(A.cols == B.rows, Matrix sizes do not match for this operation.);
+    dASSERT(A.cols == B.rows, "Matrix sizes do not match for this operation.");
 
     int Acols = A.cols, Bcols = B.cols;
     if (rows != A.rows || cols != B.cols)
@@ -389,7 +389,7 @@ template<>
 MATHLIB void TDenseMatrix<float>::AB (const TDenseMatrix<float> &A,
     const TDenseMatrix<float> &B)
 {
-    dASSERT(A.cols == B.rows, Matrix sizes do not match for this operation.);
+    dASSERT(A.cols == B.rows, "Matrix sizes do not match for this operation.");
 
     int Acols = A.cols, Bcols = B.cols;
     if (rows != A.rows || cols != B.cols)
@@ -410,7 +410,7 @@ template<>
 MATHLIB void TDenseMatrix<toast::complex>::AB (const TDenseMatrix<toast::complex> &A,
     const TDenseMatrix<toast::complex> &B)
 {
-    dASSERT(A.cols == B.rows, Matrix sizes do not match for this operation.);
+    dASSERT(A.cols == B.rows, "Matrix sizes do not match for this operation.");
 
     int Acols = A.cols, Bcols = B.cols;
     if (rows != A.rows || cols != B.cols)
@@ -698,7 +698,8 @@ TDenseMatrix<MT> &TDenseMatrix<MT>::operator= (MT v)
 template<class MT>
 TDenseMatrix<MT> TDenseMatrix<MT>::operator+ (const TDenseMatrix<MT> &m) const
 {
-    dASSERT(this->rows == m.rows && this->cols == m.cols, Incompatible matrix dimensions);
+    dASSERT(this->rows == m.rows && this->cols == m.cols,
+	    "Incompatible matrix dimensions");
 
     TDenseMatrix<MT> tmp(m);
     for (int i = 0; i < rc; i++) tmp.val[i] += val[i];
@@ -708,7 +709,8 @@ TDenseMatrix<MT> TDenseMatrix<MT>::operator+ (const TDenseMatrix<MT> &m) const
 template<class MT>
 TDenseMatrix<MT> TDenseMatrix<MT>::operator- (const TDenseMatrix<MT> &m) const
 {
-    dASSERT(this->rows == m.rows && this->cols == m.cols, Incompatible matrix dimensions);
+    dASSERT(this->rows == m.rows && this->cols == m.cols,
+	    "Incompatible matrix dimensions");
 
     TDenseMatrix<MT> tmp(*this);
     for (int i = 0; i < rc; i++) tmp.val[i] -= m.val[i];
@@ -747,7 +749,7 @@ MATHLIB TDenseMatrix<MT> cath (const TDenseMatrix<MT> &A,
     if (bc == 0 && br == 0) return A;
 
     nc = ac+bc;
-    xASSERT (nr == B.nRows(), Matrix row dimensions do not match);
+    xASSERT (nr == B.nRows(), "Matrix row dimensions do not match");
 
     TDenseMatrix<MT> C (nr, nc);
     MT *valt  = C.val;
@@ -782,7 +784,7 @@ MATHLIB TDenseMatrix<MT> catv (const TDenseMatrix<MT> &A,
     if (bc == 0 && br == 0) return A;
 
     nr = ar+br;
-    xASSERT (nc = B.nCols(), Matrix column dimensions do not match);
+    xASSERT (nc = B.nCols(), "Matrix column dimensions do not match");
 
     TDenseMatrix<MT> C (nr, nc);
     MT *valt  = C.val;
@@ -805,13 +807,14 @@ MATHLIB TDenseMatrix<MT> catv (const TDenseMatrix<MT> &A,
 template<class MT>
 MATHLIB MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai)
 {
-    xASSERT(A.nRows() == A.nCols(), Need square matrix to compute determinant);
+    xASSERT(A.nRows() == A.nCols(),
+	    "Need square matrix to compute determinant");
     const double detmin = 1e-50;
     int n = A.nCols();
     MT d;
 #ifdef FEM_DEBUG
     if (Ai) dASSERT(Ai->rows == n && Ai->cols == n,
-		    Argument 2 matrix has wrong dimension);
+		    "Argument 2 matrix has wrong dimension");
 #endif
 
     switch (n) {
@@ -821,14 +824,14 @@ MATHLIB MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai)
     case 1:
         d = A(0,0);
 	if (Ai) {
-	    xASSERT(norm(d) > detmin, Matrix singular);
+	    xASSERT(norm(d) > detmin, "Matrix singular");
 	    Ai->Set (0,0,(MT)1/d);
 	}
 	break;
     case 2:
         d = A(0,0)*A(1,1) - A(0,1)*A(1,0);
 	if (Ai) {
-	    xASSERT(norm(d) > detmin, Matrix singular);
+	    xASSERT(norm(d) > detmin, "Matrix singular");
 	    Ai->Set(0,0, A(1,1)/d);
 	    Ai->Set(0,1,-A(0,1)/d);
 	    Ai->Set(1,0,-A(1,0)/d);
@@ -840,7 +843,7 @@ MATHLIB MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai)
 	  A(0,1) * (A(1,0)*A(2,2) - A(2,0)*A(1,2)) +
 	  A(0,2) * (A(1,0)*A(2,1) - A(2,0)*A(1,1));
       if (Ai) {
-	  xASSERT(norm(d) > detmin, Matrix singular);
+	  xASSERT(norm(d) > detmin, "Matrix singular");
 	  Ai->Set(0,0, ( A(1,1)*A(2,2) - A(2,1)*A(1,2))/d);
 	  Ai->Set(1,0, (-A(1,0)*A(2,2) + A(2,0)*A(1,2))/d);
 	  Ai->Set(2,0, ( A(1,0)*A(2,1) - A(2,0)*A(1,1))/d);
@@ -866,7 +869,7 @@ MATHLIB MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai)
 	    else     d += A(k,0) * det(tmp);
 	}
 	xASSERT(Ai == 0,
-	    This routine does not compute inverse for matrix greater than 3x3);
+	   "This routine does not compute inverse for matrix greater than 3x3");
 	}
 	break;
     }
@@ -877,7 +880,7 @@ template<class MT>
 MATHLIB TDenseMatrix<MT> inverse (const TDenseMatrix<MT> &A)
 {
     int n = A.nRows();
-    xASSERT (n == A.nCols(), Inverse requires square matrix.);
+    xASSERT (n == A.nCols(), "Inverse requires square matrix.");
     TDenseMatrix<MT> Ai (n);
 
     if (n <= 3) {
@@ -980,7 +983,7 @@ MATHLIB void LUFactorize (TDenseMatrix<MT> &a, IVector &indx, double &d)
     double big, sum, dum, temp;
     int i, j, k, imax, n = a.nRows();
     if (n != a.nCols())
-        xERROR (LUFactorize requires square matrix.);
+        xERROR ("LUFactorize requires square matrix.");
     indx.New(n);
     RVector vv(n);
     d = 1.0;  // no row interchanges yet
@@ -989,7 +992,7 @@ MATHLIB void LUFactorize (TDenseMatrix<MT> &a, IVector &indx, double &d)
 	for (j = 0; j < n; j++)
 	    if ((temp = fabs(a(i,j))) > big) big = temp;
 	if (big == 0.0)
-	    xERROR (Singular matrix in LUFactorize);
+	    xERROR ("Singular matrix in LUFactorize");
 	vv[i] = 1.0/big;
     }
     for (j = 0; j < n; j++) {

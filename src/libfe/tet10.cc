@@ -354,8 +354,8 @@ void Tetrahedron10::Initialise (const NodeList &nlist)
 
 int Tetrahedron10::SideNode (int side, int node) const
 {
-    dASSERT(side >= 0 && side < 4, Side index out of range);
-    dASSERT(node >= 0 && node < 6, Node index out of range);
+    dASSERT(side >= 0 && side < 4, "Side index out of range");
+    dASSERT(node >= 0 && node < 6, "Node index out of range");
     static int SN[4][6] = {{0,1,2,4,7,5},{0,3,1,6,8,4},
 			   {0,2,3,5,9,6},{1,3,2,8,9,7}};
     return SN[side][node];
@@ -368,7 +368,7 @@ double Tetrahedron10::SideSize (int sd, const NodeList &nlist) const
 
 Point Tetrahedron10::Local (const NodeList &nlist, const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
 
     Point loc(3);
     double scale = 1.0/(a0+a1+a2+a3);
@@ -392,14 +392,14 @@ Point Tetrahedron10::NodeLocal (int node) const
     case 7: nloc[0] = nloc[1] = 0.5; nloc[2] = 0.0; break;
     case 8: nloc[0] = nloc[2] = 0.5; nloc[1] = 0.0; break;
     case 9: nloc[0] = 0.0; nloc[1] = nloc[2] = 0.5; break;
-    default: xERROR(Node index out of range);
+    default: xERROR("Node index out of range");
     }
     return nloc;
 }
 
 Point Tetrahedron10::SurfToLocal (int side, const Point &p) const
 {
-    dASSERT(p.Dim() == 2, Arg 2 wrong vector dimension);
+    dASSERT(p.Dim() == 2, "Arg 2 wrong vector dimension");
 
     Point loc(3);
     switch (side) {
@@ -408,7 +408,7 @@ Point Tetrahedron10::SurfToLocal (int side, const Point &p) const
     case 2: loc[0] = 0.0;  loc[1] = p[0]; loc[2] = p[1]; break;
     case 3: loc[0] = p[0]; loc[1] = p[1];
             loc[2] = 1.0-p[0]-p[1];                      break;
-    default: xERROR(Arg 1 index out of range);
+    default: xERROR("Arg 1 index out of range");
     }
     return loc;
 }
@@ -421,7 +421,7 @@ RVector Tetrahedron10::DirectionCosine (int side, RDenseMatrix &jacin)
     case 1: cosin[0] = -b2, cosin[1] = -c2, cosin[2] = -d2; break;
     case 2: cosin[0] = -b1, cosin[1] = -c1, cosin[2] = -d1; break;
     case 3: cosin[0] = -b0, cosin[1] = -c0, cosin[2] = -d0; break;
-    default: xERROR(Side index out of range);
+    default: xERROR("Side index out of range");
     }
     return cosin/length(cosin);
 }
@@ -436,13 +436,13 @@ const RVector &Tetrahedron10::LNormal (int side) const
     static const RVector *lnm[4] = {
       &lnm0, &lnm1, &lnm2, &lnm3
     };
-    dASSERT(side >= 0 && side < 4, Argument 1 index out of range);
+    dASSERT(side >= 0 && side < 4, "Argument 1 index out of range");
     return *lnm[side];
 }
 
 bool Tetrahedron10::LContains (const Point &loc, bool pad) const
 {
-    dASSERT(loc.Dim() == 3, Local point must be 3D);
+    dASSERT(loc.Dim() == 3, "Local point must be 3D");
     if (pad) {
         static const double EPS = 1e-8;
 	return (loc[0]+EPS >= 0.0 && loc[1]+EPS >= 0.0 &&
@@ -455,7 +455,7 @@ bool Tetrahedron10::LContains (const Point &loc, bool pad) const
 
 RVector Tetrahedron10::LocalShapeF (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Invalid point dimension);
+    dASSERT(loc.Dim() == 3, "Invalid point dimension");
     RVector fun(10);
     double L0 = 1.0-loc[0]-loc[1]-loc[2];
     double L1 = loc[0];
@@ -476,7 +476,7 @@ RVector Tetrahedron10::LocalShapeF (const Point &loc) const
 
 RDenseMatrix Tetrahedron10::LocalShapeD (const Point &loc) const
 {
-    dASSERT(loc.Dim() == 3, Invalid point dimension);
+    dASSERT(loc.Dim() == 3, "Invalid point dimension");
     RDenseMatrix der(3,10);
     double lx = loc[0], ly = loc[1], lz = loc[2];
 
@@ -500,7 +500,7 @@ RDenseMatrix Tetrahedron10::LocalShapeD (const Point &loc) const
 RVector Tetrahedron10::GlobalShapeF (const NodeList& nlist, const Point& glob)
     const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
     RVector fun(10);
     double scale = 1.0/(6.0*size);
     double L0 = scale * (a0 + b0*glob[0] + c0*glob[1] + d0*glob[2]);
@@ -523,7 +523,7 @@ RVector Tetrahedron10::GlobalShapeF (const NodeList& nlist, const Point& glob)
 RDenseMatrix Tetrahedron10::GlobalShapeD (const NodeList &nlist,
     const Point &glob) const
 {
-    dASSERT(glob.Dim() == 3, Invalid point dimension);
+    dASSERT(glob.Dim() == 3, "Invalid point dimension");
     RDenseMatrix der(3,10);
     double scale = 1.0/(6.0*size);
     double scale4 = 4.0*scale;
@@ -1628,7 +1628,7 @@ double Tetrahedron10::IntFDD (int i, int j, int k) const
 		    intfd9d9(i,8)*(d3*d3))/size;
 	}
     }
-    xERROR(Index out of range);
+    xERROR("Index out of range");
     return 0;
 }
 

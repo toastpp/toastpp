@@ -1122,7 +1122,7 @@ void SolverLM_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
     err00 = 0; // this is previous error
     
     //    test_biscale();
-    LOGOUT_1PRM("Starting error: %f", errstart);
+    LOGOUT("Starting error: %f", errstart);
     
     // LM iteration loop
     for (inr = 0; (!nrmax || inr < nrmax) &&
@@ -1165,13 +1165,13 @@ void SolverLM_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	cerr << "T(gradient)=" << walltoc() << endl;
 	walltic();
 	
-	LOGOUT_1PRM("Gradient norm: %f", l2norm(r));
+	LOGOUT("Gradient norm: %f", l2norm(r));
 	
 	// add prior to gradient
 	RVector gpsi = reg->GetGradient (x);
 	gpsi *= M; // apply Hessian normalisation
 	r -= gpsi;
-	LOGOUT_1PRM("Gradient norm with penalty: %f", l2norm(r));
+	LOGOUT("Gradient norm with penalty: %f", l2norm(r));
 	cerr << "T(prior_grad)=" << walltoc() << endl;
 	walltic();
 	
@@ -1179,7 +1179,7 @@ void SolverLM_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	i_count = 0;
 	err00 = err0;
 	while (i_count < itmax && KeepGoing) {
-	    LOGOUT_1PRM ("LM iteration %d", i_count);
+	    LOGOUT("LM iteration %d", i_count);
 
 	    if (Gradient_descent) {
 
@@ -1369,22 +1369,21 @@ void SolverLM_CW_MW_MPI::Solve (RFwdSolverMW &FWS, const Raster &raster,
 	        lambda *= lambda_scale;
 	    }
 	    if (lambda) {
-		LOGOUT_1PRM("LM param lambda: %g", lambda);
+		LOGOUT("LM param lambda: %g", lambda);
 	    }
 	    cerr << "T(update)=" << walltoc() << endl;
 	    walltic();
 
 	    i_count++;
 	}
-	LOGOUT_3PRM("Iteration %d  CPU %f  OF %f",
-	    inr+1, toc(clock0), err0);
+	LOGOUT("Iteration %d  CPU %f  OF %f", inr+1, toc(clock0), err0);
     } // end of NR loop;
 
     // final residuals
     double rd = ObjectiveFunction::get_value (data, proj, sd, cov);
     double rp = reg->GetValue (x);
     double tau = reg->GetTau();
-    LOGOUT_4PRM("Residuals  TAU %g  DATA %g  PRIOR/TAU %g  IT %d", tau, rd,
+    LOGOUT("Residuals  TAU %g  DATA %g  PRIOR/TAU %g  IT %d", tau, rd,
 		rp/tau, inr);
 }
 
@@ -1695,7 +1694,7 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
 	fbp = reg->GetValue (p1);
 	fb  = fbd + fbp;
-	LOGOUT_4PRM("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g", xb,fbd,fbp,fb);
+	LOGOUT("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g", xb,fbd,fbp,fb);
     } else {
 	LOGOUT ("Parameters out of range in trial step");
 	fb = f0*4.0; // force reduction in step size
@@ -1712,7 +1711,7 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	    fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
 	    fbp = reg->GetValue (p1);
 	    fb  = fbd + fbp;
-	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
+	    LOGOUT("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 		     xb, fbd, fbp, fb);
 	} else {
 	    LOGOUT ("Parameters out of range in trial step");
@@ -1731,7 +1730,7 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 		fbd = ObjectiveFunction::get_value (data, proj, sd, cov);
 		fbp = reg->GetValue (p1);
 		fb  = fbd + fbp;
-		LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
+		LOGOUT("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 			 xb, fbd, fbp, fb);
 	    } else {
 		LOGOUT ("Parameters out of range in trial step");
@@ -1748,7 +1747,7 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 	    fmd = ObjectiveFunction::get_value (data, proj, sd, cov);
 	    fmp = reg->GetValue (p1);
 	    fm  = fmd + fmp;
-	    LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
+	    LOGOUT("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 		     xm, fmd, fmp, fm);
 	} else {
 	    LOGOUT ("Parameters out of range in trial step");
@@ -1768,7 +1767,7 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
 		fmd = ObjectiveFunction::get_value (data, proj, sd, cov);
 		fmp = reg->GetValue (p1);
 		fm  = fmd + fmp;
-		LOGOUT_4PRM ("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
+		LOGOUT("Lsearch: STEP %g OF %g PRIOR %g TOTAL %g",
 			 xm, fmd, fmp, fm);
 	    } else {
 		LOGOUT ("Parameters out of range in trial step");
@@ -1791,7 +1790,7 @@ bool LineSearchWithPrior (RFwdSolverMW &FWS, const Raster &raster,
     if (fmin > fm) {  // interpolation didn't give improvement
         lambda = xm, fmin = fm;
     }
-    LOGOUT_4PRM("Lsearch final: STEP %g OF %g PRIOR %g TOTAL %g",
+    LOGOUT("Lsearch final: STEP %g OF %g PRIOR %g TOTAL %g",
 		lambda, fmind, fminp, fmin);
     // restimate tau 
     //    tau = fmind/fminp;

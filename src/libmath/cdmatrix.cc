@@ -116,8 +116,8 @@ TCoordMatrix<MT> &TCoordMatrix<MT>::operator= (const TCoordMatrix<MT> &m)
 template<class MT>
 MT &TCoordMatrix<MT>::operator() (int r, int c)
 {
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     // assumes unsorted lists
     for (int i = 0; i < this->nval; i++)
@@ -131,8 +131,8 @@ MT TCoordMatrix<MT>::Get (int r, int c) const
 {
     const static MT zero = (MT)0;
 
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     for (int i = 0; i < this->nval; i++)
         if (rowidx[i] == r && colidx[i] == c) return this->val[i];
@@ -142,8 +142,8 @@ MT TCoordMatrix<MT>::Get (int r, int c) const
 template<class MT>
 bool TCoordMatrix<MT>::Exists (int r, int c) const
 {
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     for (int i = 0; i < this->nval; i++)
         if (rowidx[i] == r && colidx[i] == c) return true;
@@ -153,14 +153,14 @@ bool TCoordMatrix<MT>::Exists (int r, int c) const
 template<class MT>
 TVector<MT> TCoordMatrix<MT>::Row (int r) const
 {
-    xERROR(Not implemented);
+    ERROR_UNDEF;
     return TVector<MT>(); // dummy
 }
 
 template<class MT>
 TVector<MT> TCoordMatrix<MT>::Col (int c) const
 {
-    xERROR (Not implemented);
+    ERROR_UNDEF;
     return TVector<MT>(); // dummy
 }
 
@@ -188,7 +188,7 @@ int TCoordMatrix<MT>::Get_index (int r, int c) const
 template<class MT>
 void TCoordMatrix<MT>::ColScale (const TVector<MT> &scale)
 {
-    dASSERT (scale.Dim() == this->cols, Argument 1: wrong size);
+    dASSERT (scale.Dim() == this->cols, "Argument 1: wrong size");
     for (int i = 0; i < this->nval; i++)
         this->val[i] *= scale[colidx[i]];
 }
@@ -196,7 +196,7 @@ void TCoordMatrix<MT>::ColScale (const TVector<MT> &scale)
 template<class MT>
 void TCoordMatrix<MT>::RowScale (const TVector<MT> &scale)
 {
-    dASSERT (scale.Dim() == this->cols, Argument 1: wrong size);
+    dASSERT (scale.Dim() == this->cols, "Argument 1: wrong size");
     for (int i = 0; i < this->nval; i++)
 	this->val[i] *= scale[rowidx[i]];
 }
@@ -246,8 +246,8 @@ void TCoordMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
 template<class MT>
 void TCoordMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT(x.Dim() == this->rows, Invalid size - vector x);
-    dASSERT(b.Dim() == this->cols, Invalid size - vector b);
+    dASSERT(x.Dim() == this->rows, "Invalid size - vector x");
+    dASSERT(b.Dim() == this->cols, "Invalid size - vector b");
 
     b.Clear();
     for (int i = 0; i < this->nval; i++)
@@ -344,7 +344,7 @@ MATHLIB TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
     nr = A.nRows();
     nc = A.nCols()+B.nCols();
     jofs = A.nCols();
-    xASSERT (nr == B.nRows(), Matrix row dimensions do not match);
+    xASSERT (nr == B.nRows(), "Matrix row dimensions do not match");
 
     const MT *Aval = A.ValPtr();
     const MT *Bval = B.ValPtr();
@@ -388,7 +388,7 @@ MATHLIB TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
     nrB = B.nRows();
     nr  = nrA+nrB;
     nc  = A.nCols();
-    xASSERT (nc == B.nCols(), Matrix column dimensions do not match);
+    xASSERT (nc == B.nCols(), "Matrix column dimensions do not match");
 
     const MT *Aval = A.ValPtr();
     const MT *Bval = B.ValPtr();

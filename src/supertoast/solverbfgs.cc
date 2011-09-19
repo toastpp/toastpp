@@ -256,7 +256,7 @@ bool LineSearch (CFwdSolver &FWS, const Raster &raster, const Scaler *pscaler,
     }
     proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
     fb = ObjectiveFunction::get_value (data, proj, sd);
-    LOGOUT_2PRM ("Step  %f  OF %f", xb, fb);
+    LOGOUT("Step  %f  OF %f", xb, fb);
 
     if (fb < f0) { // increase interval
         xm = xb; fm = fb;
@@ -269,7 +269,7 @@ bool LineSearch (CFwdSolver &FWS, const Raster &raster, const Scaler *pscaler,
 	} else {
 	    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
 	    fb = ObjectiveFunction::get_value (data, proj, sd);
-	    LOGOUT_2PRM ("Step  %f  OF %f", xb, fb);
+	    LOGOUT("Step  %f  OF %f", xb, fb);
 	}
 	while (fb < fm) {
 	    x0 = xm; f0 = fm;
@@ -279,7 +279,7 @@ bool LineSearch (CFwdSolver &FWS, const Raster &raster, const Scaler *pscaler,
 	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
 	    fb = ObjectiveFunction::get_value (data, proj, sd);
-	    LOGOUT_2PRM ("Step  %f  OF %f", xb, fb);
+	    LOGOUT("Step  %f  OF %f", xb, fb);
 	}
     } else { // decrease interval
         xm = 0.5*xb;
@@ -287,7 +287,7 @@ bool LineSearch (CFwdSolver &FWS, const Raster &raster, const Scaler *pscaler,
 	raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
 	fm = ObjectiveFunction::get_value (data, proj, sd);
-	LOGOUT_2PRM ("Step  %f  OF %f", xm, fm);
+	LOGOUT("Step  %f  OF %f", xm, fm);
 	int itcount = 0;
 	while (fm > f0) {
   	    if (++itcount > MAXIT) return false;
@@ -297,7 +297,7 @@ bool LineSearch (CFwdSolver &FWS, const Raster &raster, const Scaler *pscaler,
 	    raster.Map_ActiveSolToMesh (pscaler->Unscale(p1), meshsol);
 	    proj = FWS.ProjectAll_real (qvec, mvec, meshsol, omega);
 	    fm = ObjectiveFunction::get_value (data, proj, sd);
-	    LOGOUT_2PRM ("Step  %f  OF %f", xm, fm);
+	    LOGOUT("Step  %f  OF %f", xm, fm);
 	}
     }
     // quadratic interpolation
@@ -311,7 +311,7 @@ bool LineSearch (CFwdSolver &FWS, const Raster &raster, const Scaler *pscaler,
     if (fmin > fm) {  // interpolation didn't give improvement
         lambda = xm, fmin = fm;
     } else proj_valid = true;
-    LOGOUT_2PRM ("Final %f  OF %f", lambda, fmin);
+    LOGOUT("Final %f  OF %f", lambda, fmin);
     LOGOUT ("Linesearch End");
     return true;
 }

@@ -230,6 +230,18 @@ private:
 };
 
 
+// ==========================================================================
+// typedefs for specific instances of `TCompRowMatrixMPI'
+
+typedef TCompRowMatrixMPI<double>   RCompRowMatrixMPI;
+typedef TCompRowMatrixMPI<float>    FCompRowMatrixMPI;
+typedef TCompRowMatrixMPI<toast::complex> CCompRowMatrixMPI;
+typedef TCompRowMatrixMPI<scomplex> SCCompRowMatrixMPI;
+typedef TCompRowMatrixMPI<int>      ICompRowMatrixMPI;
+
+// ==========================================================================
+// extern declarations of TCompRowMatrix (only required for VS)
+
 #ifndef MATHLIB_IMPLEMENTATION
 extern template class MATHLIB TCompRowMatrixMPI<double>;
 extern template class MATHLIB TCompRowMatrixMPI<float>;

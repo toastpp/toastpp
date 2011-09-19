@@ -75,14 +75,10 @@ void MWsolution::RegisterChange()
 {
     const double c0 = 0.3;
     RVector covern(meshlength);
-    RVector tmp_C2A(meshlength);
+    RVector tmp_c2A = GetC2A();
 
     covern = c0/GetParam(nmuaChromo+2);
     
-    for (int k = 0; k < meshlength; k++) {
-	tmp_C2A[k] = covern[k]/(2*A_Keijzer(param[nmuaChromo+2][k]));
-    }
-
     for (int i = 0; i < nofwavel; i++) {
 	RVector tmp_cMua(meshlength);
 	RVector tmp_ckappa(meshlength);
@@ -101,7 +97,7 @@ void MWsolution::RegisterChange()
 
 	swsol[i]->SetParam(OT_CMUA, tmp_cMua);
 	swsol[i]->SetParam(OT_CKAPPA, tmp_ckappa);
-	swsol[i]->SetParam(OT_C2A, tmp_C2A);
+	swsol[i]->SetParam(OT_C2A, tmp_c2A);
     }
 }
 
@@ -130,4 +126,14 @@ RVector MWsolution::GetJacobianCoeff_b (int wavelind) const
                 * GetJacobianCoeff_A (wavelind);
 
   return jcoeff; 
+}
+
+RVector MWsolution::GetC2A () const
+{
+    RVector c2a(meshlength);
+    for (int k = 0; k < meshlength; k++) {
+        double n = param[nmuaChromo+2][k];
+	c2a[k] = Parameter::C2A(REFLECTION_KEIJZER, n);
+    }
+    return c2a;
 }

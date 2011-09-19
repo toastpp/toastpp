@@ -570,20 +570,20 @@ int ILUSolveZSYM (const CCompRowMatrix &A, const CVector &b, CVector &x,
 
 void ILUSetPermtype (int ptype)
 {
-    xERROR (No ILUPack support provided);
+    xERROR ("No ILUPack support provided");
 }
 
 int ILUSolveZGNL (const CCompRowMatrix &A, const CVector &b, CVector &x,
     double tol, double droptol, int maxit)
 {
-    xERROR (No ILUPack support provided);
+    xERROR ("No ILUPack support provided");
     return 0;
 }
 
 int ILUSolveZSYM (const CCompRowMatrix &A, const CVector &b, CVector &x,
     double tol, double droptol, int maxit)
 {
-    xERROR (No ILUPack support provided);
+    xERROR ("No ILUPack support provided");
     return 0;
 }
 

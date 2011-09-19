@@ -23,6 +23,7 @@ public:
 private:
     int itmax;                  // max number of CG iterations
     double cg_tol;              // CG convergence criterion
+    double cg_delta;            // CG stopping criterion
     double alpha;               // step length for line search
 
     enum PCG_PRECON {           // preconditioners for PCG solver

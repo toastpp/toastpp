@@ -49,7 +49,7 @@ int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci, toast::complex *rv) con
 
 void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b) const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);
 
@@ -67,7 +67,7 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b) const
 void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b,
     int r1, int r2) const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
         "Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
 
     idxtype r, i2;
@@ -88,8 +88,8 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b,
 
 void SCCompRowMatrixMixed::ATx (const CVector &x, CVector &b) const
 {
-    dASSERT(x.Dim() == rows, Invalid size - vector x);
-    dASSERT(b.Dim() == cols, Invalid size - vector b);
+    dASSERT(x.Dim() == rows, "Invalid size - vector x");
+    dASSERT(b.Dim() == cols, "Invalid size - vector b");
 
     if (!col_access) SetColAccess();
     int i, c;
@@ -105,7 +105,7 @@ void SCCompRowMatrixMixed::ATx (const CVector &x, CVector &b) const
 // ==========================================================================
 
 int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
-    double &elim, SCPreconditionerMixed *precon, int restart,
+    double &elim, SCPreconditionerMixed *precon, int restart, int maxit,
     void (*clbk)(void*))
 {
 #ifdef VERBOSE_GMRES
@@ -114,6 +114,7 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
 
     int N=b.Dim();
     int MAX_GMRES_STEPS=restart;
+    int MAX_CYCLE = (maxit ? maxit : N+1);
     int j, k, l, cycle, n;
     double norm_b,norm_v,norm_x, tmp;
     toast::complex h1, h2, r, sum;
@@ -157,7 +158,7 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
     //----------------------------------------------------------------
  
     while ( ((norm_v=sqrt(l2normsq(v[0]))) > elim*norm_b)
-            // && (cycle < MAX_CYCLE)
+            && (cycle < MAX_CYCLE)
 	    )
       {
  
@@ -182,7 +183,7 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
         cycle++;
         while ((norm_x=norm(s[j+1])) > elim*norm_b
                 && (j < (MAX_GMRES_STEPS-1))
-                // && (cycle < MAX_CYCLE)
+                && (cycle < MAX_CYCLE)
 		)
 	  {
 	    j++;

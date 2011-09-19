@@ -27,7 +27,7 @@ double Ptr2Handle (void *ptr)
 	return h.handle;
 	}
     default:
-	xERROR(Unsupported pointer size);
+	xERROR("Unsupported pointer size");
 	return 0;
     }
 }
@@ -52,7 +52,7 @@ void *Handle2Ptr (double handle)
 	return h.p;
         }
     default:
-	xERROR(Unsupported pointer size);
+	xERROR("Unsupported pointer size");
 	return NULL;
     }
 }

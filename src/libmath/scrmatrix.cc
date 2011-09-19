@@ -51,7 +51,7 @@ template<class MT>
 TSymCompRowMatrix<MT>::TSymCompRowMatrix (int rows, int cols)
     : TGenericSparseMatrix<MT> (rows, cols)
 {
-    xASSERT(rows == cols, Invalid arguments);
+    xASSERT(rows == cols, "Invalid arguments");
     rowptr = new idxtype[rows+1];
     for (int i = 0; i <= rows; i++) rowptr[i] = 0;
 
@@ -68,7 +68,7 @@ TSymCompRowMatrix<MT>::TSymCompRowMatrix (int rows, int cols,
     const int *rptr, const int *cidx, const MT *data)
     : TGenericSparseMatrix<MT> (rows, cols)
 {
-    xASSERT(rows == cols, Invalid arguments);
+    xASSERT(rows == cols, "Invalid arguments");
     rowptr = new idxtype[rows+1];
 
     // column access is off on startup
@@ -145,21 +145,21 @@ template<class MT>
 MT &TSymCompRowMatrix<MT>::operator() (int r, int c)
 {
     static MT dummy;
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     if (r < c) { int tmp = r; r = c; c = tmp; }
     for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
-    xERROR(Attempt to access non-existing entry);
+    xERROR("Attempt to access non-existing entry");
     return dummy;
 }
 
 template<class MT>
 MT TSymCompRowMatrix<MT>::Get (int r, int c) const
 {
-    dASSERT(r < this->rows, Row index out of range);
-    dASSERT(c < this->cols, Col index out of range);
+    dASSERT(r < this->rows, "Row index out of range");
+    dASSERT(c < this->cols, "Col index out of range");
 
     if (r < c) { int tmp = r; r = c; c = tmp; }
     const static MT zero = (MT)0;
@@ -295,7 +295,7 @@ void TSymCompRowMatrix<MT>::SetColAccess (bool yes) const
 template<class MT>
 void TSymCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 {
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
 	"Parameter 1 invalid size %d (expected %d)", x.Dim(), this->cols);
     if (b.Dim() != this->rows) b.New (this->rows);
     else                 b.Clear();
@@ -315,7 +315,7 @@ template<class MT>
 void TSymCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
     int r1, int r2) const
 {
-    dASSERT_2PRM(x.Dim() == this->cols,
+    dASSERT(x.Dim() == this->cols,
 	"Parameter 1 invalid size %d (expected %d)", x.Dim(), this->cols);
     if (b.Dim() != this->rows) b.New (this->rows);
     else b.Clear();
@@ -341,7 +341,7 @@ template<>
 void TSymCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
     TVector<toast::complex> &b) const
 {
-    dASSERT_2PRM(x.Dim() == cols,
+    dASSERT(x.Dim() == cols,
         "Parameter 1 invalid size %d (expected %d)", x.Dim(), cols);
     if (b.Dim() != rows) b.New (rows);
     else                 b.Clear();
@@ -440,7 +440,7 @@ bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
 		    ajk_set = true;
 #endif
 		}
-		dASSERT(ajk_set, Cholesky factor not column-sorted);
+		dASSERT(ajk_set, "Cholesky factor not column-sorted");
 		fullcol[r] -= ajk * Lval[Lvofs[i]];
 	    }
 	}
@@ -448,7 +448,7 @@ bool CholeskyFactorize (const TSymCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
 	if (fullcol[c] > MT(0)) {   /* problem here, if using complex */
 	    d[c] = sqrt (fullcol[c]);
 	} else {
-	    if (!recover) xERROR(Matrix not positive definite);
+	    if (!recover) xERROR("Matrix not positive definite");
 	    ok = false;
 	    d[c] = EPS;
 	}

@@ -38,7 +38,7 @@ RVector ATA_lambdaI_x (const TMatrix<double> &A, double lambda,
 
 template<class MT>
 int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
-    TVector<MT> &x, TPreconditioner<MT> *precon, double &elim,
+    TVector<MT> &x, TPreconditioner<MT> *precon, double &elim, int maxit,
     void (*clbk)(void*))
 {
 #ifdef VERBOSE_GMRES
@@ -48,6 +48,7 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
 
     int N=b.Dim();
     int MAX_GMRES_STEPS=restart;
+    int MAX_CYCLE = (maxit ? maxit : N+1);
     int j, k, l, cycle, n;
     double norm_b,norm_v,norm_x, tmp;
     MT h1, h2, r, sum;
@@ -98,7 +99,7 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
     //----------------------------------------------------------------
  
     while ( ((norm_v=sqrt(l2normsq(v[0]))) > elim*norm_b)
-            // && (cycle < MAX_CYCLE)
+            && (cycle < MAX_CYCLE)
 	    )
       {
  
@@ -123,7 +124,7 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
         cycle++;
         while ((norm_x=norm(s[j+1])) > elim*norm_b
                 && (j < (MAX_GMRES_STEPS-1))
-                // && (cycle < MAX_CYCLE)
+                && (cycle < MAX_CYCLE)
 		)
 	  {
 	    j++;
@@ -233,7 +234,7 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
 template<class MT>
 int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
     void *context), const TVector<MT> &b, TVector<MT> &x,
-    TPreconditioner<MT> *precon, double &elim, void *context)
+    TPreconditioner<MT> *precon, double &elim, int maxit, void *context)
 {
     // This "matrix-less" version of gmres can be used whenever matrix A is
     // not available in explicit form. The user provides a callback function
@@ -247,6 +248,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 
     int N=b.Dim();
     int MAX_GMRES_STEPS=restart;
+    int MAX_CYCLE = (maxit ? maxit : N+1);
     int j, k, l, cycle, n;
     double norm_b,norm_v,norm_x, tmp;
     MT h1, h2, r, sum;
@@ -297,7 +299,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
     //----------------------------------------------------------------
  
     while ( ((norm_v=sqrt(l2normsq(v[0]))) > elim*norm_b)
-            // && (cycle < MAX_CYCLE)
+            && (cycle < MAX_CYCLE)
 	    )
     {
 	    
@@ -322,7 +324,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 	    cycle++;
 	    while ((norm_x=norm(s[j+1])) > elim*norm_b
 		   && (j < (MAX_GMRES_STEPS-1))
-		   // && (cycle < MAX_CYCLE)
+		   && (cycle < MAX_CYCLE)
 		   )
 		{
 		    j++;
@@ -573,32 +575,33 @@ CVector precond (const CGenericSparseMatrix& AC,const CVector& y)
 
 template int gmres (int restart, const TMatrix<float> &A,
     const TVector<float> &b, TVector<float> &x,
-    TPreconditioner<float> *precon, double &elim,
+    TPreconditioner<float> *precon, double &elim, int maxit,
     void (*clbk)(void*));
 
 template int gmres (int restart, const TMatrix<double> &A,
     const TVector<double> &b, TVector<double> &x,
-    TPreconditioner<double> *precon, double &elim,
+    TPreconditioner<double> *precon, double &elim, int maxit,
     void (*clbk)(void*));
 
 template int gmres (int restart, const TMatrix<toast::complex> &A,
     const TVector<toast::complex> &b, TVector<toast::complex> &x,
-    TPreconditioner<toast::complex> *precon, double &elim,
+    TPreconditioner<toast::complex> *precon, double &elim, int maxit,
     void (*clbk)(void*));
 
 template int gmres (int restart, const TMatrix<scomplex> &A,
     const TVector<scomplex> &b, TVector<scomplex> &x,
-    TPreconditioner<scomplex> *precon, double &elim,
+    TPreconditioner<scomplex> *precon, double &elim, int maxit,
     void (*clbk)(void*));
 
 template int gmres (int restart,
     TVector<double> (*Av_clbk)(const TVector<double> &v, void *context),
     const TVector<double> &b, TVector<double> &x,
-    TPreconditioner<double> *precon, double &elim, void *context);
+    TPreconditioner<double> *precon, double &elim, int maxit, void *context);
 
 template int gmres (int restart,
-    TVector<toast::complex> (*Av_clbk)(const TVector<toast::complex> &v, void *context),
-    const TVector<toast::complex> &b, TVector<toast::complex> &x,
-    TPreconditioner<toast::complex> *precon, double &elim, void *context);
+    TVector<toast::complex> (*Av_clbk)(const TVector<toast::complex> &v,
+    void *context), const TVector<toast::complex> &b,
+    TVector<toast::complex> &x, TPreconditioner<toast::complex> *precon,
+    double &elim, int maxit, void *context);
 
 #endif // NEED_EXPLICIT_INSTANTIATION
