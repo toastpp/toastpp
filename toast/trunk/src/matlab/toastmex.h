@@ -17,12 +17,18 @@ typedef int mwSize;
 #define INDEX64
 #endif
 
+typedef enum {
+    ROWVEC,
+    COLVEC
+} VectorOrientation;
+
 // =========================================================================
 // TOAST -> MATLAB interface conversions
 
-void CopyVector (mxArray **array, RVector &vec);
-void CopyVector (mxArray **array, CVector &vec);
-void CopyVector (mxArray **array, const IVector &vec);
+void CopyVector (mxArray **array, RVector &vec, VectorOrientation vo=COLVEC);
+void CopyVector (mxArray **array, CVector &vec, VectorOrientation vo=COLVEC);
+void CopyVector (mxArray **array, const IVector &vec,
+    VectorOrientation vo=COLVEC);
 
 void CopyMatrix (mxArray **array, RDenseMatrix &mat);
 void CopyMatrix (mxArray **array, CDenseMatrix &mat);

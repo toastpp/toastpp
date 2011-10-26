@@ -19,11 +19,14 @@ static bool is64bit = (sizeof(mwIndex) == 8);
 // ============================================================================
 // Copy a dense RVector from TOAST to MATLAB format
 
-void CopyVector (mxArray **array, RVector &vec)
+void CopyVector (mxArray **array, RVector &vec, VectorOrientation vo)
 {
     int i, m = vec.Dim();
+    mxArray *tmp;
 
-    mxArray *tmp = mxCreateDoubleMatrix (m, 1, mxREAL);
+    // note: these seem transposed, but produce correct result
+    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (m, 1, mxREAL);
+    else            tmp = mxCreateDoubleMatrix (1, m, mxREAL);
     double *pr = mxGetPr (tmp);
 
     for (i = 0; i < m; i++)
@@ -35,11 +38,14 @@ void CopyVector (mxArray **array, RVector &vec)
 // ============================================================================
 // Copy a dense CVector from TOAST to MATLAB format
 
-void CopyVector (mxArray **array, CVector &vec)
+void CopyVector (mxArray **array, CVector &vec, VectorOrientation vo)
 {
     int i, m = vec.Dim();
+    mxArray *tmp;
 
-    mxArray *tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
+    // note: these seem transposed, but produce correct result
+    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
+    else            tmp = mxCreateDoubleMatrix (1, m, mxCOMPLEX);
     double *pr = mxGetPr (tmp);
     double *pi = mxGetPi (tmp);
 
@@ -54,12 +60,16 @@ void CopyVector (mxArray **array, CVector &vec)
 // ============================================================================
 // Copy a dense IVector from TOAST to MATLAB format
 
-void CopyVector (mxArray **array, const IVector &vec)
+void CopyVector (mxArray **array, const IVector &vec, VectorOrientation vo)
 {
     int i, m = vec.Dim();
 
     const mwSize dim = (mwSize)vec.Dim();
-    mxArray *tmp = mxCreateNumericMatrix (1, dim, mxINT32_CLASS, mxREAL);
+    mxArray *tmp;
+
+    // note: these seem transposed, but produce correct result
+    if (vo==ROWVEC) tmp = mxCreateNumericMatrix (dim,1, mxINT32_CLASS, mxREAL);
+    else            tmp = mxCreateNumericMatrix (1,dim, mxINT32_CLASS, mxREAL);
     int *pr = (int*)mxGetData (tmp);
 
     for (i = 0; i < m; i++)

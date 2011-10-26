@@ -15,13 +15,13 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     Raster *raster = (Raster*)Handle2Ptr (mxGetScalar (prhs[0]));
     int i, dim = raster->Dim();
     if (nlhs >= 1) {
-	RVector tmp(dim);
+	IVector tmp(dim);
 	for (i = 0; i < dim; i++) tmp[i] = raster->BDim()[i];
-	CopyVector (&plhs[0], tmp);
+	CopyVector (&plhs[0], tmp, ROWVEC);
     }
     if (nlhs >= 2) {
-	RVector tmp(dim);
+	IVector tmp(dim);
 	for (i = 0; i < dim; i++) tmp[i] = raster->GDim()[i];
-	CopyVector (&plhs[1], tmp);
+	CopyVector (&plhs[1], tmp, ROWVEC);
     }
 }
