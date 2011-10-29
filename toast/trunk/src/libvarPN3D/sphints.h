@@ -43,8 +43,8 @@ using namespace toast;
 
 const double irtpi = 1/sqrt(M_PI);
 const double irt2 = sqrt(0.5);
-const complex iirt2 = sqrt( complex(-0.5,0));
-const complex myi =  complex(0.0,1.0);
+const toast::complex iirt2 = sqrt( toast::complex(-0.5,0));
+const toast::complex myi =  toast::complex(0.0,1.0);
 
 RDenseMatrix Chop(const RDenseMatrix& ) ;
 RDenseMatrix RealMat(const CDenseMatrix& ) ;

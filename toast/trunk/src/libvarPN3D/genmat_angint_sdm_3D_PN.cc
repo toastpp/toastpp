@@ -23,9 +23,9 @@ typedef unsigned pid_t;
 #include <string.h>
 #include <mathlib.h>
 #include <felib.h>
-#include "toast.h"
-#include "rte3D.h"
-#include "sphints.h"
+#include <toast.h>
+#include <rte3D.h>
+#include <sphints.h>
 
 #define USE_INTONSPHERE
     using namespace toast;
@@ -52,10 +52,10 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
   int rp = 0, ci = 0;
   int *rowptr ;
   int *colidx ;
-  complex *val;
+  toast::complex *val;
   double *rval;
   CCompRowMatrix tmp(nsp,nsp);
-  complex val00;
+  toast::complex val00;
 
   Aintscsc.New(nsp,nsp);// integrals of products of spherical harmonics with xx
 
@@ -88,7 +88,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = nsp;
     rowptr = new int [nsp+1];
     colidx = new int [nnz];
-    val = new complex [nnz];
+    val = new toast::complex [nnz];
     for (i = 0; i < nsp; i++){
  //      cerr << "i " << i;
       rowptr[i] = rp++;
@@ -110,7 +110,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 2*(nsp - sporder)+sporder; // number of nonzeros
     rowptr = new int [nsp+1];
     colidx = new int [nnz];
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     for (int l = 0; l < nso ; l++) {
 	for (int m = -l; m < 0; m++) {
@@ -165,7 +165,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 3*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     const double iY2m2N = (SQR(Y1m1N)/Y22[0][0]);
 
@@ -185,7 +185,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 	}
       }
       if(lmYindex((l),(m-2))>= 0) {
-   	  val00 = complex(0,0);
+   	  val00 = toast::complex(0,0);
 	  if(lmYindex((l-1),(m-1)) >= 0)
 	    val00 += CGmem(l,m)*CGmep((l-1),(m-1));
 	  if(lmYindex((l+1),(m-1)) >= 0)
@@ -220,7 +220,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 3*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     const double iY2m1N = ((Y1m1N*Y10N)/Y22[0][1]);
 
@@ -240,7 +240,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 	}
       }
       if(lmYindex((l),(m-1))>= 0) {
-   	  val00 = complex(0,0);
+   	  val00 = toast::complex(0,0);
 	  if(lmYindex((l-1),(m-1)) >= 0)
 	    val00 += CGmem(l,m)*CGzp((l-1),(m-1));
 	  if(lmYindex((l+1),(m-1)) >= 0)
@@ -278,7 +278,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 3*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     const double iY20N = ((Y1p1N*Y1m1N)/Y22[0][2]);
     const double iY00N = -((Y1p1N*Y00N*sqrt(2.0/3.0))/Y22[0][2]);
@@ -299,7 +299,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 	}
       }
       if(lmYindex((l),(m))>= 0) {
-   	  val00 = complex(iY00N/iY20N,0);
+   	  val00 = toast::complex(iY00N/iY20N,0);
 	  if(lmYindex((l-1),(m+1)) >= 0)
 	    val00 += CGpem(l,m)*CGmep((l-1),(m+1));
 	  if(lmYindex((l+1),(m+1)) >= 0)
@@ -339,7 +339,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 3*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     const double iY2p1N = ((Y1p1N*Y10N)/Y22[1][2]);
 
@@ -359,7 +359,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 	}
       }
       if(lmYindex((l),(m+1))>= 0) {
-   	  val00 = complex(0,0);
+   	  val00 = toast::complex(0,0);
 	  if(lmYindex((l-1),(m+1)) >= 0)
 	    val00 += CGpem(l,m)*CGzp((l-1),(m+1));
 	  if(lmYindex((l+1),(m+1)) >= 0)
@@ -397,7 +397,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 3*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     const double iY2p2N = (SQR(Y1p1N)/Y22[2][2]);
 
@@ -417,7 +417,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 	}
       }
       if(lmYindex((l),(m+2))>= 0) {
-   	  val00 = complex(0,0);
+   	  val00 = toast::complex(0,0);
 	  if(lmYindex((l-1),(m+1)) >= 0)
 	    val00 += CGpem(l,m)*CGpep((l-1),(m+1));
 	  if(lmYindex((l+1),(m+1)) >= 0)
@@ -458,7 +458,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
     nnz = 3*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     for(int k = 0; k < nsp; k++) {
       rowptr[k] = rp;
@@ -508,21 +508,21 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 /*------------ now form all the real matrices by combination and rotation */
     const double Y2N = sqrt(4*M_PI/5);
     RCompRowMatrix sxx(nsp,nsp);
-    tmp = RY*((Y2m2YYC+Y2p2YYC)*complex(sqrt(1.0/6.0),0) - Y20YYC*complex(1.0/3.0))*RYT*complex(Y2N,0) +idnspC*complex(1.0/3.0);
+    tmp = RY*((Y2m2YYC+Y2p2YYC)*toast::complex(sqrt(1.0/6.0),0) - Y20YYC*toast::complex(1.0/3.0))*RYT*toast::complex(Y2N,0) +idnspC*toast::complex(1.0/3.0);
     sxx = RealMat(tmp);
     Aintscsc = Chop(sxx);
     cout << "\nBuilt RRxx by Y2 method\n";
     cerr << Aintscsc << endl;
 
     RCompRowMatrix syy(nsp,nsp);
-    tmp = RY*((Y2m2YYC+Y2p2YYC)*complex(-sqrt(1.0/6.0),0) - Y20YYC*complex(1.0/3.0))*RYT*complex(Y2N,0) +idnspC*complex(1.0/3.0);
+    tmp = RY*((Y2m2YYC+Y2p2YYC)*toast::complex(-sqrt(1.0/6.0),0) - Y20YYC*toast::complex(1.0/3.0))*RYT*toast::complex(Y2N,0) +idnspC*toast::complex(1.0/3.0);
     syy = RealMat(tmp);
     Aintssss = Chop(syy);
     cout << "\nBuilt RRyy by Y2 method\n";
     cerr << Aintssss << endl;
 
     RCompRowMatrix szz(nsp,nsp);
-    tmp = RY*Y20YYC*RYT*complex(2*Y2N/3,0)+idnspC*complex(1.0/3.0);
+    tmp = RY*Y20YYC*RYT*toast::complex(2*Y2N/3,0)+idnspC*toast::complex(1.0/3.0);
     szz = RealMat(tmp);
     Aintcc = Chop(szz);
     cout << "\nBuilt RRzz by Y2 method\n";
@@ -530,7 +530,7 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 
     RCompRowMatrix sxy(nsp,nsp);
 
-    tmp = RY*((Y2m2YYC-Y2p2YYC)*complex(0,sqrt(1.0/6.0)))*RYT*complex(Y2N,0);
+    tmp = RY*((Y2m2YYC-Y2p2YYC)*toast::complex(0,sqrt(1.0/6.0)))*RYT*toast::complex(Y2N,0);
     sxy = RealMat(tmp);
     Aintscss = Chop(sxy);
     cout << "\nBuilt RRxy by Y2 method\n";
@@ -538,14 +538,14 @@ void genmat_angint_sdm_3D_PN(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss
 
    RCompRowMatrix sxz(nsp,nsp);
    //   cout << "testing Y21 matrices\n(Y2m1YYC-Y2p2YYC) : " << Sparse2Dense(Y2m1YYC-Y2p1YYC) <<endl;
-    tmp = RY*(Y2m1YYC-Y2p1YYC)*RYT*complex(Y2N*sqrt(1.0/6.0),0);
+    tmp = RY*(Y2m1YYC-Y2p1YYC)*RYT*toast::complex(Y2N*sqrt(1.0/6.0),0);
     sxz = RealMat(tmp);
     Aintscc = Chop(sxz);
     cout << "\nBuilt RRxz by Y2 method\n";
     cerr << Aintscc << endl;
 
    RCompRowMatrix syz(nsp,nsp);
-    tmp = RY*((Y2m1YYC+Y2p1YYC)*complex(0,sqrt(1.0/6.0)) )*RYT*complex(Y2N,0);
+    tmp = RY*((Y2m1YYC+Y2p1YYC)*toast::complex(0,sqrt(1.0/6.0)) )*RYT*toast::complex(Y2N,0);
     syz = RealMat(tmp);
     Aintssc = Chop(syz);
     cout << "\nBuilt RRyz by Y2 method\n";
