@@ -23,9 +23,9 @@ typedef unsigned pid_t;
 #include <string.h>
 #include <mathlib.h>
 #include <felib.h>
-#include "toast.h"
-#include "rte3D.h"
-#include "sphints.h"
+#include <toast.h>
+#include <rte3D.h>
+#include <sphints.h>
 
 #define USE_INTONSPHERE
     using namespace toast;
@@ -43,7 +43,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
   int rp = 0, ci = 0;
   int *rowptr ;
   int *colidx ;
-  complex *val;
+  toast::complex *val;
   double *rval;
 
   Aint.New(nsp,nsp);   // integrals of products of spherical harmonics 
@@ -85,7 +85,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
     nnz = 2*(nsp - sporder)+sporder; // number of nonzeros
     rowptr = new int [nsp+1];
     colidx = new int [nnz];
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     for (int l = 0; l < nso ; l++) {
 	for (int m = -l; m < 0; m++) {
@@ -131,7 +131,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
       for(j = 0; j < nsp; j++)
 	if(RY.Exists(i,j))
 	  RYT(i,j) = conj(RYT(i,j));
-       //cout << "conjg transp rotation test \n" << Sparse2Dense(RYT*RY) << endl;
+    //    cerr << "conjg transp rotation \n" << Sparse2Dense(RYT) << endl;
     
 
     /*---------------------------- z YY integral --------------------------*/
@@ -141,7 +141,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
     nnz = 2*nsp-2;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz]; 
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
     for(int k = 0; k < nsp; k++) {
       rowptr[k] = rp;
@@ -192,7 +192,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
     nnz = 4*nsp;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz];
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
 
     for(int k = 0; k < nsp; k++) {
@@ -245,7 +245,7 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
     nnz = 4*nsp;// this is a slight over estimate
     rowptr = new int [nsp+1];
     colidx = new int [nnz];
-    val = new complex[nnz];
+    val = new toast::complex[nnz];
     rp = 0; ci = 0;
 
    for(int k = 0; k < nsp; k++) {
@@ -255,21 +255,21 @@ void genmat_angint_3D_PN(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowM
 
       if(l >0) {
 	if(m > -l+1){
-	  val[ci] = complex(0,CGmem(l,m)/2);
+	  val[ci] = toast::complex(0,CGmem(l,m)/2);
 	  colidx[ci++] = lmYindex((l-1),(m-1));rp++;
 	}
 	if(m < l-1){
-	  val[ci] = complex(0,-CGpem(l,m)/2);
+	  val[ci] = toast::complex(0,-CGpem(l,m)/2);
 	  colidx[ci++] = lmYindex((l-1),(m+1));rp++;
 	}
       }
       if(l <nso-1) {
 	if(m > -l-1){
-	  val[ci] = complex(0,CGmep(l,m)/2);
+	  val[ci] = toast::complex(0,CGmep(l,m)/2);
 	  colidx[ci++] = lmYindex((l+1),(m-1));rp++;
 	}
       	if(m < l+1) {
-	  val[ci] = complex(0,-CGpep(l,m)/2);
+	  val[ci] = toast::complex(0,-CGpep(l,m)/2);
 	  colidx[ci++] = lmYindex((l+1),(m+1));rp++;
 	}
       }

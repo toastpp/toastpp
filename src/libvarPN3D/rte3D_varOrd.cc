@@ -1961,7 +1961,7 @@ void SelectMeasurementProfile (ParamParser &pp, int &mtype, double &mwidth)
 void WriteData (const RVector &data, char *fname)
 {
     ofstream ofs (fname);
-    ofs << setprecision(14);
+//    ofs << setprecision(14);
     ofs << data << endl;
 }
 

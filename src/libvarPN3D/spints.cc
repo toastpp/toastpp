@@ -18,9 +18,9 @@ typedef unsigned pid_t;
 #include <string.h>
 #include <mathlib.h>
 #include <felib.h>
-#include "toast.h"
+#include <toast.h>
 
-#include "sphints.h"
+#include <sphints.h>
 RDenseMatrix Chop(const RDenseMatrix& A) {
       int n = A.nRows();
       int m = A.nCols();
@@ -103,7 +103,7 @@ RCompRowMatrix RealMat( CCompRowMatrix& A) {
       int m = A.nCols();
       int nnz;
       const idxtype *rowptr, *colidx;
-      const complex *valA = A.ValPtr();
+      const toast::complex *valA = A.ValPtr();
       nnz = A.GetSparseStructure (&rowptr, &colidx);
       RCompRowMatrix AA (n,m);
       AA.Initialise(rowptr, colidx);
@@ -112,7 +112,6 @@ RCompRowMatrix RealMat( CCompRowMatrix& A) {
 	valAA[i] = valA[i].re;
       //delete [] rowptr;
       //delete [] colidx;
-      AA.Shrink();
       return AA;
 }
 RCompRowMatrix ImagMat( CCompRowMatrix& A) {
@@ -120,7 +119,7 @@ RCompRowMatrix ImagMat( CCompRowMatrix& A) {
       int m = A.nCols();
       int nnz;
       const idxtype *rowptr, *colidx;
-      const complex *valA = A.ValPtr();
+      const toast::complex *valA = A.ValPtr();
       nnz = A.GetSparseStructure (&rowptr, &colidx);
       RCompRowMatrix AA (n,m);
       AA.Initialise(rowptr, colidx);
