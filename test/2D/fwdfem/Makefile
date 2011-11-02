@@ -7,7 +7,7 @@ fwdfem1r ::
 	@echo fwdfem test 1r: real, direct solver
 	@echo -----------------------------------------------------------
 	@echo "2 1 ../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 4 ../meshes/tgt_mua_ellips_tri10.nim 4 ../meshes/tgt_mus_ellips_tri10.nim 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null
-	cmpvec fmod.fem fmod_test1r.fem -e=1e-12
+	$(TBIN)/cmpvec fmod.fem fmod_test1r.fem -r=1e-7
 	@rm fmod.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -17,8 +17,8 @@ fwdfem1c ::
 	@echo fwdfem test 1c: complex, direct solver
 	@echo -----------------------------------------------------------
 	@echo "2 1 ../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 4 ../meshes/tgt_mua_ellips_tri10.nim 4 ../meshes/tgt_mus_ellips_tri10.nim 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null
-	cmpvec fmod.fem fmod_test1c.fem -e=1e-12
-	cmpvec farg.fem farg_test1c.fem -e=1e-12
+	$(TBIN)/cmpvec fmod.fem fmod_test1c.fem -r=1e-7
+	$(TBIN)/cmpvec farg.fem farg_test1c.fem -r=1e-7
 	@rm {fmod,farg}.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -28,7 +28,7 @@ fwdfem2r ::
 	@echo fwdfem test 2r: real, CG solver, no preconditioner
 	@echo -----------------------------------------------------------
 	@echo "2 2 1e-12 5000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.01 2 1 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null
-	cmpvec fmod.fem fmod_test2r.fem -e=1e-12
+	$(TBIN)/cmpvec fmod.fem fmod_test2r.fem -r=1e-7
 	@rm fmod.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -38,8 +38,8 @@ fwdfem2c ::
 	@echo fwdfem test 2c: complex, BiCGSTAB solver, no preconditioner
 	@echo -----------------------------------------------------------
 	@echo "2 4 1e-12 5000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.01 2 1 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null
-	cmpvec fmod.fem fmod_test2c.fem -e=1e-12
-	cmpvec farg.fem farg_test2c.fem -e=1e-12
+	$(TBIN)/cmpvec fmod.fem fmod_test2c.fem -r=1e-7
+	$(TBIN)/cmpvec farg.fem farg_test2c.fem -r=1e-7
 	@rm {fmod,farg}.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -49,7 +49,7 @@ fwdfem3r ::
 	@echo fwdfem test 3r: real, CG solver, incomplete Cholesky
 	@echo -----------------------------------------------------------
 	@echo "2 2 1e-12 5000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.01 2 1 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null
-	cmpvec fmod.fem fmod_test3r.fem -e=1e-12
+	$(TBIN)/cmpvec fmod.fem fmod_test3r.fem -r=1e-7
 	@rm fmod.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -59,8 +59,8 @@ fwdfem3c ::
 	@echo fwdfem test 3c: complex, BiCGSTAB solver, incomplete Cholesky
 	@echo -----------------------------------------------------------
 	@echo "2 4 1e-12 5000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.01 2 1 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null
-	cmpvec fmod.fem fmod_test3c.fem -e=1e-12
-	cmpvec farg.fem farg_test3c.fem -e=1e-12
+	$(TBIN)/cmpvec fmod.fem fmod_test3c.fem -r=1e-7
+	$(TBIN)/cmpvec farg.fem farg_test3c.fem -r=1e-7
 	@rm {fmod,farg}.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
