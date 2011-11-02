@@ -7,7 +7,7 @@ fwd1 ::
 	@echo matlab forward solver test 1 of 1 ...
 	@echo Comparison Explicit/direct moments
 	@echo -----------------------------------------------------------
-	$(MATLAB) -r "istest=1;fwd_tpsf;if pass,exit,end"
+	$(MATLAB) -r "run([getenv('TOASTDIR') '/mtoast_install.m']);istest=1;fwd_tpsf;if pass,exit,end"
 	@echo "#### Test 1 passed! ####"
 
 
