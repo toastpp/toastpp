@@ -24,6 +24,7 @@
 
 // matrix/vector index types
 typedef int idxtype;
+//typedef long idxtype;
 
 // some constants ===========================================================
 

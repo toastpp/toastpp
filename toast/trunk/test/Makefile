@@ -1,4 +1,4 @@
-all :: test_2D
+all :: test_2D test_3D
 
 test_2D ::
 	@echo "Testing all in 2D ..."

@@ -108,6 +108,17 @@ help entry point is located in
 
 Note that the source-level documentation is not yet complete.
 
+Toast comes with a set of tests for various forward and inverse solver cases
+to ensure a successful installation. To run the tests, type
+
+	make test
+
+in the Toast main directory. Note that it can a significant amount of time
+to run all tests. You can also run individual test sections by going into one
+of the subdirectories of the 'test' directory tree and typing
+
+	make
+
 
 2.1.3 Compiling the mex files for the Matlab toolbox
 ----------------------------------------------------
