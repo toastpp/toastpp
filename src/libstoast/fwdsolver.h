@@ -482,6 +482,10 @@ protected:
     mutable int *Q0, *Q1; ///< range of sources (q0<=q<q1) for all processes
 
 #endif // TOAST_MPI
+
+#if THREAD_LEVEL==2
+    int nthread;
+#endif
 };
 
 

@@ -13,6 +13,8 @@
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+#ifdef TOAST_THREAD
     int nth = (int)mxGetScalar (prhs[0]);
     Task_Init (nth);
+#endif
 }

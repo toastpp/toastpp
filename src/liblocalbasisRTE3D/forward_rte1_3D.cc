@@ -63,7 +63,8 @@ const double *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, 
 const double *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
 toast::complex *xmatval;
 
-int *browptr, *bcolidx, nzb;
+idxtype *browptr, *bcolidx;
+int nzb;
 int spatN, angN;
 
 double w, c;
@@ -152,7 +153,8 @@ void genmat_spatint_nobf_3D(const Mesh& mesh, const RVector &muabs, const RVecto
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
 
-   int *rowptr, *colidx, nzero;
+   idxtype *rowptr, *colidx;
+   int nzero;
    int *elrowptr, *elcolidx;
    mesh.SparseRowStructure (rowptr, colidx, nzero);
    Sint.New (sysdim, sysdim);
@@ -207,7 +209,8 @@ void genmat_spatint_sdm_nobf_3D(const Mesh& mesh,  const RVector& delta, const R
 {
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
 
-   int *rowptr, *colidx, nzero;
+   idxtype *rowptr, *colidx;
+   int nzero;
    int *elrowptr, *elcolidx;
    mesh.SparseRowStructure (rowptr, colidx, nzero);
 
@@ -303,11 +306,11 @@ void genmat_spatint_sdm_nobf_3D(const Mesh& mesh,  const RVector& delta, const R
 RCompRowMatrix shrink(const RDenseMatrix &dnsmat)
 {
     int i, j;
-    int *rowptr, *colidx;
+    idxtype *rowptr, *colidx;
     double *val;
     int m =  dnsmat.nRows(), n= dnsmat.nCols();
 
-    rowptr = new int[m+1];
+    rowptr = new idxtype[m+1];
     rowptr[0] = 0;
     for (i = 0; i < m; i++) {
 	int nz=0;
@@ -317,7 +320,7 @@ RCompRowMatrix shrink(const RDenseMatrix &dnsmat)
 	rowptr[i+1] = rowptr[i] + nz;
     }
     
-    colidx = new int[rowptr[m]];
+    colidx = new idxtype[rowptr[m]];
     val = new double[rowptr[m]];
     int k=0;
     for(i=0; i < m; i++){
@@ -344,7 +347,8 @@ void genmat_angint_3D(RCompRowMatrix& Aint, RCompRowMatrix& Aintsc, RCompRowMatr
   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
   const int& SE =  S2mesh.elen();       // number of spherical elements.
 
-  int *angrowptr, *angcolidx, nzero;
+  idxtype *angrowptr, *angcolidx;
+  int nzero;
   S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
   Anvec.New(SN,SN);  // and this one...
   Anvec.Initialise(angrowptr, angcolidx);
@@ -430,7 +434,8 @@ void genmat_angint_sdm_3D(RCompRowMatrix& Aintscsc,  RCompRowMatrix& Aintscss,  
   const int& SN =  S2mesh.nlen();       // dimensions are size of nodes.
   const int& SE =  S2mesh.elen();       // number of spherical elements.
 
-  int *angrowptr, *angcolidx, nzero;
+  idxtype *angrowptr, *angcolidx;
+  int nzero;
   S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
 
   RDenseMatrix dnsAintscsc(SN, SN), dnsAintscss(SN, SN), dnsAintcc(SN, SN);
@@ -593,7 +598,7 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, RCompRowMatrix& A2, CC
     int ia, ib, ka, kb, ja, jb, i, idx;
     int va_i, vb_i, v_i;
     int snzero, anzero;
-    int *srowptr, *scolidx, *arowptr, *acolidx; 
+    idxtype *srowptr, *scolidx, *arowptr, *acolidx; 
     mesh.SparseRowStructure(srowptr, scolidx, snzero);
     S2mesh.SparseRowStructure(arowptr, acolidx, anzero);
 
@@ -656,8 +661,8 @@ void initialiseA2b1(const Mesh &mesh, const Mesh &S2mesh, RCompRowMatrix& A2, CC
     int nb = S2mesh.nlen(), mb = S2mesh.nlen();
     int n = na*nb, m = ma*mb, v = snzero*anzero;
 
-    int *rowptr = new int[n+1];
-    int *colidx = new int[v];
+    idxtype *rowptr = new idxtype[n+1];
+    idxtype *colidx = new idxtype[v];
 
     rowptr[0] = 0;
     i = idx = 0;
@@ -745,7 +750,8 @@ void genmat_boundint_3D(const Mesh& mesh,  const Mesh& S2mesh, RCompRowMatrix& A
    int el, nodel, i, j, k,is, js;
 
    // first create structure for angular integrals 
-   int *angrowptr, *angcolidx, nzero;
+   idxtype *angrowptr, *angcolidx;
+   int nzero;
    S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
 
    RVector sx(SN);    // sample Sin t Cos p on nodes
@@ -837,9 +843,9 @@ void genmat_b2(const Mesh &mesh, const Mesh& S2mesh, CCompRowMatrix& Svec, const
    int SN = S2mesh.nlen();
    int fullsysdim = sysdim*SN;   // full size of angles X space nodes
    
-   int *rowptr, *colidx;
-   rowptr = new int[fullsysdim+1];
-   colidx = new int[fullsysdim];
+   idxtype *rowptr, *colidx;
+   rowptr = new idxtype[fullsysdim+1];
+   colidx = new idxtype[fullsysdim];
    rowptr[0] = 0;
    for(int i=1;  i <= fullsysdim; i++)
 	rowptr[i] = i;
@@ -1482,32 +1488,33 @@ void genmat_sourcevalvector_3D(CCompRowMatrix& Svec, const Mesh& mesh, const Mes
    const int& SE =  S2mesh.elen();       // number of spherical elements.
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
    int fullsysdim = sysdim*SN;   // full size of angles X space nodes
-   int* srp;
-   if( !(srp = new int [sysdim+1]))
+   idxtype* srp;
+   if( !(srp = new idxtype [sysdim+1]))
       cerr << "Memory Allocation error srp = new int\n";
-   int* sci;
-   if( !(sci = new int [sysdim]))   // structure of boundary element matrix
+   idxtype* sci;
+   if( !(sci = new idxtype [sysdim]))   // structure of boundary element matrix
       cerr << "Memory Allocation error sci = new int\n";
    for(i = 0; i < sysdim; i++) // make it dense for simplicity
       sci[i] = 0;
 
    Svec.New (fullsysdim,1);
 
-   int *arp;
-   if( !(arp = new int [SN+1]))
+   idxtype *arp;
+   if( !(arp = new idxtype [SN+1]))
       cerr << "Memory Allocation error arp = new int\n";
    for(i = 0; i <= SN; i++) // make it dense for simplicity
       arp[i] = i;
 
-   int *aci;
-   if( !(aci = new int [SN]))   // structure of boundary element matrix
+   idxtype *aci;
+   if( !(aci = new idxtype [SN]))   // structure of boundary element matrix
       cerr << "Memory Allocation error sci = new int\n";
    for(i = 0; i < SN; i++) // make it dense for simplicity
       aci[i] = 0;
 
 
 
-   int *angrowptr, *angcolidx, nzero;
+   idxtype *angrowptr, *angcolidx;
+   int nzero;
    S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
 
    RVector sx(SN);    // sample Sin t Cos p on nodes
@@ -1610,30 +1617,31 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_cosi
    const int& SE =  S2mesh.elen();       // number of spherical elements.
    int sysdim = mesh.nlen();       // dimensions are size of nodes.
    int fullsysdim = sysdim*SN;   // full size of angles X space nodes
-   int* srp;
-   if( !(srp = new int [sysdim+1]))
+   idxtype* srp;
+   if( !(srp = new idxtype [sysdim+1]))
       cerr << "Memory Allocation error srp = new int\n";
-   int* sci;
-   if( !(sci = new int [sysdim]))   // structure of boundary element matrix
+   idxtype* sci;
+   if( !(sci = new idxtype [sysdim]))   // structure of boundary element matrix
       cerr << "Memory Allocation error sci = new int\n";
    for(i = 0; i < sysdim; i++) // make it dense for simplicity
       sci[i] = 0;
 
    Svec.New (fullsysdim,1);
 
-   int *arp;
-   if( !(arp = new int [SN+1]))
+   idxtype *arp;
+   if( !(arp = new idxtype [SN+1]))
       cerr << "Memory Allocation error arp = new int\n";
    for(i = 0; i <= SN; i++) // make it dense for simplicity
       arp[i] = i;
 
-   int *aci;
-   if( !(aci = new int [SN]))   // structure of boundary element matrix
+   idxtype *aci;
+   if( !(aci = new idxtype [SN]))   // structure of boundary element matrix
       cerr << "Memory Allocation error sci = new int\n";
    for(i = 0; i < SN; i++) // make it dense for simplicity
       aci[i] = 0;
 
-   int *angrowptr, *angcolidx, nzero;
+   idxtype *angrowptr, *angcolidx;
+   int nzero;
    S2mesh.SparseRowStructure (angrowptr, angcolidx, nzero);
 
    RVector sx(SN);    // sample Sin t Cos p on nodes

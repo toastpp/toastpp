@@ -53,7 +53,7 @@ double g_refind;
 char g_meshname[256];
 int g_imgfmt = IMGFMT_NIM;
 
-double clock0;
+double clock0, wt0;
 
 #ifdef DO_PROFILE
 double solver_time = 0.0;
@@ -92,6 +92,7 @@ int  SelectSDMode ();
 int main (int argc, char *argv[])
 {
     clock0 = tic();
+    wt0 = walltic();
 
     if (argc > 1 && pp.Open (argv[1]))
         cout << "Reading parameters from " << argv[1] << endl;
@@ -501,11 +502,12 @@ int main (int argc, char *argv[])
     //times (&tme);
     //double total_time = (double)(tme.tms_utime-clock0)/(double)HZ;
     double total_time = toc(clock0);
-    LOGOUT("Final timings:");
-    LOGOUT("Total: %f", total_time);
+    double total_wallc = walltoc(wt0);
+
 #ifdef DO_PROFILE
     LOGOUT("Solver: %f", solver_time);
 #endif
+    LOGOUT("Total timings: %f real, %f CPU", total_wallc, total_time);
 
     return 0;
 }                                                                              

@@ -444,6 +444,7 @@ MATHLIB int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
 		p[i].im = r[i].im + beta * (p[i].im-omega*v[i].im);
 	    }
 	}
+
 	if (precon) precon->Apply (p, pd);
 	else        pd = p;
 

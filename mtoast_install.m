@@ -4,7 +4,7 @@
 % file to your startup.m file, located in our Matlab startup
 % directory, or in <matlabroot>/toolbox/local.
 
-function mtoast_install
+function mtoast_install(nogui)
 
 fprintf(1,'\nAdding search paths for TOAST Matlab scripts and MEX files.\n\n')
 
@@ -97,7 +97,9 @@ mexp = [toastver '/mex'];
 addpath (mexp);
 disp(['Adding search path ' mexp])
 
-% open path tool GUI to allow user to modify and save the toast paths
-fprintf(1,'\nPlease check that the toast paths are set correctly,\n')
-fprintf(1,'then save to store the paths permanently.\n')
-pathtool
+if nargin == 0 || nogui==false
+    % open path tool GUI to allow user to modify and save the toast paths
+    fprintf(1,'\nPlease check that the toast paths are set correctly,\n')
+    fprintf(1,'then save to store the paths permanently.\n')
+    pathtool
+end

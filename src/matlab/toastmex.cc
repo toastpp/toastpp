@@ -25,8 +25,8 @@ void CopyVector (mxArray **array, RVector &vec, VectorOrientation vo)
     mxArray *tmp;
 
     // note: these seem transposed, but produce correct result
-    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (m, 1, mxREAL);
-    else            tmp = mxCreateDoubleMatrix (1, m, mxREAL);
+    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (1, m, mxREAL);
+    else            tmp = mxCreateDoubleMatrix (m, 1, mxREAL);
     double *pr = mxGetPr (tmp);
 
     for (i = 0; i < m; i++)
@@ -44,8 +44,8 @@ void CopyVector (mxArray **array, CVector &vec, VectorOrientation vo)
     mxArray *tmp;
 
     // note: these seem transposed, but produce correct result
-    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
-    else            tmp = mxCreateDoubleMatrix (1, m, mxCOMPLEX);
+    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (1, m, mxCOMPLEX);
+    else            tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
     double *pr = mxGetPr (tmp);
     double *pi = mxGetPi (tmp);
 
@@ -67,9 +67,8 @@ void CopyVector (mxArray **array, const IVector &vec, VectorOrientation vo)
     const mwSize dim = (mwSize)vec.Dim();
     mxArray *tmp;
 
-    // note: these seem transposed, but produce correct result
-    if (vo==ROWVEC) tmp = mxCreateNumericMatrix (dim,1, mxINT32_CLASS, mxREAL);
-    else            tmp = mxCreateNumericMatrix (1,dim, mxINT32_CLASS, mxREAL);
+    if (vo==ROWVEC) tmp = mxCreateNumericMatrix (1,dim, mxINT32_CLASS, mxREAL);
+    else            tmp = mxCreateNumericMatrix (dim,1, mxINT32_CLASS, mxREAL);
     int *pr = (int*)mxGetData (tmp);
 
     for (i = 0; i < m; i++)

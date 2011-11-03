@@ -139,7 +139,7 @@ while (itr < itrmax) && ...
     clear J;
     for i = 1:nlambda
         mua = GetMua(extinct(:,i),C);
-        Ji = toastJacobianCW (hMesh, hBasis, qvec, mvec, mua, mus, ref, 'direct');
+        Ji = toastJacobianCW (hMesh, hBasis, qvec, mvec, mua, mus, ref, prm.linsolver.method, prm.linsolver.tol);
         for j = 1:prm.nch
             J((i-1)*nqm+1:i*nqm,(j-1)*slen+1:j*slen) = Ji * extinct(j,i);
         end
@@ -225,7 +225,8 @@ end
     
     function p_ = ProjectAll (C)
     for i_ = 1:nlambda
-        p_((i_-1)*nqm+1:i_*nqm,1) = ProjectSingle (extinct(:,i_), C);
+        proj_ = ProjectSingle (extinct(:,i_), C);
+        p_((i_-1)*nqm+1:i_*nqm,1) = proj_(dmask);
     end
     end
 
@@ -292,6 +293,9 @@ function prm = checkprm(prm)
 prm.solver.method = 'LM'; % only supported method for now
 if isfield(prm.solver,'tol') == false
     prm.solver.tol = 1e-10;
+end
+if isfield(prm.linsolver,'tol') == false
+    prm.linsolver.tol = 1e-10;
 end
 if isfield(prm.solver,'krylov') == false || isfield(prm.solver.krylov,'method') == false
     prm.solver.krylov.method = 'gmres';

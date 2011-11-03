@@ -8,6 +8,7 @@
 using namespace std;
 
 bool is_silent = false;
+const char *vecname[2] = {0,0};
 
 void print_usage_and_exit (int errcode = 0);
 void print_error_and_exit (const char *msg, int errcode = 0);
@@ -15,7 +16,6 @@ void print_error_and_exit (const char *msg, int errcode = 0);
 int main (int argc, char *argv[])
 {
     int i, n, nvec = 0;
-    const char *vecname[2];
     double maxerr = 0;
     bool is_complex = false;
     bool is_verbose = false;
@@ -141,7 +141,12 @@ void print_usage_and_exit (int errcode)
 
 void print_error_and_exit (const char *msg, int errcode)
 {
-    if (!is_silent)
+    if (!is_silent) {
+        if (vecname[0] && vecname[1])
+	    cout << vecname[0] << " and " << vecname[1] << ":\n";
 	cout << msg << endl;
+	if (errcode)
+	    cout << "#### Comparison error! ####\n" << endl;
+    }
     exit (errcode);
 }
