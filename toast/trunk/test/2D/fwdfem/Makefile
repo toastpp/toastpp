@@ -35,7 +35,7 @@ fwd_real_cg ::
 	@echo -----------------------------------------------------------
 	@echo fwd_real_cg: real, CG solver, no preconditioner
 	@echo -----------------------------------------------------------
-	@time (echo "2 2 1e-14 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null)
+	@time (echo "2 2 1e-15 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null)
 	@unzip -q testdata.zip fmod_real_cg.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_real_cg.fem -r=1e-8
 	@rm fmod.fem fmod_real_cg.fem fwdfem.out
@@ -46,7 +46,7 @@ fwd_real_cg_diag ::
 	@echo -----------------------------------------------------------
 	@echo fwd_real_ch_diag: real, CG solver, DIAG preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 2 1e-14 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null)
+	@time(echo "2 2 1e-15 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null)
 	@unzip -q testdata.zip fmod_real_cg_diag.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_real_cg_diag.fem -r=1e-8
 	@rm fmod.fem fmod_real_cg_diag.fem fwdfem.out
@@ -57,7 +57,7 @@ fwd_real_cg_ich ::
 	@echo -----------------------------------------------------------
 	@echo fwd_real_ch_ich: real, CG solver, ICH preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 2 1e-14 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null)
+	@time(echo "2 2 1e-15 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem_cw >& /dev/null)
 	@unzip -q testdata.zip fmod_real_cg_ich.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_real_cg_ich.fem -r=1e-8
 	@rm fmod.fem fmod_real_cg_ich.fem fwdfem.out
@@ -80,7 +80,7 @@ fwd_cplx_bicgstab ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_bicgstab: complex, BiCGSTAB solver, no preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 4 1e-14 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 4 1e-15 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab.fem -r=1e-8
@@ -92,7 +92,7 @@ fwd_cplx_bicgstab_diag ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_bicgstab_diag: complex, BiCGSTAB solver, DIAG preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 4 1e-14 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 4 1e-15 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab_diag.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_diag.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_diag.fem -r=1e-8
@@ -104,7 +104,7 @@ fwd_cplx_bicgstab_ich ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_bicgstab_ich: complex, BiCGSTAB solver, ICH preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 4 1e-14 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 4 1e-15 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab_ich.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_ich.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_ich.fem -r=1e-8
@@ -116,7 +116,7 @@ fwd_cplx_bicgstab_dilu ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_bicgstab_dilu: complex, BiCGSTAB solver, DILU preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 4 1e-14 10000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 4 1e-15 10000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab_dilu.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_dilu.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_dilu.fem -r=1e-8
@@ -128,7 +128,7 @@ fwd_cplx_gmres ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_gmres: complex, GMRES solver, no preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 5 1e-14 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 5 1e-15 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres.fem -r=1e-8
@@ -140,7 +140,7 @@ fwd_cplx_gmres_diag ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_gmres_diag: complex, GMRES solver, DIAG preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 5 1e-14 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 5 1e-15 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres_diag.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_diag.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_diag.fem -r=1e-8
@@ -152,7 +152,7 @@ fwd_cplx_gmres_ich ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_gmres_ich: complex, GMRES solver, ICH preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 5 1e-14 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 5 1e-15 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres_ich.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_ich.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_ich.fem -r=1e-8
@@ -164,7 +164,7 @@ fwd_cplx_gmres_dilu ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_gmres_dilu: complex, GMRES solver, DILU preconditioner
 	@echo -----------------------------------------------------------
-	@time(echo "2 5 1e-14 10000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "2 5 1e-15 10000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres_dilu.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_dilu.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_dilu.fem -r=1e-8
