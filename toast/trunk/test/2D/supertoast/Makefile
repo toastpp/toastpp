@@ -1,6 +1,11 @@
 TBIN = $(TOASTVER)/bin
 
-all :: test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 test12
+all   :: ncg gn lbfgs
+
+ncg   :: inv_ncg inv_ncg_tk1 inv_ncg_tv inv_ncg_huber
+gn    :: inv_gn inv_gn_tk1 inv_gn_tv inv_gn_huber
+lbfgs :: inv_lbfgs inv_lbfgs_tk1 inv_lbfgs_tv inv_lbfgs_huber
+
 
 fmod.fem ::
 	@echo "Generating forward data ..."
@@ -8,104 +13,55 @@ fmod.fem ::
 	@rm fwdfem.out
 
 
-test1 :: fmod.fem
+inv_ncg :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 1: NCG solver, no regularisation"
+	@echo "inv_ncg: supertoast NCG solver, no regularisation"
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 0 0" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 0 0" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test1.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_cg.dat
+	@cmp iter.dat inv_cg.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_cg.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
-test2 :: fmod.fem
+inv_ncg_tk1 :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 2: NCG solver, Tikhonov (TK1)"
+	@echo "inv_ncg_tk1: supertoast NCG solver, Tikhonov (TK1)"
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 3 1e-4 0" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 3 1e-4 0" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test2.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_ncg_tk1.dat
+	@cmp iter.dat inv_ncg_tk1.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_ncg_tk1.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
-test3 :: fmod.fem
+inv_ncg_tv :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 3: NCG solver, total variation (TV)"
+	@echo "inv_ncg_tv: supertoast NCG solver, total variation (TV)"
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 1 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 1 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test3.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_ncg_tv.dat
+	@cmp iter.dat inv_ncg_tv.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_ncg_tv.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
-test4 :: fmod.fem
+inv_ncg_huber :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 4: NCG solver, Huber reg."
+	@echo "inv_ncg_huber: supertoast NCG solver, Huber reg."
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 4 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 1 1e-8 1e-8 10 0 0 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 4 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test4.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
-	@echo "#### Test passed! ####"
-	@echo
-
-
-
-
-
-
-test5 :: fmod.fem
-	@echo -----------------------------------------------------------
-	@echo "supertoast test 5: GN solver, no regularisation"
-	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 0 0" | $(TBIN)/supertoast >& /dev/null
-	@grep Iteration supertoast.out | \
-		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test5.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
-	@echo "#### Test passed! ####"
-	@echo
-
-test6 :: fmod.fem
-	@echo -----------------------------------------------------------
-	@echo "supertoast test 6: GN solver, Tikhonov (TK1)"
-	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 3 1e-4 0" | $(TBIN)/supertoast >& /dev/null
-	@grep Iteration supertoast.out | \
-		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test6.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
-	@echo "#### Test passed! ####"
-	@echo
-
-test7 :: fmod.fem
-	@echo -----------------------------------------------------------
-	@echo "supertoast test 7: GN solver, total variation (TV)"
-	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 1 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null
-	@grep Iteration supertoast.out | \
-		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test7.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
-	@echo "#### Test passed! ####"
-	@echo
-
-test8 :: fmod.fem
-	@echo -----------------------------------------------------------
-	@echo "supertoast test 8: GN solver, Huber reg."
-	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 4 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null
-	@grep Iteration supertoast.out | \
-		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test8.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_ncg_huber.dat
+	@cmp iter.dat inv_ncg_huber.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_ncg_huber.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
@@ -114,50 +70,111 @@ test8 :: fmod.fem
 
 
 
-test9 :: fmod.fem
+inv_gn :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 9: LBFGS solver, no regularisation"
+	@echo "inv_gn: supertoast GN solver, no regularisation"
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 0 0" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 0 0" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test9.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_gn.dat
+	@cmp iter.dat inv_gn.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_gn.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
-test10 :: fmod.fem
+inv_gn_tk1 :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 10: LBFGS solver, Tikhonov (TK1)"
+	@echo "inv_gn_tk1: supertoast GN solver, Tikhonov (TK1)"
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 3 1e-4 0" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 3 1e-4 0" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test10.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_gn_tk1.dat
+	@cmp iter.dat inv_gn_tk1.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_gn_tk1.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
-test11 :: fmod.fem
+inv_gn_tv :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 11: LBFGS solver, total variation (TV)"
+	@echo "inv_gn_tv: supertoast GN solver, total variation (TV)"
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 1 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 1 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test11.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_gn_tv.dat
+	@cmp iter.dat inv_gn_tv.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_gn_tv.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
 
-test12 :: fmod.fem
+inv_gn_huber :: fmod.fem
 	@echo -----------------------------------------------------------
-	@echo "supertoast test 12: LBFGS solver, Huber reg."
+	@echo "inv_gn_huber: supertoast GN solver, Huber reg."
 	@echo -----------------------------------------------------------
-	@echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 4 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 2 5 1e-8 5 1e-2 y 0 1 0 1 1 n 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 4 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null)
 	@grep Iteration supertoast.out | \
 		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
-	@cmp iter.dat test12.dat
-	@rm gradient*.nim update*.nim recon*.raw iter.dat supertoast.out
+	@unzip -q testdata.zip inv_gn_huber.dat
+	@cmp iter.dat inv_gn_huber.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_gn_huber.dat supertoast.out
+	@echo "#### Test passed! ####"
+	@echo
+
+
+
+
+
+
+inv_lbfgs :: fmod.fem
+	@echo -----------------------------------------------------------
+	@echo "inv_lbfgs: supertoast LBFGS solver, no regularisation"
+	@echo -----------------------------------------------------------
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 0 0" | $(TBIN)/supertoast >& /dev/null)
+	@grep Iteration supertoast.out | \
+		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
+	@unzip -q testdata.zip inv_lbfgs.dat
+	@cmp iter.dat inv_lbfgs.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_lbfgs.dat supertoast.out
+	@echo "#### Test passed! ####"
+	@echo
+
+inv_lbfgs_tk1 :: fmod.fem
+	@echo -----------------------------------------------------------
+	@echo "inv_lbfgs_tk1: supertoast LBFGS solver, Tikhonov (TK1)"
+	@echo -----------------------------------------------------------
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 3 1e-4 0" | $(TBIN)/supertoast >& /dev/null)
+	@grep Iteration supertoast.out | \
+		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
+	@unzip -q testdata.zip inv_lbfgs_tk1.dat
+	@cmp iter.dat inv_lbfgs_tk1.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_lbfgs_tk1.dat supertoast.out
+	@echo "#### Test passed! ####"
+	@echo
+
+inv_lbfgs_tv :: fmod.fem
+	@echo -----------------------------------------------------------
+	@echo "inv_lbfgs_tv: supertoast LBFGS solver, total variation (TV)"
+	@echo -----------------------------------------------------------
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 1 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null)
+	@grep Iteration supertoast.out | \
+		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
+	@unzip -q testdata.zip inv_lbfgs_tv.dat
+	@cmp iter.dat inv_lbfgs_tv.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_lbfgs_tv.dat supertoast.out
+	@echo "#### Test passed! ####"
+	@echo
+
+inv_lbfgs_huber :: fmod.fem
+	@echo -----------------------------------------------------------
+	@echo "inv_lbfgs_huber: supertoast LBFGS solver, Huber reg."
+	@echo -----------------------------------------------------------
+	@time (echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 80 80 n 2 5 1e-8 1e-8 10 10 2 1 2 0.025 2 2 2 1.4 fmod.fem farg.fem 100 4 1 0 0 0 4 1e-4 0 1e-2" | $(TBIN)/supertoast >& /dev/null)
+	@grep Iteration supertoast.out | \
+		sed -e s/"Iteration [0-9]*  CPU [0-9.]*  OF "//g > iter.dat
+	@unzip -q testdata.zip inv_lbfgs_huber.dat
+	@cmp iter.dat inv_lbfgs_huber.dat
+	@rm gradient*.nim update*.nim recon*.raw iter.dat inv_lbfgs_huber.dat supertoast.out
 	@echo "#### Test passed! ####"
 	@echo
