@@ -331,17 +331,29 @@ void GLProjector::constructMatrix_SF()
 
     // Scale each column by 1/l1norm(column) so that P^T*P=I
     toField = transp(toImage);
-/*    RVector scale(nNodes);
+    RVector scale(nNodes);
+    double m=0;
     for (int c=0; c<nBndNodes; ++c)
     {
 	int nidx = bndNodes[c];
 	RVector row = toField.Row(nidx);
 	double s = l1norm(row);
-	if (s>0.0)
+        //cout <<s<<endl;
+	if (m<s) m=s;
+    }
+
+
+
+    for (int c=0; c<nBndNodes; ++c)
+    {
+	
+	if (m>0.0)
 	{
-	    scale[bndNodes[c]] = 1.0/s;
+ 	//cout <<"s = "<<s<<endl;
+	    scale[bndNodes[c]] = 1.0/m;
 	}
     }
-    toField.RowScale(scale);*/
+
+    toField.RowScale(scale);
 }
 
