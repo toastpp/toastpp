@@ -1,4 +1,4 @@
-﻿Build started 09/11/2011 14:26:46.
+﻿Build started 09/11/2011 14:49:44.
      1>Project "C:\Files\TOAST\win32\VS2005\libmath\libmath.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Touching "Debug\libmath.unsuccessfulbuild".
@@ -2588,4 +2588,4 @@
 
 Build FAILED.
 
-Time Elapsed 00:00:19.83
+Time Elapsed 00:00:19.36

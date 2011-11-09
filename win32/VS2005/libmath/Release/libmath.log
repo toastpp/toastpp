@@ -1,9 +1,9 @@
-﻿Build started 09/11/2011 14:22:56.
+﻿Build started 09/11/2011 14:53:28.
      1>Project "C:\Files\TOAST\win32\VS2005\libmath\libmath.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Touching "Release\libmath.unsuccessfulbuild".
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\CL.exe /c /IC:\Files\TOAST\win32\VS2005\..\..\ /IC:\Files\TOAST\win32\VS2005\..\..\include /IC:\Files\TOAST\win32\VS2005\..\..\src\libmath /IC:\Files\TOAST\win32\VS2005\..\..\src\libfe /IC:\Files\TOAST\win32\VS2005\..\..\src\libstoast /IC:\Files\TOAST\win32\VS2005\..\..\src\libbemdiff /IC:\Files\TOAST\win32\VS2005\..\..\src\libbem /IC:\Files\TOAST\win32\VS2005\..\..\numerics\SuperLU_4.1\SRC /IC:\Files\TOAST\win32\VS2005\..\..\numerics\ILUPACK\include /Zi /nologo /W2 /WX- /O2 /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D LIBMATH_EXPORTS /D _CRT_SECURE_NO_DEPRECATE /D _WINDLL /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /errorReport:prompt ..\..\..\src\libmath\cdmatrix.cc ..\..\..\src\libmath\complex.cc ..\..\..\src\libmath\cr_cholesky.cc ..\..\..\src\libmath\crmatrix.cc ..\..\..\src\libmath\crmatrix_cm.cc ..\..\..\src\libmath\dgmatrix.cc ..\..\..\src\libmath\dnsmatrix.cc ..\..\..\src\libmath\error.cc ..\..\..\src\libmath\fourn.cc ..\..\..\src\libmath\gmres.cc ..\..\..\src\libmath\gsmatrix.cc ..\..\..\src\libmath\ilutoast.cc ..\..\..\src\libmath\mathdef.cc ..\..\..\src\libmath\matrix.cc ..\..\..\src\libmath\nr.cc ..\..\..\src\libmath\precon.cc ..\..\..\src\libmath\scomplex.cc ..\..\..\src\libmath\scrmatrix.cc ..\..\..\src\libmath\symatrix.cc ..\..\..\src\libmath\timing.cc ..\..\..\src\libmath\util.cc ..\..\..\src\libmath\vector.cc
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\Files\TOAST\win32\VS2005\..\..\ /IC:\Files\TOAST\win32\VS2005\..\..\include /IC:\Files\TOAST\win32\VS2005\..\..\src\libmath /IC:\Files\TOAST\win32\VS2005\..\..\src\libfe /IC:\Files\TOAST\win32\VS2005\..\..\src\libstoast /IC:\Files\TOAST\win32\VS2005\..\..\src\libbemdiff /IC:\Files\TOAST\win32\VS2005\..\..\src\libbem /IC:\Files\TOAST\win32\VS2005\..\..\numerics\SuperLU_4.1\SRC /IC:\Files\TOAST\win32\VS2005\..\..\numerics\ILUPACK\include /Zi /nologo /W2 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D LIBMATH_EXPORTS /D _CRT_SECURE_NO_DEPRECATE /D _WINDLL /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\src\libmath\cdmatrix.cc ..\..\..\src\libmath\complex.cc ..\..\..\src\libmath\cr_cholesky.cc ..\..\..\src\libmath\crmatrix.cc ..\..\..\src\libmath\crmatrix_cm.cc ..\..\..\src\libmath\dgmatrix.cc ..\..\..\src\libmath\dnsmatrix.cc ..\..\..\src\libmath\error.cc ..\..\..\src\libmath\fourn.cc ..\..\..\src\libmath\gmres.cc ..\..\..\src\libmath\gsmatrix.cc ..\..\..\src\libmath\ilutoast.cc ..\..\..\src\libmath\mathdef.cc ..\..\..\src\libmath\matrix.cc ..\..\..\src\libmath\nr.cc ..\..\..\src\libmath\precon.cc ..\..\..\src\libmath\scomplex.cc ..\..\..\src\libmath\scrmatrix.cc ..\..\..\src\libmath\symatrix.cc ..\..\..\src\libmath\timing.cc ..\..\..\src\libmath\util.cc ..\..\..\src\libmath\vector.cc
          cdmatrix.cc
      1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
      1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
@@ -2287,4 +2287,4 @@
 
 Build FAILED.
 
-Time Elapsed 00:00:12.71
+Time Elapsed 00:00:10.59
