@@ -70,6 +70,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastRegulHess1f.cc \
 	toastRegulKappa.cc \
 	toastRegulValue.cc \
+	toastRelaxMesh.cc \
 	toastSampleField.cc \
 	toastSetBasis.cc \
 	toastSetQM.cc \
