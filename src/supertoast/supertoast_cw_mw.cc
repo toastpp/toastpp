@@ -25,6 +25,8 @@ using namespace toast;
 // Verbose timing output
 //#define DO_PROFILE
 
+#define LIMIT_RANGE
+
 // ==========================================================================
 // Global variables
 
@@ -1242,8 +1244,9 @@ static bool CheckRange (const MWsolution &sol)
 {
     bool inrange = true;
     
+#ifdef LIMIT_RANGE
     const double MIN_CMUA = 0;
-    const double MAX_CMUA = 0.1;
+    const double MAX_CMUA = 1.0;
     const double MIN_CKAPPA = 0;
     const double MAX_CKAPPA = 10;
 
@@ -1266,6 +1269,8 @@ static bool CheckRange (const MWsolution &sol)
 	    inrange = false;
 	}
     }
+#endif
+
     return inrange;
 }
 

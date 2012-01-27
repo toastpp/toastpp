@@ -256,6 +256,8 @@ public:
      * \note Any changes to the original vector in that range also affect the
      *   new vector (and vice versa).
      * \note ofs+dim <= v.Dim() is required.
+     * \note This constructor is not threadsafe if used by multiple threads
+     *   referencing the same vector v.
      */
     inline TVector (const TVector<VT> &v, int ofs, int dim);
 

@@ -143,12 +143,19 @@ RVector CFwdSolverMW::ProjectAll_wavel_real (const CCompRowMatrix &qvec,
     // complex case: split real and imaginary parts
     CVector cproj = ProjectAll_wavel (qvec, mvec, sol, omega, scl);
 
+    const QMMesh *mesh = this->meshptr;
+    int nofwavel = sol.nofwavel;
+    int nqm = mesh->nQM;
     int n = cproj.Dim();
+    int i;
     RVector proj(n*2);
-    RVector proj_re (proj, 0, n);
-    RVector proj_im (proj, n, n);
-    proj_re = Re(cproj);
-    proj_im = Im(cproj);
+    for (i = 0; i < nofwavel; i++) {
+        CVector cproj_i(cproj, i*nqm, nqm);
+	RVector proj_re (proj, i*2*nqm, nqm);
+	RVector proj_im (proj, (i*2+1)*nqm, nqm);
+	proj_re = Re(cproj_i);
+	proj_im = Im(cproj_i);
+    }
     return proj;
 }
 

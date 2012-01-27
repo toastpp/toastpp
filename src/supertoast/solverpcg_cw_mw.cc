@@ -672,7 +672,9 @@ RVector single_gradient_data (const Raster &raster,
 	    double dn = 1.0/(rp*rp);
 
 	    // amplitude term
-	    term = -/* 2.0 * */ b_mod[idx] / (ype[idx]*s_mod[idx]);
+	    // MS 120117: re-instated factor 2 to be consistent with frequency
+	    // domain version, but this needs to be tested
+	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
 	    wqa += qs * (term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);

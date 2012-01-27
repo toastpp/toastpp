@@ -25,6 +25,7 @@ using namespace std;
 int Task::nthread = Task::nProcessor();
 double Task::ttime = 0.0;
 double Task::wtime = 0.0;
+bool Task::is_multiprocessing = false;
 
 pthread_mutex_t Task::user_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -62,6 +63,7 @@ void Task::Multiprocess (void *func(task_data*), void *data, int np)
     task_data *td = new task_data[np];
     pthread_t *thread = new pthread_t[np];
 
+    is_multiprocessing = true;
     cerr << "Multiprocess: Branch into " << np << " threads\n";
     double t0 = tic();
     double w0 = walltic();
@@ -87,6 +89,7 @@ void Task::Multiprocess (void *func(task_data*), void *data, int np)
     ttime += toc(t0);
     wtime += walltoc(w0);
     cerr << "Multiprocess: Threads joined\n";
+    is_multiprocessing = false;
     
     delete []td;
     delete []thread;

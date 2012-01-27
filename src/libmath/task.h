@@ -56,6 +56,8 @@ public:
     // each instance of 'func'. 'np' is the number of threads to create. If
     // np==0 then nthread is used
 
+    static bool IsMultiprocessing() { return is_multiprocessing; }
+
     inline static void UserMutex_lock() { pthread_mutex_lock (&user_mutex); }
     inline static void UserMutex_unlock() {pthread_mutex_unlock (&user_mutex);}
 
@@ -64,6 +66,7 @@ private:
     static double ttime; // accumulated cpu time spent multiprocessing
     static double wtime; // accumulated wall clock time spent multiprocessing
     static pthread_mutex_t user_mutex;
+    static bool is_multiprocessing;  // we are currently in Multiprocess
 };
 
 // ===========================================================================
