@@ -1134,6 +1134,7 @@ static bool CheckRange (const Solution &sol)
 {
     bool inrange = true;
 
+#ifdef LIMIT_RANGE
     const double MIN_CMUA = 0;
     const double MAX_CMUA = 0.1;
     const double MIN_CKAPPA = 0;
@@ -1152,6 +1153,8 @@ static bool CheckRange (const Solution &sol)
 	     << " in trial solution" << endl;
 	inrange = false;
     }
+#endif
+
     return inrange;
 }
 

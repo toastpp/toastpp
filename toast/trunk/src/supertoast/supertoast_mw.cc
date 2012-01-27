@@ -25,6 +25,8 @@ const int MAX_NOFWLENGTH = 50;
 // Verbose timing output
 //#define DO_PROFILE
 
+#define LIMIT_RANGE
+
 // ==========================================================================
 // Global variables
 
@@ -51,7 +53,7 @@ int bOutputGradient = 0;
 double avg_cmua = 1.0, avg_ckappa = 1.0;
 ParamParser pp;
 
-double clock0;
+double clock0, wclock0;
 
 #ifdef DO_PROFILE
 double solver_time = 0.0;
@@ -83,6 +85,7 @@ int  SelectSDMode ();
 int main (int argc, char *argv[])
 {
     clock0 = tic();
+    wclock0 = walltic();
 
     if (argc > 1 && pp.Open (argv[1]))
         cout << "Reading parameters from " << argv[1] << endl;
@@ -484,18 +487,21 @@ int main (int argc, char *argv[])
 	RVector proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 	sd = proj;
 	double avd1 = 0.0, avd2 = 0.0;
-	int ndat = nQM*nofwavel;
 	// note: This sums over all wavelengths. Maybe better to scale
 	// wavelengths individually
-	for (i = 0; i < ndat; i++) {
-	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+ndat]*sd[i+ndat];
+	for (i = 0; i < nofwavel; i++) {
+	    for (j = 0; j < nQM; j++) {
+	        avd1 += sd[i*2*nQM+j]*sd[i*2*nQM+j];
+		avd2 += sd[(i*2+1)*nQM+j]*sd[(i*2+1)*nQM+j];
+	    }
 	}
 	avd1 = sqrt(avd1);
 	avd2 = sqrt(avd2);
-	for (i = 0; i < ndat; i++) {
-	    sd[i] = avd1;
-	    sd[i+ndat] = avd2;
+	for (i = 0; i < nofwavel; i++) {
+	    for (j = 0; j < nQM; j++) {
+	        sd[i*2*nQM+j] = avd1;
+		sd[(i*2+1)*nQM+j] = avd2;
+	    }
 	}
 	cout << "Averages: log amplitude " << avd1 << ", phase " << avd2
 	     << endl << endl;
@@ -505,18 +511,21 @@ int main (int argc, char *argv[])
 	RVector proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 	sd = (data - proj);
 	double avd1 = 0.0, avd2 = 0.0;
-	int ndat = nQM*nofwavel;
 	// note: This sums over all wavelengths. Maybe better to scale
 	// wavelengths individually
-	for (i = 0; i < ndat; i++) {
-	    avd1 += sd[i]*sd[i];
-	    avd2 += sd[i+ndat]*sd[i+ndat];
+	for (i = 0; i < nofwavel; i++) {
+	    for (j = 0; j < nQM; j++) {
+	        avd1 += sd[i*2*nQM+j]*sd[i*2*nQM+j];
+		avd2 += sd[(i*2+1)*nQM+j]*sd[(i*2+1)*nQM+j];
+	    }
 	}
 	avd1 = sqrt(avd1);
 	avd2 = sqrt(avd2);
-	for (i = 0; i < ndat; i++) {
-	    sd[i] = avd1;
-	    sd[i+ndat] = avd2;
+	for (i = 0; i < nofwavel; i++) {
+	    for (j = 0; j < nQM; j++) {
+	        sd[i*2*nQM+j] = avd1;
+		sd[(i*2+1)*nQM+j] = avd2;
+	    }
 	}
 	cout << "Averages: log amplitude " << avd1 << ", phase " << avd2
 	     << endl << endl;
@@ -542,8 +551,15 @@ int main (int argc, char *argv[])
     delete []aphi;
 
     double total_time = toc(clock0);
+    double total_wtime = walltoc(wclock0);
+
     LOGOUT ("Final timings:");
-    LOGOUT("Total: %f", total_time);
+    LOGOUT("Total: CPU: %f, Wall: %f", total_time, total_wtime);
+#ifdef TOAST_THREAD
+    LOGOUT("Multiprocessing: CPU: %f, Wall %f", Task::GetThreadCPUTiming(),
+	   Task::GetThreadWallTiming());
+#endif
+
 #ifdef DO_PROFILE
     LOGOUT("Solver: %f", solver_time);
 #endif
@@ -985,13 +1001,13 @@ void SelectData (DataScale dscale, int nqm, int nlambda, const RVector &wlength,
 {
     char cbuf[256], tag[256];
     RVector adata, pdata;
-    int i, len = nqm*nlambda;
+    int i;
 
-    data.New (len*2);
+    data.New (nqm*2*nlambda);
 
     for (i = 0; i < nlambda; i++) {
-        adata.Relink (data, i*nqm, nqm);
-	pdata.Relink (data, i*nqm+len, nqm);
+        adata.Relink (data, i*2*nqm, nqm);
+	pdata.Relink (data, (i*2+1)*nqm, nqm);
 
 	switch (dscale) {
 	case DATA_LIN:
@@ -1045,13 +1061,13 @@ void SelectRefdata (DataScale dscale, int nqm, int nlambda,
 {
     char cbuf[256], tag[256];
     RVector adata, pdata;
-    int i, cmd, len = nqm*nlambda;
+    int i, cmd;
 
-    data.New (len*2);
+    data.New (nqm*2*nlambda);
 
     for (i = 0; i < nlambda; i++) {
-        adata.Relink (data, i*nqm, nqm);
-	pdata.Relink (data, i*nqm+len, nqm);
+        adata.Relink (data, i*2*nqm, nqm);
+	pdata.Relink (data, (i*2+1)*nqm, nqm);
 
 	switch (dscale) {
 	case DATA_LIN:
@@ -1283,8 +1299,9 @@ static bool CheckRange (const MWsolution &sol)
 {
     bool inrange = true;
 
+#ifdef LIMIT_RANGE
     const double MIN_CMUA = 0;
-    const double MAX_CMUA = 0.1;
+    const double MAX_CMUA = 1.0;
     const double MIN_CKAPPA = 0;
     const double MAX_CKAPPA = 10;
 
@@ -1307,6 +1324,8 @@ static bool CheckRange (const MWsolution &sol)
 	    inrange = false;
 	}
     }
+#endif
+
     return inrange;
 }
 

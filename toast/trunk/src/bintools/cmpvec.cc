@@ -62,7 +62,11 @@ int main (int argc, char *argv[])
     ifstream ifs1(vecname[0]);
     ifstream ifs2(vecname[1]);
 
-    if (!ifs1 || !ifs2) print_usage_and_exit(3);
+    if (!ifs1 || !ifs2) {
+        char cbuf[256];
+	sprintf (cbuf, "Could not open file: %s", vecname[!ifs1 ? 0 : 1]);
+	print_error_and_exit(cbuf, 3);
+    }
 
     if (is_complex) {
 	CVector v1, v2;

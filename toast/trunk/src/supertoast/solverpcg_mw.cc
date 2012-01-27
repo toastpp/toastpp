@@ -135,7 +135,9 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
     ofdata.sd = &sd;
 
     // r = -f'(x)
+    walltic();
     MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd, omega);
+    LOGOUT("gradient time=%g", walltoc());
     pscaler->ScaleGradient (bsol.GetActiveParams(), r);
     r += reg->GetGradient (x0);
     r0 = r;
@@ -243,8 +245,10 @@ void SolverPCG_MW::Solve (CFwdSolverMW &FWS, const Raster &raster,
 	LOGOUT ("Generating fields and gradient");
 	proj = FWS.ProjectAll_wavel_real (qvec, mvec, msol, omega);
 
+	walltic();
 	MW_get_gradient (raster, FWS, dphi, qvec, mvec, &msol, r, data, sd,
 			 omega);
+	LOGOUT("gradient time=%g", walltoc());
 	pscaler->ScaleGradient (bsol.GetActiveParams(), r);
 	r += reg->GetGradient(x);
 
@@ -579,7 +583,7 @@ void ATA_dense (const Raster &raster, const RDenseMatrix &a,
 // Doesn't seem to provide any runtime benefit in the current form
 // Also may be responsible for occasional (non-reproducible) CTDs
 
-#if 0 // THREAD_LEVEL==2
+#if THREAD_LEVEL==2
 
 struct SINGLEGRADIENT_THREADDATA {
     const QMMesh *mesh;
@@ -595,124 +599,6 @@ struct SINGLEGRADIENT_THREADDATA {
 
 void *single_gradient_data_engine (task_data *td)
 {
-#ifdef UNDEF
-    int itask = td->proc;
-    int ntask = td->np;
-    SINGLEGRADIENT_THREADDATA *thdata = (SINGLEGRADIENT_THREADDATA*)td->data;
-    const QMMesh *mesh = thdata->mesh;
-    const Raster *raster = thdata->raster;
-    CFwdSolverMW *fws = thdata->fws;
-    const CCompRowMatrix *mvec = thdata->mvec;
-    const RVector *proj = thdata->proj;
-    const RVector *data = thdata->data;
-    const RVector *sd = thdata->sd;
-    CVector *dphi = thdata->dphi;
-    RVector *grad = thdata->grad;
-    int i, j, q, m, n, idx, ofs_mod, ofs_arg;
-    int nq = mesh->nQ;
-    int q0 = (itask*nq)/ntask;
-    int q1 = ((itask+1)*nq)/ntask;
-    int glen = raster->GLen();
-    int slen = raster->SLen();
-    int dim  = raster->Dim();
-    toast::complex term;
-    CVector wqa (mesh->nlen());
-    RVector wqb (mesh->nlen());
-    CVector dgrad (slen);
-    RVector grad_cmua_loc (slen);
-    RVector grad_ckap_loc (slen);
-    RVector grad_cmua(*grad, 0, slen);     // mua part of grad
-    RVector grad_ckap (*grad, slen, slen); // kappa part of grad
-    const IVector &gdim = raster->GDim();
-    const RVector &gsize = raster->GSize();
-    const int *elref = raster->Elref();
-    for (q = 0, ofs_mod = 0; q < q0; q++)
-	ofs_mod += mesh->nQMref[q];
-    ofs_arg = ofs_mod + mesh->nQM;
-
-    for (q = q0; q < q1; q++) {
-        // expand field and gradient
-	CVector cdfield (glen);
-	CVector *cdfield_grad = new CVector[dim];
-	raster->Map_MeshToGrid (dphi[q], cdfield);
-	ImageGradient (gdim, gsize, cdfield, cdfield_grad, elref);
-        n = mesh->nQMref[q];
-	RVector y_mod (*data, ofs_mod, n);
-	RVector s_mod (*sd, ofs_mod, n);
-	RVector ypm_mod (*proj, ofs_mod, n);
-	//RVector b_mod(n);
-	//b_mod = (y_mod-ypm_mod)/s_mod;
-
-	RVector y_arg (*data, ofs_arg, n);
-	RVector s_arg (*sd, ofs_arg, n);
-	RVector ypm_arg (*proj, ofs_arg, n);
-	//RVector b_arg(n);
-	//b_arg = (y_arg-ypm_arg)/s_arg;
-
-	//RVector ype(n);
-	//ype = 1.0;  // will change if data type is normalised
-
-	CVector cproj(n);
-	cproj = fws->ProjectSingle (q, *mvec, dphi[q], DATA_LIN);
-	wqa = toast::complex(0,0);
-	wqb = 0.0;
-
-	for (m = idx = 0; m < mesh->nM; m++) {
-	    if (!mesh->Connected (q, m)) continue;
-	    //const CVector qs = mvec->Row(m);
-	    //double rp = cproj[idx].re;
-	    //double ip = cproj[idx].im;
-	    //double dn = 1.0/(rp*rp + ip*ip);
-	    
-	    // amplitude term (re(log))
-	    term.re = -2.0 * (y_mod[idx]-ypm_mod[idx])/(s_mod[idx]*s_mod[idx]);
-	    // log phase term (im(log))
-	    term.im = +2.0 * (y_arg[idx]-ypm_arg[idx])/(s_arg[idx]*s_arg[idx]);
-
-	    wqa += mvec->Row(m) * (term/cproj[idx]);
-	    //wqa += qs * toast::complex (term.re*rp*dn, -term.re*ip*dn);
-	    //wqa += qs * toast::complex (-term.im*ip*dn, -term.im*rp*dn);
-
-	    //wqb += Re(qs) * (term * ypm[idx]);
-	    idx++;
-	}
-
-	// adjoint field and gradient
-	CVector wphia (mesh->nlen());
-	fws->CalcField (wqa, wphia);
-
-	CVector cafield(glen);
-	CVector *cafield_grad = new CVector[dim];
-	raster->Map_MeshToGrid (wphia, cafield);
-	ImageGradient (gdim, gsize, cafield, cafield_grad, elref);
-
-	// absorption contribution
-	raster->Map_GridToSol (cdfield * cafield, dgrad);
-	grad_cmua_loc -= Re(dgrad);
-
-	// diffusion contribution
-	// multiply complex field gradients
-	CVector gk(glen);
-	for (i = 0; i < glen; i++)
-	    for (j = 0; j < dim; j++)
-	        gk[i] += cdfield_grad[j][i] * cafield_grad[j][i];
-	raster->Map_GridToSol (gk, dgrad);
-	grad_ckap_loc -= Re(dgrad);
-
-	ofs_mod += n; // step to next source
-	ofs_arg += n;
-
-	delete []cdfield_grad;
-	delete []cafield_grad;
-    }
-
-    // assemble into global gradient vector
-    Task::UserMutex_lock();
-    grad_cmua += grad_cmua_loc;
-    grad_ckap += grad_ckap_loc;
-    Task::UserMutex_unlock();
-#endif
-
     int i, j, q, m, n, idx, ofs_mod, ofs_arg;
     int itask = td->proc;
     int ntask = td->np;
@@ -721,9 +607,9 @@ void *single_gradient_data_engine (task_data *td)
     const Raster *raster = thdata->raster;
     CFwdSolverMW *fws = thdata->fws;
     const CCompRowMatrix *mvec = thdata->mvec;
-    const RVector *proj = thdata->proj;
-    const RVector *data = thdata->data;
-    const RVector *sd = thdata->sd;
+    const RVector &proj = *thdata->proj;
+    const RVector &data = *thdata->data;
+    const RVector &sd = *thdata->sd;
     CVector *dphi = thdata->dphi;
     int nq = mesh->nQ;
     int q0 = (itask*nq)/ntask;
@@ -738,12 +624,10 @@ void *single_gradient_data_engine (task_data *td)
     RVector *grad = thdata->grad;
     RVector grad_cmua_loc (slen);
     RVector grad_ckap_loc (slen);
-    RVector grad_cmua(*grad, 0, slen);     // mua part of grad
-    RVector grad_ckap (*grad, slen, slen); // kappa part of grad
     CVector wqa (mesh->nlen());
     RVector wqb (mesh->nlen());
     CVector dgrad (slen);
-    ofs_mod = 0;         // data offset for Mod data
+    ofs_mod = 0;          // data offset for Mod data
     ofs_arg = mesh->nQM;  // data offset for Arg data
     for (i = 0; i < q0; i++) {
 	ofs_mod += mesh->nQMref[i];
@@ -760,23 +644,24 @@ void *single_gradient_data_engine (task_data *td)
 
         n = mesh->nQMref[q];
 
-	RVector y_mod (*data, ofs_mod, n);
-	RVector s_mod (*sd, ofs_mod, n);
-	RVector ypm_mod (*proj, ofs_mod, n);
 	RVector b_mod(n);
-	b_mod = (y_mod-ypm_mod)/s_mod;
-
-	RVector y_arg (*data, ofs_arg, n);
-	RVector s_arg (*sd, ofs_arg, n);
-	RVector ypm_arg (*proj, ofs_arg, n);
 	RVector b_arg(n);
-	b_arg = (y_arg-ypm_arg)/s_arg;
+	RVector s_mod(n);
+	RVector s_arg(n);
+	for (i = 0; i < n; i++) {
+	    s_mod[i] = sd[ofs_mod+i];
+	    s_arg[i] = sd[ofs_arg+i];
+ 	    b_mod[i] = (data[ofs_mod+i]-proj[ofs_mod+i])/s_mod[i];
+	    b_arg[i] = (data[ofs_arg+i]-proj[ofs_arg+i])/s_arg[i];
+	}
 
 	RVector ype(n);
 	ype = 1.0;  // will change if data type is normalised
 
 	CVector cproj(n);
+
 	cproj = fws->ProjectSingle (q, *mvec, dphi[q], DATA_LIN);
+
 	wqa = toast::complex(0,0);
 	wqb = 0.0;
 
@@ -830,10 +715,13 @@ void *single_gradient_data_engine (task_data *td)
 
     // assemble into global gradient vector
     Task::UserMutex_lock();
-    grad_cmua += grad_cmua_loc;
-    grad_ckap += grad_ckap_loc;
+    {
+        RVector grad_cmua(*grad, 0, slen);    // mua part of grad
+	RVector grad_ckap(*grad, slen, slen); // kappa part of grad
+	grad_cmua += grad_cmua_loc;
+	grad_ckap += grad_ckap_loc;
+    }
     Task::UserMutex_unlock();
-
 }
 
 RVector single_gradient_data (const Raster &raster,
@@ -865,13 +753,12 @@ RVector single_gradient_data (const Raster &raster,
     thdata.dphi = dphi;
     thdata.grad = &grad;
 
-    //cerr << "tick1" << endl;
     Task::Multiprocess (single_gradient_data_engine, &thdata);
-    //cerr << "tick2" << endl;
 
     // hack: make this general
-    double c = 0.3/1.4;
-    return grad*c; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
+    //double c = 0.3/1.4;
+    return grad/* *c */; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
+    // MS120119: removed scaling by c
 }
 
 #else
@@ -896,8 +783,8 @@ RVector single_gradient_data (const Raster &raster,
     CVector dgrad (slen);
     ofs_mod = 0;         // data offset for Mod data
     ofs_arg = mesh.nQM;  // data offset for Arg data
-    RVector grad_cmua(grad, 0, slen);       // mua part of grad
-    RVector grad_ckap (grad, slen, slen); // kappa part of grad
+    RVector grad_cmua(grad, 0, slen);    // mua part of grad
+    RVector grad_ckap(grad, slen, slen); // kappa part of grad
 
     double tm_mesh2grid = 0.0;
     double tm_grid2sol = 0.0;
@@ -1001,8 +888,9 @@ RVector single_gradient_data (const Raster &raster,
     }
 
     // hack: make this general
-    double c = 0.3/1.4;
-    return grad*c; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
+    //double c = 0.3/1.4;
+    return grad/* *c */; // dy/dcmua -> dy/dmua,  dy/dckappa -> dy/dkappa
+    // MS120119: removed scaling by c
 }
 
 #endif
@@ -1036,10 +924,10 @@ void MW_get_gradient (const Raster &raster, CFwdSolverMW &FWS,
 	FWS.CalcFields (qvec, dphi);
 	proj_i = FWS.ProjectAll_real (mvec, dphi);
 	for (j = 0; j < nqm; j++) {
-	    data_i[j] = data[i*nqm+j];
-	    data_i[j+nqm] = data[(nlambda+i)*nqm+j];
-	    sd_i[j] = sd[i*nqm+j];
-	    sd_i[j+nqm] = sd[(nlambda+i)*nqm+j];
+	    data_i[j] = data[i*2*nqm+j];
+	    data_i[j+nqm] = data[(i*2+1)*nqm+j];
+	    sd_i[j] = sd[i*2*nqm+j];
+	    sd_i[j+nqm] = sd[(i*2+1)*nqm+j];
 	}
 	//data_i = RVector(data,i*ndat_i,ndat_i);
 	//sd_i = RVector(sd,i*ndat_i,ndat_i);
