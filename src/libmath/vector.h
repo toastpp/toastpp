@@ -131,7 +131,8 @@ template<class VT>
 MATHLIB double l1norm (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB double l2norm (const TVector<VT> &v);
+double l2norm (const TVector<VT> &v)
+{ return sqrt (l2normsq (v)); }
 
 template<class VT>
 MATHLIB double linfnorm (const TVector<VT> &v);
@@ -756,7 +757,7 @@ public:
      * \return \f$ \sqrt{\sum_i^{v.Dim()} v_i^2} \f$
      * \sa length(), l2normsq(), l1norm(), linfnorm()
      */
-    friend MATHLIB double l2norm<> (const TVector<VT> &v);
+    friend double l2norm<> (const TVector<VT> &v);
 
     /**
      * \brief L-infinity norm of vector elements
@@ -1395,11 +1396,6 @@ inline toast::complex doth (const TVector<toast::complex> &v1,
 }
 #endif // !MATH_DEBUG
 
-template<class VT>
-inline MATHLIB double l2norm (const TVector<VT> &v)
-{
-    return sqrt (l2normsq (v));
-}
 #ifdef USE_BLAS_LEVEL1
 template<>
 inline double l2norm (const TVector<double> &v)
