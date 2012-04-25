@@ -115,7 +115,7 @@ void OutputProgramInfo (std::ostream &os);
 MATHLIB void SetErrorhandler (void (*ErrorFunc)(char*));
 MATHLIB void Error (const char *name, const char *file, int line);
 MATHLIB void Error (const char *name, const char *file, int line, const char *msg, ...);
-void Error_Undef (const char *name, const char *file, int line);
+MATHLIB void Error_Undef (const char *name, const char *file, int line);
 
 // log file output routines
 void LogoutOn();                   // turn on output to log file

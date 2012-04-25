@@ -93,26 +93,26 @@ liblbfgs::
 	mkdir -p $(TOASTOBJ)/liblbfgs/include; \
 	mkdir -p $(TOASTOBJ)/liblbfgs/lib; \
 	cd $(TOASTOBJ)/liblbfgs; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/configure .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/install-sh .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/ltmain.sh .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/missing .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/depcomp .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/config.sub .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/config.guess .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/config.h.in .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/Makefile.in .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/README .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/INSTALL .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/COPYING .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/AUTHORS .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/ChangeLog .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/NEWS .; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/include/* include; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/lib/* lib; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/configure .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/install-sh .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/ltmain.sh .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/missing .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/depcomp .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/config.sub .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/config.guess .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/config.h.in .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/Makefile.in .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/README .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/INSTALL .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/COPYING .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/AUTHORS .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/ChangeLog .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/NEWS .; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/include/* include; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/lib/* lib; \
 	mkdir sample; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/Makefile.in ./sample; \
-	cp $(NUMERICSDIR)/liblbfgs-1.6/sample/sample.c ./sample;\
+	cp $(NUMERICSDIR)/liblbfgs-1.10/sample/Makefile.in ./sample; \
+	cp $(NUMERICSDIR)/liblbfgs-1.10/sample/sample.c ./sample;\
 	if test "$(ARCHDIR)" = "darwin32" -o "$(ARCHDIR)" = "darwin64"; then \
 		./configure CC=$(CC) CXX=$(CXX) F77=$(F77) FFLAGS='$(FFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' --exec-prefix=/Thisisaveeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeryloooooooooooooooooooooooooooooooongstring; \
 	else \
@@ -122,7 +122,7 @@ liblbfgs::
 	cp lib/.libs/*$(LIB_SUFFIX) $(LIBDIR); \
 	cp include/* $(TOASTDIR)/include; \
 	if test "$(ARCHDIR)" = "darwin32" -o "$(ARCHDIR)" = "darwin64"; then \
-		install_name_tool -id @rpath/liblbfgs-1.6$(LIB_SUFFIX) $(LIBDIR)/liblbfgs-1.6$(LIB_SUFFIX); \
+		install_name_tool -id @rpath/liblbfgs-1.10$(LIB_SUFFIX) $(LIBDIR)/liblbfgs-1.10$(LIB_SUFFIX); \
 		install_name_tool -id @rpath/liblbfgs$(LIB_SUFFIX) $(LIBDIR)/liblbfgs$(LIB_SUFFIX); \
 	fi
 
