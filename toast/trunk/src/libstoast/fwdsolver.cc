@@ -891,6 +891,14 @@ STOASTLIB RVector TFwdSolver<toast::complex>::UnfoldComplex (const CVector &vec)
     return rvec;
 }
 
+template<class T>
+RVector TFwdSolver<T>::UnfoldComplex (const TVector<T> &vec)
+   const
+{
+	xERROR("Not implemented");
+	return RVector();
+}
+
 template<>
 STOASTLIB FVector TFwdSolver<float>::UnfoldSComplex (const FVector &vec)
    const
@@ -913,39 +921,55 @@ STOASTLIB FVector TFwdSolver<scomplex>::UnfoldSComplex (const SCVector &vec)
 // =========================================================================
 
 template<>
-RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &mvec,
+STOASTLIB RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &mvec,
     const RVector *phi, DataScale scl)
 {
     return ProjectAll (mvec, phi, scl);
 }
 
 template<>
-RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &mvec,
+STOASTLIB RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &mvec,
     const CVector *phi, DataScale scl)
 {
     return UnfoldComplex (ProjectAll (mvec, phi, scl));
 }
 
+template<class T>
+RVector TFwdSolver<T>::ProjectAll_real (const TCompRowMatrix<T> &mvec,
+    const TVector<T> *phi, DataScale scl)
+{
+    xERROR("Not implemented");
+	return RVector();
+}
+
 // =========================================================================
 
 template<>
-FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &mvec,
+STOASTLIB FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &mvec,
     const FVector *phi, DataScale scl)
 {
     return ProjectAll (mvec, phi, scl);
 }
 
 template<>
-FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
+STOASTLIB FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
     const SCCompRowMatrix &mvec, const SCVector *phi, DataScale scl)
 {
     return UnfoldSComplex (ProjectAll (mvec, phi, scl));
 }
 
+template<class T>
+FVector TFwdSolver<T>::ProjectAll_singlereal (const TCompRowMatrix<T> &mvec,
+    const TVector<T> *phi, DataScale scl)
+{
+    xERROR("Not implemented");
+	return FVector();
+}
+
 // =========================================================================
 
 template<>
-RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &qvec,
+STOASTLIB RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &qvec,
     const RCompRowMatrix &mvec, const Solution &sol, double omega,
     DataScale scl)
 {
@@ -953,17 +977,26 @@ RVector TFwdSolver<double>::ProjectAll_real (const RCompRowMatrix &qvec,
 }
 
 template<>
-RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &qvec,
+STOASTLIB RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &qvec,
     const CCompRowMatrix &mvec, const Solution &sol, double omega,
     DataScale scl)
 {
     return UnfoldComplex (ProjectAll (qvec, mvec, sol, omega, scl));
 }
 
+template<class T>
+RVector TFwdSolver<T>::ProjectAll_real (const TCompRowMatrix<T> &qvec,
+    const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
+    DataScale scl)
+{
+    xERROR("Not implemented");
+	return RVector();
+}
+
 // =========================================================================
 
 template<>
-FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &qvec,
+STOASTLIB FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &qvec,
     const FCompRowMatrix &mvec, const Solution &sol, double omega,
     DataScale scl)
 {
@@ -971,11 +1004,20 @@ FVector TFwdSolver<float>::ProjectAll_singlereal (const FCompRowMatrix &qvec,
 }
 
 template<>
-FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
+STOASTLIB FVector TFwdSolver<scomplex>::ProjectAll_singlereal (
     const SCCompRowMatrix &qvec, const SCCompRowMatrix &mvec,
     const Solution &sol, double omega, DataScale scl)
 {
     return UnfoldSComplex (ProjectAll (qvec, mvec, sol, omega, scl));
+}
+
+template<class T>
+FVector TFwdSolver<T>::ProjectAll_singlereal (const TCompRowMatrix<T> &qvec,
+    const TCompRowMatrix<T> &mvec, const Solution &sol, double omega,
+    DataScale scl)
+{
+    xERROR("Not implemented");
+	return FVector();
 }
 
 // =========================================================================
