@@ -66,7 +66,7 @@ MATHLIB void Error (const char *name, const char *file, int line, const char *ms
     Errorhandler (NULL);
 }
 
-void Error_Undef (const char *name, const char *file, int line)
+MATHLIB void Error_Undef (const char *name, const char *file, int line)
 {
     char cbuf[500];
     sprintf (cbuf, "#########################\nERROR IN LIBFE3:\nFunction not implemented:\n%s\n%s, %d\n#########################\n",
