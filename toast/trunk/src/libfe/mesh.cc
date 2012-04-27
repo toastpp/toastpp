@@ -1156,10 +1156,10 @@ double Mesh::Size (Point *centre) const
     for (d = 0; d < dim; d++) {
 	mx[d] = -1e10, mn[d] = 1e10;
 	for (i = 0; i < nlist.Len(); i++) {
-	    mx[d] = toast::max (mx[d], nlist[i][d]);
-	    mn[d] = toast::min (mn[d], nlist[i][d]);
+	    mx[d] = max (mx[d], nlist[i][d]);
+	    mn[d] = min (mn[d], nlist[i][d]);
 	}
-	size = toast::max (size, mx[d]-mn[d]);
+	size = max (size, mx[d]-mn[d]);
     }
     if (centre) *centre = (mx+mn) * 0.5;
     return 0.5 * size;
@@ -1341,7 +1341,7 @@ int MarkBoundary_qsort_comp (const void *arg1, const void *arg2)
     int k;
     const SideRec *sd1 = (SideRec*)arg1;
     const SideRec *sd2 = (SideRec*)arg2;
-    int nnd = toast::min (sd1->n, sd2->n);
+    int nnd = min (sd1->n, sd2->n);
     for (k = 0; k < nnd; k++) {
         if (sd1->nd[k] < sd2->nd[k]) return -1;
         else if (sd1->nd[k] > sd2->nd[k]) return 1;
@@ -3037,19 +3037,19 @@ RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
     for (iz = 0; iz < bz; iz++) {
 	if (is3d) {
 	    z0 = (iz-1)*dz;
-	    zm = toast::max (0, (int)((iz-3)*dz));
-	    zp = toast::min (gz-1, (int)((iz+1)*dz));
+	    zm = max (0, (int)((iz-3)*dz));
+	    zp = min (gz-1, (int)((iz+1)*dz));
 	} else {
 	    zm = 0, zp = 0;
 	}
 	for (iy = 0; iy < by; iy++) {
 	    y0 = (iy-1.0)*dy;
-	    ym = toast::max (0, (int)((iy-3)*dy));
-	    yp = toast::min (gy-1, (int)((iy+1)*dy));
+	    ym = max (0, (int)((iy-3)*dy));
+	    yp = min (gy-1, (int)((iy+1)*dy));
 	    for (ix = 0; ix < bx; ix++) {
 		x0 = (ix-1.0)*dx; // pixel cnt in bitmap coords
-		xm = toast::max (0, (int)((ix-3)*dx));
-		xp = toast::min (gx-1, (int)((ix+1)*dx));
+		xm = max (0, (int)((ix-3)*dx));
+		xp = min (gx-1, (int)((ix+1)*dx));
 
 		for (z = zm; z <= zp; z++) {
 		    sz = (is3d ? spline ((z-z0)/dz) : 1.0);
@@ -3079,19 +3079,19 @@ RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
     for (iz = 0; iz < bz; iz++) {
 	if (is3d) {
 	    z0 = (iz-1)*dz;
-	    zm = toast::max (0, (int)((iz-3)*dz));
-	    zp = toast::min (gz-1, (int)((iz+1)*dz));
+	    zm = max (0, (int)((iz-3)*dz));
+	    zp = min (gz-1, (int)((iz+1)*dz));
 	} else {
 	    zm = 0, zp = 0;
 	}
 	for (iy = 0; iy < by; iy++) {
 	    y0 = (iy-1.0)*dy;
-	    ym = toast::max (0, (int)((iy-3)*dy));
-	    yp = toast::min (gy-1, (int)((iy+1)*dy));
+	    ym = max (0, (int)((iy-3)*dy));
+	    yp = min (gy-1, (int)((iy+1)*dy));
 	    for (ix = 0; ix < bx; ix++) {
 		x0 = (ix-1.0)*dx; // pixel cnt in bitmap coords
-		xm = toast::max (0, (int)((ix-3)*dx));
-		xp = toast::min (gx-1, (int)((ix+1)*dx));
+		xm = max (0, (int)((ix-3)*dx));
+		xp = min (gx-1, (int)((ix+1)*dx));
 
 		for (z = zm; z <= zp; z++) {
 		    sz = (is3d ? spline ((z-z0)/dz) : 1.0);

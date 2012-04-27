@@ -979,7 +979,7 @@ void lnsrch (int n, double xold[], double fold, double g[], double p[],
         slope += g[i]*p[i];
     test = 0.0;
     for (i = 1; i <= n; i++) {
-        temp = fabs (p[i])/::max (fabs(xold[i]),1.0);
+        temp = fabs (p[i])/max (fabs(xold[i]),1.0);
 	if (temp > test) test = temp;
     }
     alamin = TOLX/test;
@@ -1014,7 +1014,7 @@ void lnsrch (int n, double xold[], double fold, double g[], double p[],
 	alam2 = alam;
 	f2 = *f;
 	fold2 = fold;
-	alam = ::max (tmplam,0.1*alam);
+	alam = max (tmplam,0.1*alam);
     }
 }
 
@@ -1054,7 +1054,7 @@ void dfpmin (double p[], int n, double gtol, int *iter, double *fret,
 	xi[i] = -g[i];
 	sum += p[i]*p[i];
     }
-    stpmax = STPMX * ::max (sqrt(sum),(double)n);
+    stpmax = STPMX * max (sqrt(sum),(double)n);
 
     for (its = 1; its <= ITMAX; its++) {
         cout << "Starting iteration " << its << endl;
@@ -1072,7 +1072,7 @@ void dfpmin (double p[], int n, double gtol, int *iter, double *fret,
 	}
 	test = 0.0;
 	for (i = 1; i <= n; i++) {
-	    temp = fabs(xi[i])/::max (fabs(p[i]),1.0);
+	    temp = fabs(xi[i])/max (fabs(p[i]),1.0);
 	    if (temp > test) test = temp;
 	}
 	if (test < TOLX) {
@@ -1082,9 +1082,9 @@ void dfpmin (double p[], int n, double gtol, int *iter, double *fret,
 	for (i = 1; i <= n; i++) dg[i] = g[i];
 	(*dfunc)(p,g);
 	test = 0.0;
-	den = ::max (*fret,1.0);
+	den = max (*fret,1.0);
 	for (i = 1; i <= n; i++) {
-	    temp = fabs(g[i]) * ::max(fabs(p[i]),1.0)/den;
+	    temp = fabs(g[i]) * max(fabs(p[i]),1.0)/den;
 	    if (temp > test) test = temp;
 	}
 	if (test < gtol) {

@@ -3,9 +3,9 @@
 // types cannot be combined
 
 #define STOASTLIB_IMPLEMENTATION
-#include "stoastlib.h"
 #include "slu_cdefs.h"
 #include "supermatrix.h"
+#include "stoastlib.h"
 #include "fwdsolver_cslu.h"
 
 // =========================================================================

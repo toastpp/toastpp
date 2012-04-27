@@ -38,19 +38,19 @@ const int END = -1; // "end" index flag
 template<class VT> class TVector;
 
 template<class VT>
-MATHLIB TVector<VT> inv (const TVector<VT> &v);  // 1/v
+TVector<VT> inv (const TVector<VT> &v);  // 1/v
 
 template<class VT>
-MATHLIB TVector<VT> sqr (const TVector<VT> &v);
+TVector<VT> sqr (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> sqrt (const TVector<VT> &v);
+TVector<VT> sqrt (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> log (const TVector<VT> &v);
+TVector<VT> log (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> exp (const TVector<VT> &v);
+TVector<VT> exp (const TVector<VT> &v);
 
 template<class VT>
 TVector<VT> pow (const TVector<VT> &v, const VT &s);
@@ -101,10 +101,10 @@ template<class VT>
 VT doth (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
-MATHLIB VT vmin (const TVector<VT> &v);
+VT vmin (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB VT vmax (const TVector<VT> &v);
+inline VT vmax (const TVector<VT> &v);
 
 template<class VT>
 TVector<VT> vsort (const TVector<VT> &v);
@@ -116,7 +116,7 @@ template<class VT>
 VT sum (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB VT mean (const TVector<VT> &v);
+VT mean (const TVector<VT> &v);
 
 template<class VT>
 VT median (const TVector<VT> &v);
@@ -128,50 +128,50 @@ template<class VT>
 VT stdv (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB double l1norm (const TVector<VT> &v);
+double l1norm (const TVector<VT> &v);
 
 template<class VT>
 double l2norm (const TVector<VT> &v)
 { return sqrt (l2normsq (v)); }
 
 template<class VT>
-MATHLIB double linfnorm (const TVector<VT> &v);
+double linfnorm (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB double l2normsq (const TVector<VT> &v);
+double l2normsq (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2);
+inline TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
-MATHLIB TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2);
+inline TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
-MATHLIB TVector<VT> operator+ (const VT &s, const TVector<VT> &v);
+TVector<VT> operator+ (const VT &s, const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> operator- (const VT &s, const TVector<VT> &v);
+TVector<VT> operator- (const VT &s, const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> operator* (const VT &s, const TVector<VT> &v);
+TVector<VT> operator* (const VT &s, const TVector<VT> &v);
 
 template<class VT>
-MATHLIB TVector<VT> operator/ (const VT &s, const TVector<VT> &v);
+TVector<VT> operator/ (const VT &s, const TVector<VT> &v);
 
 template<class VT>
-MATHLIB bool operator== (const TVector<VT> &v1, const TVector<VT> &v2);
+bool operator== (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
-MATHLIB bool operator!= (const TVector<VT> &v1, const TVector<VT> &v2);
+bool operator!= (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
-MATHLIB bool visnan (const TVector<VT> &v);
+bool visnan (const TVector<VT> &v);
 
 template<class VT>
-MATHLIB std::ostream &operator<< (std::ostream &os, const TVector<VT> &v);
+std::ostream &operator<< (std::ostream &os, const TVector<VT> &v);
 
 template<class VT>
-MATHLIB std::istream &operator>> (std::istream &is, TVector<VT> &v);
+std::istream &operator>> (std::istream &is, TVector<VT> &v);
 
 template<class VT>
 VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
@@ -179,7 +179,7 @@ VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
 	       int from, int to);
 
 template<class VT>
-MATHLIB TVector<double> UnfoldComplex (const TVector<VT> &v);
+TVector<double> UnfoldComplex (const TVector<VT> &v);
 
 // ==========================================================================
 // class TVector
@@ -371,7 +371,7 @@ public:
     /// - Return value is true if any elements have been truncated.
     /// - This method is only defined for data types which support boolean
     ///   comparisons.
-    bool Clip (VT vmin, VT vmax);
+    inline bool Clip (VT vmin, VT vmax);
 
     /// \brief Move vector elements left.
     ///
@@ -460,7 +460,7 @@ public:
      * \return Returns \e true if both vectors are identical, \e false
      *   otherwise.
      */
-    friend MATHLIB bool operator== <> (const TVector<VT> &v1,
+    friend bool operator== <> (const TVector<VT> &v1,
         const TVector<VT> &v2);
 
     /**
@@ -470,7 +470,7 @@ public:
      * \return Returns \e false if both vectors are identical, \e true
      *   otherwise.
      */
-    friend MATHLIB bool operator!=<> (const TVector<VT> &v1,
+    friend bool operator!=<> (const TVector<VT> &v1,
         const TVector<VT> &v2);
 
     /// \brief Dot product of two vectors
@@ -571,22 +571,22 @@ public:
 
     // friends
     /// \brief Returns element-wise inverse vector 1/(*this)[i]
-    friend MATHLIB TVector<VT> inv<> (const TVector<VT> &v);
+    friend TVector<VT> inv<> (const TVector<VT> &v);
 
     /// \brief Returns element-wise square vector (*this)[i]^2
-    friend MATHLIB TVector<VT> sqr<> (const TVector<VT> &v);
+    friend TVector<VT> sqr<> (const TVector<VT> &v);
 
     /// \brief Returns element-wise square-root vector (*this)[i]^(1/2)
-    friend MATHLIB TVector<VT> sqrt<> (const TVector<VT> &v);
+    friend TVector<VT> sqrt<> (const TVector<VT> &v);
 
     /// \brief Returns element-wise power vector (*this)[i]^s
     friend TVector<VT> pow<> (const TVector<VT> &v, const VT &s);
 
     /// \brief Returns element-wise natural logarithm vector ln((*this)[i])
-    friend MATHLIB TVector<VT> log<> (const TVector<VT> &v);
+    friend TVector<VT> log<> (const TVector<VT> &v);
 
     /// \brief Returns element-wise base-e exponential vector exp((*this)[i])
-    friend MATHLIB TVector<VT> exp<> (const TVector<VT> &v);
+    friend TVector<VT> exp<> (const TVector<VT> &v);
 
     /// \brief Returns element-wise complex conjugate vector ((*this([i].re,
     ///   -(*this)[i].im)
@@ -672,7 +672,7 @@ public:
      * \remarks Only works with template types that define relational
      *   operator <.
      */
-    friend MATHLIB VT vmin<> (const TVector<VT> &v);
+    friend VT vmin<> (const TVector<VT> &v);
 
     /**
      * \brief Extract largest element in vector.
@@ -680,7 +680,7 @@ public:
      * \remarks Only works with template types that define relational
      *   operator >.
      */
-    friend MATHLIB VT vmax<> (const TVector<VT> &v);
+    friend VT vmax<> (const TVector<VT> &v);
 
     /**
      * \brief Sort vector
@@ -717,7 +717,7 @@ public:
      *   v.Dim >= 1
      * \sa median(), variance(), stdv()
      */
-    friend MATHLIB VT mean<> (const TVector<VT> &v);
+    friend VT mean<> (const TVector<VT> &v);
 
     /**
      * \brief Median value of elements
@@ -750,7 +750,7 @@ public:
      * \return \f$ \sum_i^{v.Dim()} | v_i | \f$
      * \sa l2norm(), linfnorm()
      */
-    friend MATHLIB double l1norm<> (const TVector<VT> &v);
+    friend double l1norm<> (const TVector<VT> &v);
 
     /**
      * \brief L2 norm of vector elements
@@ -764,14 +764,14 @@ public:
      * \return \f$ \max_i | v_i | \f$
      * \sa l1norm(), l2norm()
      */
-    friend MATHLIB double linfnorm<> (const TVector<VT> &v);
+    friend double linfnorm<> (const TVector<VT> &v);
 
     /**
      * \brief Square of L2 norm of vector elements
      * \return \f$ \sum_i^{v.Dim()} v_i^2 \f$
      * \sa l2norm()
      */
-    friend MATHLIB double l2normsq<> (const TVector<VT> &v);
+    friend double l2normsq<> (const TVector<VT> &v);
 
     /**
      * \brief Length of a vector (L2 norm of elements)
@@ -789,7 +789,7 @@ public:
      * \return Result of the concatenation (the modified v1 argument)
      * \remarks Argument v2 unchanged.
      */
-    friend MATHLIB TVector<VT> &append<> (TVector<VT> &v1, const TVector<VT> &v2);
+    friend TVector<VT> &append<> (TVector<VT> &v1, const TVector<VT> &v2);
 
     /**
      * \brief Concatenate two vectors
@@ -798,7 +798,7 @@ public:
      * \return The result of the concatenation, {v1,v2}
      * \note Both arguments unchanged
      */
-    friend MATHLIB TVector<VT> cat<> (const TVector<VT> &v1, const TVector<VT> &v2);
+    friend TVector<VT> cat<> (const TVector<VT> &v1, const TVector<VT> &v2);
 
     /**
      * \brief Element-wise addition of a scalar from the left
@@ -815,7 +815,7 @@ public:
 #ifndef USE_CUDA_FLOAT
 // none of the operator friend definitions seem to work with nvcc
 #if (defined(WIN32)||defined(WIN64))
-    template <class VT> friend MATHLIB TVector<VT> operator+ (const VT &s,
+    template <class VT> friend TVector<VT> operator+ (const VT &s,
         const TVector<VT> &v);
 #elif (GCC_VERSION < 30404) // old-style definitions
     friend TVector<VT> operator+ <> (const VT &s, const TVector<VT> &v);
@@ -837,7 +837,7 @@ public:
      * \sa TVector::operator-()
      */
 #if (defined(WIN32)||defined(WIN64))
-    template<class VT> friend MATHLIB TVector<VT> operator- (const VT &s,
+    template<class VT> friend TVector<VT> operator- (const VT &s,
         const TVector<VT> &v);
 #elif (GCC_VERSION < 30404) // old-style definitions
     friend TVector<VT> operator- <> (const VT &s, const TVector<VT> &v);
@@ -858,7 +858,7 @@ public:
      * \sa TVector::operator*()
      */
 #if (defined(WIN32)||defined(WIN64))
-    template<class VT> friend MATHLIB TVector<VT> operator* (const VT &s,
+    template<class VT> friend TVector<VT> operator* (const VT &s,
         const TVector<VT> &v);
 #elif (GCC_VERSION < 30404) // old-style definitions
     friend TVector<VT> operator* <> (const VT &s, const TVector<VT> &v);
@@ -879,7 +879,7 @@ public:
      * \sa TVector::operator/()
      */
 #if (defined(WIN32)||defined(WIN64))
-    template<class VT> friend MATHLIB TVector<VT> operator/ (const VT &s,
+    template<class VT> friend TVector<VT> operator/ (const VT &s,
         const TVector<VT> &v);
     // JK also works (TVector::operator/ )
 #elif (GCC_VERSION < 30404) // old-style definitions
@@ -888,7 +888,7 @@ public:
     friend TVector<VT> (::operator/ <>) (const VT &s, const TVector<VT> &v);
 #endif
 
-    friend MATHLIB bool visnan<> (const TVector<VT> &v);
+    friend bool visnan<> (const TVector<VT> &v);
 
     /**
      * \brief Write vector to output stream
@@ -907,7 +907,7 @@ public:
      * [<0 0> <-3.1 44.123>]
      * \endcode
      */
-    friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
+    friend std::ostream &operator<< <> (std::ostream &os,
         const TVector<VT> &v);
 
     /**
@@ -928,7 +928,7 @@ public:
      * [<0 0> <-3.1 44.123>]
      * \endcode
      */
-    friend MATHLIB std::istream &operator>> <> (std::istream &is, TVector<VT> &v);
+    friend std::istream &operator>> <> (std::istream &is, TVector<VT> &v);
 
     /**
      * \brief Sparse dot product of two vectors
@@ -960,7 +960,7 @@ public:
      *   and imaginary parts of the vector.
      * \note For real template types, this simply returns the input vector.
      */
-    friend MATHLIB TVector<double> UnfoldComplex<> (const TVector<VT> &v);
+    friend TVector<double> UnfoldComplex<> (const TVector<VT> &v);
 
     /**
      * \brief Initialise vector elements from a string.
@@ -1427,30 +1427,32 @@ typedef TVector<scomplex> SCVector;
 typedef TVector<int>      IVector;
 
 /* add specific function for CVector */
-MATHLIB FVector Re(const SCVector &);
-MATHLIB RVector Re(const CVector &);
-MATHLIB FVector Im(const SCVector &);
-MATHLIB RVector Im(const CVector &);
-RVector Mod(const CVector &);
-MATHLIB RVector LogMod(const CVector &);
-MATHLIB RVector Arg (const CVector &);
-CVector Conj(const CVector &); // obsolete
-void SelfConj(const CVector &);
-CVector Hadamard(const CVector &, const CVector &);
-MATHLIB void SetReal (CVector&, const RVector&);
-MATHLIB void SetImag (CVector&, const RVector&);
+inline FVector Re(const SCVector &);
+inline RVector Re(const CVector &);
+inline FVector Im(const SCVector &);
+inline RVector Im(const CVector &);
+inline RVector Mod(const CVector &);
+inline RVector LogMod(const CVector &);
+inline RVector Arg (const CVector &);
+inline CVector Conj(const CVector &); // obsolete
+inline void SelfConj(const CVector &);
+inline CVector Hadamard(const CVector &, const CVector &);
+inline void SetReal (CVector&, const RVector&);
+inline void SetImag (CVector&, const RVector&);
 
-CVector MakeCVector (const SCVector &v);
+inline CVector MakeCVector (const SCVector &v);
 
 // ==========================================================================
 // extern declarations of TVector (only required for VS)
 
 #ifndef __VECTOR_CC
-extern template class MATHLIB TVector<double>;
-extern template class MATHLIB TVector<float>;
-extern template class MATHLIB TVector<toast::complex>;
-extern template class MATHLIB TVector<scomplex>;
-extern template class MATHLIB TVector<int>;
+//extern template class MATHLIB TVector<double>;
+//extern template class MATHLIB TVector<float>;
+//extern template class MATHLIB TVector<toast::complex>;
+//extern template class MATHLIB TVector<scomplex>;
+//extern template class MATHLIB TVector<int>;
 #endif // !__VECTOR_CC
+
+#include "vector_imp.hpp"
 
 #endif // !__VECTOR_H
