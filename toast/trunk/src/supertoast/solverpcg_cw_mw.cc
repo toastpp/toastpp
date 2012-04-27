@@ -419,7 +419,7 @@ void SolverPCG_CW_MW::ReadParams (ParamParser &pp)
         cout << "\nPCG nonlinear solver -----------------------------------\n";
 	cout << "Select the initial step length for the line search\n";
 	do {
-	    cout << "\nNONLIN_ITMAX (float, >=0, 0=auto):\n>> ";
+	    cout << "\nLS_INIT_STEPLENGTH (float, >=0, 0=auto):\n>> ";
 	    cin >> alpha;
 	} while (alpha < 0.0);
     }
