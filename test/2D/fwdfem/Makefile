@@ -82,8 +82,8 @@ fwd_cplx_bicgstab ::
 	@echo -----------------------------------------------------------
 	@time(echo "2 4 1e-15 10000 0 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab.fem -r=1e-6
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_bicgstab.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -94,8 +94,8 @@ fwd_cplx_bicgstab_diag ::
 	@echo -----------------------------------------------------------
 	@time(echo "2 4 1e-15 10000 1 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab_diag.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_diag.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_diag.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_diag.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_diag.fem -r=1e-6
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_bicgstab_diag.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -118,8 +118,8 @@ fwd_cplx_bicgstab_dilu ::
 	@echo -----------------------------------------------------------
 	@time(echo "2 4 1e-15 10000 3 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_bicgstab_dilu.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_dilu.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_dilu.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_bicgstab_dilu.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_bicgstab_dilu.fem -r=1e-6
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_bicgstab_dilu.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -154,8 +154,8 @@ fwd_cplx_gmres_ich ::
 	@echo -----------------------------------------------------------
 	@time(echo "2 5 1e-15 10000 2 ../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres_ich.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_ich.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_ich.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_ich.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_ich.fem -r=1e-7
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_gmres_ich.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo

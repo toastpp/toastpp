@@ -571,9 +571,9 @@ fi
 TEMPLATEFLAGS="-DNEED_EXPLICIT_INSTANTIATION"
 
 # Turn of implicit instantiation in gcc
-if test "${GXX}" = "yes" ; then
-    TEMPLATEFLAGS="${TEMPLATEFLAGS} -fno-implicit-templates"
-fi
+#if test "${GXX}" = "yes" ; then
+#    TEMPLATEFLAGS="${TEMPLATEFLAGS} -fno-implicit-templates"
+#fi
 
 # Add to the compiler flags
 CXXFLAGS="${CXXFLAGS} ${TEMPLATEFLAGS}"

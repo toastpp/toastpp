@@ -53,7 +53,7 @@ char *ParamParser::trim_string (char *cbuf)
 void ParamParser::Lineout (const char *str)
 {
     LogOut (str);
-    cout << str << endl;
+    //cout << str << endl;
 }
 
 bool ParamParser::GetString (const char *cat, char *str)

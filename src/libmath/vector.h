@@ -104,7 +104,7 @@ template<class VT>
 VT vmin (const TVector<VT> &v);
 
 template<class VT>
-inline VT vmax (const TVector<VT> &v);
+VT vmax (const TVector<VT> &v);
 
 template<class VT>
 TVector<VT> vsort (const TVector<VT> &v);

@@ -1297,6 +1297,7 @@ int SelectSDMode ()
 
 static bool CheckRange (const MWsolution &sol)
 {
+    return true;
     bool inrange = true;
 
 #ifdef LIMIT_RANGE
