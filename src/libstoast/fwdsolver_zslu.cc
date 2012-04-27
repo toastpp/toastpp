@@ -3,9 +3,9 @@
 // types cannot be combined
 
 #define STOASTLIB_IMPLEMENTATION
-#include "stoastlib.h"
 #include "slu_zdefs.h"
 #include "supermatrix.h"
+#include "stoastlib.h"
 #include "fwdsolver_zslu.h"
 
 using namespace toast;

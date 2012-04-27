@@ -81,7 +81,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(ProjectDir)..\include\*.h $(ToastRootDir)include"
+				CommandLine="copy &quot;$(ProjectDir)..\include\*.h&quot; &quot;$(ToastRootDir)include&quot;"
 			/>
 		</Configuration>
 		<Configuration

@@ -13,6 +13,7 @@
 #endif
 #include <stdlib.h>
 #include <math.h>
+#include <algorithm>
 
 #ifdef FEM_DEBUG
 #define MATH_DEBUG  		// switch on error checks
@@ -40,14 +41,14 @@ typedef unsigned char BYTE;
 
 // macros ===================================================================
 
-#ifndef __MINMAX_DEFINED
-namespace toast {
-    template<class T>
-    inline T min (const T x, const T y) { return (x < y) ? x : y; }
-    template<class T>
-    inline T max (const T x, const T y) { return (x > y) ? x : y; }
-}
-#endif
+//#ifndef __MINMAX_DEFINED
+//namespace toast {
+//    template<class T>
+//    inline T min (const T x, const T y) { return (x < y) ? x : y; }
+//    template<class T>
+//    inline T max (const T x, const T y) { return (x > y) ? x : y; }
+//}
+//#endif
 
 template<class T>
 inline T sqr (const T a) { return (a == 0.0 ? (T)0 : a*a); }
@@ -80,8 +81,8 @@ inline bool iszero (double d)
 inline int binomial_coeff (int n, int r)
 {
     int i, sum = 1;
-    for (i = n; i > toast::max (r, (n-r)); i--) sum *= i;
-    for (i = toast::min (r, (n-r)); i > 1; i--) sum /= i;
+	for (i = n; i > std::max (r, (n-r)); i--) sum *= i;
+	for (i = std::min (r, (n-r)); i > 1; i--) sum /= i;
     return sum;
 }
 
