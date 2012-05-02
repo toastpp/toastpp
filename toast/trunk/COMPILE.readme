@@ -55,8 +55,7 @@ tar xzvf numerics.tar.gz
 2.1.1 Preliminaries:
 --------------------
 
-You need the GNU g++ and g77 compilers (should work for 3.2 to 4.2, not
-tested for later versions).
+You need up-to-date GNU g++ and gfortran compilers (4.2 or later).
 
 For compiling the source-level help documents you need doxygen
 (http://www.stack.nl/~dimitri/doxygen/)
@@ -205,7 +204,8 @@ Troubleshooting FAQ
 
 1. FORTRAN compiler problems
 
-   Where available, use gfortran instead of g77 to compile the Fortran
-   libraries (BLAS, LaPACK, etc.). If configure insists on g77, you can
-   change the preferences by setting environment variable F77 to gfortran.
-   g77 appears to cause problems on 64-bit architectures.
+   The Fortran libraries must be compiled with gfortran, _not_ with g77
+   which was part of older GNU compiler installations. If you use g77, you
+   will get linker errors related to mismatched underscores in the symbol
+   names exported by the Fortran compilers (this only seems to happen on
+   64-bit architectures).
