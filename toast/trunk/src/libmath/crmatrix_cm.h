@@ -18,11 +18,12 @@
 #define __CRMATRIX_CM
 
 #include "crmatrix.h"
-#include "precon.h"
+
 // ==========================================================================
 // Nonmember declarations
 
 class SCCompRowMatrixMixed;
+class SCPreconditionerMixed;
 
 int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
     double &tol, const SCPreconditionerMixed *precon = 0, int restart = 10,

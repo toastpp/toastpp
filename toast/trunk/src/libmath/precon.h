@@ -13,6 +13,7 @@
 #include "matrix.h"
 #include "dgmatrix.h"
 #include "crmatrix.h"
+#include "crmatrix_cm.h"
 #ifdef HAVE_ILU
 #include "ilupack.h"
 #endif // HAVE_ILU

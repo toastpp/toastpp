@@ -20,6 +20,10 @@
 //#define CG_PARALLEL
 #endif
 
+#ifdef DBG_TIMING
+extern double cgtime;
+#endif
+
 #include "matrix.h"
 
 const int BUFFER_CHUNK_SIZE = 256;
