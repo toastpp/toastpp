@@ -41,7 +41,7 @@ scomplex scomplex::operator/= (const scomplex& z)
     return *this;
 }
 
-scomplex sqrt (const scomplex& z)
+MATHLIB scomplex sqrt (const scomplex& z)
 {
     if (!z.re && !z.im) return scomplex(0.0, 0.0);
     double r, w, x = fabs (z.re), y = fabs (z.im);
@@ -69,7 +69,7 @@ scomplex pow (const scomplex& /*zb*/, double /*e*/)
     return (scomplex(0,0));
 }
 
-ostream &operator<< (ostream &os, const scomplex &z)
+MATHLIB ostream &operator<< (ostream &os, const scomplex &z)
 {
     os << '<' << z.re << ' ' << z.im << '>';
     return os;

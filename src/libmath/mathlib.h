@@ -70,4 +70,16 @@ extern unsigned int flops_mul;
 //#define SQR(x) ((x)*(x))
 #define CUBE(x) ((x)*(x)*(x))
 
+// The template implementation headers
+#include "vector_imp.hpp"
+#include "gmres_imp.hpp"
+#include "precon_imp.hpp"
+#include "matrix_imp.hpp"
+#include "dnsmatrix_imp.hpp"
+#include "symatrix_imp.hpp"
+#include "gsmatrix_imp.hpp"
+#include "dgmatrix_imp.hpp"
+#include "crmatrix_imp.hpp"
+#include "cdmatrix_imp.hpp"
+
 #endif // !__MATHLIB_H

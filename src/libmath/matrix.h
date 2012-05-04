@@ -57,27 +57,27 @@ TSymMatrix<MT> ATA (const TMatrix<MT> &A);
 // Returns symmetric matrix A^T A (dimension A.Cols() x A.Cols())
 
 template<class MT>
-MATHLIB TSymMatrix<MT> AAT (const TMatrix<MT> &A);
+TSymMatrix<MT> AAT (const TMatrix<MT> &A);
 // Returns symmetric matrix A A^T (dimension A.Rows() x A.Rows())
 
 template<class MT>
-MATHLIB TVector<MT> ATA_diag (const TMatrix<MT> &A);
+TVector<MT> ATA_diag (const TMatrix<MT> &A);
 // Returns the diagonal of A^T A as a vector
 
 template<class MT>
-MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
+int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon = 0, int maxit = 0);
 // PCG (preconditioned conjugate gradient) linear solver
 // Solves Ax = b for given tolerance and preconditioner
 
 template<class MT>
-MATHLIB void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
+void PCG (const TMatrix<MT> &A, const TVector<MT> *b, TVector<MT> *x,
    int nrhs, double tol, int maxit = 0, TPreconditioner<MT> *precon = 0,
    IterativeSolverResult *res = 0);
 // PCG solver for multiple right-hand sides
 
 template<class MT>
-MATHLIB int PCG (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
+int PCG (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
     void *context), void *context, const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon = 0, 
     int maxit = 0);
@@ -89,29 +89,29 @@ int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 // Solves Ax = b for given tolerance and preconditioner
 
 template<class MT>
-MATHLIB int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
+int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-MATHLIB void BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> *b,
+void BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> *b,
     TVector<MT> *x, int nrhs, double tol, int maxit = 0,
     TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 // BiCGSTAB solver for multiple right-hand sides
 
 template<class MT>
-MATHLIB int BiCGSTAB (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
+int BiCGSTAB (TVector<MT> (*Mv_clbk)(const TVector<MT> &v,
     void *context), void *context, const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon = 0, 
     int maxit = 0);
 
 template<class MT>
-MATHLIB int BiCGSTAB (void (*MVM)(TVector<MT> &),  const TVector<MT> &b, 
+int BiCGSTAB (void (*MVM)(TVector<MT> &),  const TVector<MT> &b, 
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon  = 0, 
     int maxit = 0);
 
 template<class MT>
-MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
+int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     double &tol, TPreconditioner<MT> *precon = 0, int restart = 10,
     int maxit = 0, void (*clbk)(void*) = 0);
 // GMRES (generalised minimum residual) linear solver
@@ -137,13 +137,13 @@ MATHLIB int GMRES (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
  * \return Currently always 0.
  */
 template<class MT>
-MATHLIB int GMRES (TVector<MT> (*Mv_clbk)(const TVector<MT> &v, void *context),
+int GMRES (TVector<MT> (*Mv_clbk)(const TVector<MT> &v, void *context),
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,
     TPreconditioner<MT> *precon = 0, int restart = 10, int maxit = 0,
     int *iter = 0, double *res = 0);
 
 template<class MT>
-MATHLIB std::ostream &operator<< (std::ostream &os, const TMatrix<MT> &mat);
+std::ostream &operator<< (std::ostream &os, const TMatrix<MT> &mat);
 
 // ==========================================================================
 // class TMatrix
@@ -387,23 +387,23 @@ public:
 
     /// Return transp(*this) * *this as a symmetric matrix.
     friend TSymMatrix<MT> ATA<> (const TMatrix<MT> &A);
-    friend MATHLIB TSymMatrix<MT> AAT<> (const TMatrix<MT> &A);
-    friend MATHLIB TVector<MT>ATA_diag<> (const TMatrix<MT> &A);
+    friend TSymMatrix<MT> AAT<> (const TMatrix<MT> &A);
+    friend TVector<MT>ATA_diag<> (const TMatrix<MT> &A);
 
-    friend MATHLIB int PCG<> (const TMatrix<MT> &A, const TVector<MT> &b,
+    friend int PCG<> (const TMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
         int maxit);
 
-    friend MATHLIB void PCG<> (const TMatrix<MT> &A, const TVector<MT> *b,
+    friend void PCG<> (const TMatrix<MT> &A, const TVector<MT> *b,
         TVector<MT> *x, int nrhs, double tol, int maxit,
         TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
-    friend MATHLIB int BiCGSTAB<> (const TMatrix<MT> &A,
+    friend int BiCGSTAB<> (const TMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
         TPreconditioner<MT> *precon, int maxit);
     // biconjugate gradient stabilised method.
 
-    friend MATHLIB void BiCGSTAB<> (const TMatrix<MT> &A,
+    friend void BiCGSTAB<> (const TMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
         TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
@@ -427,7 +427,7 @@ public:
         TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0)
         const;
 
-    friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
+    friend std::ostream &operator<< <> (std::ostream &os,
         const TMatrix<MT> &mat);
     // stream output
 

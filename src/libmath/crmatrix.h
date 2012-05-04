@@ -38,7 +38,7 @@ template<class MT>class TPrecon_IC;
 template<class MT>class TDenseMatrix;
 template<class MT>class TDiagMatrix;
 
-MATHLIB void BlockExpand (int *rowptr, int *colidx, int n,
+void BlockExpand (int *rowptr, int *colidx, int n,
 		  int *&browptr, int *&bcolidx, int &bn,
 		  int blockn, int blockm);
 // expand the nonsparsity structure (rowptr,colidx) of an (n x m) matrix
@@ -47,51 +47,51 @@ MATHLIB void BlockExpand (int *rowptr, int *colidx, int n,
 // block
 
 template<class MT>
-MATHLIB TCompRowMatrix<MT>transp (const TCompRowMatrix<MT> &m);
+TCompRowMatrix<MT>transp (const TCompRowMatrix<MT> &m);
 
 template<class MT>
-MATHLIB double l2norm (const TCompRowMatrix<MT> &A);
+double l2norm (const TCompRowMatrix<MT> &A);
 
 template<class MT>
-MATHLIB TCompRowMatrix<MT> kron (const TCompRowMatrix<MT> &A,
+TCompRowMatrix<MT> kron (const TCompRowMatrix<MT> &A,
     const TCompRowMatrix<MT> &B);
 
 template<class MT>
-MATHLIB TCompRowMatrix<MT> cath (const TCompRowMatrix<MT> &A,
+TCompRowMatrix<MT> cath (const TCompRowMatrix<MT> &A,
     const TCompRowMatrix<MT> &B);
 
 template<class MT>
-MATHLIB TCompRowMatrix<MT> catv (const TCompRowMatrix<MT> &A,
+TCompRowMatrix<MT> catv (const TCompRowMatrix<MT> &A,
     const TCompRowMatrix<MT> &B);
 
 template<class MT>
-MATHLIB bool CholeskyFactorize (const TCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
+bool CholeskyFactorize (const TCompRowMatrix<MT> &A, TCompRowMatrix<MT> &L,
     TVector<MT> &d, bool recover = false);
 
 template<class MT>
-MATHLIB bool IncompleteCholeskyFactorize (const TCompRowMatrix<MT> &A,
+bool IncompleteCholeskyFactorize (const TCompRowMatrix<MT> &A,
     TCompRowMatrix<MT> &L, TVector<MT> &d, bool recover = false);
 // Perform an incomplete Cholesky factorisation without creating additional
 // fillin. Lower triangle (without diagonal) stored in L, diagonal stored in
 // d. If recover==true, then non-SPD matrices will not cause a fatal error.
 
 template<class MT>
-MATHLIB void LUFactorize (TCompRowMatrix<MT> &A, bool LUrealloc = true);
+void LUFactorize (TCompRowMatrix<MT> &A, bool LUrealloc = true);
 
 template<class MT>
-MATHLIB void CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
+void CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
     const TVector<MT> &b, TVector<MT> &x);
 
 template<class MT>
-MATHLIB TVector<MT> CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
+TVector<MT> CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
     const TVector<MT> &b);
 
 template<class MT>
-MATHLIB void CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
+void CholeskySolve (const TCompRowMatrix<MT> &L, const TVector<MT> &d,
     const TDenseMatrix<MT> &BT, TDenseMatrix<MT> &XT, int n = 0);
 
 template<class MT>
-MATHLIB void LUSolve (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
+void LUSolve (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
     TVector<MT> &x);
 
 template<class MT>
@@ -109,22 +109,22 @@ int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 
 #ifdef USE_CUDA_FLOAT
 template<class MT>
-MATHLIB int PCG (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
+int PCG (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-MATHLIB void PCG (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
+void PCG (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
     TVector<MT> *x, int nrhs, double tol, int maxit = 0,
     TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 
 template<class MT>
-MATHLIB int BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
+int BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-MATHLIB void BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
+void BiCGSTAB (const TCompRowMatrix<MT> &A, const TVector<MT> *b,
     TVector<MT> *x, int nrhs, double tol, int maxit = 0,
     TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 #endif // USE_CUDA_FLOAT
@@ -144,10 +144,10 @@ int ML_getrow (ML_Operator *Amat, int N_requested_rows,
 #endif // ML_INTERFACE
 
 template<class MT>
-MATHLIB std::istream &operator>> (std::istream &is, TCompRowMatrix<MT> &m);
+std::istream &operator>> (std::istream &is, TCompRowMatrix<MT> &m);
 
 template<class MT>
-MATHLIB std::ostream &operator<< (std::ostream &os,
+std::ostream &operator<< (std::ostream &os,
     const TCompRowMatrix<MT> &m);
 
 // ==========================================================================
@@ -309,7 +309,7 @@ public:
      * \note This method has the functionality of the MATLAB construct
      *   C = (A,B)
      */
-    friend MATHLIB TCompRowMatrix<MT> cath<> (const TCompRowMatrix<MT> &A,
+    friend TCompRowMatrix<MT> cath<> (const TCompRowMatrix<MT> &A,
 	const TCompRowMatrix<MT> &B);
 
     /**
@@ -322,7 +322,7 @@ public:
      * \note This method has the functionality of the MATLAB construct
      *   C = (A;B)
      */
-    friend MATHLIB TCompRowMatrix<MT> catv<> (const TCompRowMatrix<MT> &A,
+    friend TCompRowMatrix<MT> catv<> (const TCompRowMatrix<MT> &A,
 	const TCompRowMatrix<MT> &B);
 
     TCompRowMatrix &merge (const TCompRowMatrix<MT> &m);
@@ -381,12 +381,12 @@ public:
     void Transpone ();
     // Replace matrix with its transpose
 
-    friend MATHLIB TCompRowMatrix<MT> transp<> (const TCompRowMatrix<MT> &m);
+    friend TCompRowMatrix<MT> transp<> (const TCompRowMatrix<MT> &m);
     // returns transpose of m
 
-    friend MATHLIB double l2norm<> (const TCompRowMatrix<MT> &A);
+    friend double l2norm<> (const TCompRowMatrix<MT> &A);
 
-    friend MATHLIB TCompRowMatrix<MT> kron<> (const TCompRowMatrix<MT> &A,
+    friend TCompRowMatrix<MT> kron<> (const TCompRowMatrix<MT> &A,
         const TCompRowMatrix<MT> &B);
     // Kronecker matrix product
 
@@ -446,41 +446,41 @@ public:
     // structure of the lower triangle of the original matrix, excluding the
     // diagonal. No additional fill-in is considered.
 
-    friend MATHLIB bool CholeskyFactorize<> (const TCompRowMatrix<MT> &A,
+    friend bool CholeskyFactorize<> (const TCompRowMatrix<MT> &A,
         TCompRowMatrix<MT> &L, TVector<MT> &d, bool recover);
     // Perform Cholesky factorisation of A and return the result in lower
     // triangle L and diagonal d (L does not contain diagonal elements)
     // L must have been initialised with the index lists returned from
     // A.CalculateCholeskyFillin()
 
-    friend MATHLIB bool IncompleteCholeskyFactorize<> (const TCompRowMatrix<MT> &A,
+    friend bool IncompleteCholeskyFactorize<> (const TCompRowMatrix<MT> &A,
         TCompRowMatrix<MT> &L, TVector<MT> &d, bool recover);
     // As above, but does not create additional fill-in. The structure of L
     // must have been set according to A.CalculateIncompleteCholeskyFillin()
 
-    friend MATHLIB void LUFactorize<> (TCompRowMatrix<MT> &A, bool LUrealloc);
+    friend void LUFactorize<> (TCompRowMatrix<MT> &A, bool LUrealloc);
     // Perform LU factorisation of A and return result in LU
     // Fill-in is calculated on the fly if data length of LU is 0
     // Otherwise LU is expected to have correct fillin structure (e.g. from
     // previous call to LUFactorize)
 
-    friend MATHLIB void CholeskySolve<> (const TCompRowMatrix<MT> &L,
+    friend void CholeskySolve<> (const TCompRowMatrix<MT> &L,
         const TVector<MT> &d, const TVector<MT> &b, TVector<MT> &x);
     // Returns solution of LL^T x = b in x
     // d contains the diagonal elements of L, as returned by CholeskyFactorize
 
-    friend MATHLIB TVector<MT> CholeskySolve<> (const TCompRowMatrix<MT> &L,
+    friend TVector<MT> CholeskySolve<> (const TCompRowMatrix<MT> &L,
         const TVector<MT> &d, const TVector<MT> &b);
     // As above, but returns solution directly as function result (involves
     // local vector construction)
 
-    friend MATHLIB void CholeskySolve<> (const TCompRowMatrix<MT> &L,
+    friend void CholeskySolve<> (const TCompRowMatrix<MT> &L,
         const TVector<MT> &d, const TDenseMatrix<MT> &BT, TDenseMatrix<MT> &XT,
 	int n);
     // Computes the solution of LL^T XT^T = BT^T for up to n columns of BT^T
     // If n==0 then all columns of BT^T are used
 
-    friend MATHLIB void LUSolve<> (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
+    friend void LUSolve<> (const TCompRowMatrix<MT> &LU, const TVector<MT> &b,
         TVector<MT> &x);
     // Returns solution of LU x = b
 
@@ -493,20 +493,20 @@ public:
     // solve symmetric system Ax=b with ILU solver
 
 #ifdef USE_CUDA_FLOAT
-    friend MATHLIB int PCG<> (const TCompRowMatrix<MT> &A,
+    friend int PCG<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
         TPreconditioner<MT> *precon, int maxit);
 
-    friend MATHLIB void PCG<> (const TCompRowMatrix<MT> &A,
+    friend void PCG<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
         TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
-    friend MATHLIB int BiCGSTAB<> (const TCompRowMatrix<MT> &A,
+    friend int BiCGSTAB<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
         TPreconditioner<MT> *precon, int maxit);
     // biconjugate gradient stabilised method.
 
-    friend MATHLIB void BiCGSTAB<> (const TCompRowMatrix<MT> &A,
+    friend void BiCGSTAB<> (const TCompRowMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
         TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
@@ -535,9 +535,9 @@ public:
     void SplitExport (const char *rootname);
     // write row index, column index and data in separate files
 
-    friend MATHLIB std::istream &operator>> <> (std::istream &is,
+    friend std::istream &operator>> <> (std::istream &is,
         TCompRowMatrix<MT> &m);
-    friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
+    friend std::ostream &operator<< <> (std::ostream &os,
         const TCompRowMatrix<MT> &m);
     // IO in generic format
 

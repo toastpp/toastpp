@@ -29,8 +29,95 @@ using namespace toast;
 // ==========================================================================
 // member definitions
 
+// --------------------------------------------------------------------------
+// constructor (vector of size 0)
+
+template<class VT>
+TVector<VT>::TVector ()
+{
+    base_nref = 0;
+    data = 0;
+    size = 0;
+}
+
+// --------------------------------------------------------------------------
+// constructor (vector of size 'dim' with zero elements)
+
+template<class VT>
+TVector<VT>::TVector (int dim)
+{
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
+    base_nref = 0;
+    Allocate (dim);
+}
+
+// --------------------------------------------------------------------------
+// constructor (uniform element assignment from scalar)
+
+template<class VT>
+TVector<VT>::TVector (int dim, const VT s)
+{
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
+    base_nref = 0;
+    Allocate (dim);
+    *this = s;
+}
+
+// --------------------------------------------------------------------------
+// constructor (assign elements from array)
+
+template<class VT>
+TVector<VT>::TVector (int dim, VT *values)
+{
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
+    base_nref = 0;
+    Allocate (dim);
+    memcpy (data, values, dim*sizeof(VT));
+}
+
+// --------------------------------------------------------------------------
+// constructor (element assignment from string)
+
+template<class VT>
+TVector<VT>::TVector (int dim, const char *init)
+{
+    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
+    base_nref = 0;
+    Allocate (dim);
+    std::istringstream iss(init);
+    for (int i = 0; i < dim; i++)
+        iss >> data[i];
+}
+
+// --------------------------------------------------------------------------
+// copy constructor
+
+template<class VT>
+TVector<VT>::TVector (const TVector<VT> &v)
+{
+    base_nref = 0;
+    Allocate (v.size);
+    Copy (v);				// copy elements from vec
+}
+
+// --------------------------------------------------------------------------
+// reference constructor
+
+template<class VT>
+TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
+{
+    dASSERT(ofs >= 0 && ofs < v.Dim(), "Parameter 1 index out of range");
+    dASSERT(dim >= 0, "Parameter 3 must be >= 0");
+    dASSERT(ofs+dim <= v.Dim(),
+	"Data block of reference vector must be contained in original vector");
+    base_nref = 0;
+    Link (v, ofs, dim);
+}
+
+// --------------------------------------------------------------------------
 // link to the data block of `vec'. This function must be called by a
 // constructor, or after a call to Unlink()
+
 template<class VT>
 void TVector<VT>::Link (const TVector<VT> &vec)
 {
@@ -69,6 +156,136 @@ void TVector<VT>::Link (const TVector<VT> &vec, int ofs, int dim)
     }
 }
 
+// --------------------------------------------------------------------------
+// Remove the vector's link to the data block
+
+template<class VT>
+void TVector<VT>::Unlink ()
+{
+    if (base_nref) {
+	if (--(*base_nref) == 0)   // was last link
+	    free (base_nref);      // -> deallocate base block
+	base_nref = 0;             // invalidate base pointer
+    }
+    data = 0;		           // invalidate data pointer
+    size = 0;			   // set dimension zero
+}
+
+// --------------------------------------------------------------------------
+// Link vector to a different data block
+
+template<class VT>
+void TVector<VT>::Relink (const TVector<VT> &v)
+{
+    Unlink ();				// remove existing link
+    Link (v);                           // link to v's data block
+}
+
+// --------------------------------------------------------------------------
+// Relink vector to part of a different data block
+
+template<class VT>
+void TVector<VT>::Relink (const TVector<VT> &v, int ofs, int dim)
+{
+    Unlink ();				// remove existing link
+    Link (v, ofs, dim);                 // link into v's data block
+}
+
+// --------------------------------------------------------------------------
+// allocate a data block for the vector. This function must be called by
+// a constructor, or after a call to Unlink()
+
+template<class VT>
+void TVector<VT>::Allocate (int dim)
+{
+    dASSERT(!base_nref, "Data block present. Use Unlink first.");
+    if (dim) {
+	char *base = (char*)malloc (2*sizeof(int) + dim*sizeof(VT));
+	dASSERT(base, "Memory allocation failed.");
+	memset (base, 0, 2*sizeof(int) + dim*sizeof(VT));
+	base_nref = (int*)base;			 // 1st int: refcount
+	base_size = base_nref + 1;		 // 2nd int: array size
+	data = base_data = (VT*)(base_nref + 2); // data are offset by 2
+	size = *base_size = dim;		 // init array size
+	*base_nref = 1;				 // init ref count
+    } else {
+	data = 0;
+	size = 0;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+template<class VT>
+void TVector<VT>::Clear ()
+{
+    memset ((void*)data, 0, size*sizeof(VT));
+    // warning: this assumes that "(VT)0" is represented by a sequence of
+    // "0" bytes - not necessarily correct
+}
+
+// --------------------------------------------------------------------------
+// Vector->Vector copy: copy from v to *this
+
+#ifdef USE_BLAS_LEVEL1
+template<>
+inline void TVector<double>::Copy (const TVector<double> &v)
+{
+    const int incr = 1;
+    if (size != v.size) New (v.size); // reallocate
+    dcopy_(size, v.data, incr, data, incr);
+}
+template<>
+inline void TVector<float>::Copy (const TVector<float> &v)
+{
+    const int incr = 1;
+    if (size != v.size) New (v.size); // reallocate
+    scopy_(size, v.data, incr, data, incr);
+}
+#endif // USE_BLAS_LEVEL1
+
+template<class VT>
+void TVector<VT>::Copy (const TVector<VT> &v)
+{
+    if (size != v.size) New (v.size); // reallocate
+    memcpy (data, v.data, size * sizeof (VT));
+}
+
+// --------------------------------------------------------------------------
+// partial Vector->Vector copy: copy part of v into *this
+
+#ifdef USE_BLAS_LEVEL1
+template<>
+inline void TVector<double>::Copy (const TVector<double> &v,
+    int tofs, int sofs, int n)
+{
+    const int incr = 1;
+    if (n < 0) n = v.size - sofs;
+    if (n > size - tofs) n = size - tofs;
+    dcopy_(n, v.data+sofs, incr, data+tofs, incr);
+}
+template<>
+inline void TVector<float>::Copy (const TVector<float> &v,
+    int tofs, int sofs, int n)
+{
+    const int incr = 1;
+    if (n < 0) n = v.size - sofs;
+    if (n > size - tofs) n = size - tofs;
+    scopy_(n, v.data+sofs, incr, data+tofs, incr);
+}
+#endif // USE_BLAS_LEVEL1
+
+template<class VT>
+void TVector<VT>::Copy (const TVector<VT> &v,
+    int tofs, int sofs, int n)
+{
+    if (n < 0) n = v.size - sofs;
+    if (n > size - tofs) n = size - tofs;
+    memcpy (data+tofs, v.data+sofs, n * sizeof (VT));
+}
+
+// --------------------------------------------------------------------------
+
 template<>
 inline bool TVector<toast::complex>::Clip (toast::complex vmin, toast::complex vmax)
 {
@@ -86,7 +303,7 @@ inline bool TVector<toast::complex>::Clip (toast::complex vmin, toast::complex v
 }
 
 template<class VT>
-inline bool TVector<VT>::Clip (VT vmin, VT vmax)
+bool TVector<VT>::Clip (VT vmin, VT vmax)
 {
     bool clip = false;
 
@@ -117,6 +334,26 @@ void TVector<VT>::ShiftRight (int n)
 
 // ==========================================================================
 
+// --------------------------------------------------------------------------
+
+template<class VT>
+VT &TVector<VT>::operator[] (int i) const
+{
+    dASSERT(i >= 0 && i < size, "Index out of range");
+    return data[i];
+}
+
+// --------------------------------------------------------------------------
+
+template<class VT>
+TVector<VT> &TVector<VT>::operator= (VT s)
+{
+    for (int i = 0; i < size; i++) data[i] = s;
+    return *this;
+}
+
+// --------------------------------------------------------------------------
+
 // vector-vector addition, general template
 
 template<class VT>
@@ -132,8 +369,8 @@ template<>
 MATHLIB TVector<double> TVector<double>::operator+ (const TVector<double> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    static int incr = 1;
-    static double scale = 1.0;
+    const int incr = 1;
+    const double scale = 1.0;
     TVector<double> tmp(*this);
     daxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
@@ -147,8 +384,8 @@ template<>
 MATHLIB TVector<float> TVector<float>::operator+(const TVector<float> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    static int incr = 1;
-    static float scale = 1.0f;
+    const int incr = 1;
+    const float scale = 1.0f;
     TVector<float> tmp(*this);
     saxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
@@ -189,8 +426,8 @@ template<>
 MATHLIB TVector<double> TVector<double>::operator- (const TVector<double> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    static int incr = 1;
-    static double scale = -1.0;
+    const int incr = 1;
+    const double scale = -1.0;
     TVector<double> tmp(*this);
     daxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
@@ -199,8 +436,8 @@ template<>
 MATHLIB TVector<float> TVector<float>::operator- (const TVector<float> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    static int incr = 1;
-    static float scale = -1.0f;
+    const int incr = 1;
+    const float scale = -1.0f;
     TVector<float> tmp(*this);
     saxpy_((int&)size, scale, v.data, incr, tmp.data, incr);
     return tmp;
@@ -290,7 +527,6 @@ TVector<VT> operator/ (const VT &s, const TVector<VT> &v)
     return tmp;  
 }
 
-#ifdef MATH_DEBUG // otherwise inline
 template<class VT>
 TVector<VT> &TVector<VT>::operator+= (const TVector<VT> &v)
 {
@@ -298,9 +534,14 @@ TVector<VT> &TVector<VT>::operator+= (const TVector<VT> &v)
     for (int i = 0; i < size; i++) data[i] += v.data[i];
     return *this;
 }
-#endif // MATH_DEBUG
 
-#ifdef MATH_DEBUG // otherwise inline
+template<class VT>
+TVector<VT> &TVector<VT>::operator+= (const VT &s)
+{
+    for (int i = 0; i < size; i++) data[i] += s;
+    return *this;
+}
+
 template<class VT>
 TVector<VT> &TVector<VT>::operator-= (const TVector<VT> &v)
 {
@@ -308,9 +549,14 @@ TVector<VT> &TVector<VT>::operator-= (const TVector<VT> &v)
     for (int i = 0; i < size; i++) data[i] -= v.data[i];
     return *this;
 }
-#endif // MATH_DEBUG
 
-#ifdef MATH_DEBUG // otherwise inline
+template<class VT>
+TVector<VT> &TVector<VT>::operator-= (const VT &s)
+{
+    for (int i = 0; i < size; i++) data[i] -= s;
+    return *this;
+}
+
 template<class VT>
 TVector<VT> &TVector<VT>::operator*= (const TVector<VT> &v)
 {
@@ -318,9 +564,43 @@ TVector<VT> &TVector<VT>::operator*= (const TVector<VT> &v)
     for (int i = 0; i < size; i++) data[i] *= v.data[i];
     return *this;
 }
-#endif // MATH_DEBUG
 
-#ifdef MATH_DEBUG // otherwise inline
+// --------------------------------------------------------------------------
+
+#ifdef USE_BLAS_LEVEL1
+template<>
+inline TVector<double> &TVector<double>::operator*= (const double &s)
+{
+    const int incr = 1;
+    dscal_(size, s, data, incr);
+    return *this;
+}
+template<>
+inline TVector<float> &TVector<float>::operator*= (const float &s)
+{
+    const int incr = 1;
+    sscal_(size, s, data, incr);
+    return *this;
+}
+template<>
+inline TVector<toast::complex> &TVector<toast::complex>::operator*=
+    (const toast::complex &s)
+{
+    const int incr = 1;
+    zscal_(size, s, data, incr);
+    return *this;
+}
+#endif // USE_BLAS_LEVEL1
+
+template<class VT>
+TVector<VT> &TVector<VT>::operator*= (const VT &s)
+{
+    for (int i = 0; i < size; i++) data[i] *= s;
+    return *this;
+}
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> &TVector<VT>::operator/= (const TVector<VT> &v)
 {
@@ -331,8 +611,18 @@ TVector<VT> &TVector<VT>::operator/= (const TVector<VT> &v)
     }
     return *this;
 }
-#endif // MATH_DEBUG
 
+// --------------------------------------------------------------------------
+
+template<class VT>
+TVector<VT> &TVector<VT>::operator/= (const VT &s)
+{
+    dASSERT (s, "Attempt to divide by zero");
+    *this *= ((VT)1/s);
+    return *this;
+}
+
+// --------------------------------------------------------------------------
 
 #ifdef NODEF
 
@@ -433,6 +723,8 @@ void TVector<VT>::Read (istream &is, int start, int n)
 
 #endif
 
+// --------------------------------------------------------------------------
+
 template<class VT>
 void TVector<VT>::ReadIndexed (istream &is, int n)
 {
@@ -459,6 +751,7 @@ bool operator== (const TVector<VT> &v1, const TVector<VT> &v2)
     return true;
 }
 
+// --------------------------------------------------------------------------
 
 template<class VT>
 bool operator!= (const TVector<VT> &v1, const TVector<VT> &v2)
@@ -470,11 +763,12 @@ bool operator!= (const TVector<VT> &v1, const TVector<VT> &v2)
     return false;
 }
 
+// --------------------------------------------------------------------------
 
 template<class VT>
 TVector<VT> inv (const TVector<VT> &v)
 {
-    const static VT one = (VT)1;
+    const VT one = (VT)1;
     TVector<VT> tmp(v.size);
     for (int i = 0; i < v.size; i++) {
         dASSERT (v[i], "Attempt to divide by zero");
@@ -482,6 +776,8 @@ TVector<VT> inv (const TVector<VT> &v)
     }
     return tmp;
 }
+
+// --------------------------------------------------------------------------
 
 template<class VT>
 TVector<VT> sqr (const TVector<VT> &v)
@@ -491,6 +787,8 @@ TVector<VT> sqr (const TVector<VT> &v)
     return tmp;
 }
 
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> sqrt (const TVector<VT> &v)
 {
@@ -499,7 +797,7 @@ TVector<VT> sqrt (const TVector<VT> &v)
     return tmp;
 }
 
-// ==========================================================================
+// --------------------------------------------------------------------------
 
 template<class VT>
 TVector<VT> log (const TVector<VT> &v)
@@ -509,7 +807,7 @@ TVector<VT> log (const TVector<VT> &v)
     return tmp;
 }
 
-// ==========================================================================
+// --------------------------------------------------------------------------
 
 template<class VT>
 TVector<VT> exp (const TVector<VT> &v)
@@ -519,7 +817,7 @@ TVector<VT> exp (const TVector<VT> &v)
     return tmp;
 }
 
-// ==========================================================================
+// --------------------------------------------------------------------------
 
 template<class VT>
 TVector<VT> pow (const TVector<VT> &v, const VT &s)
@@ -529,7 +827,7 @@ TVector<VT> pow (const TVector<VT> &v, const VT &s)
     return tmp;
 }
 
-// ==========================================================================
+// --------------------------------------------------------------------------
 
 template<class VT>
 TVector<VT> conj (const TVector<VT> &v)
@@ -539,7 +837,8 @@ TVector<VT> conj (const TVector<VT> &v)
     return tmp;
 }
 
-// ==========================================================================
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> sin (const TVector<VT> &v)
 {
@@ -547,7 +846,9 @@ TVector<VT> sin (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = sin (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> cos (const TVector<VT> &v)
 {
@@ -555,7 +856,9 @@ TVector<VT> cos (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = cos (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> tan (const TVector<VT> &v)
 {
@@ -563,7 +866,9 @@ TVector<VT> tan (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = tan (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> asin (const TVector<VT> &v)
 {
@@ -571,7 +876,9 @@ TVector<VT> asin (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = asin (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> acos (const TVector<VT> &v)
 {
@@ -579,7 +886,9 @@ TVector<VT> acos (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = acos (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> atan (const TVector<VT> &v)
 {
@@ -587,7 +896,9 @@ TVector<VT> atan (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = atan (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> sinh (const TVector<VT> &v)
 {
@@ -595,7 +906,9 @@ TVector<VT> sinh (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = sinh (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> cosh (const TVector<VT> &v)
 {
@@ -603,7 +916,9 @@ TVector<VT> cosh (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = cosh (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> tanh (const TVector<VT> &v)
 {
@@ -611,7 +926,9 @@ TVector<VT> tanh (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = tanh (v[i]);
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> asinh (const TVector<VT> &v)
 {
@@ -619,7 +936,9 @@ TVector<VT> asinh (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = (VT)log ( v[i] + sqrt(sqr(v[i])+1.) );
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> acosh (const TVector<VT> &v)
 {
@@ -627,7 +946,9 @@ TVector<VT> acosh (const TVector<VT> &v)
     for (int i = 0; i < v.size; i++) tmp[i] = (VT)log ( v[i] + sqrt(sqr(v[i])-1.) );
     return tmp;
 }
-// ==========================================================================
+
+// --------------------------------------------------------------------------
+
 template<class VT>
 TVector<VT> atanh (const TVector<VT> &v)
 {
@@ -636,9 +957,37 @@ TVector<VT> atanh (const TVector<VT> &v)
     return tmp;
 }
 
-// ==========================================================================
+// --------------------------------------------------------------------------
 
-#ifdef MATH_DEBUG // otherwise inline
+#ifdef USE_BLAS_LEVEL1 // interface to BLAS level1 xDOT functions
+template<>
+inline double dot (const TVector<double> &v1, const TVector<double> &v2)
+{
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
+    const int incr = 1;
+    int size = v1.size;
+    return ddot_(size, v1.data, incr, v2.data, incr);
+}
+template<>
+inline float dot (const TVector<float> &v1, const TVector<float> &v2)
+{
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
+    const int incr = 1;
+    int size = v1.size;
+    return sdot_(size, v1.data, incr, v2.data, incr);
+}
+template<>
+inline toast::complex dot (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
+{
+    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
+    const int incr = 1;
+    int size = v1.size;
+    dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
+			       (dcomplex*)v2.data, &incr);
+    return toast::complex(z.r, z.i);
+}
+#endif // USE_BLAS_LEVEL1
+
 template<class VT>
 VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
 {
@@ -647,50 +996,15 @@ VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
     for (int i = 0; i < v1.size; i++) d += v1[i] * v2[i];
     return d;
 }
-#ifdef USE_BLAS_LEVEL1 // interface to BLAS level1 xDOT functions
-template<>
-double dot (const TVector<double> &v1, const TVector<double> &v2)
-{
-    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
-    static int incr = 1;
-    int size = v1.size;
-    return ddot_(size, v1.data, incr, v2.data, incr);
-}
-template<>
-float dot (const TVector<float> &v1, const TVector<float> &v2)
-{
-    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
-    static int incr = 1;
-    int size = v1.size;
-    return sdot_(size, v1.data, incr, v2.data, incr);
-}
-template<>
-toast::complex dot (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
-{
-    dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
-    static int incr = 1;
-    int size = v1.size;
-    dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
-			       (dcomplex*)v2.data, &incr);
-    return toast::complex(z.r, z.i);
-}
-#endif // USE_BLAS_LEVEL1
-#endif // MATH_DEBUG
 
-// ==========================================================================
+// --------------------------------------------------------------------------
 
-#ifdef MATH_DEBUG // otherwise inline
-template<class VT>
-VT doth (const TVector<VT> &v1, const TVector<VT> &v2)
-{
-    return dot (v1, v2);
-}
 template<>
-toast::complex doth (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
+inline toast::complex doth (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
 #ifdef USE_BLAS_LEVEL1
-    static int incr = 1;
+    const int incr = 1;
     int size = v1.size;
     dcomplex z = zdotc_(size, v1.data, incr, v2.data, incr);
     return toast::complex(z.r, z.i);
@@ -700,7 +1014,41 @@ toast::complex doth (const TVector<toast::complex> &v1, const TVector<toast::com
     return d;
 #endif // USE_BLAS_LEVEL1
 }
-#endif // MATH_DEBUG
+
+template<class VT>
+VT doth (const TVector<VT> &v1, const TVector<VT> &v2)
+{
+    return dot (v1, v2);
+}
+
+// --------------------------------------------------------------------------
+
+#ifdef USE_BLAS_LEVEL1
+template<>
+inline double l2norm (const TVector<double> &v)
+{
+    const int incr = 1;
+    return dnrm2_((int&)v.size, v.data, incr);
+}
+template<>
+inline double l2norm (const TVector<float> &v)
+{
+    const int incr = 1;
+    return (double)snrm2_((int&)v.size, v.data, incr);
+}
+template<>
+inline double l2norm (const TVector<toast::complex> &v)
+{
+    const int incr = 1;
+    return dznrm2_((int&)v.size, v.data, incr);
+}
+#endif // USE_BLAS_LEVEL1
+
+template<class VT>
+double l2norm (const TVector<VT> &v)
+{
+	return sqrt (l2normsq (v));
+}
 
 // ==========================================================================
 
@@ -882,7 +1230,7 @@ double linfnorm (const TVector<VT> &v)
 
 // Return concatenation of v1 and v2
 template<class VT>
-inline TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2)
+TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2)
 {
     TVector<VT> tmp (v1.size + v2.size);
     tmp.Copy (v1, 0, 0, v1.size);
@@ -892,7 +1240,7 @@ inline TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2)
 
 // Append v2 to v1 and return resulting v1
 template<class VT>
-inline TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2)
+TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2)
 {
     if (v2.size) {
         TVector<VT> tmp(v1);
@@ -1063,97 +1411,4 @@ void TVector<VT>::Scan (const char *cbuf, int nmax)
     if (!nmax || nmax > size) nmax = size;
     std::istringstream iss (cbuf);
     for (int i = 0; i < size; i++) iss >> data[i];
-}
-
-/* Explicit complex conversions */
-/* These ought to be friends really, except that I can't see how to do that
-when using template */
-inline FVector Re (const SCVector &vec)
-{
-    FVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].re;
-    return tmp;
-}
-
-inline RVector Re (const CVector &vec)
-{
-    RVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].re;
-    return tmp;
-}
-
-inline FVector Im (const SCVector &vec)
-{
-    FVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].im;
-    return tmp;
-}
-
-inline RVector Im (const CVector &vec)
-{
-    RVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = vec[i].im;
-    return tmp;
-}
-
-inline RVector Mod (const CVector &vec)
-{
-    RVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = mod(vec[i]);
-    return tmp;
-}
-
-inline RVector LogMod (const CVector &vec)
-{
-    RVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = log(mod(vec[i]));
-    return tmp;
-}
-
-
-inline RVector Arg (const CVector &vec)
-{
-    RVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = arg(vec[i]);
-    return tmp;
-}
-
-
-inline CVector Conj (const CVector &vec)
-{
-    CVector tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = conj(vec[i]);
-    return tmp;
-}
-inline void SelfConj (const CVector &vec)
-{
-  /* version converts this vector to conjugate */
-    for (int i = 0; i < vec.Dim(); i++) vec[i] = conj(vec[i]);
-}
-inline CVector Hadamard (const CVector &a, const CVector &b)
-{
-    dASSERT(a.Dim() == b.Dim(), "Dimension mismatch");
-    CVector tmp(a.Dim());
-    for (int i = 0; i < a.Dim(); i++) tmp[i] = hadamard(a[i],b[i]);
-    return tmp;
-}
-
-inline void SetReal (CVector &z, const RVector &zre)
-{
-    dASSERT(z.Dim() == zre.Dim(), "Dimension mismatch");
-    for (int i = 0; i < z.Dim(); i++) z[i].re = zre[i];
-}
-
-inline void SetImag (CVector &z, const RVector &zim)
-{
-    dASSERT(z.Dim() == zim.Dim(), "Dimension mismatch");
-    for (int i = 0; i < z.Dim(); i++) z[i].im = zim[i];
-}
-
-inline CVector MakeCVector (const SCVector &v)
-{
-    CVector c(v.Dim());
-    for (int i = 0; i < v.Dim(); i++)
-	c[i] = (toast::complex)v[i];
-    return c;
 }
