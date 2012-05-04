@@ -36,6 +36,10 @@ typedef enum {
 // ==========================================================================
 // Nonmember declarations
 
+extern MATHLIB IterativeMethod itmethod_general;
+extern MATHLIB IterativeMethod itmethod_complex;
+extern MATHLIB int IterCount;
+
 template<class MT>class TGenericSparseMatrix;
 template<class MT>class TPreconditioner;
 
@@ -52,33 +56,33 @@ void QRSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &c,
 
 
 template<class MT>
-MATHLIB int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+int IterativeSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-MATHLIB void IterativeSolve (const TGenericSparseMatrix<MT> &A,
+void IterativeSolve (const TGenericSparseMatrix<MT> &A,
     const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit = 0,
     TPreconditioner<MT> *precon = 0, IterativeSolverResult *res = 0);
 
 template<class MT>
-MATHLIB int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-MATHLIB int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon = 0,
     int maxit = 0);
 
 template<class MT>
-MATHLIB int ComplexBiCGSolve (const TGenericSparseMatrix<MT> &Are,
+int ComplexBiCGSolve (const TGenericSparseMatrix<MT> &Are,
     const TGenericSparseMatrix<MT> &Aim, const TVector<MT> &bre,
     const TVector<MT> &bim, TVector<MT> &xre, TVector<MT> &xim,
     double &tol, int maxit = 0);
 
 template<class MT>
-MATHLIB int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, int maxit = 0);
 
 // ==========================================================================
@@ -260,7 +264,7 @@ public:
     // Solves set of linear equations Ax=b, where A, c and d are the result of
     // a preceeding call to QRFactorize
 
-    friend MATHLIB int IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
+    friend int IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol,
 	TPreconditioner<MT> *precon, int maxit);
     // Solves Ax=b using the previously selected iterative solver
@@ -269,28 +273,28 @@ public:
     // maxit is iteration limit (0 = no limit)
     // return value is iteration count
 
-    friend MATHLIB void IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
+    friend void IterativeSolve<> (const TGenericSparseMatrix<MT> &A,
         const TVector<MT> *b, TVector<MT> *x, int nrhs, double tol, int maxit,
         TPreconditioner<MT> *precon, IterativeSolverResult *res);
 
-    friend MATHLIB int CG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+    friend int CG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
         int maxit);
     // preconditioned conjugate gradient method.
 
-    friend MATHLIB int BiCG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
+    friend int BiCG<> (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
         TVector<MT> &x, double &tol, TPreconditioner<MT> *precon,
         int maxit);
     // biconjugate gradient method.
 
-    friend MATHLIB int ComplexBiCGSolve<> (const TGenericSparseMatrix<MT> &Are,
+    friend int ComplexBiCGSolve<> (const TGenericSparseMatrix<MT> &Are,
         const TGenericSparseMatrix<MT> &Aim, const TVector<MT> &bre,
 	const TVector<MT> &bim, TVector<MT> &xre, TVector<MT> &xim,
 	double &tol, int maxit);
     // Solves Ax = b for complex case using biconjugate gradient solver
     // obsolete
 
-    friend MATHLIB int GaussSeidel<> (const TGenericSparseMatrix<MT> &A,
+    friend int GaussSeidel<> (const TGenericSparseMatrix<MT> &A,
         const TVector<MT> &b, TVector<MT> &x, double &tol, int maxit);
     // Solves Ax = b using Gauss-Seidel iteration
 
@@ -309,9 +313,9 @@ protected:
     static void cg_loop3(void*,int,int);
 #endif
 
-private:
-    static IterativeMethod itmethod_general;
-    static IterativeMethod itmethod_complex;
+//private:
+//    static IterativeMethod itmethod_general;
+//    static IterativeMethod itmethod_complex;
 };
 
 // ==========================================================================
@@ -328,11 +332,11 @@ typedef TGenericSparseMatrix<int>	IGenericSparseMatrix;	// 'integer'
 // ==========================================================================
 // Member definitions
 
-template<class MT>
-IterativeMethod TGenericSparseMatrix<MT>::itmethod_general = ITMETHOD_CG;
+//template<class MT>
+//IterativeMethod TGenericSparseMatrix<MT>::itmethod_general = ITMETHOD_CG;
 
-template<class MT>
-IterativeMethod TGenericSparseMatrix<MT>::itmethod_complex = ITMETHOD_BICGSTAB;
+//template<class MT>
+//IterativeMethod TGenericSparseMatrix<MT>::itmethod_complex = ITMETHOD_BICGSTAB;
 
 // --------------------------------------------------------------------------
 
@@ -573,11 +577,5 @@ IterativeMethod TGenericSparseMatrix<MT>::GetGlobalIterativeSolver_complex ()
 RGenericSparseMatrix Re(const CGenericSparseMatrix &);
 RGenericSparseMatrix Im(const CGenericSparseMatrix &);
 #endif //!CMAT2RMAT
-
-#ifdef __GSMATRIX_CC
-int IterCount = 0;  // a global iteration counter
-#else
-extern int IterCount;
-#endif
 
 #endif // !__GSMATRIX_H

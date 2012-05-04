@@ -27,18 +27,18 @@ template<class MT> class TCoordMatrix;
 template<class MT> class TCompRowMatrix;
 
 template<class MT>
-MATHLIB TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
+TCoordMatrix<MT> cath (const TCoordMatrix<MT> &A,
     const TCoordMatrix<MT> &B);
 
 template<class MT>
-MATHLIB TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
+TCoordMatrix<MT> catv (const TCoordMatrix<MT> &A,
     const TCoordMatrix<MT> &B);
 
 template<class MT>
-MATHLIB std::istream &operator>> (std::istream &is, TCoordMatrix<MT> &m);
+std::istream &operator>> (std::istream &is, TCoordMatrix<MT> &m);
 
 template<class MT>
-MATHLIB std::ostream &operator<< (std::ostream &os, const TCoordMatrix<MT> &m);
+std::ostream &operator<< (std::ostream &os, const TCoordMatrix<MT> &m);
 
 // ==========================================================================
 // class TCoordMatrix
@@ -150,7 +150,7 @@ public:
      * \note This method has the functionality of the MATLAB construct
      *   C = (A,B)
      */
-    friend MATHLIB TCoordMatrix<MT> cath<> (const TCoordMatrix<MT> &A,
+    friend TCoordMatrix<MT> cath<> (const TCoordMatrix<MT> &A,
 				    const TCoordMatrix<MT> &B);
     
     /**
@@ -163,11 +163,11 @@ public:
      * \note This method has the functionality of the MATLAB construct
      *   C = (A;B)
      */
-    friend MATHLIB TCoordMatrix<MT> catv<> (const TCoordMatrix<MT> &A,
+    friend TCoordMatrix<MT> catv<> (const TCoordMatrix<MT> &A,
 				    const TCoordMatrix<MT> &B);
 
-    friend MATHLIB std::istream &operator>> <> (std::istream &is, TCoordMatrix<MT> &m);
-    friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
+    friend std::istream &operator>> <> (std::istream &is, TCoordMatrix<MT> &m);
+    friend std::ostream &operator<< <> (std::ostream &os,
         const TCoordMatrix<MT> &m);
 
 private:
@@ -183,16 +183,6 @@ private:
     mutable int iterator_pos;
 };
 
-#ifdef NEED_FRIEND_PT
-
-template<class VT>
-istream &operator>> (istream &is, TCoordMatrix<MT> &m);
-
-template<class VT>
-ostream &operator<< (ostream &os, const TCoordMatrix<MT> &m);
-
-#endif // NEED_FRIEND_PT
-
 // ==========================================================================
 // typedefs for specific instances of `TCoordMatrix'
 
@@ -206,11 +196,11 @@ typedef TCoordMatrix<int>	ICoordMatrix;	// 'integer'
 // extern declarations of TCoordMatrix (only required for VS)
 
 #ifndef __CDMATRIX_CC
-extern template class MATHLIB TCoordMatrix<double>;
-extern template class MATHLIB TCoordMatrix<float>;
-extern template class MATHLIB TCoordMatrix<toast::complex>;
-extern template class MATHLIB TCoordMatrix<scomplex>;
-extern template class MATHLIB TCoordMatrix<int>;
+//extern template class MATHLIB TCoordMatrix<double>;
+//extern template class MATHLIB TCoordMatrix<float>;
+//extern template class MATHLIB TCoordMatrix<toast::complex>;
+//extern template class MATHLIB TCoordMatrix<scomplex>;
+//extern template class MATHLIB TCoordMatrix<int>;
 #endif // !__CDMATRIX_CC
 
 #endif // !__CDMATRIX_H

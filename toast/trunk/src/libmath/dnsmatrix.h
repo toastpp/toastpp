@@ -19,53 +19,53 @@ template<class MT> class TDenseMatrix;
 template<class MT> class TCompRowMatrix;
 
 template<class MT>
-MATHLIB TDenseMatrix<MT> transpose (const TDenseMatrix<MT> &A);
+TDenseMatrix<MT> transpose (const TDenseMatrix<MT> &A);
 
 template<class MT>
-MATHLIB TDenseMatrix<MT> cath (const TDenseMatrix<MT> &A,
+TDenseMatrix<MT> cath (const TDenseMatrix<MT> &A,
     const TDenseMatrix<MT> &B);
 
 template<class MT>
-MATHLIB TDenseMatrix<MT> catv (const TDenseMatrix<MT> &A,
+TDenseMatrix<MT> catv (const TDenseMatrix<MT> &A,
     const TDenseMatrix<MT> &B);
 
 template<class MT>
-MATHLIB TSymMatrix<MT> ATA (const TDenseMatrix<MT> &A);
+TSymMatrix<MT> ATA (const TDenseMatrix<MT> &A);
 
 template<class MT>
-MATHLIB TSymMatrix<MT> AAT (const TDenseMatrix<MT> &A);
+TSymMatrix<MT> AAT (const TDenseMatrix<MT> &A);
 
 template<class MT>
-MATHLIB TDenseMatrix<MT> kron (const TDenseMatrix<MT> &A, const TDenseMatrix<MT> &B);
+TDenseMatrix<MT> kron (const TDenseMatrix<MT> &A, const TDenseMatrix<MT> &B);
 
 template<class MT>
-MATHLIB MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai = 0);
+MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai = 0);
 
 template<class MT>
-MATHLIB TDenseMatrix<MT> inverse (const TDenseMatrix<MT> &A);
+TDenseMatrix<MT> inverse (const TDenseMatrix<MT> &A);
 
 template<class MT>
-MATHLIB int QRFactorize (TDenseMatrix<MT> &A, TVector<MT> &c, TVector<MT> &d);
+int QRFactorize (TDenseMatrix<MT> &A, TVector<MT> &c, TVector<MT> &d);
 
 template<class MT>
-MATHLIB void RSolve (const TDenseMatrix<MT> &A, const TVector<MT> &d,
+void RSolve (const TDenseMatrix<MT> &A, const TVector<MT> &d,
     TVector<MT> &b);
 
 template<class MT>
-MATHLIB void QRSolve (const TDenseMatrix<MT> &A, const TVector<MT> &c,
+void QRSolve (const TDenseMatrix<MT> &A, const TVector<MT> &c,
     const TVector<MT> &d, const TVector<MT> &b, TVector<MT> &x);
 
 template<class MT>
-MATHLIB void LUFactorize (TDenseMatrix<MT> &a, IVector &indx, double &d);
+void LUFactorize (TDenseMatrix<MT> &a, IVector &indx, double &d);
 
 template<class MT>
-MATHLIB void LUSolve (const TDenseMatrix<MT> &a, const IVector &indx, TVector<MT> &b);
+void LUSolve (const TDenseMatrix<MT> &a, const IVector &indx, TVector<MT> &b);
 
 template<class MT>
-MATHLIB std::istream &operator>> (std::istream &is, TDenseMatrix<MT> &m);
+std::istream &operator>> (std::istream &is, TDenseMatrix<MT> &m);
 
 template<class MT>
-MATHLIB std::ostream &operator<< (std::ostream &os, const TDenseMatrix<MT> &m);
+std::ostream &operator<< (std::ostream &os, const TDenseMatrix<MT> &m);
 
 // ==========================================================================
 // class TDenseMatrix
@@ -341,7 +341,7 @@ public:
     }
     // scalar matrix division on *this
 
-    friend MATHLIB TDenseMatrix<MT> transpose<> (const TDenseMatrix<MT> &A);
+    friend TDenseMatrix<MT> transpose<> (const TDenseMatrix<MT> &A);
     // returns transpose(A)
 
     /**
@@ -353,7 +353,7 @@ public:
      * \note This method has the functionality of the MATLAB construct
      *   C = (A,B)
      */
-    friend MATHLIB TDenseMatrix<MT> cath<> (const TDenseMatrix<MT> &A,
+    friend TDenseMatrix<MT> cath<> (const TDenseMatrix<MT> &A,
         const TDenseMatrix<MT> &B);
 
     /**
@@ -366,55 +366,55 @@ public:
      * \note This method has the functionality of the MATLAB construct
      *   C = (A;B)
      */
-    friend MATHLIB TDenseMatrix<MT> catv<> (const TDenseMatrix<MT> &A,
+    friend TDenseMatrix<MT> catv<> (const TDenseMatrix<MT> &A,
         const TDenseMatrix<MT> &B);
 
-    friend MATHLIB TSymMatrix<MT> ATA<> (const TDenseMatrix<MT> &A);
+    friend TSymMatrix<MT> ATA<> (const TDenseMatrix<MT> &A);
     // returns transpose(A) * A
 
-    friend MATHLIB TSymMatrix<MT> AAT<> (const TDenseMatrix<MT> &A);
+    friend TSymMatrix<MT> AAT<> (const TDenseMatrix<MT> &A);
     // returns A * transpose(A)
 
-    friend MATHLIB TDenseMatrix<MT> kron<> (const TDenseMatrix<MT> &A,
+    friend TDenseMatrix<MT> kron<> (const TDenseMatrix<MT> &A,
         const TDenseMatrix<MT> &B);
     // Kronecker matrix product
 
-    friend MATHLIB MT det<> (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai);
+    friend MT det<> (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai);
     // Returns the determinant of A. If Ai != 0 and order <= 3x3 then it
     // is set to the inverse of A; this is more efficient than a separate
     // call to 'inverse'
 
-    friend MATHLIB TDenseMatrix<MT> inverse<> (const TDenseMatrix<MT> &A);
+    friend TDenseMatrix<MT> inverse<> (const TDenseMatrix<MT> &A);
     // uses LU decomposition for matrices > 3x3
 
-    friend MATHLIB int QRFactorize<> (TDenseMatrix<MT> &A, TVector<MT> &c,
+    friend int QRFactorize<> (TDenseMatrix<MT> &A, TVector<MT> &c,
         TVector<MT> &d);
     // QR decomposition. Return value != 0 indicates singularity
 
-    friend MATHLIB void RSolve<> (const TDenseMatrix<MT> &A, const TVector<MT> &d,
+    friend void RSolve<> (const TDenseMatrix<MT> &A, const TVector<MT> &d,
 	TVector<MT> &b);
     // Solves set of linear equations Rx=b where R is upper triangular matrix
     // stored in A and d. On return b is overwritten by the result x.
 
-    friend MATHLIB void QRSolve<> (const TDenseMatrix<MT> &A, const TVector<MT> &c,
+    friend void QRSolve<> (const TDenseMatrix<MT> &A, const TVector<MT> &c,
         const TVector<MT> &d, const TVector<MT> &b, TVector<MT> &x);
     // Solves set of linear equations Ax=b, where A, c and d are the result of
     // a preceeding call to QRFactorize
 
-    friend MATHLIB void LUFactorize<MT> (TDenseMatrix<MT> &a, IVector &indx,
+    friend void LUFactorize<MT> (TDenseMatrix<MT> &a, IVector &indx,
         double &d);
     // Replaces a with its LU factorisation. On exit, indx contains the
     // permutation vector from partial pivoting, and d = +/-1 depending on
     // even/odd number of interchanges
 
-    friend MATHLIB void LUSolve<MT> (const TDenseMatrix<MT> &a,
+    friend void LUSolve<MT> (const TDenseMatrix<MT> &a,
         const IVector &indx, TVector<MT> &b);
   
     MT *data_buffer() { return val; }
     const MT *data_buffer() const { return val; }
 
-    friend MATHLIB std::istream &operator>> <> (std::istream &is, TDenseMatrix<MT> &m);
-    friend MATHLIB std::ostream &operator<< <> (std::ostream &os,
+    friend std::istream &operator>> <> (std::istream &is, TDenseMatrix<MT> &m);
+    friend std::ostream &operator<< <> (std::ostream &os,
         const TDenseMatrix<MT> &m);
     // IO in generic format
 
@@ -445,11 +445,11 @@ typedef TDenseMatrix<scomplex> SCDenseMatrix;   // 'single complex'
 typedef TDenseMatrix<int>      IDenseMatrix;    // 'integer'
 
 #ifndef MATHLIB_IMPLEMENTATION
-extern template class MATHLIB TDenseMatrix<double>;
-extern template class MATHLIB TDenseMatrix<float>;
-extern template class MATHLIB TDenseMatrix<toast::complex>;
-extern template class MATHLIB TDenseMatrix<scomplex>;
-extern template class MATHLIB TDenseMatrix<int>;
+//extern template class MATHLIB TDenseMatrix<double>;
+//extern template class MATHLIB TDenseMatrix<float>;
+//extern template class MATHLIB TDenseMatrix<toast::complex>;
+//extern template class MATHLIB TDenseMatrix<scomplex>;
+//extern template class MATHLIB TDenseMatrix<int>;
 #endif // MATHLIB_IMPLEMENTATION
 
 #endif // !__DNSMATRIX_H

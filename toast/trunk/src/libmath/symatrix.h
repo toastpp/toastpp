@@ -35,10 +35,10 @@
 template<class MT> class TSymMatrix;
 
 template<class MT>
-MATHLIB bool CHdecomp (TSymMatrix<MT> &a, bool recover = false);
+bool CHdecomp (TSymMatrix<MT> &a, bool recover = false);
 
 template<class MT>
-MATHLIB TVector<MT> CHsubst (const TSymMatrix<MT> &a, const TVector<MT> &b);
+TVector<MT> CHsubst (const TSymMatrix<MT> &a, const TVector<MT> &b);
 
 // ==========================================================================
 // class TSymMatrix
@@ -195,10 +195,10 @@ public:
 
     // **** friends ****
 
-    friend MATHLIB bool CHdecomp<> (TSymMatrix<MT> &a, bool recover);
+    friend bool CHdecomp<> (TSymMatrix<MT> &a, bool recover);
     // replaces `a' with its Choleski decomposition
 
-    friend MATHLIB TVector<MT> CHsubst<> (const TSymMatrix<MT> &a,
+    friend TVector<MT> CHsubst<> (const TSymMatrix<MT> &a,
         const TVector<MT> &b);
 
     MT *data_buffer() { return val; }
@@ -239,11 +239,11 @@ typedef TSymMatrix<int>	     ISymMatrix;	// 'integer'
 // extern declarations of TSymMatrix (only required for VS)
 
 #ifndef __SYMATRIX_CC
-extern template class MATHLIB TSymMatrix<double>;
-extern template class MATHLIB TSymMatrix<float>;
-extern template class MATHLIB TSymMatrix<toast::complex>;
-extern template class MATHLIB TSymMatrix<scomplex>;
-extern template class MATHLIB TSymMatrix<int>;
+//extern template class MATHLIB TSymMatrix<double>;
+//extern template class MATHLIB TSymMatrix<float>;
+//extern template class MATHLIB TSymMatrix<toast::complex>;
+//extern template class MATHLIB TSymMatrix<scomplex>;
+//extern template class MATHLIB TSymMatrix<int>;
 #endif // !__SYMATRIX_CC
 
 #endif // !__SYMATRIX_H

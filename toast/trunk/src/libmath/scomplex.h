@@ -13,11 +13,16 @@
 #include "complex.h"
 #include <math.h>
 
+class MATHLIB scomplex;
+
+MATHLIB scomplex sqrt (const scomplex &z);
+MATHLIB std::ostream &operator<< (std::ostream &os, const scomplex &z);
+
 // ==========================================================================
 // declaration
 // ==========================================================================
 
-class scomplex {
+class MATHLIB scomplex {
 
 public:
 
@@ -85,7 +90,7 @@ public:
     friend scomplex conj (const scomplex &z);  // scomplex conjugate
     friend double norm2 (const scomplex &z);  // square of norm
     friend double norm (const scomplex &z);
-    friend scomplex sqrt (const scomplex &z);
+    friend MATHLIB scomplex sqrt (const scomplex &z);
     friend double arg (const scomplex &z);
     friend double mod (const scomplex &z);
     friend scomplex log (const scomplex &z);
@@ -94,7 +99,7 @@ public:
     friend scomplex exp (scomplex &z);
     friend bool iszero (scomplex &z) { return z.re == 0.0 && z.im == 0.0; }
     friend std::istream &operator>> (std::istream &is, scomplex &z);
-    friend std::ostream &operator<< (std::ostream &os, const scomplex &z);
+    friend MATHLIB std::ostream &operator<< (std::ostream &os, const scomplex &z);
 };
 
 

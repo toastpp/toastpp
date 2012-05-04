@@ -131,8 +131,7 @@ template<class VT>
 double l1norm (const TVector<VT> &v);
 
 template<class VT>
-double l2norm (const TVector<VT> &v)
-{ return sqrt (l2normsq (v)); }
+double l2norm (const TVector<VT> &v);
 
 template<class VT>
 double linfnorm (const TVector<VT> &v);
@@ -141,10 +140,10 @@ template<class VT>
 double l2normsq (const TVector<VT> &v);
 
 template<class VT>
-inline TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2);
+TVector<VT> &append (TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
-inline TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2);
+TVector<VT> cat (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
 TVector<VT> operator+ (const VT &s, const TVector<VT> &v);
@@ -181,6 +180,22 @@ VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
 template<class VT>
 TVector<double> UnfoldComplex (const TVector<VT> &v);
 
+/* add specific function for CVector */
+MATHLIB TVector<float> Re(const TVector<scomplex> &vec);
+MATHLIB TVector<double> Re(const TVector<toast::complex> &vec);
+MATHLIB TVector<float> Im(const TVector<scomplex> &vec);
+MATHLIB TVector<double> Im(const TVector<toast::complex> &vec);
+MATHLIB TVector<double> Mod(const TVector<toast::complex> &vec);
+MATHLIB TVector<double> LogMod(const TVector<toast::complex> &vec);
+MATHLIB TVector<double> Arg (const TVector<toast::complex> &vec);
+MATHLIB TVector<toast::complex> Conj(const TVector<toast::complex> &vec); // obsolete
+MATHLIB void SelfConj(const TVector<toast::complex> &vec);
+MATHLIB TVector<toast::complex> Hadamard(const TVector<toast::complex> &a, const TVector<toast::complex> &b);
+MATHLIB void SetReal (TVector<toast::complex> &z, const TVector<double> &zre);
+MATHLIB void SetImag (TVector<toast::complex> &z, const TVector<double> &zim);
+
+MATHLIB TVector<toast::complex> MakeCVector (const TVector<scomplex> &v);
+
 // ==========================================================================
 // class TVector
 
@@ -203,20 +218,20 @@ public:
     /**
      * \brief Constructor. Creates a vector of length 0
      */
-    inline TVector ();
+    TVector ();
 
     /**
      * \brief Constructor. Create a vector of length 'dim' and zero all elements.
      * \param dim vector size (>= 0)
      */
-    inline TVector (int dim);
+    TVector (int dim);
 
     /**
      * \brief Constructor. Creates a vector of length 'dim' and set all values to 's'
      * \param dim vector size (>= 0)
      * \param s element value
      */
-    inline TVector (int dim, const VT s);
+    TVector (int dim, const VT s);
 
     /**
      * \brief Constructor. Create a vector of length 'dim' and initialise
@@ -225,7 +240,7 @@ public:
      * \param values array of element values
      * \note The 'values' array must contain at least 'dim' elements.
      */
-    inline TVector (int dim, VT *values);
+    TVector (int dim, VT *values);
 
     /**
      * \brief Constructor. Create a vector of length 'dim' and initialise
@@ -237,13 +252,13 @@ public:
      *   stream-in operator ('>>') for the appropriate template type.
      * \note Elements must be separated by whitespace.
      */
-    inline TVector (int dim, const char *init);
+    TVector (int dim, const char *init);
 
     /**
      * \brief Copy constructor. Create vector as copy of another vector.
      * \param v original vector
      */
-    inline TVector (const TVector<VT> &v);
+    TVector (const TVector<VT> &v);
 
     /**
      * \brief Reference constructor. Create a vector which shares its data
@@ -260,25 +275,25 @@ public:
      * \note This constructor is not threadsafe if used by multiple threads
      *   referencing the same vector v.
      */
-    inline TVector (const TVector<VT> &v, int ofs, int dim);
+    TVector (const TVector<VT> &v, int ofs, int dim);
 
     /**
      * \brief Destructor. Delete vector and deallocate data block.
      */
-    inline ~TVector () { Unlink (); }
+    ~TVector () { Unlink (); }
 
     /**
      * \brief Returns the size of the vector.
      * \return Size (number of elements) of the vector.
      */
-    inline int Dim () const { return size; }
+    int Dim () const { return size; }
 
     /**
      * \brief Vector element access operator (read and write)
      * \param i element index (0 <= i < TVector::Dim())
      * \note The operator syntax is: x = v[i]
      */
-    inline VT &operator[] (int i) const;
+    VT &operator[] (int i) const;
 
     /// \brief Assignment operator.
     ///
@@ -359,19 +374,13 @@ public:
     ///   buffer, e.g. after a call to New().
     const VT *data_buffer () const { return data; }
 
-    //inline VT Vmin () const { return vmin (*this); }
-    // returns smallest element
-
-    //inline VT Vmax () const { return vmax (*this); }
-    // returns largest element
-
     /// \brief Truncate vector elements to specified range.
     ///
     /// - Truncate all elements of the vector to the range vmin ... vmax.
     /// - Return value is true if any elements have been truncated.
     /// - This method is only defined for data types which support boolean
     ///   comparisons.
-    inline bool Clip (VT vmin, VT vmax);
+    bool Clip (VT vmin, VT vmax);
 
     /// \brief Move vector elements left.
     ///
@@ -980,7 +989,7 @@ protected:
     /// \remarks If the vector already had an associated data block, this
     ///   must be detached with Unlink first.
     /// \sa Unlink(), New()
-    inline void Allocate (int dim);
+    void Allocate (int dim);
 
     /// \brief Link the vector to the data block of another vector.
     /// \param vec referenced vector
@@ -1010,7 +1019,7 @@ protected:
     /// \brief Unlink vector from its data block.
     /// \remarks This results in a (valid) vector of length zero.
     /// \sa New(), Clear()
-    inline void Unlink ();
+    void Unlink ();
 
     int size;		 ///< vector length
     int *base_size;	 ///< pointer to length of linked data block
@@ -1020,439 +1029,12 @@ protected:
 };
 
 // ==========================================================================
-// ==========================================================================
-// Member definitions
-
-// --------------------------------------------------------------------------
-// constructor (vector of size 0)
-
-template<class VT>
-TVector<VT>::TVector ()
-{
-    base_nref = 0;
-    data = 0;
-    size = 0;
-}
-
-// --------------------------------------------------------------------------
-// constructor (vector of size 'dim' with zero elements)
-
-template<class VT>
-TVector<VT>::TVector (int dim)
-{
-    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
-    base_nref = 0;
-    Allocate (dim);
-}
-
-// --------------------------------------------------------------------------
-// constructor (uniform element assignment from scalar)
-
-template<class VT>
-TVector<VT>::TVector (int dim, const VT s)
-{
-    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
-    base_nref = 0;
-    Allocate (dim);
-    *this = s;
-}
-
-// --------------------------------------------------------------------------
-// constructor (assign elements from array)
-
-template<class VT>
-TVector<VT>::TVector (int dim, VT *values)
-{
-    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
-    base_nref = 0;
-    Allocate (dim);
-    memcpy (data, values, dim*sizeof(VT));
-}
-
-// --------------------------------------------------------------------------
-// constructor (element assignment from string)
-
-template<class VT>
-TVector<VT>::TVector (int dim, const char *init)
-{
-    dASSERT(dim >= 0, "Parameter 1 must be >= 0");
-    base_nref = 0;
-    Allocate (dim);
-    std::istringstream iss(init);
-    for (int i = 0; i < dim; i++)
-        iss >> data[i];
-}
-
-// --------------------------------------------------------------------------
-// copy constructor
-
-template<class VT>
-TVector<VT>::TVector (const TVector<VT> &v)
-{
-    base_nref = 0;
-    Allocate (v.size);
-    Copy (v);				// copy elements from vec
-}
-
-// --------------------------------------------------------------------------
-// reference constructor
-
-template<class VT>
-TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
-{
-    dASSERT(ofs >= 0 && ofs < v.Dim(), "Parameter 1 index out of range");
-    dASSERT(dim >= 0, "Parameter 3 must be >= 0");
-    dASSERT(ofs+dim <= v.Dim(),
-	"Data block of reference vector must be contained in original vector");
-    base_nref = 0;
-    Link (v, ofs, dim);
-}
-
-// --------------------------------------------------------------------------
-// allocate a data block for the vector. This function must be called by
-// a constructor, or after a call to Unlink()
-template<class VT>
-inline void TVector<VT>::Allocate (int dim)
-{
-    dASSERT(!base_nref, "Data block present. Use Unlink first.");
-    if (dim) {
-	char *base = (char*)malloc (2*sizeof(int) + dim*sizeof(VT));
-	dASSERT(base, "Memory allocation failed.");
-	memset (base, 0, 2*sizeof(int) + dim*sizeof(VT));
-	base_nref = (int*)base;			 // 1st int: refcount
-	base_size = base_nref + 1;		 // 2nd int: array size
-	data = base_data = (VT*)(base_nref + 2); // data are offset by 2
-	size = *base_size = dim;		 // init array size
-	*base_nref = 1;				 // init ref count
-    } else {
-	data = 0;
-	size = 0;
-    }
-}
-
-// --------------------------------------------------------------------------
-// Remove the vector's link to the data block
-template<class VT>
-inline void TVector<VT>::Unlink ()
-{
-    if (base_nref) {
-	if (--(*base_nref) == 0)   // was last link
-	    free (base_nref);      // -> deallocate base block
-	base_nref = 0;             // invalidate base pointer
-    }
-    data = 0;		           // invalidate data pointer
-    size = 0;			   // set dimension zero
-}
-
-// --------------------------------------------------------------------------
-// Vector->Vector copy: copy from v to *this
-
-template<class VT>
-inline void TVector<VT>::Copy (const TVector<VT> &v)
-{
-    if (size != v.size) New (v.size); // reallocate
-    memcpy (data, v.data, size * sizeof (VT));
-}
-#ifdef USE_BLAS_LEVEL1
-template<>
-inline void TVector<double>::Copy (const TVector<double> &v)
-{
-    static int incr = 1;
-    if (size != v.size) New (v.size); // reallocate
-    dcopy_(size, v.data, incr, data, incr);
-}
-template<>
-inline void TVector<float>::Copy (const TVector<float> &v)
-{
-    static int incr = 1;
-    if (size != v.size) New (v.size); // reallocate
-    scopy_(size, v.data, incr, data, incr);
-}
-#endif // USE_BLAS_LEVEL1
-
-// --------------------------------------------------------------------------
-// partial Vector->Vector copy: copy part of v into *this
-
-template<class VT>
-inline void TVector<VT>::Copy (const TVector<VT> &v,
-    int tofs, int sofs, int n)
-{
-    if (n < 0) n = v.size - sofs;
-    if (n > size - tofs) n = size - tofs;
-    memcpy (data+tofs, v.data+sofs, n * sizeof (VT));
-}
-#ifdef USE_BLAS_LEVEL1
-template<>
-inline void TVector<double>::Copy (const TVector<double> &v,
-    int tofs, int sofs, int n)
-{
-    static int incr = 1;
-    if (n < 0) n = v.size - sofs;
-    if (n > size - tofs) n = size - tofs;
-    dcopy_(n, v.data+sofs, incr, data+tofs, incr);
-}
-template<>
-inline void TVector<float>::Copy (const TVector<float> &v,
-    int tofs, int sofs, int n)
-{
-    static int incr = 1;
-    if (n < 0) n = v.size - sofs;
-    if (n > size - tofs) n = size - tofs;
-    scopy_(n, v.data+sofs, incr, data+tofs, incr);
-}
-#endif // USE_BLAS_LEVEL1
-
-// --------------------------------------------------------------------------
-
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator= (VT s)
-{
-    for (int i = 0; i < size; i++) data[i] = s;
-    return *this;
-}
-
-// --------------------------------------------------------------------------
-
-template<class VT>
-inline VT &TVector<VT>::operator[] (int i) const
-{
-    dASSERT(i >= 0 && i < size, "Index out of range");
-    return data[i];
-}
-
-// --------------------------------------------------------------------------
-
-#ifndef MATH_DEBUG
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator+= (const TVector<VT> &v)
-{
-    for (int i = 0; i < size; i++) data[i] += v.data[i];
-    return *this;
-}
-#endif // !MATH_DEBUG
-
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator+= (const VT &s)
-{
-    for (int i = 0; i < size; i++) data[i] += s;
-    return *this;
-}
-
-#ifndef MATH_DEBUG
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator-= (const TVector<VT> &v)
-{
-    for (int i = 0; i < size; i++) data[i] -= v.data[i];
-    return *this;
-}
-#endif // !MATH_DEBUG
-
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator-= (const VT &s)
-{
-    for (int i = 0; i < size; i++) data[i] -= s;
-    return *this;
-}
-
-#ifndef MATH_DEBUG
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator*= (const TVector<VT> &v)
-{
-    for (int i = 0; i < size; i++) data[i] *= v.data[i];
-    return *this;
-}
-#endif // !MATH_DEBUG
-
-// ==========================================================================
-
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator*= (const VT &s)
-{
-    for (int i = 0; i < size; i++) data[i] *= s;
-    return *this;
-}
-#ifdef USE_BLAS_LEVEL1
-template<>
-inline TVector<double> &TVector<double>::operator*= (const double &s)
-{
-    static int incr = 1;
-    dscal_(size, s, data, incr);
-    return *this;
-}
-template<>
-inline TVector<float> &TVector<float>::operator*= (const float &s)
-{
-    static int incr = 1;
-    sscal_(size, s, data, incr);
-    return *this;
-}
-template<>
-inline TVector<toast::complex> &TVector<toast::complex>::operator*=
-    (const toast::complex &s)
-{
-    static int incr = 1;
-    zscal_(size, s, data, incr);
-    return *this;
-}
-#endif // USE_BLAS_LEVEL1
-
-// ==========================================================================
-
-#ifndef MATH_DEBUG
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator/= (const TVector<VT> &v)
-{
-    for (int i = 0; i < size; i++) {
-        data[i] /= v.data[i];
-    }
-    return *this;
-}
-#endif // !MATH_DEBUG
-
-template<class VT>
-inline TVector<VT> &TVector<VT>::operator/= (const VT &s)
-{
-    dASSERT (s, "Attempt to divide by zero");
-    *this *= ((VT)1/s);
-    return *this;
-}
-
-// Link vector to a different data block
-template<class VT>
-inline void TVector<VT>::Relink (const TVector<VT> &v)
-{
-    Unlink ();				// remove existing link
-    Link (v);                           // link to v's data block
-}
-
-// Relink vector to part of a different data block
-template<class VT>
-inline void TVector<VT>::Relink (const TVector<VT> &v, int ofs, int dim)
-{
-    Unlink ();				// remove existing link
-    Link (v, ofs, dim);                 // link into v's data block
-}
-
-template<class VT>
-inline void TVector<VT>::Clear ()
-{
-    memset ((void*)data, 0, size*sizeof(VT));
-    // warning: this assumes that "(VT)0" is represented by a sequence of
-    // "0" bytes - not necessarily correct
-}
-
-#ifndef MATH_DEBUG
-template<class VT>
-inline VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
-{
-    VT d = (VT)0;
-    for (int i = 0; i < v1.size; i++) d += v1[i] * v2[i];
-    return d;
-}
-#ifdef USE_BLAS_LEVEL1 // interface to BLAS level1 xDOT/ZDOTU functions
-template<>
-inline double dot (const TVector<double> &v1, const TVector<double> &v2)
-{
-    static int incr = 1;
-    return ddot_((int&)v1.size, v1.data, incr, v2.data, incr);
-}
-template<>
-inline float dot (const TVector<float> &v1, const TVector<float> &v2)
-{
-    static int incr = 1;
-    return sdot_((int&)v1.size, v1.data, incr, v2.data, incr);
-}
-template<>
-inline toast::complex dot (const TVector<toast::complex> &v1,
-    const TVector<toast::complex> &v2)
-{
-    static int incr = 1;
-    int size = v1.size;
-    dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
-			       (dcomplex*)v2.data, &incr);
-    return toast::complex(z.r, z.i);
-}
-#endif // USE_BLAS_LEVEL1
-#endif // !MATH_DEBUG
-
-#ifndef MATH_DEBUG
-template<class VT>
-inline VT doth (const TVector<VT> &v1, const TVector<VT> &v2)
-{
-    return dot (v1, v2);
-}
-template<class VT>
-inline toast::complex doth (const TVector<toast::complex> &v1,
-    const TVector<toast::complex> &v2)
-{
-#ifdef USE_BLAS_LEVEL1
-    static int incr = 1;
-    return zdotc_((int&)v1.size, v1.data, incr, v2.data, incr);
-#else
-    toast::complex d = (toast::complex)0;
-    for (int i = 0; i < v1.size; i++) d += conj(v1[i]) * v2[i];
-    return d;
-#endif // USE_BLAS_LEVEL1
-}
-#endif // !MATH_DEBUG
-
-#ifdef USE_BLAS_LEVEL1
-template<>
-inline double l2norm (const TVector<double> &v)
-{
-    static int incr = 1;
-    return dnrm2_((int&)v.size, v.data, incr);
-}
-template<>
-inline double l2norm (const TVector<float> &v)
-{
-    static int incr = 1;
-    return (double)snrm2_((int&)v.size, v.data, incr);
-}
-template<>
-inline double l2norm (const TVector<toast::complex> &v)
-{
-    static int incr = 1;
-    return dznrm2_((int&)v.size, v.data, incr);
-}
-#endif // USE_BLAS_LEVEL1
-
-// ==========================================================================
 // template typedefs
 
-typedef TVector<double>   RVector;
-typedef TVector<float>    FVector;
+typedef TVector<double>          RVector;
+typedef TVector<float>           FVector;
 typedef TVector<toast::complex>  CVector;
-typedef TVector<scomplex> SCVector;
-typedef TVector<int>      IVector;
-
-/* add specific function for CVector */
-inline FVector Re(const SCVector &);
-inline RVector Re(const CVector &);
-inline FVector Im(const SCVector &);
-inline RVector Im(const CVector &);
-inline RVector Mod(const CVector &);
-inline RVector LogMod(const CVector &);
-inline RVector Arg (const CVector &);
-inline CVector Conj(const CVector &); // obsolete
-inline void SelfConj(const CVector &);
-inline CVector Hadamard(const CVector &, const CVector &);
-inline void SetReal (CVector&, const RVector&);
-inline void SetImag (CVector&, const RVector&);
-
-inline CVector MakeCVector (const SCVector &v);
-
-// ==========================================================================
-// extern declarations of TVector (only required for VS)
-
-#ifndef __VECTOR_CC
-//extern template class MATHLIB TVector<double>;
-//extern template class MATHLIB TVector<float>;
-//extern template class MATHLIB TVector<toast::complex>;
-//extern template class MATHLIB TVector<scomplex>;
-//extern template class MATHLIB TVector<int>;
-#endif // !__VECTOR_CC
-
-#include "vector_imp.hpp"
+typedef TVector<scomplex>        SCVector;
+typedef TVector<int>             IVector;
 
 #endif // !__VECTOR_H

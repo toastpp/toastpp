@@ -8,7 +8,7 @@
 #ifndef __CR_CHOLESKY_H
 #define __CR_CHOLESKY_H
 
-int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
+MATHLIB int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
     idxtype *&frowptr, idxtype *&fcolidx);
 // For a symmetric positive definite matrix of dimension dim x dim, with
 // sparse structure defined by rowptr and colidx (SCR format), generate the

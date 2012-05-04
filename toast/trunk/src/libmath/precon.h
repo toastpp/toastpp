@@ -235,8 +235,6 @@ typedef TPrecon_CG_Multigrid<int>       IPrecon_CG_Multigrid;
 // matrix (requires separate implementation to work with double-precision
 // vectors)
 
-class SCCompRowMatrixMixed;
-
 class SCPreconditionerMixed {
 public:
     SCPreconditionerMixed() {}
@@ -251,7 +249,7 @@ public:
     // Apply preconditioner to r and return the result in s
     // e.g. s = M^-1 r for a preconditioner matrix M
 
-    static SCPreconditionerMixed *Create (PreconType type);
+    inline static SCPreconditionerMixed *Create (PreconType type);
     // create a new preconditioner of type 'type' and return pointer to it
 };
 
@@ -267,8 +265,8 @@ class SCPreconMixed_Diag: public SCPreconditionerMixed {
 public:
     SCPreconMixed_Diag() {}
     PreconType Type() { return PRECON_DIAG; }
-    void Reset (const SCCompRowMatrixMixed *A);
-    void Apply (const CVector &r, CVector &s) ;
+    inline void Reset (const SCCompRowMatrixMixed *A);
+    inline void Apply (const CVector &r, CVector &s);
 
 private:
     CVector idiag;
@@ -278,14 +276,13 @@ class SCPreconMixed_DILU: public SCPreconditionerMixed {
 public:
     SCPreconMixed_DILU() {}
     PreconType Type() { return PRECON_DILU; }
-    void Reset (const SCCompRowMatrixMixed *);
-    void Apply (const CVector &r, CVector &s);
+    inline void Reset (const SCCompRowMatrixMixed *);
+    inline void Apply (const CVector &r, CVector &s);
 
 private:
     int dim;                       // problem dimension
     CVector ipivot;                // inverse pivots
     const SCCompRowMatrixMixed *A; // pointer to matrix
 };
-
 
 #endif // !__PRECON_H
