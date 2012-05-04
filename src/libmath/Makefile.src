@@ -12,22 +12,16 @@ SRCS = \
 	util.cc \
 	timing.cc \
 	complex.cc \
-	matrix.cc \
-	dnsmatrix.cc \
-	symatrix.cc \
-	dgmatrix.cc \
+	vector.cc \
 	gsmatrix.cc \
-	cdmatrix.cc \
 	crmatrix.cc \
 	scrmatrix.cc \
 	crmatrix_cm.cc \
-	precon.cc \
 	nr.cc \
 	scomplex.cc \
 	error.cc \
 	cr_cholesky.cc \
 	arpack.cc \
-	gmres.cc \
 	fourn.cc \
 	ilutoast.cc
 
