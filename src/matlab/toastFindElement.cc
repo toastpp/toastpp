@@ -27,5 +27,5 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     Point pt(dim);
     CopyVector (pt, prhs[1]);
     //cerr << pt[0] << ' ' << pt[1] << ' ' << pt[2] << endl;
-    plhs[0] = mxCreateScalarDouble (mesh->ElFind(pt)+1);
+    plhs[0] = mxCreateDoubleScalar (mesh->ElFind(pt)+1);
 }

@@ -18,5 +18,5 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     //int hMesh = (int)mxGetScalar (prhs[0]);
     //QMMesh *mesh = (QMMesh*)hMesh;
     Mesh *mesh = (Mesh*)Handle2Ptr (mxGetScalar (prhs[0]));
-    plhs[0] = mxCreateScalarDouble (mesh->FullSize());
+    plhs[0] = mxCreateDoubleScalar (mesh->FullSize());
 }

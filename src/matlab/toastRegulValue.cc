@@ -29,5 +29,5 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     CopyVector (x, prhs[1]);
 
     double prior = (reg ? reg->GetValue (x) : 0.0);
-    plhs[0] = mxCreateScalarDouble (prior);
+    plhs[0] = mxCreateDoubleScalar (prior);
 }
