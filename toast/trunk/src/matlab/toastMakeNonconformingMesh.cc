@@ -127,7 +127,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		
 	}
   
-    plhs[0] = mxCreateScalarDouble (Ptr2Handle (mesh));
+    plhs[0] = mxCreateDoubleScalar (Ptr2Handle (mesh));
 
     mexPrintf ("Mesh nodes:%d elements:%d dimension:%d number of interior edges:%d number of boundary edges:%d\n", nvtx, nel, dim, mesh->iedge_elist.size(), mesh->bedge_elist.size());
     /*for(int i =0 ; i<10; i++)

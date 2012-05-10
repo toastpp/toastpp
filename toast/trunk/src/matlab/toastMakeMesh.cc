@@ -95,7 +95,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    list[i] = new Triangle3D6;
 	    break;
 	default:
-	    mexPrintf ("Element type not supported!\n");
+	  mexPrintf ("Element type %d not supported!\n", eltp);
 	    list[i] = 0;
 	    break;
 	}
@@ -142,7 +142,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // set up mesh
     mesh->Setup();
 
-    plhs[0] = mxCreateScalarDouble (Ptr2Handle (mesh));
+    plhs[0] = mxCreateDoubleScalar (Ptr2Handle (mesh));
 
     mexPrintf ("Mesh: %d nodes, %d elements, dimension %d\n", nvtx, nel, dim);
     mexPrintf ("      %d boundary nodes\n", mesh->nbnd());

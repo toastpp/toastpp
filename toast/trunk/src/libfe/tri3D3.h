@@ -46,6 +46,8 @@ public:
     BYTE Type () const { return ELID_TRI3D3; }
     // returns element type id
 
+    int Dimension () const { return 3; }
+
   //    unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }
     // Return element capability flags
 

@@ -106,7 +106,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	break;
     }
 	
-    plhs[0] = mxCreateScalarDouble (Ptr2Handle (raster));
+    plhs[0] = mxCreateDoubleScalar (Ptr2Handle (raster));
 
     char cbuf[256];
     mexPrintf ("basis: Type:       %s-%s\n",

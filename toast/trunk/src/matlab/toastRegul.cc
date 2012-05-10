@@ -392,5 +392,5 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	
     }
     
-    plhs[0] = mxCreateScalarDouble (Ptr2Handle (reg));
+    plhs[0] = mxCreateDoubleScalar (Ptr2Handle (reg));
 }
