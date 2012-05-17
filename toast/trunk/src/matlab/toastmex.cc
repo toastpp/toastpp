@@ -469,9 +469,9 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
     mwIndex i;
     mwIndex *ir = mxGetIr (array);
     mwIndex *jc = mxGetJc (array);
-    rowptr = new int[m+1];
+    rowptr = new int[n+1];
     colidx = new int[nz];
-    for (i = 0; i <= m; i++) rowptr[i] = (int)jc[i];
+    for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
     for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
 #else
     rowptr = mxGetJc (array);
@@ -512,9 +512,9 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
     mwIndex i;
     mwIndex *ir = mxGetIr (array);
     mwIndex *jc = mxGetJc (array);
-    rowptr = new int[m+1];
+    rowptr = new int[n+1];
     colidx = new int[nz];
-    for (i = 0; i <= m; i++) rowptr[i] = (int)jc[i];
+    for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
     for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
 #else
     rowptr = mxGetJc (array);
