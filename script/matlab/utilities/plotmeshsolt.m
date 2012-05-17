@@ -73,7 +73,7 @@ ZMAX=65.;
  b1=25;
  b2=2;
 caxis([cmin cmax]);
- axis([XMIN XMAX YMIN YMAX ZMIN ZMAX]);
+ %axis([XMIN XMAX YMIN YMAX ZMIN ZMAX]);
   colorbar('vert');
 
 title(tle);

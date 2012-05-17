@@ -11,7 +11,7 @@ meshname  = '../meshes/circle25_32.msh';              % mesh file
 qmname    = '../meshes/circle25_1x1.qm';            % source-detector file
 
 refind = 1.4;                           % refractive index
-bx = 32; by = 32;                     % solution basis: grid dimension
+grd = [64 64];                          % solution basis: grid dimension
 freq = 100;                             % modulation frequency [MHz]
 test_meshbasis = false;
 % ======================================================================
@@ -20,12 +20,13 @@ test_meshbasis = false;
 
 % Initialisations
 toastCatchErrors();
+tol = 1e-12;
 
 disp('jacobian_test');
 disp('Test the integrity of toastJacobian by comparing to explicit');
 disp('calculation obtained by pixel-wise parameter perturbation.');
 % Set up some variables
-blen = bx*by;
+blen = prod(grd);
 c0 = 0.3;
 cm = c0/refind;
 
@@ -36,7 +37,7 @@ n = toastMeshNodeCount (hMesh);
 dmask = toastDataLinkList (hMesh);
 
 % Set up the mapper between FEM and solution bases
-hBasis = toastSetBasis (hMesh, [bx by]);
+hBasis = toastSetBasis (hMesh, grd);
 solmask = toastSolutionMask (hBasis);
 solmask2 = [solmask solmask+blen];
 slen = length(solmask);
@@ -82,14 +83,14 @@ mn = min([mua_d mua_e]);
 mx = max([mua_d mua_e]);
 
 figure(1);
-img = reshape(toastMapMeshToBasis(hBasis,mua_d),bx,by);
+img = reshape(toastMapMeshToBasis(hBasis,mua_d),grd);
 subplot(1,3,1);imagesc(img,[mn mx]); axis equal tight; title('direct'); colorbar
 
-img = reshape(toastMapMeshToBasis(hBasis,mua_e),bx,by);
+img = reshape(toastMapMeshToBasis(hBasis,mua_e),grd);
 subplot(1,3,2);imagesc(img,[mn mx]); axis equal tight; title('explicit'); colorbar
 
 ratio = mua_d./mua_e;
-img = reshape(toastMapMeshToBasis(hBasis,ratio),bx,by);
+img = reshape(toastMapMeshToBasis(hBasis,ratio),grd);
 subplot(1,3,3);imagesc(img);axis equal tight;colorbar;title('ratio')
 
 mean(mean(img(8:24,8:24)))
@@ -98,18 +99,27 @@ end
 
 %% Test 2: Jacobian in grid basis
 J = toastJacobian (hMesh, hBasis, qvec, mvec, mua0, mus0, ref, freq, 'direct');
+smat = toastSysmat (hMesh, mua0, mus0, ref, freq);
+[L U] = luinc(smat,1e-4);
 
 h = waitbar(0,'Calculating explicit Jacobian');
+tic;
 for i=1:slen
     idx = solmask(i);
     bmua = bmua0;
     bmua(idx) = bmua0(idx)+dmua;
     mua = toastMapBasisToMesh(hBasis,bmua);
-    proj = toastProject (hMesh,mua,mus0,ref,freq,qvec,mvec);
+    smat = toastSysmat (hMesh, mua, mus0, ref, freq);
+    %[phi,flag] = bicgstab(smat,qvec,tol,1000,L,U);
+    phi = smat\qvec;
+    cprj = log(mvec.' * phi);
+    proj = [real(cprj);imag(cprj)];
+    %proj = toastProject (hMesh,mua,mus0,ref,freq,qvec,mvec);
     dy = (proj-proj0)/dmua;
     Je(:,i) = dy / cm;
     waitbar(i/slen);
 end
+toc
 delete(h);
 
 mua_d = J(1,1:slen);
@@ -118,18 +128,21 @@ mn = min([mua_d mua_e]);
 mx = max([mua_d mua_e]);
 
 [bbmin bbmax] = toastMeshBB(hMesh);
-elsize = prod ((bbmax-bbmin) ./ [bx; by]);
+elsize = prod ((bbmax-bbmin) ./ grd');
 mua_d = mua_d * elsize; % scale with element size
 
 figure(2);
-img = reshape(toastMapSolToBasis(hBasis,mua_d),bx,by);
+img = reshape(toastMapSolToBasis(hBasis,mua_d),grd);
 subplot(1,3,1);imagesc(img,[mn mx]); axis equal tight; title('direct'); colorbar
 
-img = reshape(toastMapSolToBasis(hBasis,mua_e),bx,by);
+img = reshape(toastMapSolToBasis(hBasis,mua_e),grd);
 subplot(1,3,2);imagesc(img,[mn mx]); axis equal tight; title('explicit'); colorbar
 
 ratio = mua_d./mua_e;
-img = reshape(toastMapSolToBasis(hBasis,ratio),bx,by);
+img = reshape(toastMapSolToBasis(hBasis,ratio),grd);
 subplot(1,3,3);imagesc(img);axis equal tight;colorbar;title('ratio')
 
 mean (ratio)
+
+toastDeleteBasis(hBasis);
+toastDeleteMesh(hMesh);
