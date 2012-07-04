@@ -3,19 +3,23 @@
 
 # Import various modules
 import os
-import sys
 import numpy as np
 from numpy import matrix
 from scipy import sparse
 from scipy.sparse import linalg
 from numpy.random import rand
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import ion
+
+ion()
 
 # PyToast environment
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 
 # Import the toast modules
 from toast import mesh
+from toast import raster
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
@@ -30,6 +34,9 @@ mesh.ReadQM(hmesh,qmfile)
 nlist,elist,eltp = mesh.Data (hmesh)
 nlen = nlist.shape[0]
 
+grd = np.array([64,64])
+hraster = raster.Make (hmesh,grd);
+
 # Homogeneous parameter distributions
 mua = np.ones ((1,nlen)) * 0.025
 mus = np.ones ((1,nlen)) * 2.0
@@ -37,38 +44,35 @@ ref = np.ones ((1,nlen)) * 1.4
 freq = 100
 
 # Set up the linear system
-smat = mesh.Sysmat (hmesh, mua, mus, ref, freq)
 qvec = mesh.Qvec (hmesh)
-qvec = qvec.transpose()
 mvec = mesh.Mvec (hmesh)
+nq = qvec.shape[0]
 
-# Solve the linear system
-nq = qvec.shape[1]
-phi = np.zeros((nlen,nq),dtype=np.cdouble)
+phi = mesh.Fields(hmesh,hraster,qvec,mvec,mua,mus,ref,freq)
+
+fig1 = plt.figure()
+ims = []
 for q in range(nq):
-    qq = qvec[:,q].todense()
-    res = linalg.bicgstab(smat,qq,tol=1e-12)
-    phi[:,q] = res[0]
+    phi = np.log (phi[q,:])
+    bphi = raster.MapBasis (hraster, 'S->B', phi)
+    bphi = np.reshape (bphi, grd)
+    ims.append ((plt.imshow(bphi.real),))
 
-# Project to boundary
-y = mvec * phi
-logy = np.log(y)
+im_ani = animation.ArtistAnimation(fig1, ims, interval=50, repeat_delay=3000, blit=True)
 
-# Display as sinogram
-plt.figure(1)
-im = plt.imshow(logy.real,interpolation='none')
+plt.show()
+
+
+# Display fields
+plt.subplot(1,2,1)
+im = plt.imshow(bphi.real)
 plt.title('log amplitude')
-plt.xlabel('detector index')
-plt.ylabel('source index')
 plt.colorbar()
-plt.draw()
+#plt.draw()
 #plt.show()
-
-plt.figure(2)
-im = plt.imshow(logy.imag,interpolation='none')
+plt.subplot(1,2,2)
+im = plt.imshow(bphi.imag)
 plt.title('phase')
-plt.xlabel('detector index')
-plt.ylabel('source index')
 plt.colorbar()
 plt.show()
 

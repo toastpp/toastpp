@@ -30,11 +30,6 @@
 using namespace std;
 using namespace toast;
 
-// multipurpose global work array
-// DO NOT USE THIS WITH THREADED CODE
-static double *dwork;
-static int ndwork = 0;
-
 // ==========================================================================
 // member definitions
 
@@ -120,14 +115,14 @@ TCompRowMatrix<MT>::TCompRowMatrix (const TCompRowMatrix<MT> &m)
 	for (i = 0; i < this->nval; i++) colidx[i] = m.colidx[i];
     }
 
-    if (diag_access = m.diag_access) {
+    if ((diag_access = m.diag_access)) {
         diagptr = new int[this->rows];
 	for (i = 0; i < this->rows; i++) diagptr[i] = m.diagptr[i];
     } else {
         diagptr = 0;
     }
 
-    if (col_access = m.col_access) {
+    if ((col_access = m.col_access)) {
         colptr = new idxtype[this->cols+1];
 	for (i = 0; i <= this->cols; i++) colptr[i] = m.colptr[i];
 	rowidx = new idxtype[this->nval];
@@ -1112,6 +1107,10 @@ template<>
 void TCompRowMatrix<double>::Ax (const TVector<double> &x, TVector<double> &b)
     const
 {
+    // NOT THREADSAFE: DO NOT USE THIS WITH THREADED CODE
+    static double *dwork;
+    static int ndwork = 0;
+
     dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
     if (b.Dim() != rows) b.New(rows);

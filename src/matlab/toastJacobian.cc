@@ -228,7 +228,14 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	double tol = 1e-10;
 	mxGetString (prhs[8], solver, 128);
 	if (nrhs >= 10) tol = mxGetScalar (prhs[9]);
-	
+
+	if (nrhs >= 11 && mxIsChar(prhs[10])) {
+	    char cbuf[32];
+	    mxGetString (prhs[10], cbuf, 32);
+	    if (strcasecmp (cbuf, "EL") == 0 && !raster)
+		raster = RASTER_ELBASIS;
+	}
+
 #ifdef WIN64
 	// for now, direct solver doesn't work in WIN64
 	if (!stricmp(solver,"direct")) {

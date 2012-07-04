@@ -100,7 +100,7 @@ int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
     dASSERT(x.Dim() == A.rows, "Dimension mismatch");
 
     double dnew, dold, alpha, beta;
-    double err, bnorm;
+    double err=0, bnorm;
     int niter, dim = x.Dim();
     if (!maxit) maxit = dim+1;
     TVector<MT> r(dim), d(dim), q(dim);
@@ -355,7 +355,7 @@ inline int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
 	CVector &x, double &tol, TPreconditioner<toast::complex> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
-    double err, bnorm, rho=0, rhop, alpha, beta, omega, aden, onum, oden;
+    double err=0, bnorm, rho=0, rhop, alpha=0, beta, omega=0, aden, onum, oden;
     if (!maxit) maxit = dim+1;
     CVector r(dim), rd(dim), p(dim), pd(dim), v(dim), s(dim), sd(dim), t(dim);
     r = rd = b - Ax(A,x);
@@ -492,7 +492,7 @@ int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon, int maxit)
 {
     int i, niter, dim = x.Dim();
-    double rho=0, alpha, aden, beta, bden, omega, err, bnorm;
+    double rho=0, alpha=0, aden, beta, bden, omega=0, err=0, bnorm;
     TVector<MT> r(dim), rd(dim), p(dim), pd(dim), s(dim), sd(dim), t(dim), v(dim);
     if (!maxit) maxit = dim+1;
     r = rd = b - Ax(A,x);

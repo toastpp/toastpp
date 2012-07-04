@@ -203,7 +203,7 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
 
     // write sparse source vector array into dense matrix
     CDenseMatrix qd(qvec);
-    doublecomplex *qbuf = (doublecomplex*)qd.valptr();
+    doublecomplex *qbuf = (doublecomplex*)qd.ValPtr();
     zCreate_Dense_Matrix (&B, m, nrhs, qbuf, m, SLU_DN, SLU_Z, SLU_GE);
 
     toast::complex *x = new toast::complex[n*nrhs];

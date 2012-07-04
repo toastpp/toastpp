@@ -27,6 +27,11 @@
 #include "felib.h"
 #include "toasttype.h"
 
+// Flags for computing Jacobian on nodal/element basis rather than
+// basis provided by a raster object
+#define RASTER_NDBASIS ((Raster*)0)
+#define RASTER_ELBASIS ((Raster*)(-1))
+
 /**
  * \defgroup jacobian Jacobian matrix calculation
  *
@@ -46,6 +51,9 @@
  * \param aphi array of adjoint fields
  * \param dscale data scaling flag (lin/log)
  * \param J Jacobian
+ * \param elbasis (only used if raster==0) If true, returned Jacobian is
+ *   generated for piecewise constant element basis rather than shape
+ *   function basis
  * \note This version generates the boundary projection values on the fly
  *   from mvec, if required (i.e. if using log data).
  */
@@ -62,6 +70,9 @@ STOASTLIB void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
  * \param aphi array of adjoint fields
  * \param dscale data scaling flag (lin/log)
  * \param J Jacobian
+ * \param elbasis (only used if raster==0) If true, returned Jacobian is
+ *   generated for piecewise constant element basis rather than shape
+ *   function basis
  * \note This version passes the boundary projection values as input arguments.
  */
 STOASTLIB void GenerateJacobian (const Raster *raster, const QMMesh *mesh,

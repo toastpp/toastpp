@@ -5,13 +5,17 @@ from distutils.sysconfig import get_python_inc
 import numpy.distutils as npd
 
 toastdir = os.getenv('TOASTDIR')
+if toastdir == None:
+    print 'Expected environment variable TOASTDIR is not defined!'
+    sys.exit(1)
+
 toastver = os.getenv('TOASTVER')
 major = "%d" % sys.version_info[0]
 minor = "%d" % sys.version_info[1]
 pyinc = get_python_inc(plat_specific=1)
 npinc = npd.misc_util.get_numpy_include_dirs()
 
-module1 = Extension('ctoast',
+module1 = Extension('toast.toastmod',
                     include_dirs = [pyinc,
                                     npinc[0],
                                     toastdir,
@@ -23,9 +27,11 @@ module1 = Extension('ctoast',
                     library_dirs = [toastver+'/lib'],
                     sources = ['toastmodule.cc'])
 
-setup (name = 'ctoast',
-       version = '1.0',
+setup (name = 'PyToast',
+       version = '120529',
        description = 'Python TOAST extension',
+       author = 'Martin Schweiger',
+       url = 'http://www.toastplusplus.org',
        ext_modules = [module1],
        packages = ['toast']
 )

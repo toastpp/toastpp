@@ -19,7 +19,7 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian_cw_mesh (const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
-    RDenseMatrix *Jmua, RDenseMatrix *Jkap);
+    RDenseMatrix *Jmua, RDenseMatrix *Jkap, bool elbasis);
 
 // Frequency-domain case Jacobians
 void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
@@ -28,7 +28,7 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
     const CVector *dphi, const CVector *aphi,
-    DataScale dscale, RDenseMatrix &J);
+    DataScale dscale, RDenseMatrix &J, bool elbasis);
 
 void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
@@ -36,13 +36,20 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian_mesh (const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
-    DataScale dscale, RDenseMatrix &J);
+    DataScale dscale, RDenseMatrix &J, bool elbasis);
 
 template<class T>
 TVector<T> IntFG (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
 
 template<class T>
 TVector<T> IntGradFGradG (const Mesh &mesh,
+    const TVector<T> &f, const TVector<T> &g);
+
+template<class T>
+TVector<T> IntFG_el (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g);
+
+template<class T>
+TVector<T> IntGradFGradG_el (const Mesh &mesh,
     const TVector<T> &f, const TVector<T> &g);
 
 // ============================================================================
@@ -82,10 +89,12 @@ void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
     const CCompRowMatrix &mvec, const CVector *dphi, const CVector *aphi,
     DataScale dscale, RDenseMatrix &J)
 {
-    if (raster)
-	GenerateJacobian_grid (raster, mesh, mvec, dphi, aphi, dscale, J);
+    if (raster == RASTER_NDBASIS)
+	GenerateJacobian_mesh (mesh, mvec, dphi, aphi, dscale, J, false);
+    else if (raster == RASTER_ELBASIS)
+	GenerateJacobian_mesh (mesh, mvec, dphi, aphi, dscale, J, true);
     else
-	GenerateJacobian_mesh (mesh, mvec, dphi, aphi, dscale, J);
+	GenerateJacobian_grid (raster, mesh, mvec, dphi, aphi, dscale, J);
 }
 
 // ============================================================================
@@ -94,12 +103,14 @@ void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
-    DataScale dscale, RDenseMatrix &J)
+    DataScale dscale, RDenseMatrix &J, bool elbasis)
 {
-    if (raster)
-	GenerateJacobian_grid (raster, mesh, dphi, aphi, proj, dscale, J);
+    if (raster == RASTER_NDBASIS)
+	GenerateJacobian_mesh (mesh, dphi, aphi, proj, dscale, J, false);
+    else if (raster == RASTER_ELBASIS)
+	GenerateJacobian_mesh (mesh, dphi, aphi, proj, dscale, J, true);
     else
-	GenerateJacobian_mesh (mesh, dphi, aphi, proj, dscale, J);
+	GenerateJacobian_grid (raster, mesh, dphi, aphi, proj, dscale, J);
 }
 
 // ============================================================================
@@ -110,10 +121,12 @@ void GenerateJacobian_cw (const Raster *raster, const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap)
 {
-    if (raster)
-	GenerateJacobian_cw_grid (raster, mesh, dphi, aphi, Jmua, Jkap);
+    if (raster == RASTER_NDBASIS)
+	GenerateJacobian_cw_mesh (mesh, dphi, aphi, Jmua, Jkap, false);
+    else if (raster == RASTER_ELBASIS)
+	GenerateJacobian_cw_mesh (mesh, dphi, aphi, Jmua, Jkap, true);
     else
-	GenerateJacobian_cw_mesh (mesh, dphi, aphi, Jmua, Jkap);
+	GenerateJacobian_cw_grid (raster, mesh, dphi, aphi, Jmua, Jkap);
 }
 
 // ============================================================================
@@ -319,17 +332,18 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
     const CVector *dphi, const CVector *aphi,
-    DataScale dscale, RDenseMatrix &J)
+    DataScale dscale, RDenseMatrix &J, bool elbasis)
 {
-    int i, j, jj, k, n, idx, nQ, nM, nQM;
+    int i, j, jj, k, n, nsol, idx, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
+    nsol = (elbasis ? mesh->elen() : n);
 
-    CVector pmdf (n*2);
-    CVector pmdf_mua (pmdf, 0, n);
-    CVector pmdf_kap (pmdf, n, n);
+    CVector pmdf (nsol*2);
+    CVector pmdf_mua (pmdf, 0, nsol);
+    CVector pmdf_kap (pmdf, n, nsol);
 
     CVector proj;
     CVector cdfield(n);
@@ -341,18 +355,23 @@ void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
 	for (j = jj = 0; j < nM; j++) {
 
 	    if (!mesh->Connected (i,j)) continue;
-	    pmdf_mua = IntFG (*mesh, dphi[i], aphi[j]);
-	    pmdf_kap = IntGradFGradG (*mesh, dphi[i], aphi[j]);
+	    if (elbasis) {
+		pmdf_mua = IntFG_el (*mesh, dphi[i], aphi[j]);
+		pmdf_kap = IntGradFGradG_el (*mesh, dphi[i], aphi[j]);
+	    } else {
+		pmdf_mua = IntFG (*mesh, dphi[i], aphi[j]);
+		pmdf_kap = IntGradFGradG (*mesh, dphi[i], aphi[j]);
+	    }
 
 	    if (dscale == DATA_LOG)   // map to log data
 		pmdf = PMDF_log (pmdf, proj[jj]);
 
 	    // map into solution basis
-	    for (k = 0; k < n; k++) {
-	        J(idx,k)       = -pmdf_mua[k].re;
-	        J(idx+nQM,k)   = -pmdf_mua[k].im;
-	        J(idx,k+n)     = -pmdf_kap[k].re;
-	        J(idx+nQM,k+n) = -pmdf_kap[k].im;
+	    for (k = 0; k < nsol; k++) {
+	        J(idx,k)          = -pmdf_mua[k].re;
+	        J(idx+nQM,k)      = -pmdf_mua[k].im;
+	        J(idx,k+nsol)     = -pmdf_kap[k].re;
+	        J(idx+nQM,k+nsol) = -pmdf_kap[k].im;
 	    }
 
 	    idx++;
@@ -367,17 +386,18 @@ void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
 
 void GenerateJacobian_mesh (const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
-    DataScale dscale, RDenseMatrix &J)
+    DataScale dscale, RDenseMatrix &J, bool elbasis)
 {
-    int i, j, jj, k, n, idx, nQ, nM, nQM;
+    int i, j, jj, k, n, nsol, idx, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
+    nsol = (elbasis ? mesh->elen() : n);
 
-    CVector pmdf (n*2);
-    CVector pmdf_mua (pmdf, 0, n);
-    CVector pmdf_kap (pmdf, n, n);
+    CVector pmdf (nsol*2);
+    CVector pmdf_mua (pmdf, 0, nsol);
+    CVector pmdf_kap (pmdf, n, nsol);
 
     //CVector proj;
     CVector cdfield(n);
@@ -390,18 +410,23 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 	for (j = jj = 0; j < nM; j++) {
 
 	    if (!mesh->Connected (i,j)) continue;
-	    pmdf_mua = IntFG (*mesh, dphi[i], aphi[j]);
-	    pmdf_kap = IntGradFGradG (*mesh, dphi[i], aphi[j]);
+	    if (elbasis) {
+		pmdf_mua = IntFG_el (*mesh, dphi[i], aphi[j]);
+		pmdf_kap = IntGradFGradG_el (*mesh, dphi[i], aphi[j]);
+	    } else {
+		pmdf_mua = IntFG (*mesh, dphi[i], aphi[j]);
+		pmdf_kap = IntGradFGradG (*mesh, dphi[i], aphi[j]);
+	    }
 
 	    if (dscale == DATA_LOG)   // map to log data
 		pmdf = PMDF_log (pmdf, (*proj)[idx]);
 
 	    // map into solution basis
-	    for (k = 0; k < n; k++) {
-	        J(idx,k)       = -pmdf_mua[k].re;
-	        J(idx+nQM,k)   = -pmdf_mua[k].im;
-	        J(idx,k+n)     = -pmdf_kap[k].re;
-	        J(idx+nQM,k+n) = -pmdf_kap[k].im;
+	    for (k = 0; k < nsol; k++) {
+	        J(idx,k)          = -pmdf_mua[k].re;
+	        J(idx+nQM,k)      = -pmdf_mua[k].im;
+	        J(idx,k+nsol)     = -pmdf_kap[k].re;
+	        J(idx+nQM,k+nsol) = -pmdf_kap[k].im;
 	    }
 
 	    idx++;
@@ -453,10 +478,10 @@ void *GenerateJacobian_cw_grid_engine (task_data *td)
     double *Jmua_ptr = 0;
     double *Jkap_ptr = 0;
     if (thdata->Jmua) {
-	Jmua_ptr = thdata->Jmua->valptr()+thdata->mesh->Qofs[q0]*slen;
+	Jmua_ptr = thdata->Jmua->ValPtr()+thdata->mesh->Qofs[q0]*slen;
     }
     if (thdata->Jkap) {
-	Jkap_ptr = thdata->Jkap->valptr()+thdata->mesh->Qofs[q0]*slen;
+	Jkap_ptr = thdata->Jkap->ValPtr()+thdata->mesh->Qofs[q0]*slen;
 	cdfield_grad = new RVector[dim];
 	cafield_grad = new RVector*[nm];
     }
@@ -565,11 +590,11 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     double *Jkap_ptr = 0;
     if (Jmua) {
 	Jmua->New (nQM, slen);
-	Jmua_ptr = Jmua->valptr();
+	Jmua_ptr = Jmua->ValPtr();
     }
     if (Jkap) {
 	Jkap->New (nQM, slen);
-	Jkap_ptr = Jkap->valptr();
+	Jkap_ptr = Jkap->ValPtr();
 	cdfield_grad = new RVector[dim];
 	cafield_grad = new RVector*[nM];
     }
@@ -644,26 +669,27 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian_cw_mesh (const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
-    RDenseMatrix *Jmua, RDenseMatrix *Jkap)
+    RDenseMatrix *Jmua, RDenseMatrix *Jkap, bool elbasis)
 {
-    int i, j, k, n, idx, nQ, nM, nQM;
+    int i, j, k, n, nsol, idx, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
+    nsol = (elbasis ? mesh->elen() : n);
 
-    RVector pmdf (n);
+    RVector pmdf (nsol);
 
     double *Jmua_ptr = 0;
     double *Jkap_ptr = 0;
 
     if (Jmua) {
-	Jmua->New(nQM, n);
-	Jmua_ptr = Jmua->valptr();
+	Jmua->New(nQM, nsol);
+	Jmua_ptr = Jmua->ValPtr();
     }
     if (Jkap) {
-	Jkap->New(nQM, n);
-	Jkap_ptr = Jkap->valptr();
+	Jkap->New(nQM, nsol);
+	Jkap_ptr = Jkap->ValPtr();
     }
 
     for (i = 0; i < nQ; i++) {
@@ -675,20 +701,26 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 
 	    // absorption component
 	    if (Jmua) {
-		pmdf = -IntFG (*mesh, dphi[i], aphi[j]);
-
+		if (elbasis)
+		    pmdf = -IntFG_el (*mesh, dphi[i], aphi[j]);
+		else
+		    pmdf = -IntFG (*mesh, dphi[i], aphi[j]);
+		
 		// copy into Jacobian
-		memcpy (Jmua_ptr, pmdf.data_buffer(), n*sizeof(double));
-		Jmua_ptr += n;
+		memcpy (Jmua_ptr, pmdf.data_buffer(), nsol*sizeof(double));
+		Jmua_ptr += nsol;
 	    }
 
 	    // diffusion component
 	    if (Jkap) {
-		pmdf = -IntGradFGradG (*mesh, dphi[i], aphi[j]);
+		if (elbasis)
+		    pmdf = -IntGradFGradG_el (*mesh, dphi[i], aphi[j]);
+		else
+		    pmdf = -IntGradFGradG (*mesh, dphi[i], aphi[j]);
 
 		// copy into Jacobian
-		memcpy (Jkap_ptr, pmdf.data_buffer(), n*sizeof(double));
-		Jkap_ptr += n;
+		memcpy (Jkap_ptr, pmdf.data_buffer(), nsol*sizeof(double));
+		Jkap_ptr += nsol;
 	    }
 	}
     }
@@ -759,6 +791,65 @@ TVector<T> IntGradFGradG (const Mesh &mesh,
 		// can be combined in each pass of the inner (k) loop
 		tmp[bs] += sum;
 	    }
+	}
+    }
+    return tmp;
+}
+
+
+// ============================================================================
+// Compute the product of two nodal field on (piecewise constant)
+// element basis
+
+template<class T>
+TVector<T> IntFG_el (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g)
+{
+    dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
+    dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
+
+    int el, nnode, *node, j, nj;
+    T sum;
+    Element *pel;
+    TVector<T> tmp(mesh.elen());
+
+    for (el = 0; el < mesh.elen(); el++) {
+        pel   = mesh.elist[el];
+	nnode = pel->nNode();
+	node  = pel->Node;
+
+	for (j = 0; j < nnode; j++) {
+	    nj = node[j];
+	    sum = (f[nj] * g[nj]) * pel->IntFF(j,j);
+	    tmp[el] += sum;
+	}
+    }
+    return tmp;
+}
+
+
+// ============================================================================
+
+template<class T>
+TVector<T> IntGradFGradG_el (const Mesh &mesh,
+    const TVector<T> &f, const TVector<T> &g)
+{
+    dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
+    dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
+
+    int el, nnode, *node, j, nj;
+    T sum;
+    Element *pel;
+    TVector<T> tmp(mesh.elen());
+
+    for (el = 0; el < mesh.elen(); el++) {
+	pel = mesh.elist[el];
+	nnode = pel->nNode();
+	node  = pel->Node;
+
+	for (j = 0; j < nnode; j++) {
+	    nj = node[j];
+	    sum = (f[nj] * g[nj]) * pel->IntDD (j,j);
+	    tmp[el] += sum;
 	}
     }
     return tmp;
@@ -899,4 +990,14 @@ template CVector IntFG (const Mesh &mesh,
 template RVector IntGradFGradG (const Mesh &mesh,
     const RVector &f, const RVector &g);
 template CVector IntGradFGradG (const Mesh &mesh,
+    const CVector &f, const CVector &g);
+
+template RVector IntFG_el (const Mesh &mesh,
+    const RVector &f, const RVector &g);
+template CVector IntFG_el (const Mesh &mesh,
+    const CVector &f, const CVector &g);
+
+template RVector IntGradFGradG_el (const Mesh &mesh,
+    const RVector &f, const RVector &g);
+template CVector IntGradFGradG_el (const Mesh &mesh,
     const CVector &f, const CVector &g);
