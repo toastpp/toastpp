@@ -246,8 +246,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     IDenseMatrix idx(ridx.nRows(), ridx.nCols());
     int i, n = ridx.nRows() * ridx.nCols();
     int minidx, maxidx;
-    double *rptr = ridx.valptr();
-    int    *iptr = idx.valptr();
+    double *rptr = ridx.ValPtr();
+    int    *iptr = idx.ValPtr();
     for (i = 0; i < n; i++) {
 	iptr[i] = (int)(rptr[i]-0.5);
 	if (!i || iptr[i] < minidx) minidx = iptr[i];

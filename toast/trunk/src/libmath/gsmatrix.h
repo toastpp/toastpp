@@ -412,7 +412,7 @@ void TGenericSparseMatrix<MT>::Initialise (int nv, const MT *data)
     int i;
     if (nv != nval) {
         if (nbuf) delete []val;
-	if (nbuf = nval = nv) val = new MT[nv];
+	if ((nbuf = (nval = nv))) val = new MT[nv];
     }
     if (data) for (i = 0; i < nv; i++) val[i] = data[i];
     else      for (i = 0; i < nv; i++) val[i] = (MT)0;

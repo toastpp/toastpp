@@ -201,7 +201,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	return;
     }
     // make zero-based
-    int *v = sidx.valptr();
+    int *v = sidx.ValPtr();
     for (i = 0; i < ntri*nnd; i++) v[i]--;
 
     // internal node label

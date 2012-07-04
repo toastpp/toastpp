@@ -223,7 +223,7 @@ public:
     }
     // Retrieve reference to element
 
-    inline MT *valptr() { return val; }
+    inline MT *ValPtr() { return val; }
     // Return pointer to data array
 
     inline TVector<MT> Row (int r) const {

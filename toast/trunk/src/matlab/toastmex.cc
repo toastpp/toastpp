@@ -410,7 +410,7 @@ void CopyMatrix (RDenseMatrix &mat, const mxArray *array)
     double *pr = mxGetPr (array);
 
     mat.New ((int)m,(int)n);
-    double *val = mat.valptr();
+    double *val = mat.ValPtr();
     for (j = 0; j < n; j++)
 	for (i = 0; i < m; i++)
 	    val[i*n+j] = *pr++;
@@ -427,7 +427,7 @@ void CopyMatrix (IDenseMatrix &mat, const mxArray *array)
     double *pr = mxGetPr (array);
 
     mat.New ((int)m,(int)n);
-    int *val = mat.valptr();
+    int *val = mat.ValPtr();
     for (j = 0; j < n; j++)
 	for (i = 0; i < m; i++)
 	    val[i*n+j] = (int)*pr++;
@@ -444,7 +444,7 @@ void CopyTMatrix (RDenseMatrix &mat, const mxArray *array)
     double *pr = mxGetPr (array);
 
     mat.New ((int)n,(int)m);
-    double *val = mat.valptr();
+    double *val = mat.ValPtr();
     for (j = 0; j < n; j++)
 	for (i = 0; i < m; i++)
 	    val[j*m+i] = *pr++;
