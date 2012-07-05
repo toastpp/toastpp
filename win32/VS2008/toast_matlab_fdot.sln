@@ -1,0 +1,85 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "makeFDOTFwd", "matlab\makeFDOTFwd\makeFDOTFwd.vcproj", "{FBAC69AE-40E3-4A3B-838C-A0230FAF6764}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deleteFDOTFwd", "matlab\deleteFDOTFwd\deleteFDOTFwd.vcproj", "{230772FB-420E-4604-A385-F2AA48B7597D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastMakeProjectorList", "matlab\toastMakeProjectorList\toastMakeProjectorList.vcproj", "{E6BCD57D-F343-4A59-B8BB-B3F9BCA5A0D5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastDeleteProjectorList", "matlab\toastDeleteProjectorList\toastDeleteProjectorList.vcproj", "{7A298EE0-322A-40EF-B4AA-005903E20A1B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastProjectToField", "matlab\toastProjectToField\toastProjectToField.vcproj", "{5FC53073-90C4-4CE1-9517-02B1EC116D77}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastProjectToImage", "matlab\toastProjectToImage\toastProjectToImage.vcproj", "{1B6A20EA-C0B8-412B-A475-53D6F0197A87}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDOTAdjOp", "matlab\FDOTAdjOp\FDOTAdjOp.vcproj", "{94FF2C52-1CAD-4C0E-A509-CE5C323CD320}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDOTExcit", "matlab\FDOTExcit\FDOTExcit.vcproj", "{9A9B98EF-C754-44A9-B93F-77EAC24D9704}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDOTFwdOpRatio", "matlab\FDOTFwdOpRatio\FDOTFwdOpRatio.vcproj", "{06E43214-CE34-4DF8-8F59-3B595F8B0F52}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDOTAdjOpRatio", "matlab\FDOTAdjOpRatio\FDOTAdjOpRatio.vcproj", "{029C4AEC-2497-422D-871C-6B660518F828}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDOTFwdOp", "matlab\FDOTFwdOp\FDOTFwdOp.vcproj", "{7B64075D-82F6-4497-B3A4-DB47ECC1A920}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FDOTSysmat", "matlab\FDOTSysmat\FDOTSysmat.vcproj", "{CC986EA2-AD66-4FB1-8476-F1462BDAD4C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release_fdot|Win32 = Release_fdot|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FBAC69AE-40E3-4A3B-838C-A0230FAF6764}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FBAC69AE-40E3-4A3B-838C-A0230FAF6764}.Debug|Win32.Build.0 = Debug|Win32
+		{FBAC69AE-40E3-4A3B-838C-A0230FAF6764}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{FBAC69AE-40E3-4A3B-838C-A0230FAF6764}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{230772FB-420E-4604-A385-F2AA48B7597D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{230772FB-420E-4604-A385-F2AA48B7597D}.Debug|Win32.Build.0 = Debug|Win32
+		{230772FB-420E-4604-A385-F2AA48B7597D}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{230772FB-420E-4604-A385-F2AA48B7597D}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{E6BCD57D-F343-4A59-B8BB-B3F9BCA5A0D5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E6BCD57D-F343-4A59-B8BB-B3F9BCA5A0D5}.Debug|Win32.Build.0 = Debug|Win32
+		{E6BCD57D-F343-4A59-B8BB-B3F9BCA5A0D5}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{E6BCD57D-F343-4A59-B8BB-B3F9BCA5A0D5}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{7A298EE0-322A-40EF-B4AA-005903E20A1B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7A298EE0-322A-40EF-B4AA-005903E20A1B}.Debug|Win32.Build.0 = Debug|Win32
+		{7A298EE0-322A-40EF-B4AA-005903E20A1B}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{7A298EE0-322A-40EF-B4AA-005903E20A1B}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{5FC53073-90C4-4CE1-9517-02B1EC116D77}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5FC53073-90C4-4CE1-9517-02B1EC116D77}.Debug|Win32.Build.0 = Debug|Win32
+		{5FC53073-90C4-4CE1-9517-02B1EC116D77}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{5FC53073-90C4-4CE1-9517-02B1EC116D77}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{1B6A20EA-C0B8-412B-A475-53D6F0197A87}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1B6A20EA-C0B8-412B-A475-53D6F0197A87}.Debug|Win32.Build.0 = Debug|Win32
+		{1B6A20EA-C0B8-412B-A475-53D6F0197A87}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{1B6A20EA-C0B8-412B-A475-53D6F0197A87}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{94FF2C52-1CAD-4C0E-A509-CE5C323CD320}.Debug|Win32.ActiveCfg = Debug|Win32
+		{94FF2C52-1CAD-4C0E-A509-CE5C323CD320}.Debug|Win32.Build.0 = Debug|Win32
+		{94FF2C52-1CAD-4C0E-A509-CE5C323CD320}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{94FF2C52-1CAD-4C0E-A509-CE5C323CD320}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{9A9B98EF-C754-44A9-B93F-77EAC24D9704}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9A9B98EF-C754-44A9-B93F-77EAC24D9704}.Debug|Win32.Build.0 = Debug|Win32
+		{9A9B98EF-C754-44A9-B93F-77EAC24D9704}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{9A9B98EF-C754-44A9-B93F-77EAC24D9704}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{06E43214-CE34-4DF8-8F59-3B595F8B0F52}.Debug|Win32.ActiveCfg = Debug|Win32
+		{06E43214-CE34-4DF8-8F59-3B595F8B0F52}.Debug|Win32.Build.0 = Debug|Win32
+		{06E43214-CE34-4DF8-8F59-3B595F8B0F52}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{06E43214-CE34-4DF8-8F59-3B595F8B0F52}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{029C4AEC-2497-422D-871C-6B660518F828}.Debug|Win32.ActiveCfg = Debug|Win32
+		{029C4AEC-2497-422D-871C-6B660518F828}.Debug|Win32.Build.0 = Debug|Win32
+		{029C4AEC-2497-422D-871C-6B660518F828}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{029C4AEC-2497-422D-871C-6B660518F828}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{7B64075D-82F6-4497-B3A4-DB47ECC1A920}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7B64075D-82F6-4497-B3A4-DB47ECC1A920}.Debug|Win32.Build.0 = Debug|Win32
+		{7B64075D-82F6-4497-B3A4-DB47ECC1A920}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{7B64075D-82F6-4497-B3A4-DB47ECC1A920}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{CC986EA2-AD66-4FB1-8476-F1462BDAD4C1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CC986EA2-AD66-4FB1-8476-F1462BDAD4C1}.Debug|Win32.Build.0 = Debug|Win32
+		{CC986EA2-AD66-4FB1-8476-F1462BDAD4C1}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{CC986EA2-AD66-4FB1-8476-F1462BDAD4C1}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
