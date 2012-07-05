@@ -30,6 +30,12 @@ Himplicit = true;                       % Implicit/explicit Hessian matrix
 toastCatchErrors();
 %toastSetVerbosity(1);
 
+% Make sure the target data files exist
+if exist(fmod_name,'file') == 0 || exist(farg_name,'file') == 0
+    disp('Generating target data')
+    run fwd1
+end
+
 % Set up some variables
 blen = prod(grd);
 c0 = 0.3;
