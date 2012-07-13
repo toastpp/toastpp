@@ -288,10 +288,11 @@ template<>
 void TFwdSolver<float>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
-    // real version
+	xASSERT (meshptr, "Mesh reference not defined."); 
     xASSERT(omega==0, "Nonzero omega parameter not allowed here");
+	// real version
 
-    RVector prm(meshptr->nlen());
+    RVector prm;
 
     // To improve accuracy, we assemble the system matrix in double
     // precision, and map it to single precision after assembly
@@ -330,10 +331,11 @@ template<>
 void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
-    // real version
+	xASSERT (meshptr, "Mesh reference not defined."); 
     xASSERT(omega==0, "Nonzero omega parameter not allowed here");
+    // real version
 
-    RVector prm(meshptr->nlen());
+    RVector prm;
 
     F->Zero();
     prm = sol.GetParam (OT_CMUA);
@@ -351,8 +353,10 @@ template<>
 void TFwdSolver<scomplex>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
-    // complex version
-    RVector prm(meshptr->nlen());
+	xASSERT (meshptr, "Mesh reference not defined."); 
+
+	// complex version
+    RVector prm;
 
     // To improve accuracy, we assemble the system matrix in double
     // precision, and map it to single precision after assembly
@@ -396,8 +400,10 @@ template<>
 void TFwdSolver<toast::complex>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
-    // complex version
-    RVector prm(meshptr->nlen());
+	xASSERT (meshptr, "Mesh reference not defined."); 
+
+	// complex version
+    RVector prm;
 
     F->Zero();
     prm = sol.GetParam (OT_CMUA);
@@ -415,7 +421,9 @@ void TFwdSolver<toast::complex>::AssembleSystemMatrix (const Solution &sol,
 template<class T>
 void TFwdSolver<T>::AssembleSystemMatrixComponent (const RVector &prm, int type)
 {
-    F->Zero();
+	xASSERT (meshptr, "Mesh reference not defined."); 
+
+	F->Zero();
     AddToSysMatrix (*meshptr, *F, &prm, type);
 }
 
@@ -423,7 +431,7 @@ template<class T>
 void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
 {
     if (!mesh) mesh = meshptr;
-    xASSERT(mesh, "No mesh information available");
+	xASSERT (meshptr, "Mesh reference not defined."); 
 
     if (!B) { // allocate on the fly
 	idxtype *rowptr, *colidx;
@@ -440,10 +448,10 @@ void TFwdSolver<T>::AssembleMassMatrix (const Mesh *mesh)
 }
 
 template<>
-void TFwdSolver<float>::Reset (const Solution &sol, double omega)
+void TFwdSolver<float>::Reset (const Solution &sol, double omega, bool elbasis)
 {
     // real version
-    AssembleSystemMatrix (sol, omega);
+    AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT)
 	CholeskyFactorize (*F, *FL, *Fd, true);
     else
@@ -452,10 +460,10 @@ void TFwdSolver<float>::Reset (const Solution &sol, double omega)
 }
 
 template<>
-void TFwdSolver<double>::Reset (const Solution &sol, double omega)
+void TFwdSolver<double>::Reset (const Solution &sol, double omega, bool elbasis)
 {
     // real version
-    AssembleSystemMatrix (sol, omega);
+    AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT)
 	CholeskyFactorize (*F, *FL, *Fd, true);
     else
@@ -464,10 +472,10 @@ void TFwdSolver<double>::Reset (const Solution &sol, double omega)
 }
 
 template<>
-void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
+void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega, bool elbasis)
 {
     // single complex version
-    AssembleSystemMatrix (sol, omega);
+    AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT) {
 	//lu_data.Setup (F);
 	((CSuperLU*)SuperLU)->Reset (F);
@@ -477,10 +485,10 @@ void TFwdSolver<scomplex>::Reset (const Solution &sol, double omega)
 }
 
 template<>
-void TFwdSolver<toast::complex>::Reset (const Solution &sol, double omega)
+void TFwdSolver<toast::complex>::Reset (const Solution &sol, double omega, bool elbasis)
 {
     // complex version
-    AssembleSystemMatrix (sol, omega);
+    AssembleSystemMatrix (sol, omega, elbasis);
     if (solvertp == LSOLVER_DIRECT)
 	//lu_data.Setup (F);
 	((ZSuperLU*)SuperLU)->Reset (F);
@@ -802,7 +810,9 @@ template<class T>
 TVector<T> TFwdSolver<T>::ProjectSingle (int q, const TCompRowMatrix<T> &mvec,
     const TVector<T> &phi, DataScale scl) const
 {
-    if (scl == DATA_DEFAULT) scl = dscale;
+	xASSERT (meshptr, "Mesh reference not defined."); 
+
+	if (scl == DATA_DEFAULT) scl = dscale;
     return ::ProjectSingle (meshptr, q, mvec, phi, scl);
 }
 
@@ -812,7 +822,9 @@ template<class T>
 TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &mvec,
     const TVector<T> *phi, DataScale scl)
 {
-    if (scl == DATA_DEFAULT) scl = dscale;
+	xASSERT (meshptr, "Mesh reference not defined."); 
+
+	if (scl == DATA_DEFAULT) scl = dscale;
 
 #ifndef TOAST_MPI
 
@@ -1329,7 +1341,9 @@ template<class T>
 void TFwdSolver<T>::ProjectAll_proc (const TCompRowMatrix<T> &mvec,
     const TVector<T> *phi, DataScale scl, TVector<T> &proj)
 {
-    // Note: we don't really know the number of sources here, so we use
+	xASSERT (meshptr, "Mesh reference not defined."); 
+
+	// Note: we don't really know the number of sources here, so we use
     // the value stored in the mesh
     int nq = meshptr->nQ;
     if (nq != nQ) DistributeSources_MPI (nq);
@@ -1363,7 +1377,7 @@ TVector<T> ProjectSingle (const QMMesh *mesh, int q,
 
     for (i = 0; i < mesh->nQMref[q]; i++) {
         m = mesh->QMref[q][i];
-	proj[i] = dot (phi, mvec.Row(m));
+        proj[i] = dot (phi, mvec.Row(m));
     }
     return (dscale == DATA_LIN ? proj : log(proj));
 }

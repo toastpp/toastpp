@@ -103,7 +103,7 @@ void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
 
 void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
-    DataScale dscale, RDenseMatrix &J, bool elbasis)
+    DataScale dscale, RDenseMatrix &J)
 {
     if (raster == RASTER_NDBASIS)
 	GenerateJacobian_mesh (mesh, dphi, aphi, proj, dscale, J, false);
@@ -397,10 +397,10 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 
     CVector pmdf (nsol*2);
     CVector pmdf_mua (pmdf, 0, nsol);
-    CVector pmdf_kap (pmdf, n, nsol);
+    CVector pmdf_kap (pmdf, nsol, nsol);
 
     //CVector proj;
-    CVector cdfield(n);
+    //CVector cdfield(n);
 
     for (i = idx = 0; i < nQ; i++) {
 
@@ -411,17 +411,17 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 
 	    if (!mesh->Connected (i,j)) continue;
 	    if (elbasis) {
-		pmdf_mua = IntFG_el (*mesh, dphi[i], aphi[j]);
-		pmdf_kap = IntGradFGradG_el (*mesh, dphi[i], aphi[j]);
+            pmdf_mua = IntFG_el (*mesh, dphi[i], aphi[j]);
+		    pmdf_kap = IntGradFGradG_el (*mesh, dphi[i], aphi[j]);
 	    } else {
-		pmdf_mua = IntFG (*mesh, dphi[i], aphi[j]);
-		pmdf_kap = IntGradFGradG (*mesh, dphi[i], aphi[j]);
+            pmdf_mua = IntFG (*mesh, dphi[i], aphi[j]);
+            pmdf_kap = IntGradFGradG (*mesh, dphi[i], aphi[j]);
 	    }
 
 	    if (dscale == DATA_LOG)   // map to log data
 		pmdf = PMDF_log (pmdf, (*proj)[idx]);
 
-	    // map into solution basis
+		// map into solution basis
 	    for (k = 0; k < nsol; k++) {
 	        J(idx,k)          = -pmdf_mua[k].re;
 	        J(idx+nQM,k)      = -pmdf_mua[k].im;
