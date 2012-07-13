@@ -40,13 +40,19 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 {
     int nQM, slen, ndat, nprm;
     nQM  = mesh->nQM;
-    slen = (raster ? raster->SLen() : mesh->nlen());
+	switch ((int)raster) {
+		case 0: slen = mesh->nlen(); break;
+		case RASTER_ELBASIS: slen = mesh->elen(); break;
+		default: slen = raster->SLen(); break;
+	}
     ndat = nQM * 2;
     nprm = slen * 2;
 
     RDenseMatrix J(ndat,nprm);
 
+	mexPrintf("Before GenerateJacobian\n");
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
+	mexPrintf("After GenerateJacobian\n");
 
     CopyMatrix (res, J);
 }
@@ -61,14 +67,17 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     double freq, char *solver, double tol, mxArray **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM, blen, slen;
+    int i, n, dim, nQ, nM, nQM, nlen, elen, blen, slen;
 
-    n    = mesh->nlen();
+	bool elbasis = (raster == RASTER_ELBASIS);
+	nlen = mesh->nlen();
+	elen = mesh->elen();
+	n    = (elbasis ? elen : nlen);
+    slen = (raster && raster != RASTER_ELBASIS ? raster->SLen() : n);
     dim  = mesh->Dimension();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
-    slen = (raster ? raster->SLen() : n);
 
     CVector *dphi, *aphi;
     CFwdSolver FWS (solver, tol);
@@ -92,13 +101,13 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 
     // build the field vectors
     dphi = new CVector[nQ];
-    for (i = 0; i < nQ; i++) dphi[i].New (n);
+    for (i = 0; i < nQ; i++) dphi[i].New (nlen);
     aphi = new CVector[nM];
-    for (i = 0; i < nM; i++) aphi[i].New (n);
+    for (i = 0; i < nM; i++) aphi[i].New (nlen);
 
     // Calculate direct and adjoint fields
     FWS.Allocate (*mesh);
-    FWS.Reset (msol, omega);
+    FWS.Reset (msol, omega, elbasis);
     FWS.CalcFields (qvec, dphi);
     FWS.CalcFields (mvec, aphi);
 
@@ -134,15 +143,24 @@ void Assert (bool cond, int arg, const char *msg)
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    // mesh
+	// mesh
     QMMesh *mesh = (QMMesh*)Handle2Ptr (mxGetScalar (prhs[0]));
     int n   = mesh->nlen();
     int nq  = mesh->nQ;
     int nm  = mesh->nM;
     int nqm = mesh->nQM;
+	int nprm = n;
 
     // raster
     Raster *raster = (Raster*)Handle2Ptr (mxGetScalar (prhs[1]));
+
+	if (nrhs >= 11 && mxIsChar(prhs[10])) {
+	    char cbuf[32];
+	    mxGetString (prhs[10], cbuf, 32);
+	    if (strcasecmp (cbuf, "EL") == 0 && !raster)
+		raster = RASTER_ELBASIS;
+		nprm = mesh->elen();
+	}
 
     if (nrhs == 5) {
 
@@ -216,9 +234,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	CopyTMatrix (mvec, prhs[3]);
 
 	// nodal optical parameters
-	RVector mua (n, mxGetPr (prhs[4]));
-	RVector mus (n, mxGetPr (prhs[5]));
-	RVector ref (n, mxGetPr (prhs[6]));
+	RVector mua (nprm, mxGetPr (prhs[4]));
+	RVector mus (nprm, mxGetPr (prhs[5]));
+	RVector ref (nprm, mxGetPr (prhs[6]));
 
 	// modulation frequency
 	double freq = mxGetScalar (prhs[7]);
@@ -228,13 +246,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	double tol = 1e-10;
 	mxGetString (prhs[8], solver, 128);
 	if (nrhs >= 10) tol = mxGetScalar (prhs[9]);
-
-	if (nrhs >= 11 && mxIsChar(prhs[10])) {
-	    char cbuf[32];
-	    mxGetString (prhs[10], cbuf, 32);
-	    if (strcasecmp (cbuf, "EL") == 0 && !raster)
-		raster = RASTER_ELBASIS;
-	}
 
 #ifdef WIN64
 	// for now, direct solver doesn't work in WIN64

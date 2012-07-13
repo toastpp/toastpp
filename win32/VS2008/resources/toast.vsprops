@@ -13,7 +13,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="$(BlasLib) superlu_41.lib"
+		AdditionalDependencies="$(BlasLib)"
 		AdditionalLibraryDirectories="&quot;$(ToastLibDir)&quot;;&quot;$(ToastAuxLibDir)&quot;"
 	/>
 	<Tool

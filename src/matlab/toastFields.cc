@@ -149,10 +149,12 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double freq = mxGetScalar (prhs[7]);
 
     // linear solver parameters
-    char solver[128];
+    char solver[128] = "direct";
     double tol = 1e-10;
-    mxGetString (prhs[8], solver, 128);
-    if (nrhs >= 10) tol = mxGetScalar (prhs[9]);
+	if (nrhs >= 9) {
+	    mxGetString (prhs[8], solver, 128);
+		if (nrhs >= 10) tol = mxGetScalar (prhs[9]);
+	}
 
     CalcFields (mesh, raster, qvec, mvec, mua, mus, ref, freq,
 		solver, tol, &plhs[0], nlhs > 1 ? &plhs[1] : NULL);

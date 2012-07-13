@@ -75,7 +75,11 @@ if dim==3
 
 else
 
-    patch('Vertices', vtx, 'Faces', idx, 'CData',surfdata, 'EdgeColor',[0 0 0],'FaceColor','interp');
+    if size(surfdata,1) == size(vtx,1)
+        patch('Vertices', vtx, 'Faces', idx, 'CData',surfdata, 'EdgeColor',[0 0 0],'FaceColor','interp');
+    else
+        patch('Vertices', vtx, 'Faces', idx, 'FaceVertexCData', surfdata, 'FaceColor', 'flat');
+    end
     view([0 0 1]);
 
 end

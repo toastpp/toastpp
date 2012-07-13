@@ -242,6 +242,8 @@ public:
      *   from a new set of parameters.
      * \param sol Solution instance containing the parameter vectors
      * \param omega modulation frequency (cycles/ps)
+	 * \param elbasis parameter vectors in sol are provided in piecewise
+	 *   constant element basis rather than nodal basis
      * \note For template type \e double, parameter omega must be 0.
      * \note The system matrices must have been allocated (once) with a
      *   previous call to \ref Allocate.
@@ -253,7 +255,7 @@ public:
      *   depend on the parameters.
      * \sa AssembleSystemMatrix, AssembleMassMatrix
      */
-    void Reset (const Solution &sol, double omega = 0);
+    void Reset (const Solution &sol, double omega = 0, bool elbasis = false);
 
     /**
      * \brief Calculate photon density field for a given source vector.
