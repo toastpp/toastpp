@@ -69,7 +69,7 @@ public:
     // Mesh::PopulateNeighbourLists
     // Note: This replaces 'EdgeAdjacentElement'
 
-    int EdgeAdjacentElement (int el, int side);
+    int EdgeAdjacentElement (int el, int side) const;
     // returns the number of the element adjacent to 'el' at side 'side'
     // returns -1 if no element is found, i.e. if 'side' is a boundary
 

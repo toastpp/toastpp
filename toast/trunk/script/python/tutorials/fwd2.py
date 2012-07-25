@@ -10,9 +10,9 @@ from scipy.sparse import linalg
 from numpy.random import rand
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib import ion
+#from matplotlib import ion
 
-ion()
+plt.ion()
 
 # PyToast environment
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
@@ -53,8 +53,8 @@ phi = mesh.Fields(hmesh,hraster,qvec,mvec,mua,mus,ref,freq)
 fig1 = plt.figure()
 ims = []
 for q in range(nq):
-    phi = np.log (phi[q,:])
-    bphi = raster.MapBasis (hraster, 'S->B', phi)
+    lphi = np.log (phi[q,:])
+    bphi = raster.MapBasis (hraster, 'S->B', lphi)
     bphi = np.reshape (bphi, grd)
     ims.append ((plt.imshow(bphi.real),))
 

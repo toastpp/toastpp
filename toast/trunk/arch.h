@@ -5,7 +5,7 @@
 #ifndef __ARCH_H
 #define __ARCH_H
 
-#if defined(WIN32)||defined(WIN64)
+#if defined(_WIN32)
 
 #include <process.h>
 #include <direct.h>
@@ -18,7 +18,7 @@
 #define isnan(arg) _isnan((arg))
 
 // avoid annoying warnings
-#define hypot(x,y) _hypot((x),(y))
+#define hypot _hypot
 #define isnan(x) _isnan((x))
 #define getpid() _getpid()
 #define getcwd(buffer,maxlen) _getcwd(buffer,maxlen)
@@ -27,6 +27,6 @@
 inline double drand48(void) { return (double)rand()/(double)RAND_MAX; }
 // quick fix of missing function. this should be improved upon!
 
-#endif
+#endif //_WIN32
 
 #endif // !__ARCH_H

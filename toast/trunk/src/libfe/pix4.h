@@ -50,7 +50,7 @@ public:
     inline int nSideNode (int /*side*/) const { return 2; }
     int SideNode (int side, int node) const;
   
-    inline double Size() const { return size; }
+    double Size() const;
 
     Point Local (const NodeList &nlist, const Point &glob) const
     { return Local (glob); }
@@ -73,23 +73,24 @@ public:
     RDenseMatrix GlobalShapeD (const NodeList &nlist, const Point &glob) const
     { return GlobalShapeD (glob); }
 
-    inline double IntF (int i) const
-    { return 0.25*dx*dy; }
-    inline double IntFF (int i, int j) const
-    { return intff(i,j); }
-    inline RSymMatrix IntFF() const
-    { return intff; }
+	double IntF (int i) const;
+
+	double IntFF (int i, int j) const;
+
+    RSymMatrix IntFF() const;
+
     double IntFFF (int i, int j, int k) const;
     double IntPFF (int i, int j, const RVector &P) const;
     RSymMatrix IntPFF (const RVector& P) const;
-    inline RSymMatrix IntDD () const { return intdd; }
-    inline double IntDD (int i, int j) const { return intdd(i,j); }
-    inline double IntFDD (int i, int j, int k) const { return intfdd[i](j,k); }
-    inline double IntPDD (int i, int j, const RVector &P) const
-    { double res = 0.0;
-      for (int k = 0; k < 4; k++) res += P[Node[k]] * intfdd[k](i,j);
-      return res;
-    }
+
+    RSymMatrix IntDD () const;
+
+    double IntDD (int i, int j) const;
+
+    double IntFDD (int i, int j, int k) const;
+
+    double IntPDD (int i, int j, const RVector &P) const;
+
     inline RSymMatrix IntPDD (const RVector& P) const
     { RSymMatrix pdd(4);
       for (int i = 0; i < 4; i++)

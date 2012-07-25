@@ -80,7 +80,7 @@ public:
     ElementList elist;   // list of mesh elements
     ParameterList plist; // list of mesh parameters (per node)
 
-    int **nbhrs;
+    mutable int **nbhrs;
     // list of edge-adjacent neighbours for each element
     // this is only defined after a call to SetupNeighbourList
 
@@ -229,7 +229,7 @@ public:
 	int &side, double sub = 0) const;
     // This contains the old algorithm which is used whenever the above fails
 
-    void SetupNeighbourList ();
+    void SetupNeighbourList () const;
     // sets up a list of edge-adjacent elements for each element in the mesh
     // and stores it in nbhrs
 

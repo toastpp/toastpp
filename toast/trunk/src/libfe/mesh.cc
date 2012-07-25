@@ -1038,7 +1038,7 @@ void Mesh::SetupElementMatrices (void)
 */
 // ***********************************************
 
-void Mesh::SetupNeighbourList ()
+void Mesh::SetupNeighbourList () const
 {
     int el, side;
     if (nbhrs) return;   // list exists already

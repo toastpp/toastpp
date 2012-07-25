@@ -579,6 +579,48 @@ double Pixel4::BndIntPFF (int i, int j, const RVector &P) const
     return res;
 }
 
+double Pixel4::Size() const
+{
+	return size;
+}
+
+double Pixel4::IntF (int i) const
+{
+	return 0.25*dx*dy;
+}
+
+double Pixel4::IntFF (int i, int j) const
+{
+	return intff(i,j);
+}
+
+RSymMatrix Pixel4::IntFF() const
+{
+	return intff;
+}
+
+RSymMatrix Pixel4::IntDD () const
+{
+	return intdd;
+}
+
+double Pixel4::IntDD (int i, int j) const
+{
+	return intdd(i,j);
+}
+
+double Pixel4::IntFDD (int i, int j, int k) const
+{
+	return intfdd[i](j,k);
+}
+
+double Pixel4::IntPDD (int i, int j, const RVector &P) const
+{
+	double res = 0.0;
+    for (int k = 0; k < 4; k++) res += P[Node[k]] * intfdd[k](i,j);
+    return res;
+}
+
 double Pixel4::dx = 0.0;
 double Pixel4::dy = 0.0;
 double Pixel4::size = 0.0;
