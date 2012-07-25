@@ -23,7 +23,7 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libmath',
                                     toastdir+'/src/libfe',
                                     toastdir+'/src/libstoast'],
-                    libraries = ['math','fe','stoast'],
+                    libraries = ['libmath','libfe','libstoast'],
                     library_dirs = [toastver+'/lib'],
                     sources = ['toastmodule.cc'])
 

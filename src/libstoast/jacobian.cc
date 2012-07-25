@@ -348,6 +348,9 @@ void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
     CVector proj;
     CVector cdfield(n);
 
+	if (elbasis && !mesh->nbhrs)
+		mesh->SetupNeighbourList();
+
     for (i = idx = 0; i < nQ; i++) {
 
 	proj = ProjectSingle (mesh, i, mvec, dphi[i], DATA_LIN);
@@ -401,6 +404,9 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 
     //CVector proj;
     //CVector cdfield(n);
+
+	if (elbasis && !mesh->nbhrs)
+		mesh->SetupNeighbourList();
 
     for (i = idx = 0; i < nQ; i++) {
 
@@ -692,6 +698,9 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 	Jkap_ptr = Jkap->ValPtr();
     }
 
+	if (elbasis && !mesh->nbhrs)
+		mesh->SetupNeighbourList();
+
     for (i = 0; i < nQ; i++) {
 
 	// loop over detectors
@@ -807,21 +816,25 @@ TVector<T> IntFG_el (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g)
     dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
     dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
-    int el, nnode, *node, j, nj;
+    int el, nnode, *node, i, j, ni, nj;
     T sum;
     Element *pel;
     TVector<T> tmp(mesh.elen());
 
-    for (el = 0; el < mesh.elen(); el++) {
-        pel   = mesh.elist[el];
-	nnode = pel->nNode();
-	node  = pel->Node;
+	for (el = 0; el < mesh.elen(); el++) {
+		pel   = mesh.elist[el];
+		nnode = pel->nNode();
+		node  = pel->Node;
+		sum = (T)0;
 
-	for (j = 0; j < nnode; j++) {
-	    nj = node[j];
-	    sum = (f[nj] * g[nj]) * pel->IntFF(j,j);
+		for (i = 0; i < nnode; i++) {
+			ni = node[i];
+			for (j = 0; j < nnode; j++) {
+				nj = node[j];
+				sum += (f[ni] * g[nj]) * pel->IntFF(i,j);
+			}
+		}
 	    tmp[el] += sum;
-	}
     }
     return tmp;
 }
@@ -836,21 +849,25 @@ TVector<T> IntGradFGradG_el (const Mesh &mesh,
     dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
     dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
-    int el, nnode, *node, j, nj;
+    int dim, el, nnode, *node, i, j, ni, nj, nbr;
     T sum;
     Element *pel;
     TVector<T> tmp(mesh.elen());
 
     for (el = 0; el < mesh.elen(); el++) {
-	pel = mesh.elist[el];
-	nnode = pel->nNode();
-	node  = pel->Node;
+		pel = mesh.elist[el];
+		nnode = pel->nNode();
+		node  = pel->Node;
+		sum = (T)0;
 
-	for (j = 0; j < nnode; j++) {
-	    nj = node[j];
-	    sum = (f[nj] * g[nj]) * pel->IntDD (j,j);
+		for (i = 0; i < nnode; i++) {
+			ni = node[i];
+			for (j = 0; j < nnode; j++) {
+				nj = node[j];
+				sum += (f[ni] * g[nj]) * pel->IntDD (i,j);
+			}
+		}
 	    tmp[el] += sum;
-	}
     }
     return tmp;
 }

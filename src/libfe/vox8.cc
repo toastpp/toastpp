@@ -175,6 +175,46 @@ RDenseMatrix Voxel8::LocalShapeD (const Point &loc) const
     return der;
 }
 
+double Voxel8::Size() const
+{
+	return size;
+}
+
+double Voxel8::IntF (int i) const
+{
+	return intf;
+}
+
+double Voxel8::IntFF (int i, int j) const
+{
+	return intff(i,j);
+}
+
+RSymMatrix Voxel8::IntFF() const
+{
+	return intff;
+}
+
+double Voxel8::IntFFF (int i, int j, int k) const
+{
+	return intfff[i](j,k);
+}
+
+RSymMatrix Voxel8::IntDD () const
+{
+	return intdd;
+}
+
+double Voxel8::IntDD (int i, int j) const
+{
+	return intdd(i,j);
+}
+
+double Voxel8::IntFDD (int i, int j, int k) const
+{
+	return intfdd[i](j,k);
+}
+
 double Voxel8::IntPFF (int i, int j, const RVector &P) const
 {
     return (intfff[0](i,j) * P[Node[0]] +

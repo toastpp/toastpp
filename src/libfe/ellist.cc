@@ -104,7 +104,7 @@ Element *ElementList::SideNeighbour (int el, int side)
     return pel->sdnbhr[side];
 }
 
-int ElementList::EdgeAdjacentElement (int el, int side)
+int ElementList::EdgeAdjacentElement (int el, int side) const
 {
     const int max_sidenode = 10;
     int i, i1, i2, nn, nd[max_sidenode];

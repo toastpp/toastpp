@@ -823,7 +823,7 @@ public:
      */
 #ifndef USE_CUDA_FLOAT
 // none of the operator friend definitions seem to work with nvcc
-#if (defined(WIN32)||defined(WIN64))
+#if defined(_WIN32)
     template <class VT> friend TVector<VT> operator+ (const VT &s,
         const TVector<VT> &v);
 #elif (GCC_VERSION < 30404) // old-style definitions
@@ -845,7 +845,7 @@ public:
      * \return Result of the subtraction, {s-v[i]}
      * \sa TVector::operator-()
      */
-#if (defined(WIN32)||defined(WIN64))
+#if defined(_WIN32)
     template<class VT> friend TVector<VT> operator- (const VT &s,
         const TVector<VT> &v);
 #elif (GCC_VERSION < 30404) // old-style definitions
@@ -866,7 +866,7 @@ public:
      * \return Result of the multiplication, {s*v[i]}
      * \sa TVector::operator*()
      */
-#if (defined(WIN32)||defined(WIN64))
+#if defined(_WIN32)
     template<class VT> friend TVector<VT> operator* (const VT &s,
         const TVector<VT> &v);
 #elif (GCC_VERSION < 30404) // old-style definitions
@@ -887,7 +887,7 @@ public:
      * \return Result of the division, {s/v[i]}
      * \sa TVector::operator/()
      */
-#if (defined(WIN32)||defined(WIN64))
+#if defined(_WIN32)
     template<class VT> friend TVector<VT> operator/ (const VT &s,
         const TVector<VT> &v);
     // JK also works (TVector::operator/ )
