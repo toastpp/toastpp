@@ -29,8 +29,10 @@
 
 // Flags for computing Jacobian on nodal/element basis rather than
 // basis provided by a raster object
-#define RASTER_NDBASIS ((Raster*)0)
-#define RASTER_ELBASIS ((Raster*)(-1))
+#define INT_NDBASIS 0
+#define INT_ELBASIS -1
+#define RASTER_NDBASIS ((Raster*)INT_NDBASIS)
+#define RASTER_ELBASIS ((Raster*)INT_ELBASIS)
 
 /**
  * \defgroup jacobian Jacobian matrix calculation

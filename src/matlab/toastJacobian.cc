@@ -40,19 +40,17 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 {
     int nQM, slen, ndat, nprm;
     nQM  = mesh->nQM;
-	switch ((int)raster) {
-		case 0: slen = mesh->nlen(); break;
-		case RASTER_ELBASIS: slen = mesh->elen(); break;
-		default: slen = raster->SLen(); break;
-	}
+    switch ((int)raster) {
+        case 0: slen = mesh->nlen(); break;
+        case INT_ELBASIS: slen = mesh->elen(); break;
+        default: slen = raster->SLen(); break;
+    }
     ndat = nQM * 2;
     nprm = slen * 2;
 
     RDenseMatrix J(ndat,nprm);
 
-	mexPrintf("Before GenerateJacobian\n");
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
-	mexPrintf("After GenerateJacobian\n");
 
     CopyMatrix (res, J);
 }
