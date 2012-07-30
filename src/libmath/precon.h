@@ -138,8 +138,7 @@ public:
     void Reset (const TMatrix<MT> *){ ERROR_UNDEF; }
     void Reset (TCompRowMatrix<MT> &, int matching, char *ordering, double droptol, int condest, int elbow);
     void Apply (const TVector<MT> &r, TVector<MT> &s);
-    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const
-    { ERROR_UNDEF; };
+    void Apply (const TDenseMatrix<MT> &r, TDenseMatrix<MT> &s)const;
     ~TPrecon_ILU();
 private:
     ilu_doublecomplex *rhs, *sol;
