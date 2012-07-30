@@ -21,6 +21,8 @@ from numpy.random import rand
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+plt.ion()
+
 itrmax = 100  # max number of nonlinear iterations
 tolCG = 1e-7
 resetCG = 10
@@ -339,4 +341,5 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     
     itr = itr+1
 
-    
+plt.ioff()
+

@@ -649,7 +649,7 @@ template<>
 void TFwdSolver<toast::complex>::CalcFields (const CCompRowMatrix &qvec,
     CVector *phi, IterativeSolverResult *res) const
 {
-    // calculate the fields for all sources
+	// calculate the fields for all sources
     static IterativeSolverResult s_res_single;
     IterativeSolverResult *res_single = 0;
     if (res) {

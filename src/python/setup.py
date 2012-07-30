@@ -23,7 +23,7 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libmath',
                                     toastdir+'/src/libfe',
                                     toastdir+'/src/libstoast'],
-                    libraries = ['math','fe','stoast'],
+                    libraries = ['libmath','libfe','libstoast'] if "win" in sys.platform else ['math','fe','stoast'],
                     library_dirs = [toastver+'/lib'],
                     sources = ['toastmodule.cc'])
 
@@ -35,3 +35,4 @@ setup (name = 'PyToast',
        ext_modules = [module1],
        packages = ['toast']
 )
+
