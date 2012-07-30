@@ -17,6 +17,7 @@ SRCS = \
 	crmatrix.cc \
 	scrmatrix.cc \
 	crmatrix_cm.cc \
+	precon.cc \
 	nr.cc \
 	scomplex.cc \
 	error.cc \
