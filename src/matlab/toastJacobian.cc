@@ -40,11 +40,12 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 {
     int nQM, slen, ndat, nprm;
     nQM  = mesh->nQM;
-    switch ((int)raster) {
-        case 0: slen = mesh->nlen(); break;
-        case INT_ELBASIS: slen = mesh->elen(); break;
-        default: slen = raster->SLen(); break;
-    }
+    if (raster == RASTER_ELBASIS)
+        slen = mesh->nlen();
+    else if (raster == RASTER_NDBASIS)
+        slen = mesh->elen();
+    else
+        slen = raster->SLen();
     ndat = nQM * 2;
     nprm = slen * 2;
 
