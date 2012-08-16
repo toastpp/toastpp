@@ -46,6 +46,9 @@ void Lin2Quad (Mesh &mesh)
 	case ELID_TRI3:
 	    maxnew += 3;
 	    break;
+	case ELID_TRI3D3:
+	    maxnew += 3;
+	    break;
 	case ELID_TET4:
 	    maxnew += 6;
 	    break;
@@ -108,6 +111,9 @@ void Lin2Quad (Mesh &mesh)
 	case ELID_TRI3:
 	    nel = new Triangle6;
 	    break;
+	case ELID_TRI3D3:
+	    nel = new Triangle3D6;
+	    break;
 	case ELID_TET4:
 	    nel = new Tetrahedron10;
 	    break;
@@ -147,6 +153,19 @@ void Lin2Quad (Mesh &mesh)
 	        int *node = mesh.elist[el]->Node;
 		switch (mesh.elist[el]->Type()) {
 		case ELID_TRI6:
+		    if (i == node[0]) {
+		        if      (nbj == node[1]) node[3] = nlen+nnlen;
+			else if (nbj == node[2]) node[5] = nlen+nnlen;
+		    } else if (i == node[1]) {
+		        if      (nbj == node[0]) node[3] = nlen+nnlen;
+			else if (nbj == node[2]) node[4] = nlen+nnlen;
+		    } else if (i == node[2]) {
+		        if      (nbj == node[0]) node[5] = nlen+nnlen;
+			else if (nbj == node[1]) node[4] = nlen+nnlen;
+		    } else
+		        cerr << "Panic!\n";
+		    break;
+		case ELID_TRI3D6:
 		    if (i == node[0]) {
 		        if      (nbj == node[1]) node[3] = nlen+nnlen;
 			else if (nbj == node[2]) node[5] = nlen+nnlen;

@@ -104,20 +104,20 @@ step = 1.0; % initial step length for line search
 % Initialise regularisation
 %hReg = toastRegul ('LAPLACIAN', hBasis, logx, tau);
 %hReg = toastRegul('TK1',hBasis,logx,tau);
-%hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta);
+hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta);
 
-tgtmua=toastReadNIM('../meshes/tgt_mua_ellips_tri10.nim');
-tgtmus=toastReadNIM('../meshes/tgt_mus_ellips_tri10.nim');
-tgtkap=1./(3*(tgtmua+tgtmus));
-hMesh2 = toastReadMesh('../meshes/ellips_tri10.msh');
-hBasis2 = toastSetBasis ('LINEAR',hMesh2,grd);
-btgtmua=toastMapMeshToGrid (hBasis2, tgtmua);
-btgtkap=toastMapMeshToGrid (hBasis2, tgtkap);
-toastDeleteBasis(hBasis2);
-toastDeleteMesh(hMesh2);
-btgt = [btgtmua; btgtkap];
-hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta, 'KapRefImage', ...
-                   btgt, 'KapRefScale', 1, 'KapRefPMThreshold', 0.1);
+%tgtmua=toastReadNIM('../meshes/tgt_mua_ellips_tri10.nim');
+%tgtmus=toastReadNIM('../meshes/tgt_mus_ellips_tri10.nim');
+%tgtkap=1./(3*(tgtmua+tgtmus));
+%hMesh2 = toastReadMesh('../meshes/ellips_tri10.msh');
+%hBasis2 = toastSetBasis ('LINEAR',hMesh2,grd);
+%btgtmua=toastMapMeshToGrid (hBasis2, tgtmua);
+%btgtkap=toastMapMeshToGrid (hBasis2, tgtkap);
+%toastDeleteBasis(hBasis2);
+%toastDeleteMesh(hMesh2);
+%btgt = [btgtmua; btgtkap];
+%hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta, 'KapRefImage', ...
+%                   btgt, 'KapRefScale', 1, 'KapRefPMThreshold', 0.1);
 
 % initial data error (=2 due to data scaling)
 err0 = privObjective (proj, data, sd, hReg, logx);  %initial error
