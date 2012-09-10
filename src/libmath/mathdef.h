@@ -50,6 +50,11 @@ typedef unsigned char BYTE;
 //}
 //#endif
 
+typedef enum {
+    DEEP_COPY,
+    SHALLOW_COPY
+} CopyMode;
+
 template<class T>
 inline T sqr (const T a) { return (a == 0.0 ? (T)0 : a*a); }
 

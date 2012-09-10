@@ -1,6 +1,8 @@
 # This pytoast example solves the forward problem
 # for a homogeneous 2D circular problem
 
+import pdb
+
 # Import various modules
 import os
 import sys

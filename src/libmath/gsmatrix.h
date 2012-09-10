@@ -114,12 +114,17 @@ public:
      * \brief Create a sparse matrix of logical size rows x cols.
      * \param rows number of rows (>= 0)
      * \param cols number of columns (>= 0)
-     * \param nz number of nonzero entries (0 <= nz <= rows.cols)
-     * \param data data array of size >= nz
-     * \note If nz>0 and data=0, all allocated elements are initialised to
+     * \param nv number of nonzero entries (0 <= nv <= rows.cols)
+     * \param data data array of size >= nv
+     * \param cmode if set to SHALLOW_COPY, the provided data array is
+     *   used directly instead of copied to a local buffer. The buffer
+     *   must remain valid during the lifetime of the matrix.
+     * \note If nv>0 and data=0, all allocated elements are initialised to
      *   zero.
      */
-    TGenericSparseMatrix (int rows, int cols, int nv = 0, const MT *data = 0);
+    TGenericSparseMatrix (int rows, int cols, int nv=0, const MT *data=0);
+
+    TGenericSparseMatrix (int rows, int cols, int nv, MT *data, CopyMode cmode=DEEP_COPY);
 
     /**
      * \brief Constructs a matrix as a copy of 'm'
@@ -161,7 +166,8 @@ public:
     virtual void Unlink ();
     // deallocate data block
 
-    void Initialise (int nv, const MT *data = 0);
+    void Initialise (int nv, const MT *data);
+    void Initialise (int nv, MT *data, CopyMode cmode);
     // reallocates data vector of length nv and initialises it with 'data',
     // if given, or zero otherwise
 
@@ -365,6 +371,17 @@ TGenericSparseMatrix<MT>::TGenericSparseMatrix (int rows, int cols,
 // --------------------------------------------------------------------------
 
 template<class MT>
+TGenericSparseMatrix<MT>::TGenericSparseMatrix (int rows, int cols,
+    int nv, MT *data, CopyMode cmode)
+: TMatrix<MT> (rows, cols)
+{
+    nbuf = nval = 0;
+    Initialise (nv, data, cmode);
+}
+
+// --------------------------------------------------------------------------
+
+template<class MT>
 TGenericSparseMatrix<MT>::TGenericSparseMatrix (const TGenericSparseMatrix<MT>
     &m)
 : TMatrix<MT> (m)
@@ -411,11 +428,27 @@ void TGenericSparseMatrix<MT>::Initialise (int nv, const MT *data)
 {
     int i;
     if (nv != nval) {
-        if (nbuf) delete []val;
+	if (nbuf) delete []val;
 	if ((nbuf = (nval = nv))) val = new MT[nv];
     }
     if (data) for (i = 0; i < nv; i++) val[i] = data[i];
     else      for (i = 0; i < nv; i++) val[i] = (MT)0;
+}
+
+// --------------------------------------------------------------------------
+
+template<class MT>
+void TGenericSparseMatrix<MT>::Initialise (int nv, MT *data, CopyMode cmode)
+{
+    if (cmode == SHALLOW_COPY) {
+	dASSERT (data, "Nonzero data buffer reference required");
+	if (nbuf) {
+	    delete []val;
+	    nbuf = 0;
+	}
+	val = data;
+	nval = nv;
+    } else Initialise (nv, data);
 }
 
 // --------------------------------------------------------------------------

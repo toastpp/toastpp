@@ -38,6 +38,7 @@ TVector<VT>::TVector ()
     base_nref = 0;
     data = 0;
     size = 0;
+    ext_data = false;
 }
 
 // --------------------------------------------------------------------------
@@ -48,6 +49,7 @@ TVector<VT>::TVector (int dim)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
+    ext_data = false;
     Allocate (dim);
 }
 
@@ -59,20 +61,25 @@ TVector<VT>::TVector (int dim, const VT s)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
+    ext_data = false;
     Allocate (dim);
     *this = s;
 }
 
 // --------------------------------------------------------------------------
-// constructor (assign elements from array)
+// constructor (assign elements from array or use array directly)
 
 template<class VT>
-TVector<VT>::TVector (int dim, VT *values)
+TVector<VT>::TVector (int dim, VT *values, CopyMode cmode)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
-    Allocate (dim);
-    memcpy (data, values, dim*sizeof(VT));
+    if (ext_data = (cmode==SHALLOW_COPY)) {
+	Link (values, dim);
+    } else {
+	Allocate (dim);
+	memcpy (data, values, dim*sizeof(VT));
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -83,6 +90,7 @@ TVector<VT>::TVector (int dim, const char *init)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
+    ext_data = false;
     Allocate (dim);
     std::istringstream iss(init);
     for (int i = 0; i < dim; i++)
@@ -96,6 +104,7 @@ template<class VT>
 TVector<VT>::TVector (const TVector<VT> &v)
 {
     base_nref = 0;
+    ext_data = false;
     Allocate (v.size);
     Copy (v);				// copy elements from vec
 }
@@ -111,7 +120,14 @@ TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
     dASSERT(ofs+dim <= v.Dim(),
 	"Data block of reference vector must be contained in original vector");
     base_nref = 0;
-    Link (v, ofs, dim);
+    if (ext_data = v.ext_data) {
+	Link (v.data + ofs, dim);
+	// raw link to v's data buffer without reference counting
+	// i.e. v must remain valid throughout the lifetime of this
+    } else {
+	Link (v, ofs, dim);
+	// this increments v's reference counter
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -135,8 +151,10 @@ void TVector<VT>::Link (const TVector<VT> &vec)
     }
 }
 
+// --------------------------------------------------------------------------
 // link to part of the data block of `vec'. This function must be called by
 // a constructor, or after a call to Unlink()
+
 template<class VT>
 void TVector<VT>::Link (const TVector<VT> &vec, int ofs, int dim)
 {
@@ -157,18 +175,34 @@ void TVector<VT>::Link (const TVector<VT> &vec, int ofs, int dim)
 }
 
 // --------------------------------------------------------------------------
+// Link to an external data buffer
+
+template<class VT>
+void TVector<VT>::Link (VT *values, int dim)
+{
+    dASSERT (values, "Invalid data buffer");
+    dASSERT (dim >= 0, "Invalid buffer size");
+    data = base_data = values;
+    size = dim;
+    base_size = 0;
+    base_nref = 0;
+    ext_data = true;
+}
+
+// --------------------------------------------------------------------------
 // Remove the vector's link to the data block
 
 template<class VT>
 void TVector<VT>::Unlink ()
 {
-    if (base_nref) {
+    if (!ext_data && base_nref) {
 	if (--(*base_nref) == 0)   // was last link
 	    free (base_nref);      // -> deallocate base block
 	base_nref = 0;             // invalidate base pointer
     }
     data = 0;		           // invalidate data pointer
     size = 0;			   // set dimension zero
+    ext_data = false;
 }
 
 // --------------------------------------------------------------------------
@@ -189,6 +223,16 @@ void TVector<VT>::Relink (const TVector<VT> &v, int ofs, int dim)
 {
     Unlink ();				// remove existing link
     Link (v, ofs, dim);                 // link into v's data block
+}
+
+// --------------------------------------------------------------------------
+// Relink vector to an external buffer
+
+template<class VT>
+void TVector<VT>::Relink (VT *values, int dim)
+{
+    Unlink();
+    Link (values, dim);
 }
 
 // --------------------------------------------------------------------------

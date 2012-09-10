@@ -121,7 +121,6 @@ mus_min = 1     # np.min(mus)
 mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
-#pdb.set_trace()
 phi = mesh.Fields(hmesh_fwd,-1,qvec,mvec,mua,mus,ref,freq)
 data = projection(phi,mvec)
 
