@@ -8,3 +8,7 @@ def Value (hreg, x):
 
 def Gradient (hreg, x):
     return toastmod.RegGradient (hreg, x)
+
+def HDiag (hreg, x):
+    return toastmod.RegHDiag (hreg, x)
+

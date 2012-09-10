@@ -26,6 +26,31 @@ ObjectManager<Raster> g_rastermgr;
 ObjectManager<Regularisation> g_regmgr;
 
 // ===========================================================================
+// Helper functions
+
+// Copy a row or column vector from python to toast
+RVector CopyVector (PyObject *pyvec)
+{
+    npy_intp *dims = PyArray_DIMS(pyvec);
+    int dim = dims[0]*dims[1];
+    // should check that one of the dimensions is 1
+
+    RVector v(dim);
+    memcpy (v.data_buffer(), PyArray_DATA(pyvec), dim*sizeof(double));
+    return v;
+}
+
+// Copy a toast vector to a 1D python array object
+void CopyVector (PyObject **pyvec, const RVector &vec)
+{
+    npy_intp dim = vec.Dim();
+    *pyvec = PyArray_SimpleNew (1, &dim, NPY_DOUBLE);
+    double *pydata = (double*)PyArray_DATA (*pyvec);
+    const double *data = vec.data_buffer();
+    memcpy (pydata, data, dim*sizeof(double));
+}
+
+// ===========================================================================
 
 static PyObject *mesh_read (PyObject *self, PyObject *args)
 {
@@ -1255,7 +1280,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     double freq, char *solver, double tol, PyObject **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM, blen, slen;
+    int i, n, dim, nQ, nM, nQM, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
@@ -1334,32 +1359,23 @@ static PyObject *toast_jacobian (PyObject *self, PyObject *args)
     int nm  = mesh->nM;
     int nqm = mesh->nQM;
 
-    // copy fields
+    // set up direct fields
     toast::complex *dphi_ptr = (toast::complex*)PyArray_DATA(py_dphi);
     CVector *dphi = new CVector[nq];
     for (i = 0; i < nq; i++) {
-	dphi[i].New (n);
-	toast::complex *v = dphi[i].data_buffer();
-	for (j = 0; j < n; j++)
-	    *v++ = *dphi_ptr++;
+	dphi[i].Relink (dphi_ptr + i*n, n);
     }
 
-    // copy adjoint fields
+    // set up adjoint fields
     toast::complex *aphi_ptr = (toast::complex*)PyArray_DATA(py_aphi);
     CVector *aphi = new CVector[nm];
     for (i = 0; i < nm; i++) {
-	aphi[i].New (n);
-	toast::complex *v = aphi[i].data_buffer();
-	for (j = 0; j < n; j++)
-	    *v++ = *aphi_ptr++;
+	aphi[i].Relink (aphi_ptr + i*n, n);
     }
 
     // copy projections
     toast::complex *proj_ptr = (toast::complex*)PyArray_DATA(py_proj);
-    CVector proj(nqm);
-    toast::complex *v = proj.data_buffer();
-    for (i = 0; i < nqm; i++)
-	*v++ = *proj_ptr++;
+    CVector proj(nqm, proj_ptr, SHALLOW_COPY);
 
     PyObject *J;
     CalcJacobian (mesh, raster, dphi, aphi, &proj, DATA_LOG, &J);
@@ -1552,44 +1568,56 @@ static PyObject *toast_gradient (PyObject *self, PyObject *args)
     int *qrowptr = (int*)PyArray_DATA(py_qvec_rp);
     int *qcolidx = (int*)PyArray_DATA(py_qvec_ci);
     toast::complex *qval = (toast::complex*)PyArray_DATA(py_qvec_vl);
-    CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval);
+    CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval, SHALLOW_COPY);
 
     int *mrowptr = (int*)PyArray_DATA(py_mvec_rp);
     int *mcolidx = (int*)PyArray_DATA(py_mvec_ci);
     toast::complex *mval = (toast::complex*)PyArray_DATA(py_mvec_vl);
-    CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval);
+    CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval, SHALLOW_COPY);
 
     double *mua_ptr = (double*)PyArray_DATA(py_mua);
-    RVector mua (n, mua_ptr);
+    RVector mua (n, mua_ptr, SHALLOW_COPY);
 
     double *mus_ptr = (double*)PyArray_DATA(py_mus);
-    RVector mus (n, mus_ptr);
+    RVector mus (n, mus_ptr, SHALLOW_COPY);
 
     double *ref_ptr = (double*)PyArray_DATA(py_ref);
-    RVector ref (n, ref_ptr);
+    RVector ref (n, ref_ptr, SHALLOW_COPY);
 
     double *data_ptr = (double*)PyArray_DATA(py_data);
-    RVector data (nQM*2, data_ptr);
+    RVector data (nQM*2, data_ptr, SHALLOW_COPY);
 
     double *sd_ptr = (double*)PyArray_DATA(py_sd);
-    RVector sd (nQM*2, sd_ptr);
+    RVector sd (nQM*2, sd_ptr, SHALLOW_COPY);
 
     CFwdSolver FWS (solver, tol);
     FWS.SetDataScaling (DATA_LOG);
 
-    RVector grad (raster->SLen()*2);
+    npy_intp grad_dim = raster->SLen()*2;
+    PyObject *py_grad = PyArray_SimpleNew (1, &grad_dim, NPY_DOUBLE);
+    double *py_grad_data = (double*)PyArray_DATA (py_grad);
+    memset (py_grad_data, 0, grad_dim*sizeof(double));
+    RVector grad (grad_dim, py_grad_data, SHALLOW_COPY);
     GetGradient (mesh, raster, FWS, mua, mus, ref, freq, data, sd,
 		 qvec, mvec, grad);
 
-    npy_intp grad_dim = grad.Dim();
-    PyObject *py_grad = PyArray_SimpleNew (1, &grad_dim, NPY_DOUBLE);
-    double *py_grad_data = (double*)PyArray_DATA (py_grad);
-    const double *grad_data = grad.data_buffer();
-    memcpy (py_grad_data, grad_data, grad.Dim()*sizeof(double));
-
     PyObject *res = Py_BuildValue ("O", py_grad);
     Py_DECREF (py_grad);
+
     return res;
+}
+
+static PyObject *toast_krylov (PyObject *self, PyObject *args)
+{
+    PyObject *py_x, *py_J;
+
+    if (!PyArg_ParseTuple (args, "OO", &py_x, &py_J))
+	return NULL;
+
+    npy_intp *J_dims = PyArray_DIMS(py_J);
+    std::cerr << "Jm=" << J_dims[0] << ", Jn=" << J_dims[1] << std::endl;
+
+    Py_RETURN_NONE;
 }
 
 // ===========================================================================
@@ -1693,6 +1721,29 @@ static PyObject *toast_regul_grad (PyObject *self, PyObject *args)
 
 // ===========================================================================
 
+static PyObject *toast_regul_hdiag (PyObject *self, PyObject *args)
+{
+    int hreg;
+    Regularisation *reg;
+    PyObject *py_x, *py_hdiag;
+
+    if (!PyArg_ParseTuple (args, "iO", &hreg, &py_x))
+	return NULL;
+    reg = (Regularisation*)g_regmgr.Get (hreg);
+    // Note: we allow reg=0 as a "null" regularisation
+
+    RVector x = CopyVector (py_x);
+    RVector diag(x.Dim());
+    if (reg) diag = reg->GetHessianDiag (x);
+    CopyVector (&py_hdiag, diag);
+
+    PyObject *res = Py_BuildValue ("O", py_hdiag);
+    Py_DECREF (py_hdiag);
+    return res;
+}
+
+// ===========================================================================
+
 static PyObject *toast_test (PyObject *self, PyObject *args)
 {
     npy_intp dmx_dims[2] = {100,10000};
@@ -1732,10 +1783,11 @@ static PyMethodDef ToastMethods[] = {
     {"Fields", toast_fields, METH_VARARGS, "Calculate direct and adjoint fields"},
     {"Jacobian", toast_jacobian, METH_VARARGS, "Calculate the Jacobian matrix of the DOT forward operator"},
     {"Gradient", toast_gradient, METH_VARARGS, "Calculate the gradient of the DOT forward operator from the optical parameters"},
-
+    {"Krylov", toast_krylov, METH_VARARGS, "Solve Hx = y with implicit Hessian H = J^T J"},
     {"Regul", (PyCFunction)toast_regul, METH_VARARGS | METH_KEYWORDS, "Return a regularisation object"},
     {"RegValue", toast_regul_value, METH_VARARGS, "Returns the regularisation value R(x) for a parameter vector x"},
     {"RegGradient", toast_regul_grad, METH_VARARGS, "Returns the regularisation gradient for a parameter vector x"},
+    {"RegHDiag", toast_regul_hdiag, METH_VARARGS, "Returns the diagonal of the Hessian of the regularisation operator"},
 
     {"Test", toast_test, METH_VARARGS, "A dummy test function"},
     {NULL, NULL, 0, NULL}

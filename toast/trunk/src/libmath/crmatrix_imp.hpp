@@ -103,6 +103,39 @@ TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols,
 }
 
 template<class MT>
+TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols,
+    idxtype *_rowptr, idxtype *_colidx, MT *data,
+    CopyMode cmode)
+    : TGenericSparseMatrix<MT> (rows, cols, _rowptr[rows], data, cmode)
+{
+    if (cmode == DEEP_COPY) {
+	int i;
+
+	rowptr = new idxtype[rows+1];
+	for (i = 0; i <= rows; i++) rowptr[i] = _rowptr[i];
+	if (this->nval) {
+	    colidx = new idxtype[this->nval];
+	    for (i = 0; i < this->nval; i++) colidx[i] = _colidx[i];
+	}
+    } else {
+	rowptr = _rowptr;
+	colidx = _colidx;
+    }
+
+    diag_access = false;
+    diagptr = 0;
+
+    // column access is off on startup
+    col_access = false;
+    colptr = 0;
+    rowidx = 0;
+    vofs   = 0;
+
+    // we don't know the sort status, so assume unsorted
+    sorted = false;
+}
+
+template<class MT>
 TCompRowMatrix<MT>::TCompRowMatrix (const TCompRowMatrix<MT> &m)
   : TGenericSparseMatrix<MT> (m)
 {
@@ -207,17 +240,23 @@ template<class MT>
 TCompRowMatrix<MT>::~TCompRowMatrix ()
 {
     SetColAccess (false); // deallocate column access index lists
-    delete []rowptr;
-    if (this->nval) delete []colidx;
+    if (this->nbuf) { // otherwise we are using external buffers
+	delete []rowptr;
+	if (this->nval) delete []colidx;
+    }
 }
 
 template<class MT>
 void TCompRowMatrix<MT>::New (int nrows, int ncols)
 {
     SetColAccess (false); // deallocate column access index lists
-    if (this->nval) delete []colidx;
-    if (this->rows != nrows) {
-        delete []rowptr;
+    if (this->nbuf) {
+	if (this->nval) delete []colidx;
+	if (this->rows != nrows) {
+	    delete []rowptr;
+	    rowptr = new idxtype[nrows+1];
+	}
+    } else {
 	rowptr = new idxtype[nrows+1];
     }
     for (int i = 0; i <= nrows; i++) rowptr[i] = 0;

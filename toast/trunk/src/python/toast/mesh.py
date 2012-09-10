@@ -159,7 +159,11 @@ def Gradient(hmesh,hraster,qvec,mvec,mua,mus,ref,freq,data,sd):
         
     return toastmod.Gradient(hmesh,hraster,qvec.data,qvec.indptr,qvec.indices,mvec.data,mvec.indptr,mvec.indices,mua,mus,ref,freq,data,sd)
 
-             
+
+def Krylov(x,J):
+    return toastmod.Krylov(x,J)
+
+
 def Linesearch(x0,d,s0,p0,func):
     sl = 0
     pl = p0

@@ -117,7 +117,7 @@ void TSymCompRowMatrix<MT>::Initialise (const int *_rowptr, const int *_colidx,
 	if (this->nval) delete []colidx;
 	if (nz) colidx = new idxtype[nz];
     }
-    TGenericSparseMatrix<MT>::Initialise (nz);
+    TGenericSparseMatrix<MT>::Initialise (nz, 0);
 
     for (r = j = 0; r < this->rows; r++) {
 	for (i = _rowptr[r]; i < _rowptr[r+1]; i++) {

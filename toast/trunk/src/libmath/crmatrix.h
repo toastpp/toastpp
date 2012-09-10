@@ -207,6 +207,10 @@ public:
         const idxtype *_rowptr, const idxtype *_colidx,
 	const MT *data = 0);
 
+    TCompRowMatrix (int rows, int cols,
+	idxtype *_rowptr, idxtype *_colidx,
+	MT *data, CopyMode cmode);
+
     /**
      * \brief Creates a compressed-row matrix as a copy of matrix m
      * \param m matrix to create a copy from.

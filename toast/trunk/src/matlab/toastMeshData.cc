@@ -8,6 +8,7 @@
 // LH parameters:
 //     1: vertex coordinate list
 //     2: element node index list
+//     3: element type list
 // =========================================================================
 
 #include "mex.h"
@@ -20,9 +21,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int i, j;
     double *pr;
 
-    // mesh handle
-    //int hMesh = (int)mxGetScalar (prhs[0]);
-    //Mesh *mesh = (Mesh*)hMesh;
     Mesh *mesh = (Mesh*)Handle2Ptr (mxGetScalar (prhs[0]));
 
     int nlen = mesh->nlen();
@@ -56,4 +54,13 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     plhs[0] = vtx;
     plhs[1] = idx;
+
+    if (nrhs >= 3) {
+	mxArray *eltp = mxCreateDoubleMatrix (elen, 1, mxREAL);
+	pr = mxGetPr (eltp);
+	for (j = 0; j < elen; j++) {
+	    *pr++ = mesh->elist[j]->Type();
+	}
+	plhs[2] = eltp;
+    }
 }

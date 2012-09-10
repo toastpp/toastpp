@@ -238,9 +238,14 @@ public:
      *   from 'values' array.
      * \param dim vector size (>= 0)
      * \param values array of element values
+     * \param cmode if set to SHALLOW_COPY, the value array is not copied
+     *   into a local buffer but used directly.
      * \note The 'values' array must contain at least 'dim' elements.
+     * \note If cmode==SHALLOW_COPY,  the buffer must exist for the lifetime
+     *   of the vector, and the caller is responsible for cleaning it
+     *   up after use.
      */
-    TVector (int dim, VT *values);
+    TVector (int dim, VT *values, CopyMode cmode=DEEP_COPY);
 
     /**
      * \brief Constructor. Create a vector of length 'dim' and initialise
@@ -357,6 +362,16 @@ public:
     ///   - n > 0
     ///   - ofs+n <= v.Dim()
     void Relink (const TVector &v, int ofs, int n);
+
+    /**
+     * \brief Link vector to an external data array.
+     * \param values external array of length >= dim
+     * \param dim vector size
+     * \note The external buffer is not copied into a local buffer but used
+     *   directly. It must exist during the lifetime of the vector, or until
+     *   it is linked to a different buffer.
+     */
+    void Relink (VT *values, int dim);
 
     /// \brief Direct access to vector data array.
     ///
@@ -1016,6 +1031,15 @@ protected:
     /// \sa Unlink(), Relink()
     void Link (const TVector<VT> &vec, int ofs, int dim);
 
+    /**
+     * \brief Link vector to an external data buffer
+     * \param values external data array of length >= dim
+     * \param dim vector size
+     * \note The external buffer must be guaranteed to exist while linked
+     *   by the vector.
+     */
+    void Link (VT *values, int dim);
+
     /// \brief Unlink vector from its data block.
     /// \remarks This results in a (valid) vector of length zero.
     /// \sa New(), Clear()
@@ -1026,6 +1050,9 @@ protected:
     int *base_nref;	 ///< pointer to data block reference counter
     VT *data;		 ///< pointer to first vector element
     VT *base_data;	 ///< pointer to linked data block
+
+private:
+    bool ext_data;       ///< data buffer is external
 };
 
 // ==========================================================================
