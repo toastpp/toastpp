@@ -85,6 +85,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastSysmatComponent.cc \
 	toastVolmat.cc \
 	toastWriteComplexHBMatrix.cc \
+	toastWriteComplexVector.cc \
 	toastWriteMesh.cc \
 	toastWriteNIM.cc \
 	toastWriteQM.cc \
