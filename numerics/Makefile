@@ -130,7 +130,7 @@ mesa::
 	cd $(NUMERICSDIR)/Mesa-7.3 ; \
 	./configure --prefix=$(TOASTOBJ) ; \
 	make ; \
-	cp -r include/* $(TOASTDIR)/include ; \
+	ln -s -f $(NUMERICSDIR)/Mesa-7.3/include/GL $(TOASTDIR)/include/GL ; \
 	cd lib ; tar czvf mesa_lib.tar.gz * ; \
 	cd $(TOASTDIR)/lib; tar xzvf $(NUMERICSDIR)/Mesa-7.3/lib/mesa_lib.tar.gz
 

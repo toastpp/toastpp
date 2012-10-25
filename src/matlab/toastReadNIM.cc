@@ -100,7 +100,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	plhs[0] = mxCreateDoubleMatrix (img.Dim(), 1, mxREAL);
 	memcpy (mxGetPr (plhs[0]), img.data_buffer(), img.Dim()*sizeof(double));
-	
-	mexPrintf ("NIM: size = %d\n", img.Dim());
+
+	if (toastVerbosity > 0)
+	    mexPrintf ("NIM: size = %d\n", img.Dim());
     }
 }

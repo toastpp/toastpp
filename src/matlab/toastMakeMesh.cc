@@ -144,6 +144,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     plhs[0] = mxCreateDoubleScalar (Ptr2Handle (mesh));
 
-    mexPrintf ("Mesh: %d nodes, %d elements, dimension %d\n", nvtx, nel, dim);
-    mexPrintf ("      %d boundary nodes\n", mesh->nbnd());
+    if (toastVerbosity > 0) {
+        mexPrintf ("Mesh: %d nodes, %d elements, dimension %d\n",
+		   nvtx, nel, dim);
+	mexPrintf ("      %d boundary nodes\n", mesh->nbnd());
+    }
 }

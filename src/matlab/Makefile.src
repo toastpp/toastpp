@@ -76,6 +76,7 @@ SRCS =  toastBasisToMeshMatrix.cc \
 	toastSetBasis.cc \
 	toastSetQM.cc \
 	toastSetThreadCount.cc \
+	toastSetVerbosity.cc \
 	toastShapeFunction.cc \
 	toastShapeFunctionGrad.cc \
 	toastSolutionMask.cc \

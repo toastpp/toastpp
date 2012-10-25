@@ -10,9 +10,9 @@ function p = toastWriteQM
 % qpos and mpos contain the boundary positions of the source and detector
 % locations.
 % linklist contains the connectivity information between sources and
-% detectors. It should be a sparse binary nm x nq matrix, where the nonzero
-% entries for column j contain the indices (1-based) of all detectors
-% containing data for source j.
+% detectors. It should be a sparse binary nm x nq matrix, where any nonzero
+% entries linklist(i,j) indicate that a measurement from detector i for
+% source j is present.
 %
 % To create a fully populated link list (all sources connect to all
 % detectors), use

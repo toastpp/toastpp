@@ -115,7 +115,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     FDOTFwd * fdot;
     fdot = new FDOTFwd(FWS, *mesh, rast, nQ, qvec, projPList);
 
-    plhs[0] = mxCreateScalarDouble (Ptr2Handle (fdot));
+    plhs[0] = mxCreateDoubleScalar (Ptr2Handle (fdot));
 
 
     // ...

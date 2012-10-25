@@ -95,7 +95,8 @@ void Mesh::Setup()
     for (i = 0; i < nlist.Len(); i++)
 	if (nlist[i].BndTp() != BND_DIRICHLET) priv_ilen++;
     priv_nbnd = nlist.NumberOf (BND_ANY);
-    cerr << "found " << priv_nbnd << " boundary nodes" << endl;
+    if (toastVerbosity > 0)
+        cout << "Found " << priv_nbnd << " boundary nodes" << endl;
 
 #ifndef TOAST_PARALLEL
     for (el = 0; el < elist.Len(); el++)
@@ -894,6 +895,8 @@ bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,
     const int MAXSIDE = 20;
     int i, n, nmin, el, sd, nbndsd, bndsd[MAXSIDE];
     double d, dmin;
+    double shift_dist, shift_dist_min = 1e100;
+    Point pshift_min;
 
     // 1. Find boundary node closest to p
     for (n = 0, dmin = 1e10; n < nlen(); n++)
@@ -920,6 +923,10 @@ bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,
 	    if (elist[el]->LContains (pnew)) {
 	        RDenseMatrix egeom = ElGeom (el);
 	        pshift = elist[el]->Global (nlist, pnew);
+		shift_dist = l2norm(pnew-p);
+		if (shift_dist > shift_dist_min) continue;
+		shift_dist_min = shift_dist;
+		pshift_min = pshift;
 	        if (sub) {
 		    RDenseMatrix lder  = elist[el]->LocalShapeD (pnew);
 		    RDenseMatrix jacin = inverse (lder * egeom);
@@ -936,7 +943,7 @@ bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,
 	}
     }
 
-    return PullToBoundary_old (p, pshift, element, side, sub);
+    return PullToBoundary_old (p, pshift_min, element, side, sub);
     // If this didn't work, fall back to the old method as a last resort
 }
 
@@ -1584,6 +1591,10 @@ FELIB istream& operator>> (istream& i, Mesh& mesh)
     mesh.boundary = ReadSurface (i);
 
     mesh.lastel_found = 0;
+
+    if (toastVerbosity > 0)
+        cout << "Mesh: " << mesh.nlen() << " nodes, " << mesh.elen()
+	     << " elements" << endl; 
     return i;
 }
 
