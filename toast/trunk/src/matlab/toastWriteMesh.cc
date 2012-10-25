@@ -27,5 +27,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ofstream ofs (meshname);
     ofs << *mesh;
 
-    mexPrintf("Mesh: written to %s\n", meshname);
+    if (toastVerbosity > 0)
+        mexPrintf("Mesh: written to %s\n", meshname);
 }

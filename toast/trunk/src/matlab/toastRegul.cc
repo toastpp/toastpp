@@ -152,9 +152,10 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     } else if (!strcasecmp (rtype, "LAPLACIAN")) {
 	    
 	// echo regularisation parameters
-	mexPrintf ("Regularisation: LAPLACIAN (obsolete)\n");
-	mexPrintf ("--> tau: %f\n", tau);
-
+        if (toastVerbosity > 0) {
+	    mexPrintf ("Regularisation: LAPLACIAN (obsolete)\n");
+	    mexPrintf ("--> tau: %f\n", tau);
+	}
 	reg = new Tikhonov1 (tau, &x0, raster);
 	    
     } else if (!strcasecmp (rtype, "TV")) {
@@ -177,17 +178,19 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
 	    
-	// echo regularisation parameters
-	mexPrintf ("Regularisation: total variation (TV)\n");
-	mexPrintf ("--> tau: %f\n", tau);
-	mexPrintf ("--> beta: %f\n", beta);
-	mexPrintf ("--> diffusivity %s\n", (brefimg ?
-	    "from image" : kapref ? "from external array" : "none"));
-	if (brefimg || kapref) {
-	    mexPrintf ("--> diffusivity field format: %s\n",
-		(istensor ? "tensor" : "scalar"));
-	    mexPrintf ("--> diffusivity scale: %f\n", sdr);
-	    mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    mexPrintf ("Regularisation: total variation (TV)\n");
+	    mexPrintf ("--> tau: %f\n", tau);
+	    mexPrintf ("--> beta: %f\n", beta);
+	    mexPrintf ("--> diffusivity %s\n", (brefimg ?
+		"from image" : kapref ? "from external array" : "none"));
+	    if (brefimg || kapref) {
+	        mexPrintf ("--> diffusivity field format: %s\n",
+		    (istensor ? "tensor" : "scalar"));
+		mexPrintf ("--> diffusivity scale: %f\n", sdr);
+		mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+	    }
 	}
 	
 	if (brefimg) {
@@ -217,26 +220,29 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
 
-	// echo regularisation parameters
-	mexPrintf ("Regularisation: 0th order Tikhonov (TK0)\n");
-	mexPrintf ("--> tau: %f\n", tau);
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    mexPrintf ("Regularisation: 0th order Tikhonov (TK0)\n");
+	    mexPrintf ("--> tau: %f\n", tau);
+	}
 	reg = new Tikhonov0 (tau, &x0, &xs);
 			     
     } else if (!strcasecmp (rtype, "TK1")) {
 	// 1-st order Tikhonov (Laplacian)
 	    
-	// echo regularisation parameters
-	mexPrintf ("Regularisation: 1st order Tikhonov (TK1)\n");
-	mexPrintf ("--> tau: %f\n", tau);
-	mexPrintf ("--> diffusivity %s\n", (brefimg ?
-	    "from image" : kapref ? "from external array" : "none"));
-	if (brefimg || kapref) {
-	    mexPrintf ("--> diffusivity field format: %s\n",
-		 (istensor ? "tensor" : "scalar"));
-	    mexPrintf ("--> diffusivity scale: %f\n", sdr);
-	    mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
-	}
-	
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    mexPrintf ("Regularisation: 1st order Tikhonov (TK1)\n");
+	    mexPrintf ("--> tau: %f\n", tau);
+	    mexPrintf ("--> diffusivity %s\n", (brefimg ?
+	        "from image" : kapref ? "from external array" : "none"));
+	    if (brefimg || kapref) {
+	        mexPrintf ("--> diffusivity field format: %s\n",
+		   (istensor ? "tensor" : "scalar"));
+		mexPrintf ("--> diffusivity scale: %f\n", sdr);
+		mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+	    }
+	}	
 	if (brefimg) {
 	    reg = new TK1 (tau, &x0, raster, kaprefimg, sdr, fT, istensor);
 	} else {
@@ -263,17 +269,19 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
 	
-	// echo regularisation parameters
-	mexPrintf ("Regularisation: Huber\n");
-	mexPrintf ("--> tau: %f\n", tau);
-	mexPrintf ("--> eps: %f\n", eps);
-	mexPrintf ("--> diffusivity %s\n", (brefimg ?
-	    "from image" : kapref ? "from external array" : "none"));
-	if (brefimg || kapref) {
-	    mexPrintf ("--> diffusivity field format: %s\n",
-		(istensor ? "tensor" : "scalar"));
-	    mexPrintf ("--> diffusivity scale: %f\n", sdr);
-	    mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    mexPrintf ("Regularisation: Huber\n");
+	    mexPrintf ("--> tau: %f\n", tau);
+	    mexPrintf ("--> eps: %f\n", eps);
+	    mexPrintf ("--> diffusivity %s\n", (brefimg ?
+	        "from image" : kapref ? "from external array" : "none"));
+	    if (brefimg || kapref) {
+	        mexPrintf ("--> diffusivity field format: %s\n",
+		    (istensor ? "tensor" : "scalar"));
+		mexPrintf ("--> diffusivity scale: %f\n", sdr);
+		mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+	    }
 	}
 	
 	if (brefimg) {
@@ -297,18 +305,20 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
 	
-	// echo regularisation parameters
-	cerr << "Regularisation: Perona-Malik (PM)" << endl;
-	cerr << "--> tau=" << tau << endl;
-	cerr << "--> T=" << T << endl;
-	cerr << "--> diffusivity "
-	     << (brefimg ? "from image" :
-		 kapref ? "from external array" : "none") << endl;
-	if (brefimg || kapref) {
-	    cerr << "--> diffusivity field format: "
-		 << (istensor ? "tensor" : "scalar") << endl;
-	    cerr << "--> diffusivity scale: " << sdr << endl;
-	    cerr << "--> diffusivity PM threshold: " << fT << endl;
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    cerr << "Regularisation: Perona-Malik (PM)" << endl;
+	    cerr << "--> tau=" << tau << endl;
+	    cerr << "--> T=" << T << endl;
+	    cerr << "--> diffusivity "
+		 << (brefimg ? "from image" :
+		     kapref ? "from external array" : "none") << endl;
+	    if (brefimg || kapref) {
+	        cerr << "--> diffusivity field format: "
+		     << (istensor ? "tensor" : "scalar") << endl;
+		cerr << "--> diffusivity scale: " << sdr << endl;
+		cerr << "--> diffusivity PM threshold: " << fT << endl;
+	    }
 	}
 	
 	if (brefimg) {
@@ -331,18 +341,20 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
 	
-	// echo regularisation parameters
-	cerr << "Regularisation: Quadratic Perona-Malik (QPM)" << endl;
-	cerr << "--> tau=" << tau << endl;
-	cerr << "--> T=" << T << endl;
-	cerr << "--> diffusivity "
-	     << (brefimg ? "from image" :
-		 kapref ? "from external array" : "none") << endl;
-	if (brefimg || kapref) {
-	    cerr << "--> diffusivity field format: "
-		 << (istensor ? "tensor" : "scalar") << endl;
-	    cerr << "--> diffusivity scale: " << sdr << endl;
-	    cerr << "--> diffusivity PM threshold: " << fT << endl;
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    cerr << "Regularisation: Quadratic Perona-Malik (QPM)" << endl;
+	    cerr << "--> tau=" << tau << endl;
+	    cerr << "--> T=" << T << endl;
+	    cerr << "--> diffusivity "
+		 << (brefimg ? "from image" :
+		     kapref ? "from external array" : "none") << endl;
+	    if (brefimg || kapref) {
+	        cerr << "--> diffusivity field format: "
+		     << (istensor ? "tensor" : "scalar") << endl;
+		cerr << "--> diffusivity scale: " << sdr << endl;
+		cerr << "--> diffusivity PM threshold: " << fT << endl;
+	    }
 	}
 	
 	if (brefimg) {
@@ -365,20 +377,22 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
 	
-	// echo regularisation parameters
-	cerr << "Regularisation: Tukey" << endl;
-	cerr << "--> tau=" << tau << endl;
-	cerr << "--> T=" << T << endl;
-	cerr << "--> diffusivity "
-	     << (brefimg ? "from image" :
-		 kapref ? "from external array" : "none") << endl;
-	if (brefimg || kapref) {
-	    cerr << "--> diffusivity field format: "
-		 << (istensor ? "tensor" : "scalar") << endl;
-	    cerr << "--> diffusivity scale: " << sdr << endl;
-	    cerr << "--> diffusivity PM threshold: " << fT << endl;
+        if (toastVerbosity > 0) {
+	    // echo regularisation parameters
+	    cerr << "Regularisation: Tukey" << endl;
+	    cerr << "--> tau=" << tau << endl;
+	    cerr << "--> T=" << T << endl;
+	    cerr << "--> diffusivity "
+		 << (brefimg ? "from image" :
+		     kapref ? "from external array" : "none") << endl;
+	    if (brefimg || kapref) {
+	        cerr << "--> diffusivity field format: "
+		     << (istensor ? "tensor" : "scalar") << endl;
+		cerr << "--> diffusivity scale: " << sdr << endl;
+		cerr << "--> diffusivity PM threshold: " << fT << endl;
+	    }
 	}
-	
+
 	if (brefimg) {
 	    reg = new Tukey (tau, T, &x0, raster, kaprefimg, sdr, fT,
 			     istensor);

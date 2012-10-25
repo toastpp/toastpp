@@ -46,7 +46,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	mesh->Setup();
 	plhs[0] = mxCreateDoubleScalar (Ptr2Handle (mesh));
-	mexPrintf("Mesh: %d nodes, %d elements\n", mesh->nlen(), mesh->elen());
     } else {
 	mexErrMsgTxt ("Mesh file not found or invalid format.\n");
     }

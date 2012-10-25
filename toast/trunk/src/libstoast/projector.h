@@ -3,7 +3,8 @@
 
 
 #include "stoastlib.h"
-#include "supermatrix.h"
+#include "slu_zdefs.h"
+//#include "supermatrix.h"
 #include "camera.h"
 
 #if (defined(WIN32)||defined(WIN64))

@@ -38,21 +38,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     char qmname[256];
     mxGetString (prhs[1], qmname, 256);
 
-if (fileExists(qmname) == 1)
-{
-
-    //int hMesh = (int)mxGetScalar (prhs[0]);
-    //QMMesh *mesh = (QMMesh*)hMesh;
-    QMMesh *mesh = (QMMesh*)Handle2Ptr(mxGetScalar(prhs[0]));
-
-    ifstream ifs(qmname);
-    mesh->LoadQM (ifs);
-
-    mexPrintf ("QM: %d sources, %d detectors, %d measurements\n",
-	       mesh->nQ, mesh->nM, mesh->nQM);
-}
-else {
-mexErrMsgTxt ("qm file not found or invalid format.\n");
-}
-
+    if (fileExists(qmname) == 1) {
+        QMMesh *mesh = (QMMesh*)Handle2Ptr(mxGetScalar(prhs[0]));
+	ifstream ifs(qmname);
+	mesh->LoadQM (ifs);
+    } else {
+        mexErrMsgTxt ("QM file not found or invalid format.\n");
+    }
 }

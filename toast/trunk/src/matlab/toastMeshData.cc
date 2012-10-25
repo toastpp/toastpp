@@ -55,7 +55,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     plhs[0] = vtx;
     plhs[1] = idx;
 
-    if (nrhs >= 3) {
+    if (nlhs >= 3) {
 	mxArray *eltp = mxCreateDoubleMatrix (elen, 1, mxREAL);
 	pr = mxGetPr (eltp);
 	for (j = 0; j < elen; j++) {

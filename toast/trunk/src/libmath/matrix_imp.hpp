@@ -408,13 +408,14 @@ inline int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
 	if (omega == 0.0) break; // no convergence
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
-    //cerr << "BICGSTAB: " << niter << " iterations" << endl;
-    if (err > tol*bnorm)
-        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
-	     << " iterations" << endl;
-    else if (VERBOSE_LEVEL >= 2)
-        cerr << "BiCGSTAB converged after " << niter
-	     << " iterations (Residual " << err/bnorm << ")" << endl;
+    if (toastVerbosity > 1) {
+        if (err > tol*bnorm)
+	    cout << "BiCGSTAB residual " << err/bnorm << " after " << niter
+		 << " iterations" << endl;
+	else
+	    cout << "BiCGSTAB converged after " << niter
+		 << " iterations (Residual " << err/bnorm << ")" << endl;
+    }
     tol = err/bnorm;
     return niter;
 }
@@ -476,13 +477,14 @@ inline int BiCGSTAB<scomplex> (const SCMatrix &A, const SCVector &b,
 	if (omega == 0.0) break; // no convergence
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
-    //cerr << "BICGSTAB: " << niter << " iterations" << endl;
-    if (err > tol*bnorm)
-        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
-	     << " iterations" << endl;
-    else if (VERBOSE_LEVEL >= 2)
-        cerr << "BiCGSTAB converged after " << niter
-	     << " iterations (Residual " << err/bnorm << ")" << endl;
+    if (toastVerbosity > 1) {
+        if (err > tol*bnorm)
+	    cout << "BiCGSTAB residual " << err/bnorm << " after " << niter
+		 << " iterations" << endl;
+	else
+	    cout << "BiCGSTAB converged after " << niter
+		 << " iterations (Residual " << err/bnorm << ")" << endl;
+    }
     tol = err/bnorm;
     return niter;
 }
@@ -545,13 +547,14 @@ int BiCGSTAB (const TMatrix<MT> &A, const TVector<MT> &b,
 	}
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
-    //cerr << "BICGSTAB: " << niter << " iterations" << endl;
-    if (err > tol*bnorm)
-        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
-	     << " iterations" << endl;
-    else if (VERBOSE_LEVEL >= 2)
-        cerr << "BiCGSTAB converged after " << niter
-	     << " iterations (Residual " << err/bnorm << ")" << endl;
+    if (toastVerbosity > 1) {
+        if (err > tol*bnorm)
+	    cout << "BiCGSTAB residual " << err/bnorm << " after " << niter
+		 << " iterations" << endl;
+	else
+	    cout << "BiCGSTAB converged after " << niter
+		 << " iterations (Residual " << err/bnorm << ")" << endl;
+    }
     tol = err/bnorm;
     return niter;
 }
@@ -644,10 +647,11 @@ int BiCGSTAB (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 	}
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
-    //cerr << "BICGSTAB: " << niter << " iterations" << endl;
-    if (err > tol*bnorm)
-        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
-	     << " iterations" << endl;
+    if (toastVerbosity > 1) {
+        if (err > tol*bnorm)
+	    cout << "BiCGSTAB residual " << err/bnorm << " after " << niter
+		 << " iterations" << endl;
+    }
     tol = err/bnorm;
     return niter;
 }
@@ -717,13 +721,14 @@ int BiCGSTAB (void (* MVM)( TVector<MT> &),  const TVector<MT> &b,
 	}
 	//cerr << "BICGSTAB: err = " << err/bnorm << endl;
     }
-    //cerr << "BICGSTAB: " << niter << " iterations" << endl;
-    if (err > tol*bnorm)
-        cerr << "BiCGSTAB residual " << err/bnorm << " after " << niter
-	     << " iterations" << endl;
-    else if (VERBOSE_LEVEL >= 2)
-        cerr << "BiCGSTAB converged after " << niter
-	     << " iterations (Residual " << err/bnorm << ")" << endl;
+    if (toastVerbosity > 1) {
+        if (err > tol*bnorm)
+	    cout << "BiCGSTAB residual " << err/bnorm << " after " << niter
+		 << " iterations" << endl;
+	else
+	    cout << "BiCGSTAB converged after " << niter
+		 << " iterations (Residual " << err/bnorm << ")" << endl;
+    }
     tol = err/bnorm;
     return niter;
 }

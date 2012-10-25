@@ -41,10 +41,10 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, TPreconditioner<MT> *precon, double &elim, int maxit,
     void (*clbk)(void*))
 {
-#ifdef VERBOSE_GMRES
-    cerr << "gmres: Enter (tol=" << elim << ")" << endl << endl;
-    tic();
-#endif
+    if (toastVerbosity > 1) {
+        cout << "gmres: Enter (tol=" << elim << ")" << endl << endl;
+	tic();
+    }
 
     int N=b.Dim();
     int MAX_GMRES_STEPS=restart;
@@ -129,10 +129,10 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
 	  {
 	    j++;
 
-#ifdef VERBOSE_GMRES
-	    cerr << "\033[1Agmres(" << cycle << ',' << j << "): res="
-		 << (norm_x/norm_b) << "    " << endl;
-#endif
+	    if (toastVerbosity > 1)
+	        cout << "\033[1Agmres(" << cycle << ',' << j << "): res="
+		     << (norm_x/norm_b) << "    " << endl;
+
 	    //---------------------------------------------------------
  
 	    /* w = v[j+1] */
@@ -178,10 +178,9 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
  
         //------------------------------------------------------------
  
-#ifdef VERBOSE_GMRES
-	cerr << "\033[1Agmres(" << cycle << ',' << j+1 << "): res="
-	     << (norm_x/norm_b) << "    " << endl;
-#endif
+	if (toastVerbosity > 1)
+	    cout << "\033[1Agmres(" << cycle << ',' << j+1 << "): res="
+		 << (norm_x/norm_b) << "    " << endl;
 
         //------------------------------------------------------------
  
@@ -218,11 +217,10 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
  
     delete [] v;
  
-#ifdef VERBOSE_GMRES
-    cerr << "\033[1Agmres: Exit  (res=" << (norm_x/norm_b)
-	 << ", it=" << cycle
-	 << ", cpu=" << toc() << ")    " << endl;
-#endif
+    if (toastVerbosity > 1)
+        cout << "\033[1Agmres: Exit  (res=" << (norm_x/norm_b)
+	     << ", it=" << cycle
+	     << ", cpu=" << toc() << ")    " << endl;
 
     elim = norm_v/norm_b;
     return cycle;
@@ -241,10 +239,10 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
     // (Av_clbk) which is called whenever the product of the matrix with a
     // vector v is required.
 
-#ifdef VERBOSE_GMRES
-    cerr << "gmres: Enter (tol=" << elim << ")" << endl << endl;
-    tic();
-#endif
+    if (toastVerbosity > 1) {
+        cout << "gmres: Enter (tol=" << elim << ")" << endl << endl;
+	tic();
+    }
 
     int N=b.Dim();
     int MAX_GMRES_STEPS=restart;
@@ -329,12 +327,12 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 		{
 		    j++;
 		    
-#ifdef VERBOSE_GMRES_LOCAL
-		    cerr << "\033[1Agmres(" << cycle << ',' << j << "): res="
-			 << (norm_x/norm_b) << "    " << endl;
-		    cout << "gmres cycle "<< cycle << " iter " << j+1
-			<< ", res = " << (norm_x/norm_b) << "    " << endl;
-#endif
+		    if (toastVerbosity > 1) {
+		      cout << "\033[1Agmres(" << cycle << ',' << j << "): res="
+			   << (norm_x/norm_b) << "    " << endl;
+		      cout << "gmres cycle "<< cycle << " iter " << j+1
+			   << ", res = " << (norm_x/norm_b) << "    " << endl;
+		    }
 		    //---------------------------------------------------------
 
 		    /* w = v[j+1] */
@@ -380,10 +378,9 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 	    
 	    //------------------------------------------------------------
 	    
-#ifdef VERBOSE_GMRES
-	    cerr << "\033[1Agmres(" << cycle << ',' << j+1 << "): res="
-		 << (norm_x/norm_b) << "    " << endl;
-#endif
+	    if (toastVerbosity > 1)
+	      cout << "\033[1Agmres(" << cycle << ',' << j+1 << "): res="
+		   << (norm_x/norm_b) << "    " << endl;
 	    
 	    //------------------------------------------------------------
 	    
@@ -419,11 +416,10 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
     
     delete [] v;
     
-#ifdef VERBOSE_GMRES
-    cerr << "\033[1Agmres: Exit  (res=" << (norm_x/norm_b)
-	 << ", it=" << cycle
-	 << ", cpu=" << toc() << ")    " << endl;
-#endif
+    if (toastVerbosity > 1)
+        cout << "\033[1Agmres: Exit  (res=" << (norm_x/norm_b)
+	     << ", it=" << cycle
+	     << ", cpu=" << toc() << ")    " << endl;
 
     elim = norm_v/norm_b;
     return cycle;

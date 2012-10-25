@@ -4,9 +4,14 @@
 % file to your startup.m file, located in our Matlab startup
 % directory, or in <matlabroot>/toolbox/local.
 
-function mtoast_install(nogui)
+function mtoast_install(varargin)
 
-fprintf(1,'\nAdding search paths for TOAST Matlab scripts and MEX files.\n\n')
+nargin = length(varargin);
+nogui = nargin > 0 && varargin{1} == true;
+
+if ~nogui
+    fprintf(1,'\nAdding search paths for TOAST Matlab scripts and MEX files.\n\n')
+end
 
 % figure out path structure
 toastdir = getenv('TOASTDIR');
@@ -42,16 +47,24 @@ k = strfind(p,'toast');
 for i=1:length(k)
     if length(k{i}) > 0
         if ~found_toast
-            fprintf(1,'Found existing toast directories in path:\n\n');
+            if ~nogui
+                fprintf(1,'Found existing toast directories in path:\n\n');
+            end
             found_toast = true;
         end
-        disp(p{i});
+        if ~nogui
+            disp(p{i});
+        end
     end
 end
 if found_toast
-    inp = input('\nDelete existing toast directories? Y/N [Y]: ','s');
-    if isempty(inp)
+    if nogui
         inp = 'Y';
+    else
+        inp = input('\nDelete existing toast directories? Y/N [Y]: ','s');
+        if isempty(inp)
+            inp = 'Y';
+        end
     end
     if strcmpi(inp,'Y')
         for i=1:length(k)
@@ -63,8 +76,10 @@ if found_toast
     fprintf('\n');
 end
 
-fprintf ('TOAST root directory: %s\n', toastdir);
-fprintf ('TOAST arch directory: %s\n\n', toastver);
+if ~nogui
+    fprintf ('TOAST root directory: %s\n', toastdir);
+    fprintf ('TOAST arch directory: %s\n\n', toastver);
+end
 
 % Add all directories under the script/matlab node
 p = genpath([toastdir '/script/matlab/']);
@@ -87,7 +102,9 @@ for i=1:size(k,1)
             pth = [pth pathsep];
         end
         pth = [pth cell2mat(p(i))];
-        disp(['Adding search path ' cell2mat(p(i))])
+        if ~nogui
+            disp(['Adding search path ' cell2mat(p(i))])
+        end
     end
 end
 addpath (pth);
@@ -95,7 +112,9 @@ addpath (pth);
 % add the mex directory
 mexp = [toastver '/mex'];
 addpath (mexp);
-disp(['Adding search path ' mexp])
+if ~nogui
+    disp(['Adding search path ' mexp])
+end
 
 if nargin == 0 || nogui==false
     % open path tool GUI to allow user to modify and save the toast paths

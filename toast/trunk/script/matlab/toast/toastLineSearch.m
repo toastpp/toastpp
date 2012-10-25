@@ -46,6 +46,22 @@ function [s, pmin] = toastLineSearch (x0, d, s0, p0, func, varargin)
 %   performing a quadratic interpolation step. d is required to be a
 %   downhill direction in the vicinity of x0.
   
+verbose = false;
+
+nvar = length(varargin);
+i = 1;
+while i <= nvar
+    if ischar(varargin{i}) && i < nvar
+        if strcmpi(varargin{i},'verbose')
+            verbose = varargin{i+1};
+            varargin = varargin([1:i-1,i+2:end]);
+            nvar = nvar-2;
+            i = i-1;
+        end
+    end
+    i = i+1;
+end
+
 if isempty(p0)
     [p0,valid] =  get_of (x0, varargin{:});
 end
@@ -55,7 +71,9 @@ pl = p0;
 sh = s0;
 x = x0 + d*sh;
 [ph,valid] = get_of (x, varargin{:});
-fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
+if verbose
+    fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
+end
 
 % bracket the minimum
 
@@ -65,7 +83,9 @@ if ph < pl && valid  % increase step size
     sh = sh*2;
     x = x0 + d*sh;
     [ph,valid] = get_of (x, varargin{:});
-    fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
+    if verbose
+        fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
+    end
 
     while ph < pm && valid
         sl = sm; pl = pm;
@@ -73,20 +93,26 @@ if ph < pl && valid  % increase step size
         sh = sh*2;
         x = x0 + d*sh;
         [ph,valid] = get_of (x, varargin{:});
-        fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
+        if verbose
+            fprintf (1, '--> Step: %f, objective: %f\n', sh, ph);
+        end
     end
 else        % decrease step size
     sm = sh/2;
     x = x0 + d*sm;
     [pm,valid] = get_of (x, varargin{:});
-    fprintf (1, '--> Step: %f, objective: %f\n', sm, pm);
-
+    if verbose
+        fprintf (1, '--> Step: %f, objective: %f\n', sm, pm);
+    end
+    
     while (pm > pl || ~valid) && sh > 1e-8*s0
         sh = sm; ph = pm;
         sm = sm/2;
         x = x0 + d*sm;
         [pm,valid] = get_of (x, varargin{:});
-        fprintf (1, '--> Step: %f, objective: %f\n', sm, pm);
+        if verbose
+            fprintf (1, '--> Step: %f, objective: %f\n', sm, pm);
+        end
     end
 end
 
@@ -103,7 +129,9 @@ else
     a = ((pl-ph)/(sl-sh) - (pl-pm)/(sl-sm)) / (sh-sm);
     b = (pl-ph)/(sl-sh) - a*(sl+sh);
     s = -b/(2*a);
-    fprintf (1, '==> Quadratic interpolation in LS, step: %f\n', s);
+    if verbose
+        fprintf (1, '==> Quadratic interpolation in LS, step: %f\n', s);
+    end
     x = x0 + d*s;
     [pmin,valid] = get_of (x, varargin{:});
     if pmin > pm || ~valid   % no improvement
@@ -112,7 +140,9 @@ else
     end
 end
 
-fprintf (1, '==> Step: %f, objective: %f [final]\n', s, pmin);
+if verbose
+    fprintf (1, '==> Step: %f, objective: %f [final]\n', s, pmin);
+end
 
     % ===================================================
     function [p,valid] = get_of(x,varargin)
