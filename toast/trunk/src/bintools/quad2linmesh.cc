@@ -91,6 +91,7 @@ void Quad2Lin (Mesh &mesh)
 	    break;
 	case ELID_TRI6:
 	case ELID_TRI10:
+	case ELID_TRI3D3:
 	    for (j = 0; j < 3; j++)
 	        nused[pel->Node[j]] = true;
 	    break;
@@ -134,6 +135,11 @@ void Quad2Lin (Mesh &mesh)
 	    for (j = 0; j < 3; j++)
 	        elist2[i]->Node[j] = nmap[mesh.elist[i]->Node[j]];
 	    break;
+	case ELID_TRI3D6:
+	    elist2[i] = new Triangle3D3;
+	    for (j = 0; j < 3; j++)
+	        elist2[i]->Node[j] = nmap[mesh.elist[i]->Node[j]];
+	    break;
 	default:
 	    cerr << "Element type not supported" << endl;
 	    exit (1);
@@ -155,6 +161,7 @@ void Quad2LinRefine (Mesh &mesh)
     for (i = 0; i < mesh.elen(); i++) {
         switch (mesh.elist[i]->Type()) {
 	case ELID_TRI6:
+	case ELID_TRI3D6:
   	    els += 4; // split quadratic triangles into 4 linear ones
 	    break;
 	case ELID_TET10:
@@ -269,6 +276,39 @@ void Quad2LinRefine (Mesh &mesh)
 	    els++;
 
 	    pel[els] = new Triangle3;
+	    pel[els]->Node[0] = nd5;
+	    pel[els]->Node[1] = nd4;
+	    pel[els]->Node[2] = nd2;
+	    els++;
+	    break;
+
+	case ELID_TRI3D6:
+	    nd0 = mesh.elist[i]->Node[0];
+	    nd1 = mesh.elist[i]->Node[1];
+	    nd2 = mesh.elist[i]->Node[2];
+	    nd3 = mesh.elist[i]->Node[3];
+	    nd4 = mesh.elist[i]->Node[4];
+	    nd5 = mesh.elist[i]->Node[5];
+
+	    pel[els] = new Triangle3D3;
+	    pel[els]->Node[0] = nd0;
+	    pel[els]->Node[1] = nd3;
+	    pel[els]->Node[2] = nd5;
+	    els++;
+
+	    pel[els] = new Triangle3D3;
+	    pel[els]->Node[0] = nd3;
+	    pel[els]->Node[1] = nd1;
+	    pel[els]->Node[2] = nd4;
+	    els++;
+
+	    pel[els] = new Triangle3D3;
+	    pel[els]->Node[0] = nd3;
+	    pel[els]->Node[1] = nd4;
+	    pel[els]->Node[2] = nd5;
+	    els++;
+
+	    pel[els] = new Triangle3D3;
 	    pel[els]->Node[0] = nd5;
 	    pel[els]->Node[1] = nd4;
 	    pel[els]->Node[2] = nd2;

@@ -16,6 +16,16 @@ dim = toastMeshDimension(hMesh);
 
 if dim == 3
     [vtx,idx,perm] = toastSurfData (hMesh);
+    if size(vtx,1)==0 % try as surface mesh
+        [vtx,idx,eltp] = toastMeshData(hMesh);
+        eltp = unique(eltp);
+        for i=1:length(eltp)
+            if eltp(i) ~= 16 && eltp(i) ~= 17
+                error('Invalid mesh');
+            end
+        end
+        perm = [1:size(vtx,1)];
+    end
 else
     [vtx,idx] = toastMeshData (hMesh);
 end

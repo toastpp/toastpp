@@ -14,8 +14,6 @@ BINS =  getnim \
 	mkmesh_cyl \
 	mkmesh_sphere \
 	opt2 \
-	gmesh2toast \
-	toast2gmesh \
 	quad2linmesh \
 	cmpvec
 
