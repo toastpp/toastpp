@@ -12,6 +12,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -38,6 +41,70 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(ToastRootDir)numerics\SuperLU_4.3\SRC&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SUPERLU_43_EXPORTS"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(ToastLibDir)$(ProjectName).lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_zdefs.h $(ToastIncDir)"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="..\..\resources\toastlib.vsprops"
+			CharacterSet="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -143,6 +210,71 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="..\..\resources\toastlib.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(ToastRootDir)numerics\SuperLU_4.3\SRC&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SUPERLU_43_EXPORTS"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(ToastLibDir)$(ProjectName).lib"
+				AdditionalLibraryDirectories=""
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_zdefs.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_Cnames.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_util.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_dcomplex.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\supermatrix.h $(ToastIncDir)&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release_fdot|Win32"
 			ConfigurationType="4"
 			InheritedPropertySheets="..\..\resources\toastlib.vsprops"
@@ -163,6 +295,71 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(ToastRootDir)numerics\SuperLU_4.3\SRC&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SUPERLU_43_EXPORTS"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(ToastLibDir)$(ProjectName).lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_zdefs.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_Cnames.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_util.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\slu_dcomplex.h $(ToastIncDir)&#x0D;&#x0A;copy $(ToastRootDir)numerics\SuperLU_4.3\SRC\supermatrix.h $(ToastIncDir)&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_fdot|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="..\..\resources\toastlib.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -232,6 +429,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\SRC\lsame.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\numerics\SuperLU_4.3\SRC\mark_relax.c"
 				>
 			</File>
@@ -269,6 +470,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\numerics\SuperLU_4.3\SRC\util.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\SRC\xerbla.c"
 				>
 			</File>
 		</Filter>
@@ -997,6 +1202,230 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\numerics\SuperLU_4.3\SRC\zlacon.c"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Cblas"
+			>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\caxpy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\ccopy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\cdotc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\cgemv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\cgerc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\chemv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\cher2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\cscal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\cswap.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\ctrsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dasum.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\daxpy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dcabs1.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dcopy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\ddot.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dgemv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dger.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dnrm2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\drot.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dscal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dswap.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dsymv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dsyr2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dtrsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dzasum.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\dznrm2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\icamax.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\idamax.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\isamax.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\izamax.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\sasum.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\saxpy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\scasum.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\scnrm2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\scopy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\sdot.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\sgemv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\sger.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\snrm2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\srot.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\sscal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\sswap.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\ssymv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\ssyr2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\strsv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zaxpy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zcopy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zdotc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zgemv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zgerc.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zhemv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zher2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zscal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\zswap.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\numerics\SuperLU_4.3\CBLAS\ztrsv.c"
 				>
 			</File>
 		</Filter>

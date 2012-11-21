@@ -30,7 +30,7 @@
 #define __PRETTY_FUNCTION__ ""
 #endif
 
-extern int toastVerbosity;  // global verbosity flag
+MATHLIB extern int toastVerbosity;  // global verbosity flag
 
 #define ERROR_UNDEF Error_Undef(__PRETTY_FUNCTION__,__FILE__,__LINE__)
 

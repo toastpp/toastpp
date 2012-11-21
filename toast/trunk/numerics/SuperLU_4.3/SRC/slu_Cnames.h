@@ -454,5 +454,7 @@
 #define c_fortran_zgssv_ c_fortran_zgssv
 #endif
 
+#ifdef USE_BLAS_COMPAT32
+#endif
 
 #endif /* __SUPERLU_CNAMES */

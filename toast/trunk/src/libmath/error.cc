@@ -31,7 +31,7 @@ Please contact S.Arridge@cs.ucl.ac.uk or martins@medphys.ucl.ac.uk\n"
 MATHLIB ofstream logfile;   // global log file handler
 MATHLIB char logbuf[256];
 
-int toastVerbosity = 0;
+MATHLIB int toastVerbosity = 0;
 
 void DefaultErrorhandler (char *msg)
 {

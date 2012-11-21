@@ -13,7 +13,6 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="$(BlasLib)"
 		AdditionalLibraryDirectories="&quot;$(ToastLibDir)&quot;;&quot;$(ToastAuxLibDir)&quot;"
 	/>
 	<Tool
@@ -38,6 +37,11 @@
 	<UserMacro
 		Name="ToastWinDir"
 		Value="$(ToastRootDir)win\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="ToastContribDir"
+		Value="$(ToastWinDir)contrib\"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
@@ -72,7 +76,8 @@
 	/>
 	<UserMacro
 		Name="ToastAuxLibDir"
-		Value="$(ToastWinDir)lib\"
+		Value="$(ToastContribDir)lib\"
+		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
 		Name="BlasLib"
