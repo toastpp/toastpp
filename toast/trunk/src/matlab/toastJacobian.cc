@@ -41,9 +41,9 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     int nQM, slen, ndat, nprm;
     nQM  = mesh->nQM;
     if (raster == RASTER_ELBASIS)
-        slen = mesh->nlen();
-    else if (raster == RASTER_NDBASIS)
         slen = mesh->elen();
+    else if (raster == RASTER_NDBASIS)
+        slen = mesh->nlen();
     else
         slen = raster->SLen();
     ndat = nQM * 2;
@@ -68,10 +68,10 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     const double c0 = 0.3;
     int i, n, dim, nQ, nM, nQM, nlen, elen, blen, slen;
 
-	bool elbasis = (raster == RASTER_ELBASIS);
-	nlen = mesh->nlen();
-	elen = mesh->elen();
-	n    = (elbasis ? elen : nlen);
+    bool elbasis = (raster == RASTER_ELBASIS);
+    nlen = mesh->nlen();
+    elen = mesh->elen();
+    n    = (elbasis ? elen : nlen);
     slen = (raster && raster != RASTER_ELBASIS ? raster->SLen() : n);
     dim  = mesh->Dimension();
     nQ   = mesh->nQ;
@@ -152,6 +152,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     // raster
     Raster *raster = (Raster*)Handle2Ptr (mxGetScalar (prhs[1]));
+
 
 	if (nrhs >= 11 && mxIsChar(prhs[10])) {
 	    char cbuf[32];

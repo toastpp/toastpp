@@ -11,6 +11,14 @@ ObjectManager<ObjTp>::ObjectManager ()
 // ===========================================================================
 
 template<typename ObjTp>
+ObjectManager<ObjTp>::~ObjectManager ()
+{
+    Clear ();
+}
+
+// ===========================================================================
+
+template<typename ObjTp>
 int ObjectManager<ObjTp>::Add (ObjTp *obj)
 {
     int i;
@@ -33,7 +41,7 @@ int ObjectManager<ObjTp>::Add (ObjTp *obj)
 
     list[i] = obj;
     nobj++;
-    return i;
+    return i+1;
     
 }
 
@@ -42,7 +50,7 @@ int ObjectManager<ObjTp>::Add (ObjTp *obj)
 template<typename ObjTp>
 ObjTp *ObjectManager<ObjTp>::Get (int idx) const
 {
-    ObjTp *obj = (idx >= 0 && idx < nlist ? list[idx] : 0);
+    ObjTp *obj = (idx > 0 && idx <= nlist ? list[idx-1] : 0);
     if (!obj) std::cerr << "Not a valid object handle" << std::endl;
     return obj;
 }
@@ -52,14 +60,15 @@ ObjTp *ObjectManager<ObjTp>::Get (int idx) const
 template<typename ObjTp>
 bool ObjectManager<ObjTp>::Delete (int idx)
 {
-    ObjTp *obj = (idx >= 0 && idx < nlist ? list[idx] : 0);
+    ObjTp *obj = (idx > 0 && idx <= nlist ? list[idx-1] : 0);
     if (obj) {
         delete obj;
-	list[idx] = 0;
+	list[idx-1] = 0;
 	nobj--;
+	std::cerr << "Deleting mesh " << idx << std::endl;
 	return true;
     } else {
-        std::cerr << "Not a valid object handle" << std::endl;
+        std::cerr << "Not a valid object handle: " << idx << std::endl;
 	return false;
     }
 }

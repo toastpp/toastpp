@@ -8,9 +8,8 @@
 #define __MATLABTOAST_H
 
 #include "mex.h"
-#include "felib.h"
 #include "stoastlib.h"
-#include "toastmex.h"
+#include "../common/objmgr.h"
 
 #ifdef FDOT
 #include "FDOTFwd.h"
@@ -19,8 +18,10 @@
 #define ASSERTARG(cond,argno,errmsg) AssertArg(cond,__FUNCTION__,argno,errmsg)
 #define ASSERTMESH(meshptr,argno) ASSERTARG(meshptr,argno,"Invalid mesh index")
 #define GETMESH_SAFE(idx) GetMesh_Safe(prhs[idx],__FUNCTION__,idx+1)
-	
+#define GETBASIS_SAFE(idx) GetBasis_Safe(prhs[idx],__FUNCTION__,idx+1)
 
+uint64_T Ptr2Handle (void *ptr);
+void *Handle2Ptr (uint64_T handle);
 void AssertArg (bool cond, const char *func, int argno, const char *errmsg);
 bool fileExists(const std::string& fileName);
 
@@ -67,6 +68,12 @@ public:
     void ClearBasis (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void GetBasisSize (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisNLen (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisBLen (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void MapBasis (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MapMeshToBasis (int nlhs, mxArray *plhs[], int nrhs,
@@ -131,8 +138,9 @@ public:
         const mxArray *prhs[]);
 
     Mesh *GetMesh (const mxArray *idx, int *errid = 0);
-	Mesh *GetMesh_Safe (const mxArray *arr, const char *func, int argno);
-    Raster *GetBasis (const mxArray *idx);
+    Mesh *GetMesh_Safe (const mxArray *arr, const char *func, int argno);
+    Raster *GetBasis (const mxArray *idx, int *errid = 0);
+    Raster *GetBasis_Safe (const mxArray *arr, const char *func, int argno);
     Regularisation *GetRegul (const mxArray *idx);
 
 	// Methods defined in mtMesh.cc
@@ -162,8 +170,8 @@ public:
 private:
     static void ErrorHandler (char *msg);
 
-    Mesh **meshlist;          // list of meshes
-    unsigned int nmesh;       // number of meshes
+  //Mesh **meshlist;          // list of meshes
+  //unsigned int nmesh;       // number of meshes
 
     Raster **basislist;       // list of basis instantiations
     unsigned int nbasis;      // number of bases

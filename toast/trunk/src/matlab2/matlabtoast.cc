@@ -1,8 +1,6 @@
-#include "mex.h"
-#include "stoastlib.h"
-#include "util.h"
-#include "toastmex.h"
 #include "matlabtoast.h"
+#include "toastmex.h"
+#include "util.h"
 #include "timing.h"
 
 using namespace std;
@@ -39,7 +37,7 @@ bool fileExists(const std::string& fileName)
 
 // =========================================================================
 
-bool ReadNim (char *name, int idx, RVector &img)
+bool ReadNim (const char *name, int idx, RVector &img, char *meshname=NULL)
 {
     char cbuf[256];
     int i, j = 0, imgsize = 0;
@@ -51,6 +49,8 @@ bool ReadNim (char *name, int idx, RVector &img)
         ifs.getline (cbuf, 256);
 	if (!strncasecmp (cbuf, "ImageSize", 9))
 	    sscanf (cbuf+11, "%d", &imgsize);
+	else if (!strncasecmp (cbuf, "Mesh", 4) && meshname)
+	    sscanf (cbuf+6, "%s", meshname);
     } while (strcasecmp (cbuf, "EndHeader"));
     if (!imgsize) return false;
     img.New(imgsize);
@@ -67,13 +67,69 @@ bool ReadNim (char *name, int idx, RVector &img)
 }
 
 // =========================================================================
+// Convert a pointer to a 64-bit handle on both 32 and 64 bit systems
+
+uint64_T Ptr2Handle (void *ptr)
+{
+    switch (sizeof(ptr)) {
+    case 4: { // 32-bit system
+        union {
+	    void *p[2];
+	    uint64_T handle;
+	} h;
+	h.p[0] = ptr;
+	h.p[1] = NULL;
+	return h.handle;
+        }
+    case 8: { // 64-bit system
+        union {
+	    void *p;
+	    uint64_T handle;
+	} h;
+	h.p = ptr;
+	return h.handle;
+        }
+    default:
+        xERROR ("Unsupported pointer size");
+	return 0;
+    }
+}
+
+// =========================================================================
+// Convert a 64-bit handle to a pointer on both 32 and 64 bit systems
+
+void *Handle2Ptr (uint64_T handle)
+{
+    switch (sizeof(void*)) {
+    case 4: { // 32-bit system
+        union {
+	    void *p[2];
+	    uint64_T handle;
+	} h;
+	h.handle = handle;
+	return h.p[0];
+        }
+    case 8: { // 64-bit system
+        union {
+	    void *p;
+	    uint64_T handle;
+	} h;
+	h.handle = handle;
+	return h.p;
+        }
+    default:
+        xERROR ("Unsupported pointer size");
+	return NULL;
+    }
+}
+
+// =========================================================================
 // =========================================================================
 // MatlabToast class implementation
 
 MatlabToast::MatlabToast ()
 {
     SetErrorhandler (ErrorHandler);
-    nmesh = 0;
     nbasis = 0;
     nreg = 0;
     verbosity = 0;
@@ -83,7 +139,6 @@ MatlabToast::MatlabToast ()
 
 MatlabToast::~MatlabToast ()
 {
-    if (nmesh) delete []meshlist;
     if (nbasis) delete []basislist;
     if (nreg) delete []reglist;
 }
@@ -99,78 +154,82 @@ void MatlabToast::ErrorHandler (char *msg)
 
 Mesh *MatlabToast::GetMesh (const mxArray *idx, int *errid)
 {
-    unsigned int meshid;
-	if (errid) *errid = 0;
+    if (errid) *errid = 0;
 
-    if (mxIsUint32(idx)) {
-		meshid = *(unsigned int*)mxGetData(idx) - 1;
-		if (meshid >= nmesh) {
-			if (errid) {
-				*errid = MESH_INDEXOUTOFRANGE;
-			} else if (nmesh) {
-				char cbuf[256];
-				sprintf (cbuf, "GetMesh: mesh index out of range (expected 1..%d).\n", nmesh);
-				mexErrMsgTxt (cbuf);
-			} else {
-				mexErrMsgTxt ("GetMesh: mesh index out of range (no meshes registered).\n");
-			}
-			return 0;
-		}
-		if (!meshlist[meshid]) {
-			if (errid) *errid = MESH_INDEXCLEARED;
-			else mexErrMsgTxt ("GetMesh: mesh index points to cleared mesh.\n");
-		}
-		return meshlist[meshid];
-    } else {
-		if (errid) *errid = MESH_INDEXFORMAT;
-		else mexErrMsgTxt ("GetMesh: Invalid mesh index format (expected uint32).\n");
-		return 0;
-    }
+    if (!mxIsUint64(idx))
+        mexErrMsgTxt("GetMesh: Invalid handle format (expected uint64)");
+
+    uint64_T meshidx = *(uint64_T*)mxGetData(idx);
+    Mesh *mesh = (Mesh*)Handle2Ptr(meshidx);
+    if (!mesh)
+        mexErrMsgTxt("GetMesh: Index out of range");
+
+    return mesh;
 }
 
 // =========================================================================
 
 Mesh *MatlabToast::GetMesh_Safe (const mxArray *arr, const char *func, int argno)
 {
-	int err;
-	Mesh *meshptr = GetMesh(arr, &err);
-	switch(err) {
-		case MESH_INDEXOUTOFRANGE:
-			AssertArg (0, func, argno, "Mesh index out of range");
-			break;
-		case MESH_INDEXCLEARED:
-			AssertArg (0, func, argno, "Index refers to cleared mesh");
-			break;
-		case MESH_INDEXFORMAT:
-			AssertArg (0, func, argno, "Wrong index format (expected uint32)");
-			break;
-	}
-	return meshptr;
+    int err;
+    Mesh *meshptr = GetMesh(arr, &err);
+    switch(err) {
+    case MESH_INDEXOUTOFRANGE:
+	AssertArg (0, func, argno, "Mesh index out of range");
+	break;
+    case MESH_INDEXCLEARED:
+	AssertArg (0, func, argno, "Index refers to cleared mesh");
+	break;
+    case MESH_INDEXFORMAT:
+	AssertArg (0, func, argno, "Wrong index format (expected uint32)");
+	break;
+    }
+    return meshptr;
 }
 
 // =========================================================================
 
-Raster *MatlabToast::GetBasis (const mxArray *idx)
+Raster *MatlabToast::GetBasis (const mxArray *idx, int *errid)
 {
     unsigned int basisid;
 
-    if (mxIsUint32(idx)) {
-	basisid = *(unsigned int*)mxGetData(idx) - 1;
-	if (basisid >= nbasis) {
-	    if (nbasis)
-		mexPrintf ("GetBasis: index out of range (expected 1..%d).\n", nbasis);
-	    else
-		mexPrintf ("GetBasis: index out of range (no basis instances registered).\n");
+    if (!mxIsUint64(idx)) {
+        if (errid) {
+	    *errid = 1;
 	    return 0;
-	}
-	if (!basislist[basisid]) {
-	    mexPrintf ("GetBasis: index points to cleared basis instance.\n");
-	}
-	return basislist[basisid];
-    } else {
-	mexPrintf ("GetBasis: Invalid index format (expected uint32).\n");
-	return 0;
+	} else
+	    mexErrMsgTxt("GetBasis: Invalid handle format (expected uint64)");
     }
+
+    uint64_T basisidx = *(uint64_T*)mxGetData(idx);
+    Raster *raster = (Raster*)Handle2Ptr(basisidx);
+    if (!raster) {
+        if (errid) {
+	    *errid = 2;
+	    return 0;
+	} else
+	    mexErrMsgTxt("GetBasis: Index out of range");
+    }
+
+    return raster;
+}
+
+// =========================================================================
+
+Raster *MatlabToast::GetBasis_Safe (const mxArray *arr, const char *func,
+    int argno)
+{
+    int err;
+    Raster *rasterptr = GetBasis(arr, &err);
+    switch(err) {
+    case 1:
+	AssertArg (0, func, argno, "Invalid handle format (expected uint64)");
+	break;
+    case 2:
+	AssertArg (0, func, argno, "Index out of range");
+	break;
+    }
+    return rasterptr;
 }
 
 // =========================================================================
@@ -210,13 +269,9 @@ void MatlabToast::SetVerbosity (int nlhs, mxArray *plhs[], int nrhs,
     if (mxIsUint32 (prhs[0])) {
 	unsigned int verb = *(unsigned int*)mxGetData (prhs[0]);
 	if (verb == verbosity) return; // nothing to do
-	verbosity = std::min (verb, max_verbosity);
+	toastVerbosity = std::min (verb, max_verbosity);
     } else {
 	mexErrMsgTxt ("SetVerbosity: Argument 1: invalid format (uint32 expected).");
-    }
-
-    if (verbosity >= 1) {
-	mexPrintf("Verbosity level set to %d.\n", verbosity);
     }
 }
 
@@ -230,106 +285,13 @@ void MatlabToast::MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
 
     Mesh *quadmesh = Lin2Quad (*mesh);
 
-    // insert mesh into mesh list
-    Mesh **tmp = new Mesh*[nmesh+1];
-    if (nmesh) {
-	memcpy (tmp, meshlist, nmesh*sizeof(Mesh*));
-	delete []meshlist;
-    }
-    meshlist = tmp;
-    meshlist[nmesh++] = quadmesh;
-
-    plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT32_CLASS, mxREAL);
-    unsigned int *ptr = (unsigned int*)mxGetData (plhs[0]);
-    *ptr = nmesh;
+    plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
+    uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
+    *ptr = Ptr2Handle(quadmesh);
 
     if (verbosity >= 1)
 	mexPrintf ("Mesh: %d nodes, %d elements, dimension %d\n",
 		   quadmesh->nlen(), quadmesh->elen(), quadmesh->Dimension());
-}
-
-// =========================================================================
-
-void MatlabToast::ReadQM (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char qmname[256];
-
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
-
-    if (mxIsChar (prhs[1]))
-	mxGetString (prhs[1], qmname, 256);
-    else
-	mexErrMsgTxt ("ReadQM: Argument 1: file name expected.");
-	
-    if (fileExists (qmname) != 1)
-	mexErrMsgTxt ("ReadQM: QM file not found.");
-
-    ifstream ifs(qmname);
-    mesh->LoadQM (ifs);
-
-    if (verbosity >= 1)
-	mexPrintf ("QM: %d sources, %d detectors, %d measurements\n",
-	       mesh->nQ, mesh->nM, mesh->nQM);
-
-}
-
-// =========================================================================
-
-void MatlabToast::SetQM (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    size_t i, j, d;
-
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
-    
-    size_t dim = (size_t)mesh->Dimension();
-
-    // Copy source positions
-    size_t nq = mxGetM(prhs[1]);
-    size_t dimq = mxGetN(prhs[1]);
-    d = std::min(dim,dimq);
-    if (dim != dimq) {
-	cerr << "Warning: toastSetQM: param 2:" << endl;
-	cerr << "source array size(" << nq << "," << dimq
-	     << ") does not correspond\nto mesh dimension ("
-	     << dim << ")" << endl;
-    }
-    RDenseMatrix Q(nq,dimq);
-    CopyMatrix (Q, prhs[1]);
-    Point *pQ = new Point[nq];
-    for (i = 0; i < nq; i++) {
-	pQ[i].New(dim);
-	for (j = 0; j < d; j++) pQ[i][j] = Q(i,j);
-    }
-
-    // Copy detector positions
-    size_t nm = mxGetM(prhs[2]);
-    size_t dimm = mxGetN(prhs[2]);
-    d = std::min(dim,dimm);
-    if (dim != dimm) {
-	cerr << "Warning: toastSetQM: param 3:" << endl;
-	cerr << "detector array size(" << nm << "," << dimm
-	     << ") does not correspond\nto mesh dimension ("
-	     << dim << ")" << endl;
-    }
-    RDenseMatrix M(nm,dimm);
-    CopyMatrix (M, prhs[2]);
-    Point *pM = new Point[nm];
-    for (i = 0; i < nm; i++) {
-	pM[i].New(dim);
-	for (j = 0; j < d; j++) pM[i][j] = M(i,j);
-    }
-
-    // Assign Q and M arrays to mesh
-    mesh->SetupQM (pQ, nq, pM, nm);
-
-    if (verbosity >= 1) {
-	mexPrintf ("QM: %d sources, %d detectors, %d measurements\n",
-		   mesh->nQ, mesh->nM, mesh->nQM);
-    }
 }
 
 // =========================================================================
@@ -370,20 +332,20 @@ void MatlabToast::GetQM (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    RDenseMatrix qvec, mvec;
+    RDenseMatrix qpos, mpos;
     RCompRowMatrix lnk;
     char qmname[256];
     int i, j;
 
-    CopyMatrix (qvec, prhs[0]);
-    CopyMatrix (mvec, prhs[1]);
+    CopyMatrix (qpos, prhs[0]);
+    CopyMatrix (mpos, prhs[1]);
 
     ASSERTARG(mxIsSparse(prhs[2]), 3, "expected sparse matrix.");
     CopyTMatrix (lnk, prhs[2]);
 
-    int dim = qvec.nCols();
-    int nq = qvec.nRows();
-    int nm = mvec.nRows();
+    int dim = qpos.nCols();
+    int nq = qpos.nRows();
+    int nm = mpos.nRows();
     
     if (nq != lnk.nRows() || nm != lnk.nCols()) {
 	char cbuf[256];
@@ -400,12 +362,12 @@ void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
     ofs << "SourceList " << nq << endl;
     for (i = 0; i < nq; i++)
 	for (j = 0; j < dim; j++)
-	    ofs << qvec(i,j) << (j == dim-1 ? '\n':' ');
+	    ofs << qpos(i,j) << (j == dim-1 ? '\n':' ');
     ofs << endl;
     ofs << "MeasurementList " << nm << endl;
     for (i = 0; i < nm; i++)
 	for (j = 0; j < dim; j++)
-	    ofs << mvec(i,j) << (j == dim-1 ? '\n':' ');
+	    ofs << mpos(i,j) << (j == dim-1 ? '\n':' ');
     ofs << endl;
 
     ofs << "LinkList" << endl;
@@ -435,28 +397,6 @@ void MatlabToast::DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
 	for (m = 0; m < mesh->nM; m++)
 	    if (mesh->Connected (q, m))
 		pr[idx++] = q*mesh->nM + m + 1;    
-}
-
-// =========================================================================
-
-void MatlabToast::FindElement (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    Mesh *mesh = GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found.");
-
-    int i, j, n, dim = mesh->Dimension();
-    RDenseMatrix pt;
-    CopyMatrix (pt, prhs[1]);
-    ASSERTARG(pt.nCols() == dim, 2, "Invalid dimension");
-    n = pt.nRows();
-    plhs[0] = mxCreateDoubleMatrix (n, 1, mxREAL);
-    double *pr = mxGetPr(plhs[0]);
-    Point p(dim);
-    for (i = 0; i < n; i++) {
-	for (j = 0; j < dim; j++) p[j] = pt(i,j);
-	*pr++ = mesh->ElFind(p)+1;
-    }
 }
 
 // =========================================================================
@@ -541,7 +481,7 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::ReadNIM (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    char nimname[256];
+    char nimname[256], meshname[256];
     int idx;
 
     if (mxIsChar (prhs[0]))
@@ -556,10 +496,14 @@ void MatlabToast::ReadNIM (int nlhs, mxArray *plhs[], int nrhs,
     else          idx = (int)mxGetScalar (prhs[1]);
 
     RVector img;
-    ReadNim (nimname, idx, img);
+    ReadNim (nimname, idx, img, meshname);
 
     plhs[0] = mxCreateDoubleMatrix (img.Dim(), 1, mxREAL);
     memcpy (mxGetPr (plhs[0]), img.data_buffer(), img.Dim()*sizeof(double));
+
+    if (nlhs > 1) {
+        plhs[1] = mxCreateString(meshname);
+    }
 
     if (verbosity >= 1)
 	mexPrintf ("NIM: size = %d\n", img.Dim());
@@ -593,233 +537,6 @@ void MatlabToast::WriteNIM (int nlhs, mxArray *plhs[], int nrhs,
     for (int i = 0; i < n; i++)
 	ofs << val[i] << ' ';
     ofs << endl;
-}
-
-// ============================================================================
-
-void Integrate_Lin_Cosine (double d, double a, double x0, double x1,
-    double &int_cos_u0, double &int_cos_u1)
-{
-    double arg1 = 2.0*a / (Pi*Pi*(x0-x1));
-
-    int_cos_u0 = arg1 * (-2*a * cos(Pi*(d-x0)/(2*a)) +
-			 2*a * cos(Pi*(d-x1)/(2*a)) +
-			 Pi * (x0-x1) * sin(Pi*(d-x0)/(2*a)));
-    int_cos_u1 = arg1 * (2*a * cos(Pi*(d-x0)/(2*a)) -
-			 2*a * cos(Pi*(d-x1)/(2*a)) -
-			 Pi * (x0-x1) * sin(Pi*(d-x1)/(2*a)));
-}
-
-CVector CompleteTrigSourceVector (const Mesh &mesh, int order)
-{
-    // currently only works with 2D circular mesh centered at origin
-    int el, sd, nnode, *node;
-    int n = mesh.nlen();
-    double phi0, phi1, rad, a, f0, f1;
-    Element *pel;
-    CVector qvec (n);
-
-    for (el = 0; el < mesh.elen(); el++) {
-	pel = mesh.elist[el];
-	xASSERT (pel->Type() == ELID_TRI3, Element type not supported);
-	nnode = pel->nNode();
-	node  = pel->Node;
-	for (sd = 0; sd < pel->nSide(); sd++) {
-	    if (!pel->IsBoundarySide (sd)) continue;
-	    Node &nd0 = mesh.nlist[node[pel->SideNode (sd, 0)]];
-	    Node &nd1 = mesh.nlist[node[pel->SideNode (sd, 1)]];
-	    phi0 = atan2 (nd0[1], nd0[0]);
-	    phi1 = atan2 (nd1[1], nd1[0]);
-
-	    if (fabs (phi0-phi1) > Pi) {
-		if (phi1 > phi0) phi0 += 2.0*Pi;
-		else             phi1 += 2.0*Pi;
-	    }
-	    if (order) {
-		a    = 2.0*Pi/4.0/order;
-		Integrate_Lin_Cosine (0, a, phi0, phi1, f0, f1);
-	    } else {
-		f0 = f1 = 0.0;
-	    }
-	    f0 += fabs (phi1-phi0);
-	    f1 += fabs (phi1-phi0);
-	    qvec[node[pel->SideNode(sd,0)]] += f0;
-	    qvec[node[pel->SideNode(sd,1)]] += f1;
-	}
-    }
-    return qvec;
-}
-
-// =========================================================================
-
-void MatlabToast::Qvec (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char typestr[256] = "";
-    char profstr[256] = "";
-    double w = 0.0;
-
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    if (!mesh) mexErrMsgTxt ("DataLinkList: Mesh not found.");
-    int i, j, idx, n = mesh->nlen(), nQ = mesh->nQ;
-
-    // read source parameters from function parameters
-    if (mxIsChar(prhs[1])) mxGetString (prhs[1], typestr, 256);
-    if (mxIsChar(prhs[2])) mxGetString (prhs[2], profstr, 256);
-    if (nrhs >= 4) {
-	idx = 3;
-	if (mxIsNumeric(prhs[idx]) && mxGetNumberOfElements(prhs[idx])==1){
-	    w = mxGetScalar (prhs[idx]);
-	    idx++;
-	}
-	// additional optional parameters to go here
-    }
-
-    SourceMode qtype;
-    if      (!strcasecmp (typestr, "Neumann"))   qtype = SRCMODE_NEUMANN;
-    else if (!strcasecmp (typestr, "Isotropic")) qtype = SRCMODE_ISOTROPIC;
-    else    mexErrMsgTxt ("toastQvec: Invalid source type");
-
-    SRC_PROFILE qprof;
-    if      (!strcasecmp (profstr, "Point"))     qprof = PROF_POINT;
-    else if (!strcasecmp (profstr, "Gaussian"))  qprof = PROF_GAUSSIAN;
-    else if (!strcasecmp (profstr, "Cosine"))    qprof = PROF_COSINE;
-    else if (!strcasecmp (profstr, "TrigBasis")) qprof = PROF_COMPLETETRIG;
-    else    mexErrMsgTxt ("toastQvec: Invalid source profile");
-
-    double qwidth;
-    if (qprof != PROF_POINT) {
-	if   (w > 0) qwidth = w;
-	else mexErrMsgTxt ("toastQvec: Invalid source width");
-    }
-
-    CCompRowMatrix qvec;
-
-    // build the source vectors
-    qvec.New (nQ, n);
-
-    for (i = 0; i < nQ; i++) {
-	CVector q(n);
-	switch (qprof) {
-	case PROF_POINT:
-	    SetReal (q, QVec_Point (*mesh, mesh->Q[i], qtype));
-	    break;
-	case PROF_GAUSSIAN:
-	    SetReal (q, QVec_Gaussian (*mesh, mesh->Q[i], qwidth, qtype));
-	    break;
-	case PROF_COSINE:
-	    SetReal (q, QVec_Cosine (*mesh, mesh->Q[i], qwidth, qtype));
-	    break;
-	case PROF_COMPLETETRIG:
-	    q = CompleteTrigSourceVector (*mesh, i);
-	    break;
-	}
-	qvec.SetRow (i, q);
-    }
-
-    // return source vectors as matrix columns to matlab
-    CopyTMatrix (&plhs[0], qvec);
-}
-
-// =========================================================================
-
-void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char cbuf[256];
-
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    if (!mesh) mexErrMsgTxt ("DataLinkList: Mesh not found.");
-
-    SRC_PROFILE mprof;
-    mxGetString (prhs[1], cbuf, 256);
-    if      (!strcasecmp (cbuf, "Gaussian"))  mprof = PROF_GAUSSIAN;
-    else if (!strcasecmp (cbuf, "Cosine"))    mprof = PROF_COSINE;
-    else if (!strcasecmp (cbuf, "TrigBasis")) mprof = PROF_COMPLETETRIG;
-    else mexErrMsgTxt ("Invalid measurement profile");
-
-    double mwidth = mxGetScalar (prhs[2]);
-
-    int n, nM;
-    int i, j, k, idx, ofs, resettp, cmd;
-
-    n = mesh->nlen();
-    nM = mesh->nM;
-    CCompRowMatrix mvec;
-
-    // build the measurement vectors
-    mvec.New (nM, n);
-    for (i = 0; i < nM; i++) {
-	CVector m(n);
-	switch (mprof) {
-	case PROF_GAUSSIAN:
-	    SetReal (m, QVec_Gaussian (*mesh, mesh->M[i], mwidth,
-				       SRCMODE_NEUMANN));
-	    break;
-	case PROF_COSINE:
-	    SetReal (m, QVec_Cosine (*mesh, mesh->M[i], mwidth,
-				     SRCMODE_NEUMANN));
-	    break;
-	case PROF_COMPLETETRIG:
-	    m = CompleteTrigSourceVector (*mesh, i);
-	    break;
-	}
-	for (j = 0; j < n; j++) m[j] *= mesh->plist[j].C2A();
-	mvec.SetRow (i, m);
-    }
-
-    // return source vectors as matrix columns to matlab
-    CopyTMatrix (&plhs[0], mvec);
-}
-
-// =========================================================================
-
-void MatlabToast::QPos (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    int i, j;
-
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
-    
-    int nq = mesh->nQ;
-    int dim = mesh->Dimension();
-    
-    mxArray *qpos = mxCreateDoubleMatrix (nq, dim, mxREAL);
-    double *pr = mxGetPr (qpos);
-
-    for (j = 0; j < dim; j++) {
-	for (i = 0; i < nq; i++) {
-	    *pr++ = mesh->Q[i][j];
-	}
-    }
-
-    plhs[0] = qpos;
-}
-
-// =========================================================================
-
-void MatlabToast::MPos (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    int i, j;
-
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
-    
-    int nm = mesh->nM;
-    int dim = mesh->Dimension();
-    
-    mxArray *mpos = mxCreateDoubleMatrix (nm, dim, mxREAL);
-    double *pr = mxGetPr (mpos);
-
-    for (j = 0; j < dim; j++) {
-	for (i = 0; i < nm; i++) {
-	    *pr++ = mesh->M[i][j];
-	}
-    }
-
-    plhs[0] = mpos;
 }
 
 // =========================================================================
@@ -1103,134 +820,6 @@ void MatlabToast::Bndmat (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
-void MatlabToast::Elmat (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char cbuf[256];
-    mxArray *elmat;
-    double *pr;
-
-    Mesh *mesh = GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found.");
-
-    int idx = (int)mxGetScalar(prhs[1]) - 1; // convert to zero-based
-    Element *pel = mesh->elist[idx];
-    int i, j, k, l, nnd = pel->nNode();
-    int dim = mesh->Dimension();
-
-    mxGetString (prhs[2], cbuf, 256);
-
-    if (!strcmp(cbuf, "F")) {
-	elmat = mxCreateDoubleMatrix (nnd, 1, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++)
-	    pr[i] = pel->IntF(i);
-    } else if (!strcmp(cbuf, "FF")) {
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    pr[i*nnd+i] = pel->IntFF(i,i);
-	    for (j = 0; j < i; j++)
-		pr[i*nnd+j] = pr[j*nnd+i] = pel->IntFF(i,j);
-	}
-    } else if (!strcmp(cbuf, "FFF")) {
-	mwSize dims[3] = {nnd,nnd,nnd};
-	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    for (j = 0; j < nnd; j++) {
-		for (k = 0; k < nnd; k++) {
-		    pr[(i*nnd+j)*nnd+k] = pel->IntFFF(i,j,k);
-		}
-	    }
-	}
-    } else if (!strcmp(cbuf, "DD")) {
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    pr[i*nnd+i] = pel->IntDD(i,i);
-	    for (j = 0; j < i; j++)
-		pr[i*nnd+j] = pr[j*nnd+i] = pel->IntDD(i,j);
-	}
-    } else if (!strcmp(cbuf, "FD")) {
-	mwSize dims[3] = {nnd, nnd, dim};
-	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++)
-	    for (j = 0; j < nnd; j++) {
-		RVector fd = pel->IntFD(i,j);
-		if (fd.Dim() == 0) {
-		    plhs[0] = mxCreateDoubleMatrix(0,0,mxREAL);
-		    return;
-		}
-		for (k = 0; k < dim; k++)
-		    pr[i + nnd*(j + k*nnd)] = fd[k];
-	    }
-    } else if (!strcmp(cbuf, "FDD")) {
-	mwSize dims[3] = {nnd, nnd, nnd};
-	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++)
-	    for (j = 0; j < nnd; j++)
-		for (k = 0; k < nnd; k++)
-		    pr[i+nnd*(j+nnd*k)] = pel->IntFDD(i,j,k);
-    } else if (!strcmp(cbuf, "dd")) {
-	mwSize dims[4] = {nnd, dim, nnd, dim};
-	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
-	RSymMatrix intdd = pel->Intdd();
-	pr = mxGetPr(elmat);
-	for (l = 0; l < dim; l++)
-	    for (k = 0; k < nnd; k++)
-		for (j = 0; j < dim; j++)
-		    for (i = 0; i < nnd; i++)
-			*pr++ = intdd(i*dim+j,k*dim+l);
-
-    } else if (!strcmp(cbuf, "BndF")) {
-
-	// for now, only integrals over all boundary sides are supported
-	elmat = mxCreateDoubleMatrix (nnd, 1, mxREAL);
-	pr = mxGetPr(elmat);
-	RVector bndintf = pel->BndIntF();
-	for (i = 0; i < pel->nNode(); i++)
-	    pr[i] = bndintf[i];
-
-    } else if (!strcmp(cbuf, "BndFF")) {
-	int ii, jj, sd;
-	if (nrhs > 3) sd = (int)mxGetScalar(prhs[3]) - 1; // side index
-	else sd = -1;
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-
-	if (sd >= 0) { // integral over a single side
-	    for (ii = 0; ii < pel->nSideNode(sd); ii++) {
-		i = pel->SideNode(sd,ii);
-		pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
-		for (jj = 0; jj < ii; jj++) {
-		    j = pel->SideNode(sd,jj);
-		    pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
-		}
-	    }
-	} else { // integral over all boundary sides
-	    for (sd = 0; sd < pel->nSide(); sd++) {
-		if (!pel->IsBoundarySide (sd)) continue;
-		for (ii = 0; ii < pel->nSideNode(sd); ii++) {
-		    i = pel->SideNode(sd,ii);
-		    pr[i*nnd+i] += pel->BndIntFFSide(i,i,sd);
-		    for (jj = 0; jj < ii; jj++) {
-			j = pel->SideNode(sd,jj);
-			pr[i*nnd+j] = pr[j*nnd+i] += pel->BndIntFFSide(i,j,sd);
-		    }
-		}
-	    }
-	}
-    } else {
-	mexErrMsgTxt ("Elmat: Integral type string not recognised");
-    }
-    plhs[0] = elmat;
-}
-
-// =========================================================================
-
 void MatlabToast::SampleField (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
@@ -1287,17 +876,21 @@ void MatlabToast::SampleField (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::BndReflectionTerm (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    char cbuf[256];
     double refind = mxGetScalar (prhs[0]);
-    mxGetString (prhs[1], cbuf, 256);
-
-    if (!strcasecmp (cbuf, "Keijzer")) {
-	plhs[0] = mxCreateDoubleScalar(A_Keijzer(refind));
-    } else if (!strcasecmp (cbuf, "Contini")) {
-	plhs[0] = mxCreateDoubleScalar(A_Contini(refind));
-    } else {
-	plhs[0] = mxCreateDoubleScalar(1.0);
+    bool match = false;
+    if (nrhs > 1 && mxIsChar(prhs[1])) {
+	char cbuf[256];
+        mxGetString (prhs[1], cbuf, 256);
+	if (!strcasecmp (cbuf, "Keijzer")) {
+	    plhs[0] = mxCreateDoubleScalar(A_Keijzer(refind));
+	    match = true;
+	} else if (!strcasecmp (cbuf, "Contini")) {
+	    plhs[0] = mxCreateDoubleScalar(A_Contini(refind));
+	    match = true;
+	}
     }
+    if (!match)
+	plhs[0] = mxCreateDoubleScalar(1.0);
 }
 
 // =========================================================================
@@ -1422,6 +1015,7 @@ void MatlabToast::WriteVector (int nlhs, mxArray *plhs[], int nrhs,
     }
 }
 
+
 // ==========================================================================
 // This data structure defines the Hessian implicitly
 
@@ -1543,7 +1137,7 @@ void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
     int iter;
     double res, time;
     tic();
-    GMRES (JTJx_clbk, &hdata, g, z, tol, &precon, 30, &iter, &res);
+    GMRES (JTJx_clbk, &hdata, g, z, tol, &precon, 30, 0, &iter, &res);
     //GMRES (JTJx_clbk, &hdata, g, z, tol, (RPreconditioner*)0, 30, &iter, &res);
     time = toc();
 
@@ -1560,4 +1154,3 @@ void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
 	mxSetField (plhs[1], 0, "time", mxCreateDoubleScalar(time));
     }
 }
-

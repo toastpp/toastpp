@@ -900,7 +900,7 @@ void SelectInitialParams (const Mesh &mesh, Solution &msol)
     msol.SetParam (OT_CKAPPA, c0/(3.0*param[2]*(param[0]+param[1])));
     msol.SetParam (OT_N, param[2]);
     for (i = 0; i < param[2].Dim(); i++)
-	param[2][i] = c0/(2*param[2][i]*A_Keijzer(param[2][i]));
+	param[2][i] = c0/(2.0*param[2][i]*A_Keijzer(param[2][i]));
     msol.SetParam (OT_C2A, param[2]);
 }
 

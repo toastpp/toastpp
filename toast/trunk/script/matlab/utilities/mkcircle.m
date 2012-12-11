@@ -1,4 +1,4 @@
-function hMesh = mkcircle (rad, nsect, nring, nbnd)
+function [vtx, idx, eltp] = mkcircle (rad, nsect, nring, nbnd)
   
   eps = 1e-8;
   
@@ -177,4 +177,3 @@ function hMesh = mkcircle (rad, nsect, nring, nbnd)
   end
   
   eltp = ones(size(idx,1),1) * 15;
-  hMesh = toastMakeMesh(vtx,idx,eltp);

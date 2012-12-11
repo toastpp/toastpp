@@ -22,6 +22,10 @@ matlab::
 	cd src; \
 	$(MAKE) matlab;
 
+matlab2::
+	cd src; \
+	$(MAKE) matlab2;
+
 python::
 	cd src; \
 	$(MAKE) python;

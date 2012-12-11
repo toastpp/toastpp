@@ -408,13 +408,13 @@ void TFwdSolver<toast::complex>::AssembleSystemMatrix (const Solution &sol,
     F->Zero();
     prm = sol.GetParam (OT_CMUA);
     AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+        elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
     prm = sol.GetParam (OT_CKAPPA);
     AddToSysMatrix (*meshptr, *F, &prm,
-		    elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+        elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
     prm = sol.GetParam (OT_C2A);
     AddToSysMatrix (*meshptr, *F, &prm,
-    		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+        elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
     AddToSysMatrix (*meshptr, *F, omega, ASSEMBLE_iCFF);
 }
 

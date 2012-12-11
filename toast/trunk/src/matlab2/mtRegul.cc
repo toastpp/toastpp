@@ -4,6 +4,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
+#include "toastmex.h"
 
 using namespace std;
 using namespace toast;
@@ -409,7 +410,7 @@ void MatlabToast::ClearRegul (int nlhs, mxArray *plhs[], int nrhs,
 	regid--;
 	if (regid >= nreg) {
 	    if (nreg)
-		mexPrintf ("ClearRegul: regularisation index out of range (expected 1..%d).\n", nmesh);
+		mexPrintf ("ClearRegul: regularisation index out of range (expected 1..%d).\n", nreg);
 	    else
 		mexPrintf ("ClearRegul: regularisation index out of range (no meshes registered).\n");
 	    return;
@@ -441,7 +442,7 @@ void MatlabToast::RegulValue (int nlhs, mxArray *plhs[], int nrhs,
     CopyVector (x, prhs[1]);
 
     double prior = (reg ? reg->GetValue (x) : 0.0);
-    plhs[0] = mxCreateScalarDouble (prior);
+    plhs[0] = mxCreateDoubleScalar (prior);
 }
 
 // =========================================================================
