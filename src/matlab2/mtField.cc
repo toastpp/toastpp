@@ -4,6 +4,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
+#include "toastmex.h"
 
 using namespace std;
 using namespace toast;

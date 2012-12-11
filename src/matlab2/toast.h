@@ -23,7 +23,7 @@
 #define TOAST_MESHSIZE          59
 #define TOAST_MESHDIMENSION      9
 #define TOAST_MESHLIN2QUAD      69
-#define TOAST_MESHOPT           70 // end
+#define TOAST_MESHOPT           70
 #define TOAST_ELEMENTSIZE       10
 #define TOAST_ELEMENTDATA       11
 #define TOAST_FINDELEMENT       12
@@ -49,6 +49,9 @@
 #define TOAST_SETBASIS          26
 #define TOAST_CLEARBASIS        27
 #define TOAST_GETBASISSIZE      28
+#define TOAST_BASIS_NLEN        71
+#define TOAST_BASIS_BLEN        72
+#define TOAST_BASIS_SLEN        73 // end
 #define TOAST_MAPBASIS          29
 #define TOAST_MAPMESHTOBASIS    30
 #define TOAST_MAPMESHTOGRID     31

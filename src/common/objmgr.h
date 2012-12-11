@@ -5,6 +5,7 @@ template<typename ObjType>
 class ObjectManager {
 public:
     ObjectManager ();
+    ~ObjectManager ();
     int Add (ObjType *obj);
     ObjType *Get (int idx) const;
     bool Delete (int idx);

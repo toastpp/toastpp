@@ -5,6 +5,9 @@ from scipy import sparse
 from types import *
 
 def Make(hmesh,grd):
+    if grd.dtype != np.int32:
+        grd = np.array(grd,dtype=np.int32)
+
     return toastmod.MakeRaster(hmesh,grd)
 
 def Clear(hraster):

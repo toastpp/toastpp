@@ -108,25 +108,5 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	
     plhs[0] = mxCreateDoubleScalar (Ptr2Handle (raster));
 
-    if (toastVerbosity > 0) {
-        char cbuf[256];
-	mexPrintf ("basis: Type:       %s-%s\n",
-		   mesh->Dimension()==2 ? "BI":"TRI", basistype);
-	sprintf (cbuf, "basis: Grid size:  %d [", raster->BLen());
-	for (i = 0; i < dim; i++)
-	    sprintf (cbuf+strlen(cbuf), "%d%c", bdim[i], i==dim-1 ? ']':'x');
-	mexPrintf ("%s\n", cbuf);
-
-	mexPrintf ("basis: Sol. size:  %d\n", raster->SLen());
-	mexPrintf ("basis: Mesh size:  %d\n", mesh->nlen());
-	if (bb) {
-	    mexPrintf ("basis: Grid bounding box:\n");
-	    for (i = 0; i < 2; i++) {
-	        for (j = 0; j < dim; j++)
-		    mexPrintf ("  %12g", bb->Get(i,j));
-		mexPrintf ("\n");
-	    }
-	}
-    }
     if (bb) delete bb;
 }

@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 include ../Makefile.incl
 
-SUBDIRS = libmath libfe libstoast libdgfe libbemdiff libbem libparam2001 libfdot supertoast bintools  displace libvarPN3D liblocalbasisRTE3D
+SUBDIRS = libmath libfe libstoast libdgfe libbemdiff libbem libparam2001 libfdot supertoast bintools displace libvarPN3D liblocalbasisRTE3D
 
 all::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
@@ -28,11 +28,16 @@ matlab::
 			cp $(TOASTDIR)/src/matlab/Makefile.src ./Makefile; \
 			echo "making" all "in matlab..."; \
 			$(MAKE) $(MFLAGS) all); \
-#		(mkdir -p $(TOASTVER)/mex2; \
-#			cd $(TOASTVER)/mex2; \
-#			cp $(TOASTDIR)/src/matlab/Makefile2.src ./Makefile; \
-#			echo "making" all "in matlab..."; \
-#			$(MAKE) $(MFLAGS) all); \
+	fi
+
+matlab2::
+	if test -d matlab2 ;\
+	then \
+		(mkdir -p $(TOASTVER)/mex2; \
+			cd $(TOASTVER)/mex2; \
+			cp $(TOASTDIR)/src/matlab2/Makefile.src ./Makefile; \
+			echo "making" all "in matlab2..."; \
+			$(MAKE) $(MFLAGS) all); \
 	fi;
 
 python::

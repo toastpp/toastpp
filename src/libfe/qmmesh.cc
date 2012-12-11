@@ -226,27 +226,48 @@ void QMMesh::InitM ()
     }
 }
 
-void QMMesh::SetupQM (Point *q, int nq, Point *m, int nm)
+void QMMesh::SetupQM (const Point *q, int nq, const Point *m, int nm,
+    const ICompRowMatrix *linklist)
 {
-    // 1. assume all sources are linked to all measurements
+    // 1. If linklist==NULL, assume all sources are linked to all measurements
     // 2. assume Point source and detector profiles
 
     int i, j;
-    Q = q, nQ = nq;
-    M = m, nM = nm;
-    nQM = nq*nm;
+    Q = new Point[nQ = nq];
+    M = new Point[nM = nm];
+    for (i = 0; i < nq; i++) Q[i] = q[i];
+    for (i = 0; i < nm; i++) M[i] = m[i];
 
     nQMref = new int[nQ];
     Qofs   = new int[nQ];
     QMref  = new int*[nQ];
     QMofs  = new int*[nQ];
-    for (i = 0; i < nQ; i++) {
-	nQMref[i] = nM;
-	Qofs[i] = (i ? Qofs[i-1]+nQMref[i-1] : 0);
-	QMref[i] = new int[nM];
-	for (j = 0; j < nM; j++) QMref[i][j] = j;
-	QMofs[i] = new int[nM];
-	for (j = 0; j < nM; j++) QMofs[i][j] = Qofs[i]+j;
+    if (!linklist) {
+        nQM = nq*nm;
+	for (i = 0; i < nQ; i++) {
+	    nQMref[i] = nM;
+	    Qofs[i] = (i ? Qofs[i-1]+nQMref[i-1] : 0);
+	    QMref[i] = new int[nM];
+	    for (j = 0; j < nM; j++) QMref[i][j] = j;
+	    QMofs[i] = new int[nM];
+	    for (j = 0; j < nM; j++) QMofs[i][j] = Qofs[i]+j;
+	}
+    } else {
+        xASSERT(linklist->nRows() == nq && linklist->nCols() == nm,
+		"Linklist invalid dimensions");
+	int nqm = linklist->nVal();
+	idxtype *rp = linklist->rowptr;
+	idxtype *ci = linklist->colidx;
+	for (i = 0; i < nQ; i++) {
+	    nQMref[i] = rp[i+1]-rp[i];
+	    Qofs[i] = (i ? Qofs[i-1]+nQMref[i-1] : 0);
+	    QMref[i] = new int[nQMref[i]];
+	    for (j = 0; j < nQMref[i]; j++) QMref[i][j] = ci[rp[i]+j];
+	    QMofs[i] = new int[nm];
+	    for (j = 0; j < nm; j++) QMofs[i][j] = -1;
+	    for (j = 0; j < nQMref[i]; j++)
+	        QMofs[i][QMref[i][j]] = Qofs[i]+j;
+	}
     }
 
     // reset source profile specs
@@ -272,6 +293,7 @@ void QMMesh::SetupQM (Point *q, int nq, Point *m, int nm)
     InitM ();
 }
 
+#ifdef UNDEF
 void QMMesh::SetupRegularQM (int nqm)
 {
     int el, sd, dim = nlist[0].Dim();
@@ -293,6 +315,7 @@ void QMMesh::SetupRegularQM (int nqm)
     }
     SetupQM (newQ, nqm, newM, nqm);
 }
+#endif
 
 void QMMesh::LoadQM (istream &is)
 {

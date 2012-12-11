@@ -5,7 +5,7 @@
 #include "stoastlib.h"
 #include <fstream>
 
-#include "objmgr.h"
+#include "../common/objmgr.h"
 
 // ===========================================================================
 // A python wrapper object that handled deallocation of C++ allocated memory

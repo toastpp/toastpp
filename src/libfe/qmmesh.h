@@ -52,8 +52,9 @@ public:
     QMMesh ();
     ~QMMesh ();
 
-    void SetupQM (Point *q, int nq, Point *m, int nm);
-    void SetupRegularQM (int nqm);
+    void SetupQM (const Point *q, int nq, const Point *m, int nm,
+        const ICompRowMatrix *linklist = NULL);
+    //void SetupRegularQM (int nqm);
     void LoadQM (std::istream &is);
 
     void ScaleMesh (double scale);

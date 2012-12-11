@@ -107,8 +107,6 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 		}
 	    }
 	}
-	if (!(i % 100))
-	    cerr << i << '/' << blen << endl;
     }
     idxtype *rowptr = new idxtype[blen+1];
     idxtype *colidx = new idxtype[nz_tot];
@@ -130,9 +128,7 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
     ((RCompRowMatrix*)G)->Initialise(rowptr, colidx, val);
     delete []rowptr;
     delete []colidx;
-    delete []val;
-    cerr << "grid->basis mapping setup: " << toc() << " s" << endl;
-    
+    delete []val;    
 
     // set up basis->grid mapping
     GI = new RCompRowMatrix (glen, blen);
@@ -168,8 +164,6 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 	} else {
 	    gi_rownz[j] = 0;
 	}
-	if (!(j % 1000))
-	    cerr << j << '/' << glen << endl;
     }
     rowptr = new idxtype[glen+1];
     colidx = new idxtype[nz_tot];
@@ -192,7 +186,6 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
     delete []rowptr;
     delete []colidx;
     delete []val;
-    cerr << "basis->grid mapping setup: " << toc() << " s" << endl;
 
     for (i = 0; i < dim; i++)
 	delete []swght[i];
@@ -208,7 +201,10 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
     for (i = slen = 0; i < blen; i++) {
 	if (rowptr[i+1] > rowptr[i]) sol2basis[slen++] = i;
     }
-    
+
+    if (toastVerbosity > 0) {
+        cout << "Basis: type: cubic" << endl;
+    }
 }
 
 Raster_CubicPixel::~Raster_CubicPixel ()

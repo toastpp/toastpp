@@ -34,10 +34,10 @@ void ProvideFDOT ()
 
 void mexClear ()
 {
-    if (mtoast) {
-	delete mtoast;
-	mtoast = 0;
-    }
+  //    if (mtoast) {
+  //	delete mtoast;
+  //	mtoast = 0;
+  //    }
 }
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -171,6 +171,15 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	break;
     case TOAST_GETBASISSIZE:
 	mtoast->GetBasisSize (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_NLEN:
+        mtoast->GetBasisNLen (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_BLEN:
+        mtoast->GetBasisBLen (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_SLEN:
+        mtoast->GetBasisSLen (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_MAPBASIS:
 	mtoast->MapBasis (nlhs, plhs, nrhs, prhs);

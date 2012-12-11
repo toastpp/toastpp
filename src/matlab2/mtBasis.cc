@@ -4,6 +4,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
+#include "toastmex.h"
 
 using namespace std;
 using namespace toast;
@@ -12,62 +13,50 @@ using namespace toast;
 // Matlab interface
 // =========================================================================
 
-// =========================================================================
-
 void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     char basistype[256] = "LINEAR";
-    int i, j, arg = 0, basistp;
+    int i, j, basistp = 0;
     RDenseMatrix *bb = 0;
 
-    // basis type
-    ASSERTARG (nrhs > arg, 0, "Too few parameters provided");
-
-    if (mxIsChar (prhs[arg])) {
-	mxGetString (prhs[arg], basistype, 256);
-	arg++;
-    }
-    if (!strcasecmp (basistype, "LINEAR")) {
-	basistp = 0;
-    } else if (!strcasecmp (basistype, "CUBIC")) {
-	basistp = 1;
-    } else {
-	basistp = -1;
-    }
-    ASSERTARG(basistp >= 0, 1, "unexpected value");
-
     // mesh
-
-    ASSERTARG(nrhs > arg, 0, "Too few parameters provided");
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[arg++]);
-    ASSERTARG(mesh, 2, "Mesh not found");
+    ASSERTARG(nrhs > 0, 0, "Too few parameters provided");
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     // solution basis dimensions
-    ASSERTARG(nrhs > arg, 0, "Too few parameters provided");
-    int dim = mxGetNumberOfElements (prhs[arg]);
+    ASSERTARG(nrhs > 1, 1, "Too few parameters provided");
+    int dim = mxGetNumberOfElements (prhs[1]);
     ASSERTARG(dim == mesh->Dimension(), 3, "Invalid basis dimensions");
     IVector bdim(dim);
     for (i = 0; i < dim; i++)
-	bdim[i] = (int)mxGetPr (prhs[arg])[i];
-    arg++;
+	bdim[i] = (int)mxGetPr (prhs[1])[i];
     IVector gdim(bdim);
 
-    if (nrhs > arg) {
-	// sampling grid dimensions
-	if (mxGetNumberOfElements (prhs[arg]) == dim) {
-	    // argument is intermediate grid dimension
-	    for (i = 0; i < dim; i++)
-		gdim[i] = (int)mxGetPr (prhs[arg])[i];
-	    arg++;
-	}
-    }
-    if (nrhs > arg) {
-	if (mxGetM (prhs[arg]) == dim && mxGetN (prhs[arg]) == 2) {
-	    // argument is grid bounding box
-	    bb = new RDenseMatrix (2,dim);
-	    CopyTMatrix (*bb, prhs[arg]);
-	    arg++;
+    // optional parameters
+    if (nrhs > 2 && mxIsCell (prhs[2])) {
+        int narg = mxGetNumberOfElements (prhs[2]);
+	for (i = 0; i < narg; i++) {
+	    mxArray *cell = mxGetCell(prhs[2], i);
+	    if (mxIsChar (cell)) { 
+	        // basis type
+		mxGetString (cell, basistype, 256);
+		if (!strcasecmp (basistype, "LINEAR")) {
+		    basistp = 0;
+		} else if (!strcasecmp (basistype, "CUBIC")) {
+		    basistp = 1;
+		} else {
+		    ASSERTARG(false, 1, "unexpected value");
+		}
+	    } else if (mxGetNumberOfElements (cell) == dim) {
+	        // intermediate grid dimension
+	        for (i = 0; i < dim; i++)
+		    gdim[i] = (int)mxGetPr (cell)[i];
+	    } else if (mxGetM (cell) == dim && mxGetN (cell) == 2) {
+	        // grid bounding box
+	        bb = new RDenseMatrix (2,dim);
+		CopyTMatrix (*bb, cell);
+	    }
 	}
     }
 
@@ -80,18 +69,10 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	raster = new Raster_CubicPixel (bdim, gdim, mesh, bb);
 	break;
     }
-	
-    Raster **tmp = new Raster*[nbasis+1];
-    if (nbasis) {
-	memcpy (tmp, basislist, nbasis*sizeof(Raster*));
-	delete []basislist;
-    }
-    basislist = tmp;
-    basislist[nbasis++] = raster;
 
-    plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT32_CLASS, mxREAL);
-    unsigned int *ptr = (unsigned int*)mxGetData (plhs[0]);
-    *ptr = nbasis;
+    plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
+    uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
+    *ptr = Ptr2Handle(raster);
 
     if (verbosity >= 1) {
 	char cbuf[256];
@@ -122,28 +103,9 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::ClearBasis (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    unsigned int basisid;
-
-    if (mxIsUint32(prhs[0])) {
-	basisid = *(unsigned int*)mxGetData(prhs[0]) - 1;
-	if (basisid >= nbasis) {
-	    if (nbasis)
-		mexPrintf ("ClearBasis: basis index out of range (expected 1..%d).\n", nbasis);
-	    else
-		mexPrintf ("ClearBasis: basis index out of range (no basis instances registered).\n");
-	    return;
-	}
-    } else {
-	mexPrintf ("ClearBasis: Invalid basis index format (expected uint32).\n");
-	return;
-    }
-
-    if (basislist[basisid]) {
-	delete basislist[basisid];
-	basislist[basisid] = 0;
-    } else {
-	mexPrintf ("ClearBasis: basis already cleared.\n");
-    }
+    Raster *raster = GETBASIS_SAFE(0);
+    delete raster;
+    std::cerr << "Basis deleted" << std::endl;
 }
 
 // =========================================================================
@@ -151,8 +113,7 @@ void MatlabToast::ClearBasis (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::GetBasisSize (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    Raster *raster = GetBasis(prhs[0]);
-    ASSERTARG(raster, 1, "Basis not found");
+    Raster *raster = GETBASIS_SAFE(0);
 
     int i, dim = raster->Dim();
     if (nlhs >= 1) {
@@ -169,12 +130,41 @@ void MatlabToast::GetBasisSize (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::GetBasisNLen (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0)
+        plhs[0] = mxCreateDoubleScalar (raster->mesh().nlen());
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisBLen (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0)
+        plhs[0] = mxCreateDoubleScalar (raster->BLen());
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0)
+        plhs[0] = mxCreateDoubleScalar (raster->SLen());
+}
+
+// =========================================================================
+
 void MatlabToast::MapBasis (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     // basis handle
-    Raster *raster = GetBasis(prhs[0]);
-    ASSERTARG(raster, 1, "Basis not found");
+    Raster *raster = GETBASIS_SAFE(0);
 
     // source and target basis representations
     ASSERTARG(mxIsChar (prhs[1]), 2, "Expected string.");
