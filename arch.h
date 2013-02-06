@@ -5,12 +5,14 @@
 #ifndef __ARCH_H
 #define __ARCH_H
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(_WIN64)
 
 #include <process.h>
 #include <direct.h>
 #include <float.h>
 #include <time.h>
+
+#define __func__ __FUNCTION__
 
 // work around language incompatibilities
 #define strcasecmp(str1,str2) _stricmp((str1),(str2))
