@@ -69,13 +69,19 @@ fprintf('ref: mean=%f, std=%f\n', mean(ref), std(ref));
 kap = 1./(3*(mua+mus));
 
 % ----------------------------------------------------------------------
-% Read the data - should also allow to pass in data vectors
-% directly with prm structure
-fprintf('Reading data:\n');
-fprintf('Log amplitude data from %s\n', prm.data.lnampfile);
-mdata = toastReadRealVector(prm.data.lnampfile);
-fprintf('Phase data from %s\n', prm.data.phasefile);
-pdata = toastReadRealVector(prm.data.phasefile);
+% Read the data
+if isfield(prm.data,'lnamp')
+    mdata = prm.data.lnamp;
+else
+    fprintf('Reading log amplitude data from %s\n', prm.data.lnampfile);
+    mdata = toastReadRealVector(prm.data.lnampfile);
+end
+if isfield(prm.data,'phase')
+    pdata = prm.data.phase;
+else
+    fprintf('Reading phase data from %s\n', prm.data.phasefile);
+    pdata = toastReadRealVector(prm.data.phasefile);
+end
 LPRM.data = [mdata;pdata];
 m = length(LPRM.data);
 fprintf('Data space dimension: %d\n', m);

@@ -80,8 +80,8 @@ varargout{1} = handles.output;
 function init(handles)
 prm.bx = 64; prm.by = 64;
 prm.blen = prm.bx*prm.by;
-prm.basis.hMesh = toastReadMesh('circle25_32.msh');
-toastReadQM (prm.basis.hMesh,'circle25_1x1.qm');
+prm.basis.hMesh = toastMesh('circle25_32.msh');
+prm.basis.hMesh.ReadQM ('circle25_1x1.qm');
 
 % initial source and detector positions
 prm.phiq = 0;
@@ -90,20 +90,19 @@ radq = 24.5;
 radm = 25.0;
 Q = [radq*cos(prm.phiq) radq*sin(prm.phiq)];
 M = [radm*cos(prm.phim) radm*sin(prm.phim)];
-toastSetQM(prm.basis.hMesh,Q,M);
+prm.basis.hMesh.SetQM(Q,M);
 
-prm.qvec = toastQvec(prm.basis.hMesh,'Neumann','Gaussian',2);
-prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,[prm.bx prm.by],[prm.bx prm.by]);
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
+prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,[prm.bx prm.by],'Linear');
+n = prm.basis.hMesh.NodeCount();
 prm.mua = ones(n,1)*0.025;
 prm.mus = ones(n,1)*2;
 prm.ref = ones(n,1)*1.4;
 prm.bkg = 0;
 prm.meas.src.freq = 100;
-prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
 axes(handles.axes1);
 %h = surface(reshape(prm.bmua,prm.bx,prm.by),'EdgeColor','none'); axis tight
 h = imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by))); axis xy equal tight off
@@ -113,7 +112,7 @@ h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy equal tight off
 %h = surface(reshape(prm.bmus,prm.bx,prm.by),'EdgeColor','none'); axis tight
 set(h,'ButtonDownFcn','toast_demo2(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes7);
-tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
+tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
 h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 %h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 hold on;
@@ -149,17 +148,17 @@ if bkg ~= prm.bkg
     % update parameter background
     switch bkg
         case 0 % flat
-            n = toastMeshNodeCount(prm.basis.hMesh);
+            n = prm.basis.hMesh.NodeCount();
             prm.mua = ones(n,1)*0.025;
             prm.mus = ones(n,1)*2;
-            prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-            prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+            prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+            prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
         case 1 % 'blobs'
             load toast_demo2.mat
             prm.bmua = bmua; clear bmua;
             prm.bmus = bmus; clear bmus;
-            prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-            prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+            prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
+            prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
     end
     
     setappdata(handles.figure1,'prm',prm);
@@ -175,15 +174,15 @@ prm = getappdata(handles.figure1,'prm');
 radq = 24.5; radm = 25.0;
 Q = [radq*cos(phiq) radq*sin(phiq)];
 M = [radm*cos(phim) radm*sin(phim)];
-toastSetQM(prm.basis.hMesh,Q,M);
-prm.qvec = toastQvec(prm.basis.hMesh,'Neumann','Gaussian',2);
-prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
+prm.basis.hMesh.SetQM(Q,M);
+prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
 prm.phiq = phiq;
 prm.phim = phim;
 
 axes(handles.axes7);
-n = toastMeshNodeCount(prm.basis.hMesh);
-tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
+n = prm.basis.hMesh.NodeCount();
+tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
 cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 %cla;h = surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 x = prm.bx*(0.5+cos(phiq)*0.45);
@@ -222,7 +221,7 @@ bpert = zeros(prm.bx,prm.by);
 bpert(pert.mua.x0-pert.mua.dx:pert.mua.x0+pert.mua.dx,pert.mua.y0-pert.mua.dx:pert.mua.y0+pert.mua.dx) = pert.mua.val;
 bpert = reshape(bpert,[],1);
 bmua = prm.bmua + bpert;
-mua = toastMapBasisToMesh(prm.basis.hBasis,bmua);
+mua = prm.basis.hBasis.Map('B->M',bmua);
 axes(handles.axes1);
 cla;
 h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy equal tight off
@@ -233,7 +232,7 @@ bpert = zeros(prm.bx,prm.by);
 bpert(pert.mus.x0-pert.mus.dx:pert.mus.x0+pert.mus.dx,pert.mus.y0-pert.mus.dx:pert.mus.y0+pert.mus.dx) = pert.mus.val;
 bpert = reshape(bpert,[],1);
 bmus = prm.bmus + bpert;
-mus = toastMapBasisToMesh(prm.basis.hBasis,bmus);
+mus = prm.basis.hBasis.Map('B->M',bmus);
 axes(handles.axes2);
 cla;
 h = imagesc(rot90(reshape(bmus,prm.bx,prm.by))); axis xy equal tight off
@@ -244,10 +243,10 @@ set(h,'ButtonDownFcn','toast_demo2(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo)
 J = toastJacobian(prm.basis.hMesh, prm.basis.hBasis, prm.qvec, prm.mvec, ...
     mua, mus, prm.ref, prm.meas.src.freq, 'direct');
 slen = size(J,2)/2;
-Ja_lnamp = toastMapSolToBasis(prm.basis.hBasis, J(1,1:slen));
-Jk_lnamp = toastMapSolToBasis(prm.basis.hBasis, J(1,slen+1:slen*2));
-Ja_phase = toastMapSolToBasis(prm.basis.hBasis, J(2,1:slen));
-Jk_phase = toastMapSolToBasis(prm.basis.hBasis, J(2,slen+1:slen*2));
+Ja_lnamp = prm.basis.hBasis.Map('S->B', J(1,1:slen));
+Jk_lnamp = prm.basis.hBasis.Map('S->B', J(1,slen+1:slen*2));
+Ja_phase = prm.basis.hBasis.Map('S->B', J(2,1:slen));
+Jk_phase = prm.basis.hBasis.Map('S->B', J(2,slen+1:slen*2));
 axes(handles.axes3);
 cla;imagesc(rot90(reshape(Ja_lnamp,prm.bx,prm.by))); axis xy equal tight off
 %cla;surface(reshape(Ja_lnamp,prm.bx,prm.by)','EdgeColor','none'); axis tight;

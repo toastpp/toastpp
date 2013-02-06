@@ -82,8 +82,13 @@ clear prm;
 %prm.fwdsolver.meshfile = 'circle25_32.msh';
 prm.fwdsolver.meshfile = 'ellips_tri3.msh';
 prm.solver.basis.bdim = [96 96];
-prm.data.lnampfile = 'fmod_ellips_16x16_100MHz.fem';
-prm.data.phasefile = 'farg_ellips_16x16_100MHz.fem';
+prm.data.lnamp0 = toastReadVector ('fmod_ellips_16x16_100MHz.fem');
+prm.data.phase0 = toastReadVector ('farg_ellips_16x16_100MHz.fem');
+prm.data.noiselevel = 0;
+prm.data.lnamp = prm.data.lnamp0 .* (1 + prm.data.noiselevel.*randn(size(prm.data.lnamp0)));
+prm.data.phase = prm.data.phase0 .* (1 + prm.data.noiselevel.*randn(size(prm.data.phase0)));
+%prm.data.lnampfile = 'fmod_ellips_16x16_100MHz.fem';
+%prm.data.phasefile = 'farg_ellips_16x16_100MHz.fem';
 prm.data.freq = 100;
 prm.meas.qmfile = 'circle25_16x16.qm';
 prm.meas.src = struct('type','Neumann','prof','Gaussian','width',2);
@@ -96,11 +101,6 @@ prm.solver.step0 = 100;
 load toast_demo5
 prm.bmua = bmua_tgt;
 prm.bmus = bmus_tgt;
-prm.regul = struct ('method','TK1', ...
-     'tau',1e-4, ...
-     'prior',struct ('smooth',1,'threshold',0.1));
-prm.regul.tv.beta = 0.01;
-prm.regul.huber.eps = 0.01;
 clear bmua_tgt bmus_tgt bkap_tgt;
 prm.initprm.mua = struct('reset','HOMOG','val',0.025);
 prm.initprm.mus = struct('reset','HOMOG','val',2);
@@ -110,14 +110,21 @@ prm.callback.context = handles;
 prm.callback.iter = @callback_vis; % iteration callback from recon
 prm.callback.request.prior = true;
 
-prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
-toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
+prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
+prm.basis.hMesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.solver.basis.bdim,prm.solver.basis.bdim);
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
-prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.solver.basis.bdim,'Linear');
+
+prm.regul = struct ('method','TK1', ...
+     'tau',1e-4, ...
+     'prior',struct ('smooth',1,'threshold',0.1));
+prm.regul.basis = prm.basis.hBasis;
+prm.regul.tv.beta = 0.01;
+prm.regul.huber.eps = 0.01;
+
+n = prm.basis.hMesh.NodeCount();
+prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
+prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
 prm.ref = ones(n,1)*1.4;
 axes(handles.axes1);
 imagesc(rot90(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0.005 0.05]);
@@ -140,13 +147,13 @@ function showref(handles,prm)
 % create a regularisation instance on the fly to get the
 % diffusivity prior
 cm = 0.3/1.4;
-slen = length(prm.smask);
+slen = prm.basis.hBasis.slen();
 scmua = ones(slen,1)*0.025*cm;
 sckap = ones(slen,1)*(1/(3*2.025))*cm;
 logx = log([scmua;sckap]);
-hReg = toastRegul (prm.regul, prm.basis.hBasis, logx);
-res.kapref = toastRegulKappa (hReg,logx);
-toastClearRegul (hReg);
+hReg = toastRegul (prm.regul, logx);
+res.kapref = hReg.Kappa (logx);
+delete(hReg);
 disp_kapref (handles,res,prm);
 
 
@@ -193,12 +200,12 @@ function disp_kapref(handles,res,prm)
 slen = length(res.kapref)/2;
 
 axes(handles.axes7);
-kref = toastMapSolToBasis(prm.basis.hBasis,res.kapref(1:slen));
+kref = prm.basis.hBasis.Map('S->B',res.kapref(1:slen));
 imagesc(rot90(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0 1.2]); axis xy equal tight off
 %set(handles.axes7,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes8);
-kref = toastMapSolToBasis(prm.basis.hBasis,res.kapref(slen+1:slen*2));
+kref = prm.basis.hBasis.Map('S->B',res.kapref(slen+1:slen*2));
 imagesc(rot90(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0 1.2]); axis xy equal tight off
 %set(handles.axes8,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
@@ -407,3 +414,30 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
+% --- Executes on slider movement.
+function slider12_Callback(hObject, eventdata, handles)
+% hObject    handle to slider12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+prm = getappdata(handles.figure1,'prm');
+v = get(hObject,'Value');
+set(handles.text37,'String',num2str(v));
+prm.data.noiselevel = v;
+prm.data.lnamp = prm.data.lnamp0 .* (1 + prm.data.noiselevel.*randn(size(prm.data.lnamp0)));
+prm.data.phase = prm.data.phase0 .* (1 + prm.data.noiselevel.*randn(size(prm.data.phase0)));
+setappdata(handles.figure1,'prm',prm);
+
+
+% --- Executes during object creation, after setting all properties.
+function slider12_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end

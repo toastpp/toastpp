@@ -13,33 +13,6 @@ using namespace toast;
 
 // =========================================================================
 
-void MatlabToast::ReadMesh (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char meshname[256];
-
-    if (mxIsChar (prhs[0]))
-	mxGetString (prhs[0], meshname, 256);
-    else
-	mexErrMsgTxt ("ReadMesh: Argument 1: file name expected.");
-	
-    if (fileExists (meshname) != 1)
-	mexErrMsgTxt ("ReadMesh: Mesh file not found.");
-
-    QMMesh *mesh = new QMMesh;
-    ifstream ifs(meshname);
-    ifs >> *mesh;
-    if (!ifs.good())
-	mexErrMsgTxt ("ReadMesh: Mesh file invalid format.");
-    mesh->Setup();
-
-    plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
-    uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
-    *ptr = Ptr2Handle(mesh);
-}
-
-// =========================================================================
-
 void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
@@ -168,6 +141,33 @@ void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::ReadMesh (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    char meshname[256];
+
+    if (mxIsChar (prhs[0]))
+	mxGetString (prhs[0], meshname, 256);
+    else
+	mexErrMsgTxt ("ReadMesh: Argument 1: file name expected.");
+	
+    if (fileExists (meshname) != 1)
+	mexErrMsgTxt ("ReadMesh: Mesh file not found.");
+
+    QMMesh *mesh = new QMMesh;
+    ifstream ifs(meshname);
+    ifs >> *mesh;
+    if (!ifs.good())
+	mexErrMsgTxt ("ReadMesh: Mesh file invalid format.");
+    mesh->Setup();
+
+    plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
+    uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
+    *ptr = Ptr2Handle(mesh);
+}
+
+// =========================================================================
+
 void MatlabToast::WriteMesh (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
@@ -242,11 +242,41 @@ void MatlabToast::MeshElementCount (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
-void MatlabToast::ClearMesh (int nlhs, mxArray *plhs[], int nrhs,
+void MatlabToast::MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     Mesh *mesh = GETMESH_SAFE(0);
-    delete mesh;
+    plhs[0] = mxCreateDoubleScalar (mesh->Dimension()); 
+}
+
+// =========================================================================
+
+void MatlabToast::MeshBB (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    int i;
+
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    int dim = mesh->Dimension();
+    Point pmin(dim), pmax(dim);
+    mesh->BoundingBox (pmin, pmax);
+
+    plhs[0] = mxCreateDoubleMatrix (2, dim, mxREAL);
+    double *pr = mxGetPr(plhs[0]);
+    for (i = 0; i < dim; i++) {
+	*pr++ = pmin[i];
+	*pr++ = pmax[i];
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::MeshSize (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+    plhs[0] = mxCreateDoubleScalar (mesh->FullSize());
 }
 
 // =========================================================================
@@ -377,6 +407,221 @@ void MatlabToast::SurfData (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
+    bool elbasis, mxArray **res)
+{
+    int n = mesh->nlen();
+    int *rowptr, *colidx, nzero;
+
+    mesh->SparseRowStructure (rowptr, colidx, nzero);
+    RCompRowMatrix F(n, n, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    if (!strcasecmp (integral_type, "FF")) {
+	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
+    } else if (!strcasecmp (integral_type, "DD")) {
+	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_DD);
+    } else if (!strcasecmp (integral_type, "PFF")) {
+      //Assert (n == prm.Dim(), "Argument 3: wrong size");
+	AddToSysMatrix (*mesh, F, &prm,
+            elbasis ? ASSEMBLE_PFF_EL : ASSEMBLE_PFF);
+    } else if (!strcasecmp (integral_type, "PDD")) {
+      // Assert (n == prm.Dim(), "Argument 3: wrong size");
+	AddToSysMatrix (*mesh, F, &prm,
+            elbasis ? ASSEMBLE_PDD_EL : ASSEMBLE_PDD);
+    } else if (!strcasecmp (integral_type, "BNDPFF")) {
+	AddToSysMatrix (*mesh, F, &prm,
+            elbasis ? ASSEMBLE_BNDPFF_EL : ASSEMBLE_BNDPFF);
+    }
+
+    // Return system matrix to MATLAB
+    CopyMatrix (res, F);
+}
+
+void MatlabToast::SysmatComponent (int nlhs, mxArray *plhs[],
+    int nrhs, const mxArray *prhs[])
+{
+  QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+
+    RVector prm;
+    int n;
+    bool elbasis = false;
+    char integral_type[32] = "";
+
+    if (nrhs >= 2 && mxIsChar(prhs[1])) {
+	mxGetString (prhs[1], integral_type, 32);
+    } else {
+	mexErrMsgTxt ("Parameter 2: string expected");
+    }
+
+    if (nrhs >= 3)
+        CopyVector (prm, prhs[2]);
+
+    if (nrhs >= 4 && mxIsChar(prhs[3])) {
+	char cbuf[32];
+	mxGetString (prhs[3], cbuf, 32);
+	elbasis = (strcasecmp (cbuf, "EL") == 0);
+    }
+    if (elbasis) n = mesh->elen();
+    else         n = mesh->nlen();
+
+    CalcSysmatComponent (mesh, prm, integral_type, elbasis, &plhs[0]);
+}
+
+// =========================================================================
+
+void MatlabToast::Massmat (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+
+    int n = mesh->nlen();
+
+    // Create forward solver to initialise system matrix
+    RFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
+    FWS.AssembleMassMatrix (mesh);
+
+    // Return system matrix to MATLAB
+    CopyMatrix (&plhs[0], *FWS.B);
+}
+
+// =========================================================================
+
+void MatlabToast::ReadQM (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    char qmname[256];
+
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+
+    if (mxIsChar (prhs[1]))
+	mxGetString (prhs[1], qmname, 256);
+    else
+	mexErrMsgTxt ("ReadQM: Argument 1: file name expected.");
+	
+    if (fileExists (qmname) != 1)
+	mexErrMsgTxt ("ReadQM: QM file not found.");
+
+    ifstream ifs(qmname);
+    mesh->LoadQM (ifs);
+}
+
+// =========================================================================
+
+void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    RDenseMatrix qpos, mpos;
+    RCompRowMatrix lnk;
+    char qmname[256];
+    int i, j;
+
+    CopyMatrix (qpos, prhs[0]);
+    CopyMatrix (mpos, prhs[1]);
+
+    ASSERTARG(mxIsSparse(prhs[2]), 3, "expected sparse matrix.");
+    CopyTMatrix (lnk, prhs[2]);
+
+    int dim = qpos.nCols();
+    int nq = qpos.nRows();
+    int nm = mpos.nRows();
+    
+    if (nq != lnk.nRows() || nm != lnk.nCols()) {
+	char cbuf[256];
+	sprintf (cbuf, "Invalid dimension (was: %d x %d, expected %d x %d)",
+		 lnk.nCols(), lnk.nRows(), nm, nq);
+	ASSERTARG(0, 3, cbuf);
+    }
+
+    mxGetString (prhs[3], qmname, 256);
+
+    ofstream ofs(qmname);
+    ofs << "QM file" << endl;
+    ofs << "Dimension " << dim << endl << endl;
+    ofs << "SourceList " << nq << endl;
+    for (i = 0; i < nq; i++)
+	for (j = 0; j < dim; j++)
+	    ofs << qpos(i,j) << (j == dim-1 ? '\n':' ');
+    ofs << endl;
+    ofs << "MeasurementList " << nm << endl;
+    for (i = 0; i < nm; i++)
+	for (j = 0; j < dim; j++)
+	    ofs << mpos(i,j) << (j == dim-1 ? '\n':' ');
+    ofs << endl;
+
+    ofs << "LinkList" << endl;
+    int *ci = new int[nm];
+    double *idx = new double[nm];
+
+    for (i = 0; i < nq; i++) {
+	int nz = lnk.SparseRow (i, ci, idx);
+	ofs << nz << ':';
+	for (j = 0; j < nz; j++)
+	    ofs << ci[j] << (j == nz-1 ? '\n':' ');
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::GetQM (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+    int q, m, n, idx;
+    int nq = mesh->nQ;
+    int nm = mesh->nM;
+    int nqm = mesh->nQM;
+
+    mxArray *lnk = mxCreateSparse (nm, nq, nqm, mxREAL);
+    double  *pr = mxGetPr (lnk);
+    mwIndex *ir = mxGetIr (lnk);
+    mwIndex *jc = mxGetJc (lnk);
+
+    *jc++ = 0;
+    for (q = idx = 0; q < nq; q++) {
+	for (m = n = 0; m < nm; m++) {
+	    if (!mesh->Connected (q,m)) continue;
+	    *pr++ = ++idx;
+	    *ir++ = m;
+	    n++;
+	}
+	*jc = *(jc-1) + n;
+	jc++;
+    }
+
+    plhs[0] = lnk;
+}
+
+// =========================================================================
+
+void MatlabToast::DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+
+    int q, m, idx;
+    plhs[0] = mxCreateDoubleMatrix (1, mesh->nQM, mxREAL);
+    double *pr = mxGetPr (plhs[0]);
+    for (q = idx = 0; q < mesh->nQ; q++)
+	for (m = 0; m < mesh->nM; m++)
+	    if (mesh->Connected (q, m))
+		pr[idx++] = q*mesh->nM + m + 1;    
+}
+
+// =========================================================================
+
+void MatlabToast::ClearMesh (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+    delete mesh;
+    if (verbosity >= 1)
+        mexPrintf ("<Mesh object deleted>\n");
+}
+
+// =========================================================================
+
 void MatlabToast::MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
@@ -403,105 +648,6 @@ void MatlabToast::MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
-void MatlabToast::MeshBB (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    int i;
-
-    Mesh *mesh = GETMESH_SAFE(0);
-
-    int dim = mesh->Dimension();
-    Point pmin(dim), pmax(dim);
-    mesh->BoundingBox (pmin, pmax);
-
-    plhs[0] = mxCreateDoubleMatrix (2, dim, mxREAL);
-    double *pr = mxGetPr(plhs[0]);
-    for (i = 0; i < dim; i++) {
-	*pr++ = pmin[i];
-	*pr++ = pmax[i];
-    }
-}
-
-// =========================================================================
-
-void MatlabToast::MeshSize (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    Mesh *mesh = GETMESH_SAFE(0);
-    plhs[0] = mxCreateDoubleScalar (mesh->FullSize());
-}
-
-// =========================================================================
-
-void MatlabToast::MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    Mesh *mesh = GETMESH_SAFE(0);
-    plhs[0] = mxCreateDoubleScalar (mesh->Dimension()); 
-}
-
-// =========================================================================
-
-void MatlabToast::ElementSize (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    Mesh *mesh = GETMESH_SAFE(0);
-
-    int n = mesh->elen();
-    plhs[0] = mxCreateDoubleMatrix (n, 1, mxREAL);
-    double *pr = mxGetPr (plhs[0]);
-    for (int i = 0; i < n; i++)
-	pr[i] = mesh->ElSize(i);
-}
-
-// =========================================================================
-
-void MatlabToast::ElementData (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    int i, j;
-    double *pr;
-
-    Mesh *mesh = GETMESH_SAFE(0);
-
-    // element index
-    int el = (int)mxGetScalar (prhs[1]) - 1;
-    if (el < 0 || el >= mesh->elen()) { // invalid index
-	plhs[0] = mxCreateDoubleMatrix (0, 0, mxREAL);
-	return;
-    }
-
-    Element *pel = mesh->elist[el];
-    int dim = pel->Dimension();
-    int nnd = pel->nNode();
-    int nsd = pel->nSide();
-    int nsn = pel->nSideNode(0);
-    for (i = 1; i < nsd; i++)
-	nsn = ::max (nsn, pel->nSideNode(i));
-
-    mxArray *vtx = mxCreateDoubleMatrix (nnd, dim, mxREAL);
-    pr = mxGetPr (vtx);
-    for (i = 0; i < dim; i++)
-	for (j = 0; j < nnd; j++)
-	    *pr++ = mesh->nlist[pel->Node[j]][i];
-
-    mxArray *idx = mxCreateDoubleMatrix (nsd, nsn, mxREAL);
-    pr = mxGetPr (idx);
-    for (i = 0; i < nsn; i++)
-	for (j = 0; j < nsd; j++)
-	    if (i < pel->nSideNode(j))
-		*pr++ = pel->Node[pel->SideNode(j,i)]+1;
-	    else
-		*pr++ = 0;
-    
-    plhs[0] = vtx;
-    plhs[1] = idx;
-    if (nlhs > 2)
-        plhs[2] = mxCreateDoubleScalar(pel->Type());
-}
-
-// =========================================================================
-
 void MatlabToast::FindElement (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
@@ -519,199 +665,6 @@ void MatlabToast::FindElement (int nlhs, mxArray *plhs[], int nrhs,
 	for (j = 0; j < dim; j++) p[j] = pt(i,j);
 	*pr++ = mesh->ElFind(p)+1;
     }
-}
-
-// =========================================================================
-
-void MatlabToast::Elmat (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char cbuf[256];
-    mxArray *elmat;
-    double *pr;
-
-    Mesh *mesh = GETMESH_SAFE(0);
-
-    int idx = (int)mxGetScalar(prhs[1]) - 1; // convert to zero-based
-    Element *pel = mesh->elist[idx];
-    int i, j, k, l, nnd = pel->nNode();
-    int dim = mesh->Dimension();
-
-    mxGetString (prhs[2], cbuf, 256);
-
-    if (!strcmp(cbuf, "F")) {
-	elmat = mxCreateDoubleMatrix (nnd, 1, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++)
-	    pr[i] = pel->IntF(i);
-    } else if (!strcmp(cbuf, "FF")) {
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    pr[i*nnd+i] = pel->IntFF(i,i);
-	    for (j = 0; j < i; j++)
-		pr[i*nnd+j] = pr[j*nnd+i] = pel->IntFF(i,j);
-	}
-    } else if (!strcmp(cbuf, "FFF")) {
-	mwSize dims[3] = {nnd,nnd,nnd};
-	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    for (j = 0; j < nnd; j++) {
-		for (k = 0; k < nnd; k++) {
-		    pr[(i*nnd+j)*nnd+k] = pel->IntFFF(i,j,k);
-		}
-	    }
-	}
-    } else if (!strcmp(cbuf, "DD")) {
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    pr[i*nnd+i] = pel->IntDD(i,i);
-	    for (j = 0; j < i; j++)
-		pr[i*nnd+j] = pr[j*nnd+i] = pel->IntDD(i,j);
-	}
-    } else if (!strcmp(cbuf, "FD")) {
-	mwSize dims[3] = {nnd, nnd, dim};
-	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++)
-	    for (j = 0; j < nnd; j++) {
-		RVector fd = pel->IntFD(i,j);
-		if (fd.Dim() == 0) {
-		    plhs[0] = mxCreateDoubleMatrix(0,0,mxREAL);
-		    return;
-		}
-		for (k = 0; k < dim; k++)
-		    pr[i + nnd*(j + k*nnd)] = fd[k];
-	    }
-    } else if (!strcmp(cbuf, "FDD")) {
-	mwSize dims[3] = {nnd, nnd, nnd};
-	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++)
-	    for (j = 0; j < nnd; j++)
-		for (k = 0; k < nnd; k++)
-		    pr[i+nnd*(j+nnd*k)] = pel->IntFDD(i,j,k);
-    } else if (!strcmp(cbuf, "dd")) {
-	mwSize dims[4] = {nnd, dim, nnd, dim};
-	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
-	RSymMatrix intdd = pel->Intdd();
-	pr = mxGetPr(elmat);
-	for (l = 0; l < dim; l++)
-	    for (k = 0; k < nnd; k++)
-		for (j = 0; j < dim; j++)
-		    for (i = 0; i < nnd; i++)
-			*pr++ = intdd(i*dim+j,k*dim+l);
-
-    } else if (!strcmp(cbuf, "PFF")) {
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	RVector prm;
-	CopyVector (prm, prhs[3]);
-	RSymMatrix intPFF = pel->IntPFF(prm);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    pr[i*nnd+i] = intPFF(i,i);
-	    for (j = 0; j < i; j++)
-	        pr[i*nnd+j] = pr[j*nnd+i] = intPFF(i,j);
-	}
-    } else if (!strcmp(cbuf, "PDD")) {
-        elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	RVector prm;
-	CopyVector (prm, prhs[3]);
-	RSymMatrix intPDD = pel->IntPDD(prm);
-	pr = mxGetPr(elmat);
-	for (i = 0; i < nnd; i++) {
-	    pr[i*nnd+i] = intPDD(i,i);
-	    for (j = 0; j < i; j++)
-	        pr[i*nnd+j] = pr[j*nnd+i] = intPDD(i,j);
-	}
-
-    } else if (!strcmp(cbuf, "BndF")) {
-
-	// for now, only integrals over all boundary sides are supported
-	elmat = mxCreateDoubleMatrix (nnd, 1, mxREAL);
-	pr = mxGetPr(elmat);
-	RVector bndintf = pel->BndIntF();
-	for (i = 0; i < pel->nNode(); i++)
-	    pr[i] = bndintf[i];
-
-    } else if (!strcmp(cbuf, "BndFF")) {
-	int ii, jj, sd;
-	if (nrhs > 3) sd = (int)mxGetScalar(prhs[3]) - 1; // side index
-	else sd = -1;
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-
-	if (sd >= 0) { // integral over a single side
-	    for (ii = 0; ii < pel->nSideNode(sd); ii++) {
-		i = pel->SideNode(sd,ii);
-		pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
-		for (jj = 0; jj < ii; jj++) {
-		    j = pel->SideNode(sd,jj);
-		    pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
-		}
-	    }
-	} else { // integral over all boundary sides
-	    for (sd = 0; sd < pel->nSide(); sd++) {
-		if (!pel->IsBoundarySide (sd)) continue;
-		for (ii = 0; ii < pel->nSideNode(sd); ii++) {
-		    i = pel->SideNode(sd,ii);
-		    pr[i*nnd+i] += pel->BndIntFFSide(i,i,sd);
-		    for (jj = 0; jj < ii; jj++) {
-			j = pel->SideNode(sd,jj);
-			pr[i*nnd+j] = pr[j*nnd+i] += pel->BndIntFFSide(i,j,sd);
-		    }
-		}
-	    }
-	}
-    } else if (!strcmp(cbuf, "BndPFF")) {
-        int sd;
-        if (nrhs > 4) sd =  (int)mxGetScalar(prhs[4]) - 1; // side index
-	else sd = -1;
-	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
-	pr = mxGetPr(elmat);
-	RVector prm;
-	CopyVector (prm, prhs[3]);
-
-	if (sd >= 0) { // integral over a single side
-	    xERROR("Not implemented yet!");
-	} else { // integral over all boundary sides
-	    for (i = 0; i < nnd; i++) {
-	        for (j = 0; j < nnd; j++)
-		    pr[i*nnd+j] = pel->BndIntPFF(i,j,prm);
-	    }
-	}
-    } else {
-	mexErrMsgTxt ("Elmat: Integral type string not recognised");
-    }
-    plhs[0] = elmat;
-}
-
-// =========================================================================
-
-void MatlabToast::ReadQM (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    char qmname[256];
-
-    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
-
-    if (mxIsChar (prhs[1]))
-	mxGetString (prhs[1], qmname, 256);
-    else
-	mexErrMsgTxt ("ReadQM: Argument 1: file name expected.");
-	
-    if (fileExists (qmname) != 1)
-	mexErrMsgTxt ("ReadQM: QM file not found.");
-
-    ifstream ifs(qmname);
-    mesh->LoadQM (ifs);
-
-    if (verbosity >= 1)
-	mexPrintf ("QM: %d sources, %d detectors, %d measurements\n",
-	       mesh->nQ, mesh->nM, mesh->nQM);
-
 }
 
 // =========================================================================
@@ -905,8 +858,7 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
 {
     char cbuf[256];
 
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    if (!mesh) mexErrMsgTxt ("DataLinkList: Mesh not found.");
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     SRC_PROFILE mprof;
     mxGetString (prhs[1], cbuf, 256);
@@ -956,8 +908,7 @@ void MatlabToast::QPos (int nlhs, mxArray *plhs[], int nrhs,
 {
     int i, j;
 
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
     
     int nq = mesh->nQ;
     int dim = mesh->Dimension();
@@ -981,8 +932,7 @@ void MatlabToast::MPos (int nlhs, mxArray *plhs[], int nrhs,
 {
     int i, j;
 
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
     
     int nm = mesh->nM;
     int dim = mesh->Dimension();

@@ -10,8 +10,9 @@ using namespace toast;
 // =========================================================================
 
 template<class T>
-TFwdSolverMW<T>::TFwdSolverMW (LSOLVER linsolver, double tol)
-    : TFwdSolver<T> (linsolver, tol)
+TFwdSolverMW<T>::TFwdSolverMW (const QMMesh *mesh, LSOLVER linsolver,
+    double tol)
+    : TFwdSolver<T> (mesh, linsolver, tol)
 {
     Setup();
 }
@@ -19,8 +20,8 @@ TFwdSolverMW<T>::TFwdSolverMW (LSOLVER linsolver, double tol)
 // =========================================================================
 
 template<class T>
-TFwdSolverMW<T>::TFwdSolverMW (char *solver, double tol)
-    : TFwdSolver<T> (solver, tol)
+TFwdSolverMW<T>::TFwdSolverMW (const QMMesh *mesh, char *solver, double tol)
+    : TFwdSolver<T> (mesh, solver, tol)
 {
     Setup();
 }
@@ -28,8 +29,8 @@ TFwdSolverMW<T>::TFwdSolverMW (char *solver, double tol)
 // =========================================================================
 
 template<class T>
-TFwdSolverMW<T>::TFwdSolverMW (ParamParser &pp)
-    : TFwdSolver<T> (pp)
+TFwdSolverMW<T>::TFwdSolverMW (const QMMesh *mesh, ParamParser &pp)
+    : TFwdSolver<T> (mesh, pp)
 {
     Setup();
 }

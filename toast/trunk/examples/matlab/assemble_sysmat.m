@@ -6,6 +6,7 @@ hmesh = toastMesh('../../test/2D/meshes/circle25_32.msh');
 
 % Construct the nodal coefficient vectors (homogeneous for simplicity)
 nnd = hmesh.NodeCount();
+nel = hmesh.ElementCount();
 mua = ones(nnd,1)*0.01;  % absorption coefficient [1/mm]
 mus = ones(nnd,1)*1;     % scattering coefficient [1/mm]
 ref = ones(nnd,1)*1.4;   % refractive index
@@ -14,15 +15,9 @@ freq = 100;              % modulation frequency [MHz]
 %% Direct assembly with toastDotSysmat call
 
 % Frequency-domain problem: complex case
-smat = toastDotSysmat(hmesh,mua,mus,ref,freq);
+smat = dotSysmat(hmesh,mua,mus,ref,freq);
 
-%% manual matrix assembly
-% Now let's assemble the system matrix manually from individual
-% element contributions
-
-% We need the element connectivity list (idx) to map from local to global DOFs
-[vtx idx, eltp] = hmesh.Data();  
-nel = size(idx,1);
+%% manual matrix assembly from individual terms
 
 % Map parameters into toast format
 c0 = 0.3;                              % vacuum light speed [mm/ps]
@@ -32,30 +27,44 @@ ckap = c./(3.0*(mua+mus));             % diffusion (c*kappa)
 zeta = c./(2.0.*toastDotBndterm(ref,'Keijzer')); % boundary term (c/2A)
 omega = freq*2.0*pi*1e-6;              % modulation frequency [cycles/ps]
 
-smat2 = sparse(nnd,nnd);
+K = hmesh.SysmatComponent ('PDD', ckap);
+C = hmesh.SysmatComponent ('PFF', cmua);
+B = omega*hmesh.SysmatComponent ('FF');
+A = hmesh.SysmatComponent ('BndPFF', zeta);
+smat2 = K + C + A + 1i*B;
 
-for el=1:nel
-    elidx = idx(el,:);
+%% manual matrix assembly
+% Now let's assemble the system matrix manually from individual
+% element contributions
+
+smat3 = sparse(nnd,nnd);
+
+for i=1:nel
+    el = hmesh.Element(i);
     
     % diffusion contribution
-    int_kapDD = hmesh.Elmat(el,'PDD',ckap);
+    int_kapDD = el.Mat('PDD',ckap);
     
     % absorption contribution
-    int_muaFF = hmesh.Elmat(el,'PFF',cmua);
+    int_muaFF = el.Mat('PFF',cmua);
 
     % frequency contribution
-    int_omegaFF = omega*hmesh.Elmat(el,'FF');
+    int_omegaFF = omega*el.Mat('FF');
 
     % boundary contribution
-    bint_zetaFF = hmesh.Elmat(el,'BndPFF',zeta);
+    bint_zetaFF = el.Mat('BndPFF',zeta);
     
     % assemble into global matrix
-    smat2(elidx,elidx) = smat2(elidx,elidx) + ...
+    elidx = el.Dof();  % global degrees of freedom for element nodes
+    smat3(elidx,elidx) = smat3(elidx,elidx) + ...
         int_kapDD + int_muaFF + bint_zetaFF + 1i*int_omegaFF;
 
 end
 
-% Compare the two matrices
-ds = smat-smat2;
-err = norm(nonzeros(ds));
-fprintf('norm of difference matrix = %e\n', err);
+%% Compare the two matrices
+ds1 = smat-smat2;
+ds2 = smat-smat3;
+err1 = norm(nonzeros(ds1));
+err2 = norm(nonzeros(ds2));
+fprintf('component-wise assembly of stiffness matrix: error=%e\n', err1);
+fprintf('element-wise assembly of stiffness matrix:   error=%e\n', err2);

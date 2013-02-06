@@ -57,7 +57,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     slen = (raster ? raster->SLen() : n);
 
     RVector *dphi, *aphi;
-    RFwdSolver FWS (solver, tol);
+    RFwdSolver FWS (mesh, solver, tol);
 
     // Solution in mesh basis
     Solution msol(OT_NPARAM, n);
@@ -81,7 +81,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     for (i = 0; i < nM; i++) aphi[i].New (n);
 
     // Calculate direct and adjoint fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, 0);
     FWS.CalcFields (qvec, dphi);
     FWS.CalcFields (mvec, aphi);

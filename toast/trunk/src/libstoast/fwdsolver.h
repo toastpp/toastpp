@@ -78,27 +78,30 @@ template<class T> class TFwdSolver {
 public:
     /**
      * \brief Constructor. Creates a forward solver instance.
+     * \param mesh pointer to associated QMMesh object
      * \param linsolver linear solver type (see \ref lsolver)
      * \param tol linear solver tolerance (only used for iterative methods)
      */
-    TFwdSolver (LSOLVER linsolver, double tol = 1e-10);
+    TFwdSolver (const QMMesh *mesh, LSOLVER linsolver, double tol = 1e-10);
 
     /**
      * \brief Constructor. Creates a forward solver instance.
+     * \param mesh pointer to associated QMMesh object
      * \param solver linear solver type, provided as a string (see notes)
      * \param tol linear solver tolerance (only used for iterative methods)
      * \note For valid strings to define the linear solver, see
      * \ref SetLinSolver.
      */
-    TFwdSolver (const char *solver, double tol = 1e-10);
+    TFwdSolver (const QMMesh *mesh, const char *solver, double tol = 1e-10);
 
     /**
      * \brief Constructor. Creates a forward solver instance.
+     * \param mesh pointer to associated QMMesh object
      * \param pp parser to read solver options from.
      * \note For recognised items in the configuration file used by the parser,
          see the \ref ReadParams method.
     */
-    TFwdSolver (ParamParser &pp);
+    TFwdSolver (const QMMesh *mesh, ParamParser &pp);
 
     /**
      * \brief Destructor. Destroys the forward solver instance.
@@ -200,17 +203,16 @@ public:
     /**
      * \brief Evaluates fill structure of system matrices and allocates
      *   dynamic memory for them.
-     * \param mesh FEM mesh to be associated with the forward solver
-     * \note This function associates the specified mesh with the forward
-     *   solver, evaluates the fill structure of the resulting sparse
-     *   system matrix and allocates storage for it.
+     * \note This function evaluates the fill structure of the sparse
+     *   system matrix from the element connectivity graph of the associated
+     *   mesh and allocates storage for it.
      * \note If a direct solver was selected, memory for the factorised matrix
      *   is also allocated, based on a symbolic Cholesky factorisation of the
      *   system matrix.
      * \note For iterative solvers, a simple diagonal precoditioner is
      *   generated.
      */
-    void Allocate (const QMMesh &mesh);
+    void Allocate ();
 
     /**
      * \brief Construct the FEM system matrix from a set of parameter

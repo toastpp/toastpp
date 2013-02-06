@@ -458,9 +458,12 @@ void QMMesh::LoadQM (istream &is)
 
     if (!external_m_pos) InitM ();
 
-    if (toastVerbosity > 0)
-        cout << "QM: " << nQ << " sources, " << nM << " detectors, "
-	     << nQM << " measurements" << endl;
+    if (toastVerbosity > 0) {
+        cout << "QM:" << endl;
+	cout << "--> Sources........." << nQ << endl;
+	cout << "--> Detectors......." << nM << endl;
+	cout << "--> Measurements...." << nQM << endl;
+    }
 }
 
 void QMMesh::ScaleMesh (double scale)

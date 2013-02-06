@@ -97,11 +97,12 @@ int main (int argc, char *argv[]) {
     double t0, wt0, dt;
     Point bbmin, bbmax;
 
-    CFwdSolver FWS (pp);
+    SelectMesh (pp, meshname, mesh);
+
+    CFwdSolver FWS (&mesh, pp);
     FWS.WriteParams (pp);
     lin_tol = FWS.GetLinSolverTol();
 
-    SelectMesh (pp, meshname, mesh);
     SelectSourceProfile (pp, qprof, qwidth, srctp);
     SelectMeasurementProfile (pp, mprof, mwidth);
     int n = mesh.nlen();
@@ -176,7 +177,7 @@ int main (int argc, char *argv[]) {
 
     // allocate system matrix
     cout << endl << "Allocating system matrix" << endl;
-    FWS.Allocate (mesh);
+    FWS.Allocate ();
 
     cout << endl << endl << "----------" << endl;
 

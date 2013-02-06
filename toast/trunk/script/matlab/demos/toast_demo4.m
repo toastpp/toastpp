@@ -91,9 +91,6 @@ prm.fwdsolver.method = 'Direct';
 prm.fwdsolver.tol = 1e-10;
 prm.solver.method = 'LM';
 prm.solver.tol = 1e-8;
-prm.regul = struct ('method','TK1', ...
-     'tau',1e-5, ...
-     'prior',struct ('refname','','smooth',1,'threshold',0.1));
 prm.initprm.mua = struct('reset','HOMOG','val',0.025);
 prm.initprm.mus = struct('reset','HOMOG','val',2);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
@@ -102,18 +99,23 @@ prm.callback.context = handles;
 prm.callback.iter = @callback_vis; % iteration callback from recon
 
 prm.bx = prm.solver.basis.bdim(1); prm.by = prm.solver.basis.bdim(2);
-prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
-toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
+prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
+prm.basis.hMesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,[prm.bx prm.by],[prm.bx prm.by]);
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,[prm.bx prm.by],'Linear');
+
+prm.regul = struct ('method','TK1', ...
+     'tau',1e-5, ...
+     'prior',struct ('refname','','smooth',1,'threshold',0.1));
+prm.regul.basis = prm.basis.hBasis;
+
+n = prm.basis.hMesh.NodeCount();
 load toast_demo1.mat
 load toast_demo2.mat
 prm.bmua = bmua; clear bmua;
 prm.bmus = bmus; clear bmus;
-prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
+prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
 prm.ref = ones(n,1)*1.4;
 axes(handles.axes1);
 imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by)),[0.005 0.05]); axis xy equal tight off
@@ -132,21 +134,22 @@ setappdata(handles.figure1,'isBusy',false);
 % --- Displays the detector setup for source 0
 function disp_detectors(handles,prm)
 
-n = toastMeshNodeCount(prm.basis.hMesh);
-tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
+n = prm.basis.hMesh.NodeCount();
+tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
 axes(handles.axes7);
 cla;imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 %cla;surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 hold on;
 
-qp = toastQPos(prm.basis.hMesh);
+qp = prm.basis.hMesh.Qpos();
 qidx = 1;
 x = (qp(qidx,1)/50.0*0.96+0.5)*prm.bx+1;
 y = (qp(qidx,2)/50.0*0.96+0.5)*prm.by+1;
 plot3(x, y, 1, 'og', 'MarkerSize',3, 'MarkerFaceColor','green');
 
-mp = toastMPos(prm.basis.hMesh);
-LL = toastGetQM(prm.basis.hMesh);
+mp = prm.basis.hMesh.Mpos();
+LL = prm.basis.hMesh.DataLinkList('matrix');
+%LL = toastGetQM(prm.basis.hMesh);
 idx = find(LL(:,qidx));
 for i=1:length(idx)
     x = (mp(idx(i),1)/50.0*0.96+0.5)*prm.bx+1;
@@ -228,7 +231,7 @@ switch get(hObject,'Value')
         prm.data.phasefile = 'farg_ellips_nback.fem';
 end
 
-toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
+prm.basis.hMesh.ReadQM (prm.meas.qmfile);
 setappdata(handles.figure1,'prm',prm);
 disp_detectors(handles,prm);
 

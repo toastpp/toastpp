@@ -81,20 +81,19 @@ varargout{1} = handles.output;
 function init(handles)
 prm.bx = 64; prm.by = 64;
 prm.blen = prm.bx*prm.by;
-prm.basis.hMesh = toastReadMesh('circle25_32.msh');
-toastReadQM(prm.basis.hMesh,'circle25_1x32.qm');
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,[prm.bx prm.by],[prm.bx prm.by]);
-prm.qvec = toastQvec(prm.basis.hMesh,'Neumann','Gaussian',2);
-prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
+prm.basis.hMesh = toastMesh('circle25_32.msh');
+prm.basis.hMesh.ReadQM('circle25_1x32.qm');
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,[prm.bx prm.by],'Linear');
+prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
+n = prm.basis.hMesh.NodeCount();
 prm.mua = ones(n,1)*0.025;
 prm.mus = ones(n,1)*2;
 prm.ref = ones(n,1)*1.4;
 prm.bkg = 0;
 prm.meas.src.freq = 100;
-prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
 prm.diff_fields = false;
 prm.diff_proj = false;
 axes(handles.axes1);
@@ -104,7 +103,7 @@ axes(handles.axes2);
 h = imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 axes(handles.axes7);
-tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
+tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
 h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 x = prm.bx*(0.45+0.5);
 y = prm.by*(0.5);
@@ -113,7 +112,7 @@ set(h,'ButtonDownFcn','toast_demo1(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo)
 clear tmp
 
 % calculate unperturbed fields
-smat = toastSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,prm.meas.src.freq);
+smat = dotSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,prm.meas.src.freq);
 phi = smat\prm.qvec;
 lphi = log(phi);
 prm.lnamp0 = real(lphi);
@@ -145,21 +144,21 @@ if bkg ~= prm.bkg
     % update parameter background
     switch bkg
         case 0 % flat
-            n = toastMeshNodeCount(prm.basis.hMesh);
+            n = prm.basis.hMesh.NodeCount();
             prm.mua = ones(n,1)*0.025;
             prm.mus = ones(n,1)*2;
-            prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-            prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+            prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+            prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
         case 1 % 'blobs'
             load toast_demo1.mat
             prm.bmua = bmua; clear bmua;
             prm.bmus = bmus; clear bmus;
-            prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-            prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+            prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
+            prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
     end
     
     % calculate unperturbed fields
-    smat = toastSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,...
+    smat = dotSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,...
                        prm.meas.src.freq);
     phi = smat\prm.qvec;
     lphi = log(phi);
@@ -179,16 +178,16 @@ function setsource(handles,phi)
 prm = getappdata(handles.figure1,'prm');
 
 % Redefine Q position
-M = toastMPos(prm.basis.hMesh);
+M = prm.basis.hMesh.Mpos();
 rad = 24.5;
 Q = [rad*cos(phi) rad*sin(phi)];
-toastSetQM(prm.basis.hMesh,Q,M);
-prm.qvec = toastQvec(prm.basis.hMesh,'Neumann','Gaussian',2);
-prm.mvec = toastMvec(prm.basis.hMesh,'Gaussian',2);
+prm.basis.hMesh.SetQM(Q,M);
+prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
 
 axes(handles.axes7);
-n = toastMeshNodeCount(prm.basis.hMesh);
-tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
+n = prm.basis.hMesh.NodeCount();
+tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
 cla;h = imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
 x = prm.bx*(0.5+cos(phi)*0.45);
 y = prm.by*(0.5-sin(phi)*0.45);
@@ -197,7 +196,7 @@ set(h,'ButtonDownFcn','toast_demo1(''axes7_ButtonDownFcn'',gcbo,[],guidata(gcbo)
 clear tmp
 
 % calculate unperturbed fields
-smat = toastSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,prm.meas.src.freq);
+smat = dotSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,prm.meas.src.freq);
 phi = smat\prm.qvec;
 lphi = log(phi);
 prm.lnamp0 = real(lphi);
@@ -218,7 +217,7 @@ if freq ~= prm.meas.src.freq
     set(handles.text20,'String',num2str(freq,'%0.0f'));
 
     % calculate unperturbed fields
-    smat = toastSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,...
+    smat = dotSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,...
                        prm.meas.src.freq);
     phi = smat\prm.qvec;
     lphi = log(phi);
@@ -243,7 +242,7 @@ bpert = zeros(prm.bx,prm.by);
 bpert(pert.mua.x0-pert.mua.dx:pert.mua.x0+pert.mua.dx,pert.mua.y0-pert.mua.dx:pert.mua.y0+pert.mua.dx) = pert.mua.val;
 bpert = reshape(bpert,[],1);
 bmua = prm.bmua + bpert;
-mua = toastMapBasisToMesh(prm.basis.hBasis,bmua);
+mua = prm.basis.hBasis.Map('B->M',bmua);
 axes(handles.axes1);
 cla; h = imagesc(rot90(reshape(bmua,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes1_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
@@ -252,14 +251,14 @@ bpert = zeros(prm.bx,prm.by);
 bpert(pert.mus.x0-pert.mus.dx:pert.mus.x0+pert.mus.dx,pert.mus.y0-pert.mus.dx:pert.mus.y0+pert.mus.dx) = pert.mus.val;
 bpert = reshape(bpert,[],1);
 bmus = prm.bmus + bpert;
-mus = toastMapBasisToMesh(prm.basis.hBasis,bmus);
+mus = prm.basis.hBasis.Map('B->M',bmus);
 axes(handles.axes2);
 cla; h = imagesc(rot90(reshape(bmus,prm.bx,prm.by))); axis xy equal tight off
 set(h,'ButtonDownFcn','toast_demo1(''axes2_ButtonDownFcn'',gcbo,[],guidata(gcbo))');
 
 % calculate the fields
-n = toastMeshNodeCount(prm.basis.hMesh);
-smat = toastSysmat(prm.basis.hMesh,mua,mus,prm.ref,prm.meas.src.freq);
+n = prm.basis.hMesh.NodeCount();
+smat = dotSysmat(prm.basis.hMesh,mua,mus,prm.ref,prm.meas.src.freq);
 phi = smat\prm.qvec;
 lphi = log(phi);
 lnamp = real(lphi);
@@ -269,10 +268,10 @@ if prm.diff_fields == true;
     phase = phase - prm.phase0;
 end
 axes(handles.axes3);
-bphi = toastMapMeshToBasis(prm.basis.hBasis,lnamp);
+bphi = prm.basis.hBasis.Map('M->B',lnamp);
 cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy equal tight off;
 axes(handles.axes4);
-bphi = toastMapMeshToBasis(prm.basis.hBasis,phase);
+bphi = prm.basis.hBasis.Map('M->B',phase);
 cla;imagesc(rot90(reshape(bphi,prm.bx,prm.by))); axis xy equal tight off;
 
 % calculate projections

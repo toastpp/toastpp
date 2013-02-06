@@ -1,12 +1,12 @@
 function p = toastSysmatComponent
 %toastSysmatComponent - Generate an FEM system matrix term.
 %
-% Synopsis: S = toastSysmatComponent (hMesh, prm, int_tp)
-%           S = toastSysmatComponent (hMesh, prm, int_tp, 'EL')
+% Synopsis: S = toastSysmatComponent (hMesh, int_tp, prm)
+%           S = toastSysmatComponent (hMesh, int_tp, prm, 'EL')
 %
 %    hMesh:  mesh handle
-%    prm:    nodal parameter (real column vector)
 %    int_tp: integration type (string; see notes)
+%    prm:    nodal parameter (real column vector)
 %    'EL'    flag to indicate element basis
 %    S:      system matrix (complex, sparse)
 %

@@ -76,7 +76,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     slen = (raster ? raster->SLen() : n);
 
     CVector *dphi, *aphi;
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
 
 //  if (FWS.LinSolver() == LSOLVER_DIRECT)
 //	mexPrintf ("Using direct solver\n");
@@ -101,7 +101,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     double omega = freq * 2.0*Pi*1e-6; // convert from MHz to rad
 
     // Calculate direct and adjoint fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega);
     CVector sphi(slen);
 

@@ -55,77 +55,20 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ProvideToast();
 
     switch (funcid) {
-    case TOAST_READMESH:
-	mtoast->ReadMesh (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MAKEMESH:
-	mtoast->MakeMesh (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_WRITEMESH:
-	mtoast->WriteMesh (nlhs, plhs, nrhs, prhs);
-	break;
     case TOAST_CLEARMESH:
 	mtoast->ClearMesh (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MESHDATA:
-	mtoast->MeshData (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_SURFDATA:
-	mtoast->SurfData (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_MARKMESHBOUNDARY:
 	mtoast->MarkMeshBoundary (nlhs, plhs, nrhs, prhs);
 	break;
-    case TOAST_MESHNODECOUNT:
-	mtoast->MeshNodeCount (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MESHELEMENTCOUNT:
-	mtoast->MeshElementCount (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MESHBB:
-	mtoast->MeshBB (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MESHSIZE:
-	mtoast->MeshSize (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MESHDIMENSION:
-	mtoast->MeshDimension (nlhs, plhs, nrhs, prhs);
-	break;
     case TOAST_MESHLIN2QUAD:
 	mtoast->MeshLin2Quad (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_MESHOPT:
-	mtoast->MeshOpt (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_READQM:
-	mtoast->ReadQM (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_SETQM:
 	mtoast->SetQM (nlhs, plhs, nrhs, prhs);
 	break;
-    case TOAST_GETQM:
-	mtoast->GetQM (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_WRITEQM:
-	mtoast->WriteQM (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_DATALINKLIST:
-	mtoast->DataLinkList (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_ELEMENTSIZE:
-	mtoast->ElementSize (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_ELEMENTDATA:
-	mtoast->ElementData (nlhs, plhs, nrhs, prhs);
-	break;
     case TOAST_FINDELEMENT:
 	mtoast->FindElement (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_SHAPEFUNC:
-	mtoast->ShapeFunc (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_SHAPEGRAD:
-	mtoast->ShapeGrad (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_READNIM:
 	mtoast->ReadNIM (nlhs, plhs, nrhs, prhs);
@@ -148,17 +91,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_SYSMAT:
 	mtoast->Sysmat (nlhs, plhs, nrhs, prhs);
 	break;
-    case TOAST_MASSMAT:
-	mtoast->Massmat (nlhs, plhs, nrhs, prhs);
-	break;
     case TOAST_VOLMAT:
 	mtoast->Volmat (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BNDMAT:
 	mtoast->Bndmat (nlhs, plhs, nrhs, prhs);
-	break;
-    case TOAST_ELMAT:
-	mtoast->Elmat (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_BNDREFLECTIONTERM:
 	mtoast->BndReflectionTerm (nlhs, plhs, nrhs, prhs);
@@ -276,6 +213,82 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	break;
     case TOAST_KRYLOV:
 	mtoast->Krylov (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_LBFGS:
+        mtoast->LBFGS (nlhs, plhs, nrhs, prhs);
+	break;
+
+    // methods defined in mtMesh.cc
+    case TOAST_MAKEMESH:
+	mtoast->MakeMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_READMESH:
+	mtoast->ReadMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITEMESH:
+	mtoast->WriteMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHOPT:
+	mtoast->MeshOpt (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHNODECOUNT:
+	mtoast->MeshNodeCount (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHELEMENTCOUNT:
+	mtoast->MeshElementCount (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHDIMENSION:
+	mtoast->MeshDimension (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHBB:
+	mtoast->MeshBB (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHSIZE:
+	mtoast->MeshSize (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHDATA:
+	mtoast->MeshData (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SURFDATA:
+	mtoast->SurfData (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SYSMATCOMPONENT:
+        mtoast->SysmatComponent (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MASSMAT:
+	mtoast->Massmat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_READQM:
+	mtoast->ReadQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITEQM:
+	mtoast->WriteQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_GETQM:
+	mtoast->GetQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_DATALINKLIST:
+	mtoast->DataLinkList (nlhs, plhs, nrhs, prhs);
+	break;
+
+    // methods defined in mtElement.cc
+    case TOAST_ELDOF:
+        mtoast->ElDof (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELEMENTSIZE:
+	mtoast->ElSize (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELEMENTDATA:
+	mtoast->ElData (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELMAT:
+	mtoast->ElMat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SHAPEFUNC:
+	mtoast->ShapeFunc (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SHAPEGRAD:
+	mtoast->ShapeGrad (nlhs, plhs, nrhs, prhs);
 	break;
 
 #ifdef FDOT

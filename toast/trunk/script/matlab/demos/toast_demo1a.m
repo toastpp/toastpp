@@ -80,21 +80,21 @@ function init(handles)
 
 prm.basis.bdim = [64 64];
 prm.blen = prod(prm.basis.bdim);
-prm.basis.hMesh = toastReadMesh('circle25_32.msh');
-toastReadQM(prm.basis.hMesh,'circle25_1x32.qm');
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.basis.bdim,prm.basis.bdim);
-prm.qvec = real(toastQvec(prm.basis.hMesh,'Isotropic','Gaussian',2));
-prm.mvec = real(toastMvec(prm.basis.hMesh,'Gaussian',2));
+prm.basis.hMesh = toastMesh('circle25_32.msh');
+prm.basis.hMesh.ReadQM('circle25_1x32.qm');
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.basis.bdim,'Linear');
+prm.qvec = real(prm.basis.hMesh.Qvec('Isotropic','Gaussian',2));
+prm.mvec = real(prm.basis.hMesh.Mvec('Gaussian',2));
 prm.mvec = prm.mvec(:,[4,8,12,16]);   % only run with 4 detectors
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
+%prm.smask = toastSolutionMask(prm.basis.hBasis);
+n = prm.basis.hMesh.NodeCount();
 prm.mua = ones(n,1)*0.01;
 prm.mus = ones(n,1)*1;
 prm.ref = ones(n,1)*1.4;
 prm.bkg = 0;
 prm.meas.src.freq = 0;
-prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
 
 prm.trange = 5000;
 prm.nstep = 100;
@@ -129,13 +129,13 @@ set(gca,'Position',[33.6 2.755 30.2 11.615],'Visible','off');
 function showqm (handles)
 
 prm = getappdata(handles.figure1,'prm');
-n = toastMeshNodeCount(prm.basis.hMesh);
-tmp = toastMapMeshToBasis(prm.basis.hBasis,ones(n,1));
+n = prm.basis.hMesh.NodeCount();
+tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
 
 midx = [4 8 12 16];
-M = toastMPos(prm.basis.hMesh);
+M = prm.basis.hMesh.Mpos();
 M = M(midx,:);   % only use 4 detectors
-Q = toastQPos(prm.basis.hMesh);
+Q = prm.basis.hMesh.Qpos();
 axes(handles.axes7);
 cla; surface(reshape(tmp,prm.basis.bdim(1),prm.basis.bdim(2)),'EdgeColor','none');
 
@@ -166,8 +166,8 @@ nstep = prm.nstep;
 dt = prm.trange/nstep;
 
 % Set up the required FEM matrices
-smat = real(toastSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,0));
-mmat = toastMassmat(prm.basis.hMesh);
+smat = real(dotSysmat(prm.basis.hMesh,prm.mua,prm.mus,prm.ref,0));
+mmat = prm.basis.hMesh.Massmat();
 K0 = -(smat * (1-theta) - mmat * 1/dt);            % backward difference matrix
 K1 = smat * theta + mmat * 1/dt;                   % forward difference matrix
 mvecT = prm.mvec.';
@@ -193,7 +193,7 @@ for i=1:nstep
     j = j+1;
     if j == ndisp || i == nstep
         axes(handles.axes5);
-        img = toastMapMeshToGrid (prm.basis.hBasis,log(max(phi,1e-25)));
+        img = prm.basis.hBasis.Map ('M->G',log(max(phi,1e-25)));
         img = reshape(img, prm.basis.bdim(1), prm.basis.bdim(2))';
         imagesc(img,[-25 -5]); axis equal tight;
         set (gca,'Visible','off');
@@ -230,17 +230,17 @@ if bkg ~= prm.bkg
     % update parameter background
     switch bkg
         case 0 % flat
-            n = toastMeshNodeCount(prm.basis.hMesh);
+            n = prm.basis.hMesh.NodeCount();
             prm.mua = ones(n,1)*0.01;
             prm.mus = ones(n,1)*1;
-            prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-            prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+            prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+            prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
         case 1 % 'blobs'
             load toast_demo1.mat
             prm.bmua = bmua * 0.01/0.025; clear bmua;
             prm.bmus = bmus * 1/2; clear bmus;
-            prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-            prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+            prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
+            prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
     end
     setappdata(handles.figure1,'prm',prm);
     showprm(handles);

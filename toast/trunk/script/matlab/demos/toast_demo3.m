@@ -92,11 +92,19 @@ prm.meas.src = struct('type','Neumann','prof','Gaussian','width',2);
 prm.meas.det = struct('prof','Gaussian','width',2);
 prm.fwdsolver.method = 'direct';
 prm.fwdsolver.tol = 1e-14;
+prm.fwdsolver.hmesh = toastMesh(prm.fwdsolver.meshfile);
+prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
+
 prm.solver.basis.bdim = [64 64];
+prm.solver.basis.hbasis = toastBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim,'Linear');
 prm.solver.method = 'PCG';
 prm.solver.tol = 1e-8;
 prm.solver.step0 = 100;
+
 prm.regul.method = 'None';
+prm.regul.basis = prm.solver.basis.hbasis;
+prm.regul.tau = 1e-4;
+
 prm.initprm.mua = struct('reset','HOMOG','val',0.025);
 prm.initprm.mus = struct('reset','HOMOG','val',2);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
@@ -104,18 +112,14 @@ prm.initprm.ref = struct('reset','HOMOG','val',1.4);
 prm.callback.context = handles;
 prm.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.fwdsolver.hmesh = toastReadMesh(prm.fwdsolver.meshfile);
-toastReadQM (prm.fwdsolver.hmesh,prm.meas.qmfile);
-
-prm.solver.basis.hbasis = toastSetBasis('LINEAR',prm.fwdsolver.hmesh,prm.solver.basis.bdim,prm.solver.basis.bdim);
-prm.smask = toastSolutionMask(prm.solver.basis.hbasis);
-n = toastMeshNodeCount(prm.fwdsolver.hmesh);
+%prm.smask = toastSolutionMask(prm.solver.basis.hbasis);
+n = prm.fwdsolver.hmesh.NodeCount();
 load toast_demo1.mat
 load toast_demo2.mat
 prm.bmua = bmua; clear bmua;
 prm.bmus = bmus; clear bmus;
-prm.mua = toastMapBasisToMesh(prm.solver.basis.hbasis,prm.bmua);
-prm.mus = toastMapBasisToMesh(prm.solver.basis.hbasis,prm.bmus);
+prm.mua = prm.solver.basis.hbasis.Map('B->M',prm.bmua);
+prm.mus = prm.solver.basis.hbasis.Map('B->M',prm.bmus);
 prm.ref = ones(n,1)*1.4;
 axes(handles.axes1);
 imagesc(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.005 0.05]);
@@ -126,16 +130,16 @@ imagesc(reshape(prm.bmus,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.5
 axis xy equal tight off
 %set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes7);
-tmp = toastMapMeshToBasis(prm.solver.basis.hbasis,ones(n,1));
+tmp = prm.solver.basis.hbasis.Map('M->B',ones(n,1));
 h = imagesc(rot90(reshape(tmp,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)))); axis xy equal tight off
 hold on;
-qp = toastQPos(prm.fwdsolver.hmesh);
+qp = prm.fwdsolver.hmesh.Qpos();
 for i=1:size(qp,1)
     x = (qp(i,1)/50.0*0.96+0.5)*prm.solver.basis.bdim(1)+1;
     y = (qp(i,2)/50.0*0.96+0.5)*prm.solver.basis.bdim(2)+1;
     plot3(x, y, 1, 'og', 'MarkerSize',3, 'MarkerFaceColor','green');
 end
-mp = toastMPos(prm.fwdsolver.hmesh);
+mp = prm.fwdsolver.hmesh.Mpos();
 for i=1:size(mp,1)
     x = (mp(i,1)/50.0*0.96+0.5)*prm.solver.basis.bdim(1)+1;
     y = (mp(i,2)/50.0*0.96+0.5)*prm.solver.basis.bdim(2)+1;
@@ -239,6 +243,7 @@ switch get(hObject,'Value')
             'prior',struct ('refname','','smooth',1,'threshold',0.1), ...
             'huber',struct ('eps',0.01));
 end
+prm.regul.basis = prm.solver.basis.hbasis;
 setappdata(handles.figure1,'prm',prm);
 
 

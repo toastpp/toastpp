@@ -1,8 +1,8 @@
 import os
 import numpy as np
-import glumpy as gp
 import OpenGL.GL as gl
-import OpenGL.GLUT as glut
+import glumpy as gp
+from glumpy import figure, Trackball
 from numpy import matrix
 from scipy import sparse
 from scipy.sparse import linalg
@@ -49,7 +49,7 @@ class Mesh3D(object):
                     ns = elist[xi,yi]
                     nt = xi*3+yi
                     v = (nim[perm[ns]]-nmin)/(nmax-nmin)
-                    col = cm._get_color(v)
+                    col = cm.get_color(v)
                     self.values[nt,:] = col._get_rgb()
     def draw(self):
         gl.glEnableClientState(gl.GL_VERTEX_ARRAY)
@@ -79,6 +79,14 @@ class Mesh2D(object):
         bbcnt = (bbmin+bbmax)/2
         scale = 1.5/np.max(bbmax-bbmin)
         nlen = nlist.shape[0]
+        elen = elist.shape[0]
+        vertices = np.zeros((elen*3),dtype=[('position','f4',3)])
+        for i in range(elen):
+            for j in range(3):
+                vertices[i*3+j] = nlist[elist[i,j]
+
+
+
         self.elen = elist.shape[0]
         self.indices = np.zeros((self.elen,3), dtype=np.int32)
         self.vertices = np.zeros((nlen,3), dtype=np.float32)
@@ -95,7 +103,7 @@ class Mesh2D(object):
                 self.vertices[xi,zi] = (nlist[xi,zi]-bbcnt[zi])*scale
             self.vertices[xi,2] = 1
             v = (nim[xi]-nmin)/(nmax-nmin)
-            col = cm._get_color(v)
+            col = cm.get_color(v)
             self.values[xi,:] = col._get_rgb()
         for xi in range(self.elen):
             for yi in range(3):
@@ -229,49 +237,51 @@ def ShowMesh2D(hmesh,nim,cmap,mode):
     
     mesh = Mesh2D(hmesh,nim,cm)
 
-    window = gp.Window(800,800)
-    trackball = gp.Trackball(0,0,2)
+    fig = figure(size=(800,800))
+    trackball = Trackball(0,0,2)
+    fig.push (mesh)
+    fig.show()
 
-    @window.event
-    def on_draw():
-        gl.glClearColor(0,0,0,1)
-        window.clear()
-        trackball.push()
-        gl.glDisable(gl.GL_DEPTH_TEST)
-        gl.glEnable(gl.GL_BLEND)
-        gl.glBlendFunc (gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-        #I.shader.bind(I.texture,I._lut)
-        mesh.draw()
-        if wire==True:
-            gl.glPolygonMode (gl.GL_FRONT, gl.GL_LINE)
-            gl.glColor4f(0,1,0,1)
-            mesh.drawwire()
-            gl.glPolygonMode (gl.GL_FRONT, gl.GL_FILL)
-
-        #I.shader.unbind()
-        trackball.pop()
-
-    @window.event
-    def on_init():
-        gl.glEnable (gl.GL_BLEND)
-        gl.glColorMaterial(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE)
-        gl.glEnable (gl.GL_COLOR_MATERIAL)
-        gl.glBlendFunc (gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-        gl.glPolygonMode (gl.GL_FRONT, gl.GL_FILL)
-        gl.glFrontFace (gl.GL_CCW)
-        gl.glEnable (gl.GL_CULL_FACE)
-        gl.glShadeModel (gl.GL_SMOOTH)
-        
-    #@window.event
-    #def on_mouse_drag(x, y, dx, dy, button):
-    #    trackball.drag_to(x,y,dx,dy)
-    #    window.draw()
-
-    @window.event
-    def on_mouse_scroll(x, y, dx, dy):
-        trackball.zoom_to(x,y,dx,dy)
-        window.draw()
-
-    window.mainloop()
+#    @window.event
+#    def on_draw():
+#        gl.glClearColor(0,0,0,1)
+#        window.clear()
+#        trackball.push()
+#        gl.glDisable(gl.GL_DEPTH_TEST)
+#        gl.glEnable(gl.GL_BLEND)
+#        gl.glBlendFunc (gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+#        #I.shader.bind(I.texture,I._lut)
+#        mesh.draw()
+#        if wire==True:
+#            gl.glPolygonMode (gl.GL_FRONT, gl.GL_LINE)
+#            gl.glColor4f(0,1,0,1)
+#            mesh.drawwire()
+#            gl.glPolygonMode (gl.GL_FRONT, gl.GL_FILL)
+#
+#       #I.shader.unbind()
+#        trackball.pop()
+#
+#    @window.event
+#    def on_init():
+#        gl.glEnable (gl.GL_BLEND)
+#        gl.glColorMaterial(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE)
+#        gl.glEnable (gl.GL_COLOR_MATERIAL)
+#        gl.glBlendFunc (gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+#        gl.glPolygonMode (gl.GL_FRONT, gl.GL_FILL)
+#        gl.glFrontFace (gl.GL_CCW)
+#        gl.glEnable (gl.GL_CULL_FACE)
+#        gl.glShadeModel (gl.GL_SMOOTH)
+#        
+#    #@window.event
+#    #def on_mouse_drag(x, y, dx, dy, button):
+#    #    trackball.drag_to(x,y,dx,dy)
+#    #    window.draw()
+#
+#    @window.event
+#    def on_mouse_scroll(x, y, dx, dy):
+#        trackball.zoom_to(x,y,dx,dy)
+#        window.draw()
+#
+#    window.mainloop()
 
 

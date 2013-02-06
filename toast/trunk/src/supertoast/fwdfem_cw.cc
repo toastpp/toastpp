@@ -99,10 +99,11 @@ int main (int argc, char *argv[]) {
     int i, j, cmd;
     double t0, wt0, dt;
 
-    RFwdSolver FWS (pp);
+    SelectMesh (pp, meshname, mesh);
+
+    RFwdSolver FWS (&mesh, pp);
     FWS.WriteParams (pp);
 
-    SelectMesh (pp, meshname, mesh);
     SelectSourceProfile (pp, qprof, qwidth, srctp);
     SelectMeasurementProfile (pp, mprof, mwidth);
     int n = mesh.nlen();
@@ -165,7 +166,7 @@ int main (int argc, char *argv[]) {
 
     // allocate system matrix
     cout << endl << "Allocating system matrix" << endl;
-    FWS.Allocate (mesh);
+    FWS.Allocate ();
     cout << endl << endl << "----------" << endl;
 
     cout << "Assembling and pre-processing system matrix" << endl;
