@@ -93,14 +93,15 @@ Raster::Raster (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
     }
 
     if (toastVerbosity > 0) {
-        cout << "Basis: Grid size:  " << blen << "[";
+        cout << "Basis:" << endl;
+	cout << "--> Grid size......." << blen << " [";
 	for (i = 0; i < dim; i++)
-	  cout << bdim[i] << (i==dim-1 ? ']':'x');
+	    cout << bdim[i] << (i==dim-1 ? ']':'x');
 	cout << endl;
-	cout << "Basis: Sol. size:  " << slen << endl;
-	cout << "Basis: Mesh size:  " << meshptr->nlen() << endl;
+	cout << "--> Sol. size......." << slen << endl;
+	cout << "--> Mesh size......." << meshptr->nlen() << endl;
 	if (bb) {
-	    cout << "Basis: Grid bounding box:" << endl;
+	    cout << "--> Grid bounding box:" << endl;
 	    for (i = 0; i < 2; i++) {
 	        for (j = 0; j < 2; j++)
 		    cout << "  " << bb->Get(i,j);

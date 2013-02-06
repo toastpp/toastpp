@@ -48,9 +48,11 @@ void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
     } else if (!strcasecmp (integral_type, "DD")) {
 	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_DD);
     } else if (!strcasecmp (integral_type, "PFF")) {
+        Assert (n == prm.Dim(), "Argument 3: wrong size");
 	AddToSysMatrix (*mesh, F, &prm,
             elbasis ? ASSEMBLE_PFF_EL : ASSEMBLE_PFF);
     } else if (!strcasecmp (integral_type, "PDD")) {
+        Assert (n == prm.Dim(), "Argument 3: wrong size");
 	AddToSysMatrix (*mesh, F, &prm,
             elbasis ? ASSEMBLE_PDD_EL : ASSEMBLE_PDD);
     } else if (!strcasecmp (integral_type, "BNDPFF")) {
@@ -65,9 +67,9 @@ void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
 {
     int n = mesh->nlen();
-    CFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
+    CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     RVector prm(n);
     for (int i = 0; i < n; i++) prm[i] = c0/ref[i];
     AddToSysMatrix (*mesh, *FWS.F, &prm, ASSEMBLE_BNDPFF);
@@ -95,13 +97,14 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     bool elbasis = false;
     char integral_type[32] = "";
 
-    CopyVector (prm, prhs[1]);
-
-    if (nrhs >= 3 && mxIsChar(prhs[2])) {
-	mxGetString (prhs[2], integral_type, 32);
+    if (nrhs >= 2 && mxIsChar(prhs[1])) {
+	mxGetString (prhs[1], integral_type, 32);
     } else {
 	mexErrMsgTxt ("Parameter 2: string expected");
     }
+
+    if (nrhs >= 3)
+        CopyVector (prm, prhs[2]);
 
     if (nrhs >= 4 && mxIsChar(prhs[3])) {
 	char cbuf[32];
@@ -110,7 +113,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     if (elbasis) n = mesh->elen();
     else         n = mesh->nlen();
-    Assert (n == prm.Dim(), "Argument 2: wrong size");
 
     CalcSysmatComponent (mesh, prm, integral_type, elbasis, &plhs[0]);
 }

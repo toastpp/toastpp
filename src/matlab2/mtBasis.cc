@@ -74,27 +74,6 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
     *ptr = Ptr2Handle(raster);
 
-    if (verbosity >= 1) {
-	char cbuf[256];
-	mexPrintf ("basis: Type:       %s-%s\n",
-		   mesh->Dimension()==2 ? "BI":"TRI", basistype);
-	sprintf (cbuf, "basis: Grid size:  %d [", raster->GLen());
-	for (i = 0; i < dim; i++)
-	    sprintf (cbuf+strlen(cbuf), "%d%c", gdim[i], i==dim-1 ? ']':'x');
-	mexPrintf ("%s\n", cbuf);
-	
-	mexPrintf ("basis: Sol. size:  %d\n", raster->SLen());
-	mexPrintf ("basis: Mesh size:  %d\n", mesh->nlen());
-	if (bb) {
-	    mexPrintf ("basis: Grid bounding box:\n");
-	    for (i = 0; i < 2; i++) {
-		for (j = 0; j < dim; j++)
-		    mexPrintf ("  %12g", bb->Get(i,j));
-		mexPrintf ("\n");
-	    }
-	}
-    }
-
     if (bb) delete bb;
 }
 
@@ -105,7 +84,8 @@ void MatlabToast::ClearBasis (int nlhs, mxArray *plhs[], int nrhs,
 {
     Raster *raster = GETBASIS_SAFE(0);
     delete raster;
-    std::cerr << "Basis deleted" << std::endl;
+    if (verbosity >= 1)
+        mexPrintf ("<Basis object deleted>\n");
 }
 
 // =========================================================================

@@ -96,7 +96,7 @@ void Mesh::Setup()
 	if (nlist[i].BndTp() != BND_DIRICHLET) priv_ilen++;
     priv_nbnd = nlist.NumberOf (BND_ANY);
     if (toastVerbosity > 0)
-        cout << "Found " << priv_nbnd << " boundary nodes" << endl;
+        cout << "--> Boundary nodes.." << priv_nbnd << endl;
 
 #ifndef TOAST_PARALLEL
     for (el = 0; el < elist.Len(); el++)
@@ -1592,9 +1592,11 @@ FELIB istream& operator>> (istream& i, Mesh& mesh)
 
     mesh.lastel_found = 0;
 
-    if (toastVerbosity > 0)
-        cout << "Mesh: " << mesh.nlen() << " nodes, " << mesh.elen()
-	     << " elements" << endl; 
+    if (toastVerbosity > 0) {
+        cout << "Mesh:" << endl;
+	cout << "--> Nodes..........." << mesh.nlen() << endl;
+	cout << "--> Elements........" << mesh.elen() << endl;
+    }
     return i;
 }
 

@@ -16,9 +16,10 @@ using namespace toast;
 // =========================================================================
 
 template<class T>
-TFwdSolver<T>::TFwdSolver (LSOLVER linsolver, double tol)
+TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, LSOLVER linsolver, double tol)
 {
     Setup ();
+    meshptr = mesh;
     solvertp = linsolver;
     iterative_tol = tol;
 }
@@ -26,18 +27,20 @@ TFwdSolver<T>::TFwdSolver (LSOLVER linsolver, double tol)
 // =========================================================================
 
 template<class T>
-TFwdSolver<T>::TFwdSolver (const char *solver, double tol)
+TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, const char *solver, double tol)
 {
     Setup ();
+    meshptr = mesh;
     SetLinSolver (solver, tol);
 }
 
 // =========================================================================
 
 template<class T>
-TFwdSolver<T>::TFwdSolver (ParamParser &pp)
+TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, ParamParser &pp)
 {
     Setup ();
+    meshptr = mesh;
     ReadParams (pp);
 }
 
@@ -135,16 +138,13 @@ DataScale TFwdSolver<T>::GetDataScaling () const
 }
 
 template<>
-void TFwdSolver<float>::Allocate (const QMMesh &mesh)
+void TFwdSolver<float>::Allocate ()
 {
     int *rowptr, *colidx, nzero;
-    int n = mesh.nlen();
-    int nq = mesh.nQ;
-
-    meshptr = &mesh;
+    int n = meshptr->nlen();
 
     // allocate system matrix
-    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
 #ifdef TOAST_MPI
     F = new FCompRowMatrixMPI (n, n, rowptr, colidx);
@@ -174,17 +174,14 @@ void TFwdSolver<float>::Allocate (const QMMesh &mesh)
 }
 
 template<>
-void TFwdSolver<double>::Allocate (const QMMesh &mesh)
+void TFwdSolver<double>::Allocate ()
 {
     idxtype *rowptr, *colidx;
 	int nzero;
-    int n = mesh.nlen();
-    int nq = mesh.nQ;
-
-    meshptr = &mesh;
+    int n = meshptr->nlen();
 
     // allocate system matrix
-    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
 #ifdef TOAST_MPI
     F = new RCompRowMatrixMPI (n, n, rowptr, colidx);
@@ -214,17 +211,14 @@ void TFwdSolver<double>::Allocate (const QMMesh &mesh)
 }
 
 template<>
-void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
+void TFwdSolver<toast::complex>::Allocate ()
 {
     idxtype *rowptr, *colidx;
 	int nzero;
-    int n = mesh.nlen();
-    int nq = mesh.nQ;
-
-    meshptr = &mesh;
+    int n = meshptr->nlen();
 
     // allocate system matrix
-    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
 #ifdef TOAST_MPI
     F = new CCompRowMatrixMPI (n, n, rowptr, colidx);
@@ -251,16 +245,13 @@ void TFwdSolver<toast::complex>::Allocate (const QMMesh &mesh)
 }
 
 template<>
-void TFwdSolver<scomplex>::Allocate (const QMMesh &mesh)
+void TFwdSolver<scomplex>::Allocate ()
 {
     int *rowptr, *colidx, nzero;
-    int n = mesh.nlen();
-    int nq = mesh.nQ;
-
-    meshptr = &mesh;
+    int n = meshptr->nlen();
 
     // allocate system matrix
-    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
 #ifdef TOAST_MPI
     F = new SCCompRowMatrixMPI (n, n, rowptr, colidx);

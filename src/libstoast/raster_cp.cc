@@ -203,7 +203,8 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
     }
 
     if (toastVerbosity > 0) {
-        cout << "Basis: type: cubic" << endl;
+        cout << "--> Type............" << (mesh->Dimension() == 2 ? "Bi":"Tri")
+	     << "-cubic" << endl;
     }
 }
 

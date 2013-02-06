@@ -49,7 +49,8 @@ Raster_Pixel::Raster_Pixel (const IVector &_bdim, const IVector &_gdim,
     delete []val;
 
     if (toastVerbosity > 0) {
-        cout << "Basis: type: linear" << endl;
+        cout << "--> Type............" << (mesh->Dimension() == 2 ? "Bi":"Tri")
+	     << "-linear" << endl;
     }
 }
 

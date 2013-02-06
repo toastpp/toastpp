@@ -20,6 +20,22 @@ void AssertArg (bool cond, const char *func, int argno, const char *errmsg)
     }
 }
 
+// -------------------------------------------------------------------------
+
+void AssertArg_Char (const mxArray *arg, const char *func, int argno)
+{
+    AssertArg (mxIsChar(arg), func, argno, "Expected character array");
+}
+
+// -------------------------------------------------------------------------
+
+void GetString_Safe (const mxArray *arg, char *pc, int len,
+    const char *func, int argno)
+{
+    AssertArg_Char (arg, func, argno);
+    mxGetString (arg, pc, len);
+}
+
 // =========================================================================
 
 bool fileExists(const std::string& fileName)
@@ -131,7 +147,6 @@ MatlabToast::MatlabToast ()
 {
     SetErrorhandler (ErrorHandler);
     nbasis = 0;
-    nreg = 0;
     verbosity = 0;
 }
 
@@ -140,7 +155,6 @@ MatlabToast::MatlabToast ()
 MatlabToast::~MatlabToast ()
 {
     if (nbasis) delete []basislist;
-    if (nreg) delete []reglist;
 }
 
 // =========================================================================
@@ -189,9 +203,18 @@ Mesh *MatlabToast::GetMesh_Safe (const mxArray *arr, const char *func, int argno
 
 // =========================================================================
 
-Raster *MatlabToast::GetBasis (const mxArray *idx, int *errid)
+Raster *MatlabToast::GetBasis (const mxArray *idx, int *errid, bool allownull)
 {
     unsigned int basisid;
+
+    if (errid) *errid = 0;
+
+    if (allownull) {
+        if (mxIsNumeric(idx)) {
+	    double v = mxGetScalar(idx);
+	    if (!v) return NULL;
+	}
+    }
 
     if (!mxIsUint64(idx)) {
         if (errid) {
@@ -220,7 +243,7 @@ Raster *MatlabToast::GetBasis_Safe (const mxArray *arr, const char *func,
     int argno)
 {
     int err;
-    Raster *rasterptr = GetBasis(arr, &err);
+    Raster *rasterptr = GetBasis(arr, &err, true);
     switch(err) {
     case 1:
 	AssertArg (0, func, argno, "Invalid handle format (expected uint64)");
@@ -236,27 +259,10 @@ Raster *MatlabToast::GetBasis_Safe (const mxArray *arr, const char *func,
 
 Regularisation *MatlabToast::GetRegul (const mxArray *idx)
 {
-    unsigned int regid;
-
-    if (mxIsUint32(idx)) {
-	regid = *(unsigned int*)mxGetData(idx);
-	if (!regid) return 0; // "no regularisation"
-	regid--;
-	if (regid >= nreg) {
-	    if (nreg)
-		mexPrintf ("GeRegul: index out of range (expected 1..%d).\n", nbasis);
-	    else
-		mexPrintf ("GetRegul: index out of range (no regularisation instances registered).\n");
-	    return 0;
-	}
-	if (!reglist[regid]) {
-	    mexPrintf ("GetRegul: index points to cleared regularisation instance.\n");
-	}
-	return reglist[regid];
-    } else {
-	mexPrintf ("GetRegul: Invalid index format (expected uint32).\n");
-	return 0;
-    }
+    uint64_T handle = *(uint64_T*)mxGetData(idx);
+    Regularisation *reg = (Regularisation*)Handle2Ptr (handle);
+    return reg;
+    // put some more safeguards into this
 }
 
 // =========================================================================
@@ -269,7 +275,7 @@ void MatlabToast::SetVerbosity (int nlhs, mxArray *plhs[], int nrhs,
     if (mxIsUint32 (prhs[0])) {
 	unsigned int verb = *(unsigned int*)mxGetData (prhs[0]);
 	if (verb == verbosity) return; // nothing to do
-	toastVerbosity = std::min (verb, max_verbosity);
+	toastVerbosity = verbosity = std::min (verb, max_verbosity);
     } else {
 	mexErrMsgTxt ("SetVerbosity: Argument 1: invalid format (uint32 expected).");
     }
@@ -292,188 +298,6 @@ void MatlabToast::MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
     if (verbosity >= 1)
 	mexPrintf ("Mesh: %d nodes, %d elements, dimension %d\n",
 		   quadmesh->nlen(), quadmesh->elen(), quadmesh->Dimension());
-}
-
-// =========================================================================
-
-void MatlabToast::GetQM (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
-
-    int q, m, n, idx;
-    int nq = mesh->nQ;
-    int nm = mesh->nM;
-    int nqm = mesh->nQM;
-
-    mxArray *lnk = mxCreateSparse (nm, nq, nqm, mxREAL);
-    double  *pr = mxGetPr (lnk);
-    mwIndex *ir = mxGetIr (lnk);
-    mwIndex *jc = mxGetJc (lnk);
-
-    *jc++ = 0;
-    for (q = idx = 0; q < nq; q++) {
-	for (m = n = 0; m < nm; m++) {
-	    if (!mesh->Connected (q,m)) continue;
-	    *pr++ = ++idx;
-	    *ir++ = m;
-	    n++;
-	}
-	*jc = *(jc-1) + n;
-	jc++;
-    }
-
-    plhs[0] = lnk;
-}
-
-// =========================================================================
-
-void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    RDenseMatrix qpos, mpos;
-    RCompRowMatrix lnk;
-    char qmname[256];
-    int i, j;
-
-    CopyMatrix (qpos, prhs[0]);
-    CopyMatrix (mpos, prhs[1]);
-
-    ASSERTARG(mxIsSparse(prhs[2]), 3, "expected sparse matrix.");
-    CopyTMatrix (lnk, prhs[2]);
-
-    int dim = qpos.nCols();
-    int nq = qpos.nRows();
-    int nm = mpos.nRows();
-    
-    if (nq != lnk.nRows() || nm != lnk.nCols()) {
-	char cbuf[256];
-	sprintf (cbuf, "Invalid dimension (was: %d x %d, expected %d x %d)",
-		 lnk.nCols(), lnk.nRows(), nm, nq);
-	ASSERTARG(0, 3, cbuf);
-    }
-
-    mxGetString (prhs[3], qmname, 256);
-
-    ofstream ofs(qmname);
-    ofs << "QM file" << endl;
-    ofs << "Dimension " << dim << endl << endl;
-    ofs << "SourceList " << nq << endl;
-    for (i = 0; i < nq; i++)
-	for (j = 0; j < dim; j++)
-	    ofs << qpos(i,j) << (j == dim-1 ? '\n':' ');
-    ofs << endl;
-    ofs << "MeasurementList " << nm << endl;
-    for (i = 0; i < nm; i++)
-	for (j = 0; j < dim; j++)
-	    ofs << mpos(i,j) << (j == dim-1 ? '\n':' ');
-    ofs << endl;
-
-    ofs << "LinkList" << endl;
-    int *ci = new int[nm];
-    double *idx = new double[nm];
-
-    for (i = 0; i < nq; i++) {
-	int nz = lnk.SparseRow (i, ci, idx);
-	ofs << nz << ':';
-	for (j = 0; j < nz; j++)
-	    ofs << ci[j] << (j == nz-1 ? '\n':' ');
-    }
-}
-
-// =========================================================================
-
-void MatlabToast::DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found.");
-
-    int q, m, idx;
-    plhs[0] = mxCreateDoubleMatrix (1, mesh->nQM, mxREAL);
-    double *pr = mxGetPr (plhs[0]);
-    for (q = idx = 0; q < mesh->nQ; q++)
-	for (m = 0; m < mesh->nM; m++)
-	    if (mesh->Connected (q, m))
-		pr[idx++] = q*mesh->nM + m + 1;    
-}
-
-// =========================================================================
-
-void MatlabToast::ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    int i, j;
-    double *pr;
-
-    // mesh handle
-    Mesh *mesh = GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found.");
-
-    int nlen = mesh->nlen();
-    int elen = mesh->elen();
-    int dim  = mesh->Dimension();
-
-    // element index
-    int idx = (int)(floor(mxGetScalar (prhs[1])-0.5));
-    ASSERTARG(idx >= 0 && idx < elen, 2, "Invalid element index");
-
-    // global point
-    Point glob(dim);
-    const mwSize *gdim = mxGetDimensions (prhs[2]);
-    ASSERTARG(gdim[0]*gdim[1] == dim, 3, "Invalid point dimension");
-    pr = mxGetPr (prhs[2]);
-    for (i = 0; i < dim; i++) glob[i] = pr[i];
-
-    // calculate shape functions
-    RVector fun = mesh->elist[idx]->GlobalShapeF (mesh->nlist, glob);
-    int nn = fun.Dim();
-
-    // vertex coordinate list
-    mxArray *sf = mxCreateDoubleMatrix (1, nn, mxREAL);
-    pr = mxGetPr (sf);
-    for (i = 0; i < nn; i++) pr[i] = fun[i];
-
-    plhs[0] = sf;    
-}
-
-// =========================================================================
-
-void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    int i, j;
-    double *pr;
-
-    // mesh handle
-    Mesh *mesh = GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found.");
-
-    int nlen = mesh->nlen();
-    int elen = mesh->elen();
-    int dim  = mesh->Dimension();
-
-    // element index
-    int idx = (int)(floor(mxGetScalar (prhs[1])-0.5));
-    ASSERTARG(idx >= 0 && idx < elen, 2, "Invalid element index");
-
-    // global point
-    Point glob(dim);
-    const mwSize *gdim = mxGetDimensions (prhs[2]);
-    ASSERTARG(gdim[0]*gdim[1] == dim, 3, "Invalid point dimension");
-    pr = mxGetPr (prhs[2]);
-    for (i = 0; i < dim; i++) glob[i] = pr[i];
-
-    // calculate shape function derivatives
-    RDenseMatrix fgrad = mesh->elist[idx]->GlobalShapeD (mesh->nlist, glob);
-    int nn = fgrad.nCols();
-
-    // vertex coordinate list
-    mxArray *sf = mxCreateDoubleMatrix (dim, nn, mxREAL);
-    CopyMatrix (&sf, fgrad);
-
-    plhs[0] = sf;
 }
 
 // =========================================================================
@@ -505,8 +329,10 @@ void MatlabToast::ReadNIM (int nlhs, mxArray *plhs[], int nrhs,
         plhs[1] = mxCreateString(meshname);
     }
 
-    if (verbosity >= 1)
-	mexPrintf ("NIM: size = %d\n", img.Dim());
+    if (verbosity >= 1) {
+        mexPrintf ("Nodal image:\n");
+	mexPrintf ("--> Size............%d\n", img.Dim());
+    }
 }
 
 // ============================================================================
@@ -556,11 +382,11 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
     sol.SetParam (OT_C2A, c2a);
 
     // Create forward solver to initialise system matrix
-    CFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
+    CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
     double omega = freq * 2.0*Pi*1e-6;
     
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.AssembleSystemMatrix (sol, omega, elbasis);
 
     // Return system matrix to MATLAB
@@ -570,9 +396,9 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
 {
     int n = mesh->nlen();
-    CFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
+    CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     RVector prm(n);
     for (int i = 0; i < n; i++) prm[i] = c0/ref[i];
     AddToSysMatrix (*mesh, *FWS.F, &prm, ASSEMBLE_BNDPFF);
@@ -591,8 +417,7 @@ void CalcBndFactors (QMMesh *mesh, RVector &ref, mxArray **res)
 void MatlabToast::Sysmat (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    if (!mesh) mexErrMsgTxt ("Sysmat: Mesh not found.");
+  QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     RVector mua, mus, ref;
     double freq;
@@ -625,24 +450,6 @@ void MatlabToast::Sysmat (int nlhs, mxArray *plhs[], int nrhs,
 	    CalcBndFactors (mesh, ref, &plhs[2]);
 	}
     }
-}
-
-// =========================================================================
-
-void MatlabToast::Massmat (int nlhs, mxArray *plhs[], int nrhs,
-    const mxArray *prhs[])
-{
-    QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
-    ASSERTARG(mesh, 1, "Mesh not found");
-
-    int n = mesh->nlen();
-
-    // Create forward solver to initialise system matrix
-    RFwdSolver FWS (LSOLVER_DIRECT, 1e-10);
-    FWS.AssembleMassMatrix (mesh);
-
-    // Return system matrix to MATLAB
-    CopyMatrix (&plhs[0], *FWS.B);
 }
 
 // =========================================================================

@@ -58,7 +58,7 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi,mvec):
-    gamma = mvec * phi.transpose()
+    gamma = mvec.transpose() * phi
     gamma = np.reshape(gamma,(-1,1),'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
@@ -103,7 +103,7 @@ mesh.ReadQM(hmesh_fwd,qmfile)
 qvec = mesh.Qvec (hmesh_fwd,type='Neumann',shape='Gaussian',width=2)
 mvec = mesh.Mvec (hmesh_fwd,shape='Gaussian',width=2)
 nlen = mesh.NodeCount (hmesh_fwd)
-nqm = qvec.shape[0] * mvec.shape[0]
+nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
 
 # Target parameters
@@ -113,6 +113,11 @@ mua = mesh.ReadNim (muafile)
 mus = mesh.ReadNim (musfile)
 ref = np.ones((1,nlen)) * 1.4
 freq = 100
+
+#DEBUG
+from toast import tglumpy
+pdb.set_trace()
+tglumpy.ShowMesh2D(hmesh_fwd,None,'','Fill')
 
 # Target ranges (for display)
 mua_min = 0.015 # np.min(mua)
@@ -196,7 +201,7 @@ plt.show()
 while itr <= itrmax:
     errp = err
     dphi,aphi = mesh.Fields(hmesh,-1,qvec,mvec,mua,mus,ref,freq,'da')
-    proj = np.reshape (mvec * dphi.transpose(),(-1,1),'F')
+    proj = np.reshape (mvec.transpose() * dphi,(-1,1),'F')
     J = mesh.Jacobian(hmesh,hraster,dphi,aphi,proj)
 
     # Data normalisation

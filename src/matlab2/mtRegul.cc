@@ -27,7 +27,7 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
     Regularisation *reg = 0;    // regularisation instance
     const mxArray *regp = 0;    // parameter structure
     mxArray *field, *subfield;  // struct field pointers
-    int prm = 0;
+    int i, prm = 0;
     char cbuf[256];
 
     // some global default settings
@@ -39,17 +39,8 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
     bool brefimg = false;       // reference diffusivity from image?
     double sdr = 0.0;           // reference std
     double fT = 0.0;            // reference PM threshold
-
-    // raster
-    Raster *raster = GetBasis(prhs[1]);
-    ASSERTARG(raster, 2, "Basis not found");
-
-    // initial image
     RVector x0;
-    CopyVector (x0, prhs[2]);
-
-    plhs[0] = mxCreateNumericMatrix (1,1, mxUINT32_CLASS, mxREAL);
-    unsigned int *ptr = (unsigned int*)mxGetData (plhs[0]);
+    Raster *raster = 0;
 
     if (mxIsStruct (prhs[0])) { // scan parameters from struct
 
@@ -71,6 +62,9 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 		cerr << "Warning: toastRegul: missing required field: tau\n";
 		cerr << "Substituting default value: " << tau << endl;
 	    }
+	    field = mxGetField(regp,0,"x0");
+	    if (field)
+	        CopyVector (x0, field);
 	    field = mxGetField(regp,0,"prior");
 	    if (field) {
 		if (subfield = mxGetField (field, 0, "refimg")) {
@@ -87,39 +81,54 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 		sdr = mxGetScalar(mxGetField(field,0,"smooth"));
 		fT = mxGetScalar(mxGetField(field,0,"threshold"));
 	    }
-	    
 	}   
 
     } else { // scan parameters from argument list
 
-	// regularisation type
-	prm = 3;
-	mxGetString (prhs[0], rtype, 256);
+        // regularisation type
+        GETSTRING_SAFE(0, rtype, 256);
 
 	// hyperparameter tau
-	tau = mxGetScalar (prhs[prm++]);
+	tau = mxGetScalar (prhs[3]);
 
-	// read generic parameters from argument list
-	int prm0 = prm;
-	while (prm0 < nrhs) {
-	    mxGetString (prhs[prm0++], cbuf, 256);
-	    if (!strcasecmp (cbuf, "KapRefImage")) {
-		CopyVector (kaprefimg, prhs[prm0++]);
-		brefimg = true;
-	    } else if (!strcasecmp (cbuf, "KapRefScale")) {
-		sdr = mxGetScalar (prhs[prm0++]);
-	    } else if (!strcasecmp (cbuf, "KapRefPMThreshold")) {
-		fT = mxGetScalar (prhs[prm0++]);
-	    } else if (!strcasecmp (cbuf, "KapRefTensor")) {
-		istensor = (mxGetScalar (prhs[prm0++]) != 0.0);
-	    } else if (!strcasecmp (cbuf, "KapRef")) {
-		ExtractKappa (prhs[prm0++], &kapref, &istensor);
-		brefimg = false;
+	// generic parameters from key/value list
+	if (nrhs > 3 && mxIsCell(prhs[4])) {
+	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+	        AssertArg_Char (field, __func__, 5);
+		mxGetString (field, cbuf, 256);
+		if (!strcasecmp (cbuf, "KapRefImage")) {
+		    CopyVector (kaprefimg, mxGetCell (prhs[4], prm+1));
+		    brefimg = true;
+		} else if (!strcasecmp (cbuf, "KapRefScale")) {
+		    sdr = mxGetScalar (mxGetCell (prhs[4], prm+1));
+		} else if (!strcasecmp (cbuf, "KapRefPMThreshold")) {
+		    fT = mxGetScalar (mxGetCell (prhs[4], prm+1));
+		} else if (!strcasecmp (cbuf, "KapRefTensor")) {
+		    istensor = (mxGetScalar (mxGetCell (prhs[4], prm+1))
+				!= 0.0);
+		} else if (!strcasecmp (cbuf, "KapRef")) {
+		    ExtractKappa (mxGetCell (prhs[4], prm+1), &kapref,
+				  &istensor);
+		    brefimg = false;
+		    // WARNING: race condition: relies on KapRefTensor
+		    // being read before KapRef
+		}
 	    }
 	}
-
     }
-	
+
+    cerr << "REGUL TYPE: " << rtype << endl;
+
+
+    // raster
+    raster = GetBasis(prhs[1]);
+    ASSERTARG(raster, 2, "Basis not found");
+
+    // initial image
+    CopyVector (x0, prhs[2]);
+
+    mexPrintf ("Regularisation:\n");
+
     if (!strcasecmp (rtype, "DIAG")) {
 	    
 	reg = new Tikhonov0 (tau, &x0, &x0);
@@ -128,8 +137,8 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    
 	if (verbosity >= 1) {
 	    // echo regularisation parameters
-	    mexPrintf ("Regularisation: LAPLACIAN (obsolete)\n");
-	    mexPrintf ("--> tau: %f\n", tau);
+	    mexPrintf ("--> Type............LAPLACIAN (obsolete)\n");
+	    mexPrintf ("--> tau.............%f\n", tau);
 	}
 
 	reg = new Tikhonov1 (tau, &x0, raster);
@@ -144,11 +153,12 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    field = mxGetField (regp,0,"tv");
 	    if (field) field = mxGetField (field,0,"beta");
 	    if (field) beta = mxGetScalar(field);
-	} else { // read TV parameters from argument list
-	    while (prm < nrhs) {
-		mxGetString (prhs[prm++], cbuf, 256);
+	} else { // read TV parameters from key/value list
+	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+	        AssertArg_Char (field, __func__, 5);
+		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "Beta")) {
-		    beta = mxGetScalar (prhs[prm++]);
+		    beta = mxGetScalar (mxGetCell (prhs[4], prm+1));
 		    break;
 		}
 	    }
@@ -156,16 +166,16 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    
 	if (verbosity >= 1) {
 	    // echo regularisation parameters
-	    mexPrintf ("Regularisation: total variation (TV)\n");
-	    mexPrintf ("--> tau: %f\n", tau);
-	    mexPrintf ("--> beta: %f\n", beta);
-	    mexPrintf ("--> diffusivity %s\n", (brefimg ?
+	    mexPrintf ("--> Type............TV (total variation)\n");
+	    mexPrintf ("--> tau.............%f\n", tau);
+	    mexPrintf ("--> beta............%f\n", beta);
+	    mexPrintf ("--> diffusivity.....%s\n", (brefimg ?
 		"from image" : kapref ? "from external array" : "none"));
 	    if (brefimg || kapref) {
-		mexPrintf ("--> diffusivity field format: %s\n",
+		mexPrintf ("--> diff. format....%s\n",
 			   (istensor ? "tensor" : "scalar"));
-		mexPrintf ("--> diffusivity scale: %f\n", sdr);
-		mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+		mexPrintf ("--> diff. scale.....%f\n", sdr);
+		mexPrintf ("--> diff PM thresh..%f\n", fT);
 	    }
 	}
 	
@@ -380,20 +390,14 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	
     } else {
 	
-	*ptr = 0;  // "no regularisation"
+	reg = 0;  // "no regularisation"
 	return;
 	
     }
     
-    Regularisation **tmp = new Regularisation*[nreg+1];
-    if (nreg) {
-	memcpy (tmp, reglist, nreg*sizeof(Regularisation*));
-	delete []reglist;
-    }
-    reglist = tmp;
-    reglist[nreg++] = reg;
-
-    *ptr = nreg;
+    plhs[0] = mxCreateNumericMatrix (1,1, mxUINT64_CLASS, mxREAL);
+    uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
+    *ptr = Ptr2Handle (reg);
 }
 
 // =========================================================================
@@ -401,32 +405,10 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::ClearRegul (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    unsigned int regid;
-
-    if (mxIsUint32(prhs[0])) {
-	regid = *(unsigned int*)mxGetData(prhs[0]);
-	if (regid == 0) // "no regularisation" flag
-	    return;     // nothing to do
-	regid--;
-	if (regid >= nreg) {
-	    if (nreg)
-		mexPrintf ("ClearRegul: regularisation index out of range (expected 1..%d).\n", nreg);
-	    else
-		mexPrintf ("ClearRegul: regularisation index out of range (no meshes registered).\n");
-	    return;
-	}
-    } else {
-	mexPrintf ("ClearRegul: Invalid regularisation index format (expected uint32).\n");
-	return;
-    }
-
-    if (reglist[regid]) {
-	delete reglist[regid];
-	reglist[regid] = 0;
-    } else {
-	mexPrintf ("ClearRegul: regularisation already cleared.\n");
-    }
-    
+    Regularisation *reg = GetRegul (prhs[0]);
+    delete reg;
+    if (verbosity >= 1)
+        mexPrintf ("<Regularisation object deleted>\n");
 }
 
 // =========================================================================

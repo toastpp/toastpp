@@ -105,18 +105,17 @@ prm.edit_extinct.lambda = 1;
 prm.callback.context = handles;
 prm.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
-toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
+prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
+prm.basis.hMesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.basis.bdim,prm.basis.bdim);
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.basis.bdim,'Linear');
+n = prm.basis.hMesh.NodeCount();
 load toast_demo1.mat
 load toast_demo2.mat
 prm.bmua = bmua; clear bmua;
 prm.bmus = bmus; clear bmus;
-prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
+prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
 prm.ref = ones(n,1)*1.4;
 
 prm.hTgt = zeros(prm.maxch,1);
@@ -219,7 +218,6 @@ showExtinct(handles);
 function rolltgt (handles)
 prm = getappdata(handles.figure1,'prm');
 grid = prm.basis.bdim;
-solmask = prm.smask;
 nch = 4;  % generate targets for max. number of chromophores
 blobtgt = str2num(get(handles.edit2,'String'));
 for c=1:nch
@@ -252,8 +250,9 @@ for c=1:nch
         end
     end
     img = reshape(img,[],1);
-    bC_tgt(c,:) = zeros(prod(grid),1);
-    bC_tgt(c,solmask) = img(solmask) * 0.3;
+    bC_tgt(c,:) = img * 0.3;
+    %bC_tgt(c,:) = zeros(prod(grid),1);
+    %bC_tgt(c,solmask) = img(solmask) * 0.3;
 end
 prm.bC_tgt = bC_tgt;
 prm.bCmin = min(min(bC_tgt(:,solmask)));

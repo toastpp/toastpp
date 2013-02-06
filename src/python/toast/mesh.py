@@ -104,15 +104,15 @@ def Sysmat_CW(hmesh,mua,mus,ref,freq):
 
 def Qvec(hmesh,type='Neumann',shape='Gaussian',width=1):
     rp,ci,vl=toastmod.Qvec(hmesh,type=type,shape=shape,width=width)
-    m = rp.shape[0]-1
-    n = toastmod.MeshNodeCount(hmesh)
-    return sparse.csr_matrix((vl,ci,rp), shape=(m,n))
+    n = rp.shape[0]-1
+    m = toastmod.MeshNodeCount(hmesh)
+    return sparse.csc_matrix((vl,ci,rp), shape=(m,n))
 
 def Mvec(hmesh,shape='Gaussian',width=1):
     rp,ci,vl=toastmod.Mvec(hmesh,shape=shape,width=width)
-    m = rp.shape[0]-1
-    n = toastmod.MeshNodeCount(hmesh)
-    return sparse.csr_matrix((vl,ci,rp), shape=(m,n))
+    n = rp.shape[0]-1
+    m = toastmod.MeshNodeCount(hmesh)
+    return sparse.csc_matrix((vl,ci,rp), shape=(m,n))
 
 def Fields(hmesh,hraster,qvec,mvec,mua,mus,ref,freq,mode='d'):
     """Calculate the nodal photon density fields.
@@ -137,11 +137,13 @@ def Fields(hmesh,hraster,qvec,mvec,mua,mus,ref,freq,mode='d'):
                 the adjoint fields
     """
     
-    if sparse.isspmatrix_csc(qvec)==True:
-        qvec = sparse.csr_matrix(qvec)
+    if sparse.isspmatrix_csr(qvec)==True:
+        qvec = sparse.csc_matrix(qvec)
+        # convert to per-source order
 
-    if sparse.isspmatrix_csc(mvec)==True:
-        mvec = sparse.csr_matrix(mvec)
+    if sparse.isspmatrix_csr(mvec)==True:
+        mvec = sparse.csc_matrix(mvec)
+        # convert to per-detector order
         
     return toastmod.Fields(hmesh,hraster,qvec.data,qvec.indptr,qvec.indices,mvec.data,mvec.indptr,mvec.indices,mua,mus,ref,freq,mode)
 

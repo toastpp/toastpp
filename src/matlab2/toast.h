@@ -41,17 +41,19 @@
 #define TOAST_READNIM           22
 #define TOAST_WRITENIM          56
 #define TOAST_SYSMAT            23
+#define TOAST_SYSMATCOMPONENT   74
 #define TOAST_MASSMAT           24
 #define TOAST_VOLMAT            65
 #define TOAST_BNDMAT            61
 #define TOAST_ELMAT             25
+#define TOAST_ELDOF             75
 #define TOAST_BNDREFLECTIONTERM 62
 #define TOAST_SETBASIS          26
 #define TOAST_CLEARBASIS        27
 #define TOAST_GETBASISSIZE      28
 #define TOAST_BASIS_NLEN        71
 #define TOAST_BASIS_BLEN        72
-#define TOAST_BASIS_SLEN        73 // end
+#define TOAST_BASIS_SLEN        73
 #define TOAST_MAPBASIS          29
 #define TOAST_MAPMESHTOBASIS    30
 #define TOAST_MAPMESHTOGRID     31
@@ -84,6 +86,7 @@
 #define TOAST_JACOBIAN          53
 #define TOAST_JACOBIANCW        54
 #define TOAST_KRYLOV            55
+#define TOAST_LBFGS             76 // end
 #define TOAST_SETVERBOSITY    1000
 
 #ifdef FDOT

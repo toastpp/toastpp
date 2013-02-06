@@ -273,7 +273,7 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     for (i = 0; i < nQ; i++) dphi[i].New (n);
 
     // Calculate fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega);
     FWS.CalcFields (qvec, dphi);
     proj = FWS.ProjectAll_real (mvec, dphi);
@@ -321,15 +321,15 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (nrhs >= 12) tol = mxGetScalar (prhs[11]);
 
 #ifdef WIN64
-	// for now, direct solver doesn't work in WIN64
-	if (!stricmp(solver,"direct")) {
-		mexWarnMsgTxt("toastGradient: direct solver not supported. Switching to BiCGSTAB(tol=1e-14)");
-		strcpy (solver,"bicgstab");
-		tol = 1e-14;
-	}
+    // for now, direct solver doesn't work in WIN64
+    if (!stricmp(solver,"direct")) {
+        mexWarnMsgTxt("toastGradient: direct solver not supported. Switching to BiCGSTAB(tol=1e-14)");
+	strcpy (solver,"bicgstab");
+	tol = 1e-14;
+    }
 #endif
 
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
     FWS.SetDataScaling (DATA_LOG);
 
     RVector grad(raster->SLen()*2);

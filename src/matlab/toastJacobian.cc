@@ -79,7 +79,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     nQM  = mesh->nQM;
 
     CVector *dphi, *aphi;
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
 
     // Solution in mesh basis
     Solution msol(OT_NPARAM, n);
@@ -105,7 +105,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     for (i = 0; i < nM; i++) aphi[i].New (nlen);
 
     // Calculate direct and adjoint fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega, elbasis);
     FWS.CalcFields (qvec, dphi);
     FWS.CalcFields (mvec, aphi);

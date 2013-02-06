@@ -102,6 +102,29 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		for (j = 0; j < dim; j++)
 		    for (i = 0; i < nnd; i++)
 			*pr++ = intdd(i*dim+j,k*dim+l);
+    } else if (!strcmp(cbuf, "PFF")) {
+	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
+	RVector prm;
+	CopyVector (prm, prhs[3]);
+	RSymMatrix intPFF = pel->IntPFF(prm);
+	pr = mxGetPr(elmat);
+	for (i = 0; i < nnd; i++) {
+	    pr[i*nnd+i] = intPFF(i,i);
+	    for (j = 0; j < i; j++)
+	        pr[i*nnd+j] = pr[j*nnd+i] = intPFF(i,j);
+	}
+    } else if (!strcmp(cbuf, "PDD")) {
+        elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
+	RVector prm;
+	CopyVector (prm, prhs[3]);
+	RSymMatrix intPDD = pel->IntPDD(prm);
+	pr = mxGetPr(elmat);
+	for (i = 0; i < nnd; i++) {
+	    pr[i*nnd+i] = intPDD(i,i);
+	    for (j = 0; j < i; j++)
+	        pr[i*nnd+j] = pr[j*nnd+i] = intPDD(i,j);
+	}
+
 
     } else if (!strcmp(cbuf, "BndF")) {
 	int ii, sd;
@@ -156,6 +179,23 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			pr[i*nnd+j] = pr[j*nnd+i] += pel->BndIntFFSide(i,j,sd);
 		    }
 		}
+	    }
+	}
+    } else if (!strcmp(cbuf, "BndPFF")) {
+        int sd;
+        if (nrhs > 4) sd =  (int)mxGetScalar(prhs[4]) - 1; // side index
+	else sd = -1;
+	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
+	pr = mxGetPr(elmat);
+	RVector prm;
+	CopyVector (prm, prhs[3]);
+
+	if (sd >= 0) { // integral over a single side
+	    xERROR("Not implemented yet!");
+	} else { // integral over all boundary sides
+	    for (i = 0; i < nnd; i++) {
+	        for (j = 0; j < nnd; j++)
+		    pr[i*nnd+j] = pel->BndIntPFF(i,j,prm);
 	    }
 	}
     } else {

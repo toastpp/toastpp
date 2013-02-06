@@ -89,7 +89,9 @@ int main (int argc, char *argv[])
     int i, j, idx, cmd;
     Point bbmin, bbmax;
 
-    RFwdSolver FWS (pp);
+    SelectMesh (pp, meshname, mesh);
+
+    RFwdSolver FWS (&mesh, pp);
     FWS.WriteParams (pp);
     lin_tol = FWS.GetLinSolverTol();
     maxit = FWS.iterative_maxit;
@@ -103,7 +105,6 @@ int main (int argc, char *argv[])
     }
     RGenericSparseMatrix::GlobalSelectIterativeSolver (method);
 
-    SelectMesh (pp, meshname, mesh);
     SelectSourceProfile (pp, qprof, qwidth, srctp);
     SelectMeasurementProfile (pp, mprof, mwidth);
     SelectTstepParams (pp, theta, dtime, nstep);
@@ -168,7 +169,7 @@ int main (int argc, char *argv[])
 
     // allocate system matrix
     cout << endl << "Allocating system matrix" << endl;
-    FWS.Allocate (mesh);
+    FWS.Allocate ();
 
     cout << endl << endl << "----------" << endl;
 

@@ -814,10 +814,10 @@ static PyObject *toast_sysmat_cw (PyObject *self, PyObject *args)
     sol.SetParam (OT_C2A, prm);
 
     // Create forward solver to initialise system matrix
-    RFwdSolver FWS (LSOLVER_ITERATIVE, 1e-10);
+    RFwdSolver FWS (mesh, LSOLVER_ITERATIVE, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
     
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.AssembleSystemMatrix (sol, 0, elbasis);
 
     const idxtype *rowptr, *colidx;
@@ -876,10 +876,10 @@ static PyObject *toast_sysmat (PyObject *self, PyObject *args)
     sol.SetParam (OT_C2A, prm);
 
     // Create forward solver to initialise system matrix
-    CFwdSolver FWS (LSOLVER_ITERATIVE, 1e-10);
+    CFwdSolver FWS (mesh, LSOLVER_ITERATIVE, 1e-10);
     FWS.SetDataScaling (DATA_LOG);
     
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.AssembleSystemMatrix (sol, omega, elbasis);
 
     const idxtype *rowptr, *colidx;
@@ -1097,7 +1097,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     slen = (raster ? raster->SLen() : n);
 
     CVector *dphi, *aphi;
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
 
     // Solution in mesh basis
     Solution msol(OT_NPARAM, n);
@@ -1117,7 +1117,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     double omega = freq * 2.0*Pi*1e-6; // convert from MHz to rad
 
     // Calculate direct and adjoint fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega);
     CVector sphi(slen);
     
@@ -1127,14 +1127,17 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 
     FWS.CalcFields (qvec, dphi);
 
-    npy_intp dmx_dims[2] = {nQ,slen};
+    npy_intp dmx_dims[2] = {slen,nQ};
     PyObject *dmx = PyArray_SimpleNew (2, dmx_dims, NPY_CDOUBLE);
     toast::complex *dmx_ptr = (toast::complex*)PyArray_DATA (dmx);
     for (i = 0; i < nQ; i++) {
+        toast::complex *dp = dmx_ptr + i*slen;
 	if (raster) raster->Map_MeshToSol (dphi[i], sphi);
 	else        sphi = dphi[i];
-	for (j = 0; j < slen; j++)
-	    *dmx_ptr++ = sphi[j];
+	for (j = 0; j < slen; j++) {
+	    *dp = sphi[j];
+	    dp += 1;
+	}
     }
     delete []dphi;
     *dfield = dmx;
@@ -1145,14 +1148,17 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 	for (i = 0; i < nM; i++) aphi[i].New (n);
 	FWS.CalcFields (mvec, aphi);
 
-	npy_intp amx_dims[2] = {nM,slen};
+	npy_intp amx_dims[2] = {slen,nM};
 	PyObject *amx = PyArray_SimpleNew (2, amx_dims, NPY_CDOUBLE);
 	toast::complex *amx_ptr = (toast::complex*)PyArray_DATA (amx);
 	for (i = 0; i < nM; i++) {
+	    toast::complex *ap = amx_ptr + i;
 	    if (raster) raster->Map_MeshToSol (aphi[i], sphi);
 	    else        sphi = aphi[i];
-	    for (j = 0; j < slen; j++)
-		*amx_ptr++ = sphi[j];
+	    for (j = 0; j < slen; j++) {
+		*ap = sphi[j];
+		ap += nM;
+	    }
 	}
 	delete []aphi;
 	*afield = amx;
@@ -1290,7 +1296,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     slen = (raster ? raster->SLen() : n);
 
     CVector *dphi, *aphi;
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
 
     // Solution in mesh basis
     Solution msol(OT_NPARAM, n);
@@ -1316,7 +1322,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     for (i = 0; i < nM; i++) aphi[i].New (n);
 
     // Calculate direct and adjoint fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega);
     FWS.CalcFields (qvec, dphi);
     FWS.CalcFields (mvec, aphi);
@@ -1524,7 +1530,7 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     for (i = 0; i < nQ; i++) dphi[i].New (n);
 
     // Calculate fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega);
     FWS.CalcFields (qvec, dphi);
     proj = FWS.ProjectAll_real (mvec, dphi);
@@ -1590,7 +1596,7 @@ static PyObject *toast_gradient (PyObject *self, PyObject *args)
     double *sd_ptr = (double*)PyArray_DATA(py_sd);
     RVector sd (nQM*2, sd_ptr, SHALLOW_COPY);
 
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
     FWS.SetDataScaling (DATA_LOG);
 
     npy_intp grad_dim = raster->SLen()*2;

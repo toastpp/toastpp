@@ -25,27 +25,30 @@ template<class T> class TFwdSolverMW: public TFwdSolver<T> {
 public:
     /**
      * \brief Constructor. Creates a forward solver instance.
+     * \param mesh pointer to associated QMMesh object
      * \param linsolver linear solver type (see \ref lsolver)
      * \param tol linear solver tolerance (only used for iterative methods)
      */
-    TFwdSolverMW (LSOLVER linsolver, double tol = 1e-10);
+    TFwdSolverMW (const QMMesh *mesh, LSOLVER linsolver, double tol = 1e-10);
 
     /**
      * \brief Constructor. Creates a forward solver instance.
+     * \param mesh pointer to associated QMMesh object
      * \param solver linear solver type, provided as a string (see notes)
      * \param tol linear solver tolerance (only used for iterative methods)
      * \note For valid strings to define the linear solver, see
      * \ref SetLinSolver.
      */
-    TFwdSolverMW (char *solver, double tol = 1e-10);
+    TFwdSolverMW (const QMMesh *mesh, char *solver, double tol = 1e-10);
 
     /**
      * \brief Constructor. Creates a forward solver instance.
+     * \param mesh pointer to associated QMMesh object
      * \param pp parser to read solver options from.
      * \note For recognised items in the configuration file used by the parser,
          see the \ref ReadParams method.
     */
-    TFwdSolverMW (ParamParser &pp);
+    TFwdSolverMW (const QMMesh *mesh, ParamParser &pp);
 
     /**
      * \brief Destructor. Destroys the forward solver instance.

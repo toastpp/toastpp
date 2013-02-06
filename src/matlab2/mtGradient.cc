@@ -66,7 +66,7 @@ void MatlabToast::Gradient (int nlhs, mxArray *plhs[], int nrhs,
     double tol = 1e-10;
     mxGetString (prhs[10], solver, 128);
     if (nrhs >= 12) tol = mxGetScalar (prhs[11]);
-    CFwdSolver FWS (solver, tol);
+    CFwdSolver FWS (mesh, solver, tol);
     FWS.SetDataScaling (DATA_LOG);
 
     RVector grad(raster->SLen()*2);
@@ -321,7 +321,7 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     for (i = 0; i < nQ; i++) dphi[i].New (n);
 
     // Calculate fields
-    FWS.Allocate (*mesh);
+    FWS.Allocate ();
     FWS.Reset (msol, omega);
     FWS.CalcFields (qvec, dphi);
     proj = FWS.ProjectAll_real (mvec, dphi);

@@ -107,22 +107,22 @@ prm.initprm.ref = struct('reset','HOMOG','val',1.4);
 prm.callback.context = handles;
 prm.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.basis.hMesh = toastReadMesh(prm.fwdsolver.meshfile);
-toastReadQM (prm.basis.hMesh,prm.meas.qmfile);
+prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
+prm.basis.hMesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastSetBasis('LINEAR',prm.basis.hMesh,prm.solver.basis.bdim,prm.solver.basis.bdim);
-prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = toastMeshNodeCount(prm.basis.hMesh);
+prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.solver.basis.bdim,'Linear');
+%prm.smask = toastSolutionMask(prm.basis.hBasis);
+n = prm.basis.hMesh.NodeCount();
 %load toast_demo6.mat
 %prm.bmua = bmua; clear bmua;
 %prm.bmus = bmus; clear bmus;
 %prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
 %prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
-prm.mua = toastReadNIM('mua_tgt_cyl2.nim');
-prm.mus = toastReadNIM('mus_tgt_cyl2.nim');
+prm.mua = toastNim('mua_tgt_cyl2.nim');
+prm.mus = toastNim('mus_tgt_cyl2.nim');
 prm.ref = ones(n,1)*1.4;
-prm.bmua = toastMapMeshToBasis(prm.basis.hBasis,prm.mua);
-prm.bmus = toastMapMeshToBasis(prm.basis.hBasis,prm.mus);
+prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
+prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
 
 setappdata(handles.figure1,'prm',prm);
 
@@ -271,10 +271,10 @@ eval(['axes(handles.axes' num2str(fignum) ')']);
 cla;
 set(gcf,'Renderer','OpenGL');
 
-[vtx,idx,perm] = toastSurfData(prm.basis.hMesh);
-[pmin pmax] = toastMeshBB(prm.basis.hMesh);
-%pmax = bb(1,:);
-%pmin = bb(2,:);
+[vtx,idx,perm] = prm.basis.hMesh.SurfData();
+bb = prm.basis.hMesh.BoundingBox();
+pmin = bb(1,:);
+pmax = bb(2,:);
 nvtx = size(vtx,1);
 msize=pmax-pmin;
 col = zeros(nvtx,3); col(:,2)=1;
@@ -321,10 +321,10 @@ prm = getappdata(handles.figure1,'prm');
 nx = prm.solver.basis.bdim(1); ny = prm.solver.basis.bdim(2); nz = prm.solver.basis.bdim(3);
 axes(hax);
 
-img = zeros(size(bimg));
-img(prm.smask) = bimg(prm.smask);
+%img = zeros(size(bimg));
+%img(prm.smask) = bimg(prm.smask);
 
-img = reshape(img,nx,ny,nz);
+img = reshape(bimg,nx,ny,nz);
 img = squeeze(img(:,:,plane));
 
 imagesc(img',[imin,imax]);

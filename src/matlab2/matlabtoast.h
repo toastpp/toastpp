@@ -15,15 +15,20 @@
 #include "FDOTFwd.h"
 #endif
 
-#define ASSERTARG(cond,argno,errmsg) AssertArg(cond,__FUNCTION__,argno,errmsg)
+#define ASSERTARG(cond,argno,errmsg) AssertArg(cond,__func__,argno,errmsg)
+#define ASSERTARG_CHAR(argno) AssertArg_Char(prhs[argno],__func__,(argno+1))
+#define GETSTRING_SAFE(idx,pc,len) GetString_Safe(prhs[idx],pc,len,__func__,(idx+1))
 #define ASSERTMESH(meshptr,argno) ASSERTARG(meshptr,argno,"Invalid mesh index")
-#define GETMESH_SAFE(idx) GetMesh_Safe(prhs[idx],__FUNCTION__,idx+1)
-#define GETBASIS_SAFE(idx) GetBasis_Safe(prhs[idx],__FUNCTION__,idx+1)
+#define GETMESH_SAFE(idx) GetMesh_Safe(prhs[idx],__func__,idx+1)
+#define GETBASIS_SAFE(idx) GetBasis_Safe(prhs[idx],__func__,idx+1)
 
 uint64_T Ptr2Handle (void *ptr);
 void *Handle2Ptr (uint64_T handle);
 void AssertArg (bool cond, const char *func, int argno, const char *errmsg);
+void AssertArg_Char(const mxArray *arg, const char *func, int argno);
 bool fileExists(const std::string& fileName);
+void GetString_Safe (const mxArray *arg, char *pc, int len,
+    const char *func, int argno);
 
 #define MESH_INDEXOUTOFRANGE 1
 #define MESH_INDEXCLEARED    2
@@ -39,17 +44,8 @@ public:
         const mxArray *prhs[]);
     void MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
-    void ReadQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void SetQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void GetQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void WriteQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
     void FindElement (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
-        const mxArray *prhs[]);
-    void ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void ReadNIM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void WriteNIM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
@@ -58,10 +54,8 @@ public:
     void QPos (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MPos (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Sysmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void Massmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Volmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Bndmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void Elmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void BndReflectionTerm (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void SetBasis (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
@@ -133,19 +127,21 @@ public:
     void JacobianCW (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void Krylov (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void LBFGS (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 
     void FDOTAdjOp (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
 
     Mesh *GetMesh (const mxArray *idx, int *errid = 0);
     Mesh *GetMesh_Safe (const mxArray *arr, const char *func, int argno);
-    Raster *GetBasis (const mxArray *idx, int *errid = 0);
+    Raster *GetBasis (const mxArray *idx, int *errid = 0,
+        bool allownull = false);
     Raster *GetBasis_Safe (const mxArray *arr, const char *func, int argno);
     Regularisation *GetRegul (const mxArray *idx);
 
 	// Methods defined in mtMesh.cc
-    void ReadMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MakeMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void ReadMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void WriteMesh (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void MeshOpt (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
@@ -153,31 +149,41 @@ public:
 		const mxArray *prhs[]);
     void MeshElementCount (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void MeshBB (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void MeshSize (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void ClearMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MeshData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void SurfData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
-    void MeshBB (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void MeshSize (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-    void MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
+    void SysmatComponent (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
-    void ElementSize (int nlhs, mxArray *plhs[], int nrhs,
+    void Massmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void ReadQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void WriteQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void GetQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
-    void ElementData (int nlhs, mxArray *plhs[], int nrhs,
+
+    // Methods defined in mtElement.cc
+    void ElDof (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void ElSize (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void ElData (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void ElMat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
 
 private:
     static void ErrorHandler (char *msg);
 
-  //Mesh **meshlist;          // list of meshes
-  //unsigned int nmesh;       // number of meshes
-
     Raster **basislist;       // list of basis instantiations
     unsigned int nbasis;      // number of bases
-
-    Regularisation **reglist; // list of regularisation instances
-    unsigned int nreg;        // number of regularisation instances
 
     unsigned int verbosity;   // verbosity level
 };

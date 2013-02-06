@@ -154,7 +154,7 @@ int main (int argc, char *argv[])
     CCompRowMatrix qvec, mvec;
     CVector *dphi, *aphi;
     int cmd;
-    CFwdSolver FWS (pp);
+    CFwdSolver FWS (&mesh, pp);
     FWS.WriteParams (pp);
     g_lsolver_tol = FWS.GetLinSolverTol();
     RVector data, data1, data2;
@@ -241,7 +241,7 @@ int main (int argc, char *argv[])
 
     // allocate system matrix
     cout << endl << "Allocating system matrix" << endl;
-    FWS.Allocate (mesh);
+    FWS.Allocate ();
 
     cout << "Generating intermediate pixel grid" << endl;
     
