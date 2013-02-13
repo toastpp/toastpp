@@ -73,6 +73,8 @@ public:
     RSymMatrix IntPDD (const RVector& P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double IntPDD (int i, int j, const RVector &P) const;
+    double BndIntFFSide (int i, int j, int sd)
+    { ERROR_UNDEF; return 0; }
     RSymMatrix BndIntPFF (const RVector &P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;

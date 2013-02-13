@@ -23,9 +23,9 @@ if length(toastver) == 0
     arch = computer;
     switch arch
         case 'PCWIN'
-            toastver = [toastdir '\win32\Release'];
+            toastver = [toastdir '\win\Win32\Release'];
         case 'PCWIN64'
-            toastver = [toastdir '\win64\Release'];
+            toastver = [toastdir '\win\x64\Release'];
         otherwise
             disp('Warning: could not determine location of mex files')
             disp('Please edit the matlab path manually')

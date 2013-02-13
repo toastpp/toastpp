@@ -728,8 +728,7 @@ public:
      * \note Nodes i and j must both belong to side sd.
      * \sa BndIntFF()const, BndIntFF(int,int)
      */
-    virtual double BndIntFFSide (int i, int j,int sd)
-    { ERROR_UNDEF; return 0; }
+    virtual double BndIntFFSide (int i, int j, int sd) = 0;
 
     /**
      * \brief Surface integrals of all products of a nodal function and two

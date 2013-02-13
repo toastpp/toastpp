@@ -113,7 +113,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
     Element *pel = mesh->elist[idx];
     int i, j, k, l, nnd = pel->nNode();
     int dim = mesh->Dimension();
-    int nprm = 2;
+    int nprm = 3;
 
     mxGetString (prhs[2], cbuf, 256);
 

@@ -159,7 +159,10 @@ public:
     { return intdd.Get(i,j) * ((P[Node[0]]+P[Node[1]])/2.0); }
     // Returns a single element of IntPDD
 
-    RSymMatrix BndIntPFF (const RVector &P) const
+    double BndIntFFSide (int i, int j, int sd)
+    { ERROR_UNDEF; return 0; }
+
+	RSymMatrix BndIntPFF (const RVector &P) const
 	{ return intbff * ((P[Node[0]]+P[Node[1]])/2.0); }
     // This is a hack! Really P would have to be taken into the integral,
     // rather than just averaged.
