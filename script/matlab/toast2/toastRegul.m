@@ -100,7 +100,11 @@ classdef toastRegul < handle
                 basis = varargin{2};
                 x0 = varargin{3};
                 tau = varargin{4};
-                extras = varargin{5:end};
+                if nargin >= 5
+                    extras = varargin{5:end};
+                else
+                    extras = [];
+                end
     	        obj.handle = toast(uint32(44),typestr,basis.handle,x0,tau,extras);
             end
         end
