@@ -28,7 +28,8 @@ classdef toastNim < double
                         b = obj.meshname;
                     end
                 case '()'
-                    b = s.subs{:};
+                    a = double(obj);
+                    b = a(s.subs{:});
             end
         end
         
