@@ -213,7 +213,7 @@ classdef toastMesh < handle
             %
             % Return values:
             %         el [object]:
-            %             element object
+            %             toastElement object
             %
             % Notes:  The element object remains only valid as long as the
             %         mesh it refers to is valid.

@@ -57,7 +57,7 @@ its address for the purposes of svn is
 
 Otherwise you can access it via ssh, in which case the address is
 
-	svn+ssh://haynes.cs.ucl.ac.uk/cs/research/medim/projects0/green/projects/svn/toast/trunk
+	svn+ssh://amy.cs.ucl.ac.uk/cs/research/medim/projects0/green/projects/svn/toast/trunk
 
 (You can use other servers instead of haynes, but apparently not sonic,
 since this seems to run an incompatible version of svn).

@@ -52,37 +52,6 @@ bool fileExists(const std::string& fileName)
 }
 
 // =========================================================================
-
-bool ReadNim (const char *name, int idx, RVector &img, char *meshname=NULL)
-{
-    char cbuf[256];
-    int i, j = 0, imgsize = 0;
-
-    ifstream ifs (name);
-    if (!ifs.getline (cbuf, 256)) return false;
-    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
-    do {
-        ifs.getline (cbuf, 256);
-	if (!strncasecmp (cbuf, "ImageSize", 9))
-	    sscanf (cbuf+11, "%d", &imgsize);
-	else if (!strncasecmp (cbuf, "Mesh", 4) && meshname)
-	    sscanf (cbuf+6, "%s", meshname);
-    } while (strcasecmp (cbuf, "EndHeader"));
-    if (!imgsize) return false;
-    img.New(imgsize);
-    for (;;) {
-	do {
-	    ifs.getline (cbuf, 256);
-	} while (ifs.good() && strncasecmp (cbuf, "Image", 5));
-	if (!ifs.good()) break;
-	for (i = 0; i < imgsize; i++)
-	    ifs >> img[i];
-	if (++j == idx) break;
-    }
-    return true;
-}
-
-// =========================================================================
 // Convert a pointer to a 64-bit handle on both 32 and 64 bit systems
 
 uint64_T Ptr2Handle (void *ptr)
@@ -302,11 +271,74 @@ void MatlabToast::MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+bool ReadNim (const char *name, int idx, RVector &img, char *meshname=NULL)
+{
+    char cbuf[256];
+    int i, j = 0, imgsize = 0;
+
+    ifstream ifs (name);
+    if (!ifs.getline (cbuf, 256)) return false;
+    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
+    do {
+        ifs.getline (cbuf, 256);
+	if (!strncasecmp (cbuf, "ImageSize", 9))
+	    sscanf (cbuf+11, "%d", &imgsize);
+	else if (!strncasecmp (cbuf, "Mesh", 4) && meshname)
+	    sscanf (cbuf+6, "%s", meshname);
+    } while (strcasecmp (cbuf, "EndHeader"));
+    if (!imgsize) return false;
+    img.New(imgsize);
+    for (;;) {
+	do {
+	    ifs.getline (cbuf, 256);
+	} while (ifs.good() && strncasecmp (cbuf, "Image", 5));
+	if (!ifs.good()) break;
+	for (i = 0; i < imgsize; i++)
+	    ifs >> img[i];
+	if (++j == idx) break;
+    }
+    return true;
+}
+
+// -------------------------------------------------------------------------
+
+bool ReadNimAll (char *name, RDenseMatrix &img)
+{
+    char cbuf[256];
+    int i, j = 0, imgsize = 0;
+
+    ifstream ifs (name);
+    if (!ifs.getline (cbuf, 256)) return false;
+    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
+    do {
+        ifs.getline (cbuf, 256);
+	if (!strncasecmp (cbuf, "ImageSize", 9))
+	    sscanf (cbuf+11, "%d", &imgsize);
+    } while (strcasecmp (cbuf, "EndHeader"));
+    if (!imgsize) return false;
+
+    img.New(imgsize,0);
+    RDenseMatrix img_single(imgsize,1);
+    for (;;) {
+	do {
+	    ifs.getline (cbuf, 256);
+	} while (ifs.good() && strncasecmp (cbuf, "Image", 5));
+	if (!ifs.good()) break;
+	for (i = 0; i < imgsize; i++)
+	    ifs >> img_single(i,0);
+	img = cath(img,img_single);
+    }
+    return true;
+}
+
+// -------------------------------------------------------------------------
+
 void MatlabToast::ReadNIM (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     char nimname[256], meshname[256];
     int idx;
+	bool read_all = false;
 
     if (mxIsChar (prhs[0]))
 	mxGetString (prhs[0], nimname, 256);
@@ -316,22 +348,43 @@ void MatlabToast::ReadNIM (int nlhs, mxArray *plhs[], int nrhs,
     if (fileExists (nimname) != 1)
 	mexErrMsgTxt ("ReadNIM: Image file not found.");
 
-    if (nrhs < 2) idx = 1;
-    else          idx = (int)mxGetScalar (prhs[1]);
+	if (nrhs < 2) {
+		idx = 1;
+	} else if (mxIsChar(prhs[1])) {
+		char cbuf[256];
+		mxGetString (prhs[1], cbuf, 256);
+		if (!strcasecmp (cbuf, "all"))
+			read_all = true;
+		else
+			mexErrMsgTxt ("Argument 2 must be index or 'all'");
+	} else {
+		idx = (int)mxGetScalar (prhs[1]);
+	}
 
-    RVector img;
-    ReadNim (nimname, idx, img, meshname);
+	if (read_all) {
+		RDenseMatrix img;
+		ReadNimAll (nimname, img);
+		CopyMatrix (&plhs[0], img);
 
-    plhs[0] = mxCreateDoubleMatrix (img.Dim(), 1, mxREAL);
-    memcpy (mxGetPr (plhs[0]), img.data_buffer(), img.Dim()*sizeof(double));
+		if (verbosity >= 1) {
+			mexPrintf ("Nodal image:\n");
+			mexPrintf ("--> Size............%d x %d\n", img.nRows(), img.nCols());
+		}
+	} else {
+	    RVector img;
+		ReadNim (nimname, idx, img, meshname);
+
+		plhs[0] = mxCreateDoubleMatrix (img.Dim(), 1, mxREAL);
+		memcpy (mxGetPr (plhs[0]), img.data_buffer(), img.Dim()*sizeof(double));
+
+		if (verbosity >= 1) {
+			mexPrintf ("Nodal image:\n");
+			mexPrintf ("--> Size............%d\n", img.Dim());
+		}
+    }
 
     if (nlhs > 1) {
         plhs[1] = mxCreateString(meshname);
-    }
-
-    if (verbosity >= 1) {
-        mexPrintf ("Nodal image:\n");
-	mexPrintf ("--> Size............%d\n", img.Dim());
     }
 }
 
