@@ -1,4 +1,4 @@
-function [S,B,alpha] = dotSysmat (hmesh,mua,mus,ref,freq)
+function [S,B,alpha] = dotSysmat (hmesh,mua,mus,ref,freq,varargin)
 % Generate an FEM system matrix for frequency DOT.
 %
 % Syntax: S = dotSysmat (mesh, mua, mus, ref, freq)
@@ -60,12 +60,26 @@ function [S,B,alpha] = dotSysmat (hmesh,mua,mus,ref,freq)
 %
 % See also:
 %         toastMesh.SysmatComponent, toastMesh.Massmat, toastMesh.Elmat
+if nargin > 5 && strcmpi(varargin{1},'el')
+
+if nargout < 2
+    S = toast(uint32(23),hmesh.handle,double(mua),double(mus),double(ref),freq,'EL');
+elseif nargout < 3
+    [S,B] = toast(uint32(23),hmesh.handle,double(mua),double(mus),double(ref),freq,'EL');
+else
+    [S,B,alpha] = toast(uint32(23),hmesh.handle,double(mua),double(mus),double(ref),freq,'EL');
+end
+
+else
+    
 if nargout < 2
     S = toast(uint32(23),hmesh.handle,double(mua),double(mus),double(ref),freq);
 elseif nargout < 3
     [S,B] = toast(uint32(23),hmesh.handle,double(mua),double(mus),double(ref),freq);
 else
     [S,B,alpha] = toast(uint32(23),hmesh.handle,double(mua),double(mus),double(ref),freq);
+end
+
 end
 
 end
