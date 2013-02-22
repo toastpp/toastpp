@@ -170,6 +170,21 @@ classdef toastBasis < handle
             %         excluding grid points external to the mesh.
             tgt = toast(uint32(29),obj.handle,mapstr,double(src));
         end
+        
+        function elref = GridElref(obj)
+            % Returns a list of element indices for each grid point.
+            %
+            % Syntax: elref = basis.GridElref()
+            %
+            % Return values:
+            %         elref [integer array]
+            %             Element index for each grid point of the basis.
+            %
+            % Notes:  The returned list is of length glen and contains the
+            %         1-based element indices for every grid point. Grid
+            %         points outside the mesh are indicated by value 0.
+            elref = toast(uint32(63),obj.handle);
+        end
     end
     
     properties
