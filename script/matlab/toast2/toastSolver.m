@@ -1,4 +1,5 @@
 classdef toastSolver < handle
+    
     methods
         function obj = toastSolver(method,prm)
             if nargin > 0
@@ -8,7 +9,32 @@ classdef toastSolver < handle
             end
         end
         
+        function SetRegul (this,prm,x0)
+            % Set up a regularisation object for the solver
+            %
+            % Syntax: solver.SetRegul(prm)
+            %
+            % Parameters:
+            %         prm [struct]:
+            %             structure defining regularisation parameters
+            %         x0 [vector]:
+            %             initial parameter vector
+            %
+            % Notes:  If the structure passed to the solver constructor
+            %         contains a 'regul' substructure, it calls
+            %         SetRegul(prm.regul) directly.
+            localprm.hReg = 0;
+            if isfield(prm,'method') && ~strcmpi(prm.regul.method,'none')
+                localprm.hReg = toastRegul (prm, x0);
+            end
+            
+            
+        end
+        
         function Solve(obj, x0)
+            global scref RES;
+            RES = [];
+            scref = obj.c0./obj.lprm.hBasis.Map ('M->S',obj.lprm.ref);
             obj.x0 = x0;
         end
         
@@ -65,7 +91,7 @@ classdef toastSolver < handle
                 mua, mus, obj.lprm.ref, obj.prm.data.freq, obj.lprm.data, obj.lprm.sd, ...
                 obj.prm.fwdsolver.method, obj.prm.fwdsolver.tol);
             g = g .* x; % parameter scaling
-            if obj.lprm.hReg ~= 0
+            if isfield(obj.lprm,'hReg') &&  obj.lprm.hReg ~= 0
                 g = g - obj.lprm.hReg.Gradient (logx);
             end
         end
@@ -90,7 +116,7 @@ classdef toastSolver < handle
             ob_data = sum(((obj.lprm.data-prj)./obj.lprm.sd).^2);
             ob_prior = 0;
                 
-            if obj.lprm.hReg ~= 0
+            if isfield(obj.lprm,'hReg') && obj.lprm.hReg ~= 0
                 ob_prior = obj.lprm.hReg.Value(logx);
             end
                 
@@ -149,7 +175,7 @@ classdef toastSolver < handle
             if isfield(prm.solver,'itmax') == false || isnumeric(prm.solver.itmax) == false
                 prm.solver.itmax = 100;
             end
-            if isfield(prm.solver,'lsearch') == false || islogical(prm.solver.itmax) == false
+            if isfield(prm.solver,'lsearch') == false || islogical(prm.solver.lsearch) == false
                 prm.solver.lsearch = true;
             end
             if isfield(prm.solver,'step0') == false || isnumeric(prm.solver.step0) == false
@@ -291,14 +317,6 @@ classdef toastSolver < handle
             x = [scmua;sckap];
             logx = log(x);
 
-            % Initialise regularisation
-            localprm.hReg = 0;
-            if isfield(prm,'regul')
-                if isfield(prm.regul,'method') && ~strcmpi(prm.regul.method,'none')
-                    localprm.hReg = toastRegul (prm.regul, logx);
-                end
-            end
-            
             localprm.Himplicit = true;                  % Implicit/explicit Hessian matrix
             
             % Parameters for display callback function
@@ -333,6 +351,10 @@ classdef toastSolver < handle
             fprintf (1, '    [LH: %f, PR: %f]\n', ob_data, ob_prior);
         end
         
+        function disp_iter (this, res)
+            fprintf (1, 'Objective: %f\n', res.of);
+        end
+        
         function solve_iter (this, prm, itr, x, err)
             fprintf (1, '**** Iteration %d, objective %f\n', itr, err)
 
@@ -358,7 +380,7 @@ classdef toastSolver < handle
                 feval(prm.callback.iter, prm.callback.context, RES);
             else
                 % inline display
-                disp_iter(RES);
+                this.disp_iter(RES);
             end
         end
     end
