@@ -101,7 +101,7 @@ classdef toastRegul < handle
                 x0 = varargin{3};
                 tau = varargin{4};
                 if nargin >= 5
-                    extras = varargin{5:end};
+                    extras = varargin(5:end);
                 else
                     extras = [];
                 end
