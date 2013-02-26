@@ -58,11 +58,11 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-prm = [];
+prm = toastParam;
 if nargin >= 4
     prmfile = varargin{1};
     set(handles.prmfile,'String',prmfile);
-    prm = toastReadParam(prmfile);
+    prm = toastParam(prmfile);
     updategui(handles,prm);
     setappdata(hObject,'prmfile',prmfile);
 end
@@ -223,6 +223,20 @@ switch idx
     case 3
         prm.nim = get(hval,'String');
 end
+
+
+function showdata(prm,mdata,pdata)
+figure(1);
+mesh=toastMesh(prm.fwdsolver.meshfile);
+mesh.ReadQM(prm.meas.qmfile);
+qpos = mesh.Qpos;
+mpos = mesh.Mpos;
+nq = size(qpos,1);
+nm = size(mpos,1);
+subplot(1,2,1); imagesc(reshape(mdata,nm,nq)); axis equal tight;
+title('lnamp'); xlabel('source #'); ylabel('detector #');
+subplot(1,2,2); imagesc(reshape(pdata,nm,nq)); axis equal tight;
+title('phase'); xlabel('source #'); ylabel('detector #');
 
 
 % --- Executes on selection change in srctype.
@@ -456,7 +470,8 @@ function runfwd_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 prm = updateprm(handles);
-toastFwd(prm);
+[mdata,pdata] = dotFwd(prm);
+showdata(prm,mdata,pdata);
 
 
 % --- Executes on selection change in linsolver.
@@ -596,8 +611,8 @@ if strcmpi(fpath, [pwd fpath(length(fpath))]) == 0
     path(pwd,path); % keep current directory available
     eval(['cd ' ['''' fpath '''']]);
 end
-prm = toastReadParam(prmfile);
-prm.prmfile = prmfile;
+prm = toastParam(prmfile);
+%prm.prmfile = prmfile;
 updategui(handles,prm);
 set(handles.figure1,'name',['fwd [' fname ']']);
 setappdata(handles.figure1,'prmfile',prmfile);
@@ -612,7 +627,7 @@ function prm_save_Callback(hObject, eventdata, handles)
 
 prmfile = getappdata(handles.figure1,'prmfile');
 prm = updateprm(handles);
-toastWriteParam(prmfile,prm);
+prm.Write(prmfile);
 
 % --- Executes on button press in prm_saveas.
 function prm_saveas_Callback(hObject, eventdata, handles)
@@ -629,7 +644,7 @@ if strcmpi(fpath, [pwd fpath(length(fpath))]) == 0
     eval(['cd ' ['''' fpath '''']]);
 end
 prm = updateprm(handles);
-toastWriteParam(prmfile,prm);
+prm.Write(prmfile);
 set(handles.figure1,'name',['fwd [' fname ']']);
 setappdata(handles.figure1,'prmfile',prmfile);
 

@@ -1758,11 +1758,11 @@ void AddToSysMatrix (const Mesh &mesh, RGenericSparseMatrix &M,
 		    break;
 		}
 		M.Add (is, js, entry);
-		//M(is, js) += entry;
 	    }
 	}
     }
 }
+
 
 // Single-precision sysmatrix version
 void AddToSysMatrix (const Mesh &mesh, FGenericSparseMatrix &M,
@@ -1810,6 +1810,7 @@ void AddToSysMatrix (const Mesh &mesh, FGenericSparseMatrix &M,
     }
 }
 
+
 void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
@@ -1819,6 +1820,7 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
 	AddToElMatrix (mesh, el, M, coeff, mode);
     }
 }
+
 
 void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
     const RVector *coeff, int mode)

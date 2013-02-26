@@ -10,12 +10,13 @@
 #define real                        float
 #define doubleprecision             double
 #define character                   char
-typedef struct { real r, i; } complex;
 
 // original
+//typedef struct { real r, i; } complex;
 //typedef struct { doubleprecision r, i; } doublecomplex;
 
 // modified
+typedef struct { float r, i; } ilu_complex;
 typedef struct { double r, i; } ilu_doublecomplex;
 
 #endif /* __F2C__ */

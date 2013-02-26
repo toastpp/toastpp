@@ -103,7 +103,7 @@ void CreateCmat (const SCCompRowMatrix &A, Cmat *mat)
     mat->nc = A.nCols();
     mat->ia = new integer[A.nRows()+1];
     mat->ja = new integer[nv];
-    mat->a  = new ::complex[nv];
+    mat->a  = new ilu_complex[nv];
 
     const scomplex *vptr = A.ValPtr();
     for (i = 0; i < nv; i++) {
