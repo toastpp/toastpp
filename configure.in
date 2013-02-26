@@ -453,7 +453,6 @@ if test "$isok" = "yes" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
     MAKE_THREAD="yes"
     TASKLIB="-lpthread"
-#    TASKDIR="libtask"
 fi
 AC_SUBST(MAKE_THREAD)
 

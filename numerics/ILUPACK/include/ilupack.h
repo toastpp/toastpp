@@ -159,7 +159,7 @@ typedef struct {
    integer nnz;
    integer *ia;
    integer *ja;
-   complex *a;
+   ilu_complex *a;
    integer issymmetric;
    integer isdefinite;
    integer ishermitian;
@@ -334,9 +334,9 @@ typedef struct CAMGLM {
   Cmat F;
   integer *p;
   integer *invq;
-  complex *rowscal;
-  complex *colscal;
-  complex *absdiag;
+  ilu_complex *rowscal;
+  ilu_complex *colscal;
+  ilu_complex *absdiag;
   struct CAMGLM *prev;
   struct CAMGLM *next;
   integer *nextblock;
@@ -478,22 +478,22 @@ typedef struct {
    integer     type;
    integer     *ibuff;
    integer     *iaux;
-   complex *dbuff;
-   complex *daux;
+   ilu_complex *dbuff;
+   ilu_complex *daux;
    integer     *ju;
    integer     *jlu;
-   complex *alu;
-   complex *testvector;
+   ilu_complex *alu;
+   ilu_complex *testvector;
    size_t  nibuff, ndbuff, nju,njlu,nalu, ndaux,niaux,ntestvector;
    integer          rcomflag, returnlabel;
-   complex          *tv;
+   ilu_complex          *tv;
    integer          *ind;
    integer              nindicator;
    integer          *indicator;
    Cmat             A;
    integer          istack[30], *pistack[20];
    real             rstack[30], *prstack[10];
-   complex          fstack[30], *pfstack[10];
+   ilu_complex          fstack[30], *pfstack[10];
    size_t           ststack[5], *pststack[5];
    Cmat             mstack[1];
    CAMGlevelmat     *amglmstack[1];
@@ -520,15 +520,15 @@ typedef struct {
    integer       nrestart;
    integer       flags;
    char         *solver;
-   complex       damping;
+   ilu_complex       damping;
    integer       mixedprecision;
    integer       (*perm0)();
    integer       (*perm)();
    integer       (*permf)();
-   complex       shift0;
-   complex       shiftmax;
+   ilu_complex       shift0;
+   ilu_complex       shiftmax;
    integer       nshifts;
-   complex       *shifts;
+   ilu_complex       *shifts;
    Cmat          *shiftmatrix;
 } CILUPACKparam;
 
@@ -657,7 +657,7 @@ void SGNLAMGsol1(SAMGlevelmat *, integer, integer, integer, integer, integer,
 void ZGNLAMGsol1(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CGNLAMGsol1(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 
 void DGNLAMGsol2(DAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 DILUPACKparam *, doubleprecision *, doubleprecision *);
@@ -666,7 +666,7 @@ void SGNLAMGsol2(SAMGlevelmat *, integer, integer, integer, integer, integer,
 void ZGNLAMGsol2(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CGNLAMGsol2(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 
 
 void DSPDAMGsol1(DAMGlevelmat *, integer, integer, integer, integer, integer, 
@@ -676,7 +676,7 @@ void SSPDAMGsol1(SAMGlevelmat *, integer, integer, integer, integer, integer,
 void ZHPDAMGsol1(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CHPDAMGsol1(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 
 void DSPDAMGsol2(DAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 DILUPACKparam *, doubleprecision *, doubleprecision *);
@@ -685,7 +685,7 @@ void SSPDAMGsol2(SAMGlevelmat *, integer, integer, integer, integer, integer,
 void ZHPDAMGsol2(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CHPDAMGsol2(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 
 
 void DSYMAMGsol1(DAMGlevelmat *, integer, integer, integer, integer, integer, 
@@ -695,11 +695,11 @@ void SSYMAMGsol1(SAMGlevelmat *, integer, integer, integer, integer, integer,
 void ZHERAMGsol1(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CHERAMGsol1(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 void ZSYMAMGsol1(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CSYMAMGsol1(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 
 void DSYMAMGsol2(DAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 DILUPACKparam *, doubleprecision *, doubleprecision *);
@@ -708,11 +708,11 @@ void SSYMAMGsol2(SAMGlevelmat *, integer, integer, integer, integer, integer,
 void ZHERAMGsol2(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CHERAMGsol2(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 void ZSYMAMGsol2(ZAMGlevelmat *, integer, integer, integer, integer, integer, 
 		 ZILUPACKparam *, ilu_doublecomplex *, ilu_doublecomplex *);
 void CSYMAMGsol2(CAMGlevelmat *, integer, integer, integer, integer, integer, 
-		 CILUPACKparam *, complex *, complex *);
+		 CILUPACKparam *, ilu_complex *, ilu_complex *);
 
 
 
@@ -798,26 +798,26 @@ void ZSHRAMGextract(Zmat *, Zmat, integer *,integer *,  integer);
 void ZSYMAMGextract(Zmat *, Zmat, integer *,integer *,  integer);
 void ZSSMAMGextract(Zmat *, Zmat, integer *,integer *,  integer);
 
-void    CGNLAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void    CGNLAMGsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *);
-void  CGNLAMGdlsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void  CGNLAMGdusol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void   CGNLAMGlsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void   CGNLAMGusol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void CGNLAMGtdlsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void CGNLAMGtdusol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void  CGNLAMGtusol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void  CGNLAMGtlsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void   CGNLAMGtsol_internal(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void   CGNLAMGtsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *);
-void    CHPDAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void    CHPDAMGsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *);
-void    CHERAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void    CHERAMGsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *);
-void    CSYMAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void    CSYMAMGsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *);
-void    CHERAMGbsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
-void    CSYMAMGbsol(CAMGlevelmat *,CILUPACKparam *, complex *, complex *, complex *);
+void    CGNLAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void    CGNLAMGsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *);
+void  CGNLAMGdlsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void  CGNLAMGdusol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void   CGNLAMGlsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void   CGNLAMGusol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void CGNLAMGtdlsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void CGNLAMGtdusol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void  CGNLAMGtusol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void  CGNLAMGtlsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void   CGNLAMGtsol_internal(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void   CGNLAMGtsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *);
+void    CHPDAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void    CHPDAMGsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *);
+void    CHERAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void    CHERAMGsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *);
+void    CSYMAMGsol_internal(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void    CSYMAMGsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *);
+void    CHERAMGbsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
+void    CSYMAMGbsol(CAMGlevelmat *,CILUPACKparam *, ilu_complex *, ilu_complex *, ilu_complex *);
 void CGNLAMGextract(Cmat *,Cmat *, Cmat, integer *,integer *,  integer);
 void CHERAMGextract(Cmat *, Cmat, integer *,integer *,  integer);
 void CSHRAMGextract(Cmat *, Cmat, integer *,integer *,  integer);
@@ -891,27 +891,27 @@ void ZGNLlupqdusol (integer *, ilu_doublecomplex *, integer *, integer *, ilu_do
 void ZGNLlupqtdusol(integer *, ilu_doublecomplex *, integer *, integer *, ilu_doublecomplex *, ilu_doublecomplex *, 
 		  ilu_doublecomplex *);
 
-void CGNLlupq(integer *, complex *, integer *, integer *, integer *);
-void CGNLlupqsol (integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqtsol(integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqlsol (integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqtlsol(integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqusol (integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqtusol(integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqdlsol (integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqtdlsol(integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqdusol (integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
-void CGNLlupqtdusol(integer *, complex *, integer *, integer *, complex *, complex *, 
-		  complex *);
+void CGNLlupq(integer *, ilu_complex *, integer *, integer *, integer *);
+void CGNLlupqsol (integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqtsol(integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqlsol (integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqtlsol(integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqusol (integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqtusol(integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqdlsol (integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqtdlsol(integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqdusol (integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
+void CGNLlupqtdusol(integer *, ilu_complex *, integer *, integer *, ilu_complex *, ilu_complex *,
+		  ilu_complex *);
 
 
 void DSPDldlp(integer *, doubleprecision *, integer *, integer *, integer *);
@@ -926,9 +926,9 @@ void ZHPDldlp(integer *, ilu_doublecomplex *, integer *, integer *, integer *);
 void ZHPDldlpsol (integer *, ilu_doublecomplex *, integer *,
 		  ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 
-void CHPDldlp(integer *, complex *, integer *, integer *, integer *);
-void CHPDldlpsol (integer *, complex *, integer *,
-		  complex *, complex *, integer *);
+void CHPDldlp(integer *, ilu_complex *, integer *, integer *, integer *);
+void CHPDldlpsol (integer *, ilu_complex *, integer *,
+		  ilu_complex *, ilu_complex *, integer *);
 
 integer AMGfactor(SPARSEmat *, AMGlevelmat *, ILUPACKparam *);
 
@@ -1035,24 +1035,24 @@ void       ZGNLlutdlsol(integer *,ilu_doublecomplex *,ilu_doublecomplex *,ilu_do
 void       ZGNLludusol (integer *,ilu_doublecomplex *,ilu_doublecomplex *,ilu_doublecomplex *,integer *,integer *);
 void       ZGNLlutdusol(integer *,ilu_doublecomplex *,ilu_doublecomplex *,ilu_doublecomplex *,integer *,integer *);
 
-void       CGNLilut (integer *,complex *,integer *,integer *,integer *,
+void       CGNLilut (integer *,ilu_complex *,integer *,integer *,integer *,
 		     real *,
-		     complex *,integer *,integer *,integer *, 
-		     complex *,integer *,integer *);
-void       CGNLilutp(integer *,complex *,integer *,integer *,integer *,
+		     ilu_complex *,integer *,integer *,integer *,
+		     ilu_complex *,integer *,integer *);
+void       CGNLilutp(integer *,ilu_complex *,integer *,integer *,integer *,
 		     real *,real *,integer *,
-		     complex *,integer *,integer *,integer *, 
-		     complex *,integer *,integer *,integer *);
-void       CGNLlusol (integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLlutsol(integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLlulsol (integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLlutlsol(integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLluusol (integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLlutusol(integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLludlsol (integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLlutdlsol(integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLludusol (integer *,complex *,complex *,complex *,integer *,integer *);
-void       CGNLlutdusol(integer *,complex *,complex *,complex *,integer *,integer *);
+		     ilu_complex *,integer *,integer *,integer *,
+		     ilu_complex *,integer *,integer *,integer *);
+void       CGNLlusol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLlutsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLlulsol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLlutlsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLluusol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLlutusol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLludlsol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLlutdlsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLludusol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
+void       CGNLlutdusol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,integer *);
 
 
 void DGNLiluc(integer *,doubleprecision *,integer *,integer *,integer *,
@@ -1461,164 +1461,164 @@ void ZSYMiluc(integer *,ilu_doublecomplex *,integer *,integer *,integer *,double
 	       ilu_doublecomplex *,integer *,integer *,ilu_doublecomplex *,integer *,
 	       integer *, integer *);
 
-void CGNLiluc(integer *,complex *,integer *,integer *,integer *,
-	      real *,integer *,complex *,integer *,integer *,
-	      integer *,complex *,integer *,integer *);
-void CGNLilucsol (integer *,complex *,complex *,complex *,integer *,
+void CGNLiluc(integer *,ilu_complex *,integer *,integer *,integer *,
+	      real *,integer *,ilu_complex *,integer *,integer *,
+	      integer *,ilu_complex *,integer *,integer *);
+void CGNLilucsol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLiluctsol(integer *,complex *,complex *,complex *,integer *,
+void CGNLiluctsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLilucdlsol (integer *,complex *,complex *,complex *,integer *,
+void CGNLilucdlsol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLiluctdlsol(integer *,complex *,complex *,complex *,integer *,
+void CGNLiluctdlsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLilucdusol (integer *,complex *,complex *,complex *,integer *,
+void CGNLilucdusol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLiluctdusol(integer *,complex *,complex *,complex *,integer *,
+void CGNLiluctdusol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLilucusol (integer *,complex *,complex *,complex *,integer *,
+void CGNLilucusol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLiluctusol(integer *,complex *,complex *,complex *,integer *,
+void CGNLiluctusol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLiluclsol (integer *,complex *,complex *,complex *,integer *,
+void CGNLiluclsol (integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
-void CGNLiluctlsol(integer *,complex *,complex *,complex *,integer *,
+void CGNLiluctlsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,integer *,
 		  integer *);
 
-void CGNLpiluclsol  (integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpilucdlsol (integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpilucusol  (integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpilucdusol (integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpiluctlsol (integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpiluctdlsol(integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpiluctusol (integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
-void CGNLpiluctdusol(integer *,integer *, complex *,complex *,
-		     complex *,integer *,integer *);
+void CGNLpiluclsol  (integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpilucdlsol (integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpilucusol  (integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpilucdusol (integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpiluctlsol (integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpiluctdlsol(integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpiluctusol (integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
+void CGNLpiluctdusol(integer *,integer *, ilu_complex *,ilu_complex *,
+		ilu_complex *,integer *,integer *);
 
-void CHERildlc(integer *,complex *,integer *,integer *,integer *,
-	       real *,integer *,complex *,integer *,integer *,
-	       complex *,integer *,integer *,integer *);
-void CHERildlcsol(integer *,complex *,complex *,complex *,
+void CHERildlc(integer *,ilu_complex *,integer *,integer *,integer *,
+	       real *,integer *,ilu_complex *,integer *,integer *,
+	       ilu_complex *,integer *,integer *,integer *);
+void CHERildlcsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		  integer *);
-void CHERpildlcdlsol(integer *,integer *,complex *,complex *,complex *,
+void CHERpildlcdlsol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CHERpildlcdusol(integer *,integer *,complex *,complex *,complex *,
+void CHERpildlcdusol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CHERpildlclsol (integer *,integer *,complex *,complex *,complex *,
+void CHERpildlclsol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CHERpildlcusol (integer *,integer *,complex *,complex *,complex *,
+void CHERpildlcusol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CHERpilucsol(integer *,complex *,complex *,complex *,
+void CHERpilucsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		  integer *);
-void CSYMpilucsol(integer *,complex *,complex *,complex *,
+void CSYMpilucsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		  integer *);
-void CHERbpilucsol(integer *,complex *,complex *,complex *,
-		   integer *,integer *,complex *);
-void CSYMbpilucsol(integer *,complex *,complex *,complex *,
-		   integer *, integer *,complex *);
-void CSYMpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CHERbpilucsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
+		   integer *,integer *,ilu_complex *);
+void CSYMbpilucsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
+		   integer *, integer *,ilu_complex *);
+void CSYMpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
                real *,integer *,integer *,integer *,integer *,
-               complex *,integer *,integer *,complex *,integer *,
-               integer *, real *, complex *, integer *, integer *, integer *,
+               ilu_complex *,integer *,integer *,ilu_complex *,integer *,
+               integer *, real *, ilu_complex *, integer *, integer *, integer *,
 	       real *, real *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,integer *,integer *);
-void CSYMbpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CSYMbpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
                real *,integer *,integer *,integer *,integer *,
-               complex *,integer *,integer *,complex *,integer *,
-               integer *, real *, complex *, integer *, integer *, integer *,
+               ilu_complex *,integer *,integer *,ilu_complex *,integer *,
+               integer *, real *, ilu_complex *, integer *, integer *, integer *,
 	       real *, real *, integer *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,integer *,integer *);
-void CHERpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CHERpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
                real *,integer *,integer *,integer *,integer *,
-               complex *,integer *,integer *,complex *,integer *,
-               integer *, real *, complex *, integer *, integer *, integer *,
+               ilu_complex *,integer *,integer *,ilu_complex *,integer *,
+               integer *, real *, ilu_complex *, integer *, integer *, integer *,
 	       real *, real *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,integer *,integer *);
-void CHERbpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CHERbpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
                real *,integer *,integer *,integer *,integer *,
-               complex *,integer *,integer *,complex *,integer *,
-               integer *, real *, complex *, integer *, integer *, integer *,
+               ilu_complex *,integer *,integer *,ilu_complex *,integer *,
+               integer *, real *, ilu_complex *, integer *, integer *, integer *,
 	       real *, real *, integer *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,
 	       integer *,integer *,integer *,integer *,integer *,integer *,integer *,integer *);
-void CSYMiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CSYMiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 	       integer *,integer *,integer *,
-	       complex *,integer *,integer *,complex *,integer *,
+	       ilu_complex *,integer *,integer *,ilu_complex *,integer *,
 	       integer *, integer *);
-void CHERiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CHERiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 	       integer *,integer *,integer *,
-	       complex *,integer *,integer *,complex *,integer *,
+	       ilu_complex *,integer *,integer *,ilu_complex *,integer *,
 	       integer *, integer *);
 
-void CSYMildlc(integer *,complex *,integer *,integer *,integer *,
-	       real *,integer *,complex *,integer *,integer *,
-	       complex *,integer *,integer *,integer *);
-void CSYMildlcsol(integer *,complex *,complex *,complex *,
+void CSYMildlc(integer *,ilu_complex *,integer *,integer *,integer *,
+	       real *,integer *,ilu_complex *,integer *,integer *,
+	       ilu_complex *,integer *,integer *,integer *);
+void CSYMildlcsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		 integer *);
-void CSYMpildlcdlsol(integer *,integer *,complex *,complex *,complex *,
+void CSYMpildlcdlsol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSYMpildlcdusol(integer *,integer *,complex *,complex *,complex *,
+void CSYMpildlcdusol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSYMpildlclsol (integer *,integer *,complex *,complex *,complex *,
+void CSYMpildlclsol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSYMpildlcusol (integer *,integer *,complex *,complex *,complex *,
+void CSYMpildlcusol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSHRildlc(integer *,complex *,integer *,integer *,integer *,
-	       real *,integer *,complex *,integer *,integer *,
-	       complex *,integer *,integer *);
-void CSHRildlcsol(integer *,complex *,complex *,complex *,
+void CSHRildlc(integer *,ilu_complex *,integer *,integer *,integer *,
+	       real *,integer *,ilu_complex *,integer *,integer *,
+	       ilu_complex *,integer *,integer *);
+void CSHRildlcsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		  integer *);
-void CSHRpildlcdlsol(integer *,integer *,complex *,complex *,complex *,
+void CSHRpildlcdlsol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSHRpildlcdusol(integer *,integer *,complex *,complex *,complex *,
+void CSHRpildlcdusol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSHRpildlclsol (integer *,integer *,complex *,complex *,complex *,
+void CSHRpildlclsol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSHRpildlcusol (integer *,integer *,complex *,complex *,complex *,
+void CSHRpildlcusol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSSMildlc(integer *,complex *,integer *,integer *,integer *,
-	       real *,integer *,complex *,integer *,integer *,
-	       complex *,integer *,integer *);
-void CSSMildlcsol(integer *,complex *,complex *,complex *,
+void CSSMildlc(integer *,ilu_complex *,integer *,integer *,integer *,
+	       real *,integer *,ilu_complex *,integer *,integer *,
+	       ilu_complex *,integer *,integer *);
+void CSSMildlcsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		 integer *);
-void CSSMpildlcdlsol(integer *,integer *,complex *,complex *,complex *,
+void CSSMpildlcdlsol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSSMpildlcdusol(integer *,integer *,complex *,complex *,complex *,
+void CSSMpildlcdusol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSSMpildlclsol (integer *,integer *,complex *,complex *,complex *,
+void CSSMpildlclsol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CSSMpildlclsol (integer *,integer *,complex *,complex *,complex *,
+void CSSMpildlclsol (integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *,
 		     integer *);
-void CGNLpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+void CGNLpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 	       real *,integer *,integer *,integer *,integer *,
-	       complex *,integer *,integer *,integer *,complex *,integer *,
-	       integer *, real *, complex *, integer *, integer *);
-void CGNLspiluc(integer *,complex *,integer *,integer *,integer *,real *,
+	       ilu_complex *,integer *,integer *,integer *,ilu_complex *,integer *,
+	       integer *, real *, ilu_complex *, integer *, integer *);
+void CGNLspiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 		real *,integer *,integer *,integer *,integer *,
-		complex *,integer *,integer *,integer *,complex *,integer *,
-		integer *, real *, complex *, integer *, integer *);
-void CGNLmpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+		ilu_complex *,integer *,integer *,integer *,ilu_complex *,integer *,
+		integer *, real *, ilu_complex *, integer *, integer *);
+void CGNLmpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 		real *,real *,integer *,integer *,integer *,integer *,
-		complex *,integer *,integer *,integer *,complex *,integer *,
-		integer *, real *, complex *, integer *, integer *);
-void CHPDpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+		ilu_complex *,integer *,integer *,integer *,ilu_complex *,integer *,
+		integer *, real *, ilu_complex *, integer *, integer *);
+void CHPDpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 	       real *,integer *,integer *,integer *,integer *,
-	       complex *,integer *,integer *,complex *,integer *,
-	       integer *, real *, complex *, integer *, integer *);
-void CHPDmpiluc(integer *,complex *,integer *,integer *,integer *,real *,
+	       ilu_complex *,integer *,integer *,ilu_complex *,integer *,
+	       integer *, real *, ilu_complex *, integer *, integer *);
+void CHPDmpiluc(integer *,ilu_complex *,integer *,integer *,integer *,real *,
 		real *,real *,integer *,integer *,integer *,integer *,
-		complex *,integer *,integer *,complex *,integer *,
-		integer *, real *, complex *, integer *, integer *);
+		ilu_complex *,integer *,integer *,ilu_complex *,integer *,
+		integer *, real *, ilu_complex *, integer *, integer *);
 
 
 /* *********************************************** */
@@ -2939,534 +2939,534 @@ integer    ZGNLperm_mwa_metis_n_fcv(Zmat, ilu_doublecomplex *,ilu_doublecomplex 
 				     integer *,integer *, integer *, ZILUPACKparam *);
 
 
-integer    CGNLperm_null        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_null        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_nd          (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_nd          (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_nd_fc       (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_nd_fc       (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_nd_fcv      (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_nd_fcv      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_nd_fc       (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_nd_fc       (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_nd_fcv      (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_nd_fcv      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_rcm         (Cmat, complex *,complex *, integer *,integer *, 
+integer    CGNLperm_rcm         (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_rcm_fc      (Cmat, complex *,complex *, integer *,integer *, 
+integer    CGNLperm_rcm_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_rcm_fcv     (Cmat, complex *,complex *, integer *,integer *, 
+integer    CGNLperm_rcm_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_mmd         (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mmd         (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_mmd_fc      (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mmd_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_mmd_fcv     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mmd_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_mmd_fc      (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mmd_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_mmd_fcv     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mmd_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_amf         (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_amf         (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_amf_fc      (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_amf_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_amf_fcv     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_amf_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_amf_fc      (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_amf_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_amf_fcv     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_amf_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_amd         (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_amd         (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_amd_fc      (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_amd_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_amd_fcv     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_amd_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_amd_fc      (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_amd_fc      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_amd_fcv     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_amd_fcv     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_metis_e     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_metis_e     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_metis_e_fc  (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_metis_e_fc  (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_metis_e_fcv (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_metis_e_fcv (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_metis_e_fc  (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_metis_e_fc  (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_metis_e_fcv (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_metis_e_fcv (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_metis_n     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_metis_n     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_metis_n_fc  (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_metis_n_fc  (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_metis_n_fcv (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_metis_n_fcv (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_metis_n_fc  (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_metis_n_fc  (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_metis_n_fcv (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_metis_n_fcv (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_pq          (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_pq          (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_fc          (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_fc          (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_fc          (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_fc          (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_fcv         (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_fcv         (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CSYMperm_fcv         (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_fcv         (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_indset      (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_indset      (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
-integer    CGNLperm_p           (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_p           (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				 integer *, CILUPACKparam *);
 
-integer    CGNLperm_mwm_rcm        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_mmd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_amf        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_amd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_metis_e    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_metis_n    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CGNLperm_mwm_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-
-integer    CHERperm_mwm_rcm        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_rcm_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_mmd        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_mmd_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amf        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amf_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amd        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amd_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_e    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_e_sp (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_n    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_n_sp (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CHERperm_mwm_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mwm_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
 
-integer    CSYMperm_mwm_rcm        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_rcm_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_rcm_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_mmd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_mmd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_mmd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amf        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amf_sp    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amf_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_e    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_e_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_e_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_n    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_n_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_n_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CSYMperm_mwm_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-
-integer    CGNLperm_matching_rcm        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_mmd        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_amf        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_amd        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_metis_e    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_metis_n    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CGNLperm_matching_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mwm_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
 
-integer    CHERperm_matching_rcm        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_rcm_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_rcm_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_mmd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_mmd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_mmd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amf        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amf_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amf_sp    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_e    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_e_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_e_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_n    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_n_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_n_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
-integer    CHERperm_matching_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-
-integer    CSYMperm_matching_rcm        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_rcm_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_mmd        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_mmd_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amf        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amf_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amd        (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amd_sp     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_e    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_e_sp (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_n    (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_n_sp (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
-				    integer *, CILUPACKparam *);
-integer    CSYMperm_matching_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mwm_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				    integer *, CILUPACKparam *);
 
+integer    CGNLperm_matching_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CGNLperm_matching_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
 
-integer    CHERperm_mc64_rcm        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_matching_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_rcm_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_mmd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amf_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_e_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_n_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CHERperm_matching_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+
+integer    CSYMperm_matching_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_rcm_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_mmd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amf_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_e_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_n_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+integer    CSYMperm_matching_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				    integer *, CILUPACKparam *);
+
+
+integer    CHERperm_mc64_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_rcm_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_rcm_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_mmd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_mmd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_mmd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amf        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amf_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amf_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_e    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_e_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_e_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_n    (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_n_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_n_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CHERperm_mc64_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CHERperm_mc64_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
 
-integer    CSYMperm_mc64_rcm        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_rcm_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_rcm_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_mmd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_mmd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_mmd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amf        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amf_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amf_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amd_sp     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amd_sp     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_e    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_e_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_e_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_n    (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_n_sp (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_n_sp (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CSYMperm_mc64_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-
-
-integer    CGNLperm_mc64_null       (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_rcm        (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_mmd        (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_amf        (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_amd        (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_metis_e    (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_metis_n    (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
-				     integer *, CILUPACKparam *);
-integer    CGNLperm_mc64_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CSYMperm_mc64_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
 
 
-integer    CGNLperm_mwa_rcm        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_null       (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_rcm_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_rcm_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_mmd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_mmd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_mmd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_amf        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_amf_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_amf_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_amd        (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_amd_fc     (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_amd_fcv    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_metis_e    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_metis_e_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_metis_e_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_metis_n    (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_metis_n_fc (Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
-integer    CGNLperm_mwa_metis_n_fcv(Cmat, complex *,complex *, integer *,integer *,
+integer    CGNLperm_mc64_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mc64_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+
+
+integer    CGNLperm_mwa_rcm        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_rcm_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_rcm_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_mmd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_mmd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_mmd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_amf        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_amf_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_amf_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_amd        (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_amd_fc     (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_amd_fcv    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_metis_e    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_metis_e_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_metis_e_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_metis_n    (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_metis_n_fc (Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
+				     integer *, CILUPACKparam *);
+integer    CGNLperm_mwa_metis_n_fcv(Cmat, ilu_complex *,ilu_complex *, integer *,integer *,
 				     integer *, CILUPACKparam *);
 
 
@@ -3705,7 +3705,7 @@ integer    SSPDperm_rcm   (Smat, real *, real *, integer *,integer *,
 integer    ZHPDperm_rcm   (Zmat, ilu_doublecomplex *,   ilu_doublecomplex *,   integer *,integer *, 
 			   integer *, ZILUPACKparam *);
 
-integer    CHPDperm_rcm   (Cmat, complex *,   complex *,   integer *,integer *, 
+integer    CHPDperm_rcm   (Cmat, ilu_complex *,   ilu_complex *,   integer *,integer *,
 			   integer *, CILUPACKparam *);
 
 
@@ -3718,7 +3718,7 @@ integer    SSYMperm_rcm_fc (Smat, real *, real *, integer *,integer *,
 integer    ZSYMperm_rcm_fc (Zmat, ilu_doublecomplex *,   ilu_doublecomplex *,   integer *,integer *, 
 			   integer *, ZILUPACKparam *);
 
-integer    CSYMperm_rcm_fc (Cmat, complex *,   complex *,   integer *,integer *, 
+integer    CSYMperm_rcm_fc (Cmat, ilu_complex *,   ilu_complex *,   integer *,integer *,
 			   integer *, CILUPACKparam *);
 
 
@@ -3731,7 +3731,7 @@ integer    SSYMperm_rcm_fcv(Smat, real *, real *, integer *,integer *,
 integer    ZSYMperm_rcm_fcv(Zmat, ilu_doublecomplex *,   ilu_doublecomplex *,   integer *,integer *, 
 			   integer *, ZILUPACKparam *);
 
-integer    CSYMperm_rcm_fcv(Cmat, complex *,   complex *,   integer *,integer *, 
+integer    CSYMperm_rcm_fcv(Cmat, ilu_complex *,   ilu_complex *,   integer *,integer *,
 			   integer *, CILUPACKparam *);
 
 
@@ -3794,7 +3794,7 @@ integer    SSPDperm_pp    (Smat, real *, real *, integer *,integer *,
 integer    ZHPDperm_pp    (Zmat, ilu_doublecomplex *,   ilu_doublecomplex *, integer *,integer *,
 			   integer *, ZILUPACKparam *);
 
-integer    CHPDperm_pp    (Cmat, complex *,   complex *, integer *,integer *,
+integer    CHPDperm_pp    (Cmat, ilu_complex *,   ilu_complex *, integer *,integer *,
 			   integer *, CILUPACKparam *);
 
 #define DSPDpermpp     DSPDperm_pp    
@@ -4025,14 +4025,14 @@ void DSYMpindfcv(Dmat, integer *,integer *, integer *,integer *,
 		 integer *, doubleprecision, doubleprecision *, integer, 
 		 doubleprecision *,integer *,doubleprecision *);
 void CSYMpindfcv(Cmat, integer *,integer *, integer *,integer *,
-		 integer *, real, complex *, integer, 
-		 real *,integer *,complex *);
+		 integer *, real, ilu_complex *, integer,
+		 real *,integer *,ilu_complex *);
 void ZSYMpindfcv(Zmat, integer *,integer *, integer *,integer *,
 		 integer *, doubleprecision, ilu_doublecomplex *, integer, 
 		 doubleprecision *,integer *,ilu_doublecomplex *);
 void CHERpindfcv(Cmat, integer *,integer *, integer *,integer *,
-		 integer *, real, complex *, integer,
-		 real *,integer *,complex *);
+		 integer *, real, ilu_complex *, integer,
+		 real *,integer *,ilu_complex *);
 void ZHERpindfcv(Zmat, integer *,integer *, integer *,integer *,
 		 integer *, doubleprecision, ilu_doublecomplex *, integer, 
 		 doubleprecision *,integer *,ilu_doublecomplex *);
@@ -4044,14 +4044,14 @@ void DSYMpindfcv_rs(Dmat, integer *,integer *, integer *,integer *,
 		 integer *, doubleprecision, doubleprecision *, integer, 
 		 doubleprecision *,integer *,doubleprecision *);
 void CSYMpindfcv_rs(Cmat, integer *,integer *, integer *,integer *,
-		 integer *, real, complex *, integer, 
-		 real *,integer *,complex *);
+		 integer *, real, ilu_complex *, integer,
+		 real *,integer *,ilu_complex *);
 void ZSYMpindfcv_rs(Zmat, integer *,integer *, integer *,integer *,
 		 integer *, doubleprecision, ilu_doublecomplex *, integer, 
 		 doubleprecision *,integer *,ilu_doublecomplex *);
 void CHERpindfcv_rs(Cmat, integer *,integer *, integer *,integer *,
-		 integer *, real, complex *, integer,
-		 real *,integer *,complex *);
+		 integer *, real, ilu_complex *, integer,
+		 real *,integer *,ilu_complex *);
 void ZHERpindfcv_rs(Zmat, integer *,integer *, integer *,integer *,
 		 integer *, doubleprecision, ilu_doublecomplex *, integer, 
 		 doubleprecision *,integer *,ilu_doublecomplex *);
@@ -4073,14 +4073,14 @@ void ZHERbuildblock(Zmat, integer *,integer *, integer *, doubleprecision *);
 void Dindfcv(Dmat, integer *, integer *, integer *, doubleprecision, doubleprecision *, integer, doubleprecision *, integer *);
 void Sindfcv(Smat, integer *, integer *, integer *, real,            real *,            integer, real *,            integer *);
 void Zindfcv(Zmat, integer *, integer *, integer *, doubleprecision, ilu_doublecomplex *,   integer, doubleprecision *, integer *);
-void Cindfcv(Cmat, integer *, integer *, integer *, real,            complex *,         integer, real *,            integer *);
+void Cindfcv(Cmat, integer *, integer *, integer *, real,            ilu_complex *,         integer, real *,            integer *);
 
 void DSYMindfcv(Dmat, integer *, integer *, integer *, doubleprecision, doubleprecision *, integer, doubleprecision *, integer *);
 void SSYMindfcv(Smat, integer *, integer *, integer *, real,            real *,            integer, real *,            integer *);
 void ZSYMindfcv(Zmat, integer *, integer *, integer *, doubleprecision, ilu_doublecomplex *,   integer, doubleprecision *, integer *);
-void CSYMindfcv(Cmat, integer *, integer *, integer *, real,            complex *,         integer, real *,            integer *);
+void CSYMindfcv(Cmat, integer *, integer *, integer *, real,            ilu_complex *,         integer, real *,            integer *);
 void ZHERindfcv(Zmat, integer *, integer *, integer *, doubleprecision, ilu_doublecomplex *,   integer, doubleprecision *, integer *);
-void CHERindfcv(Cmat, integer *, integer *, integer *, real,            complex *,         integer, real *,            integer *);
+void CHERindfcv(Cmat, integer *, integer *, integer *, real,            ilu_complex *,         integer, real *,            integer *);
 
 
 void dqsortr2i(doubleprecision *, integer *, integer *, integer, integer);
@@ -4089,7 +4089,7 @@ void sqsortr2i(real *, integer *, integer *, integer, integer);
 void Dclear(integer, doubleprecision *, integer);
 void Sclear(integer, real *,            integer);
 void Zclear(integer, ilu_doublecomplex *,   integer);
-void Cclear(integer, complex *,         integer);
+void Cclear(integer, ilu_complex *,         integer);
 
 void IP_etree(integer *, integer *, integer, integer *, 
 	      integer *, integer *, integer *);
@@ -4126,15 +4126,15 @@ void      ZHERqmr(integer *,ilu_doublecomplex *,ilu_doublecomplex *,integer *,do
 void      Zgmres(integer *,ilu_doublecomplex *,ilu_doublecomplex *,integer *,doubleprecision *,ilu_doublecomplex *);
 void      Zfgmres(integer *,ilu_doublecomplex *,ilu_doublecomplex *,integer *,doubleprecision *,ilu_doublecomplex *);
 
-void      Cpcg(integer *,complex *,complex *,integer *,real *,complex *);
-void      Cfpcg(integer *,complex *,complex *,integer *,real *,complex *);
-void      Cbcg(integer *,complex *,complex *,integer *,real *,complex *);
-void      CSYMbcg(integer *,complex *,complex *,integer *,real *,complex *);
-void      CHERbcg(integer *,complex *,complex *,integer *,real *,complex *);
-void      CSYMqmr(integer *,complex *,complex *,integer *,real *,complex *);
-void      CHERqmr(integer *,complex *,complex *,integer *,real *,complex *);
-void      Cgmres(integer *,complex *,complex *,integer *,real *,complex *);
-void      Cfgmres(integer *,complex *,complex *,integer *,real *,complex *);
+void      Cpcg(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      Cfpcg(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      Cbcg(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      CSYMbcg(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      CHERbcg(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      CSYMqmr(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      CHERqmr(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      Cgmres(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
+void      Cfgmres(integer *,ilu_complex *,ilu_complex *,integer *,real *,ilu_complex *);
 
 
 doubleprecision Ddistdot(integer *,doubleprecision *,integer *,doubleprecision *,integer *);
@@ -4144,8 +4144,8 @@ real            Sdistdot(integer *,real *,integer *,real *,integer *);
 ilu_doublecomplex   Zdistdotc(integer *,ilu_doublecomplex *,integer *,ilu_doublecomplex *,integer *);
 ilu_doublecomplex   Zdistdotu(integer *,ilu_doublecomplex *,integer *,ilu_doublecomplex *,integer *);
 
-complex         Cdistdotc(integer *,complex *,integer *,complex *,integer *);
-complex         Cdistdotu(integer *,complex *,integer *,complex *,integer *);
+ilu_complex         Cdistdotc(integer *,ilu_complex *,integer *,ilu_complex *,integer *);
+ilu_complex         Cdistdotu(integer *,ilu_complex *,integer *,ilu_complex *,integer *);
 
 integer AMGsolver(SPARSEmat *, AMGlevelmat *, ILUPACKparam *, 
 		  void *, void *);
@@ -4229,29 +4229,29 @@ integer ZSYMDSYMAMGsolver(Zmat *, DAMGlevelmat *, DILUPACKparam *,
 			  ilu_doublecomplex *, ilu_doublecomplex *);
 
 integer CGNLAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-		      complex *, complex *);
+		      ilu_complex *, ilu_complex *);
 integer CGNLSGNLAMGsolver(Cmat *, SAMGlevelmat *, SILUPACKparam *, 
-			  complex *, complex *);
+			  ilu_complex *, ilu_complex *);
 integer CGNLSYMAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-			 complex *, complex *);
+			 ilu_complex *, ilu_complex *);
 integer CGNLHERAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-			 complex *, complex *);
+			 ilu_complex *, ilu_complex *);
 integer CGNLHPDAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-			 complex *, complex *);
+			 ilu_complex *, ilu_complex *);
 integer CGNLDSPDAMGsolver(Cmat *, SAMGlevelmat *, SILUPACKparam *, 
-			  complex *, complex *);
+			  ilu_complex *, ilu_complex *);
 integer CGNLDSYMAMGsolver(Cmat *, SAMGlevelmat *, SILUPACKparam *, 
-			  complex *, complex *);
+			  ilu_complex *, ilu_complex *);
 integer CHPDAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-		      complex *, complex *);
+		      ilu_complex *, ilu_complex *);
 integer CHERAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-		      complex *, complex *);
+		      ilu_complex *, ilu_complex *);
 integer CSYMAMGsolver(Cmat *, CAMGlevelmat *, CILUPACKparam *, 
-		      complex *, complex *);
+		      ilu_complex *, ilu_complex *);
 integer CSYMSSPDAMGsolver(Cmat *, SAMGlevelmat *, SILUPACKparam *, 
-			  complex *, complex *);
+			  ilu_complex *, ilu_complex *);
 integer CSYMSSYMAMGsolver(Cmat *, SAMGlevelmat *, SILUPACKparam *, 
-			  complex *, complex *);
+			  ilu_complex *, ilu_complex *);
 
 void AMGinit(SPARSEmat *, ILUPACKparam *);
 
@@ -4411,10 +4411,10 @@ void      Zcsrcsc(integer *, integer *, integer *, ilu_doublecomplex *, integer 
 void      Zcsrcsc (integer *,integer *,integer *,ilu_doublecomplex *,
 		   integer *,integer *,ilu_doublecomplex *,integer *,integer *);
 
-void      Ccsrcsc(integer *, integer *, integer *, complex *, integer *, integer *, 
-		  complex *, integer *, integer *);
-void      Ccsrcsc(integer *,integer *,integer *,complex *,
-		  integer *,integer *,complex *,integer *,integer *);
+void      Ccsrcsc(integer *, integer *, integer *, ilu_complex *, integer *, integer *,
+		  ilu_complex *, integer *, integer *);
+void      Ccsrcsc(integer *,integer *,integer *,ilu_complex *,
+		  integer *,integer *,ilu_complex *,integer *,integer *);
 
 
 
@@ -4433,9 +4433,9 @@ void ZGNLmatvec(Zmat, ilu_doublecomplex *, ilu_doublecomplex *);
 void ZGNLmattvec(Zmat, ilu_doublecomplex *, ilu_doublecomplex *);
 void ZGNLmathvec(Zmat, ilu_doublecomplex *, ilu_doublecomplex *);
 
-void CGNLmatvec(Cmat, complex *, complex *);
-void CGNLmattvec(Cmat, complex *, complex *);
-void CGNLmathvec(Cmat, complex *, complex *);
+void CGNLmatvec(Cmat, ilu_complex *, ilu_complex *);
+void CGNLmattvec(Cmat, ilu_complex *, ilu_complex *);
+void CGNLmathvec(Cmat, ilu_complex *, ilu_complex *);
 
 
 void DSYMmatvec(Dmat, doubleprecision *, doubleprecision *);
@@ -4449,20 +4449,20 @@ void ZSHRmatvec(Zmat, ilu_doublecomplex *, ilu_doublecomplex *);
 void ZSYMmatvec(Zmat, ilu_doublecomplex *, ilu_doublecomplex *);
 void ZSSMmatvec(Zmat, ilu_doublecomplex *, ilu_doublecomplex *);
 
-void CHERmatvec(Cmat, complex *, complex *);
-void CSHRmatvec(Cmat, complex *, complex *);
-void CSYMmatvec(Cmat, complex *, complex *);
-void CSSMmatvec(Cmat, complex *, complex *);
+void CHERmatvec(Cmat, ilu_complex *, ilu_complex *);
+void CSHRmatvec(Cmat, ilu_complex *, ilu_complex *);
+void CSYMmatvec(Cmat, ilu_complex *, ilu_complex *);
+void CSSMmatvec(Cmat, ilu_complex *, ilu_complex *);
 
 
 void Sqsort(real *,            integer *, integer *, integer *); 
 void Dqsort(doubleprecision *, integer *, integer *, integer *); 
-void Cqsort(complex *,         integer *, integer *, integer *); 
+void Cqsort(ilu_complex *,         integer *, integer *, integer *);
 void Zqsort(ilu_doublecomplex *,   integer *, integer *, integer *); 
 
 void Sbqsort(real *,           integer *,integer *,integer *,integer *); 
 void Dbqsort(doubleprecision *,integer *,integer *,integer *,integer *); 
-void Cbqsort(complex *,        integer *,integer *,integer *,integer *); 
+void Cbqsort(ilu_complex *,        integer *,integer *,integer *,integer *);
 void Zbqsort(ilu_doublecomplex *,  integer *,integer *,integer *,integer *); 
 
 
@@ -4499,7 +4499,7 @@ integer  Cspartran(Cmat, Cmat *, integer, integer);
 void Csetupgraph(Cmat, Cmat *, integer *, integer *, size_t);
 void Csetupgraph_epsilon(Cmat, Cmat *, real, real *, integer *, integer *, size_t);
 void Csetupgraph_epsilon_sp(Cmat, Cmat *, real, real *, integer *, integer *, size_t, integer *);
-void Cqqsort(complex *, integer *, integer *, integer *, integer *); 
+void Cqqsort(ilu_complex *, integer *, integer *, integer *, integer *);
 void Ccperm(Cmat *, integer *);
 void Crperm(Cmat *, integer *);
 
@@ -4559,33 +4559,33 @@ void ZSYMscale(integer *, ilu_doublecomplex *,integer *,
 void ZHERscale(integer *, ilu_doublecomplex *,integer *,
 	       integer *,ilu_doublecomplex *,ilu_doublecomplex *,integer *);
 
-void Croscal(integer *,integer *,integer *,complex *,integer *,
-	    integer *,complex *,complex *,integer *,integer *,
+void Croscal(integer *,integer *,integer *,ilu_complex *,integer *,
+	    integer *,ilu_complex *,ilu_complex *,integer *,integer *,
 	    integer *);
-void Ccoscal(integer *,integer *,integer *,complex *,integer *,
-	    integer *,complex *,complex *,integer *,integer *,
+void Ccoscal(integer *,integer *,integer *,ilu_complex *,integer *,
+	    integer *,ilu_complex *,ilu_complex *,integer *,integer *,
 	    integer *);
-void Crowscale(integer *,integer *,complex *,integer *,
-	       integer *,complex *,integer *);
-void Ccolscale(integer *,integer *,complex *,integer *,
-	       integer *,complex *,integer *);
-void CHPDscale(integer *, complex *,integer *,
-	       integer *,complex *,integer *);
-void CSYMscale(integer *, complex *,integer *,
-	       integer *, complex *,complex *,integer *);
-void CHERscale(integer *, complex *,integer *,
-	       integer *,complex *,complex *,integer *);
+void Crowscale(integer *,integer *,ilu_complex *,integer *,
+	       integer *,ilu_complex *,integer *);
+void Ccolscale(integer *,integer *,ilu_complex *,integer *,
+	       integer *,ilu_complex *,integer *);
+void CHPDscale(integer *, ilu_complex *,integer *,
+	       integer *,ilu_complex *,integer *);
+void CSYMscale(integer *, ilu_complex *,integer *,
+	       integer *, ilu_complex *,ilu_complex *,integer *);
+void CHERscale(integer *, ilu_complex *,integer *,
+	       integer *,ilu_complex *,ilu_complex *,integer *);
 
 
 integer DPQpermF(Dmat, integer, integer *, integer *, integer *, doubleprecision, doubleprecision *, integer *);
 integer SPQpermF(Smat, integer, integer *, integer *, integer *, real,            real *,            integer *);
 integer ZPQpermF(Zmat, integer, integer *, integer *, integer *, doubleprecision, ilu_doublecomplex *,   integer *);
-integer CPQpermF(Cmat, integer, integer *, integer *, integer *, real,            complex *,         integer *);
+integer CPQpermF(Cmat, integer, integer *, integer *, integer *, real,            ilu_complex *,         integer *);
 
 integer DPPpermF(Dmat, integer, integer *, integer *, doubleprecision, doubleprecision *, integer *);
 integer SPPpermF(Smat, integer, integer *, integer *, real,            real *,            integer *);
 integer ZPPpermF(Zmat, integer, integer *, integer *, doubleprecision, ilu_doublecomplex *,   integer *);
-integer CPPpermF(Cmat, integer, integer *, integer *, real,            complex *,         integer *);
+integer CPPpermF(Cmat, integer, integer *, integer *, real,            ilu_complex *,         integer *);
 
 
 
@@ -4606,10 +4606,10 @@ void      Zreadmtc(integer *,integer *,integer *,character *,ilu_doublecomplex *
 		   integer *,character *,character *,character *,
 		   integer *, integer *, integer *, ilu_doublecomplex *,
 		   integer *,ftnlen,ftnlen,ftnlen,ftnlen,ftnlen);
-void      Creadmtc(integer *,integer *,integer *,character *,complex *,integer *,
-		   integer *,complex *,integer *,character *,integer *,integer *,
+void      Creadmtc(integer *,integer *,integer *,character *,ilu_complex *,integer *,
+		   integer *,ilu_complex *,integer *,character *,integer *,integer *,
 		   integer *,character *,character *,character *,
-		   integer *, integer *, integer *, complex *,
+		   integer *, integer *, integer *, ilu_complex *,
 		   integer *,ftnlen,ftnlen,ftnlen,ftnlen,ftnlen);
 void      Dwritemtc(character *, doubleprecision *,integer *,integer *,
 		    doubleprecision *,integer *, character *,
@@ -4626,8 +4626,8 @@ void      Zwritemtc(character *, ilu_doublecomplex *,integer *,integer *,
 		    integer *,integer *,integer *,
 		    character *,character *,character *,
 		    ftnlen,ftnlen,ftnlen,ftnlen,ftnlen);
-void      Cwritemtc(character *, complex *,integer *,integer *,
-		    complex *,integer *, character *,
+void      Cwritemtc(character *, ilu_complex *,integer *,integer *,
+		    ilu_complex *,integer *, character *,
 		    integer *,integer *,integer *,
 		    character *,character *,character *,
 		    ftnlen,ftnlen,ftnlen,ftnlen,ftnlen);
@@ -4638,7 +4638,7 @@ void      Sreadvectors(character *,real *,integer *,integer *,
 		       character *,character *, ftnlen,ftnlen,ftnlen);
 void      Zreadvectors(character *,ilu_doublecomplex *,integer *,integer *,
 		       character *,character *, ftnlen,ftnlen,ftnlen);
-void      Creadvectors(character *,complex *,integer *,integer *,
+void      Creadvectors(character *,ilu_complex *,integer *,integer *,
 		       character *,character *, ftnlen,ftnlen,ftnlen);
 
 void      Dwritevectors(character *,doubleprecision *,integer *,integer *,
@@ -4647,7 +4647,7 @@ void      Swritevectors(character *,real *,integer *,integer *,
 			character *,character *, ftnlen,ftnlen,ftnlen);
 void      Zwritevectors(character *,ilu_doublecomplex *,integer *,integer *,
 			character *,character *, ftnlen,ftnlen,ftnlen);
-void      Cwritevectors(character *,complex *,integer *,integer *,
+void      Cwritevectors(character *,ilu_complex *,integer *,integer *,
 			character *,character *, ftnlen,ftnlen,ftnlen);
 
 
@@ -4655,17 +4655,17 @@ integer  DSSMsmwm(Dmat, integer *, integer *, doubleprecision *),
      SSSMsmwm(Smat, integer *, integer *, real *),
      DSYMsmwm(Dmat, integer *, integer *, doubleprecision *),
      SSYMsmwm(Smat, integer *, integer *, real *),
-     CSSMsmwm(Cmat, integer *, integer *, complex *),
+     CSSMsmwm(Cmat, integer *, integer *, ilu_complex *),
      ZSSMsmwm(Zmat, integer *, integer *, ilu_doublecomplex *),
-     CSYMsmwm(Cmat, integer *, integer *, complex *),
+     CSYMsmwm(Cmat, integer *, integer *, ilu_complex *),
      ZSYMsmwm(Zmat, integer *, integer *, ilu_doublecomplex *),
-     CSHRsmwm(Cmat, integer *, integer *, complex *),
+     CSHRsmwm(Cmat, integer *, integer *, ilu_complex *),
      ZSHRsmwm(Zmat, integer *, integer *, ilu_doublecomplex *),
-     CHERsmwm(Cmat, integer *, integer *, complex *),
+     CHERsmwm(Cmat, integer *, integer *, ilu_complex *),
      ZHERsmwm(Zmat, integer *, integer *, ilu_doublecomplex *),
      DGNLsmwm(Dmat, integer *, integer *, doubleprecision *),
      SGNLsmwm(Smat, integer *, integer *, real *),
-     CGNLsmwm(Cmat, integer *, integer *, complex *),
+     CGNLsmwm(Cmat, integer *, integer *, ilu_complex *),
      ZGNLsmwm(Zmat, integer *, integer *, ilu_doublecomplex *);
 
 
@@ -4737,34 +4737,34 @@ integer ssymilupackdel(long *, long *,
 		   real *, integer *);
 
 
-integer csymilupack   (integer *, integer *, integer *, complex *, complex *, complex *,
+integer csymilupack   (integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, 
 		   real *, integer *);
 integer csymilupackfac(long *, long *, 
-		   integer *, integer *, integer *, complex *, complex *, complex *,
+		   integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, integer *, 
 		   real *, integer *);
 integer csymilupacksol(long *, long *, 
-		   integer *, integer *, integer *, complex *, complex *, complex *,
+		   integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, integer *, 
 		   real *, integer *);
 integer csymilupackdel(long *, long *, 
-		   integer *, integer *, integer *, complex *, complex *, complex *,
+		   integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, integer *, 
 		   real *, integer *);
-integer chermilupack   (integer *, integer *, integer *, complex *, complex *, complex *,
+integer chermilupack   (integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, 
 		   real *, integer *);
 integer cherilupackfac(long *, long *, 
-		   integer *, integer *, integer *, complex *, complex *, complex *,
+		   integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, integer *, 
 		   real *, integer *);
 integer cherilupacksol(long *, long *, 
-		   integer *, integer *, integer *, complex *, complex *, complex *,
+		   integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, integer *, 
 		   real *, integer *);
 integer cherilupackdel(long *, long *, 
-		   integer *, integer *, integer *, complex *, complex *, complex *,
+		   integer *, integer *, integer *, ilu_complex *, ilu_complex *, ilu_complex *,
 		   real *, real *, integer *, integer *, integer *, 
 		   real *, integer *);
 
@@ -4813,7 +4813,7 @@ void dgnlamginit(integer *, integer *, integer *,
 		 double *, double *, integer *, double *,
 		 integer *, integer *, integer *, integer *, integer *);
 void cgnlamginit(integer *, integer *, integer *,
-		 complex *, integer *, character *, real *, real *,
+		 ilu_complex *, integer *, character *, real *, real *,
 		 real *, real *, integer *, real *,
 		 integer *, integer *, integer *, integer *, integer *);
 void zgnlamginit(integer *, integer *, integer *,
@@ -4830,7 +4830,7 @@ void dspdamginit(integer *, integer *, integer *,
 		 double *, double *, integer *, double *,
 		 integer *, integer *, integer *, integer *, integer *);
 void chpdamginit(integer *, integer *, integer *,
-		 complex *, integer *, character *, real *, real *,
+		 ilu_complex *, integer *, character *, real *, real *,
 		 real *, real *, integer *, real *,
 		 integer *, integer *, integer *, integer *, integer *);
 void zhpdamginit(integer *, integer *, integer *,
@@ -4847,7 +4847,7 @@ void dsymamginit(integer *, integer *, integer *,
 		 double *, double *, integer *, double *,
 		 integer *, integer *, integer *, integer *, integer *);
 void cheramginit(integer *, integer *, integer *,
-		 complex *, integer *, character *, real *, real *,
+		 ilu_complex *, integer *, character *, real *, real *,
 		 real *, real *, integer *, real *,
 		 integer *, integer *, integer *, integer *, integer *);
 void zheramginit(integer *, integer *, integer *,
@@ -4855,7 +4855,7 @@ void zheramginit(integer *, integer *, integer *,
 		 double *, double *, integer *, double *,
 		 integer *, integer *, integer *, integer *, integer *);
 void csymamginit(integer *, integer *, integer *,
-		 complex *, integer *, character *, real *, real *,
+		 ilu_complex *, integer *, character *, real *, real *,
 		 real *, real *, integer *, real *,
 		 integer *, integer *, integer *, integer *, integer *);
 void zsymamginit(integer *, integer *, integer *,
@@ -4876,7 +4876,7 @@ int dgnlamgfactor(size_t *, size_t *,
 		  integer *, integer *, integer *, integer *, integer *);
 int cgnlamgfactor(size_t *, size_t *, 
 		  integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zgnlamgfactor(size_t *, size_t *, 
@@ -4897,7 +4897,7 @@ int dspdamgfactor(size_t *, size_t *,
 		  integer *, integer *, integer *, integer *, integer *);
 int chpdamgfactor(size_t *, size_t *, 
 		  integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zhpdamgfactor(size_t *, size_t *, 
@@ -4918,7 +4918,7 @@ int dsymamgfactor(size_t *, size_t *,
 		  integer *, integer *, integer *, integer *, integer *);
 int cheramgfactor(size_t *, size_t *, 
 		  integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zheramgfactor(size_t *, size_t *, 
@@ -4928,7 +4928,7 @@ int zheramgfactor(size_t *, size_t *,
 		  integer *, integer *, integer *, integer *, integer *);
 int csymamgfactor(size_t *, size_t *, 
 		  integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zsymamgfactor(size_t *, size_t *,
@@ -4949,8 +4949,8 @@ int dgnlamgsolver(size_t *, size_t *,
 		  double *, double *, integer *, double *,
 		  integer *, integer *, integer *, integer *, integer *);
 int cgnlamgsolver(size_t *, size_t *, 
-		  complex *, complex *, integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, ilu_complex *, integer *, integer *, integer *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 
@@ -4971,8 +4971,8 @@ int dspdamgsolver(size_t *, size_t *,
 		  double *, double *, integer *, double *,
 		  integer *, integer *, integer *, integer *, integer *);
 int chpdamgsolver(size_t *, size_t *, 
-		  complex *, complex *, integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, ilu_complex *, integer *, integer *, integer *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zhpdamgsolver(size_t *, size_t *, 
@@ -4992,8 +4992,8 @@ int dsymamgsolver(size_t *, size_t *,
 		  double *, double *, integer *, double *,
 		  integer *, integer *, integer *, integer *, integer *);
 int cheramgsolver(size_t *, size_t *, 
-		  complex *, complex *, integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, ilu_complex *, integer *, integer *, integer *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zheramgsolver(size_t *, size_t *, 
@@ -5002,8 +5002,8 @@ int zheramgsolver(size_t *, size_t *,
 		  double *, double *, integer *, double *,
 		  integer *, integer *, integer *, integer *, integer *);
 int csymamgsolver(size_t *, size_t *, 
-		  complex *, complex *, integer *, integer *, integer *,
-		  complex *, integer *, character *, real *, real *,
+		  ilu_complex *, ilu_complex *, integer *, integer *, integer *,
+		  ilu_complex *, integer *, character *, real *, real *,
 		  real *, real *, integer *, real *,
 		  integer *, integer *, integer *, integer *, integer *);
 int zsymamgsolver(size_t *, size_t *, 
@@ -5018,7 +5018,7 @@ void sgnlamgsol(size_t *, size_t *,
 void dgnlamgsol(size_t *, size_t *, 
 		double *, double *, integer *);
 void cgnlamgsol(size_t *, size_t *, 
-		complex *, complex *, integer *);
+		ilu_complex *, ilu_complex *, integer *);
 void zgnlamgsol(size_t *, size_t *, 
 		ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 
@@ -5027,7 +5027,7 @@ void sspdamgsol(size_t *, size_t *,
 void dspdamgsol(size_t *, size_t *, 
 		double *, double *, integer *);
 void chpdamgsol(size_t *, size_t *, 
-		complex *, complex *, integer *);
+		ilu_complex *, ilu_complex *, integer *);
 void zhpdamgsol(size_t *, size_t *, 
 		ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 
@@ -5036,11 +5036,11 @@ void ssymamgsol(size_t *, size_t *,
 void dsymamgsol(size_t *, size_t *, 
 		double *, double *, integer *);
 void csymamgsol(size_t *, size_t *, 
-		complex *, complex *, integer *);
+		ilu_complex *, ilu_complex *, integer *);
 void zsymamgsol(size_t *, size_t *, 
 		ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 void cheramgsol(size_t *, size_t *, 
-		complex *, complex *, integer *);
+		ilu_complex *, ilu_complex *, integer *);
 void zheramgsol(size_t *, size_t *, 
 		ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 void ssymamgsol(size_t *, size_t *, 
@@ -5048,11 +5048,11 @@ void ssymamgsol(size_t *, size_t *,
 void dsymamgsol(size_t *, size_t *, 
 		double *, double *, integer *);
 void csymamgsol(size_t *, size_t *, 
-		complex *, complex *, integer *);
+		ilu_complex *, ilu_complex *, integer *);
 void zsymamgsol(size_t *, size_t *, 
 		ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 void cheramgsol(size_t *, size_t *, 
-		complex *, complex *, integer *);
+		ilu_complex *, ilu_complex *, integer *);
 void zheramgsol(size_t *, size_t *, 
 		ilu_doublecomplex *, ilu_doublecomplex *, integer *);
 
@@ -5081,7 +5081,7 @@ void sspdamginfo(size_t *, size_t *, integer *, integer *,
 void dspdamginfo(size_t *, size_t *, 
 		 integer *, integer *, integer *, double *);
 void chpdamginfo(size_t *, size_t *, 
-		 integer *, integer *, integer *, complex *);
+		 integer *, integer *, integer *, ilu_complex *);
 void zhpdamginfo(size_t *, size_t *, 
 		 integer *, integer *, integer *, ilu_doublecomplex *);
 
@@ -5090,11 +5090,11 @@ void ssymamginfo(size_t *, size_t *,
 void dsymamginfo(size_t *, size_t *,
 		 integer *, integer *, integer *, double *);
 void cheramginfo(size_t *, size_t *,
-		 integer *, integer *, integer *, complex *);
+		 integer *, integer *, integer *, ilu_complex *);
 void zheramginfo(size_t *, size_t *,
 		 integer *, integer *, integer *, ilu_doublecomplex *);
 void csymamginfo(size_t *, size_t *,
-		 integer *, integer *, integer *, complex *);
+		 integer *, integer *, integer *, ilu_complex *);
 void zsymamginfo(size_t *, size_t *,
 		 integer *, integer *, integer *, ilu_doublecomplex *);
 
@@ -5103,7 +5103,7 @@ void sgnlamginfo(size_t *, size_t *,
 void dgnlamginfo(size_t *, size_t *,
 		 integer *, integer *, integer *, double *);
 void cgnlamginfo(size_t *, size_t *,
-		 integer *, integer *, integer *, complex *);
+		 integer *, integer *, integer *, ilu_complex *);
 void zgnlamginfo(size_t *, size_t *,
 		 integer *, integer *, integer *, ilu_doublecomplex *);
 
@@ -5132,7 +5132,7 @@ void zherhpdamgconvert(size_t *, size_t *);
 
 void samgundoscaling(size_t *, size_t *, integer *, integer *, integer *, real *);
 void damgundoscaling(size_t *, size_t *, integer *, integer *, integer *, doubleprecision *);
-void camgundoscaling(size_t *, size_t *, integer *, integer *, integer *, complex *);
+void camgundoscaling(size_t *, size_t *, integer *, integer *, integer *, ilu_complex *);
 void zamgundoscaling(size_t *, size_t *, integer *, integer *, integer *, ilu_doublecomplex *);
 
 
@@ -5157,10 +5157,10 @@ void DSYMpiluclsol(integer *,doubleprecision *,doubleprecision *,doubleprecision
 		   integer *);
 void DSYMpilucusol(integer *,doubleprecision *,doubleprecision *,doubleprecision *,
 		   integer *);
-void CSYMpiluclsol(integer *,complex *,complex *,complex *, integer *);
-void CSYMpilucusol(integer *,complex *,complex *,complex *, integer *);
-void CHERpiluclsol(integer *,complex *,complex *,complex *, integer *);
-void CHERpilucusol(integer *,complex *,complex *,complex *, integer *);
+void CSYMpiluclsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
+void CSYMpilucusol(integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
+void CHERpiluclsol(integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
+void CHERpilucusol(integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
 void ZSYMpiluclsol(integer *,ilu_doublecomplex *,ilu_doublecomplex *,ilu_doublecomplex *, integer *);
 void ZSYMpilucusol(integer *,ilu_doublecomplex *,ilu_doublecomplex *,ilu_doublecomplex *, integer *);
 void ZHERpiluclsol(integer *,ilu_doublecomplex *,ilu_doublecomplex *,ilu_doublecomplex *, integer *);
@@ -5173,10 +5173,10 @@ void DSYMppiluclsol(integer *,integer *,doubleprecision *,doubleprecision *,
 		    doubleprecision *, integer *);
 void DSYMppilucusol(integer *,integer *,doubleprecision *,doubleprecision *,
 		    doubleprecision *, integer *);
-void CSYMppiluclsol(integer *,integer *,complex *,complex *,complex *, integer *);
-void CSYMppilucusol(integer *,integer *,complex *,complex *,complex *, integer *);
-void CHERppiluclsol(integer *,integer *,complex *,complex *,complex *, integer *);
-void CHERppilucusol(integer *,integer *,complex *,complex *,complex *, integer *);
+void CSYMppiluclsol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
+void CSYMppilucusol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
+void CHERppiluclsol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
+void CHERppilucusol(integer *,integer *,ilu_complex *,ilu_complex *,ilu_complex *, integer *);
 void ZSYMppiluclsol(integer *,integer *,ilu_doublecomplex *,ilu_doublecomplex *,
 		    ilu_doublecomplex *, integer *);
 void ZSYMppilucusol(integer *,integer *,ilu_doublecomplex *,ilu_doublecomplex *,
@@ -5198,7 +5198,7 @@ integer Zmps_arms(Zmat, integer *, doubleprecision *, doubleprecision *,
 
 void sprivatesptrs(character *uplo, integer *n, integer *nrhs, real *ap, integer *ipiv, real *b, integer *ldb, integer *info, ftnlen uplolen);
 void dprivatesptrs(character *uplo, integer *n, integer *nrhs, doubleprecision *ap, integer *ipiv, doubleprecision *b, integer *ldb, integer *info, ftnlen uplolen);
-void cprivatehptrs(character *uplo, integer *n, integer *nrhs, complex *ap, integer *ipiv, complex *b, integer *ldb, integer *info, ftnlen uplolen);
+void cprivatehptrs(character *uplo, integer *n, integer *nrhs, ilu_complex *ap, integer *ipiv, ilu_complex *b, integer *ldb, integer *info, ftnlen uplolen);
 void zprivatehptrs(character *uplo, integer *n, integer *nrhs, ilu_doublecomplex *ap, integer *ipiv, ilu_doublecomplex *b, integer *ldb, integer *info, ftnlen uplolen);
 
 
@@ -5235,7 +5235,7 @@ void Dmergematrices(Dmat *C, Dmat *A, Dmat *B,
 		    doubleprecision shift, integer *buff);
 void Cmergematrices(Cmat *C, Cmat *A, Cmat *B, 
 		    integer *p, integer *invq, integer *lenB, 
-		    complex shift, integer *buff);
+		    ilu_complex shift, integer *buff);
 void Zmergematrices(Zmat *C, Zmat *A, Zmat *B, 
 		    integer *p, integer *invq, integer *lenB, 
 		    ilu_doublecomplex shift, integer *buff);
@@ -5249,17 +5249,17 @@ void DSYMmergematrices(Dmat *C, Dmat *A, Dmat *B,
 		       integer *p, integer *invq, integer *lenB, 
 		       doubleprecision shift, integer *buff);
 void CSYMmergematrices(Cmat *C, Cmat *A, Cmat *B, 
-		       complex *rowscale,
+		       ilu_complex *rowscale,
 		       integer *p, integer *invq, integer *lenB, 
-		       complex shift, integer *buff);
+		       ilu_complex shift, integer *buff);
 void ZSYMmergematrices(Zmat *C, Zmat *A, Zmat *B, 
 		       ilu_doublecomplex *rowscale,
 		       integer *p, integer *invq, integer *lenB, 
 		       ilu_doublecomplex shift, integer *buff);
 void CHERmergematrices(Cmat *C, Cmat *A, Cmat *B, 
-		       complex *rowscale,
+		       ilu_complex *rowscale,
 		       integer *p, integer *invq, integer *lenB, 
-		       complex shift, integer *buff);
+		       ilu_complex shift, integer *buff);
 void ZHERmergematrices(Zmat *C, Zmat *A, Zmat *B, 
 		       ilu_doublecomplex *rowscale,
 		       integer *p, integer *invq, integer *lenB, 
