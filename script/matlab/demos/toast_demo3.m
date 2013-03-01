@@ -78,7 +78,7 @@ varargout{1} = handles.output;
 %% ===========================================================
 function init(handles)
 
-clear prm;
+prm = toastParam;
 prm.fwdsolver.meshfile = 'circle25_32.msh';
 prm.data.lnampfile = 'fmod_ellips_16x16_100MHz.fem';
 prm.data.phasefile = 'farg_ellips_16x16_100MHz.fem';
@@ -109,29 +109,29 @@ prm.initprm.mua = struct('reset','HOMOG','val',0.025);
 prm.initprm.mus = struct('reset','HOMOG','val',2);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
 
-prm.callback.context = handles;
-prm.callback.iter = @callback_vis; % iteration callback from recon
+prm.transient.callback.context = handles;
+prm.transient.callback.iter = @callback_vis; % iteration callback from recon
 
 %prm.smask = toastSolutionMask(prm.solver.basis.hbasis);
 n = prm.fwdsolver.hmesh.NodeCount();
 load toast_demo1.mat
 load toast_demo2.mat
-prm.bmua = bmua; clear bmua;
-prm.bmus = bmus; clear bmus;
-prm.mua = prm.solver.basis.hbasis.Map('B->M',prm.bmua);
-prm.mus = prm.solver.basis.hbasis.Map('B->M',prm.bmus);
-prm.ref = ones(n,1)*1.4;
+prm.initprm.mua.bmua = bmua; clear bmua;
+prm.initprm.mus.bmus = bmus; clear bmus;
+prm.initprm.mua.mua = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mua.bmua);
+prm.initprm.mus.mus = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mus.bmus);
+prm.initprm.ref.ref = ones(n,1)*1.4;
 axes(handles.axes1);
-imagesc(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.005 0.05]);
+imagesc(reshape(prm.initprm.mua.bmua,prm.solver.basis.bdim),[0.005 0.05]);
 axis xy equal tight off
 %set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes2);
-imagesc(reshape(prm.bmus,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)),[0.5 4]);
+imagesc(reshape(prm.initprm.mus.bmus,prm.solver.basis.bdim),[0.5 4]);
 axis xy equal tight off
 %set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes7);
 tmp = prm.solver.basis.hbasis.Map('M->B',ones(n,1));
-h = imagesc(rot90(reshape(tmp,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2)))); axis xy equal tight off
+h = imagesc(rot90(reshape(tmp,prm.solver.basis.bdim))); axis xy equal tight off
 hold on;
 qp = prm.fwdsolver.hmesh.Qpos();
 for i=1:size(qp,1)
@@ -173,14 +173,13 @@ end
 
 
 % Display reconstruction results for current iteration
-function callback_vis(handles,res)
-prm = getappdata(handles.figure1,'prm');
+function callback_vis(prm,res)
+handles = prm.transient.callback.context;
 axes(handles.axes3);
-imagesc(reshape(res.bmua,res.bdim(1),res.bdim(2)),[0.005 0.05]); axis xy equal tight off
-%set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+bdim = prm.solver.basis.bdim;
+imagesc(reshape(res.bmua,bdim),[0.005 0.05]); axis xy equal tight off
 axes(handles.axes4);
-imagesc(reshape(res.bmus,res.bdim(1),res.bdim(2)),[0.5 4]); axis xy equal tight off
-%set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
+imagesc(reshape(res.bmus,bdim),[0.5 4]); axis xy equal tight off
 axes(handles.axes5);
 semilogy(res.of); axis tight
 set(handles.axes5,'FontSize',7);

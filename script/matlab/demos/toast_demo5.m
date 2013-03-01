@@ -78,7 +78,7 @@ varargout{1} = handles.output;
 %% ===========================================================
 function init(handles)
 
-clear prm;
+prm = toastParam;
 %prm.fwdsolver.meshfile = 'circle25_32.msh';
 prm.fwdsolver.meshfile = 'ellips_tri3.msh';
 prm.solver.basis.bdim = [96 96];
@@ -98,40 +98,40 @@ prm.fwdsolver.tol = 1e-10;
 prm.solver.method = 'LM';
 prm.solver.tol = 1e-8;
 prm.solver.step0 = 100;
-load toast_demo5
-prm.bmua = bmua_tgt;
-prm.bmus = bmus_tgt;
-clear bmua_tgt bmus_tgt bkap_tgt;
 prm.initprm.mua = struct('reset','HOMOG','val',0.025);
 prm.initprm.mus = struct('reset','HOMOG','val',2);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
+load toast_demo5
+prm.initprm.mua.bmua = bmua_tgt;
+prm.initprm.mus.bmus = bmus_tgt;
+clear bmua_tgt bmus_tgt bkap_tgt;
 
-prm.callback.context = handles;
-prm.callback.iter = @callback_vis; % iteration callback from recon
-prm.callback.request.prior = true;
+prm.transient.callback.context = handles;
+prm.transient.callback.iter = @callback_vis; % iteration callback from recon
+prm.transient.callback.request.prior = true;
 
-prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
-prm.basis.hMesh.ReadQM (prm.meas.qmfile);
+prm.fwdsolver.hmesh = toastMesh(prm.fwdsolver.meshfile);
+prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.solver.basis.bdim,'Linear');
+prm.solver.basis.hbasis = toastBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim,'Linear');
 
 prm.regul = struct ('method','TK1', ...
      'tau',1e-4, ...
      'prior',struct ('smooth',1,'threshold',0.1));
-prm.regul.basis = prm.basis.hBasis;
+prm.regul.basis = prm.solver.basis.hbasis;
 prm.regul.tv.beta = 0.01;
 prm.regul.huber.eps = 0.01;
 
-n = prm.basis.hMesh.NodeCount();
-prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
-prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
-prm.ref = ones(n,1)*1.4;
+n = prm.fwdsolver.hmesh.NodeCount;
+prm.initprm.mua.mua = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mua.bmua);
+prm.initprm.mus.mus = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mus.bmus);
+prm.initprm.ref.ref = ones(n,1)*1.4;
 axes(handles.axes1);
-imagesc(rot90(reshape(prm.bmua,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0.005 0.05]);
+imagesc(rot90(reshape(prm.initprm.mua.bmua,prm.solver.basis.bdim)),[0.005 0.05]);
 axis xy equal tight off
 %set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes2);
-imagesc(rot90(reshape(prm.bmus,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0.5 4]);
+imagesc(rot90(reshape(prm.initprm.mus.bmus,prm.solver.basis.bdim)),[0.5 4]);
 axis xy equal tight off
 %set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
@@ -147,7 +147,7 @@ function showref(handles,prm)
 % create a regularisation instance on the fly to get the
 % diffusivity prior
 cm = 0.3/1.4;
-slen = prm.basis.hBasis.slen();
+slen = prm.solver.basis.hbasis.slen();
 scmua = ones(slen,1)*0.025*cm;
 sckap = ones(slen,1)*(1/(3*2.025))*cm;
 logx = log([scmua;sckap]);
@@ -200,13 +200,13 @@ function disp_kapref(handles,res,prm)
 slen = length(res.kapref)/2;
 
 axes(handles.axes7);
-kref = prm.basis.hBasis.Map('S->B',res.kapref(1:slen));
-imagesc(rot90(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0 1.2]); axis xy equal tight off
+kref = prm.solver.basis.hbasis.Map('S->B',res.kapref(1:slen));
+imagesc(rot90(reshape(kref,prm.solver.basis.bdim)),[0 1.2]); axis xy equal tight off
 %set(handles.axes7,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes8);
-kref = prm.basis.hBasis.Map('S->B',res.kapref(slen+1:slen*2));
-imagesc(rot90(reshape(kref,prm.solver.basis.bdim(1),prm.solver.basis.bdim(2))),[0 1.2]); axis xy equal tight off
+kref = prm.solver.basis.hbasis.Map('S->B',res.kapref(slen+1:slen*2));
+imagesc(rot90(reshape(kref,prm.solver.basis.bdim)),[0 1.2]); axis xy equal tight off
 %set(handles.axes8,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 

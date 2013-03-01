@@ -315,7 +315,7 @@ if isfield(prm,'callback') && isfield(prm.callback,'iter')
             RES.kapref = LPRM.hReg.Kappa (log(x));
         end
     end
-    feval(prm.callback.iter, prm.callback.context, RES);
+    feval(prm.callback.iter, prm, RES);
 else
     % inline display
     disp_iter(RES);
