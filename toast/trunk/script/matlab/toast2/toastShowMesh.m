@@ -18,18 +18,19 @@ dim = mesh.Dimension;
 eltps = unique(eltp);
 
 if dim == 3
-    [vtx,idx,perm] = mesh.SurfData;
-    if size(vtx,1)==0 % try as surface mesh
-        [vtx,idx,eltp] = mesh.Data;
-        eltps = unique(eltp);
-        for i=1:length(eltps)
-            if eltps(i) ~= 16 && eltp(i) ~= 17
-                error('Invalid mesh');
-            end
+    % Test for surface mesh
+    is_surfmesh = true;
+    eltps = unique(eltp);
+    for i=1:length(eltps)
+        if eltps(i) ~= 16 && eltps(i) ~= 17
+            is_surfmesh = false;
+            break;
         end
-        perm = [1:size(vtx,1)];
+    end
+    if ~is_surfmesh
+        [vtx,idx,perm] = mesh.SurfData;
     else
-        eltp = zeros(size(idx,1),1); % dummy
+        perm = [1:size(vtx,1)];
     end
 end
 
@@ -93,6 +94,8 @@ if length(eltps) == 1   % can only fix uniform meshes
         idx = idx(:,1:3);
     elseif ieltp == 7  % 10-noded tetrahedron
         idx = idx(:,1:4);
+    elseif ieltp == 17 % 6-noded surface triangle
+        idx = idx(:,[1,3,5]);
     end
 end
 

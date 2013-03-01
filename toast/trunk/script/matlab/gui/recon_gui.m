@@ -59,11 +59,11 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 global prm;
-prm = [];
+prm = toastParam;
 if nargin >= 4
     prmfile = varargin{1};
     set(handles.figure1,'name',['recon [' prmfile ']']);
-    prm = readparams(prmfile);
+    prm = toastParam(prmfile);
     updategui(handles,prm);
     setappdata(hObject,'prmfile',prmfile);
 end
@@ -104,11 +104,6 @@ function prmfile_Callback(hObject, eventdata, handles)
 %if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
 %    set(hObject,'BackgroundColor','white');
 %end
-
-
-% --- Read parameters from file
-function prm = readparams(prmfile)
-prm = toastReadParam (prmfile);
 
 
 % --- Update GUI elements from parameters
@@ -238,8 +233,8 @@ if ~isequal(fname,0) && ~isequal(fpath,0)
         path(pwd,path); % keep current directory available
         eval(['cd ' ['''' fpath '''']]);
     end
-    prm = readparams(prmfile);
-    prm.prmfile = prmfile;
+    prm = toastParam(prmfile);
+    %prm.prmfile = prmfile;
     updategui(handles,prm);
     set(handles.figure1,'name',['recon [' fname ']']);
     setappdata(handles.figure1,'prmfile',prmfile);
@@ -255,7 +250,7 @@ function prm_save_Callback(hObject, eventdata, handles)
 
 prmfile = getappdata(handles.figure1,'prmfile');
 prm = getappdata(handles.figure1,'prm');
-toastWriteParam(prmfile,prm);
+prm.Write(prmfile);
 
 
 % --- Executes on button press in prm_saveas.
@@ -274,7 +269,7 @@ if ~isequal(fname,0) && ~isequal(fpath,0)
         eval(['cd ' ['''' fpath '''']]);
     end
     prm = getappdata(handles.figure1,'prm');
-    toastWriteParam(prmfile,prm);
+    prm.Write(prmfile);
     set(handles.figure1,'name',['recon [' fname ']']);
     setappdata(handles.figure1,'prmfile',prmfile);
 end
@@ -460,3 +455,6 @@ if isstruct(tmp)
     updategui(handles,prm);
 end
 
+
+function clbk_iter(arg1,arg2,arg3)
+    arg1

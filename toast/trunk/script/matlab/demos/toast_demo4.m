@@ -78,7 +78,7 @@ varargout{1} = handles.output;
 %% ===========================================================
 function init(handles)
 
-clear prm;
+prm = toastParam;
 prm.fwdsolver.meshfile = 'circle25_32.msh';
 prm.solver.basis.bdim = [64 64];
 prm.data.lnampfile = 'fmod_ellips_16x16_100MHz.fem';
@@ -95,33 +95,33 @@ prm.initprm.mua = struct('reset','HOMOG','val',0.025);
 prm.initprm.mus = struct('reset','HOMOG','val',2);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
 
-prm.callback.context = handles;
-prm.callback.iter = @callback_vis; % iteration callback from recon
+prm.transient.callback.context = handles;
+prm.transient.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.bx = prm.solver.basis.bdim(1); prm.by = prm.solver.basis.bdim(2);
-prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
-prm.basis.hMesh.ReadQM (prm.meas.qmfile);
+prm.fwdsolver.hmesh = toastMesh(prm.fwdsolver.meshfile);
+prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastBasis(prm.basis.hMesh,[prm.bx prm.by],'Linear');
+prm.solver.basis.bdim = [64 64];
+prm.solver.basis.hbasis = toastBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim,'Linear');
 
 prm.regul = struct ('method','TK1', ...
      'tau',1e-5, ...
      'prior',struct ('refname','','smooth',1,'threshold',0.1));
-prm.regul.basis = prm.basis.hBasis;
+prm.regul.basis = prm.solver.basis.hbasis;
 
-n = prm.basis.hMesh.NodeCount();
+n = prm.fwdsolver.hmesh.NodeCount;
 load toast_demo1.mat
 load toast_demo2.mat
-prm.bmua = bmua; clear bmua;
-prm.bmus = bmus; clear bmus;
-prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
-prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
-prm.ref = ones(n,1)*1.4;
+prm.initprm.mua.bmua = bmua; clear bmua;
+prm.initprm.mus.bmus = bmus; clear bmus;
+prm.initprm.mua.mua = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mua.bmua);
+prm.initprm.mus.mus = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mus.bmus);
+prm.initprm.ref.ref = ones(n,1)*1.4;
 axes(handles.axes1);
-imagesc(rot90(reshape(prm.bmua,prm.bx,prm.by)),[0.005 0.05]); axis xy equal tight off
+imagesc(rot90(reshape(prm.initprm.mua.bmua,prm.solver.basis.bdim)),[0.005 0.05]); axis xy equal tight off
 %set(handles.axes1,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes2);
-imagesc(rot90(reshape(prm.bmus,prm.bx,prm.by)),[0.5 4]); axis xy equal tight off
+imagesc(rot90(reshape(prm.initprm.mus.bmus,prm.solver.basis.bdim)),[0.5 4]); axis xy equal tight off
 %set(handles.axes2,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 setappdata(handles.figure1,'prm',prm);
@@ -134,26 +134,26 @@ setappdata(handles.figure1,'isBusy',false);
 % --- Displays the detector setup for source 0
 function disp_detectors(handles,prm)
 
-n = prm.basis.hMesh.NodeCount();
-tmp = prm.basis.hBasis.Map('M->B',ones(n,1));
+n = prm.fwdsolver.hmesh.NodeCount;
+tmp = prm.solver.basis.hbasis.Map('M->B',ones(n,1));
 axes(handles.axes7);
-cla;imagesc(rot90(reshape(tmp,prm.bx,prm.by))); axis xy equal tight off
+cla;imagesc(rot90(reshape(tmp,prm.solver.basis.bdim))); axis xy equal tight off
 %cla;surface(reshape(tmp,prm.bx,prm.by),'EdgeColor','none'); axis tight
 hold on;
 
-qp = prm.basis.hMesh.Qpos();
+qp = prm.fwdsolver.hmesh.Qpos();
 qidx = 1;
-x = (qp(qidx,1)/50.0*0.96+0.5)*prm.bx+1;
-y = (qp(qidx,2)/50.0*0.96+0.5)*prm.by+1;
+x = (qp(qidx,1)/50.0*0.96+0.5)*prm.solver.basis.bdim(1)+1;
+y = (qp(qidx,2)/50.0*0.96+0.5)*prm.solver.basis.bdim(2)+1;
 plot3(x, y, 1, 'og', 'MarkerSize',3, 'MarkerFaceColor','green');
 
-mp = prm.basis.hMesh.Mpos();
-LL = prm.basis.hMesh.DataLinkList('matrix');
+mp = prm.fwdsolver.hmesh.Mpos();
+LL = prm.fwdsolver.hmesh.DataLinkList('matrix');
 %LL = toastGetQM(prm.basis.hMesh);
 idx = find(LL(:,qidx));
 for i=1:length(idx)
-    x = (mp(idx(i),1)/50.0*0.96+0.5)*prm.bx+1;
-    y = (mp(idx(i),2)/50.0*0.96+0.5)*prm.by+1;
+    x = (mp(idx(i),1)/50.0*0.96+0.5)*prm.solver.basis.bdim(1)+1;
+    y = (mp(idx(i),2)/50.0*0.96+0.5)*prm.solver.basis.bdim(2)+1;
     plot3(x, y, 1, 'oy', 'MarkerSize',3, 'MarkerFaceColor','yellow');
 end
 clear tmp
@@ -180,13 +180,13 @@ end
 
 
 % Display reconstruction results for current iteration
-function callback_vis(handles,res)
-prm = getappdata(handles.figure1,'prm');
+function callback_vis(prm,res)
+handles = prm.transient.callback.context;
 axes(handles.axes3);
-imagesc(rot90(reshape(res.bmua,res.bdim(1),res.bdim(2))),[0.005 0.05]); axis xy equal tight off
+imagesc(rot90(reshape(res.bmua,prm.solver.basis.bdim)),[0.005 0.05]); axis xy equal tight off
 %set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes4);
-imagesc(rot90(reshape(res.bmus,res.bdim(1),res.bdim(2))),[0.5 4]); axis xy equal tight off
+imagesc(rot90(reshape(res.bmus,prm.solver.basis.bdim)),[0.5 4]); axis xy equal tight off
 %set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 axes(handles.axes5);
 semilogy(res.of); axis tight

@@ -9,6 +9,7 @@ classdef toastParam
         solver = [];
         initprm = [];
         regul = [];
+        transient = [];
     end
     
     methods
@@ -30,6 +31,8 @@ classdef toastParam
                 obj.data = obj.ReadData(fname);
                 obj.initprm = obj.ReadInitprm(fname);
                 obj.fwdsolver = obj.ReadFwdsolver(fname);
+                obj.solver = obj.ReadSolver(fname);
+                obj.regul = obj.ReadRegul(fname);
             end
         end
         
@@ -62,6 +65,7 @@ classdef toastParam
             obj.WriteInitprm(obj.initprm,fid);
             obj.WriteFwdsolver(obj.fwdsolver,fid);
             obj.WriteSolver(obj.solver,fid);
+            obj.WriteRegul(obj.regul,fid);
             fclose(fid);
         end
         
@@ -231,6 +235,42 @@ classdef toastParam
             end
         end
         
+        function WriteRegul(obj,prm,fid)
+            if isfield(prm,'method')
+                saveprm(fid,'PRIOR',prm.method);
+                if strcmpi(prm.method,'NONE') == 0
+                    switch upper(prm.method)
+                        case 'TV'
+                            if isfield(prm,'tv')
+                                obj.WriteRegulTV(prm.tv,fid);
+                            end
+                        % more to come
+                    end
+                    if isfield(prm,'prior')
+                        obj.WriteRegulPrior(prm.prior,fid);
+                    end
+                    if isfield(prm,'smooth')
+                        saveprm(fid,'PRIOR_DIFFSCALE',num2str(prm.smooth));
+                    end
+                    if isfield(prm,'threshold')
+                        saveprm(fid,'PRIOR_PMTHRESHOLD',num2str(prm.threshold));
+                    end
+                end
+            end
+        end
+        
+        function WriteRegulTV(obj,prm,fid)
+            if isfield(prm,'beta')
+                saveprm(fid,'TV_BETA',prm.beta);
+            end
+        end
+        
+        function WriteRegulPrior(obj,prm,fid)
+            if isfield(prm,'refname')
+                saveprm(fid,'PRIOR_KAPREFIMG',prm.refname);
+            end
+        end
+        
         % -------------------------------------------------
         
         function prm = ReadMeas(obj,fname)
@@ -279,6 +319,62 @@ classdef toastParam
             else
                 prm.tol = str2double(prm.tol);
             end
+        end
+        
+        function prm = ReadSolver(obj,fname)
+            tmp = obj.scanprm(fname,'BASIS');
+            if ~isempty(tmp)
+                prm.basis.bdim = str2num(tmp);
+            end
+            tmp = obj.scanprm(fname,'GRID');
+            if ~isempty(tmp)
+                prm.basis.gdim = str2num(tmp);
+            end
+            prm.method = obj.scanprm(fname,'SOLVER');
+            tmp = obj.scanprm(fname,'NONLIN_TOL');
+            if ~isempty(tmp)
+                prm.tol = str2num(tmp);
+            end
+            tmp = obj.scanprm(fname,'NONLIN_ITMAX');
+            if ~isempty(tmp)
+                prm.itmax = tmp;
+            end
+            tmp = obj.scanprm(fname,'DATA_SCALING');
+            if ~isempty(tmp)
+                prm.dscale = tmp;
+            end
+            tmp = obj.scanprm(fname,'LM_LINESEARCH');
+            if ~isempty(tmp)
+                if strcmpi(tmp,'true')
+                    prm.lsearch = true;
+                else
+                    prm.lsearch = false;
+                end
+            end
+        end
+        
+        function prm = ReadRegul(obj,fname)
+            prm.method = obj.scanprm(fname,'PRIOR');
+            if isempty(prm.method)
+                prm.method = 'None';
+            end
+            if ~strcmpi(prm.method,'None')
+                prm.tau = str2num(obj.scanprm(fname,'PRIOR_TAU'));
+                switch upper(prm.method)
+                    case 'TV'
+                        prm.tv = obj.ReadRegulTV(obj,fname);
+                end
+                prm.prior = struct('refname',obj.scanprm(fname,'PRIOR_KAPREFIMG'), ...
+                    'smooth',obj.scanprm(fname,'PRIOR_DIFFSCALE'), ...
+                    'threshold',obj.scanprm(fname,'PRIOR_PMTHRESHOLD'));
+                if isempty(prm.prior.refname) || strcmpi(prm.prior.refname,'none')
+                    prm = rmfield(prm,'prior');
+                end
+            end
+        end
+        
+        function prm = ReadRegulTV(obj,fname)
+            prm.beta = obj.scanprm(fname,'TV_BETA');
         end
     end
     

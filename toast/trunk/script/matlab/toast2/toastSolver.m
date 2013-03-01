@@ -370,14 +370,14 @@ classdef toastSolver < handle
             RES.bmus = this.lprm.hBasis.Map ('S->B', smus);
             RES.of(itr+1) = err;
 
-            if isfield(prm,'callback') && isfield(prm.callback,'iter')
+            if isfield(prm.transient,'callback') && isfield(prm.transient.callback,'iter')
                 % let the calling function do the display
-                if isfield(prm.callback,'request') % check requests for secondary results
-                    if isfield(prm.callback.request,'prior') && prm.callback.request.prior == true
+                if isfield(prm.transient.callback,'request') % check requests for secondary results
+                    if isfield(prm.transient.callback.request,'prior') && prm.transient.callback.request.prior == true
                         RES.kapref = this.lprm.hReg.Kappa (log(x));
                     end
                 end
-                feval(prm.callback.iter, prm.callback.context, RES);
+                feval(prm.transient.callback.iter, prm, RES);
             else
                 % inline display
                 this.disp_iter(RES);
