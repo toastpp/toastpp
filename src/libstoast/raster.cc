@@ -951,8 +951,7 @@ RVector Raster::SmoothImage(const RVector &x, double sd) const
 
     for(int k = 0; k < sx.Dim(); k++)
         max = (sx[k] > max ? sx[k] : max);
-    LOGOUT("Max solbasis (on input)= ",max);
-    //    cout << "Max solbasis (on input) = " << max << endl;
+    LOGOUT("Max solbasis (on input) = %f",max);
     RVector gsx(glen);            // image in grid coordinates
     //    cout << "smoothing image \n";
     Map_SolToGrid(sx,gsx);
@@ -1117,8 +1116,7 @@ RVector Raster::SmoothImage(const RVector &x, double sd) const
     max = -1;
     for(int k = 0 ; k < sx.Dim(); k++)
         max = (sx[k] > max ? sx[k] : max);
-    //    cout << "Max solbasis (after smoothing) = " << max << endl;
-    LOGOUT("Max solbasis (after smoothing) = ", max);
+    LOGOUT("Max solbasis (after smoothing) = %f", max);
     delete [] data;
     delete [] nn;
     delete [] w0;
@@ -1154,8 +1152,7 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
 
     for(int k = 0; k < x.Dim(); k++)
         max = (x[k] > max ? x[k] : max);
-    LOGOUT("Max solbasis (on input)= ",max);
-    //    cout << "Max solbasis (on input) = " << max << endl;
+    LOGOUT("Max solbasis (on input) = %f",max);
     RVector gsx(glen);            // image in grid coordinates
     //    cout << "smoothing image \n";
     Map_SolToGrid(x,gsx);
@@ -1367,7 +1364,7 @@ RVector *Raster::ImageJet(const RVector &x, double sd, bool *iflags) const
         max = (gx[ng][k] > max ? gx[ng][k] : max);
     //    cout << "Max solbasis (after smoothing) = " << max << endl;
     } // end of images loop
-    LOGOUT("Max solbasis (after smoothing) = ", max);
+    LOGOUT("Max solbasis (after smoothing) = %f", max);
     delete []data;
     delete []data0;
     delete []nn;

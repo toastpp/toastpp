@@ -161,12 +161,10 @@ p = length(x);
 
 % ----------------------------------------------------------------------
 % Initialise regularisation
-LPRM.hReg = 0;
-if isfield(prm,'regul')
-    if isfield(prm.regul,'method') && ~strcmpi(prm.regul.method,'none')
-        LPRM.hReg = toastRegul (prm.regul, logx);
-    end
-end
+%LPRM.hReg = 0;
+%if isfield(prm.regul,'method') && ~strcmpi(prm.regul.method,'none')
+%    LPRM.hReg = toastRegul (prm.regul, logx);
+%end
 
 % ----------------------------------------------------------------------
 % Inverse solver loop

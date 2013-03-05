@@ -117,9 +117,6 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	}
     }
 
-    cerr << "REGUL TYPE: " << rtype << endl;
-
-
     // raster
     raster = GetBasis(prhs[1]);
     ASSERTARG(raster, 2, "Basis not found");
@@ -219,15 +216,15 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 
 	if (verbosity >= 1) {
 	    // echo regularisation parameters
-	    mexPrintf ("Regularisation: 1st order Tikhonov (TK1)\n");
-	    mexPrintf ("--> tau: %f\n", tau);
-	    mexPrintf ("--> diffusivity %s\n", (brefimg ?
+	    mexPrintf ("--> Type............1st order Tikhonov (TK1)\n");
+	    mexPrintf ("--> tau.............%f\n", tau);
+	    mexPrintf ("--> diffusivity.....%s\n", (brefimg ?
 		 "from image" : kapref ? "from external array" : "none"));
 	    if (brefimg || kapref) {
-		mexPrintf ("--> diffusivity field format: %s\n",
+		mexPrintf ("--> diff. format....%s\n",
 			   (istensor ? "tensor" : "scalar"));
-		mexPrintf ("--> diffusivity scale: %f\n", sdr);
-		mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+		mexPrintf ("--> diff. scale.....%f\n", sdr);
+		mexPrintf ("--> diff PM thresh..%f\n", fT);
 	    }
 	}
 

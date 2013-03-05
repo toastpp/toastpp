@@ -78,9 +78,11 @@ varargout{1} = handles.output;
 %% ===========================================================
 function init(handles)
 
+toastSetVerbosity(1);
+
 prm = toastParam;
-%prm.fwdsolver.meshfile = 'circle25_32.msh';
-prm.fwdsolver.meshfile = 'ellips_tri3.msh';
+prm.fwdsolver.meshfile = 'circle25_32.msh';
+%prm.fwdsolver.meshfile = 'ellips_tri3.msh';
 prm.solver.basis.bdim = [96 96];
 prm.data.lnamp0 = toastReadVector ('fmod_ellips_16x16_100MHz.fem');
 prm.data.phase0 = toastReadVector ('farg_ellips_16x16_100MHz.fem');
@@ -177,15 +179,15 @@ end
 
 
 % Display reconstruction results for current iteration
-function callback_vis(handles,res)
-prm = getappdata(handles.figure1,'prm');
+function callback_vis(prm,res)
+handles = prm.transient.callback.context;
 
 axes(handles.axes3);
-imagesc(rot90(reshape(res.bmua,res.bdim(1),res.bdim(2))),[0.005 0.05]); axis xy equal tight off
+imagesc(rot90(reshape(res.bmua,prm.solver.basis.bdim)),[0.005 0.05]); axis xy equal tight off
 %set(handles.axes3,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes4);
-imagesc(rot90(reshape(res.bmus,res.bdim(1),res.bdim(2))),[0.5 4]); axis xy equal tight off
+imagesc(rot90(reshape(res.bmus,prm.solver.basis.bdim)),[0.5 4]); axis xy equal tight off
 %set(handles.axes4,'XTick',[],'XTickLabel','','YTick',[],'YTickLabel','');
 
 axes(handles.axes5);

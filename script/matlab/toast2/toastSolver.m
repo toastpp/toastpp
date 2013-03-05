@@ -23,10 +23,24 @@ classdef toastSolver < handle
             % Notes:  If the structure passed to the solver constructor
             %         contains a 'regul' substructure, it calls
             %         SetRegul(prm.regul) directly.
-            localprm.hReg = 0;
-            if isfield(prm,'method') && ~strcmpi(prm.regul.method,'none')
-                localprm.hReg = toastRegul (prm, x0);
-            end
+            this.lprm.hReg = 0;
+
+            
+%DEBUG
+rprm.method = 'TV';
+rprm.tau = 1e-3;
+rprm.basis = prm.basis;
+rprm.prior.smooth = 0.5;
+rprm.prior.threshold = 0.25;
+rprm.prior.refimg = prm.prior.refimg;
+rprm.tv.beta = 0.01;
+this.lprm.hReg = toastRegul (rprm, x0);
+
+
+
+%            if isfield(prm,'method') && ~strcmpi(prm.method,'none')
+%                this.lprm.hReg = toastRegul (prm, x0);
+%            end
             
             
         end
@@ -36,6 +50,7 @@ classdef toastSolver < handle
             RES = [];
             scref = obj.c0./obj.lprm.hBasis.Map ('M->S',obj.lprm.ref);
             obj.x0 = x0;
+            obj.SetRegul(obj.prm.regul,x0);
         end
         
         function DispPrm(prm,prefix)
@@ -92,7 +107,7 @@ classdef toastSolver < handle
                 obj.prm.fwdsolver.method, obj.prm.fwdsolver.tol);
             g = g .* x; % parameter scaling
             if isfield(obj.lprm,'hReg') &&  obj.lprm.hReg ~= 0
-                g = g - obj.lprm.hReg.Gradient (logx);
+                g = g - obj.lprm.hReg.Gradient (log(x));
             end
         end
             
