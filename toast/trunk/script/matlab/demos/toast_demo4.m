@@ -231,7 +231,7 @@ switch get(hObject,'Value')
         prm.data.phasefile = 'farg_ellips_nback.fem';
 end
 
-prm.basis.hMesh.ReadQM (prm.meas.qmfile);
+prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
 setappdata(handles.figure1,'prm',prm);
 disp_detectors(handles,prm);
 
