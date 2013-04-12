@@ -11,7 +11,6 @@
 #
 # to avoid python blocking on opening the figure
 
-
 import pdb
 
 # Import various modules
@@ -115,9 +114,8 @@ ref = np.ones((1,nlen)) * 1.4
 freq = 100
 
 #DEBUG
-from toast import tglumpy
-pdb.set_trace()
-tglumpy.ShowMesh2D(hmesh_fwd,None,'','Fill')
+#from toast import tglumpy
+#tglumpy.ShowMesh2D(hmesh_fwd,None,'','Fill')
 
 # Target ranges (for display)
 mua_min = 0.015 # np.min(mua)
@@ -194,7 +192,6 @@ errmus = np.array([imerr(bmus,bmus_tgt)])
 itr = 1
 step = 1.0
 
-#pdb.set_trace()
 hfig=plt.figure(1)
 plt.show()
 
@@ -215,6 +212,7 @@ while itr <= itrmax:
     #Gradient of cost function
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
     r = matrix(J).transpose() * (2*(data-proj)/sd)
+    pdb.set_trace()
 
     if itr > 1:
         delta_old = delta_new

@@ -58,7 +58,7 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi,mvec):
-    gamma = mvec * phi.transpose()
+    gamma = mvec.transpose() * phi
     gamma = np.reshape(gamma,(-1,1),'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
@@ -103,7 +103,7 @@ mesh.ReadQM(hmesh_fwd,qmfile)
 qvec = mesh.Qvec (hmesh_fwd,type='Neumann',shape='Gaussian',width=2)
 mvec = mesh.Mvec (hmesh_fwd,shape='Gaussian',width=2)
 nlen = mesh.NodeCount (hmesh_fwd)
-nqm = qvec.shape[0] * mvec.shape[0]
+nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
 
 # Target parameters
@@ -196,8 +196,9 @@ plt.show()
 while itr <= itrmax:
     errp = err
     dphi,aphi = mesh.Fields(hmesh,-1,qvec,mvec,mua,mus,ref,freq,'da')
-    proj = np.reshape (mvec * dphi.transpose(),(-1,1),'F')
+    proj = np.reshape (mvec.transpose() * dphi,(-1,1),'F')
     J = mesh.Jacobian(hmesh,hraster,dphi,aphi,proj)
+    pdb.set_trace()
 
     # Data normalisation
     for i in range(J.shape[0]):

@@ -434,16 +434,21 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 	c2a[i] = c0/(2.0*ref[i]*A_Keijzer (ref[i]));
     sol.SetParam (OT_C2A, c2a);
 
-    // Create forward solver to initialise system matrix
-    CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
-    FWS.SetDataScaling (DATA_LOG);
-    double omega = freq * 2.0*Pi*1e-6;
-    
-    FWS.Allocate ();
-    FWS.AssembleSystemMatrix (sol, omega, elbasis);
-
-    // Return system matrix to MATLAB
-    CopyMatrix (res, *FWS.F);
+    if (freq) { // complex-valued system matrix
+        // Create forward solver to initialise system matrix
+        CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
+	FWS.SetDataScaling (DATA_LOG);
+	double omega = freq * 2.0*Pi*1e-6;
+	FWS.Allocate ();
+	FWS.AssembleSystemMatrix (sol, omega, elbasis);
+	CopyMatrix (res, *FWS.F);
+    } else { // real-valued problem
+        RFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
+	FWS.SetDataScaling (DATA_LOG);
+	FWS.Allocate ();
+	FWS.AssembleSystemMatrix (sol, 0, elbasis);
+	CopyMatrix (res, *FWS.F);
+    }
 }
 
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)

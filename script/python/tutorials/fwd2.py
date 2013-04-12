@@ -46,14 +46,14 @@ freq = 100
 # Set up the linear system
 qvec = mesh.Qvec (hmesh)
 mvec = mesh.Mvec (hmesh)
-nq = qvec.shape[0]
+nq = qvec.shape[1]
 
 phi = mesh.Fields(hmesh,hraster,qvec,mvec,mua,mus,ref,freq)
 
 fig1 = plt.figure()
 ims = []
 for q in range(nq):
-    lphi = np.log (phi[q,:])
+    lphi = np.log (phi[:,q])
     bphi = raster.MapBasis (hraster, 'S->B', lphi)
     bphi = np.reshape (bphi, grd)
     ims.append ((plt.imshow(bphi.real),))

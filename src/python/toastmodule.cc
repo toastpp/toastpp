@@ -1131,12 +1131,12 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     PyObject *dmx = PyArray_SimpleNew (2, dmx_dims, NPY_CDOUBLE);
     toast::complex *dmx_ptr = (toast::complex*)PyArray_DATA (dmx);
     for (i = 0; i < nQ; i++) {
-        toast::complex *dp = dmx_ptr + i*slen;
+        toast::complex *dp = dmx_ptr + i;
 	if (raster) raster->Map_MeshToSol (dphi[i], sphi);
 	else        sphi = dphi[i];
 	for (j = 0; j < slen; j++) {
 	    *dp = sphi[j];
-	    dp += 1;
+	    dp += nQ;
 	}
     }
     delete []dphi;
@@ -1266,6 +1266,10 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 
     RDenseMatrix J(ndat,nprm);
 
+    ofstream ofs("dbg_p.dat");
+    ofs << dphi[0] << endl;
+    ofs.close();
+
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
 
     npy_intp J_dims[2] = {ndat, nprm};
@@ -1335,6 +1339,10 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 	*proj = FWS.ProjectAll (mvec, dphi, DATA_LIN);
     	//ProjectAll (*mesh, FWS, mvec, dphi, *proj);
     }
+
+    ofstream ofs("dbg_p.dat");
+    ofs << *proj << endl;
+    ofs.close();
 
     // Calculate Jacobian
     CalcJacobian (mesh, raster, dphi, aphi, proj, dscale, res);

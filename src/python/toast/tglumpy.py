@@ -10,6 +10,8 @@ from numpy.random import rand
 from types import *
 import mesh
 
+import pdb
+
 class Mesh3D(object):
     def __init__(self,hmesh,nim,cm):
         nlist,elist,perm = mesh.SurfData (hmesh)
@@ -81,11 +83,10 @@ class Mesh2D(object):
         nlen = nlist.shape[0]
         elen = elist.shape[0]
         vertices = np.zeros((elen*3),dtype=[('position','f4',3)])
-        for i in range(elen):
-            for j in range(3):
-                vertices[i*3+j] = nlist[elist[i,j]
-
-
+        #for i in range(elen):
+        #    for j in range(3):
+        #        vertices[i*3+j] = nlist[elist[i,j]
+        # TODO!!!
 
         self.elen = elist.shape[0]
         self.indices = np.zeros((self.elen,3), dtype=np.int32)

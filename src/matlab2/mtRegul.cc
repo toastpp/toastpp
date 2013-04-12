@@ -245,10 +245,11 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    if (field) field = mxGetField(field,0,"eps");
 	    if (field) eps = mxGetScalar(field);
 	} else { // read Huber parameters from argument list
-	    while (prm < nrhs) {
-		mxGetString (prhs[prm++], cbuf, 256);
+	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+	        AssertArg_Char (field, __func__, 5);
+		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "Eps")) {
-		    eps = mxGetScalar (prhs[prm++]);
+		    eps = mxGetScalar (mxGetCell (prhs[4], prm+1));
 		    break;
 		}
 	    }
@@ -256,16 +257,16 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 
 	if (verbosity >= 1) {
 	    // echo regularisation parameters
-	    mexPrintf ("Regularisation: Huber\n");
-	    mexPrintf ("--> tau: %f\n", tau);
-	    mexPrintf ("--> eps: %f\n", eps);
-	    mexPrintf ("--> diffusivity %s\n", (brefimg ?
-		 "from image" : kapref ? "from external array" : "none"));
+	    mexPrintf ("--> Type............Huber\n");
+	    mexPrintf ("--> tau.............%f\n", tau);
+	    mexPrintf ("--> eps.............%f\n", eps);
+	    mexPrintf ("--> diffusivity.....%s\n", (brefimg ?
+		"from image" : kapref ? "from external array" : "none"));
 	    if (brefimg || kapref) {
-		mexPrintf ("--> diffusivity field format: %s\n",
+		mexPrintf ("--> diff. format....%s\n",
 			   (istensor ? "tensor" : "scalar"));
-		mexPrintf ("--> diffusivity scale: %f\n", sdr);
-		mexPrintf ("--> diffusivity PM threshold: %f\n", fT);
+		mexPrintf ("--> diff. scale.....%f\n", sdr);
+		mexPrintf ("--> diff PM thresh..%f\n", fT);
 	    }
 	}
 

@@ -79,18 +79,18 @@ varargout{1} = handles.output;
 function init(handles)
 
 rand('state',14);
-clear prm;
-prm.maxch = 4;
-prm.maxlambda = 4;
-prm.nch = 2;
-prm.nlambda = 2;
-prm.extinct = [[0.01 0.02 0.03 0.035]; [0.035 0.015 0.01 0.02]; [0.03 0.02 0.02 0.03]; [0.015 0.03 0.035 0.025]]; % extinction coefficient for both chromophores at both wavelengths
-prm.basis.bdim = [64 64];
+prm = toastParam;
+prm.user.maxch = 4;
+prm.user.maxlambda = 4;
+prm.user.nch = 2;
+prm.user.nlambda = 2;
+prm.user.extinct = [[0.01 0.02 0.03 0.035]; [0.035 0.015 0.01 0.02]; [0.03 0.02 0.02 0.03]; [0.015 0.03 0.035 0.025]]; % extinction coefficient for both chromophores at both wavelengths
+prm.solver.basis.bdim = [256 256]; %[64 64];
 prm.fwdsolver.meshfile = 'circle25_32.msh';
 prm.meas.qmfile = 'circle25_16x16.qm';
 prm.meas.src = struct('freq',100,'type','Neumann','prof','Gaussian','width',2);
 prm.meas.det = struct('prof','Gaussian','width',2);
-prm.linsolver.method = 'Direct';
+prm.fwdsolver.method = 'Direct';
 prm.solver.method = 'LM';
 prm.solver.tol = 1e-8;
 prm.solver.step0 = 100;
@@ -99,27 +99,31 @@ prm.regul.method = 'None';
 prm.initprm.mus = struct('reset','HOMOG','val',2);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
 
-prm.edit_extinct.ch = 1;
-prm.edit_extinct.lambda = 1;
+prm.user.edit_extinct.ch = 1;
+prm.user.edit_extinct.lambda = 1;
 
-prm.callback.context = handles;
-prm.callback.iter = @callback_vis; % iteration callback from recon
+prm.transient.callback.context = handles;
+prm.transient.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
-prm.basis.hMesh.ReadQM (prm.meas.qmfile);
+prm.fwdsolver.hmesh = toastMesh(prm.fwdsolver.meshfile);
+prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
 
-prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.basis.bdim,'Linear');
-n = prm.basis.hMesh.NodeCount();
-load toast_demo1.mat
-load toast_demo2.mat
-prm.bmua = bmua; clear bmua;
-prm.bmus = bmus; clear bmus;
-prm.mua = prm.basis.hBasis.Map('B->M',prm.bmua);
-prm.mus = prm.basis.hBasis.Map('B->M',prm.bmus);
-prm.ref = ones(n,1)*1.4;
+prm.solver.basis.hbasis = toastBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim,'Linear');
+n = prm.fwdsolver.hmesh.NodeCount;
+%load toast_demo1.mat
+%load toast_demo2.mat
+%prm.initprm.mua.bmua = bmua; clear bmua;
+%prm.initprm.mus.bmus = bmus; clear bmus;
+%prm.initprm.mua.mua = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mua.bmua);
+%prm.initprm.mus.mus = prm.solver.basis.hbasis.Map('B->M',prm.initprm.mus.bmus);
+%prm.initprm.ref.ref = ones(n,1)*1.4;
+prm.initprm.mus.mus = ones(n,1)*2;
+prm.initprm.ref.ref = ones(n,1)*1.4;
+prm.initprm.mus.bmus = prm.solver.basis.hbasis.Map('M->B',prm.initprm.mus.mus);
 
-prm.hTgt = zeros(prm.maxch,1);
-prm.hMuaTgt = zeros(prm.maxlambda,1);
+
+prm.user.hTgt = zeros(prm.user.maxch,1);
+prm.user.hMuaTgt = zeros(prm.user.maxlambda,1);
 setappdata(handles.figure1,'prm',prm);
 rolltgt (handles);
 updategui (handles);
@@ -132,7 +136,7 @@ setappdata(handles.figure1,'isBusy',false);
 function show_C_images (handles)
 prm = getappdata(handles.figure1,'prm');
 for i=1:4
-    if i <= prm.nch
+    if i <= prm.user.nch
         vis = 'on';
     else
         vis = 'off';
@@ -141,14 +145,14 @@ for i=1:4
     eval (['set(handles.text' num2str(i+4) ',''Visible'',''' vis ''')']);
     eval (['set(handles.text' num2str(i+12) ',''Visible'',''' vis ''')']);
 
-    if i <= prm.nch
+    if i <= prm.user.nch
         eval(['axes(handles.axes' num2str(i) ')']);
-        h = imagesc(reshape(prm.bC_tgt(i,:), prm.basis.bdim(1), ...
-                            prm.basis.bdim(2)),[0,prm.bCmax]);
-        prm.hTgt(i) = h;
-    elseif prm.hTgt(i) ~= 0
-        delete(prm.hTgt(i));
-        prm.hTgt(i) = 0;
+        h = imagesc(reshape(prm.user.bC_tgt(i,:), prm.solver.basis.bdim(1), ...
+                            prm.solver.basis.bdim(2)),[0,prm.user.bCmax]);
+        prm.user.hTgt(i) = h;
+    elseif prm.user.hTgt(i) ~= 0
+        delete(prm.user.hTgt(i));
+        prm.user.hTgt(i) = 0;
     end
     eval (['set(handles.axes' num2str(i) ',''Visible'',''off'')']);
     eval (['set(handles.axes' num2str(i+4) ',''Visible'',''off'')']);
@@ -159,28 +163,28 @@ end
 % ===========================================================
 function show_mua_images (handles)
 prm = getappdata(handles.figure1,'prm');
-for i=1:prm.nlambda
-    img(i,:) = zeros(1,prod(prm.basis.bdim));
-    for j=1:prm.nch
-        img(i,:) = img(i,:) + prm.bC_tgt(j,:) * prm.extinct(j,i);
+for i=1:prm.user.nlambda
+    img(i,:) = zeros(1,prod(prm.solver.basis.bdim));
+    for j=1:prm.user.nch
+        img(i,:) = img(i,:) + prm.user.bC_tgt(j,:) * prm.user.extinct(j,i);
     end
 end
 muamax = max(max(img));
 for i=1:4
-    if i <= prm.nlambda
+    if i <= prm.user.nlambda
         vis = 'on';
     else
         vis = 'off';
     end
     eval (['set(handles.text' num2str(i+8) ',''Visible'',''' vis ''')']);
-    if i <= prm.nlambda
+    if i <= prm.user.nlambda
         eval(['axes(handles.axes' num2str(i+8) ')']);
-        h = imagesc(reshape(img(i,:), prm.basis.bdim(1), ...
-                            prm.basis.bdim(2)),[0,muamax]);
-        prm.hMuaTgt(i) = h;
-    elseif prm.hMuaTgt(i) ~= 0
-        delete(prm.hMuaTgt(i));
-        prm.hMuaTgt(i) = 0;
+        h = imagesc(reshape(img(i,:), prm.solver.basis.bdim(1), ...
+                            prm.solver.basis.bdim(2)),[0,muamax]);
+        prm.user.hMuaTgt(i) = h;
+    elseif prm.user.hMuaTgt(i) ~= 0
+        delete(prm.user.hMuaTgt(i));
+        prm.user.hMuaTgt(i) = 0;
     end
     eval (['set(handles.axes' num2str(i+8) ',''Visible'',''off'')']);
     setappdata(handles.figure1,'prm',prm);
@@ -193,11 +197,11 @@ function showExtinct (handles)
 prm = getappdata(handles.figure1,'prm');
 col = ['b' 'r' 'g' 'k'];
 axes(handles.axes13);
-h = plot(prm.extinct(1,1:prm.nlambda),['-o' col(1)]);
+h = plot(prm.user.extinct(1,1:prm.user.nlambda),['-o' col(1)]);
 set(h,'ButtonDownFcn','toast_demo7(''axes13_ButtonDownFcn'',gcbo,1,guidata(gcbo))');
 hold on
-for i=2:prm.nch
-    h = plot(prm.extinct(i,1:prm.nlambda),['-o' col(i)]);
+for i=2:prm.user.nch
+    h = plot(prm.user.extinct(i,1:prm.user.nlambda),['-o' col(i)]);
     set(h,'ButtonDownFcn',['toast_demo7(''axes13_ButtonDownFcn'',gcbo,' num2str(i) ',guidata(gcbo))']);
 end
 hold off
@@ -206,9 +210,9 @@ hold off
 % ===========================================================
 function updategui (handles)
 prm = getappdata(handles.figure1,'prm');
-set(handles.popupmenu1,'Value',prm.nch);
-set(handles.popupmenu2,'Value',prm.nlambda);
-set(handles.edit1,'String',num2str(prm.extinct(prm.edit_extinct.ch,prm.edit_extinct.lambda)));
+set(handles.popupmenu1,'Value',prm.user.nch);
+set(handles.popupmenu2,'Value',prm.user.nlambda);
+set(handles.edit1,'String',num2str(prm.user.extinct(prm.user.edit_extinct.ch,prm.user.edit_extinct.lambda)));
 show_C_images(handles);
 show_mua_images(handles);
 showExtinct(handles);
@@ -217,7 +221,7 @@ showExtinct(handles);
 % ===========================================================
 function rolltgt (handles)
 prm = getappdata(handles.figure1,'prm');
-grid = prm.basis.bdim;
+grid = prm.solver.basis.bdim;
 nch = 4;  % generate targets for max. number of chromophores
 blobtgt = str2num(get(handles.edit2,'String'));
 for c=1:nch
@@ -254,9 +258,16 @@ for c=1:nch
     %bC_tgt(c,:) = zeros(prod(grid),1);
     %bC_tgt(c,solmask) = img(solmask) * 0.3;
 end
-prm.bC_tgt = bC_tgt;
-prm.bCmin = min(min(bC_tgt(:,solmask)));
-prm.bCmax = max(max(bC_tgt(:,solmask)));
+prm.user.bC_tgt = bC_tgt;
+for i=1:size(bC_tgt,1)
+    tmp(i,:) = prm.solver.basis.hbasis.Map('B->S', bC_tgt(i,:));
+end
+prm.user.bCmin = min(min(tmp));
+prm.user.bCmax = max(max(tmp));
+clear tmp;
+
+%prm.user.bCmin = min(min(bC_tgt(:,solmask)));
+%prm.user.bCmax = max(max(bC_tgt(:,solmask)));
 setappdata(handles.figure1,'prm',prm);
 
 
@@ -272,7 +283,7 @@ if getappdata(handles.figure1,'isBusy') == false
     setappdata(handles.figure1,'isBusy',true);
     set(handles.pushbutton1,'String','Stop (may be delayed)');
     % generate target data at all wavelengths
-    prm.data = genfwddata (prm, prm.extinct, prm.bC_tgt);
+    prm.data = genfwddata (prm, prm.user.extinct, prm.user.bC_tgt);
     % and reconstruct concentrations from homogeneous intial guesses
     toastReconMultispectralCW(prm);
     setappdata(handles.figure1,'isBusy',false);
@@ -287,10 +298,9 @@ end
 % Display reconstruction results for current iteration
 function callback_vis(handles,res)
 prm = getappdata(handles.figure1,'prm');
-for i=1:prm.nch
+for i=1:prm.user.nch
     eval(['axes(handles.axes' num2str(i+4) ')']);
-    h = imagesc(reshape(res.bC(i,:), prm.basis.bdim(1), ...
-                        prm.basis.bdim(2)),[0,prm.bCmax]);
+    h = imagesc(reshape(res.bC(i,:), prm.solver.basis.bdim),[0,prm.user.bCmax]);
     eval (['set(handles.axes' num2str(i+4) ',''Visible'',''off'')']);
 end
 axes(handles.axes14);
@@ -308,7 +318,7 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns popupmenu1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu1
 prm = getappdata(handles.figure1,'prm');
-prm.nch = get(hObject,'Value');
+prm.user.nch = get(hObject,'Value');
 setappdata(handles.figure1,'prm',prm);
 updategui(handles);
 
@@ -337,7 +347,7 @@ function popupmenu2_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns popupmenu2 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu2
 prm = getappdata(handles.figure1,'prm');
-prm.nlambda = get(hObject,'Value');
+prm.user.nlambda = get(hObject,'Value');
 setappdata(handles.figure1,'prm',prm);
 updategui(handles);
 
@@ -375,7 +385,7 @@ function edit1_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of edit1 as a double
 prm = getappdata(handles.figure1,'prm');
 e = str2num(get(hObject,'String'));
-prm.extinct(prm.edit_extinct.ch,prm.edit_extinct.lambda) = e;
+prm.user.extinct(prm.user.edit_extinct.ch,prm.user.edit_extinct.lambda) = e;
 setappdata(handles.figure1,'prm',prm);
 updategui(handles);
 
@@ -399,10 +409,10 @@ mouse = get(gca,'currentpoint');
 x = mouse(1,1);
 ch = eventdata;
 lambda = round(x);
-prm.edit_extinct.ch = ch;
-prm.edit_extinct.lambda = lambda;
+prm.user.edit_extinct.ch = ch;
+prm.user.edit_extinct.lambda = lambda;
 set(handles.text34,'String',sprintf('Chromophore %d, wavelength %0.0f',ch,lambda));
-set(handles.edit1,'String',num2str(prm.extinct(ch,lambda)));
+set(handles.edit1,'String',num2str(prm.user.extinct(ch,lambda)));
 setappdata(handles.figure1,'prm',prm);
 
 
@@ -429,21 +439,21 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function data = genfwddata (prm, extinct, bC)
-data = [];
-fwdprm = prm;
-%prm.initprm.mus = mus;
-%prm.initprm.ref = ref;
-for i = 1:fwdprm.nlambda
-    bmua = GetMua (prm, extinct (:,i), bC);
-    fwdprm.initprm.mua = toastMapGridToMesh (fwdprm.basis.hBasis,bmua);
-    proj = toastFwdCW(fwdprm);
-    data = [data; proj];
+function mua = GetMua (prm, extinct, C)
+mua = zeros(size(C,2),1);
+for i = 1:prm.user.nch
+    mua = mua + C(i,:)'*extinct(i);
 end
 
 
-function mua = GetMua (prm, extinct, C)
-mua = zeros(size(C,2),1);
-for i = 1:prm.nch
-    mua = mua + C(i,:)'*extinct(i);
+function data = genfwddata(prm, extinct, bC)
+qvec = real(prm.fwdsolver.hmesh.Qvec(prm.meas.src.type, prm.meas.src.prof, prm.meas.src.width));
+mvec = real(prm.fwdsolver.hmesh.Mvec(prm.meas.det.prof, prm.meas.det.width));
+data = [];
+for i=1:prm.user.nlambda
+    bmua = GetMua(prm,extinct(:,i), bC);
+    mua = prm.solver.basis.hbasis.Map ('G->M', bmua);
+    proj = toastProject (prm.fwdsolver.hmesh, mua, prm.initprm.mus.mus, ...
+        prm.initprm.ref.ref, 0, qvec, mvec, 'Direct', 1e-10);
+    data = [data; proj];
 end

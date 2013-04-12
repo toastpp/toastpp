@@ -27,20 +27,20 @@ classdef toastSolver < handle
 
             
 %DEBUG
-rprm.method = 'TV';
-rprm.tau = 1e-3;
-rprm.basis = prm.basis;
-rprm.prior.smooth = 0.5;
-rprm.prior.threshold = 0.25;
-rprm.prior.refimg = prm.prior.refimg;
-rprm.tv.beta = 0.01;
-this.lprm.hReg = toastRegul (rprm, x0);
+%rprm.method = 'TV';
+%rprm.tau = 1e-3;
+%rprm.basis = prm.basis;
+%rprm.prior.smooth = 0.5;
+%rprm.prior.threshold = 0.25;
+%rprm.prior.refimg = prm.prior.refimg;
+%rprm.tv.beta = 0.01;
+%this.lprm.hReg = toastRegul (rprm, x0);
 
 
 
-%            if isfield(prm,'method') && ~strcmpi(prm.method,'none')
-%                this.lprm.hReg = toastRegul (prm, x0);
-%            end
+            if isfield(prm,'method') && ~strcmpi(prm.method,'none')
+                this.lprm.hReg = toastRegul (prm, x0);
+            end
             
             
         end

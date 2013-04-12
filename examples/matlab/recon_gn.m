@@ -1,4 +1,4 @@
-function recon2
+function recon_gn
 
 disp('MATLAB-TOAST sample script:')
 disp('2D image reconstruction with Gauss-Newton solver')
