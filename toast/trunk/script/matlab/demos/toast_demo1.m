@@ -25,6 +25,10 @@ function varargout = toast_demo1(varargin)
 
 % Last Modified by GUIDE v2.5 23-Feb-2008 04:19:30
 
+global FWD_IN_PROGRESS SRC_IN_PROGRESS;
+FWD_IN_PROGRESS = false;
+SRC_IN_PROGRESS = false;
+
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -175,6 +179,8 @@ end
 
 %% ===========================================================
 function setsource(handles,phi)
+global SRC_IN_PROGRESS;
+SRC_IN_PROGRESS = true;
 prm = getappdata(handles.figure1,'prm');
 
 % Redefine Q position
@@ -207,6 +213,7 @@ prm.lgamma0 = reshape (log(prm.mvec.' * phi), [], 1);
 
 setappdata(handles.figure1,'prm',prm);
 fwdsolve(handles);
+SRC_IN_PROGRESS = false;
 
 
 %% ===========================================================
@@ -235,6 +242,9 @@ end
 %% ===========================================================
 function fwdsolve(handles)
 prm = getappdata(handles.figure1,'prm');
+
+global FWD_IN_PROGRESS
+FWD_IN_PROGRESS = true;
 
 % perturbation parameters
 pert = getappdata(handles.figure1,'pert');
@@ -288,17 +298,32 @@ if prm.diff_proj == true
 else
     plot(-imag(prm.lgamma0));hold on;plot(-imag(lgamma),'r');hold off;axis tight
 end
+FWD_IN_PROGRESS = false;
 
 
 function axes1_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
+h = gcf;
+props.by = prm.by;
+props.handles = handles;
+props.axes = gca;
+setappdata(h,'TestGuiCallbacks',props);
+set(h,'WindowButtonMotionFcn',{@mua_ButtonMotionFcn});
+set(h,'WindowButtonUpFcn',{@ButtonUpFcn});
+
+
+function mua_ButtonMotionFcn(hObject, eventdata)
+global FWD_IN_PROGRESS
+props = getappdata(hObject,'TestGuiCallbacks');
+handles = props.handles;
+prm = getappdata(handles.figure1,'prm');
 pert = getappdata(handles.figure1,'pert');
-mouse = get(gca,'currentpoint');
+mouse = get(props.axes,'currentpoint');
 x = round(mouse(1,1));
-y = prm.by-round(mouse(1,2));
+y = props.by-round(mouse(1,2));
 x = min(max(x,pert.mua.dx+1),prm.bx-pert.mua.dx-1);
 y = min(max(y,pert.mua.dx+1),prm.by-pert.mua.dx-1);
-if x ~= pert.mua.x0 || y ~= pert.mua.y0
+if (x ~= pert.mua.x0 || y ~= pert.mua.y0) && FWD_IN_PROGRESS == false
     pert.mua.x0 = x;
     pert.mua.y0 = y;
     setappdata(handles.figure1,'pert',pert);
@@ -306,15 +331,34 @@ if x ~= pert.mua.x0 || y ~= pert.mua.y0
 end
 
 
+function ButtonUpFcn(hObject, eventdata)
+set(hObject,'WindowButtonMotionFcn','');
+set(hObject,'WindowButtonUpFcn','');
+
+
 function axes2_ButtonDownFcn(hObject, eventdata, handles)
 prm = getappdata(handles.figure1,'prm');
+h = gcf;
+props.by = prm.by;
+props.handles = handles;
+props.axes = gca;
+setappdata(h,'TestGuiCallbacks',props);
+set(h,'WindowButtonMotionFcn',{@mus_ButtonMotionFcn});
+set(h,'WindowButtonUpFcn',{@ButtonUpFcn});
+
+
+function mus_ButtonMotionFcn(hObject, eventdata)
+global FWD_IN_PROGRESS
+props = getappdata(hObject,'TestGuiCallbacks');
+handles = props.handles;
+prm = getappdata(handles.figure1,'prm');
 pert = getappdata(handles.figure1,'pert');
-mouse = get(gca,'currentpoint');
+mouse = get(props.axes,'currentpoint');
 x = round(mouse(1,1));
-y = prm.by-round(mouse(1,2));
+y = props.by-round(mouse(1,2));
 x = min(max(x,pert.mus.dx+1),prm.bx-pert.mus.dx-1);
 y = min(max(y,pert.mus.dx+1),prm.by-pert.mus.dx-1);
-if x ~= pert.mus.x0 || y ~= pert.mus.y0
+if (x ~= pert.mus.x0 || y ~= pert.mus.y0) && FWD_IN_PROGRESS == false
     pert.mus.x0 = x;
     pert.mus.y0 = y;
     setappdata(handles.figure1,'pert',pert);
@@ -323,14 +367,28 @@ end
 
 
 function axes7_ButtonDownFcn(hObject, eventdata, handles)
+h = gcf;
+props.handles = handles;
+props.axes = gca;
+setappdata(h,'TestGuiCallbacks',props);
+set(h,'WindowButtonMotionFcn',{@src_ButtonMotionFcn});
+set(h,'WindowButtonUpFcn',{@ButtonUpFcn});
+
+
+function src_ButtonMotionFcn(hObject, eventdata)
+global SRC_IN_PROGRESS
+props = getappdata(hObject,'TestGuiCallbacks');
+handles = props.handles;
 prm = getappdata(handles.figure1,'prm');
-mouse = get(gca,'currentpoint');
+mouse = get(props.axes,'currentpoint');
 x = mouse(1,1);
 y = prm.by-mouse(1,2);
 dx = x/(prm.bx*0.5)-1.0;
 dy = y/(prm.by*0.5)-1.0;
 phi = atan2(dy,dx);
-setsource(handles,phi);
+if SRC_IN_PROGRESS == false
+    setsource(handles,phi);
+end
 
 
 % --- Executes on slider movement.

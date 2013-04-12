@@ -61,4 +61,8 @@ end
 lgamma = lgamma(hMesh.DataLinkList());
 
 % Rearrange data in terms of log amplitude and phase shift blocks
-proj = [real(lgamma);imag(lgamma)];
+if omega > 0
+    proj = [real(lgamma);imag(lgamma)];
+else
+    proj = lgamma;
+end

@@ -80,6 +80,19 @@ for mm = 1:nmom
 end
 dmom = full(dmom);
 
+% compute moments inside medium
+phi0 = smat\qvec;
+phi00 = phi0;
+for mm = 1:nmom
+    phi = mm*(smat\(mmat*phi0));
+    mphi(:,mm) = phi./phi00;
+    phi0 = phi;
+end
+grd = [128,128];
+hbasis = toastSetBasis(hMesh,grd);
+meant = reshape(toastMapMeshToBasis(hbasis,mphi(:,1)), grd);
+figure; imagesc(meant); axis equal tight;
+
 if ~dotest
     % Plot comparisons of moments (explicit TPSF vs direct)
     figure;

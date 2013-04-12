@@ -9,6 +9,7 @@ classdef toastParam
         solver = [];
         initprm = [];
         regul = [];
+        user = [];
         transient = [];
     end
     

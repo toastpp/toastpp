@@ -1,7 +1,8 @@
-function recon3
+function recon_meshbasis_v1
 
 disp('MATLAB-TOAST sample script:')
-disp('2D image reconstruction using structural priors')
+disp('2D image reconstruction with conjugate gradient solver')
+disp('This version performs the reconstruction in the FEM mesh basis')
 disp('-------------------------------------------------------')
 
 % ======================================================================
@@ -18,12 +19,9 @@ refind = 1.4;                           % refractive index
 grd = [100 100];                        % solution basis: grid dimension
 freq = 100;                             % modulation frequency [MHz]
 noiselevel = 0.01;                      % additive data noise level
-tau = 1e-3;                             % regularisation parameter
-beta = 0.01;                            % TV regularisation parameter
-tolGN = 1e-5;                           % Gauss-Newton convergence criterion
-tolKrylov = 1e-2;                       % Krylov convergence criterion
+tolCG = 1e-6;                           % Gauss-Newton convergence criterion
+resetCG = 10;                           % PCG reset interval
 itrmax = 100;                           % Gauss-Newton max. iterations
-Himplicit = true;                       % Implicit/explicit Hessian matrix
 cmap = 'gray';
 
 % ======================================================================
@@ -62,16 +60,13 @@ pdata = imag(lgamma);                               % phase data
 mdata = mdata + mdata.*noiselevel.*randn(size(mdata));
 pdata = pdata + pdata.*noiselevel.*randn(size(pdata));
 data = [mdata;pdata];                               % linear data vector
-m = length(data);                                   % number of measurement data
 
 % display the target parameter distributions for comparison
 muarng = [min(mua)*0.9, max(mua)*1.1];
 musrng = [min(mus)*0.9, max(mus)*1.1];
 hbasis = toastSetBasis(hmesh,grd);
-muatgt = toastMapBasis (hbasis, 'M->B', mua);
-mustgt = toastMapBasis (hbasis, 'M->B', mus);
-muatgt_img = reshape (muatgt, grd);
-mustgt_img = reshape (mustgt, grd);
+muatgt_img = reshape (toastMapBasis (hbasis, 'M->B', mua), grd);
+mustgt_img = reshape (toastMapBasis (hbasis, 'M->B', mus), grd);
 mua_img = [muatgt_img, zeros(size(muatgt_img))];
 mus_img = [mustgt_img, zeros(size(mustgt_img))];
 
@@ -107,9 +102,8 @@ mus = ones(n,1) * 2;                                % initial mus estimate
 ref = ones(n,1) * refind;                           % refractive index estimate
 kap = 1./(3*(mua+mus));                             % diffusion coefficient
 
-% Set up the mapper between FEM and solution bases
-hbasis = toastSetBasis ('LINEAR', hmesh, grd);      % maps between mesh and reconstruction basis
-solmask = toastSolutionMask (hbasis);               % mask unused voxels
+% Basis mapper (for visualisation only)
+hbasis = toastSetBasis (hmesh, grd);                % maps between mesh and reconstruction basis
 
 % Generate source vectors
 qvec = toastQvec (hmesh, 'Neumann', 'Gaussian', 2); % nodal source vectors
@@ -130,32 +124,16 @@ msd = ones(size(lgamma)) * norm(mdata-mproj);       % scale log amp data with da
 psd = ones(size(lgamma)) * norm(pdata-pproj);       % scale phase data with data difference
 sd = [msd;psd];                                     % linear scaling vector
 
-% map initial parameter estimates to solution basis
-bmua = toastMapMeshToBasis (hbasis, mua);           % mua mapped to full grid
-bmus = toastMapMeshToBasis (hbasis, mus);           % mus mapped to full grid
-bkap = toastMapMeshToBasis (hbasis, kap);           % kap mapped to full grid
-bcmua = bmua*cm;                                    % scale parameters with speed of light
-bckap = bkap*cm;                                    % scale parameters with speed of light
-scmua = bcmua(solmask);                             % map to solution basis
-sckap = bckap(solmask);                             % map to solution basis
+% transform initial parameters
+cmua = mua*cm;                                      % scale parameters with speed of light
+ckap = kap*cm;                                      % scale parameters with speed of light
 
 % solution vector
-x = [scmua;sckap];                                  % linea solution vector
+x = [cmua;ckap];                                    % linea solution vector
 logx = log(x);                                      % transform to log
-p = length(x);                                      % solution vector dimension
-
-% Initialise regularisation
-% For simplicity, we use the target images for defining the edge priors
-regul.method = 'TV';
-regul.tau = tau;
-regul.prior.smooth = 0.5;
-regul.prior.threshold = 0.25;
-regul.prior.refimg = [muatgt;mustgt];
-regul.tv.beta = beta;
-hreg = toastRegul (regul, hbasis, logx);
 
 % initial data error (=2 due to data scaling)
-err0 = privObjective (proj, data, sd, hreg, logx);  %initial error
+err0 = privObjective (proj, data, sd);              %initial error
 err = err0;                                         % current error
 errp = inf;                                         % previous error
 erri(1) = err0;                                     % keep history
@@ -163,81 +141,56 @@ itr = 1;                                            % iteration counter
 fprintf (1, '\n**** INITIAL ERROR %f\n\n', err);
 step = 1.0;                                         % initial step length for line search
 
-% Gauss-Newton loop
-while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
+% Nonlinear conjugate gradient loop
+while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
 
     errp = err;
     
-    % Construct the Jacobian
-    fprintf (1,'Calculating Jacobian\n');
-    J = toastJacobian (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, 'direct');
-
-    % data normalisation
-    for i = 1:m
-        J(i,:) = J(i,:) / sd(i);
-    end
-
-    % parameter normalisation (map to log)
-    for i = 1:p
-        J(:,i) = J(:,i) * x(i);
-    end
-    
-    % Normalisation of Hessian (map to diagonal 1)
-    psiHdiag = toastRegulHDiag (hreg, logx);
-    M = zeros(p,1);
-    for i = 1:p
-        M(i) = sum(J(:,i) .* J(:,i));
-        M(i) = M(i) + psiHdiag(i);
-        M(i) = 1 ./ sqrt(M(i));
-    end
-    for i = 1:p
-        J(:,i) = J(:,i) * M(i);
-    end
-    
     % Gradient of cost function
-    r = J' * ((data-proj)./sd);
-    r = r - toastRegulGradient (hreg, logx) .* M;
+    J = toastJacobian (hmesh,0,qvec,mvec,mua,mus,ref,freq,'direct');
+    r = J' * (-2*(proj-data)./sd.^2);
     
-    if Himplicit == true
-        % Update with implicit Krylov solver
-        fprintf (1, 'Entering Krylov solver\n');
-        dx = toastKrylov (x, J, r, M, 0, hreg, tolKrylov);
-    else
-        % Update with explicit Hessian
-        H = J' * J;
-        lambda = 0.01;
-        H = H + eye(size(H)).* lambda;
-        dx = H \ r;
-        clear H;
+    r = r .* x; % parameter scaling
+    
+    if itr > 1
+        delta_old = delta_new;
+        delta_mid = r' * s;
     end
     
-    clear J;
+    % Apply PCG preconditioner
+    s = r; % dummy for now
+    
+    if itr == 1
+        d = s;
+        delta_new = r' * d;
+    else
+        delta_new = r' * s;
+        beta = (delta_new - delta_mid) / delta_old;
+        if mod (itr, resetCG) == 0 || beta <= 0
+            d = s;  % reset CG
+        else
+            d = s + d*beta;
+        end
+    end
     
     % Line search
     fprintf (1, 'Entering line search\n');
-    step0 = step;
-    [step, err] = toastLineSearch (logx, dx, step0, err, @objective, 'verbose', verbosity>0);
-    if errp-err <= tolGN
-        dx = r; % try steepest descent
-        step = toastLineSearch (logx, dx, step0, err, @objective, 'verbose', verbosity>0);
-    end
-
+    step = toastLineSearch (logx, d, step, err, @objective);
+    
     % Add update to solution
-    logx = logx + dx*step;
+    logx = logx + d*step;
     x = exp(logx);
     
     % Map parameters back to mesh
-    scmua = x(1:size(x)/2);
-    sckap = x(size(x)/2+1:size(x));
-    smua = scmua/cm;
-    skap = sckap/cm;
-    smus = 1./(3*skap) - smua;
-    mua = toastMapSolToMesh (hbasis, smua);
-    mus = toastMapSolToMesh (hbasis, smus);
-    bmua(solmask) = smua;
-    bmus(solmask) = smus;
+    cmua = x(1:size(x)/2);
+    ckap = x(size(x)/2+1:size(x));
+    mua = cmua/cm;
+    kap = ckap/cm;
+    mus = 1./(3*kap) - mua;
 
-    % display the reconstructions
+    %figure(1);
+    bmua = toastMapMeshToBasis(hbasis,mua);
+    bmus = toastMapMeshToBasis(hbasis,mus);
     subplot(2,2,1);
     muarec_img = reshape(bmua,grd);
     mua_img(:,size(muarec_img,2)+1:end) = muarec_img;
@@ -253,11 +206,10 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     title ('\mu_s tgt, recon');
     set(gca,'Position',[0.01 0.05 0.4 0.4]);
     
-    % update projection from current parameter estimate
     proj = toastProject (hmesh, mua, mus, ref, freq, qvec, mvec);
 
     % update objective function
-    err = privObjective (proj, data, sd, hreg, logx);
+    err = privObjective (proj, data, sd);
     fprintf (1, '**** GN ITERATION %d, ERROR %f\n\n', itr, err);
 
     itr = itr+1;
@@ -272,14 +224,14 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     drawnow
 end
 
-disp('recon3: finished')
+disp('recon1: finished')
 
     % =====================================================================
     % Callback function for objective evaluation (called by toastLineSearch)
     function p = objective(x)
 
-    proj = privProject (hmesh, hbasis, x, ref, freq, qvec, mvec);
-    [p, p_data, p_prior] = privObjective (proj, data, sd, hreg, x);
+    proj = privProject (hmesh, 0, x, ref, freq, qvec, mvec);
+    [p, p_data, p_prior] = privObjective (proj, data, sd);
     if verbosity > 0
         fprintf (1, '    [LH: %f, PR: %f]\n', p_data, p_prior);
     end

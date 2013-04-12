@@ -78,7 +78,7 @@ varargout{1} = handles.output;
 %% ===========================================================
 function init(handles)
 
-clear prm;
+prm = toastParam;
 %prm.basis.meshfile = 'vox32_2blobs.msh';
 %prm.basis.bdim = [25 30 20];
 %prm.data.lnampfile = 'fmod_head_vox32_3plane.fem';
@@ -95,6 +95,8 @@ prm.meas.det = struct('prof','Gaussian','width',2);
 prm.fwdsolver.method = 'BiCGSTAB';
 %prm.linsolver.method = 'DIRECT';
 prm.fwdsolver.tol = 1e-10;
+prm.fwdsolver.hmesh = toastMesh(prm.fwdsolver.meshfile);
+prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
 prm.solver.method = 'PCG';
 prm.solver.tol = 1e-8;
 prm.solver.step0 = 87;
@@ -104,25 +106,22 @@ prm.initprm.mua = struct('reset','HOMOG','val',0.01);
 prm.initprm.mus = struct('reset','HOMOG','val',1);
 prm.initprm.ref = struct('reset','HOMOG','val',1.4);
 
-prm.callback.context = handles;
-prm.callback.iter = @callback_vis; % iteration callback from recon
+prm.transient.callback.context = handles;
+prm.transient.callback.iter = @callback_vis; % iteration callback from recon
 
-prm.basis.hMesh = toastMesh(prm.fwdsolver.meshfile);
-prm.basis.hMesh.ReadQM (prm.meas.qmfile);
-
-prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.solver.basis.bdim,'Linear');
+prm.solver.basis.hbasis = toastBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim,'Linear');
 %prm.smask = toastSolutionMask(prm.basis.hBasis);
-n = prm.basis.hMesh.NodeCount();
+n = prm.fwdsolver.hmesh.NodeCount;
 %load toast_demo6.mat
 %prm.bmua = bmua; clear bmua;
 %prm.bmus = bmus; clear bmus;
 %prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
 %prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
-prm.mua = toastNim('mua_tgt_cyl2.nim');
-prm.mus = toastNim('mus_tgt_cyl2.nim');
-prm.ref = ones(n,1)*1.4;
-prm.bmua = prm.basis.hBasis.Map('M->B',prm.mua);
-prm.bmus = prm.basis.hBasis.Map('M->B',prm.mus);
+prm.initprm.mua.mua = toastNim('mua_tgt_cyl2.nim');
+prm.initprm.mus.mus = toastNim('mus_tgt_cyl2.nim');
+prm.initprm.ref.ref = ones(n,1)*1.4;
+prm.initprm.mua.bmua = prm.solver.basis.hbasis.Map('M->B',prm.initprm.mua.mua);
+prm.initprm.mus.bmus = prm.solver.basis.hbasis.Map('M->B',prm.initprm.mus.mus);
 
 setappdata(handles.figure1,'prm',prm);
 
@@ -145,9 +144,9 @@ set(handles.slider2,'Value',lprm.cs_mus);
 
 setappdata(handles.figure1,'lprm',lprm);
 
-showiso(handles,prm.bmua,0.015,prm.bmus,1.5,1);
-showcs(handles,prm.bmua,lprm.cs_mua,0.005,0.02,handles.axes2);
-showcs(handles,prm.bmus,lprm.cs_mus,0.5,2,handles.axes8);
+showiso(handles,prm.initprm.mua.bmua,0.015,prm.initprm.mus.bmus,1.5,1);
+showcs(handles,prm.initprm.mua.bmua,lprm.cs_mua,0.005,0.02,handles.axes2);
+showcs(handles,prm.initprm.mus.bmus,lprm.cs_mus,0.5,2,handles.axes8);
 tic
 
 % --- Executes on button press in pushbutton1.
@@ -171,8 +170,8 @@ end
 
 
 % Display reconstruction results for current iteration
-function callback_vis(handles,res)
-prm = getappdata(handles.figure1,'prm');
+function callback_vis(prm,res)
+handles = prm.transient.callback.context;
 lprm = getappdata(handles.figure1,'lprm');
 th_mua = min (0.015, max (0.011,(max(res.bmua)+0.01)/2));
 th_mus = min (1.5, max (1.1, (max(res.bmus)+1)/2));
@@ -271,8 +270,8 @@ eval(['axes(handles.axes' num2str(fignum) ')']);
 cla;
 set(gcf,'Renderer','OpenGL');
 
-[vtx,idx,perm] = prm.basis.hMesh.SurfData();
-bb = prm.basis.hMesh.BoundingBox();
+[vtx,idx,perm] = prm.fwdsolver.hmesh.SurfData();
+bb = prm.fwdsolver.hmesh.BoundingBox();
 pmin = bb(1,:);
 pmax = bb(2,:);
 nvtx = size(vtx,1);

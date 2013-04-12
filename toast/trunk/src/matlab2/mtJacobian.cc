@@ -215,6 +215,10 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 
     RDenseMatrix J(ndat,nprm);
 
+    ofstream ofs("dbg_m.dat");
+    ofs << dphi[0] << endl;
+    ofs.close();
+
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
 
     CopyMatrix (res, J);
@@ -280,6 +284,10 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 	*proj = FWS.ProjectAll (mvec, dphi, DATA_LIN);
     	//ProjectAll (*mesh, FWS, mvec, dphi, *proj);
     }
+
+    ofstream ofs("dbg_m.dat");
+    ofs << *proj << endl;
+    ofs.close();
 
     // Calculate Jacobian
     CalcJacobian (mesh, raster, dphi, aphi, proj, dscale, res);

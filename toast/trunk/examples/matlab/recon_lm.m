@@ -1,7 +1,7 @@
-function recon1
+function recon_lm
 
 disp('MATLAB-TOAST sample script:')
-disp('2D image reconstruction with conjugate gradient solver')
+disp('2D image reconstruction with Levenberg-Marquardt solver')
 disp('-------------------------------------------------------')
 
 % ======================================================================
@@ -15,14 +15,16 @@ invmesh = [meshdir 'circle25_32.msh'];   % mesh for inverse solver forward model
 
 refind = 1.4;                           % refractive index
 
-grd = [100 100];                        % solution basis: grid dimension
-freq = 100;                             % modulation frequency [MHz]
-noiselevel = 0.01;                      % additive data noise level
+grd = [48 48];                        % solution basis: grid dimension
+freq = 100;                             % modulation freqcleuency [MHz]
+noiselevel = 0.0;                      % additive data noise level
 tau = 1e-3;                             % regularisation parameter
 beta = 0.01;                            % TV regularisation parameter
-tolCG = 1e-6;                           % Gauss-Newton convergence criterion
-resetCG = 10;                           % PCG reset interval
+eps = 0.02;
+tolGN = 1e-5;                           % Gauss-Newton convergence criterion
+tolKrylov = 1e-2;                       % Krylov convergence criterion
 itrmax = 100;                           % Gauss-Newton max. iterations
+Himplicit = true;                       % Implicit/explicit Hessian matrix
 cmap = 'gray';
 
 % ======================================================================
@@ -40,7 +42,7 @@ cm = c0/refind;                         % lightspeed in medium
 hmesh = toastMesh(fwdmesh);             % load FEM mesh from file
 hmesh.ReadQM(qmname);                   % add source-detector descriptions
 n = hmesh.NodeCount();                  % number of nodes
-dmask = hmesh.DataLinkList ();          % source-detector connectivity
+dmask = hmesh.DataLinkList();           % source-detector connectivity
 
 mua = toastNim([meshdir 'tgt_mua_ellips_tri10.nim']); % target absorption
 mus = toastNim([meshdir 'tgt_mus_ellips_tri10.nim']); % target scattering
@@ -60,11 +62,12 @@ pdata = imag(lgamma);                         % phase data
 % add some noise
 mdata = mdata + mdata.*noiselevel.*randn(size(mdata));
 pdata = pdata + pdata.*noiselevel.*randn(size(pdata));
-data = [mdata;pdata];                         % linear data vector
+data = [mdata;pdata];                               % linear data vector
+m = length(data);                                   % number of measurement data
 
 % display the target parameter distributions for comparison
-muarng = [min(mua)*0.9, max(mua)*1.1];
-musrng = [min(mus)*0.9, max(mus)*1.1];
+muarng = [min(mua)/1.2, max(mua)*1.2];
+musrng = [min(mus)/1.2, max(mus)*1.2];
 hbasis = toastBasis(hmesh,grd);
 muatgt_img = reshape (hbasis.Map ('M->B', mua), grd);
 mustgt_img = reshape (hbasis.Map ('M->B', mus), grd);
@@ -134,9 +137,11 @@ sckap = hbasis.Map ('B->S', bckap);                 % map to solution basis
 % solution vector
 x = [scmua;sckap];                                  % linea solution vector
 logx = log(x);                                      % transform to log
+p = length(x);                                      % solution vector dimension
 
 % Initialise regularisation
-hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
+%hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
+hreg = toastRegul ('Huber', hbasis, logx, tau, 'Eps', eps);
 
 % initial data error (=2 due to data scaling)
 err0 = toastObjective (proj, data, sd, hreg, logx); %initial error
@@ -145,46 +150,88 @@ errp = inf;                                         % previous error
 erri(1) = err0;                                     % keep history
 itr = 1;                                            % iteration counter
 fprintf (1, '\n**** INITIAL ERROR %f\n\n', err);
-step = 1.0;                                         % initial step length for line search
+lambda = 1e-8;                                      % initial value of LM control parameter
 
-% Nonlinear conjugate gradient loop
-while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
+img_rec_mua = reshape(bmua,grd);
+img_rec_mus = reshape(bmus,grd);
+
+% Gauss-Newton loop
+while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
 
     errp = err;
     
+    % Construct the Jacobian
+    fprintf (1,'Calculating Jacobian\n');
+    J = toastJacobian (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, 'direct');
+
+    % data normalisation
+    for i = 1:m
+        J(i,:) = J(i,:) / sd(i);
+    end
+
+    % parameter normalisation (map to log)
+    for i = 1:p
+        J(:,i) = J(:,i) * x(i);
+    end
+    
+    % Normalisation of Hessian (map to diagonal 1)
+    psiHdiag = hreg.HDiag(logx);
+    M = zeros(p,1);
+    for i = 1:p
+        M(i) = sum(J(:,i) .* J(:,i));
+        M(i) = M(i) + psiHdiag(i);
+        M(i) = 1 ./ sqrt(M(i));
+    end
+    for i = 1:p
+        J(:,i) = J(:,i) * M(i);
+    end
+    
     % Gradient of cost function
-    r = -toastGradient (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, ...
-                       data, sd, 'direct');
-    r = r .* x;                   % parameter scaling
-    r = r - hreg.Gradient (logx); % regularisation contribution
+    r = J' * ((data-proj)./sd);
+    r = r - hreg.Gradient (logx) .* M;
     
-    if itr > 1
-        delta_old = delta_new;
-        delta_mid = r' * s;
-    end
-    
-    % Apply PCG preconditioner
-    s = r; % dummy for now
-    
-    if itr == 1
-        d = s;
-        delta_new = r' * d;
+    while 1
+        
+    if Himplicit == true
+        % Update with implicit Krylov solver
+        fprintf (1, 'Entering Krylov solver\n');
+        dx = toastKrylov (x, J, r, M, lambda, hreg, tolKrylov);
     else
-        delta_new = r' * s;
-        beta = (delta_new - delta_mid) / delta_old;
-        if mod (itr, resetCG) == 0 || beta <= 0
-            d = s;  % reset CG
-        else
-            d = s + d*beta;
-        end
+        % Update with explicit Hessian
+        H = J' * J;
+        lambda = 0.1;
+        H = H + eye(size(H)).* lambda;
+        dx = H \ r;
+        clear H;
     end
     
-    % Line search
-    fprintf (1, 'Line search:\n');
-    step = toastLineSearch (logx, d, step, err, @objective);
+    logx_new = logx + dx;
+    x_new = exp(logx_new);
+    scmua = x_new(1:size(x_new)/2);
+    sckap = x_new(size(x_new)/2+1:size(x_new));
+    smua = scmua/cm;
+    skap = sckap/cm;
+    smus = 1./(3*skap) - smua;
+    mua = hbasis.Map ('S->M', smua);
+    mus = hbasis.Map ('S->M', smus);
+
+    proj = toastProject (hmesh, mua, mus, ref, freq, qvec, mvec);
+    err_new = toastObjective (proj, data, sd, hreg, logx);
     
-    % Add update to solution
-    logx = logx + d*step;
+    if err_new < err
+        logx = logx_new;
+        err = err_new;
+        lambda = lambda/2;
+        break;
+    else
+        lambda = lambda*2;
+    end
+    
+    end
+    
+    clear J;
+    
+    lambda
     x = exp(logx);
     
     % Map parameters back to mesh
@@ -198,7 +245,8 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     bmua = hbasis.Map ('S->B', smua);
     bmus = hbasis.Map ('S->B', smus);
 
-    %figure(1);
+    % display the reconstructions
+    figure(1);
     subplot(2,2,1);
     muarec_img = reshape(bmua,grd);
     mua_img(:,size(muarec_img,2)+1:end) = muarec_img;
@@ -214,12 +262,12 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     title ('\mu_s tgt, recon');
     set(gca,'Position',[0.01 0.05 0.4 0.4]);
     
+    % update projection from current parameter estimate
     proj = toastProject (hmesh, mua, mus, ref, freq, qvec, mvec);
 
     % update objective function
     err = toastObjective (proj, data, sd, hreg, logx);
-    fprintf ('GN iteration %d\n', itr);
-    fprintf ('--> Objective: %f\n', err);
+    fprintf (1, '**** GN ITERATION %d, ERROR %f\n\n', itr, err);
 
     itr = itr+1;
     erri(itr) = err;
@@ -231,9 +279,14 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     xlabel('iteration');
     ylabel('objective function');
     drawnow
+    
+    if mod(itr,1) == 0
+        img_rec_mua = [img_rec_mua muarec_img];
+        img_rec_mus = [img_rec_mus musrec_img];
+    end
 end
 
-disp('recon1: finished')
+disp('recon2: finished')
 
     % =====================================================================
     % Callback function for objective evaluation (called by toastLineSearch)
@@ -243,7 +296,7 @@ disp('recon1: finished')
     proj = toastProject (hmesh, mua, mus, ref, freq, qvec, mvec);
     [p, p_data, p_prior] = toastObjective (proj, data, sd, hreg, x);
     if verbosity > 0
-        fprintf (1, '--> LH: %f, PR: %f\n', p_data, p_prior);
+        fprintf (1, '    [LH: %f, PR: %f]\n', p_data, p_prior);
     end
     end
 

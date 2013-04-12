@@ -1,7 +1,7 @@
-function recon1
+function recon_gn_v1
 
 disp('MATLAB-TOAST sample script:')
-disp('2D image reconstruction with conjugate gradient solver')
+disp('2D image reconstruction with Gauss-Newton solver')
 disp('-------------------------------------------------------')
 
 % ======================================================================
@@ -20,9 +20,10 @@ freq = 100;                             % modulation frequency [MHz]
 noiselevel = 0.01;                      % additive data noise level
 tau = 1e-3;                             % regularisation parameter
 beta = 0.01;                            % TV regularisation parameter
-tolCG = 1e-6;                           % Gauss-Newton convergence criterion
-resetCG = 10;                           % PCG reset interval
+tolGN = 1e-5;                           % Gauss-Newton convergence criterion
+tolKrylov = 1e-2;                       % Krylov convergence criterion
 itrmax = 100;                           % Gauss-Newton max. iterations
+Himplicit = true;                       % Implicit/explicit Hessian matrix
 cmap = 'gray';
 
 % ======================================================================
@@ -61,6 +62,7 @@ pdata = imag(lgamma);                               % phase data
 mdata = mdata + mdata.*noiselevel.*randn(size(mdata));
 pdata = pdata + pdata.*noiselevel.*randn(size(pdata));
 data = [mdata;pdata];                               % linear data vector
+m = length(data);                                   % number of measurement data
 
 % display the target parameter distributions for comparison
 muarng = [min(mua)*0.9, max(mua)*1.1];
@@ -138,6 +140,7 @@ sckap = bckap(solmask);                             % map to solution basis
 % solution vector
 x = [scmua;sckap];                                  % linea solution vector
 logx = log(x);                                      % transform to log
+p = length(x);                                      % solution vector dimension
 
 % Initialise regularisation
 hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
@@ -151,46 +154,67 @@ itr = 1;                                            % iteration counter
 fprintf (1, '\n**** INITIAL ERROR %f\n\n', err);
 step = 1.0;                                         % initial step length for line search
 
-% Nonlinear conjugate gradient loop
-while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
+% Gauss-Newton loop
+while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
 
     errp = err;
     
+    % Construct the Jacobian
+    fprintf (1,'Calculating Jacobian\n');
+    J = toastJacobian (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, 'direct');
+
+    % data normalisation
+    for i = 1:m
+        J(i,:) = J(i,:) / sd(i);
+    end
+
+    % parameter normalisation (map to log)
+    for i = 1:p
+        J(:,i) = J(:,i) * x(i);
+    end
+    
+    % Normalisation of Hessian (map to diagonal 1)
+    psiHdiag = toastRegulHDiag (hreg, logx);
+    M = zeros(p,1);
+    for i = 1:p
+        M(i) = sum(J(:,i) .* J(:,i));
+        M(i) = M(i) + psiHdiag(i);
+        M(i) = 1 ./ sqrt(M(i));
+    end
+    for i = 1:p
+        J(:,i) = J(:,i) * M(i);
+    end
+    
     % Gradient of cost function
-    r = -toastGradient (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, ...
-                       data, sd, 'direct');
-    r = r .* x; % parameter scaling
+    r = J' * ((data-proj)./sd);
+    r = r - toastRegulGradient (hreg, logx) .* M;
     
-    rr = toastRegulGradient (hreg, logx);
-    r = r - rr;
-    
-    if itr > 1
-        delta_old = delta_new;
-        delta_mid = r' * s;
-    end
-    
-    % Apply PCG preconditioner
-    s = r; % dummy for now
-    
-    if itr == 1
-        d = s;
-        delta_new = r' * d;
+    if Himplicit == true
+        % Update with implicit Krylov solver
+        fprintf (1, 'Entering Krylov solver\n');
+        dx = toastKrylov (x, J, r, M, 0, hreg, tolKrylov);
     else
-        delta_new = r' * s;
-        beta = (delta_new - delta_mid) / delta_old;
-        if mod (itr, resetCG) == 0 || beta <= 0
-            d = s;  % reset CG
-        else
-            d = s + d*beta;
-        end
+        % Update with explicit Hessian
+        H = J' * J;
+        lambda = 0.01;
+        H = H + eye(size(H)).* lambda;
+        dx = H \ r;
+        clear H;
     end
+    
+    clear J;
     
     % Line search
     fprintf (1, 'Entering line search\n');
-    step = toastLineSearch (logx, d, step, err, @objective);
-    
+    step0 = step;
+    [step, err] = toastLineSearch (logx, dx, step0, err, @objective, 'verbose', verbosity>0);
+    if errp-err <= tolGN
+        dx = r; % try steepest descent
+        step = toastLineSearch (logx, dx, step0, err, @objective, 'verbose', verbosity>0);
+    end
+
     % Add update to solution
-    logx = logx + d*step;
+    logx = logx + dx*step;
     x = exp(logx);
     
     % Map parameters back to mesh
@@ -204,7 +228,7 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     bmua(solmask) = smua;
     bmus(solmask) = smus;
 
-    %figure(1);
+    % display the reconstructions
     subplot(2,2,1);
     muarec_img = reshape(bmua,grd);
     mua_img(:,size(muarec_img,2)+1:end) = muarec_img;
@@ -220,6 +244,7 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     title ('\mu_s tgt, recon');
     set(gca,'Position',[0.01 0.05 0.4 0.4]);
     
+    % update projection from current parameter estimate
     proj = toastProject (hmesh, mua, mus, ref, freq, qvec, mvec);
 
     % update objective function
@@ -238,7 +263,7 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     drawnow
 end
 
-disp('recon1: finished')
+disp('recon2: finished')
 
     % =====================================================================
     % Callback function for objective evaluation (called by toastLineSearch)
