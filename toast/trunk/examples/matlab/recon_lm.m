@@ -199,7 +199,6 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     else
         % Update with explicit Hessian
         H = J' * J;
-        lambda = 0.1;
         H = H + eye(size(H)).* lambda;
         dx = H \ r;
         clear H;

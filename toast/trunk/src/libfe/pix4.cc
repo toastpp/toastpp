@@ -17,6 +17,11 @@ Pixel4::Pixel4 (const Pixel4 &el): Element_Structured_2D (el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Pixel4::Copy ()
+{
+    return new Pixel4(*this);
+}
+
 void Pixel4::Initialise (const NodeList &nlist)
 {
     static bool need_setup = true;

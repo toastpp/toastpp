@@ -104,6 +104,11 @@ public:
     virtual ~Element ();
 
     /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    virtual Element *Copy() = 0;
+
+    /**
      * \brief Element initialisation.
      *
      * Calculation of geometric element parameters, including element size and

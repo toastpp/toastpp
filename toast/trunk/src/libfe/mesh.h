@@ -27,6 +27,7 @@
 #define ASSEMBLE_PDD_EL    10
 #define ASSEMBLE_BNDPFF_EL 11
 #define ASSEMBLE_BNDFF     12
+#define ASSEMBLE_iPFF      13
 
 // rhs assembly modes
 #define RHS_P           0
@@ -98,7 +99,7 @@ public:
     virtual ~Mesh ();
     // destructor
 
-    void Setup();
+    void Setup (bool mark_boundary=true);
     // call this once the node list and element list have been assigned to
     // let the mesh perform its setup stuff
 

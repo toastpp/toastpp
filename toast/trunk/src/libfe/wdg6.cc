@@ -25,6 +25,11 @@ Wedge6::Wedge6 (const Wedge6 &el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Wedge6::Copy ()
+{
+    return new Wedge6(*this);
+}
+
 void Wedge6::Initialise (const NodeList &nlist)
 {
     Element_Unstructured_3D::Initialise (nlist);

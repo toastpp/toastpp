@@ -41,6 +41,11 @@ public:
     Pixel4 (const Pixel4 &el);
     ~Pixel4 () { delete[]Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList &nlist);
 
     inline BYTE Type() const { return ELID_PIX4; }

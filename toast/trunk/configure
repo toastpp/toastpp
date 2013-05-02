@@ -634,8 +634,19 @@ MEXEXT
 MEXFLAGS
 OBJDIR
 CCVERSION
-MAKE_MPI
-MAKE_THREAD
+SCOTCHLIBDIR
+SCOTCHINCDIR
+ENABLE_SCOTCH
+PARMETISLIBDIR
+PARMETISINCDIR
+ENABLE_PARMETIS
+MPILIBDIR
+MPIINCDIR
+ENABLE_MPI
+ENABLE_PTHREAD
+ZOLTANLIBDIR
+ZOLTANINCDIR
+ENABLE_ZOLTAN
 ARCHDIR
 LOCAL_BLT
 LOCAL_TIX
@@ -723,8 +734,21 @@ with_ilu
 enable_fdot
 enable_debug
 enable_prof
+enable_zoltan
+with_zoltan_dir
+with_zoltan_incdir
+with_zoltan_libdir
 enable_threads
 enable_mpi
+with_mpi_dir
+with_mpi_incdir
+with_mpi_libdir
+with_parmetis_dir
+with_parmetis_incdir
+with_parmetis_libdir
+with_scotch_dir
+with_scotch_incdir
+with_scotch_libdir
 enable_cuda
 with_cuda
 enable_shared
@@ -1365,6 +1389,7 @@ Optional Features:
   --enable-fdot           Include FMT library support
   --enable-debug          build debug version
   --enable-prof           build profiling version
+  --enable-zoltan         build with Zoltan load-balancing support
   --enable-threads        build pthreads parallel version
   --enable-mpi            build MPI distributed version
   --enable-cuda           enable CUDA GPU support
@@ -1393,6 +1418,18 @@ Optional Packages:
                               Default is auto-search for BLT
   --with-ilu=PATH         Path to ILUPACK base directory
                               If not specified, no ILU support is provided
+  --with-zoltan-dir       Zoltan source installation directory
+  --with-zoltan-incdir    Zoltan include directory
+  --with-zoltan-libdir    Zoltan library directory
+  --with-mpi-dir       MPI source installation directory
+  --with-mpi-incdir    MPI include directory
+  --with-mpi-libdir    MPI library directory
+  --with-parmetis-dir  ParMETIS source installation directory
+  --with-parmetis-incdir  ParMETIS include directory
+  --with-parmetis-libdir  ParMETIS library directory
+  --with-scotch-dir  Scotch source installation directory
+  --with-scotch-incdir  Scotch include directory
+  --with-scotch-libdir  Scotch library directory
   --with-cuda=PATH        Path to CUDA base directory
                               (implies --enable-cuda). If not specified,
                               CUDA_INSTALL_PATH environment variable is used
@@ -6386,6 +6423,10 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 TMP_CXXFLAGS=$CXXFLAGS
 CXXFLAGS="$CXXFLAGS $X_CFLAGS"
+NEED_MPI=no
+NEED_PTHREAD=no
+NEED_PARMETIS=no
+NEES_SCOTCH=no
 
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -7084,6 +7125,55 @@ else
 fi
 
 # =========================================================================
+# Check whether user wants to add Zoltan support
+
+# Check whether --enable-zoltan was given.
+if test "${enable_zoltan+set}" = set; then :
+  enableval=$enable_zoltan; isok=$enableval
+else
+  isok=no
+fi
+
+if test "$isok" = "yes" ; then
+    ENABLE_ZOLTAN=yes
+    NEED_PARMETIS=yes
+    NEED_SCOTCH=yes
+    NEED_PTHREAD=yes
+    NEED_MPI=yes
+
+
+# Check whether --with-zoltan-dir was given.
+if test "${with_zoltan_dir+set}" = set; then :
+  withval=$with_zoltan_dir; ZOLTANDIR=$withval
+else
+  ZOLTANDIR=${ZOLTANDIR}
+fi
+
+
+
+# Check whether --with-zoltan-incdir was given.
+if test "${with_zoltan_incdir+set}" = set; then :
+  withval=$with_zoltan_incdir; ZOLTANINCDIR=$withval
+else
+  ZOLTANINCDIR=${ZOLTANDIR}/include
+fi
+
+
+
+# Check whether --with-zoltan-libdir was given.
+if test "${with_zoltan_libdir+set}" = set; then :
+  withval=$with_zoltan_libdir; ZOLTANLIBDIR=$withval
+else
+  ZOLTANLIBDIR=${ZOLTANDIR}/lib
+fi
+
+fi
+
+
+
+
+
+# =========================================================================
 # Check whether user wants to build a threaded version
 
 # Check whether --enable-threads was given.
@@ -7095,10 +7185,8 @@ fi
 
 if test "$isok" = "yes" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
-    MAKE_THREAD="yes"
-    TASKLIB="-lpthread"
+    NEED_PTHREAD=yes
 fi
-
 
 # =========================================================================
 # Check whether user wants to build an MPI version
@@ -7111,13 +7199,135 @@ else
 fi
 
 if test "$isok" = "yes" ; then
-    MAKE_MPI="yes"
+    NEED_MPI=yes
+    CXXFLAGS="${CXXFLAGS} -DTOAST_MPI"
+fi
+
+# =========================================================================
+# If pthreads support is required, set the pthreads environment
+
+if test "$NEED_PTHREAD" = "yes" ; then
+    ENABLE_PTHREAD=yes
+    TASKLIB="-lpthread"
+fi
+
+
+# =========================================================================
+# If MPI support is required, set the MPI environment
+
+if test "$NEED_MPI" = "yes" ; then
+    ENABLE_MPI=yes
     CXX="mpicxx"
     F77="mpif77"
-    CXXFLAGS="${CXXFLAGS} -DTOAST_MPI"
 # Workaround for MPI-2 SEEK bug:
     CXXFLAGS="${CXXFLAGS} -DMPICH_IGNORE_CXX_SEEK"
+
+
+# Check whether --with-mpi-dir was given.
+if test "${with_mpi_dir+set}" = set; then :
+  withval=$with_mpi_dir; MPIDIR=$withval
+else
+  MPIDIR=${MPIDIR}
 fi
+
+
+
+# Check whether --with-mpi-incdir was given.
+if test "${with_mpi_incdir+set}" = set; then :
+  withval=$with_mpi_incdir; MPIINCDIR=$withval
+else
+  MPIINCDIR=${MPIDIR}/include
+fi
+
+
+
+# Check whether --with-mpi-libdir was given.
+if test "${with_mpi_libdir+set}" = set; then :
+  withval=$with_mpi_libdir; MPILIBDIR=$withval
+else
+  MPILIBDIR=${MPIDIR}/lib
+fi
+
+fi
+
+
+
+
+
+# =========================================================================
+# If ParMETIS support is required, set the environment
+
+if test "$NEED_PARMETIS" = "yes" ; then
+    ENABLE_PARMETIS=yes
+
+
+# Check whether --with-parmetis-dir was given.
+if test "${with_parmetis_dir+set}" = set; then :
+  withval=$with_parmetis_dir; PARMETISDIR=$withval
+else
+  PARMETISDIR=${PARMETISDIR}
+fi
+
+
+
+# Check whether --with-parmetis-incdir was given.
+if test "${with_parmetis_incdir+set}" = set; then :
+  withval=$with_parmetis_incdir; PARMETISINCDIR=$withval
+else
+  PARMETISINCDIR=${PARMETISDIR}
+fi
+
+
+
+# Check whether --with-parmetis-libdir was given.
+if test "${with_parmetis_libdir+set}" = set; then :
+  withval=$with_parmetis_libdir; PARMETISLIBDIR=$withval
+else
+  PARMETISLIBDIR=${PARMETISDIR}
+fi
+
+fi
+
+
+
+
+
+# =========================================================================
+# if Scotch support is required, set the environment
+
+if test "$NEED_SCOTCH" = "yes" ; then
+    ENABLE_SCOTCH=yes
+
+
+# Check whether --with-scotch-dir was given.
+if test "${with_scotch_dir+set}" = set; then :
+  withval=$with_scotch_dir; SCOTCHDIR=$withval
+else
+  SCOTCHDIR=${SCOTCHDIR}
+fi
+
+
+
+# Check whether --with-scotch-incdir was given.
+if test "${with_scotch_incdir+set}" = set; then :
+  withval=$with_scotch_incdir; SCOTCHINCDIR=$withval
+else
+  SCOTCHINCDIR=${SCOTCHDIR}/include
+fi
+
+
+
+# Check whether --with-scotch-libdir was given.
+if test "${with_scotch_libdir+set}" = set; then :
+  withval=$with_scotch_libdir; SCOTCHLIBDIR=$withval
+else
+  SCOTCHLIBDIR=${SCOTCHDIR}/lib
+fi
+
+fi
+
+
+
 
 
 # =========================================================================

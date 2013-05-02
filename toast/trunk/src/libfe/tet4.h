@@ -65,6 +65,11 @@ public:
     Tetrahedron4( const Tetrahedron4 &el);
     ~Tetrahedron4() { delete []Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList &nlist);
 
     BYTE Type() const { return ELID_TET4; }

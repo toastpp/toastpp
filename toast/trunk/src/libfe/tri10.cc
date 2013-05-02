@@ -340,6 +340,11 @@ Triangle10::Triangle10 (const Triangle10 &el): Element_Unstructured_2D (el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Triangle10::Copy ()
+{
+    return new Triangle10(*this);
+}
+
 void Triangle10::Initialise (const NodeList &nlist)
 {
 #ifdef TRI10_STORE_COORDS

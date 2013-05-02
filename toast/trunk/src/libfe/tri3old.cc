@@ -73,6 +73,11 @@ Triangle3old::~Triangle3old ()
     if (intfd_1) delete []intfd_1;
 }
 
+Element *Triangle3old::Copy ()
+{
+    return new Triangle3old(*this);
+}
+
 void Triangle3old::Initialise (const NodeList& nlist)
 {
 #ifndef TRI3_STORE_COORDS

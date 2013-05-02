@@ -34,6 +34,11 @@ Triangle6_ip::Triangle6_ip (const Triangle6_ip &el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Triangle6_ip::Copy ()
+{
+    return new Triangle6_ip(*this);
+}
+
 void Triangle6_ip::Initialise (const NodeList &nlist)
 {
 #ifdef TRI6IP_STORE_COORDS

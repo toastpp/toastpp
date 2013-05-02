@@ -23,6 +23,11 @@ Triangle10_ip::Triangle10_ip (const Triangle10_ip &el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Triangle10_ip::Copy ()
+{
+    return new Triangle10_ip(*this);
+}
+
 void Triangle10_ip::Initialise (const NodeList &nlist)
 {
 #ifdef TRI10IP_STORE_COORDS

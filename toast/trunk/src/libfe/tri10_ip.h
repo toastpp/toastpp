@@ -42,6 +42,11 @@ public:
     Triangle10_ip (const Triangle10_ip &el);
     ~Triangle10_ip () { delete []Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList &nlist);
 
     BYTE Type () const { return ELID_TRI10_IP; }

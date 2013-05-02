@@ -72,8 +72,8 @@ TVector<T> TFwdSolverMW<T>::ProjectAll_wavel (const TCompRowMatrix<T> &qvec,
     int nfwd = nofwavel*nq;    // number of sources over all wavelengths
 
     int nfwd_part = (nfwd+sze-1)/sze;       // number of sources per processor
-    int wq0 = toast::min(nfwd,rnk*nfwd_part);    // low source index
-    int wq1 = toast::min(nfwd,(rnk+1)*nfwd_part);// high source index+1
+    int wq0 = min(nfwd,rnk*nfwd_part);    // low source index
+    int wq1 = min(nfwd,(rnk+1)*nfwd_part);// high source index+1
     int r, qi, ofs, len, w_old = -1;
     TVector<T> phi(n);
 
@@ -86,8 +86,8 @@ TVector<T> TFwdSolverMW<T>::ProjectAll_wavel (const TCompRowMatrix<T> &qvec,
 	    qidx[i] = (!i ? 0 : qidx[i-1] + mesh->nQMref[i-1]);
 
 	for (r = 0; r < sze; r++) {
-	    int wwq0 = toast::min(nfwd,r*nfwd_part);
-	    int wwq1 = toast::min(nfwd,(r+1)*nfwd_part);
+	    int wwq0 = min(nfwd,r*nfwd_part);
+	    int wwq1 = min(nfwd,(r+1)*nfwd_part);
 	    projall_count[r] = 0;
 	    if (wwq0 < wwq1) {
 		for (i = wwq0; i < wwq1; i++) {

@@ -55,6 +55,11 @@ public:
     Triangle6 (const Triangle6 &el);
     ~Triangle6() { delete []Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList& nlist);
 
     BYTE Type() const { return ELID_TRI6; }

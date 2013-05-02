@@ -37,7 +37,8 @@ SRCS += \
 	vector_MT.cc
 endif
 
-ifdef MAKE_MPI
+ifeq ($(ENABLE_MPI),yes)
+MATHLIB += -L$(MPILIBDIR) -lmpich -lmpl
 SRCS += \
 	crmatrix_mpi.cc \
 	dnsmatrix_mpi.cc \

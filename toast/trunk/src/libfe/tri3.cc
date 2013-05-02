@@ -73,6 +73,11 @@ Triangle3::~Triangle3 ()
     if (intfd_1) delete []intfd_1;
 }
 
+Element *Triangle3::Copy ()
+{
+    return new Triangle3(*this);
+}
+
 void Triangle3::Initialise (const NodeList& nlist)
 {
     double x0 = nlist[Node[0]][0], y0 = nlist[Node[0]][1];

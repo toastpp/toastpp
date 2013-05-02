@@ -181,6 +181,11 @@ Triangle6::Triangle6 (const Triangle6 &el): Element_Unstructured_2D (el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Triangle6::Copy ()
+{
+    return new Triangle6(*this);
+}
+
 void Triangle6::Initialise (const NodeList &nlist)
 {
     double x0 = nlist[Node[0]][0], y0 = nlist[Node[0]][1];

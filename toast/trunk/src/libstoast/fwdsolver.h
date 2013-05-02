@@ -379,7 +379,7 @@ public:
     const QMMesh *meshptr;  ///< pointer to the associated FEM mesh
     LSOLVER solvertp;       ///< linear solver type
     IterativeMethod method; ///< iterative solver method, if applicable
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
     TCompRowMatrixMPI<T> *F;  ///< Distributed FEM system matrix
 #else
     TCompRowMatrix<T> *F;   ///< FEM system matrix
@@ -422,7 +422,7 @@ protected:
     // ===============================================================
     // MPI-specific functions and data members
 
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
 
 public:
 
@@ -485,7 +485,7 @@ protected:
     mutable int nQ;       ///< current number of sources for load balancing
     mutable int *Q0, *Q1; ///< range of sources (q0<=q<q1) for all processes
 
-#endif // TOAST_MPI
+#endif // MPI_FWDSOLVER
 
 #if THREAD_LEVEL==2
     int nthread;
@@ -500,7 +500,7 @@ STOASTLIB void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
 // ==========================================================================
 // Some macros
 
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
 #define SETUP_MPI() Setup_MPI()
 #define CLEANUP_MPI() Cleanup_MPI()
 #else
