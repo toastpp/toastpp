@@ -28,6 +28,11 @@ public:
     ~Triangle3old();
     // constructors, destructor
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList& nlist);
 
     BYTE Type () const { return ELID_TRI3OLD; }

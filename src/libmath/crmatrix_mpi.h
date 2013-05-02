@@ -30,7 +30,7 @@
  * row sub- matrix representing part of the complete matrix. Matrix operations
  * such as Ax or ATx are performed in parallel.
  */
-template<class MT> class TCompRowMatrixMPI: public TMatrix<MT> {
+template<class MT> class TCompRowMatrixMPI: public TGenericSparseMatrix<MT> {
 
 public:
     /**
@@ -46,6 +46,10 @@ public:
      *   \ref Initialise to allocate data space.
      */
     TCompRowMatrixMPI (int rows, int cols);
+
+    TCompRowMatrixMPI (int rows, int cols,
+	const int *_rowptr, const int *_colidx,
+	int proc_nrows, const int *proc_rows);
 
     /**
      * \brief Creates a matrix of dimension rows x cols, and sets up data
@@ -159,6 +163,14 @@ public:
     // removes the matrix' link to its data block and deletes the data
     // block, if necessary
 
+    bool Exists (int r, int c) const;
+
+    MT &operator() (int r, int c);
+
+    int Get_index (int r, int c) const;
+
+    MT GetNext (int &r, int &c) const;
+
     /**
      * \brief Matrix-vector product.
      * \param[in] x vector argument (length ncols)
@@ -167,6 +179,10 @@ public:
      */
     void Ax (const TVector<MT> &x, TVector<MT> &b) const;
 
+    void Ax (const TVector<MT> &x, TVector<MT> &b, int i1, int i2) const;
+
+    void ATx (const TVector<MT> &x, TVector<MT> &b) const
+    { xERROR("Not implemented"); }
 
     // ======================================================================
     // Process-specific functions
@@ -182,12 +198,16 @@ public:
      */
     void Add_proc (int r, int c, MT val);
   
-private:
+  //private:
+public:
     /**
      * \brief MPI data initialisation
      * \note Sets the sze and rnk parameters.
      */
     void MPIinit();
+
+    int rnk;    ///< MPI process id (0 <= rnk < \ref sze)
+    int sze;    ///< Number of MPI processes (>= 1)
 
     /**
      * \brief Array of row pointers
@@ -207,21 +227,10 @@ private:
      */
     int *colidx;
 
-    /**
-     * \brief Array of data values
-     * \note The data array contains the values for allocated matrix elements.
-     * \note The dimension of data is \ref nval.
-     */
-    MT *data;
-
-    int nval;   ///< Number of allocated entries in process block
-
-    int rnk;    ///< MPI process id (0 <= rnk < \ref sze)
-    int sze;    ///< Number of MPI processes (>= 1)
-
-    int r0;     ///< Low row index for this process
-    int r1;     ///< High row index + 1 for this process
-    int nr;     ///< Number of rows managed by this process
+    int r0;     ///< Low row index for this process - OBSOLETE
+    int r1;     ///< High row index + 1 for this process - OBSOLETE
+    int my_nr;  ///< Number of rows managed by this process
+    int *my_r;  ///< List of rows owned by this process
 
     int *mpi_r0; ///< array of row offsets for all processes
     int *mpi_nr; ///< array of row numbers for all processes

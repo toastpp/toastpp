@@ -26,6 +26,11 @@ Tetrahedron10_ip::Tetrahedron10_ip (const Tetrahedron10_ip &el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Tetrahedron10_ip::Copy ()
+{
+    return new Tetrahedron10_ip(*this);
+}
+
 void Tetrahedron10_ip::Initialise (const NodeList &nlist)
 {
     extern double TriangleArea (const Point &p1,

@@ -1595,7 +1595,7 @@ static RVector RescaleHessian (const  RMatrix *J, const RVector &x,
 }
 
 #ifdef TOAST_MPI
-RVector RescaleHessianPart (RDenseMatrix &Jpart, const RVector &x,
+static RVector RescaleHessianPart (RDenseMatrix &Jpart, const RVector &x,
     RCompRowMatrix *RHess, int rank)
 {
     int i, j, k, nz;

@@ -289,6 +289,11 @@ Tetrahedron10::Tetrahedron10 (const Tetrahedron10 &el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Tetrahedron10::Copy ()
+{
+    return new Tetrahedron10(*this);
+}
+
 void Tetrahedron10::Initialise (const NodeList &nlist)
 {
     extern double TriangleArea (const Point &p1,

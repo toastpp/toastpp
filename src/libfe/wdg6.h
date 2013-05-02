@@ -22,6 +22,11 @@ public:
     Wedge6 (const Wedge6 &el);
     ~Wedge6 () { delete []Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList& nlist);
 
     BYTE Type (void) const { return ELID_WDG6; }

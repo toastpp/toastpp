@@ -77,12 +77,14 @@ endif
 # =======================================================================
 # Pthreads flags
 
-MAKE_THREAD = @MAKE_THREAD@
+ENABLE_PTHREAD = @ENABLE_PTHREAD@
 
 # =======================================================================
 # MPI flags
 
-MAKE_MPI = @MAKE_MPI@
+ENABLE_MPI = @ENABLE_MPI@
+MPIINCDIR = @MPIINCDIR@
+MPILIBDIR = @MPILIBDIR@
 
 # =======================================================================
 # CUDA support
@@ -101,22 +103,62 @@ BUILD_SUPERLU = @BUILD_SUPERLU@
 SUPERLU_LOCAL_STATIC = @SUPERLU_LOCAL_STATIC@
 
 # =======================================================================
+# ParMETIS support
+
+ENABLE_PARMETIS = @ENABLE_PARMETIS@
+PARMETISINCDIR = @PARMETISINCDIR@
+PARMETISLIBDIR = @PARMETISLIBDIR@
+
+# =======================================================================
+# Scotch support
+
+ENABLE_SCOTCH = @ENABLE_SCOTCH@
+SCOTCHINCDIR = @SCOTCHINCDIR@
+SCOTCHLIBDIR = @SCOTCHLIBDIR@
+
+# =======================================================================
+# Zoltan support
+
+ENABLE_ZOLTAN = @ENABLE_ZOLTAN@
+ZOLTANINCDIR = @ZOLTANINCDIR@
+ZOLTANLIBDIR = @ZOLTANLIBDIR@
+
+# =======================================================================
 # Libraries
 
-#LIBS     = @DL_LIBS@ @LIBS@ @MATH_LIBS@
 LIBS      = @DL_LIBS@ @LIBS@ -lm
 TLIBS     = -lfe -lmath $(SUPERLULIB) -larpack $(LAPACKLIB) $(BLASLIB) \
 		$(SPBLASLIB) @TASKLIB@ $(FLIBS) $(ILUPACKLIB)
+
+ifeq ($(ENABLE_ZOLTAN),yes)
+	TINC  += -I$(ZOLTANINCDIR)
+	TLIBS += -L$(ZOLTANLIBDIR) -lzoltan
+endif
+
+ifeq ($(ENABLE_PARMETIS),yes)
+        TINC  += -I$(PARMETISINCDIR)
+	TLIBS += -L$(PARMETISLIBDIR) -lparmetis -lmetis
+endif
+
+ifeq ($(ENABLE_SCOTCH),yes)
+        TINC  += -I$(SCOTCHINCDIR)
+	TLIBS += -L$(SCOTCHLIBDIR) -lptscotch -lscotch -lscotcherr
+endif
+
+ifeq ($(ENABLE_PTHREAD),yes)
+	TLIBS += -lpthread
+endif
+
+ifeq ($(ENABLE_MPI),yes)
+	TINC  += -I$(MPIINCDIR)
+	TLIBS += -L$(MPILIBDIR) -lmpich -lmpl
+endif
+
 MATHLIB   = -L$(TLIB) -larpack @SUPERLULIB@ $(SPBLASLIB) $(LAPACKLIB) $(BLASLIB)
 FELIB     = -L$(TLIB) $(TLIBS)
 TOASTLIB  = -L$(TLIB) -ltoast $(TLIBS)
 TOASTCLIB = -L$(TLIB) -lctoast -ltoast $(TLIBS)
 STOASTLIB = -L$(TLIB) -lstoast $(TLIBS)
-
-#XINC     = @X_CFLAGS@
-#XLIB     = @X_LIBS@ -lX11 -lnsl -ldl
-#XVIEWINC = $(XINC) @XVIEWINC@
-#XVIEWLIB = $(XLIB) -L/usr/openwin/lib -lxview -lolgx
 
 GUIFLAGS  = -I$(TSRC)/libtcl @GUIFLAGS@
 GUILIBS   = -ltoasttcl @GUILIBS@

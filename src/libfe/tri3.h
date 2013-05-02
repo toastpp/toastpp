@@ -59,6 +59,11 @@ public:
     ~Triangle3();
 
     /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
+    /**
      * \brief Initialises the triangle.
      * \param nlist mesh node list
      * \note This method should be called one the mesh node indices have been

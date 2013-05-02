@@ -44,6 +44,11 @@ public:
     Voxel8 (const Voxel8 &el);
     ~Voxel8 () { delete []Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList &nlist);
     void PostInitialisation (const NodeList &nlist);
 

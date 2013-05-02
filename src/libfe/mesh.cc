@@ -77,7 +77,7 @@ void Mesh::PostSetup_engine (void *arg, int el0, int el1) {
 }
 #endif
 
-void Mesh::Setup()
+void Mesh::Setup (bool mark_boundary)
 {
     int i, j, el;
 
@@ -89,7 +89,8 @@ void Mesh::Setup()
     g_tpool->ProcessSequence (Mesh::Setup_engine, this, 0, elist.Len(), grain);
 #endif // TOAST_PARALLEL
 
-    MarkBoundary();
+    if (mark_boundary)
+        MarkBoundary();
     priv_ilen = 0;
 
     for (i = 0; i < nlist.Len(); i++)
@@ -1708,6 +1709,10 @@ void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
 		break;
 	    case ASSEMBLE_BNDPFF_EL:
 		entry.re = mesh.elist[el]->BndIntFF (i, j) * (*coeff)[el];
+		break;
+
+	    case ASSEMBLE_iPFF:
+	        entry.im = mesh.elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    }
 	    M.Add (is, js, entry);

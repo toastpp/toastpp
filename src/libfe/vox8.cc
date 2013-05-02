@@ -21,6 +21,11 @@ Voxel8::Voxel8 (const Voxel8 &el): Element_Structured_3D (el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Voxel8::Copy ()
+{
+    return new Voxel8(*this);
+}
+
 void Voxel8::Initialise (const NodeList &nlist)
 {
     x0 = nlist[Node[0]][0];

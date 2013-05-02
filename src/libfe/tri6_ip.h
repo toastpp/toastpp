@@ -41,6 +41,11 @@ public:
     Triangle6_ip (const Triangle6_ip &el);
     ~Triangle6_ip () { delete []Node; }
 
+    /**
+     * \brief Create a copy of the element and return a pointer to it
+     */
+    Element *Copy();
+
     void Initialise (const NodeList& nlist);
 
     BYTE Type() const { return ELID_TRI6_IP; }

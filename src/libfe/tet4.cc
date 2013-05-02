@@ -106,6 +106,11 @@ Tetrahedron4::Tetrahedron4 (const Tetrahedron4 &el)
     for (int i = 0; i < nNode(); i++) Node[i] = el.Node[i];
 }
 
+Element *Tetrahedron4::Copy ()
+{
+    return new Tetrahedron4(*this);
+}
+
 void Tetrahedron4::Initialise (const NodeList &nlist)
 {
     double x0 = nlist[Node[0]][0], y0 = nlist[Node[0]][1],

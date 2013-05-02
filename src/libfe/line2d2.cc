@@ -69,6 +69,11 @@ Line2D2::~Line2D2 ()
     if (intfd_1) delete []intfd_1;
 }
 
+Element *Line2D2::Copy ()
+{
+    return new Line2D2(*this);
+}
+
 void Line2D2::Initialise (const NodeList& nlist)
 {
     double x0 = nlist[Node[0]][0], y0 = nlist[Node[0]][1];

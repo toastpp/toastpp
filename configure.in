@@ -66,6 +66,10 @@ AC_LANG_CPLUSPLUS
 
 TMP_CXXFLAGS=$CXXFLAGS
 CXXFLAGS="$CXXFLAGS $X_CFLAGS"
+NEED_MPI=no
+NEED_PTHREAD=no
+NEED_PARMETIS=no
+NEES_SCOTCH=no
 
 AC_TRY_COMPILE([#include <X11/Xlib.h>], [return 0;], xok=yes, xok=no)
 
@@ -444,6 +448,36 @@ else
 fi
 
 # =========================================================================
+# Check whether user wants to add Zoltan support
+
+AC_ARG_ENABLE(zoltan,
+    [  --enable-zoltan         build with Zoltan load-balancing support],
+    [isok=$enableval], [isok=no])
+if test "$isok" = "yes" ; then
+    ENABLE_ZOLTAN=yes
+    NEED_PARMETIS=yes
+    NEED_SCOTCH=yes
+    NEED_PTHREAD=yes
+    NEED_MPI=yes
+
+    AC_ARG_WITH(zoltan-dir,
+        [  --with-zoltan-dir       Zoltan source installation directory],
+        ZOLTANDIR=$withval, ZOLTANDIR=${ZOLTANDIR})
+
+    AC_ARG_WITH(zoltan-incdir,
+        [  --with-zoltan-incdir    Zoltan include directory],
+        ZOLTANINCDIR=$withval, ZOLTANINCDIR=${ZOLTANDIR}/include)
+
+    AC_ARG_WITH(zoltan-libdir,
+        [  --with-zoltan-libdir    Zoltan library directory],
+        ZOLTANLIBDIR=$withval, ZOLTANLIBDIR=${ZOLTANDIR}/lib)
+fi
+
+AC_SUBST(ENABLE_ZOLTAN)
+AC_SUBST(ZOLTANINCDIR)
+AC_SUBST(ZOLTANLIBDIR)
+
+# =========================================================================
 # Check whether user wants to build a threaded version
 
 AC_ARG_ENABLE(threads,
@@ -451,10 +485,8 @@ AC_ARG_ENABLE(threads,
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
-    MAKE_THREAD="yes"
-    TASKLIB="-lpthread"
+    NEED_PTHREAD=yes
 fi
-AC_SUBST(MAKE_THREAD)
 
 # =========================================================================
 # Check whether user wants to build an MPI version
@@ -463,14 +495,91 @@ AC_ARG_ENABLE(mpi,
     [  --enable-mpi            build MPI distributed version],
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
-    MAKE_MPI="yes"
+    NEED_MPI=yes
+    CXXFLAGS="${CXXFLAGS} -DTOAST_MPI"
+fi
+
+# =========================================================================
+# If pthreads support is required, set the pthreads environment
+
+if test "$NEED_PTHREAD" = "yes" ; then
+    ENABLE_PTHREAD=yes
+    TASKLIB="-lpthread"
+fi
+AC_SUBST(ENABLE_PTHREAD)
+
+# =========================================================================
+# If MPI support is required, set the MPI environment
+
+if test "$NEED_MPI" = "yes" ; then
+    ENABLE_MPI=yes
     CXX="mpicxx"
     F77="mpif77"
-    CXXFLAGS="${CXXFLAGS} -DTOAST_MPI"
 # Workaround for MPI-2 SEEK bug:
     CXXFLAGS="${CXXFLAGS} -DMPICH_IGNORE_CXX_SEEK"
+
+    AC_ARG_WITH(mpi-dir,
+        [  --with-mpi-dir       MPI source installation directory],
+        MPIDIR=$withval, MPIDIR=${MPIDIR})
+
+    AC_ARG_WITH(mpi-incdir,
+        [  --with-mpi-incdir    MPI include directory],
+        MPIINCDIR=$withval, MPIINCDIR=${MPIDIR}/include)
+
+    AC_ARG_WITH(mpi-libdir,
+        [  --with-mpi-libdir    MPI library directory],
+        MPILIBDIR=$withval, MPILIBDIR=${MPIDIR}/lib)
 fi
-AC_SUBST(MAKE_MPI)
+
+AC_SUBST(ENABLE_MPI)
+AC_SUBST(MPIINCDIR)
+AC_SUBST(MPILIBDIR)
+
+# =========================================================================
+# If ParMETIS support is required, set the environment
+
+if test "$NEED_PARMETIS" = "yes" ; then
+    ENABLE_PARMETIS=yes
+
+    AC_ARG_WITH(parmetis-dir,
+        [  --with-parmetis-dir  ParMETIS source installation directory],
+        PARMETISDIR=$withval, PARMETISDIR=${PARMETISDIR})
+
+    AC_ARG_WITH(parmetis-incdir,
+        [  --with-parmetis-incdir  ParMETIS include directory],
+        PARMETISINCDIR=$withval, PARMETISINCDIR=${PARMETISDIR})
+
+    AC_ARG_WITH(parmetis-libdir,
+        [  --with-parmetis-libdir  ParMETIS library directory],
+        PARMETISLIBDIR=$withval, PARMETISLIBDIR=${PARMETISDIR})
+fi
+
+AC_SUBST(ENABLE_PARMETIS)
+AC_SUBST(PARMETISINCDIR)
+AC_SUBST(PARMETISLIBDIR)
+
+# =========================================================================
+# if Scotch support is required, set the environment
+
+if test "$NEED_SCOTCH" = "yes" ; then
+    ENABLE_SCOTCH=yes
+
+    AC_ARG_WITH(scotch-dir,
+        [  --with-scotch-dir  Scotch source installation directory],
+        SCOTCHDIR=$withval, SCOTCHDIR=${SCOTCHDIR})
+
+    AC_ARG_WITH(scotch-incdir,
+        [  --with-scotch-incdir  Scotch include directory],
+        SCOTCHINCDIR=$withval, SCOTCHINCDIR=${SCOTCHDIR}/include)
+
+    AC_ARG_WITH(scotch-libdir,
+        [  --with-scotch-libdir  Scotch library directory],
+        SCOTCHLIBDIR=$withval, SCOTCHLIBDIR=${SCOTCHDIR}/lib)
+fi
+
+AC_SUBST(ENABLE_SCOTCH)
+AC_SUBST(SCOTCHINCDIR)
+AC_SUBST(SCOTCHLIBDIR)
 
 # =========================================================================
 # Check whether user wants CUDA support

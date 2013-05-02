@@ -3,7 +3,7 @@
 #include "stoastlib.h"
 #include "fwdsolver_zslu.h"
 #include "fwdsolver_cslu.h"
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
 #include "toast_mpi.h"
 #endif
 #ifdef USE_CUDA_FLOAT
@@ -146,7 +146,7 @@ void TFwdSolver<float>::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
     F = new FCompRowMatrixMPI (n, n, rowptr, colidx);
 #else
     F = new FCompRowMatrix (n, n, rowptr, colidx);
@@ -183,7 +183,7 @@ void TFwdSolver<double>::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
     F = new RCompRowMatrixMPI (n, n, rowptr, colidx);
 #else
     F = new RCompRowMatrix (n, n, rowptr, colidx);
@@ -220,7 +220,7 @@ void TFwdSolver<toast::complex>::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
     F = new CCompRowMatrixMPI (n, n, rowptr, colidx);
 #else
     F = new CCompRowMatrix (n, n, rowptr, colidx);
@@ -253,7 +253,7 @@ void TFwdSolver<scomplex>::Allocate ()
     // allocate system matrix
     meshptr->SparseRowStructure (rowptr, colidx, nzero);
     if (F) delete F;
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
     F = new SCCompRowMatrixMPI (n, n, rowptr, colidx);
 #else
     F = new SCCompRowMatrix (n, n, rowptr, colidx);
@@ -696,7 +696,7 @@ void TFwdSolver<T>::CalcFields (const TCompRowMatrix<T> &qvec,
 	res->rel_err = 0.0;
     }
 
-#ifndef TOAST_MPI
+#ifndef MPI_FWDSOLVER
     int i, nq = qvec.nRows();
 
     if (solvertp == LSOLVER_DIRECT) {
@@ -817,7 +817,7 @@ TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &mvec,
 
 	if (scl == DATA_DEFAULT) scl = dscale;
 
-#ifndef TOAST_MPI
+#ifndef MPI_FWDSOLVER
 
     return ::ProjectAll (meshptr, mvec, phi, scl);
 
@@ -842,7 +842,7 @@ TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &mvec,
     delete []len;
     return proj;
 
-#endif // TOAST_MPI
+#endif // MPI_FWDSOLVER
 }
 
 // =========================================================================
@@ -864,11 +864,11 @@ TVector<T> TFwdSolver<T>::ProjectAll (const TCompRowMatrix<T> &qvec,
     Reset (sol, omega);
     // for MPI, this is a bottleneck - how to do in parallel?
 
-#ifndef TOAST_MPI
+#ifndef MPI_FWDSOLVER
     CalcFields (qvec, pphi);
 #else
     CalcFields_proc (qvec, pphi);
-#endif // TOAST_MPI
+#endif // MPI_FWDSOLVER
 
     return ProjectAll (mvec, pphi, scl);
 }
@@ -1248,7 +1248,7 @@ void TFwdSolver<T>::SetLinSolver (const char *solver, double tol)
 // =========================================================================
 // MPI-specific methods
 
-#ifdef TOAST_MPI
+#ifdef MPI_FWDSOLVER
 
 // =========================================================================
 // Set MPI parameters
@@ -1350,7 +1350,7 @@ void TFwdSolver<T>::ProjectAll_proc (const TCompRowMatrix<T> &mvec,
     }
 }
 
-#endif // TOAST_MPI
+#endif // MPI_FWDSOLVER
 
 
 // =========================================================================
