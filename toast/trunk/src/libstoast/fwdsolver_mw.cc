@@ -166,9 +166,9 @@ template<class T>
 void TFwdSolverMW<T>::Setup ()
 {
 #ifdef TOAST_MPI
-    sze   = TMPI<T>::Size();
-    rnk   = TMPI<T>::Rank();
-    mpitp = TMPI<T>::MPIType();
+    sze   = TMPI::Size();
+    rnk   = TMPI::Rank();
+    mpitp = TMPI::MPIType<T>();
     projall_count = 0;
     projall_ofs   = 0;
     qidx          = 0;

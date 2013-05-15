@@ -3,38 +3,51 @@
 #include "mathlib.h"
 #include "toast_mpi.h"
 
-template <class T>
-int TMPI<T>::Rank()
+int TMPI::rank = -1;
+int TMPI::size = -1;
+
+int TMPI::Rank()
 {
-    int rnk;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rnk);
-    return rnk;
+    if (rank < 0) 
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return rank;
+}
+
+int TMPI::Size()
+{
+    if (size < 0)
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+    return size;
 }
 
 template <class T>
-int TMPI<T>::Size()
-{
-    int sze;
-    MPI_Comm_size(MPI_COMM_WORLD, &sze);
-    return sze;
-}
-
-template <class T>
-MPI_Datatype TMPI<T>::MPIType()
+MPI_Datatype TMPI::MPIType ()
 {
     return MPI_INT;
 }
 
 template<>
-MPI_Datatype TMPI<double>::MPIType()
+MPI_Datatype TMPI::MPIType<double> ()
 {
     return MPI_DOUBLE;
 }
 
 template<>
-MPI_Datatype TMPI<toast::complex>::MPIType()
+MPI_Datatype TMPI::MPIType<float> ()
+{
+    return MPI_FLOAT;
+}
+
+template<>
+MPI_Datatype TMPI::MPIType<toast::complex> ()
 {
     return MPI_DOUBLE_COMPLEX;
+}
+
+template<>
+MPI_Datatype TMPI::MPIType<scomplex> ()
+{
+    return MPI_COMPLEX;
 }
 
 // ==========================================================================
@@ -42,10 +55,6 @@ MPI_Datatype TMPI<toast::complex>::MPIType()
 
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
-template class MATHLIB TMPI<double>;
-template class MATHLIB TMPI<float>;
-template class MATHLIB TMPI<toast::complex>;
-template class MATHLIB TMPI<scomplex>;
-template class MATHLIB TMPI<int>;
+template MATHLIB MPI_Datatype TMPI::MPIType<int>();
 
 #endif // NEED_EXPLICIT_INSTANTIATION

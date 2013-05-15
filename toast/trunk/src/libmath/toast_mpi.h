@@ -6,21 +6,17 @@
 #include "complex.h"
 
 #ifdef TOAST_MPI
-template<class T> class TMPI {
+class TMPI {
 public:
     TMPI() {}
-    static MPI_Datatype MPIType();
     static int Rank();
     static int Size();
+    template<class T> static MPI_Datatype MPIType ();
+
+private:
+    static int rank;
+    static int size;
 };
 #endif
-
-#ifndef MATHLIB_IMPLEMENTATION
-extern template class MATHLIB TMPI<double>;
-extern template class MATHLIB TMPI<float>;
-extern template class MATHLIB TMPI<toast::complex>;
-extern template class MATHLIB TMPI<scomplex>;
-extern template class MATHLIB TMPI<int>;
-#endif // MATHLIB_IMPLEMENTATION
 
 #endif // !__TOASTMPI_H
