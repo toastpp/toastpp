@@ -317,9 +317,9 @@ void TCompRowMatrixMPI<MT>::Add_proc (int r, int c, MT v)
 template<class MT>
 void TCompRowMatrixMPI<MT>::MPIinit ()
 {
-    rnk = TMPI<MT>::Rank();
-    sze = TMPI<MT>::Size();
-    mpitp = TMPI<MT>::MPIType();
+    rnk = TMPI::Rank();
+    sze = TMPI::Size();
+    mpitp = TMPI::MPIType<MT>();
     mpi_r0 = new int[sze+1];
     mpi_nr = new int[sze];
 }
