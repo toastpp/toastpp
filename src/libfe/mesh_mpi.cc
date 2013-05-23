@@ -182,6 +182,9 @@ void MeshMPI::ComputePartition (GraphData *graph)
 	graph->nborGID   = new ZOLTAN_ID_TYPE[numGlobalNeighbours];
 	graph->nborPart  = new int[numGlobalNeighbours];
 
+	graph->vertex_capacity = numGlobalVertices;
+	graph->nbor_capacity = numGlobalNeighbours;
+
 	graph->nborIndex[0] = 0;
 
 	for (i = 0; i < numGlobalVertices; i++) {
@@ -264,6 +267,10 @@ void MeshMPI::ComputePartition (GraphData *graph)
 
 	*graph = send_graph[0];
 
+	// MS: is the following correct? (was missing in original example)
+	graph->vertex_capacity = graph->numMyVertices;
+	graph->nbor_capacity = graph->nborIndex[graph->numMyVertices];
+
 	// Send other subgraphs to their processes
 	for (i = 1; i < nproc; i++) {
 	    send_count[0] = send_graph[i].numMyVertices;
@@ -341,6 +348,8 @@ void MeshMPI::ComputePartition (GraphData *graph)
 	    MPI_Finalize();
 	    exit(1);
 	}
+	graph->vertex_capacity = send_count[0];
+	graph->nbor_capacity = send_count[1];
     }
 }
 
@@ -417,6 +426,8 @@ void MeshMPI::Migrate (struct Zoltan_Struct *zz)
 	importProcs, importToPart,
 	numExport, exportGlobalGids, exportLocalGids,
 	exportProcs, exportToPart);
+
+    cerr << "#### rank: " << rank << endl;
 
     // Use the data dictionary to find neighbours' partitions
     start_gid = myGraph.numMyVertices - numImport;

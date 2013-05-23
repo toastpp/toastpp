@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 include ../Makefile.incl
 
-SUBDIRS = libmath libfe libstoast libdgfe libbemdiff libbem libparam2001 libfdot supertoast bintools displace libvarPN3D liblocalbasisRTE3D
+SUBDIRS = libmath libfe libstoast libdgfe libbemdiff libbem libparam2001 libfdot supertoast bintools displace libvarPN3D liblocalbasisRTE3D supertoast_zoltan
 
 all::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \

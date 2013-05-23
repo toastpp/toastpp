@@ -57,6 +57,10 @@ public:
         int mode) const;
     void AddToSysMatrix (CCompRowMatrixMPI &M, RVector *coeff, int mode) const;
 
+    // temporary
+    int *Parts() const { return parts; }
+    ZOLTAN_ID_PTR Lids() const { return lids; }
+
 protected:
     void ComputeNodeToElementMap (int **nndel, int ***ndel) const;
     void ClearNodeToElementMap ();
