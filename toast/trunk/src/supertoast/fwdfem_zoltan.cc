@@ -18,10 +18,11 @@ void OutputPartition (int myRank, int numProcs, MeshMPI::GraphData &myGraph,
 
 int main (int argc, char *argv[])
 {
-    //const char *fname = "PedroToastFormat_shifted.msh";
+    const char *fname = "PedroToastFormat_shifted.msh";
+    const char *qmname = "PedroMesh_shifted_1ring.qm";
 
-    const char *fname = "circle25_32.msh";
-    const char *qmname = "circle25_32x32.qm";
+    //const char *fname = "circle25_32.msh";
+    //const char *qmname = "circle25_32x32.qm";
     double qwidth = 2.0;
     SourceMode srctp = SRCMODE_NEUMANN;
     double tol = 1e-12;
