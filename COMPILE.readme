@@ -137,10 +137,11 @@ This will write a file
 
 Edit this file by appending the line
 
-	source $TOASTVER/mexopts.incl
+	. $TOASTVER/mexopts.incl
 
-to the end of it. This will tell the mex compiler about toast-specific
-libararies and include paths.
+to the end of it (don't forget the single dot at the beginning of the line).
+This will tell the mex compiler about toast-specific libararies and include
+paths.
 
 Then, in the toast main directory, type
 
