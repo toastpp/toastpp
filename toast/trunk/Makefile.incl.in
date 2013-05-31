@@ -66,6 +66,10 @@ OGLLIB = @OGLLIB@
 BLASLIB   = @BLASLIB@
 SPBLASLIB = -lfsbtk
 LAPACKLIB = @LAPACKLIB@
+
+# =======================================================================
+# ILUPACK support
+
 ILUPACKDIR = @ILUPACKDIR@
 ifdef ILUPACKDIR
 ILUPACKINC = -I$(ILUPACKDIR)/include

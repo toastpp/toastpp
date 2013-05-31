@@ -1,7 +1,12 @@
 SHELL = /bin/sh
 include ../Makefile.incl
 
-SUBDIRS = libmath libfe libstoast libdgfe libbemdiff libbem libparam2001 libfdot supertoast bintools displace libvarPN3D liblocalbasisRTE3D supertoast_zoltan
+SUBDIRS = libmath libfe libstoast libdgfe libbemdiff libbem libparam2001 libfdot supertoast bintools displace liblocalbasisRTE3D supertoast_zoltan
+
+ifdef ILUPACKDIR
+SUBDIRS += libvarPN3D
+# this library requires ILUPACK support
+endif
 
 all::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
