@@ -75,9 +75,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double lin_tol = mxGetScalar(prhs[5]);    
     cout << "Creating forward solver: " << solverType << ", tolerance = " << lin_tol << endl;
 
-    RFwdSolver *FWS = new RFwdSolver (solverType, lin_tol);
+    RFwdSolver *FWS = new RFwdSolver (mesh, solverType, lin_tol);
     cout << endl << "Allocating system matrix" << endl;
-    FWS->Allocate (*mesh);
+    FWS->Allocate ();
 
     // Set optical parameters of FEM solver
     Solution sol(OT_NPARAM, n);
