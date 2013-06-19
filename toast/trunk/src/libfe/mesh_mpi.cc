@@ -427,8 +427,6 @@ void MeshMPI::Migrate (struct Zoltan_Struct *zz)
 	numExport, exportGlobalGids, exportLocalGids,
 	exportProcs, exportToPart);
 
-    cerr << "#### rank: " << rank << endl;
-
     // Use the data dictionary to find neighbours' partitions
     start_gid = myGraph.numMyVertices - numImport;
     num_nbors = myGraph.nborIndex[myGraph.numMyVertices] -

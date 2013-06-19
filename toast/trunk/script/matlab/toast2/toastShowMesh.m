@@ -1,4 +1,4 @@
-function p = toastShowMesh (mesh, vtxdata, varargin)
+function h = toastShowMesh (mesh, vtxdata, varargin)
 %toastShowMesh        - Render a mesh surface in 3-D view.
 %
 % Synopsis: toastShowMesh (mesh)
@@ -95,7 +95,7 @@ if length(eltps) == 1   % can only fix uniform meshes
     elseif ieltp == 7  % 10-noded tetrahedron
         idx = idx(:,1:4);
     elseif ieltp == 17 % 6-noded surface triangle
-        idx = idx(:,[1,3,5]);
+        idx = idx(:,1:3);
     end
 end
 
@@ -110,15 +110,14 @@ if dim==3
     if showsurfdata == true
         h = patch('Vertices', vtx, 'Faces', idx, 'CData',surfdata);
         view([1 1 1]);
-        set(gcf,'Renderer','zbuffer')
+        %set(gcf,'Renderer','zbuffer')
         if scnlighting
             shading interp
             lightangle(45,30)
-            set(h,'FaceLighting', 'Phong');
-            set(findobj(gca,'type','surface'), ...
+            set(h, ...
                 'FaceLighting','phong', ...
                 'AmbientStrength',.2,'DiffuseStrength',.8,...
-                'SpecularStrength',.3,'SpecularExponent',5,...
+                'SpecularStrength',.0,'SpecularExponent',1,...
                 'BackFaceLighting','unlit');
         else
             set(h, 'FaceColor','interp');

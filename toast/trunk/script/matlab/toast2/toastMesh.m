@@ -911,7 +911,7 @@ classdef toastMesh < handle
             mvec = toast(uint32(19),obj.handle,varargin{:});
         end
         
-	    function Display(obj,varargin)
+	    function h = Display(obj,varargin)
             % Display a mesh geometry and nodal field.
             %
             % Syntax: mesh.Display ()
@@ -941,7 +941,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0
-                toastShowMesh(obj,varargin{:});
+                h = toastShowMesh(obj,varargin{:});
             end
         end
     end
