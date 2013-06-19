@@ -13,8 +13,6 @@ meshfile2 = [meshdir 'circle25_32.msh'];              % mesh for reconstruction
 qmfile    = [meshdir 'circle25_32x32.qm'];            % source-detector file
 muafile   = [meshdir 'tgt_mua_ellips_tri10.nim'];     % nodal target absorption
 musfile   = [meshdir 'tgt_mus_ellips_tri10.nim'];     % nodal target scattering
-fmod_name = '../fwdfem/fmod_ellips_32x32_100MHz.fem'; % data file: log amplitude
-farg_name = '../fwdfem/farg_ellips_32x32_100MHz.fem'; % data file: phase
 
 refind = 1.4;                           % refractive index
 freq = 100;                             % modulation frequency [MHz]
@@ -111,7 +109,7 @@ proj = projection (phi, mvec, dmask);
 lnamp = proj(1:nqm);
 phase = proj(nqm+1:end);
 
-% data scaling
+% Data scaling
 sd_lnmod = ones(size(lnamp)) * norm(lnamp_tgt-lnamp); 
 sd_phase = ones(size(phase)) * norm(phase_tgt-phase);
 sd = [sd_lnmod;sd_phase];

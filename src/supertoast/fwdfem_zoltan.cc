@@ -3,11 +3,14 @@
 #include <iostream>
 #include <iomanip>
 #include "zoltan.h"
+#include "timing.h"
 
 using namespace std;
 
 // =========================================================================
 // local prototypes
+
+void SelectMesh (ParamParser &pp, char *meshname, MeshMPI &mesh);
 
 // Auxiliary functions
 void OutputPartition (int myRank, int numProcs, MeshMPI::GraphData &myGraph,
@@ -18,14 +21,12 @@ void OutputPartition (int myRank, int numProcs, MeshMPI::GraphData &myGraph,
 
 int main (int argc, char *argv[])
 {
-    const char *fname = "PedroToastFormat_shifted.msh";
-    const char *qmname = "PedroMesh_shifted_1ring.qm";
+    ParamParser pp;
+    if (argc > 1) pp.Open (argv[1]);
 
-    //const char *fname = "circle25_32.msh";
-    //const char *qmname = "circle25_32x32.qm";
     double qwidth = 2.0;
     SourceMode srctp = SRCMODE_NEUMANN;
-    double tol = 1e-12;
+    double t, tol = 1e-12;
     int maxit = 1000;
 
     int i, j, rc, nlen;
@@ -51,12 +52,9 @@ int main (int argc, char *argv[])
     zz = Zoltan_Create(MPI_COMM_WORLD);
 
     // Load the mesh
+    char meshname[256];
     MeshMPI mesh;
-    ifstream ifs(fname);
-    ifs >> mesh;
-    mesh.Setup();
-    ifstream qmf(qmname);
-    mesh.LoadQM(qmf);
+    SelectMesh (pp, meshname, mesh);
     nlen = mesh.nlen();
     mesh.NodeToElementMap (&nndel, &ndel);
 
@@ -94,6 +92,9 @@ int main (int argc, char *argv[])
 	myGraph.numMyVertices, mynode);
 
     // assemble the partial system matrix
+    if (myRank == 0)
+        tic();
+
     RVector cmua(nlen);
     RVector ckap(nlen);
     RVector c2a(nlen);
@@ -114,6 +115,11 @@ int main (int argc, char *argv[])
     mesh.AddToSysMatrix (smat, &c2a, ASSEMBLE_BNDPFF);
     mesh.AddToSysMatrix (smat, &omega, ASSEMBLE_iPFF);
 
+    if (myRank == 0) {
+        t = toc();
+	cerr << "assembly time: " << t << endl;
+    }
+
     // Lets try a distributed matrix-vector product on the system matrix
     CVector x(nlen);
     for (i = 0; i < nlen; i++)
@@ -123,11 +129,19 @@ int main (int argc, char *argv[])
     for (i = 0; i < nq; i++)
         dphi[i].New (nlen);
 
+    if (myRank == 0)
+        tic();
+
     CPrecon_Null precon;
     for (i = 0; i < nq; i++) {
         GMRES (smat, qvec.Row(i), dphi[i], tol, &precon, 20, maxit);
     }
     
+    if (myRank == 0) {
+        t = toc();
+	cerr << "solver time: " << t << endl;
+    }
+
     if (myRank == 0) {
         ofstream ofs ("dbg.dat");
 	ofs << dphi[0] << endl;
@@ -138,6 +152,28 @@ int main (int argc, char *argv[])
 
     return 0;
 }                                                                              
+
+// ============================================================================
+
+void SelectMesh (ParamParser &pp, char *meshname, MeshMPI &mesh)
+{
+    char qmname[256];
+    
+    if (!pp.GetString ("MESHFILE", meshname)) {
+        cout << "\nMesh file name:\n>> ";
+	cin >> meshname;
+    }
+    ifstream ifs (meshname);
+    ifs >> mesh;
+    mesh.Setup ();
+    
+    if (!pp.GetString ("QMFILE", qmname)) {
+        cout << "\nQM file name:\n";
+	cin >> qmname;
+    }
+    ifstream qmf (qmname);
+    mesh.LoadQM (qmf);
+}
 
 // ============================================================================
 
