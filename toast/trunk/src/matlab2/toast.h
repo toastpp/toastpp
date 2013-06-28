@@ -86,7 +86,11 @@
 #define TOAST_JACOBIAN          53
 #define TOAST_JACOBIANCW        54
 #define TOAST_KRYLOV            55
-#define TOAST_LBFGS             76 // end
+#define TOAST_LBFGS             76
+#define TOAST_MESHREFINE        77
+#define TOAST_SPLITELEMENT      78
+#define TOAST_NODENEIGHBOUR     79
+#define TOAST_UNWRAPPHASE       80 // end
 #define TOAST_SETVERBOSITY    1000
 
 #ifdef FDOT

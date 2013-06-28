@@ -21,29 +21,33 @@ classdef toastNim < double
             toast(uint32(56),fname,meshname,double(obj));
         end
         
-        function b = subsref(obj,s)
-            switch s(1).type
-                case '.'
-                    if strcmp(s.subs,'meshname')
-                        b = obj.meshname;
-                    end
-                case '()'
-                    a = double(obj);
-                    b = a(s.subs{:});
-            end
+        function v = Values(obj)
+            v = double(obj);
         end
         
-        function obj = subsasgn(obj,s,val)
-            switch s(1).type
-                case '.'
-                    if strcmp(s.subs,'meshname')
-                        obj.meshname = val;
-                    end
-                case '()'
-                    val = builtin('subsasgn',double(obj),s,val);
-                    obj = toastNim(val,obj.meshname);
-            end
-        end
+%         function b = subsref(obj,s)
+%             switch s(1).type
+%                 case '.'
+%                     if strcmp(s(1).subs,'meshname')
+%                         b = obj.meshname;
+%                     end
+%                 case '()'
+%                     a = double(obj);
+%                     b = a(s(1).subs{:});
+%             end
+%         end
+        
+%         function obj = subsasgn(obj,s,val)
+%             switch s(1).type
+%                 case '.'
+%                     if strcmp(s.subs,'meshname')
+%                         obj.meshname = val;
+%                     end
+%                 case '()'
+%                     val = builtin('subsasgn',double(obj),s,val);
+%                     obj = toastNim(val,obj.meshname);
+%             end
+%         end
     end
     
     properties

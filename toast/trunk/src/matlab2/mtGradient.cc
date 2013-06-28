@@ -69,6 +69,13 @@ void MatlabToast::Gradient (int nlhs, mxArray *plhs[], int nrhs,
     CFwdSolver FWS (mesh, solver, tol);
     FWS.SetDataScaling (DATA_LOG);
 
+    if (nrhs >= 13) {
+	char unwrap[128];
+	mxGetString (prhs[12], unwrap, 128);
+	if (!strcasecmp(unwrap,"unwrap"))
+	    FWS.SetPhaseUnwrap(true);
+    }
+
     RVector grad(raster->SLen()*2);
     GetGradient (mesh, raster, FWS, mua, mus, ref, freq, data, sd,
         qvec, mvec, grad);

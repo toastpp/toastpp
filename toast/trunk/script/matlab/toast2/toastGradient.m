@@ -1,4 +1,4 @@
-function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,solver,tol)
+function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,solver,tol,unwrap)
 %toastGradient        - Return gradient of objective function.
 %
 % Synopsis: G = toastGradient(hMesh,hBasis,qvec,mvec,mua,mus,n,f,data,sd,solver,tol)
@@ -22,11 +22,14 @@ function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,solve
 % The returned gradient vector is with respect to the inverse solution basis
 % defined by hBasis, rather than the nodal mesh basis.
 
-if nargin < 12
-    tol = 1e-10;
-    if nargin < 11
-        solver = 'DIRECT';
+if nargin < 13
+    unwrap = '';
+    if nargin < 12
+        tol = 1e-10;
+        if nargin < 11
+            solver = 'DIRECT';
+        end
     end
 end
 
-p = toast(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,solver,tol);
+p = toast(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,solver,tol,unwrap);

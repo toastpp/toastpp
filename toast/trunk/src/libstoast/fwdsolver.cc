@@ -72,6 +72,7 @@ void TFwdSolver<T>::Setup ()
     precontp = PRECON_NULL;
     iterative_tol = 1e-6;
     iterative_maxit = 0;
+    unwrap_phase = false;
     F  = 0;
     FL = 0;
     Fd = 0;
@@ -934,7 +935,38 @@ template<>
 STOASTLIB RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMatrix &mvec,
     const CVector *phi, DataScale scl)
 {
-    return UnfoldComplex (ProjectAll (mvec, phi, scl));
+    if (!unwrap_phase || scl == DATA_LIN) { // nothing to unwrap
+	return UnfoldComplex (ProjectAll (mvec, phi, scl));
+    } else {
+	RVector proj(meshptr->nQM*2);
+	//RVector mproj (proj, 0, meshptr->nQM);
+	//RVector pproj (proj, meshptr->nQM, meshptr->nQM);
+	int i, q, m, len, mofs = 0, pofs = meshptr->nQM, nq = meshptr->nQ;
+	double scale;
+	for (q = 0; q < nq; q++) {
+	    len = meshptr->nQMref[q];
+	    CVector lphi = log(phi[q]);
+	    RVector lnamp = Re(lphi);
+	    RVector phase = Im(lphi);
+
+	    NimPhaseUnwrap (meshptr, phase, meshptr->Q[q]);
+
+	    for (i = 0; i < len; i++) {
+		m = meshptr->QMref[q][i];
+		// log amplitude projection
+		toast::complex c = log (dot (phi[q], mvec.Row(m)));
+		proj[mofs++] = c.re;
+
+		// phase projection
+		RVector mv_r = Re(mvec.Row(m));
+		// not sure what to do if mvec has imaginary component
+		scale = sum(mv_r);
+		proj[pofs++] = dot (phase, mv_r) / scale;
+
+	    }
+	}
+	return proj;
+    }
 }
 
 template<class T>

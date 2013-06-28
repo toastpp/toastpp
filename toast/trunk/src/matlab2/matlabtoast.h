@@ -166,6 +166,14 @@ public:
     void GetQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void DataLinkList (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void MeshRefine (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void SplitElement (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void NodeNeighbour (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void UnwrapPhase (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
 
     // Methods defined in mtElement.cc
     void ElDof (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);

@@ -270,6 +270,18 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_DATALINKLIST:
 	mtoast->DataLinkList (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_MESHREFINE:
+        mtoast->MeshRefine (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SPLITELEMENT:
+	mtoast->SplitElement (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_NODENEIGHBOUR:
+	mtoast->NodeNeighbour (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_UNWRAPPHASE:
+	mtoast->UnwrapPhase (nlhs, plhs, nrhs, prhs);
+	break;
 
     // methods defined in mtElement.cc
     case TOAST_ELDOF:

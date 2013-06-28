@@ -949,3 +949,122 @@ void MatlabToast::MPos (int nlhs, mxArray *plhs[], int nrhs,
     plhs[0] = mpos;
 }
 
+// =========================================================================
+
+void MatlabToast::MeshRefine (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    void(*RefineFunc)(Mesh*,bool*);
+    Mesh *mesh = (Mesh*)GETMESH_SAFE(0);
+    int i, nv, nlen = mesh->nlen(), elen = mesh->elen();
+    BYTE eltp = mesh->elist[0]->Type();
+    switch (eltp) {
+    case ELID_TRI3:
+        RefineFunc = RefineTriangle3Mesh;
+	break;
+    case ELID_TET4:
+        RefineFunc = RefineTetrahedron4Mesh;
+	break;
+    default:
+        mexErrMsgTxt("MeshRefine: Element type not supported");
+	return;
+    }
+    for (i = 1; i < nlen; i++)
+        if (mesh->elist[i]->Type() != eltp) {
+	    mexErrMsgTxt("MeshRefine: Mesh must consist of elements of only one type");
+	}
+
+    bool *elrefine = new bool[elen];
+    for (i = 0; i < elen; i++)
+        elrefine[i] = false;
+
+    if (nrhs > 1) {
+        RVector v;
+	CopyVector (v, prhs[1]);
+	nv = v.Dim();
+	for (i = 0; i < nv; i++) {
+	    int el = (int)(v[i]-0.5);
+	    elrefine[el] = true;
+	}
+    } else {
+        for (i = 0; i < elen; i++)
+	    elrefine[i] = true;
+    }
+
+    RefineFunc (mesh, elrefine);
+}
+
+// =========================================================================
+
+void MatlabToast::SplitElement (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    // currently only works for Triangle3 meshes.
+
+    Mesh *mesh = (Mesh*)GETMESH_SAFE(0);
+    int el = (int)(mxGetScalar(prhs[1])-0.5); // switch to 0-based
+
+    Mesh_SplitTriangle3 (mesh, el);
+}
+
+// =========================================================================
+
+void MatlabToast::NodeNeighbour (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    int *nnbrs, **nbrs;
+    Mesh *mesh = (Mesh*)GETMESH_SAFE(0);
+    int i, j, nlen = mesh->nlen();
+    mesh->NodeNeighbourList (&nnbrs, &nbrs);
+
+    int maxnbr = 0;
+    for (i = 0; i < nlen; i++)
+	if (nnbrs[i] > maxnbr)
+	    maxnbr = nnbrs[i];
+
+    if (nlhs > 0) {
+	plhs[0] = mxCreateNumericMatrix (nlen, maxnbr, mxINT32_CLASS, mxREAL);
+	int *ptr = (int*)mxGetData (plhs[0]);
+    
+	for (i = 0; i < maxnbr; i++) {
+	    for (j = 0; j < nlen; j++) {
+		*ptr++ = (i < nnbrs[j] ? nbrs[j][i]+1 : 0);
+	    }
+	}
+    }
+
+    for (i = 0; i < nlen; i++)
+	delete []nbrs[i];
+    delete []nbrs;
+    delete []nnbrs;
+}
+
+// =========================================================================
+
+void MatlabToast::UnwrapPhase (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    if (nlhs < 1) return; // sanity check
+
+    Mesh *mesh = (Mesh*)GETMESH_SAFE(0);
+    int i;
+    int nlen = mesh->nlen();
+    int dim = mesh->Dimension();
+    RVector phase;
+    RVector seed;
+    CopyVector (phase, prhs[1]);
+    CopyVector (seed, prhs[2]);
+
+    if (seed.Dim() != dim)
+	mexErrMsgTxt ("Invalid dimension for seed point");
+
+    Point seedpt(dim);
+    for (i = 0; i < dim; i++)
+	seedpt[i] = seed[i];
+
+    NimPhaseUnwrap (mesh, phase, seedpt);
+    plhs[0] = mxCreateDoubleMatrix(nlen,1,mxREAL);
+    double *pr = mxGetPr(plhs[0]);
+    for (i = 0; i < nlen; i++)
+	*pr++ = phase[i];
+}

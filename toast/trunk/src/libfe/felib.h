@@ -55,6 +55,7 @@
 #include "mesh.h"
 #include "meshopt.h"
 #include "qmmesh.h"
+#include "nim.h"
 #include "timespec.h"
 #include "refine_mesh.h"
 

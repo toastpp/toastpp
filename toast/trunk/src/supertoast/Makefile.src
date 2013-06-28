@@ -6,7 +6,7 @@ BINS  = fwdfem fwdfem_cw fwdfem_tpsf
 BINS += supertoast supertoast_mw supertoast_cw_mw
 
 ifeq ($(ENABLE_MPI),yes)
-     BINS += fwdfem_zoltan fwdfem_zoltan3
+     BINS += fwdfem_zoltan
 #     BINS += supertoast_mpi supertoast_mw_mpi supertoast_cw_mw_mpi
 endif
 
@@ -52,9 +52,6 @@ fwdfem_tpsf_cuda : fwdfem_tpsf_cuda.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(STOASTLIB)
 
 fwdfem_zoltan : fwdfem_zoltan.o
-	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
-
-fwdfem_zoltan3 : fwdfem_zoltan3.o
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
 
 supertoast : supertoast.o supertoast_util.o util.o solver.o solverlm.o \
