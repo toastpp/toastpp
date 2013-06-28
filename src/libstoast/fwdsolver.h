@@ -128,6 +128,9 @@ public:
      */
     DataScale GetDataScaling () const;
 
+    void SetPhaseUnwrap (bool unwrap)
+    { unwrap_phase = unwrap; }
+
     /**
      * \brief Read solver parameters from a parameter file.
      * \param pp parser instance
@@ -418,6 +421,7 @@ protected:
 
     DataScale dscale;       ///< default data scaling: DATA_LIN or DATA_LOG
     TVector<T> *pphi;       ///< work buffer for field calculation
+    bool unwrap_phase;      ///< use phase unwrapping?
 
     // ===============================================================
     // MPI-specific functions and data members

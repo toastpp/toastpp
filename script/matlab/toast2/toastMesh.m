@@ -911,6 +911,69 @@ classdef toastMesh < handle
             mvec = toast(uint32(19),obj.handle,varargin{:});
         end
         
+        function nn = NodeNeighbour (obj)
+            % Generate the node neighbour matrix of the mesh.
+            %
+            % Syntax: nn = mesh.NodeNeighbour();
+            %
+            % Return values:
+            %         nn [nlen x maxnbr integer matrix]
+            %              Each row i of nn contains a list of indices
+            %              >= 1 of neighbour nodes of i. Trailing entries
+            %              of 0 are unused.
+            nn = toast(uint32(79),obj.handle);
+        end
+        
+        function Refine(obj,elrefine)
+            % Refine elements in a mesh.
+            %
+            % Syntax: mesh.Refine
+            %         mesh.Refine (ellist)
+            %
+            % Parameters:
+            %         ellist [real array]
+            %             list of elements to be refined
+            %
+            % Notes:  If no ellist is provided, all elements are refined.
+            %
+            %         The method also recursively refines neighbouring
+            %         elements if required.
+            if nargin > 1
+                toast(uint32(77),obj.handle,elrefine);
+            else
+                toast(uint32(77),obj.handle,elrefine);
+            end
+        end
+        
+        function SplitElement(obj,elidx)
+            % Split an element in the mesh.
+            %
+            % Syntax: mesh.SplitElement(elidx)
+            %
+            % Parameters:
+            %         elidx
+            %             element indx (>= 1)
+            %
+            % Notes:  currently works only with Triangle3 meshes.
+            toast(uint32(78),obj.handle,elidx);
+        end
+    
+        function uphase = UnwrapPhase(obj,phase,seed)
+            % Unwrap a nodal phase field.
+            %
+            % Syntax: mesh.UnwrapPhase(phase,seed)
+            %
+            % Parameters:
+            %         phase [real vector nlen]
+            %             nodal phase field coefficients to be unwrapped
+            %         seed [real vector dim]
+            %             seed point for unwrapping
+            %
+            % Notes:  This function will fail if the target phase
+            %         difference between neighbouring nodes is > pi
+            uphase = toast(uint32(80),obj.handle,phase,seed);
+        end
+            
 	    function h = Display(obj,varargin)
             % Display a mesh geometry and nodal field.
             %
