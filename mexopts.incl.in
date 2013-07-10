@@ -26,7 +26,7 @@ if test "@TOAST_FDOT@" = "1" ; then
 	TOAST_LIB="$TOAST_LIB -lfdot @OGLLIB@"
 fi
 
-TOAST_FLAG="-Wno-deprecated $TOAST_INC"
+TOAST_FLAG="-Wno-deprecated $TOAST_INC @MATLAB_TOASTFLAGS@"
 
 if test "$Arch" = "maci" -o "$Arch" = "maci64"; then
 	TOAST_FLAG="$TOAST_FLAG -Wl,-rpath,$TOASTVER/lib"

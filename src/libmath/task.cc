@@ -64,9 +64,9 @@ void Task::Multiprocess (void *func(task_data*), void *data, int np)
     pthread_t *thread = new pthread_t[np];
 
     is_multiprocessing = true;
-    cerr << "Multiprocess: Branch into " << np << " threads\n";
+    cout << "Multiprocess: Branch " << np << endl;
     double t0 = tic();
-    double w0 = walltic();
+    double w, w0 = walltic();
 
     // create worker threads
     for (p = 1; p < np; p++) {
@@ -87,8 +87,8 @@ void Task::Multiprocess (void *func(task_data*), void *data, int np)
         pthread_join (thread[p], NULL);
 
     ttime += toc(t0);
-    wtime += walltoc(w0);
-    cerr << "Multiprocess: Threads joined\n";
+    wtime += (w=walltoc(w0));
+    cout << "Multiprocess: Join (t=" << w << ")" << endl;
     is_multiprocessing = false;
     
     delete []td;

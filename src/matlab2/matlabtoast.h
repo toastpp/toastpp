@@ -42,6 +42,8 @@ public:
 	// Methods defined in matlabtoast.cc
     void SetVerbosity (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void ThreadCount (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void SetQM (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);

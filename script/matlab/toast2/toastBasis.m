@@ -185,6 +185,10 @@ classdef toastBasis < handle
             %         points outside the mesh are indicated by value 0.
             elref = toast(uint32(63),obj.handle);
         end
+
+	function g = ImageGradient(obj,img)
+	    g = toast(uint32(64),obj.handle,img);
+	end
     end
     
     properties

@@ -1,18 +1,23 @@
-function hMesh = mkrect(bb,gdim)
+function [vtx,idx,eltp] = mkrect(bb,gdim)
 
 % Create a toast mesh for a rectangular geometry consisting of regular
 % pixel elements.
 %
-% Synopsis: hMesh = mkrect (bb,gdim)
+% Syntax: [vtx,idx,eltp] = mkrect (bb,gdim)
 %
-% bb:    bounding box (mm): 2x2 real matrix containing min and
-%        max coordinates of the slab
-% gdim:  1x2 integer vector: contains grid dimensions
-% hMesh: mesh handle
+% Parameters:
+%         bb:  bounding box (mm): 2x2 real matrix containing min and
+%              max coordinates of the slab
+%         gdim:  1x2 integer vector: contains grid dimensions
+%
+% Return values:
+%         vtx: list of mesh vertices
+%         idx: list of element node indices
+%         eltp: list of element type indices
 %
 % Usage example:
-%     hMesh = mkslab ([[0 0];[10 10]], [10 10]);
-%     toastWriteMesh (hMesh,'rect.msh');
+%     [vtx,idx,eltp] = mkslab ([[0 0];[10 10]], [10 10]);
+%     mesh = toastMesh(vtx,idx,eltp);
 
 dim = 2;
 
@@ -59,16 +64,15 @@ eltp = ones(prod(gdim),1) * 14;
 
 % Build parameter matrix
 
-mua = 0.025;
-mus = 2;
-kap = 1./(3*(mua+mus));
-ref = 1.4;
-
-prm = ones(prod(vdim),3);
-prm(:,1) = mua;
-prm(:,2) = kap;
-prm(:,3) = ref;
+% mua = 0.025;
+% mus = 2;
+% kap = 1./(3*(mua+mus));
+% ref = 1.4;
+% 
+% prm = ones(prod(vdim),3);
+% prm(:,1) = mua;
+% prm(:,2) = kap;
+% prm(:,3) = ref;
 
 % Make mesh
-
-hMesh = toastMakeMesh(vtx,idx,eltp,prm);
+% hMesh = toastMakeMesh(vtx,idx,eltp,prm);

@@ -601,6 +601,7 @@ ac_includes_default="\
 
 ac_header_list=
 ac_subst_vars='LTLIBOBJS
+MATLAB_TOASTFLAGS
 CUDA_INSTALL_PATH
 ENABLE_CUDA
 OGLLIB
@@ -7185,6 +7186,7 @@ fi
 
 if test "$isok" = "yes" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
+    MATLAB_TOASTFLAGS="-DTOAST_THREAD"
     NEED_PTHREAD=yes
 fi
 
@@ -7530,7 +7532,7 @@ else
     OBJDIR="${CCVERSION}_static"
 fi
 
-if test "${MAKE_THREAD}" = "yes" ; then
+if test "${ENABLE_PTHREAD}" = "yes" ; then
     OBJDIR="${OBJDIR}_smp"
 fi
 
@@ -7612,6 +7614,7 @@ fi
 
 
 #AC_SUBST(TASKDIR)
+
 
 
 
