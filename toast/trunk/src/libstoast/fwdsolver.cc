@@ -939,6 +939,7 @@ STOASTLIB RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMat
 	return UnfoldComplex (ProjectAll (mvec, phi, scl));
     } else {
 	RVector proj(meshptr->nQM*2);
+#ifdef UNDEF
 	//RVector mproj (proj, 0, meshptr->nQM);
 	//RVector pproj (proj, meshptr->nQM, meshptr->nQM);
 	int i, q, m, len, mofs = 0, pofs = meshptr->nQM, nq = meshptr->nQ;
@@ -965,6 +966,15 @@ STOASTLIB RVector TFwdSolver<toast::complex>::ProjectAll_real (const CCompRowMat
 
 	    }
 	}
+#else
+	int i;
+	proj = UnfoldComplex (ProjectAll (mvec, phi, scl));
+	RVector pproj (proj, meshptr->nQM, meshptr->nQM);
+	for (i = 0; i < meshptr->nQM; i++)
+	    if (pproj[i] > 0.0)
+		pproj[i] -= Pi2;
+#endif
+
 	return proj;
     }
 }

@@ -31,7 +31,7 @@ SRCS += \
 	eigpair.cc
 endif
 
-ifdef MAKE_THREAD
+ifdef ENABLE_PTHREAD
 SRCS += \
 	task.cc \
 	vector_MT.cc

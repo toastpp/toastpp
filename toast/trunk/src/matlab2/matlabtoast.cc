@@ -252,6 +252,30 @@ void MatlabToast::SetVerbosity (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::ThreadCount (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    int nthread_get = 1;
+    int nthread_set = 1;
+    int ncore = 1;
+#ifdef TOAST_THREAD
+    nthread_get = Task::GetThreadCount();
+    ncore = Task::nProcessor();
+    if (nrhs > 0) {
+	nthread_set = (int)(mxGetScalar(prhs[0])+0.5);
+	Task::SetThreadCount (nthread_set);
+    }
+#endif
+    if (nlhs > 0) {
+	plhs[0] = mxCreateDoubleScalar(nthread_get);
+	if (nlhs > 1) {
+	    plhs[1] = mxCreateDoubleScalar(ncore);
+	}
+    }
+}
+
+// =========================================================================
+
 void MatlabToast::MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {

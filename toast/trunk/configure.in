@@ -485,6 +485,7 @@ AC_ARG_ENABLE(threads,
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
+    MATLAB_TOASTFLAGS="-DTOAST_THREAD"
     NEED_PTHREAD=yes
 fi
 
@@ -719,7 +720,7 @@ else
     OBJDIR="${CCVERSION}_static"
 fi
 
-if test "${MAKE_THREAD}" = "yes" ; then
+if test "${ENABLE_PTHREAD}" = "yes" ; then
     OBJDIR="${OBJDIR}_smp"
 fi
 
@@ -808,6 +809,7 @@ AC_SUBST(TOAST_FDOT)
 AC_SUBST(OGLLIB)
 AC_SUBST(ENABLE_CUDA)
 AC_SUBST(CUDA_INSTALL_PATH)
+AC_SUBST(MATLAB_TOASTFLAGS)
 
 AC_OUTPUT(Makefile.incl mexopts.incl)
 #AC_OUTPUT(Makefile.incl mexopts.incl gui/Makefile gui/Togl/Makefile)

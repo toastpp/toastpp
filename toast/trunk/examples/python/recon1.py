@@ -212,7 +212,6 @@ while itr <= itrmax:
     #Gradient of cost function
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
     r = matrix(J).transpose() * (2*(data-proj)/sd)
-    pdb.set_trace()
 
     if itr > 1:
         delta_old = delta_new

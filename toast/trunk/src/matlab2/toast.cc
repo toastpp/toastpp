@@ -18,6 +18,10 @@ void ProvideToast ()
     if (!mtoast) {
 	mtoast = new MatlabToast;
 	mexAtExit (mexClear);
+
+#ifdef TOAST_THREAD
+	Task_Init (0);
+#endif
     }
 }
 
@@ -174,6 +178,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	break;
     case TOAST_SETVERBOSITY:
 	mtoast->SetVerbosity (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_THREADCOUNT:
+	mtoast->ThreadCount (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_REGUL:
 	mtoast->Regul (nlhs, plhs, nrhs, prhs);
