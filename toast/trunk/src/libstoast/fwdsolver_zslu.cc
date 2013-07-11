@@ -194,7 +194,7 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     int i, r;
     const idxtype *rptr, *cidx;
 
-	int m = qvec.nCols();
+    int m = qvec.nCols();
     int n = phi[0].Dim();
     int nrhs = qvec.nRows();
 
@@ -217,9 +217,9 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     for (i = 0; i < nrhs; i++)
         memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(toast::complex));
 
-	Destroy_SuperMatrix_Store (&B);
+    Destroy_SuperMatrix_Store (&B);
     Destroy_SuperMatrix_Store (&X);
-
+    
     delete []x;
 }
 
