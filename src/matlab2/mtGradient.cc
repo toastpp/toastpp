@@ -29,13 +29,15 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     const RVector &mua, const RVector &mus, const RVector &ref, double freq,
     const RVector &data, const RVector &sd,
     const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-    RVector &grad);
+    RVector &grad, CVector *phi=0, RVector *proj=0);
 
 // =========================================================================
 
 void MatlabToast::Gradient (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
+    int i, j;
+
     // mesh
     QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
     ASSERTARG(mesh, 1, "Mesh not found");
@@ -44,6 +46,8 @@ void MatlabToast::Gradient (int nlhs, mxArray *plhs[], int nrhs,
 
     Raster *raster = GetBasis(prhs[1]);
     ASSERTARG(raster, 2, "Basis not found");
+
+    RVector grad(raster->SLen()*2);
 
     // source vectors
     CCompRowMatrix qvec;
@@ -65,25 +69,56 @@ void MatlabToast::Gradient (int nlhs, mxArray *plhs[], int nrhs,
     RVector data (mesh->nQM*2, mxGetPr (prhs[8]));
     RVector sd (mesh->nQM*2, mxGetPr (prhs[9]));
     
-    // linear solver parameters
-    char solver[128];
+    char solver[128] = "direct";
     double tol = 1e-10;
-    mxGetString (prhs[10], solver, 128);
-    if (nrhs >= 12) tol = mxGetScalar (prhs[11]);
-    CFwdSolver FWS (mesh, solver, tol);
-    FWS.SetDataScaling (DATA_LOG);
+    bool unwrap = false;
+    CVector *phi = 0;
+    RVector *proj = 0;
 
-    if (nrhs >= 13) {
-	char unwrap[128];
-	mxGetString (prhs[12], unwrap, 128);
-	if (!strcasecmp(unwrap,"unwrap"))
-	    FWS.SetPhaseUnwrap(true);
+    // read optional parameters as tupels
+    for (i = 10; i < nrhs; i++) {
+        char label[128];
+        mxGetString (prhs[i], label, 128);
+
+	if (!strcasecmp(label, "Method")) {     // linear solver method
+	    mxGetString (prhs[++i], solver, 128);
+	} else if (!strcasecmp(label, "Tolerance")) { // linear solver tolerance
+  	    tol = mxGetScalar (prhs[++i]);
+	} else if (!strcasecmp(label, "Fields")) { // fields for all sources
+	    i++;
+	    int q, nq = mesh->nQ, nlen = mesh->nlen();
+	    int m = mxGetM(prhs[i]);
+	    int n = mxGetN(prhs[i]);
+	    double *pr = mxGetPr(prhs[i]);
+	    double *pi = mxGetPi(prhs[i]);
+	    xASSERT(m == nlen && n == nq, "Parameter phi wrong dimension");
+	    phi = new CVector[nq];
+	    for (q = 0; q < nq; q++) {
+	        phi[q].New (nlen);
+		for (j = 0; j < nlen; j++) {
+		    phi[q][j].re = *pr++;
+		    phi[q][j].im = *pi++;
+		}
+	    }
+	} else if (!strcasecmp(label,"Projections")) {
+	    proj = new RVector(mesh->nQM*2, mxGetPr (prhs[++i]));
+	} else if (!strcasecmp(label,"Unwrap")) {
+	    unwrap = mxIsLogicalScalarTrue (prhs[++i]);	    
+	} else {
+	    mexErrMsgTxt("Error parsing arguments");
+	}
     }
 
-    RVector grad(raster->SLen()*2);
+    CFwdSolver FWS (mesh, solver, tol);
+    FWS.SetDataScaling (DATA_LOG);
+    FWS.SetPhaseUnwrap (unwrap);
+
     GetGradient (mesh, raster, FWS, mua, mus, ref, freq, data, sd,
-        qvec, mvec, grad);
-    CopyVector (&plhs[0], grad);    
+		 qvec, mvec, grad, phi, proj);
+    CopyVector (&plhs[0], grad);
+
+    if (phi) delete []phi;
+    if (proj) delete proj;
 }
 
 // ==========================================================================
@@ -105,7 +140,7 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
     const RVector &gsize = raster->GSize();
     const int *elref = raster->Elref();
     CVector wqa (mesh->nlen());
-    RVector wqb (mesh->nlen());
+    //RVector wqb (mesh->nlen());
     CVector dgrad (slen);
     ofs_mod = 0;
     ofs_arg = mesh->nQM;
@@ -138,10 +173,9 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 	ype = 1.0;  // will change if data type is normalised
 
 	CVector cproj(n);
-	//Project_cplx (*mesh, q, dphi[q], cproj);
 	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
 	wqa = toast::complex(0,0);
-	wqb = 0.0;
+	//wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
 	    if (!mesh->Connected (q, m)) continue;
@@ -468,13 +502,13 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
     const RVector &mua, const RVector &mus, const RVector &ref, double freq,
     const RVector &data, const RVector &sd,
     const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-    RVector &grad)
+    RVector &grad, CVector *phi, RVector *proj)
 {
     const double c0 = 0.3;
     int i, n = mesh->nlen();
     int nQ = mesh->nQ;
-    CVector *dphi;
-    RVector proj(data.Dim());
+    CVector *phi_local = 0;
+    RVector proj_local(data.Dim());
 
     // Solution in mesh basis
     Solution msol(OT_NPARAM, n);
@@ -491,18 +525,32 @@ void GetGradient (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
 
     double omega = freq * 2.0*Pi*1e-6; // convert from MHz to rad
 
-    // build the field vectors
-    dphi = new CVector[nQ];
-    for (i = 0; i < nQ; i++) dphi[i].New (n);
-
     // Calculate fields
     FWS.Allocate ();
     FWS.Reset (msol, omega);
-    FWS.CalcFields (qvec, dphi);
-    proj = FWS.ProjectAll_real (mvec, dphi);
 
-    AddDataGradient (mesh, raster, FWS, proj, data, sd, dphi, mvec, grad);
+    if (!phi || !proj) {
+        if (!phi) {
+	    phi_local = new CVector[nQ];
+	    for (i = 0; i < nQ; i++)
+	        phi_local[i].New (n);
+	    FWS.CalcFields (qvec, phi_local);
+	    phi = phi_local;
+	}
+	if (!proj) {
+	    proj_local = FWS.ProjectAll_real (mvec, phi);
+	    proj = &proj_local;
+	}
+    } else if (phi && FWS.LinSolver() == LSOLVER_DIRECT) {
+	// HACK: SuperLU appears to fail occasionally unless it starts with
+	// solving for a 'regular' source. Maybe a problem with condition
+	// of linear system when RHS is an adjoint source?
+	CVector tmp(n);
+	FWS.CalcField(qvec.Row(0), tmp);
+    }
 
-    delete []dphi;
+    AddDataGradient (mesh, raster, FWS, *proj, data, sd, phi, mvec, grad);
+
+    if (phi_local) delete []phi_local;
 }
 

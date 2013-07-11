@@ -1,35 +1,51 @@
-function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,solver,tol,unwrap)
-%toastGradient        - Return gradient of objective function.
+function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,varargin)
+% toastGradient        - Return gradient of objective function.
 %
-% Synopsis: G = toastGradient(hMesh,hBasis,qvec,mvec,mua,mus,n,f,data,sd,solver,tol)
-%    hmesh:  mesh handle
-%    hbasis: basis handle
-%    qvec:   array of source column-vectors (complex sparse)
-%    mvec:   array of measurement column-vectors (complex sparse)
-%    mua:    nodal absorption values [1/mm] (real)
-%    mus:    nodal scattering values [1/mm] (real)
-%    ref:    nodal refractive index values (real)
-%    f:      modulation frequency [MHz] (real scalar)
-%    data:   measurement data vector (real)
-%    sd:     measurement standard-deviation vector (real)
-%    solver: DIRECT|CG|BICG|BICGSTAB|GMRES|GAUSSSEIDEL (string)
-%    tol:    solver tolerance (optional, iterative solvers only)
-%    G:      gradient of objective function (real)
+% Syntax: g = toastGradient(mesh,basis,qvec,mvec,mua,mus,ref,freq,data,sd, ...)
+%
+% Parameters:
+%         mesh (toastMesh instance):
+%             mesh object
+%         basis (toastBasis instance):
+%             basis mapper object
+%         qvec (complex matrix n x nq):
+%             array of nodal source vectors
+%         mvec (complex matrix n x nm):
+%             array of nodal measurement vectors
+%         mua (real array n):
+%             array of nodal absorption coefficients [1/mm]
+%         mus (real array n):
+%             array of nodal scattering coefficients [1/mm]
+%         ref (real array n):
+%             array of nodal refractive indices
+%         freq (scalar):
+%             modulation frequency [MHz]
+%         data (real array nqm*2):
+%             array of measurement data (lnamp, phase)
+%         sd (real array nqm*2):
+%             array of standard deviations (lnamp, phase)
+%
+% Optional parameters:
+%         'Method', method (string):
+%             forward solver method
+%             (DIRECT|CG|BICG|BICGSTAB|GMRES|GAUSSSEIDEL)
+%         'Tolerance', tol (scalar):
+%             forward solver tolerance
+%         'Fields', phi (complex matrix n x nq):
+%             array of nodal fields for each source
+%         'Projections', proj (real array nqm*2):
+%             array of projection data (lnamp, phase)
+%         'Unwrap', true|false (boolean):
+%             flag for activating phase unwrapping
+%
+% Return values:
+%         g (real array slen*2):
+%             gradient of objective function (mua, mus) in inverse basis
 %
 % This function runs the forward solver with the nodal optical parameters
 % provided, and calculates the derivative of the objective function with
 % respect to the optical parameters.
 % The returned gradient vector is with respect to the inverse solution basis
-% defined by hBasis, rather than the nodal mesh basis.
+% defined by basis, rather than the nodal mesh basis.
 
-if nargin < 13
-    unwrap = '';
-    if nargin < 12
-        tol = 1e-10;
-        if nargin < 11
-            solver = 'DIRECT';
-        end
-    end
-end
-
-p = toast(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,solver,tol,unwrap);
+p = toast(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,varargin{:});
