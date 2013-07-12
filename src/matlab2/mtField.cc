@@ -14,9 +14,9 @@ using namespace toast;
 // =========================================================================
 
 void CalcFields (QMMesh *mesh, Raster *raster,
-    const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-    const RVector &mua, const RVector &mus, const RVector &ref,
-    double freq, char *solver, double tol, mxArray **dfield, mxArray **afield);
+    const CCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
+    const RVector &ref, double freq, char *solver, double tol,
+    mxArray **dfield);
 
 // =========================================================================
 
@@ -29,59 +29,48 @@ void MatlabToast::Fields (int nlhs, mxArray *plhs[], int nrhs,
     int n = mesh->nlen();
 
     // raster
-    Raster *raster = GetBasis(prhs[1]);
-    ASSERTARG(raster, 2, "Basis not found");
+    Raster *raster = GetBasis(prhs[1], 0, true);
 
     // source vectors
     CCompRowMatrix qvec;
     CopyTMatrix (qvec, prhs[2]);
 
-    // measurement vectors
-    CCompRowMatrix mvec;
-    CopyTMatrix (mvec, prhs[3]);
-
     // nodal optical parameters
-    RVector mua (n, mxGetPr (prhs[4]));
-    RVector mus (n, mxGetPr (prhs[5]));
-    RVector ref (n, mxGetPr (prhs[6]));
+    RVector mua (n, mxGetPr (prhs[3]));
+    RVector mus (n, mxGetPr (prhs[4]));
+    RVector ref (n, mxGetPr (prhs[5]));
 
     // modulation frequency
-    double freq = mxGetScalar (prhs[7]);
+    double freq = mxGetScalar (prhs[6]);
 
     // linear solver parameters
     char solver[128];
     double tol = 1e-10;
-    mxGetString (prhs[8], solver, 128);
-    if (nrhs >= 10) tol = mxGetScalar (prhs[9]);
+    mxGetString (prhs[7], solver, 128);
+    if (nrhs >= 9) tol = mxGetScalar (prhs[8]);
 
-    CalcFields (mesh, raster, qvec, mvec, mua, mus, ref, freq,
-		solver, tol, &plhs[0], nlhs > 1 ? &plhs[1] : NULL);
+    CalcFields (mesh, raster, qvec, mua, mus, ref, freq,
+		solver, tol, &plhs[0]);
 }
 
 // =========================================================================
 // Implementation
 
 void CalcFields (QMMesh *mesh, Raster *raster,
-    const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-    const RVector &mua, const RVector &mus, const RVector &ref,
-    double freq, char *solver, double tol, mxArray **dfield, mxArray **afield)
+    const CCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
+    const RVector &ref, double freq, char *solver, double tol,
+    mxArray **dfield)
 {
     const double c0 = 0.3;
-    int i, j, idx, n, dim, nQ, nM, nQM, slen;
+    int i, j, idx, n, dim, nQ, nQM, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
-    nQ   = mesh->nQ;
-    nM   = mesh->nM;
+    nQ   = qvec.nRows();
     slen = (raster ? raster->SLen() : n);
 
-    CVector *dphi, *aphi;
+    CVector *dphi;
     CFwdSolver FWS (mesh, solver, tol);
-
-//  if (FWS.LinSolver() == LSOLVER_DIRECT)
-//	mexPrintf ("Using direct solver\n");
-//  else
-//	mexPrintf ("Using iterative solver, tol=%f\n", FWS.ItSolverTol());
 
     // Solution in mesh basis
     Solution msol(OT_NPARAM, n);
@@ -124,26 +113,4 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     }
     delete []dphi;
     *dfield = dmx;
-
-    // build adjoint field vectors
-    if (afield) {
-	aphi = new CVector[nM];
-	for (i = 0; i < nM; i++) aphi[i].New (n);
-	FWS.CalcFields (mvec, aphi);
-	mxArray *amx = mxCreateDoubleMatrix (slen, nM, mxCOMPLEX);
-	pr = mxGetPr (amx);
-	pi = mxGetPi (amx);
-
-	for (i = idx = 0; i < nM; i++) {
-	    if (raster) raster->Map_MeshToSol (aphi[i], sphi);
-	    else        sphi = aphi[i];
-	    for (j = 0; j < slen; j++) {
-		pr[idx] = sphi[j].re;
-		pi[idx] = sphi[j].im;
-		idx++;
-	    }
-	}
-	delete []aphi;
-	*afield = amx;
-    }
 }                                                    

@@ -37,7 +37,7 @@
 
 #ifdef TOAST_THREAD
 
-#define THREAD_LEVEL 0 // 0=none, 1=fine-grain, 2=coarse-grain
+#define THREAD_LEVEL 2 // 0=none, 1=fine-grain, 2=coarse-grain
 #define TOAST_THREAD_MATLAB_GRADIENT  // parallelise Matlab toastGradient
 #define TOAST_THREAD_MATLAB_QMVEC     // parallelise Matlab Mvec
 
