@@ -69,6 +69,10 @@ matlab_clean:
 	cd $(TOASTVER)/mex; \
 	$(MAKE) clean
 
+matlab2_clean:
+	cd $(TOASTVER)/mex2; \
+	$(MAKE) clean
+
 doc_clean::
 	cd src; \
 	$(MAKE) doc_clean

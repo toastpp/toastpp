@@ -92,38 +92,36 @@ void *Qvec_engine (task_data *td)
     int nq = mesh->nQ;
     int q0 = (itask*nq)/ntask;
     int q1 = ((itask+1)*nq)/ntask;
+    int dq = q1-q0;
     SourceMode qtype = thdata->qtype;
     SRC_PROFILE qprof = thdata->qprof;
     double qwidth = thdata->qwidth;
     CCompRowMatrix *qvec = thdata->qvec;
 
-    CVector *q = new CVector[q1-q0];
+    CCompRowMatrix qvec_part(dq, n);
 
     for (i = q0; i < q1; i++) {
-	ii = i-q0;
-	q[ii].New(n);
+	CVector q(n);
 	switch (qprof) {
 	case PROF_POINT:
-	    SetReal (q[ii], QVec_Point (*mesh, mesh->Q[i], qtype));
+	    SetReal (q, QVec_Point (*mesh, mesh->Q[i], qtype));
 	    break;
 	case PROF_GAUSSIAN:
-	    SetReal (q[ii], QVec_Gaussian (*mesh, mesh->Q[i], qwidth, qtype));
+	    SetReal (q, QVec_Gaussian (*mesh, mesh->Q[i], qwidth, qtype));
 	    break;
 	case PROF_COSINE:
-	    SetReal (q[ii], QVec_Cosine (*mesh, mesh->Q[i], qwidth, qtype));
+	    SetReal (q, QVec_Cosine (*mesh, mesh->Q[i], qwidth, qtype));
 	    break;
 	case PROF_COMPLETETRIG:
-	    q[ii] = CompleteTrigSourceVector (*mesh, i);
+	    q = CompleteTrigSourceVector (*mesh, i);
 	    break;
 	}
+	qvec_part.SetRow (i-q0, q);
     }
 
     Task::UserMutex_lock();
-    for (i = q0; i < q1; i++)
-	qvec->SetRow (i, q[i-q0]);
+    qvec->SetRows (q0, qvec_part);
     Task::UserMutex_unlock();
-
-    delete []q;
 }
 #endif
 
@@ -228,37 +226,35 @@ void *Mvec_engine (task_data *td)
     int nm = mesh->nM;
     int m0 = (itask*nm)/ntask;
     int m1 = ((itask+1)*nm)/ntask;
+    int dm = m1-m0;
     SRC_PROFILE mprof = thdata->mprof;
     double mwidth = thdata->mwidth;
     CCompRowMatrix *mvec = thdata->mvec;
 
-    CVector *m = new CVector[m1-m0];
+    CCompRowMatrix mvec_part(dm, n);
 
     for (i = m0; i < m1; i++) {
-	ii = i-m0;
-	m[ii].New(n);
+	CVector m(n);
 	switch (mprof) {
 	case PROF_GAUSSIAN:
-	    SetReal (m[ii], QVec_Gaussian (*mesh, mesh->M[i], mwidth,
+	    SetReal (m, QVec_Gaussian (*mesh, mesh->M[i], mwidth,
 				       SRCMODE_NEUMANN));
 	    break;
 	case PROF_COSINE:
-	    SetReal (m[ii], QVec_Cosine (*mesh, mesh->M[i], mwidth,
+	    SetReal (m, QVec_Cosine (*mesh, mesh->M[i], mwidth,
 				     SRCMODE_NEUMANN));
 	    break;
 	case PROF_COMPLETETRIG:
-	    m[ii] = CompleteTrigSourceVector (*mesh, i);
+	    m = CompleteTrigSourceVector (*mesh, i);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[ii][j] *= mesh->plist[j].C2A();
+	for (j = 0; j < n; j++) m[j] *= mesh->plist[j].C2A();
+	mvec_part.SetRow (i-m0, m);
     }
 
     Task::UserMutex_lock();
-    for (i = m0; i < m1; i++)
-	mvec->SetRow (i, m[i-m0]);
+    mvec->SetRows (m0, mvec_part);
     Task::UserMutex_unlock();
-
-    delete []m;
 }
 #endif
 

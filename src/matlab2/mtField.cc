@@ -86,6 +86,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     msol.SetParam (OT_C2A, c2a);
 
     FWS.SetDataScaling (DATA_LOG);
+    FWS.SetPrecon (PRECON_ICH);
 
     double omega = freq * 2.0*Pi*1e-6; // convert from MHz to rad
 

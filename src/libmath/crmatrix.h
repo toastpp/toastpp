@@ -351,7 +351,11 @@ public:
     // See TMatrix
 
     void SetRow (int r, const TVector<MT> &row);
+    // Replace row r with 'row', removing zero elements
 
+    void SetRows (int r0, const TCompRowMatrix<MT> &rows);
+    // starting with row r0, replace matrix rows with 'rows'
+ 
     void RemoveRow(int c);
     //Remove row c;
 
