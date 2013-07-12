@@ -59,7 +59,7 @@ def objective_ls(logx):
 # ---------------------------------------------------
 # Projections from fields
 def projection(phi,mvec):
-    gamma = mvec * phi.transpose()
+    gamma = mvec.transpose() * phi
     gamma = np.reshape(gamma,(-1,1),'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real

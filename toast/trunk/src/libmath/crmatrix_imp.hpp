@@ -941,6 +941,55 @@ void TCompRowMatrix<MT>::SetRow (int r, const TVector<MT> &row)
 }
 
 template<class MT>
+void TCompRowMatrix<MT>::SetRows (int r0, const TCompRowMatrix<MT> &rws)
+{
+    int rr = min (rws.rows, this->rows-r0);   // number of rows to replace
+    if (rr <= 0) return;
+
+    int i, ncpy, ofs;
+    int nnz_insert = rws.rowptr[rr];         // number of nonzeros to insert
+    int nnz_remove = rowptr[r0+rr]-rowptr[r0]; // number of nonzeros to remove
+    int nnz_new = this->nval+nnz_insert-nnz_remove;// nonzeros in updated matrix
+
+    int *rp = new int[this->rows+1];
+    int *ci = new int[nnz_new];
+    MT *v   = new MT[nnz_new];
+
+    for (i = 0; i <= r0; i++)
+	rp[i] = rowptr[i];
+    for (; i <= r0+rr; i++)
+	rp[i] = rp[i-1] + rws.rowptr[i-r0]-rws.rowptr[i-r0-1];
+    for (; i <= this->rows; i++)
+	rp[i] = rowptr[i] + nnz_insert-nnz_remove;
+    
+    ofs = 0;
+    ncpy = rowptr[r0];
+    if (ncpy) {
+	memcpy(ci+ofs, colidx, ncpy*sizeof(int));
+	memcpy(v+ofs, this->val, ncpy*sizeof(MT));
+	ofs += ncpy;
+    }
+    ncpy = rws.rowptr[rr];
+    if (ncpy) {
+	memcpy(ci+ofs, rws.colidx, ncpy*sizeof(int));
+	memcpy(v+ofs, rws.val, ncpy*sizeof(MT));
+	ofs += ncpy;
+    }
+    ncpy = rowptr[this->rows] - rowptr[r0+rr];
+    if (ncpy) {
+	memcpy(ci+ofs, colidx+rowptr[r0+rr], ncpy*sizeof(int));
+	memcpy(v+ofs, this->val+rowptr[r0+rr], ncpy*sizeof(MT));
+	ofs += ncpy;
+    }
+    Initialise(rp, ci, v);
+    delete []rp;
+    delete []ci;
+    delete []v;
+
+    xASSERT(ofs == this->nval, "SetRows: inconsistency");
+}
+
+template<class MT>
 void TCompRowMatrix<MT>::RemoveRow (int nR)
 {
  SetColAccess (false);
