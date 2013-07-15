@@ -6,14 +6,15 @@
 // ===========================================================================
 // Local prototypes
 
-void ProcessNeighbours (const Mesh *mesh, int **nbrs, int *nnbrs,
+int ProcessNeighbours (const Mesh *mesh, int **nbrs, int *nnbrs,
     RVector &phase, TVector<bool> &processed, TVector<int> &front, int &nfront);
 
 
 // ===========================================================================
 // Unwrap nodal phase vector 'phase', starting from point 'seed'
+// Return the number of unwrapped nodes
 
-void NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed)
+int NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed)
 {
     // Get the node neighbour list
     int *nnbrs, **nbrs;
@@ -35,14 +36,15 @@ void NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed)
     TVector<int> frontline(nlen);
     frontline[0] = seednd;
     int nfront = 1;
+    int nunwrap = 0;
 
     for (i = 0; i < nlen; i++)
 	processed[i] = false;
     processed[seednd] = true;
 
     while (nfront) {
-	ProcessNeighbours (mesh, nbrs, nnbrs, phase, processed, frontline,
-            nfront);
+	nunwrap += ProcessNeighbours (mesh, nbrs, nnbrs, phase, processed,
+				      frontline, nfront);
     }
 
     // cleanup
@@ -50,11 +52,14 @@ void NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed)
 	delete []nbrs[i];
     delete []nbrs;
     delete []nnbrs;
+
+    return nunwrap;
 }
 
-void ProcessNeighbours (const Mesh *mesh, int **nbrs, int *nnbrs,
+int ProcessNeighbours (const Mesh *mesh, int **nbrs, int *nnbrs,
     RVector &phase, TVector<bool> &processed, TVector<int> &front, int &nfront)
 {
+    int nunwrap = 0;
     int i, j, noldfront = nfront;
     TVector<int> oldfront(noldfront);
     for (i = 0; i < noldfront; i++)
@@ -66,13 +71,19 @@ void ProcessNeighbours (const Mesh *mesh, int **nbrs, int *nnbrs,
 	for (j = 0; j < nnbrs[s]; j++) {
 	    int nb = nbrs[s][j];
 	    if (!processed[nb]) {
-		while (phase[nb] >= phase[s]+Pi)
-		    phase[nb] -= Pi2;
-		while (phase[nb] < phase[s]-Pi)
-		    phase[nb] += Pi2;
+	        if (phase[nb] >= phase[s]+Pi) {
+		    while (phase[nb] >= phase[s]+Pi)
+		        phase[nb] -= Pi2;
+		    nunwrap++;
+		} else if (phase[nb] < phase[s]-Pi) {
+		    while (phase[nb] < phase[s]-Pi)
+		        phase[nb] += Pi2;
+		    nunwrap++;
+		}
 		processed[nb] = true;
 		front[nfront++] = nb;
 	    }
 	}
     }
+    return nunwrap;
 }
