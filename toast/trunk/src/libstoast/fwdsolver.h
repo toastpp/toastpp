@@ -128,6 +128,15 @@ public:
      */
     DataScale GetDataScaling () const;
 
+    /**
+     * \brief Set the preconditioning method.
+     * \param type Preconditioner type.
+     * \note The default preconditioner is None.
+     * \note If the preconditioner is constructed from a ParamParser object,
+     *   the preconditioner may also be set via the LINSOLVER_PRECON tag in
+     *   the parameter file.
+     * \sa ReadParams
+     */
     void SetPrecon (PreconType type);
 
     void SetPhaseUnwrap (bool unwrap)
