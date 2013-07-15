@@ -128,6 +128,8 @@ public:
      */
     DataScale GetDataScaling () const;
 
+    void SetPrecon (PreconType type);
+
     void SetPhaseUnwrap (bool unwrap)
     { unwrap_phase = unwrap; }
 
