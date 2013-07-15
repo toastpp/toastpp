@@ -138,6 +138,20 @@ DataScale TFwdSolver<T>::GetDataScaling () const
     return dscale;
 }
 
+template<class T>
+void TFwdSolver<T>::SetPrecon (PreconType type)
+{
+    if (solvertp == LSOLVER_DIRECT) return; // no preconditioner here
+    if (type == precontp) return;           // nothing to do
+    if (precon) delete precon;
+    precontp = type;
+    switch (precontp) {
+    case PRECON_DIAG: precon = new TPrecon_Diag<T>; break;
+    case PRECON_ICH:  precon = new TPrecon_IC<T>;   break;
+    default:          precon = new TPrecon_Null<T>; break;
+    }
+}
+
 template<>
 void TFwdSolver<float>::Allocate ()
 {

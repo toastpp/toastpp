@@ -188,17 +188,21 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 
 	// default settings
 	RVector xs (x0.Dim());
+	RVector tauvec;
 	xs = 1;
 	if (regp) { // read TK0 parameters from structure
 	    field = mxGetField(regp,0,"tk0");
 	    if (field) field = mxGetField(field,0,"xs");
 	    if (field) CopyVector (xs, field);
-	} else { // read TK0 parameters from argument list
-	    while (prm < nrhs) {
-		mxGetString (prhs[prm++], cbuf, 256);
+	} else { // read TK0 parameters from key/value list
+	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+		AssertArg_Char (field, __func__, 5);
+		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "Xs")) {
-		    CopyVector (xs, prhs[prm++]);
-		    break;
+		    CopyVector (xs, mxGetCell (prhs[4], prm+1));
+		} else if (!strcasecmp (cbuf, "Tauvec")) {
+		    CopyVector (tauvec, mxGetCell (prhs[4], prm+1));
+		    xASSERT(tauvec.Dim() == x0.Dim(), "TauVec: wrong length");
 		}
 	    }
 	}
@@ -210,6 +214,10 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	}
 
 	reg = new Tikhonov0 (tau, &x0, &xs);
+	if (tauvec.Dim() > 0) {
+	    ((Tikhonov0*)reg)->SetTau(tauvec);
+	    cerr << "Using Tauvec!" << endl;
+	}
 
     } else if (!strcasecmp (rtype, "TK1")) {
 	// 1-st order Tikhonov (Laplacian)
@@ -396,6 +404,8 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
     plhs[0] = mxCreateNumericMatrix (1,1, mxUINT64_CLASS, mxREAL);
     uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
     *ptr = Ptr2Handle (reg);
+
+    cerr << "Regul is " << reg->GetName() << endl;
 }
 
 // =========================================================================
