@@ -124,7 +124,7 @@ bool Voxel8::LContains (const Point &loc, bool pad) const
 
 bool Voxel8::GContains (const Point &glob, const NodeList&) const
 {
-    const double EPS = 1e-10;
+    const double EPS = 1e-6;
     return (glob[0] >= x0-EPS && glob[0] <= x0+dx+EPS &&
 	    glob[1] >= y0-EPS && glob[1] <= y0+dy+EPS &&
 	    glob[2] >= z0-EPS && glob[2] <= z0+dz+EPS);
