@@ -354,6 +354,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\matlab2\mtQMvec.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\matlab2\mtRegul.cc"
 				>
 			</File>

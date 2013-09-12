@@ -1,5 +1,6 @@
 // -*-C++-*-
 // Utilities for nodal images
+#define FELIB_IMPLEMENTATION
 
 #include "nim.h"
 
@@ -14,7 +15,7 @@ int ProcessNeighbours (const Mesh *mesh, int **nbrs, int *nnbrs,
 // Unwrap nodal phase vector 'phase', starting from point 'seed'
 // Return the number of unwrapped nodes
 
-int NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed)
+FELIB int NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed)
 {
     // Get the node neighbour list
     int *nnbrs, **nbrs;
