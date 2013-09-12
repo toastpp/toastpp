@@ -1,4 +1,8 @@
+#define FELIB_IMPLEMENTATION
+
 #include "felib.h"
+#include "toastdef.h"
+#include "refine_mesh.h"
 
 struct EDGE {   // structure for the edge of a 2-D element
     int nd[2];      // node indices
@@ -528,7 +532,7 @@ void Triangle3_SplitElement (Mesh *mesh, Element *e, int sidend)
 
 // Subdivide element 'el' in 'mesh'. If necessary, recursively refine the
 // neighbours as well.
-void Mesh_SplitTriangle3 (Mesh *mesh, int el)
+FELIB void Mesh_SplitTriangle3 (Mesh *mesh, int el)
 {
     Element *pel = mesh->elist[el];
     if (pel->Type() != ELID_TRI3)
@@ -581,7 +585,7 @@ void Mesh_SplitTriangle3 (Mesh *mesh, int el)
     mesh->Setup();
 }
 
-void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
+FELIB void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 {
     int i, j, idx;
     int nel = mesh->elen();
@@ -721,7 +725,7 @@ void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 }
 
 
-void RefineTetrahedron4Mesh (Mesh *mesh, bool *elrefine)
+FELIB void RefineTetrahedron4Mesh (Mesh *mesh, bool *elrefine)
 {
 }
 

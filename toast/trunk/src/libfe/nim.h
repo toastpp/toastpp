@@ -7,6 +7,6 @@
 #include "mathlib.h"
 #include "felib.h"
 
-int NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed);
+FELIB int NimPhaseUnwrap (const Mesh *mesh, RVector &phase, Point seed);
 
 #endif // !__NIM_H
