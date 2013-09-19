@@ -104,7 +104,7 @@ classdef toastSolver < handle
                 
             g = -toastGradient (obj.lprm.hMesh, obj.lprm.hBasis, obj.lprm.qvec, obj.lprm.mvec, ...
                 mua, mus, obj.lprm.ref, obj.prm.data.freq, obj.lprm.data, obj.lprm.sd, ...
-                obj.prm.fwdsolver.method, obj.prm.fwdsolver.tol);
+                'method',obj.prm.fwdsolver.method, 'tolerance',obj.prm.fwdsolver.tol);
             g = g .* x; % parameter scaling
             if isfield(obj.lprm,'hReg') &&  obj.lprm.hReg ~= 0
                 g = g - obj.lprm.hReg.Gradient (log(x));
