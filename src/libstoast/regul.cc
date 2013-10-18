@@ -58,6 +58,8 @@ Regularisation *Regularisation::Create (ParamParser *pp, const RVector *_x0,
 	    prior = 3;
 	else if (!strcasecmp (cbuf, "HUBER"))
 	    prior = 4;
+	else if (!strcasecmp (cbuf, "MRF"))
+	    prior = 5;
     }
     while (prior < 0) {
 	cout << "\nSelect a regularisation method:\n";
@@ -66,7 +68,8 @@ Regularisation *Regularisation::Create (ParamParser *pp, const RVector *_x0,
 	cout << "(2) Tikhonov 0th order (TK0)\n";
 	cout << "(3) Tikhonov 1st order (TK1)\n";
 	cout << "(4) Huber\n";
-	cout << "[0|1|2|3|4] >> ";
+	cout << "(5) MRF\n";
+	cout << "[0|1|2|3|4|5] >> ";
 	cin >> prior;
     }
 
@@ -76,6 +79,7 @@ Regularisation *Regularisation::Create (ParamParser *pp, const RVector *_x0,
     case 2: reg = new Tikhonov0 (1, _x0, _xs); break;
     case 3: reg = new TK1 (1, _x0, _raster); break;
     case 4: reg = new Huber (1, 1, _x0, _raster); break;
+    case 5: reg = new MRF(1, _x0, _raster); break;
     }
     if (reg) {
 	reg->ReadParams (pp);
@@ -1804,6 +1808,232 @@ RVector GenericScaleSpace::GetHessianDiag (const RVector &x) const
 {
   RVector tmp;
   return tmp;
+}
+
+// ==========================================================================
+
+MRF::MRF (double _tau, const RVector *_x0, const Raster *_raster,
+    const RVector *_kap)
+    : Regularisation (_raster, _tau, _x0)
+{
+    MRFa = 0;
+    MRFb = 0;
+    SetKaprefImg (_kap);
+}
+
+MRF::~MRF ()
+{
+    if (MRFa) delete MRFa;
+    if (MRFb) delete MRFb;
+}
+
+void MRF::SetKaprefImg (const RVector *kap)
+{
+    if (MRFa) delete MRFa;
+    if (MRFb) delete MRFb;
+
+    if (kap) {
+	// Build up the neighbour graph
+	int i, j, k, m1, m2, bm1, bm2;
+	int *rp, *ci, nz;
+	int slen = raster->SLen();
+	int blen = raster->BLen();
+	int dim = raster->Dim();
+	IVector bdim = raster->BDim();
+	raster->NeighbourGraph (rp, ci, nz);
+	MRFa = new RCompRowMatrix(slen,slen,rp,ci);
+	MRFb = new RCompRowMatrix(slen,slen,rp,ci);
+	RCompRowMatrix &rMRFa = *MRFa;
+	RCompRowMatrix &rMRFb = *MRFb;
+    
+	const double *muaim = 0, *musim = 0;
+	muaim = kap->data_buffer();
+	musim = (kap->Dim() == blen*2 ? muaim + blen : 0);
+
+	double minmrf = 1e-2;
+	double mrfdiff = 1.0 - minmrf;
+	double diff, sum;
+
+	int bx = bdim[0], by = bdim[1], bz = (dim == 3 ? bdim[2]:1);
+	for (k = 0; k < bz; k++) {
+	    for (j = 0; j < by; j++) {
+		for (i = 0; i < bx; i++) {
+		    bm1 = i + (j + k*by)*bx;
+		    m1 = raster->Basis2Sol (bm1);
+		    if (m1 < 0) continue;
+		    if (i < bx-1) {
+			bm2 = i+1 + (j + k*by)*bx;
+			m2 = raster->Basis2Sol (bm2);
+			if (m2 >= 0) {
+			    if (muaim) {
+				diff = fabs(muaim[bm1]-muaim[bm2]);
+				sum  = muaim[bm1]+muaim[bm2];
+				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			    if (musim) {
+				diff = fabs(musim[bm1]-musim[bm2]);
+				sum  = musim[bm1]+musim[bm2];
+				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
+			}
+		    }
+		    if (i > 0) {
+			bm2 = i-1 + (j + k*by)*bx;
+			m2 = raster->Basis2Sol (bm2);
+			if (m2 >= 0) {
+			    if (muaim) {
+				diff = fabs(muaim[bm1]-muaim[bm2]);
+				sum  = muaim[bm1]+muaim[bm2];
+				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			    if (musim) {
+				diff = fabs(musim[bm1]-musim[bm2]);
+				sum  = musim[bm1]+musim[bm2];
+				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
+			}
+		    }
+
+		    if (j < by-1) {
+			bm2 = i + (j+1 + k*by)*bx;
+			m2 = raster->Basis2Sol (bm2);
+			if (m2 >= 0) {
+			    if (muaim) {
+				diff = fabs(muaim[bm1]-muaim[bm2]);
+				sum  = muaim[bm1]+muaim[bm2];
+				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			    if (musim) {
+				diff = fabs(musim[bm1]-musim[bm2]);
+				sum  = musim[bm1]+musim[bm2];
+				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
+			}
+		    }
+		    if (j > 0) {
+			bm2 = i + (j-1 + k*by)*bx;
+			m2 = raster->Basis2Sol (bm2);
+			if (m2 >= 0) {
+			    if (muaim) {
+				diff = fabs(muaim[bm1]-muaim[bm2]);
+				sum  = muaim[bm1]+muaim[bm2];
+				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			    if (musim) {
+				diff = fabs(musim[bm1]-musim[bm2]);
+				sum  = musim[bm1]+musim[bm2];
+				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
+			}
+		    }
+		
+		    if (k < bz-1) {
+			bm2 = i + (j + (k+1)*by)*bx;
+			m2 = raster->Basis2Sol (bm2);
+			if (m2 >= 0) {
+			    if (muaim) {
+				diff = fabs(muaim[bm1]-muaim[bm2]);
+				sum  = muaim[bm1]+muaim[bm2];
+				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			    if (musim) {
+				diff = fabs(musim[bm1]-musim[bm2]);
+				sum  = musim[bm1]+musim[bm2];
+				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
+			}
+		    }
+		    if (k > 0) {
+			bm2 = i + (j + (k-1)*by)*bx;
+			m2 = raster->Basis2Sol (bm2);
+			if (m2 >= 0) {
+			    if (muaim) {
+				diff = fabs(muaim[bm1]-muaim[bm2]);
+				sum  = muaim[bm1]+muaim[bm2];
+				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			    if (musim) {
+				diff = fabs(musim[bm1]-musim[bm2]);
+				sum  = musim[bm1]+musim[bm2];
+				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
+			}
+		    }
+		}
+	    }
+	}
+
+	// Populate the diagonal
+	const double *pMRFa = MRFa->ValPtr();
+	const double *pMRFb = MRFb->ValPtr();
+	for (i = 0; i < slen; i++) {
+	    double suma = 0.0, sumb = 0.0;
+	    for (j = rp[i]; j < rp[i+1]; j++) {
+		suma += pMRFa[j];
+		sumb += pMRFb[j];
+	    }
+	    rMRFa(i,i) = suma;
+	    rMRFb(i,i) = sumb;
+	}
+
+	delete []rp;
+	delete []ci;
+
+	// DEBUG
+	//ofstream ofs("mrfa.dbg");
+	//MRFa->ExportRCV (ofs);
+    } else {
+	MRFa = 0;
+	MRFb = 0;
+    }
+}
+
+double MRF::GetValue (const RVector &x) const
+{ // TO BE DONE
+    return 0;
+}
+
+RVector MRF::GetGradient (const RVector &x) const
+{ // TO BE DONE
+    return RVector();
+}
+
+RVector MRF::GetKappa (const RVector &x)  const
+{ // DUMMY
+    return RVector();
+}
+
+void MRF::SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p)
+{ // DUMMY
+}
+
+void MRF::SetHess1FromKappa (RCompRowMatrix &Hess, const RVector &kap)
+{ // DUMMY
+}
+
+RVector MRF::GetHess1f (const RVector &x, const RVector &f) const
+{ // DUMMY
+    return RVector();
+}
+
+void MRF::SetFullHess (RCompRowMatrix &Hess, const RVector &x, const int p)
+{ // DUMMY
+}
+
+RVector MRF::GetFullHessf (const RVector &x, const RVector &f) const
+{ // DUMMY
+    return RVector();
+}
+
+int MRF::GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
+    const
+{ // DUMMY
+    return 0;
+}
+
+RVector MRF::GetHessianDiag (const RVector &x) const
+{ // DUMMY
+    return RVector();
 }
 
 //#define OLD_REGUL2

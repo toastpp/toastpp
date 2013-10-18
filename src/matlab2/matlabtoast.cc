@@ -295,68 +295,6 @@ void MatlabToast::MeshLin2Quad (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
-bool ReadNim (const char *name, int idx, RVector &img, char *meshname=NULL)
-{
-    char cbuf[256];
-    int i, j = 0, imgsize = 0;
-
-    ifstream ifs (name);
-    if (!ifs.getline (cbuf, 256)) return false;
-    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
-    do {
-        ifs.getline (cbuf, 256);
-	if (!strncasecmp (cbuf, "ImageSize", 9))
-	    sscanf (cbuf+11, "%d", &imgsize);
-	else if (!strncasecmp (cbuf, "Mesh", 4) && meshname)
-	    sscanf (cbuf+6, "%s", meshname);
-    } while (strcasecmp (cbuf, "EndHeader"));
-    if (!imgsize) return false;
-    img.New(imgsize);
-    for (;;) {
-	do {
-	    ifs.getline (cbuf, 256);
-	} while (ifs.good() && strncasecmp (cbuf, "Image", 5));
-	if (!ifs.good()) break;
-	for (i = 0; i < imgsize; i++)
-	    ifs >> img[i];
-	if (++j == idx) break;
-    }
-    return true;
-}
-
-// -------------------------------------------------------------------------
-
-bool ReadNimAll (char *name, RDenseMatrix &img)
-{
-    char cbuf[256];
-    int i, j = 0, imgsize = 0;
-
-    ifstream ifs (name);
-    if (!ifs.getline (cbuf, 256)) return false;
-    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
-    do {
-        ifs.getline (cbuf, 256);
-	if (!strncasecmp (cbuf, "ImageSize", 9))
-	    sscanf (cbuf+11, "%d", &imgsize);
-    } while (strcasecmp (cbuf, "EndHeader"));
-    if (!imgsize) return false;
-
-    img.New(imgsize,0);
-    RDenseMatrix img_single(imgsize,1);
-    for (;;) {
-	do {
-	    ifs.getline (cbuf, 256);
-	} while (ifs.good() && strncasecmp (cbuf, "Image", 5));
-	if (!ifs.good()) break;
-	for (i = 0; i < imgsize; i++)
-	    ifs >> img_single(i,0);
-	img = cath(img,img_single);
-    }
-    return true;
-}
-
-// -------------------------------------------------------------------------
-
 void MatlabToast::ReadNIM (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
