@@ -33,7 +33,8 @@ typedef enum {
     PRIOR_GGMRF,
     PRIOR_GENERIC,
     PRIOR_GENERICSIGMA,
-    PRIOR_GENERICSCALESPACE
+    PRIOR_GENERICSCALESPACE,
+    PRIOR_MRF
 } PRIOR;
 
 
@@ -775,7 +776,7 @@ class STOASTLIB Tikhonov1: public Regularisation {
 public:
     Tikhonov1 (double _tau, const RVector *_x0, const Raster *raster, const RVector *_kap=0);
     ~Tikhonov1 ();
-    PRIOR Type() const {return PRIOR_LAPLACIAN; } 
+    PRIOR Type() const { return PRIOR_LAPLACIAN; } 
     const char *GetName() const { return "Tikhonov1"; }
     double GetValue (const RVector &x) const;
     RVector GetGradient (const RVector &x) const;
@@ -850,6 +851,35 @@ public:
   TVOLD (double _tau, double _beta, const RVector *_x0, const Raster *_raster,  const RVector *_kap=0): TVSigmaOLD(_tau,_beta,0,_x0, _raster, false, _kap) {};
     PRIOR Type() const {return PRIOR_TV; } 
 
+};
+
+// =========================================================================
+
+class STOASTLIB MRF: public Regularisation {
+public:
+    MRF (double _tau, const RVector *_x0, const Raster *raster, const RVector *_kap = 0);
+    ~MRF ();
+    PRIOR Type() const { return PRIOR_MRF; }
+    const char *GetName() const { return "MRF"; }
+
+    void SetKaprefImg (const RVector *kap = 0);
+
+    double GetValue (const RVector &x) const;
+    RVector GetGradient (const RVector &x) const;
+
+    // not implemented (yet)
+    RVector GetKappa (const RVector &x)  const;
+    void SetHess1 (RCompRowMatrix &Hess1, const RVector &x, const int p);
+    void SetHess1FromKappa (RCompRowMatrix &Hess, const RVector &kap);
+    RVector GetHess1f (const RVector &x, const RVector &f) const;
+    void SetFullHess (RCompRowMatrix &Hess, const RVector &x, const int p);
+    RVector GetFullHessf (const RVector &x, const RVector &f) const;
+    int GetHessianRow (const RVector &x, int i, idxtype *colidx, double *val)
+	const;
+    RVector GetHessianDiag (const RVector &x) const;
+
+private:
+    RCompRowMatrix *MRFa, *MRFb;
 };
 
 #endif // !OLD_REGUL2
