@@ -223,7 +223,7 @@ MATHLIB int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
     if (swap) {
 	delete []colbuf;
 	fclose (swap);
-	unlink (swapname);
+	remove (swapname);
     }
     return nval;
 }

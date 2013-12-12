@@ -8,6 +8,8 @@
 #include "supertoast.h"
 #include "supertoast_util.h"
 #include <time.h>
+#include <unistd.h>
+
 //latest revision
 using namespace std;
 using namespace toast;

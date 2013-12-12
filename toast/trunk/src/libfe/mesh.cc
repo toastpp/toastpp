@@ -1632,6 +1632,91 @@ void Mesh::put (ostream &os, ParameterType p1, ParameterType p2,
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal or element coefficients are given by 'coeff'
 
+void AddToElMatrix (const Mesh &mesh, int el, RGenericSparseMatrix &M,
+    const RVector *coeff, int mode)
+{
+    int i, j, is, js, nnode;
+    double entry;
+
+    nnode = mesh.elist[el]->nNode();
+    for (i = 0; i < nnode; i++) {
+        is = mesh.elist[el]->Node[i];
+	for (j = 0; j < nnode; j++) {
+	    js = mesh.elist[el]->Node[j];
+	    switch (mode) {
+	    case ASSEMBLE_FF:
+	        entry = mesh.elist[el]->IntFF (i, j);
+		break;
+	    case ASSEMBLE_DD:
+	        entry = mesh.elist[el]->IntDD (i, j);
+		break;
+	    case ASSEMBLE_PFF:
+	        entry = mesh.elist[el]->IntPFF (i, j, *coeff);
+		break;
+	    case ASSEMBLE_PDD:
+	        entry = mesh.elist[el]->IntPDD (i, j, *coeff);
+		break;
+	    case ASSEMBLE_BNDPFF:
+	        entry = mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		break;
+	    case ASSEMBLE_PFF_EL:
+	        entry = mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		break;
+	    case ASSEMBLE_PDD_EL:
+	        entry = mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		break;
+	    case ASSEMBLE_BNDPFF_EL:
+	        entry = mesh.elist[el]->BndIntFF (i, j) * (*coeff)[el];
+		break;
+	    }
+	    M.Add (is, js, entry);
+	}
+    }
+}
+
+void AddToElMatrix (const Mesh &mesh, int el, FGenericSparseMatrix &M,
+    const RVector *coeff, int mode)
+{
+    int i, j, is, js, nnode;
+    double entry;
+
+    nnode = mesh.elist[el]->nNode();
+    for (i = 0; i < nnode; i++) {
+        is = mesh.elist[el]->Node[i];
+	for (j = 0; j < nnode; j++) {
+	    js = mesh.elist[el]->Node[j];
+	    switch (mode) {
+	    case ASSEMBLE_FF:
+	        entry = (float)mesh.elist[el]->IntFF (i, j);
+		break;
+	    case ASSEMBLE_DD:
+	        entry = (float)mesh.elist[el]->IntDD (i, j);
+		break;
+	    case ASSEMBLE_PFF:
+	        entry = (float)mesh.elist[el]->IntPFF (i, j, *coeff);
+		break;
+	    case ASSEMBLE_PDD:
+	        entry = (float)mesh.elist[el]->IntPDD (i, j, *coeff);
+		break;
+	    case ASSEMBLE_BNDPFF:
+	        entry = (float)mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		break;
+	    case ASSEMBLE_PFF_EL:
+	        entry = (float)mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		break;
+	    case ASSEMBLE_PDD_EL:
+	        entry = (float)mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		break;
+	    case ASSEMBLE_BNDPFF_EL:
+	        entry = (float)mesh.elist[el]->BndIntFF (i, j) *
+		    (*coeff)[el];
+		break;
+	    }
+	    M.Add (is, js, entry);
+	}
+    }
+}
+
 void AddToElMatrix (const Mesh &mesh, int el, SCGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
@@ -1724,117 +1809,121 @@ void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal coefficients are given by 'coeff'
 
+#ifdef TOAST_THREAD_ASSEMBLE
+template<typename T>
+struct Assemble_Threaddata {
+    const Mesh *mesh;
+    TCompRowMatrix<T> *M;
+    const RVector *coeff;
+    int mode;
+};
+
+template<typename T>
+void *AddToSysMatrix_engine (task_data *td)
+{
+    int el;
+    int itask = td->proc;
+    int ntask = td->np;
+    Assemble_Threaddata<T> *thdata =
+        (Assemble_Threaddata<T>*)td->data;
+    const Mesh *mesh = thdata->mesh;
+    int nlen = mesh->nlen();
+    int elen = mesh->elen();
+    int e0 = (itask*elen)/ntask;
+    int e1 = ((itask+1)*elen)/ntask;
+
+    TCompRowMatrix<T> M_local (nlen, nlen, thdata->M->rowptr,
+        thdata->M->colidx);
+
+    for (el = e0; el < e1; el++)
+        AddToElMatrix (*mesh, el, M_local, thdata->coeff, thdata->mode);
+      
+    Task::UserMutex_lock();
+    *thdata->M += M_local;
+    Task::UserMutex_unlock();
+}
+
+#endif // TOAST_THREAD_ASSEMBLE
+
 void AddToSysMatrix (const Mesh &mesh, RGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
-    int i, j, is, js, el, nnode;
-    double entry;
-
-    for (el = 0; el < mesh.elen(); el++) {
-        nnode = mesh.elist[el]->nNode();
-	for (i = 0; i < nnode; i++) {
-	    is = mesh.elist[el]->Node[i];
-	    for (j = 0; j < nnode; j++) {
-	        js = mesh.elist[el]->Node[j];
-	        switch (mode) {
-		case ASSEMBLE_FF:
-		    entry = mesh.elist[el]->IntFF (i, j);
-		    break;
-		case ASSEMBLE_DD:
-		    entry = mesh.elist[el]->IntDD (i, j);
-		    break;
-		case ASSEMBLE_PFF:
-		    entry = mesh.elist[el]->IntPFF (i, j, *coeff);
-		    break;
-		case ASSEMBLE_PDD:
-		    entry = mesh.elist[el]->IntPDD (i, j, *coeff);
-		    break;
-		case ASSEMBLE_BNDPFF:
-		    entry = mesh.elist[el]->BndIntPFF (i, j, *coeff);
-		    break;
-		case ASSEMBLE_PFF_EL:
-		    entry = mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
-		    break;
-		case ASSEMBLE_PDD_EL:
-		    entry = mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
-		    break;
-		case ASSEMBLE_BNDPFF_EL:
-		    entry = mesh.elist[el]->BndIntFF (i, j) * (*coeff)[el];
-		    break;
-		}
-		M.Add (is, js, entry);
-	    }
-	}
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        Assemble_Threaddata<double> thdata = {
+	    &mesh, (TCompRowMatrix<double>*)&M, coeff, mode
+	};
+	Task::Multiprocess (AddToSysMatrix_engine<double>, (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
     }
+#else
+    int el;
+    for (el = 0; el < mesh.elen(); el++)
+        AddToElMatrix (mesh, el, M, coeff, mode);
+#endif
 }
 
 
-// Single-precision sysmatrix version
 void AddToSysMatrix (const Mesh &mesh, FGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
-    int i, j, is, js, el, nnode;
-    double entry;
-
-    for (el = 0; el < mesh.elen(); el++) {
-        nnode = mesh.elist[el]->nNode();
-	for (i = 0; i < nnode; i++) {
-	    is = mesh.elist[el]->Node[i];
-	    for (j = 0; j < nnode; j++) {
-	        js = mesh.elist[el]->Node[j];
-	        switch (mode) {
-		case ASSEMBLE_FF:
-		    entry = (float)mesh.elist[el]->IntFF (i, j);
-		    break;
-		case ASSEMBLE_DD:
-		    entry = (float)mesh.elist[el]->IntDD (i, j);
-		    break;
-		case ASSEMBLE_PFF:
-		    entry = (float)mesh.elist[el]->IntPFF (i, j, *coeff);
-		    break;
-		case ASSEMBLE_PDD:
-		    entry = (float)mesh.elist[el]->IntPDD (i, j, *coeff);
-		    break;
-		case ASSEMBLE_BNDPFF:
-		    entry = (float)mesh.elist[el]->BndIntPFF (i, j, *coeff);
-		    break;
-		case ASSEMBLE_PFF_EL:
-		    entry = (float)mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
-		    break;
-		case ASSEMBLE_PDD_EL:
-		    entry = (float)mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
-		    break;
-		case ASSEMBLE_BNDPFF_EL:
-		    entry = (float)mesh.elist[el]->BndIntFF (i, j) *
-		        (*coeff)[el];
-		    break;
-		}
-		M.Add (is, js, entry);
-	    }
-	}
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        Assemble_Threaddata<float> thdata = {
+	    &mesh, (TCompRowMatrix<float>*)&M, coeff, mode
+	};
+	Task::Multiprocess (AddToSysMatrix_engine<float>, (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
     }
+#else
+    int el;
+    for (el = 0; el < mesh.elen(); el++)
+        AddToElMatrix (mesh, el, M, coeff, mode);
+#endif
 }
 
 
 void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
-    int el;
-
-    for (el = 0; el < mesh.elen(); el++) {
-	AddToElMatrix (mesh, el, M, coeff, mode);
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        Assemble_Threaddata<toast::complex> thdata = {
+	    &mesh, (TCompRowMatrix<toast::complex>*)&M, coeff, mode
+	};
+	Task::Multiprocess (AddToSysMatrix_engine<toast::complex>,
+			    (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
     }
+#else
+    int el;
+    for (el = 0; el < mesh.elen(); el++)
+	AddToElMatrix (mesh, el, M, coeff, mode);
+#endif
 }
 
 
 void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
-    int el;
-
-    for (el = 0; el < mesh.elen(); el++) {
-	AddToElMatrix (mesh, el, M, coeff, mode);
+#ifdef TOAST_THREAD_ASSEMBLE
+    if (M.StorageType() == MATRIX_COMPROW) {
+        Assemble_Threaddata<scomplex> thdata = {
+	    &mesh, (TCompRowMatrix<scomplex>*)&M, coeff, mode
+	};
+	Task::Multiprocess (AddToSysMatrix_engine<scomplex>,
+			    (void*)&thdata);
+    } else {
+        xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
     }
+#else
+    int el;
+    for (el = 0; el < mesh.elen(); el++)
+	AddToElMatrix (mesh, el, M, coeff, mode);
+#endif
 }
 
 void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,

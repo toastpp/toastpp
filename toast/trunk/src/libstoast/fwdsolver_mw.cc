@@ -63,7 +63,7 @@ TVector<T> TFwdSolverMW<T>::ProjectAll_wavel (const TCompRowMatrix<T> &qvec,
 
     for (w = 0; w < nofwavel; w++) {
 	this->Reset (*sol.swsol[w], omega);
-	CalcFields (qvec, phi);
+	this->CalcFields (qvec, phi);
 	TVector<T> proj_w (proj, w*mesh->nQM, mesh->nQM);
 	proj_w = this->ProjectAll (mvec, phi, scl);
     }
