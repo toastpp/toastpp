@@ -446,11 +446,12 @@ public:
     // Same as RasterLinPixel, but for cubic pixels
 
     // I/O
-	friend FELIB std::istream& operator>> (std::istream& i, Mesh& mesh);
-	friend FELIB std::ostream& operator<< (std::ostream& o, Mesh& mesh);
-	void put (std::ostream &os, ParameterType p1 = PRM_MUA,
-	ParameterType p2 = PRM_KAPPA, ParameterType p3 = PRM_N);
-  
+    friend FELIB std::istream& operator>> (std::istream& i, Mesh& mesh);
+    friend FELIB std::ostream& operator<< (std::ostream& o, Mesh& mesh);
+    void put (std::ostream &os, ParameterType p1 = PRM_MUA,
+	      ParameterType p2 = PRM_KAPPA, ParameterType p3 = PRM_N);
+    void WriteVtk (ostream &os, const RVector &nim);
+
     bool trap_load_error;
     // set this to false if mesh input errors should not cause an abort
     // default is true

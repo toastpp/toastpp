@@ -1624,6 +1624,50 @@ void Mesh::put (ostream &os, ParameterType p1, ParameterType p2,
     }
 }
 
+void Mesh::WriteVtk (ostream &os, const RVector &nim)
+{
+    int i, j, n;
+
+    os << "# vtk DataFile Version 2.0" << endl;
+    os << "Toast mesh file" << endl;
+    os << "ASCII" << endl;
+    os << endl;
+
+    os << "DATASET UNSTRUCTURED_GRID" << endl;
+    os << "POINTS " << nlist.Len() << " float" << endl;
+
+    for (i = 0; i < nlist.Len(); i++) {
+	for (j = 0; j < 3; j++)
+	    os << (j < nlist[i].Dim() ? nlist[i][j] : 0)
+	       << (j == 2 ? '\n' : ' ');
+    }
+
+    os << endl;
+    for (n = i = 0; i < elist.Len(); i++)
+	n += elist[i]->nNode()+1;
+    os << "CELLS " << elist.Len() << ' ' << n << endl;
+    for (i = 0; i < elist.Len(); i++) {
+	os << elist[i]->nNode();
+	for (j = 0; j < elist[i]->nNode(); j++)
+	    os << ' ' << elist[i]->Node[j];
+	os << endl;
+    }
+
+    os << endl;
+    os << "CELL_TYPES " << elist.Len() << endl;
+    for (i = 0; i < elist.Len(); i++) {
+	os << elist[i]->VtkType() << endl;
+    }
+
+    os << endl;
+    os << "POINT_DATA " << nlist.Len() << endl;
+    os << "SCALARS scalars float 1" << endl;
+    os << "LOOKUP_TABLE default" << endl;
+    for (i = 0; i < nlist.Len(); i++) {
+	os << nim[i] << endl;
+    }
+}
+
 // =========================================================================
 // Nonmember functions
 // =========================================================================

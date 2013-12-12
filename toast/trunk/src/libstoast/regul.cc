@@ -1832,165 +1832,178 @@ void MRF::SetKaprefImg (const RVector *kap)
     if (MRFa) delete MRFa;
     if (MRFb) delete MRFb;
 
-    if (kap) {
-	// Build up the neighbour graph
-	int i, j, k, m1, m2, bm1, bm2;
-	int *rp, *ci, nz;
-	int slen = raster->SLen();
-	int blen = raster->BLen();
-	int dim = raster->Dim();
-	IVector bdim = raster->BDim();
-	raster->NeighbourGraph (rp, ci, nz);
-	MRFa = new RCompRowMatrix(slen,slen,rp,ci);
-	MRFb = new RCompRowMatrix(slen,slen,rp,ci);
-	RCompRowMatrix &rMRFa = *MRFa;
-	RCompRowMatrix &rMRFb = *MRFb;
+    // Build up the neighbour graph
+    int i, j, k, m1, m2, bm1, bm2;
+    int *rp, *ci, nz;
+    int slen = raster->SLen();
+    int blen = raster->BLen();
+    int dim = raster->Dim();
+    IVector bdim = raster->BDim();
+    raster->NeighbourGraph (rp, ci, nz);
+    MRFa = new RCompRowMatrix(slen,slen,rp,ci);
+    MRFb = new RCompRowMatrix(slen,slen,rp,ci);
+    RCompRowMatrix &rMRFa = *MRFa;
+    RCompRowMatrix &rMRFb = *MRFb;
     
-	const double *muaim = 0, *musim = 0;
+    const double *muaim = 0, *musim = 0;
+    if (kap) {
 	muaim = kap->data_buffer();
 	musim = (kap->Dim() == blen*2 ? muaim + blen : 0);
+    } else {
+	double *sol = new double[slen];
+	for (i = 0; i < slen; i++) sol[i] = 1.0;
+	muaim = new double[raster->BLen()];
+	musim = muaim;
+	delete []sol;
+    }
 
-	double minmrf = 1e-2;
-	double mrfdiff = 1.0 - minmrf;
-	double diff, sum;
-
-	int bx = bdim[0], by = bdim[1], bz = (dim == 3 ? bdim[2]:1);
-	for (k = 0; k < bz; k++) {
-	    for (j = 0; j < by; j++) {
-		for (i = 0; i < bx; i++) {
-		    bm1 = i + (j + k*by)*bx;
-		    m1 = raster->Basis2Sol (bm1);
-		    if (m1 < 0) continue;
-		    if (i < bx-1) {
-			bm2 = i+1 + (j + k*by)*bx;
-			m2 = raster->Basis2Sol (bm2);
-			if (m2 >= 0) {
-			    if (muaim) {
-				diff = fabs(muaim[bm1]-muaim[bm2]);
-				sum  = muaim[bm1]+muaim[bm2];
-				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
-			    if (musim) {
-				diff = fabs(musim[bm1]-musim[bm2]);
-				sum  = musim[bm1]+musim[bm2];
-				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
-			}
+    double minmrf = 1e-2;
+    double mrfdiff = 1.0 - minmrf;
+    double diff, sum;
+    
+    int bx = bdim[0], by = bdim[1], bz = (dim == 3 ? bdim[2]:1);
+    for (k = 0; k < bz; k++) {
+	for (j = 0; j < by; j++) {
+	    for (i = 0; i < bx; i++) {
+		bm1 = i + (j + k*by)*bx;
+		m1 = raster->Basis2Sol (bm1);
+		if (m1 < 0) continue;
+		if (i < bx-1) {
+		    bm2 = i+1 + (j + k*by)*bx;
+		    m2 = raster->Basis2Sol (bm2);
+		    if (m2 >= 0) {
+			if (muaim) {
+			    diff = fabs(muaim[bm1]-muaim[bm2]);
+			    sum  = muaim[bm1]+muaim[bm2];
+			    rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			if (musim) {
+			    diff = fabs(musim[bm1]-musim[bm2]);
+			    sum  = musim[bm1]+musim[bm2];
+			    rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFb(m1,m2) = -minmrf - mrfdiff;
 		    }
-		    if (i > 0) {
-			bm2 = i-1 + (j + k*by)*bx;
-			m2 = raster->Basis2Sol (bm2);
-			if (m2 >= 0) {
-			    if (muaim) {
-				diff = fabs(muaim[bm1]-muaim[bm2]);
-				sum  = muaim[bm1]+muaim[bm2];
-				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
-			    if (musim) {
-				diff = fabs(musim[bm1]-musim[bm2]);
-				sum  = musim[bm1]+musim[bm2];
-				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
-			}
+		}
+		if (i > 0) {
+		    bm2 = i-1 + (j + k*by)*bx;
+		    m2 = raster->Basis2Sol (bm2);
+		    if (m2 >= 0) {
+			if (muaim) {
+			    diff = fabs(muaim[bm1]-muaim[bm2]);
+			    sum  = muaim[bm1]+muaim[bm2];
+			    rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			if (musim) {
+			    diff = fabs(musim[bm1]-musim[bm2]);
+			    sum  = musim[bm1]+musim[bm2];
+			    rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFb(m1,m2) = -minmrf - mrfdiff;
 		    }
-
-		    if (j < by-1) {
-			bm2 = i + (j+1 + k*by)*bx;
-			m2 = raster->Basis2Sol (bm2);
-			if (m2 >= 0) {
-			    if (muaim) {
-				diff = fabs(muaim[bm1]-muaim[bm2]);
-				sum  = muaim[bm1]+muaim[bm2];
-				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
-			    if (musim) {
-				diff = fabs(musim[bm1]-musim[bm2]);
-				sum  = musim[bm1]+musim[bm2];
-				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
-			}
-		    }
-		    if (j > 0) {
-			bm2 = i + (j-1 + k*by)*bx;
-			m2 = raster->Basis2Sol (bm2);
-			if (m2 >= 0) {
-			    if (muaim) {
-				diff = fabs(muaim[bm1]-muaim[bm2]);
-				sum  = muaim[bm1]+muaim[bm2];
-				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
-			    if (musim) {
-				diff = fabs(musim[bm1]-musim[bm2]);
-				sum  = musim[bm1]+musim[bm2];
-				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
-			}
-		    }
+		}
 		
-		    if (k < bz-1) {
-			bm2 = i + (j + (k+1)*by)*bx;
-			m2 = raster->Basis2Sol (bm2);
-			if (m2 >= 0) {
-			    if (muaim) {
-				diff = fabs(muaim[bm1]-muaim[bm2]);
-				sum  = muaim[bm1]+muaim[bm2];
-				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
-			    if (musim) {
-				diff = fabs(musim[bm1]-musim[bm2]);
-				sum  = musim[bm1]+musim[bm2];
-				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
-			}
+		if (j < by-1) {
+		    bm2 = i + (j+1 + k*by)*bx;
+		    m2 = raster->Basis2Sol (bm2);
+		    if (m2 >= 0) {
+			if (muaim) {
+			    diff = fabs(muaim[bm1]-muaim[bm2]);
+			    sum  = muaim[bm1]+muaim[bm2];
+			    rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			if (musim) {
+			    diff = fabs(musim[bm1]-musim[bm2]);
+			    sum  = musim[bm1]+musim[bm2];
+			    rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFb(m1,m2) = -minmrf - mrfdiff;
 		    }
-		    if (k > 0) {
-			bm2 = i + (j + (k-1)*by)*bx;
-			m2 = raster->Basis2Sol (bm2);
-			if (m2 >= 0) {
-			    if (muaim) {
-				diff = fabs(muaim[bm1]-muaim[bm2]);
-				sum  = muaim[bm1]+muaim[bm2];
-				rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFa(m1,m2) = -minmrf - mrfdiff;
-			    if (musim) {
-				diff = fabs(musim[bm1]-musim[bm2]);
-				sum  = musim[bm1]+musim[bm2];
-				rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
-			    } else rMRFb(m1,m2) = -minmrf - mrfdiff;
-			}
+		}
+		if (j > 0) {
+		    bm2 = i + (j-1 + k*by)*bx;
+		    m2 = raster->Basis2Sol (bm2);
+		    if (m2 >= 0) {
+			if (muaim) {
+			    diff = fabs(muaim[bm1]-muaim[bm2]);
+			    sum  = muaim[bm1]+muaim[bm2];
+			    rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			if (musim) {
+			    diff = fabs(musim[bm1]-musim[bm2]);
+			    sum  = musim[bm1]+musim[bm2];
+			    rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFb(m1,m2) = -minmrf - mrfdiff;
+		    }
+		}
+		
+		if (k < bz-1) {
+		    bm2 = i + (j + (k+1)*by)*bx;
+		    m2 = raster->Basis2Sol (bm2);
+		    if (m2 >= 0) {
+			if (muaim) {
+			    diff = fabs(muaim[bm1]-muaim[bm2]);
+			    sum  = muaim[bm1]+muaim[bm2];
+			    rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			if (musim) {
+			    diff = fabs(musim[bm1]-musim[bm2]);
+			    sum  = musim[bm1]+musim[bm2];
+			    rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFb(m1,m2) = -minmrf - mrfdiff;
+		    }
+		}
+		if (k > 0) {
+		    bm2 = i + (j + (k-1)*by)*bx;
+		    m2 = raster->Basis2Sol (bm2);
+		    if (m2 >= 0) {
+			if (muaim) {
+			    diff = fabs(muaim[bm1]-muaim[bm2]);
+			    sum  = muaim[bm1]+muaim[bm2];
+			    rMRFa(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFa(m1,m2) = -minmrf - mrfdiff;
+			if (musim) {
+			    diff = fabs(musim[bm1]-musim[bm2]);
+			    sum  = musim[bm1]+musim[bm2];
+			    rMRFb(m1,m2) = -minmrf - mrfdiff * (diff<0.1*sum ? 1:0);
+			} else rMRFb(m1,m2) = -minmrf - mrfdiff;
 		    }
 		}
 	    }
 	}
-
-	// Populate the diagonal
-	const double *pMRFa = MRFa->ValPtr();
-	const double *pMRFb = MRFb->ValPtr();
-	for (i = 0; i < slen; i++) {
-	    double suma = 0.0, sumb = 0.0;
-	    for (j = rp[i]; j < rp[i+1]; j++) {
-		suma += pMRFa[j];
-		sumb += pMRFb[j];
-	    }
-	    rMRFa(i,i) = suma;
-	    rMRFb(i,i) = sumb;
-	}
-
-	delete []rp;
-	delete []ci;
-
-	// DEBUG
-	//ofstream ofs("mrfa.dbg");
-	//MRFa->ExportRCV (ofs);
-    } else {
-	MRFa = 0;
-	MRFb = 0;
     }
+
+    // Populate the diagonal
+    const double *pMRFa = MRFa->ValPtr();
+    const double *pMRFb = MRFb->ValPtr();
+    for (i = 0; i < slen; i++) {
+	double suma = 0.0, sumb = 0.0;
+	for (j = rp[i]; j < rp[i+1]; j++) {
+	    suma += pMRFa[j];
+	    sumb += pMRFb[j];
+	}
+	rMRFa(i,i) = -suma;
+	rMRFb(i,i) = -sumb;
+    }
+
+    delete []rp;
+    delete []ci;
+    if (!kap)
+	delete []muaim;
 }
 
 double MRF::GetValue (const RVector &x) const
-{ // TO BE DONE
-    return 0;
+{
+    // DEBUG
+    ofstream ofs1("dbg.dat");
+    MRFa->ExportRCV(ofs1);
+
+    int slen = raster->SLen();
+    RVector xa(x, 0, slen);
+    RVector xb(x, slen, slen);
+    RVector res;
+    MRFa->Ax(xa, res);
+    double va = res & xa;
+    MRFb->Ax(xb, res);
+    double vb = res & xb;
+    return tau * (va+vb);
 }
 
 RVector MRF::GetGradient (const RVector &x) const

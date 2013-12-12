@@ -71,6 +71,34 @@ Raster_Pixel::~Raster_Pixel ()
 
 // ==========================================================================
 
+double Raster_Pixel::Value_nomask (const Point &p, int i) const
+{
+    int bi = sol2basis[i];
+    int iz = (dim < 3 ? 0 : bi / (bdim[0]*bdim[1]));
+    bi -= iz*bdim[0]*bdim[1];
+    int iy = bi/bdim[0];
+    int ix = bi - iy*bdim[0];
+
+    double intvx = (bbmax[0]-bbmin[0])/(double)(bdim[0]-1);
+    double intvy = (bbmax[1]-bbmin[1])/(double)(bdim[1]-1);
+
+    double dx = fabs(bbmin[0] + ix*intvx - p[0]);
+    double vx = max(0.0, 1.0-dx/intvx);
+    double dy = fabs(bbmin[1] + iy*intvy - p[1]);
+    double vy = max(0.0, 1.0-dy/intvy);
+    double v = vx*vy;
+
+    if (dim > 2) {
+	double intvz = (bbmax[2]-bbmin[2])/(double)(bdim[2]-1);
+	double dz = fabs(bbmin[2] + iz*intvz - p[2]);
+	double vz = max(0.0, 1.0-dz/intvz);
+	v *= vz;
+    }
+    return v;
+}
+
+// ==========================================================================
+
 void Raster_Pixel::Map_GridToBasis (const RVector &gvec, RVector &bvec) const
 {
     if (G) G->Ax (gvec, bvec);

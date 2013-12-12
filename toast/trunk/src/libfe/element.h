@@ -149,6 +149,12 @@ public:
     virtual BYTE Type () const = 0;
 
     /**
+     * \brief Returns the VTK element type identifier, or 0 if the
+     *   element doesn't have a VTK representation.
+     */
+    virtual BYTE VtkType () const { return 0; }
+
+    /**
      * \brief Returns element capability flags.
      * \return Bitflags for element caps. (see \ref elcap)
      */

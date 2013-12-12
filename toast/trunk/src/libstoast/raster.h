@@ -121,19 +121,36 @@ public:
      */
     void SolutionVoxelPositions (RDenseMatrix &pos) const;
 
+    virtual void Sample (const RVector &bvec, const IVector &grd, RVector &img)
+	const;
+
+    /**
+     * \brief Value of basis function b_i at point p
+     * Identical to Value_nomask, but returns zero if p is outside the mesh
+     * \sa Value_nomask
+     */
+    virtual double Value (const Point &p, int i) const;
+
+    /**
+     * \brief Value of basis function b_i at point p
+     * This does not check for mesh support
+     * \sa Value
+     */
+    virtual double Value_nomask (const Point &p, int i) const = 0;
+
     /**
      * \brief Map a real-valued field from mesh to grid representation.
      * \param [in] mvec field vector in mesh representation
      * \param [out] bvec field vector in grid representation
      */
-    void Map_MeshToGrid (const RVector &mvec, RVector &gvec) const;
+    virtual void Map_MeshToGrid (const RVector &mvec, RVector &gvec) const;
 
     /**
      * \brief Map a complex-valued field from mesh to grid representation.
      * \param [in] mvec field vector in mesh representation
      * \param [out] bvec field vector in grid representation
      */
-    void Map_MeshToGrid (const CVector &mvec, CVector &gvec) const;
+    virtual void Map_MeshToGrid (const CVector &mvec, CVector &gvec) const;
 
     /**
      * \brief Map a set of fields from mesh to grid representation.
@@ -141,7 +158,7 @@ public:
      * \param [out] gsol field set in grid representation
      * \param [in] mapall flag mapping all/active only fields in the set
      */
-    void Map_MeshToGrid (const Solution &msol, Solution &gsol,
+    virtual void Map_MeshToGrid (const Solution &msol, Solution &gsol,
         bool mapall = false) const;
 
     /**
@@ -149,14 +166,14 @@ public:
      * \param [in] gvec field vector in grid representation
      * \param [out] mvec field vector in mesh representation
      */
-    void Map_GridToMesh (const RVector &gvec, RVector &mvec) const;
+    virtual void Map_GridToMesh (const RVector &gvec, RVector &mvec) const;
 
     /**
      * \brief Map a complex-valued field from grid to mesh representation
      * \param [in] gvec field vector in grid representation
      * \param [out] mvec field vector in mesh representation
      */
-    void Map_GridToMesh (const CVector &gvec, CVector &mvec) const;
+    virtual void Map_GridToMesh (const CVector &gvec, CVector &mvec) const;
 
     /**
      * \brief Map a set of fields from grid to mesh representation.
@@ -164,7 +181,7 @@ public:
      * \param [out] msol field set in mesh representation
      * \param [in] mapall flag mapping all/active only fields in the set
      */
-    void Map_GridToMesh (const Solution &gsol, Solution &msol,
+    virtual void Map_GridToMesh (const Solution &gsol, Solution &msol,
 	bool mapall = false) const;
 
     /**
@@ -187,7 +204,7 @@ public:
      * \param [out] bsol field set in basis representation
      * \param [in] mapall flag mapping all/active only fields in the set
      */
-    void Map_GridToBasis (const Solution &gsol, Solution &bsol,
+    virtual void Map_GridToBasis (const Solution &gsol, Solution &bsol,
 	bool mapall = false) const;
 
     /**
@@ -210,7 +227,7 @@ public:
      * \param [out] gsol field set in grid representation
      * \param [in] mapall flag mapping all/active only fields in the set
      */
-    void Map_BasisToGrid (const Solution &bsol, Solution &gsol,
+    virtual void Map_BasisToGrid (const Solution &bsol, Solution &gsol,
 	bool mapall = false) const;
 
     /**
@@ -364,11 +381,11 @@ public:
      */
     virtual void Map_SolToMesh (const CVector &svec, CVector &mvec) const;
 
-    void Map_SolToMesh (const Solution &ssol, Solution &msol,
+    virtual void Map_SolToMesh (const Solution &ssol, Solution &msol,
 	bool mapall = false ) const;
 
     // Mapping from active parameter vector to solution
-    void Map_ActiveSolToMesh (const RVector &asol, Solution &msol) const;
+    virtual void Map_ActiveSolToMesh (const RVector &asol, Solution &msol) const;
 
     /**
      * \brief Map a real-valued field from mesh to solution representation.
@@ -463,10 +480,19 @@ public:
     /**
      * \brief Map a linear basis index into the xy or xyz indices of the
      *   corresponding voxel.
+     * \param [in] basisidx linear basis index (>= 0)
+     * \param [out] crd Vector of voxel coordinates
+     */
+    virtual void GetBasisIndices (int basisidx, IVector &crd) const;
+
+    /**
+     * \brief Map a linear basis index into the xy or xyz indices of the
+     *   corresponding voxel.
      * \param basisidx linear basis index (>= 0)
      * \return Vector of voxel coordinates.
+     * \note This version is not threadsafe
      */
-    virtual IVector &GetBasisIndices (int basisidx) const;
+    //virtual IVector &GetBasisIndices (int basisidx) const;
 
     /**
      * \brief Map a linear grid index into the xy or xyz indices of the

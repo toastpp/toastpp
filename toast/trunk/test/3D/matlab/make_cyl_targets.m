@@ -104,6 +104,9 @@ end
 
 if nargin > 1 && display == true
     
+    img_mua = smooth3(img_mua);
+    img_mus = smooth3(img_mus);
+    
     cyl = zeros(grd+4);
     for k=1:size(cyl,3)
         z = (k-(size(cyl,3)+1)/2) * 50/grd(3);

@@ -122,6 +122,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_BASIS_SLEN:
         mtoast->GetBasisSLen (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_BASIS_VALUE:
+	mtoast->BasisValue (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_MAPBASIS:
 	mtoast->MapBasis (nlhs, plhs, nrhs, prhs);
 	break;
@@ -157,6 +160,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	break;
     case TOAST_BASISTOMESHMATRIX:
 	mtoast->BasisToMeshMatrix (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASISSAMPLE:
+	mtoast->SampleBasis (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_GRIDELREF:
 	mtoast->GridElref (nlhs, plhs, nrhs, prhs);
@@ -235,8 +241,14 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_WRITEMESH:
 	mtoast->WriteMesh (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_WRITEMESHVTK:
+	mtoast->WriteMeshVtk (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_MESHOPT:
 	mtoast->MeshOpt (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHREORDER:
+	mtoast->MeshReorder (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_MESHNODECOUNT:
 	mtoast->MeshNodeCount (nlhs, plhs, nrhs, prhs);
