@@ -293,6 +293,16 @@ public:
     // as boundary nodes
 
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
+        RGenericSparseMatrix &M, const RVector *coeff, int mode);
+    // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
+    // (only fills entries relevant for the element)
+
+    friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
+        FGenericSparseMatrix &M, const RVector *coeff, int mode);
+    // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
+    // (only fills entries relevant for the element)
+
+    friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
 	SCGenericSparseMatrix &M, const RVector *coeff, int mode);
     // Assembles nodal coefficient vector 'coeff' into element matrix 'M'
     // (only fills entries relevant for the element)

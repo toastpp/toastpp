@@ -40,6 +40,7 @@
 #define THREAD_LEVEL 2 // 0=none, 1=fine-grain, 2=coarse-grain
 #define TOAST_THREAD_MATLAB_GRADIENT  // parallelise Matlab toastGradient
 #define TOAST_THREAD_MATLAB_QMVEC     // parallelise Matlab Mvec
+#define TOAST_THREAD_ASSEMBLE         // parallelise system matrix assembly
 
 #else
 

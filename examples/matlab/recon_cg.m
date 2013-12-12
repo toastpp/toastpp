@@ -154,7 +154,7 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     
     % Gradient of cost function
     r = -toastGradient (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, ...
-                       data, sd, 'direct');
+                       data, sd, 'Method', 'direct');
     r = r .* x;                   % parameter scaling
     r = r - hreg.Gradient (logx); % regularisation contribution
     

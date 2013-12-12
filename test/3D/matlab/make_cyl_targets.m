@@ -8,39 +8,39 @@ img_mus = ones(grd) .* mus_bkg;
 
 %% Create inclusions
 
-ellipsoid.r = [15,15,5];
-ellipsoid.p = [0,5,-10];
-ellipsoid.phi = 30*pi/180;
+ellipsoid.r = [16,16,7];
+ellipsoid.p = [0,0,-13];
+ellipsoid.phi = -30*pi/180;
 ellipsoid.mua = 0.02;
-ellipsoid.mus = mua_bkg;
+ellipsoid.mus = mus_bkg;
 
-sphere1.r = 10;
-sphere1.p = [0,-5,10];
+sphere1.r = 11;
+sphere1.p = [0,5,10];
 sphere1.mua = mua_bkg;
 sphere1.mus = 2;
 
 sphere2.r = 5;
-sphere2.p = [8,13,15];
+sphere2.p = [-8,-13,15];
 sphere2.mua = 0.02;
 sphere2.mus = 0.5;
 
 sphere3.r = 5;
-sphere3.p = [-8,13,15];
+sphere3.p = [8,-13,15];
 sphere3.mua = 0.005;
 sphere3.mus = 2;
 
 sphere4.r = 3;
-sphere4.p = [0,-17,0];
+sphere4.p = [0,17,-6];
 sphere4.mua = 0.04;
 sphere4.mus = 0.25;
 
 sphere5.r = 3;
-sphere5.p = [0,-17,-10];
+sphere5.p = [0,17,-14];
 sphere5.mua = 0.0025;
 sphere5.mus = 4;
 
 sphere6.r = 4;
-sphere6.p = [0,-5,14];
+sphere6.p = [0,8,14];
 sphere6.mua = 0.02;
 sphere6.mus = mus_bkg;
 
