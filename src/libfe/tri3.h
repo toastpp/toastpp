@@ -76,6 +76,8 @@ public:
     BYTE Type () const { return ELID_TRI3; }
     // returns element type id
 
+    BYTE VtkType() const { return 5; }
+
     unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }
     // Return element capability flags
 

@@ -134,6 +134,10 @@ classdef toastBasis < handle
             end
         end
         
+	function v = Value(obj,pt,idx)
+	    v = toast(uint32(81),obj.handle,pt,idx);
+	end
+
         function tgt = Map(obj,mapstr,src)
             % Map a scalar function defined over the problem domain from
             % one basis representation to another.
@@ -169,6 +173,26 @@ classdef toastBasis < handle
             %         the unstructured mesh, to regular grid basis 'simg'
             %         excluding grid points external to the mesh.
             tgt = toast(uint32(29),obj.handle,mapstr,double(src));
+        end
+        
+        function img = Sample(obj,svec,grd)
+            % Samples basis coefficients on a regular grid
+            %
+            % Syntax: img = basis.Sample(svec,grd)
+            %
+            % Parameters:
+            %         svec [real array slen]
+            %             Vector of basis coefficients
+            %         grd [integer array 2 or 3]
+            %             Sampling grid sizes
+            %
+            % Return values:
+            %         img [real array]
+            %             One-dimensional array of sampled image
+            %
+            % Notes:  To turn the returned vector into a d-dimensional
+            %         image, use img = reshape(img,grd)
+            img = toast(uint32(83),obj.handle,svec,grd);
         end
         
         function elref = GridElref(obj)

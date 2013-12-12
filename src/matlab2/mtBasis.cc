@@ -16,9 +16,11 @@ using namespace toast;
 void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    char basistype[256] = "LINEAR";
+    char optionstr[256];
     int i, j, basistp = 0;
     RDenseMatrix *bb = 0;
+    double blobrad = 1.0;
+    double blobarg = 1.0;
 
     // mesh
     ASSERTARG(nrhs > 0, 0, "Too few parameters provided");
@@ -40,11 +42,27 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	    mxArray *cell = mxGetCell(prhs[2], i);
 	    if (mxIsChar (cell)) { 
 	        // basis type
-		mxGetString (cell, basistype, 256);
-		if (!strcasecmp (basistype, "LINEAR")) {
+		mxGetString (cell, optionstr, 256);
+		if (!strcasecmp (optionstr, "LINEAR")) {
 		    basistp = 0;
-		} else if (!strcasecmp (basistype, "CUBIC")) {
+		} else if (!strcasecmp (optionstr, "CUBIC")) {
 		    basistp = 1;
+		} else if (!strcasecmp (optionstr, "BLOB_GAUSS")) {
+		    basistp = 2;
+		} else if (!strcasecmp (optionstr, "BLOB_BESSEL")) {
+		    basistp = 3;
+		} else if (!strcasecmp (optionstr, "BLOB_HANNING")) {
+		    basistp = 4;
+		} else if (!strcasecmp (optionstr, "BLOB_RAMP")) {
+		    basistp = 5;
+		} else if (!strcasecmp (optionstr, "BLOB_SPLINE")) {
+		    basistp = 6;
+		} else if (!strcasecmp (optionstr, "RADIUS")) {
+		    blobrad = mxGetScalar(mxGetCell(prhs[2], ++i));
+		} else if (!strcasecmp (optionstr, "SIGMA")) {
+		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
+		} else if (!strcasecmp (optionstr, "ALPHA")) {
+		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else {
 		    ASSERTARG(false, 1, "unexpected value");
 		}
@@ -67,6 +85,22 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	break;
     case 1:
 	raster = new Raster_CubicPixel (bdim, gdim, mesh, bb);
+	break;
+    case 2:
+	raster = new Raster_GaussBlob (bdim, gdim, mesh, blobarg, blobrad, bb);
+	break;
+    case 3:
+	raster = new Raster_BesselBlob (bdim, gdim, mesh, blobarg, blobrad,
+					bb);
+	break;
+    case 4:
+	raster = new Raster_HanningBlob (bdim, gdim, mesh, blobrad, bb);
+	break;
+    case 5:
+	raster = new Raster_RampBlob (bdim, gdim, mesh, blobrad, bb);
+	break;
+    case 6:
+	raster = new Raster_SplineBlob (bdim, gdim, mesh, blobrad, bb);
 	break;
     }
 
@@ -136,6 +170,19 @@ void MatlabToast::GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
     Raster *raster = GETBASIS_SAFE(0);
     if (nlhs > 0)
         plhs[0] = mxCreateDoubleScalar (raster->SLen());
+}
+
+// =========================================================================
+
+void MatlabToast::BasisValue (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    RVector pt;
+    CopyVector (pt, prhs[1]);
+    int idx = (int)mxGetScalar(prhs[2]) - 1;
+
+    plhs[0] = mxCreateDoubleScalar(raster->Value(pt, idx));
 }
 
 // =========================================================================
@@ -930,6 +977,31 @@ void ImageGradient (const IVector &gdim, const RVector &gsize,
     }
 }
 #endif
+
+void MatlabToast::SampleBasis (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    int i, n;
+
+    // raster
+    Raster *raster = GetBasis(prhs[0]);
+    ASSERTARG(raster, 1, "Basis not found");
+
+    // for now, assume real-valued argument
+    RVector svec;
+    CopyVector (svec, prhs[1]);
+
+    RVector grd;
+    CopyVector (grd, prhs[2]);
+    IVector igrd(grd.Dim());
+    for (i = 0, n = 1; i < grd.Dim(); i++) {
+	igrd[i] = (int)(grd[i]+0.5);
+	n *= igrd[i];
+    }
+    RVector img(n);
+    raster->Sample(svec,igrd,img);
+    CopyVector (&plhs[0],img);
+}
 
 void MatlabToast::ImageGradient (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])

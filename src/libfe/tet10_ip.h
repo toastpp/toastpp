@@ -52,6 +52,7 @@ public:
     void Initialise (const NodeList &nlist);
 
     BYTE Type() const { return ELID_TET10_IP; }
+    BYTE VtkType() const { return 24; }
     unsigned long GetCaps () const { return ELCAPS_CURVED_BOUNDARY; }
     int nNode() const { return 10; }
     int nSide() const { return 4; }

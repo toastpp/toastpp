@@ -37,6 +37,13 @@ public:
     ~Raster_CubicPixel ();
 
     /**
+     * \brief Value of basis function b_i at point p
+     * This does not check for mesh support
+     * \sa Value
+     */
+    double Value_nomask (const Point &p, int i) const;
+
+    /**
      * \brief Map a real-valued field from grid to basis representation.
      * \param [in] gvec field in grid representation
      * \param [out] bvec field in native basis representation

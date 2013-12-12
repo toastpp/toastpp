@@ -53,6 +53,7 @@ public:
     void PostInitialisation (const NodeList &nlist);
 
     inline BYTE Type() const { return ELID_VOX8; }
+    BYTE VtkType() const { return 11; }
     inline unsigned long GetCaps() const { return 0; }
     inline int nNode() const { return 8; }
     inline int nSide() const { return 6; }

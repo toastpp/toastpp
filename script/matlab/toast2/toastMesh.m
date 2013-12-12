@@ -202,6 +202,56 @@ classdef toastMesh < handle
             end
         end
 
+        function WriteVtk(obj,fname,nim)
+            if obj.handle > 0
+                toast(uint32(82),obj.handle,fname,nim);
+            end
+        end
+        
+        function perm = Optimise(obj,modestr)
+            % Compute a mesh node reordering.
+            %
+            % Syntax: perm = mesh.Optimise(mode)
+            %
+            % Parameters:
+            %         mode [string]:
+            %             MMD:     MMD reordering
+            %             BANDW:   bandwidth minimisation
+            %             TINNEY2: Tinney-2 reordering
+            %
+            % Return values:
+            %         perm [integer array]:
+            if obj.handle > 0
+                perm = toast(uint32(70),obj.handle,modestr);
+            end
+        end
+        
+        function Reorder(obj,perm)
+            % Re-order mesh nodes.
+            %
+            % Syntax: mesh.Reorder(perm)
+            %
+            % Parameters:
+            %         perm [integer array]:
+            %             permutation vector
+            %
+            % Notes:  On exit, the mesh node and element index lists
+            %         are re-ordered according to the permutation array.
+            %
+            %         This can be used e.g. for mesh optimisation in
+            %         combination with mesh.Optimise.
+            %
+            %         Nodal images created for the original mesh will need
+            %         to be re-ordered as well to work with the modified
+            %         mesh.
+            %        
+            % See also:
+            %         toastMesh/Optimise
+            if obj.handle > 0
+                toast(uint32(84),obj.handle,perm);
+            end
+        end
+        
         function el = Element(obj,elid)
             % Return an element object for one of the mesh elements.
             %

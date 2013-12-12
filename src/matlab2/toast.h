@@ -13,6 +13,7 @@
 #define TOAST_READMESH           0
 #define TOAST_MAKEMESH           1
 #define TOAST_WRITEMESH          2
+#define TOAST_WRITEMESHVTK      82
 #define TOAST_CLEARMESH          3
 #define TOAST_MESHDATA           4
 #define TOAST_SURFDATA           5
@@ -24,6 +25,7 @@
 #define TOAST_MESHDIMENSION      9
 #define TOAST_MESHLIN2QUAD      69
 #define TOAST_MESHOPT           70
+#define TOAST_MESHREORDER       84 // end
 #define TOAST_ELEMENTSIZE       10
 #define TOAST_ELEMENTDATA       11
 #define TOAST_FINDELEMENT       12
@@ -54,6 +56,7 @@
 #define TOAST_BASIS_NLEN        71
 #define TOAST_BASIS_BLEN        72
 #define TOAST_BASIS_SLEN        73
+#define TOAST_BASIS_VALUE       81
 #define TOAST_MAPBASIS          29
 #define TOAST_MAPMESHTOBASIS    30
 #define TOAST_MAPMESHTOGRID     31
@@ -67,6 +70,7 @@
 #define TOAST_MAPGRIDTOSOL      39
 #define TOAST_BASISTOMESHMATRIX 40
 #define TOAST_MESHTOBASISMATRIX 68
+#define TOAST_BASISSAMPLE       83
 #define TOAST_GRIDELREF         63
 #define TOAST_SAMPLEFIELD       66
 #define TOAST_IMAGEGRADIENT     64
@@ -90,7 +94,7 @@
 #define TOAST_MESHREFINE        77
 #define TOAST_SPLITELEMENT      78
 #define TOAST_NODENEIGHBOUR     79
-#define TOAST_UNWRAPPHASE       80 // end
+#define TOAST_UNWRAPPHASE       80
 
 #define TOAST_SETVERBOSITY    1000
 #define TOAST_THREADCOUNT     1001

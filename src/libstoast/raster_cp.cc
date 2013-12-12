@@ -41,7 +41,7 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
     for (i = 0; i < dim; i++) {
 	swght[i] = new double[gdim[i]];
     }
-    IVector imin(3), imax(3);
+    IVector imin(3), imax(3), basisgrd;
     int grd[3];
     int jx, jy, jz, zofs, yofs;
 
@@ -49,7 +49,7 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 	nz = 0;
 	gsum = 0.0;
 	grow.Clear();
-	IVector &basisgrd = GetBasisIndices (i);
+	GetBasisIndices (i, basisgrd);
 	imin = 100000; imax = -1;
 	if (dim < 3) imin[2] = imax[2] = 0;
 	// find grid support range for this basis function
@@ -217,7 +217,8 @@ Raster_CubicPixel::~Raster_CubicPixel ()
 double Raster_CubicPixel::Value (int basisidx, const Point &p)
 {
     int i;
-    IVector &grd = GetBasisIndices (basisidx);
+    IVector grd;
+    GetBasisIndices (basisidx, grd);
     
     double dr, s, val = 1.0;
     for (i = 0; i < dim; i++) {
@@ -258,6 +259,14 @@ double Raster_CubicPixel::Value (const IVector &basisgrd, const Point &p)
 	val *= s;
     }
     return val;    
+}
+
+// ==========================================================================
+
+double Raster_CubicPixel::Value_nomask (const Point &p, int i) const
+{
+    // to be done
+    return 0.0;
 }
 
 // ==========================================================================

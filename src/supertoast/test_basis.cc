@@ -41,8 +41,8 @@ int main (int argc, char *argv[])
 {
     //char *meshname = "ellips_tri10.msh";
     //char *tgtname = "tgt_mua_ellips_tri10.nim";
-    char *meshname = "cyl2.msh";
-    char *tgtname = "mua_tgt_cyl2.nim";
+    char *meshname = "circle25_32.msh";
+    char *tgtname = "tmp.nim";
 
     Mesh mesh;
     ifstream ifs (meshname);
@@ -55,35 +55,17 @@ int main (int argc, char *argv[])
     IVector gdim(bdim*4);
 
     Raster *raster;
-    raster = new Raster_CubicPixel (bdim, gdim, &mesh);
-
-    int glen = raster->GLen();
-    int blen = raster->BLen();
-    int slen = raster->SLen();
-
-    cout << "glen=" << glen << endl;
-    cout << "blen=" << blen << endl;
-    cout << "slen=" << slen << endl;
+    raster = new Raster_GaussBlob(bdim,bdim,&mesh,1,1);
 
     int n = mesh.nlen();
-    RVector mua(n);
-    if (!ReadNim (tgtname, 0, mua))
-	mua = 1;
+    RVector prm(n);
+    n = 1;
 
-    RVector gmua(glen);
-    raster->Map_MeshToGrid (mua, gmua);
-    ofstream ofs1 ("gmua.dat");
-    ofs1 << gmua << endl;
+    RVector bprm(raster->BLen());
+    raster->Map_MeshToBasis(prm,bprm);
 
-    RVector bmua(blen);
-    raster->Map_GridToBasis (gmua, bmua);
-    ofstream ofs2 ("bmua.dat");
-    ofs2 << bmua << endl;
-    
-    RVector gmua2(glen);
-    raster->Map_BasisToGrid (bmua, gmua2);
-    ofstream ofs3 ("gmua2.dat");
-    ofs3 << gmua2 << endl;
+    bprm = 1;
+    raster->Map_BasisToMesh(bprm,prm);
 
     return 0;
 }

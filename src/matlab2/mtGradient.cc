@@ -218,6 +218,10 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 	raster->Map_GridToSol (gk, dgrad);
 	grad_ckappa -= Re(dgrad);
 
+	// DEBUG
+	//if (q == 6)
+	//  return;
+
 	delete []cdfield_grad;
 	delete []cafield_grad;
 

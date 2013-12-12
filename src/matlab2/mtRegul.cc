@@ -394,6 +394,14 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 	    reg = new Tukey (tau, T, &x0, raster, kapref, istensor);
 	}
 	
+    } else if (!strcasecmp (rtype, "MRF")) {
+
+	if (verbosity >= 1) {
+	    cerr << "Regularisation: MRF" << endl;
+	    cerr << "--> tau=" << tau << endl;
+	}
+	reg = new MRF (tau, &x0, raster);
+
     } else {
 	
 	reg = 0;  // "no regularisation"

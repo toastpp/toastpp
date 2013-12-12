@@ -136,7 +136,8 @@ x = [scmua;sckap];                                  % linea solution vector
 logx = log(x);                                      % transform to log
 
 % Initialise regularisation
-hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
+%hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
+hreg = toastRegul('MRF',hbasis,logx,tau);
 
 % initial data error (=2 due to data scaling)
 err0 = toastObjective (proj, data, sd, hreg, logx); %initial error
@@ -154,7 +155,7 @@ while (itr <= itrmax) && (err > tolCG*err0) && (errp-err > tolCG)
     
     % Gradient of cost function
     r = -toastGradient (hmesh, hbasis, qvec, mvec, mua, mus, ref, freq, ...
-                       data, sd, 'Method', 'direct');
+                       data, sd, 'method', 'direct');
     r = r .* x;                   % parameter scaling
     r = r - hreg.Gradient (logx); % regularisation contribution
     

@@ -50,6 +50,7 @@ public:
     void Initialise (const NodeList &nlist);
 
     BYTE Type() const { return ELID_TET10; }
+    BYTE VtkType() const { return 24; }
     unsigned long GetCaps () const { return ELCAPS_SUBSAMPLING; }
     int nNode() const { return 10; }
     int nSide() const { return 4; }

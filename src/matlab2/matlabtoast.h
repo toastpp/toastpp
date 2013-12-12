@@ -71,6 +71,8 @@ public:
         const mxArray *prhs[]);
     void GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void BasisValue (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
     void MapBasis (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MapMeshToBasis (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
@@ -96,6 +98,8 @@ public:
         const mxArray *prhs[]);
     void MeshToBasisMatrix (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void SampleBasis (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
     void GridElref (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void SampleField (int nlhs, mxArray *plhs[], int nrhs,
@@ -146,7 +150,11 @@ public:
     void ReadMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void WriteMesh (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void WriteMeshVtk (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void MeshOpt (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void MeshReorder (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
     void MeshNodeCount (int nlhs, mxArray *plhs[], int nrhs,
 		const mxArray *prhs[]);
     void MeshElementCount (int nlhs, mxArray *plhs[], int nrhs,

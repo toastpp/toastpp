@@ -147,6 +147,14 @@ void Raster::SolutionVoxelPositions (RDenseMatrix &pos) const
 
 // ==========================================================================
 
+double Raster::Value (const Point &p, int i) const
+{
+    double v = Value_nomask (p, i);
+    return (v && meshptr->ElFind(p) >= 0 ? v : 0.0);
+}
+
+// ==========================================================================
+
 void Raster::Map_MeshToGrid (const RVector &mvec, RVector &gvec) const
 {
     B->Ax (mvec, gvec);
@@ -419,6 +427,40 @@ void Raster::Map_MeshToSol (const Solution &msol, Solution &ssol, bool mapall)
 
 // ==========================================================================
 
+void Raster::Sample (const RVector &svec, const IVector &grd, RVector &img)
+    const
+{
+    dASSERT(svec.Dim() == slen, "Invalid basis vector length");
+    dASSERT(grd.Dim() == dim, "Invalid grid dimension");
+    int i, j, k, s, idx;
+    int nx = grd[0];
+    int ny = grd[1];
+    int nz = (dim >= 3 ? grd[2] : 1);
+    int ilen = nx*ny*nz;
+    if (img.Dim() != ilen)
+	img.New(ilen);
+    double v;
+    double dx = (bbmax[0]-bbmin[0])/(grd[0]-1.0);
+    double dy = (bbmax[1]-bbmin[1])/(grd[1]-1.0);
+    double dz = (dim >= 3 ? (bbmax[2]-bbmin[2])/(grd[2]-1.0) : 0.0);
+    Point p(dim);
+
+    for (k = idx = 0; k < nz; k++) {
+	if (dim >= 3) p[2] = bbmin[2] + k*dz;
+	for (j = 0; j < ny; j++) {
+	    p[1] = bbmin[1] + j*dy;
+	    for (i = 0; i < nx; i++) {
+		p[0] = bbmin[0] + i*dx;
+		for (s = 0, v = 0.0; s < slen; s++)
+		    v += Value(p, s) * svec[s];
+		img[idx++] = v;
+	    }
+	}
+    }
+}
+
+// ==========================================================================
+
 int Raster::GetSolIdx (int basisidx) const
 {
     dASSERT (basisidx >= 0 && basisidx < blen, "Argument 1 index out of range");
@@ -446,6 +488,20 @@ int Raster::GetBasisIdx (int solidx) const
 
 // ==========================================================================
 
+void Raster::GetBasisIndices (int basisidx, IVector &crd) const
+{
+    if (crd.Dim() != dim) crd.New(dim);
+    if (dim == 3) {
+	crd[2] = basisidx / (bdim[0]*bdim[1]);
+	basisidx -= crd[2]*bdim[0]*bdim[1];
+    }
+    crd[0] = basisidx % bdim[0];
+    crd[1] = basisidx / bdim[0];
+}
+
+// ==========================================================================
+// Warning: this version is not threadsafe
+#ifdef UNDEF
 IVector &Raster::GetBasisIndices (int basisidx) const
 {
     static IVector crd;
@@ -458,7 +514,7 @@ IVector &Raster::GetBasisIndices (int basisidx) const
     crd[1] = basisidx / bdim[0];
     return crd;
 }
-
+#endif
 // ==========================================================================
 
 IVector &Raster::GetGridIndices (int grididx) const
