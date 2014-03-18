@@ -1,6 +1,14 @@
 Toast++ software suite for forward and inverse Modelling in Optical Tomography
 Copyright 2014 Martin Schweiger and Simon Arridge
 
+    The Toast homepage is located at www.toastplusplus.org and contains
+    useful information and examples.
+
+    The Toast SVN repository can be found at
+    https://sourceforge.net/projects/toastpp/
+
+    For installation instructions, see INSTALL.
+
     Toast++ is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
