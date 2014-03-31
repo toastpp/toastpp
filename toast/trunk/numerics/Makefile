@@ -18,9 +18,9 @@ else
 	SUPERLU_NAME = libsuperlu$(LIB_SUFFIX)
 endif
 
-ifeq ($(BUILD_FDOT),1)
-	COMPONENT += mesa
-endif
+#ifeq ($(BUILD_FDOT),1)
+#	COMPONENT += mesa
+#endif
 
 all:: $(COMPONENT)
 
