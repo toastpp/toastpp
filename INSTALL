@@ -1,5 +1,5 @@
-TOAST compilation and installation from source tree.           19.6.2009
-====================================================
+Toast++ compilation and installation           31.3.2014
+====================================
 
 Contents
 --------
@@ -15,34 +15,16 @@ Contents
 
 1. Obtaining the toast sources
 ------------------------------
+The Toast++ sources are available from the SVN repository on Sourceforge.
+To check out a copy, you need an SVN client.
 
-1.1 Toast sources from SVN
---------------------------
+Command line: 
 
-You can only check out the toast sources from the SVN repository, if
+svn checkout svn://svn.code.sf.net/p/toastpp/code/ toastpp-code
 
-- you have an account at cs.ucl.ac.uk, and
-- you are a member of the 'medim' group (type 'groups' at the shell
-  prompt to find out).
+or
 
-See SVN.readme for instructions on accessing the repository.
-
-
-1.2 Toast sources from a tarball
---------------------------------
-
-If you have obtained a tarball containing the toast sources (e.g.
-toast-src.tar.gz), go to the directory where you want to install the toast
-source tree and unpack the tarball:
-
-tar xzvf toast-src.tar.gz
-
-This will create the 'toast' directory containing the toast source tree.
-
-You then have to unpack the numerics libraries:
-
-cd toast
-tar xzvf numerics.tar.gz
+svn checkout http://svn.code.sf.net/p/toastpp/code/ toastpp-code
 
 
 
@@ -164,6 +146,20 @@ Type
 	help toast
 
 for toolbox documentation and a list of toast functions.
+
+
+2.1.4 Compiling with fluorescence imaging support
+-------------------------------------------------
+To add support for fluorescence reconstruction (fDOT), you need to add a
+parameter to your call to configure:
+
+./configure --enable-fdot
+
+and proceed with the compilation as described above. Note that the fluorescence
+module includes code for projecting source distributions onto a mesh surface,
+and exitance measurements from the mesh surface to an imaging system. The
+projection code requires the libraries and header files of the Mesa 3D Graphics
+Library (http://www.mesa3d.org/) installed on your system.
 
 
 2.2 Windows
