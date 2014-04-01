@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>Parameter structure (prm)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="definitions.html">Definitions</a> &gt;
+Parameter structure (prm)
+</div>
+
+<div class="param">
+<h1>Parameter structure (prm)</h1>
+<p>The TOAST forward and inverse solvers are highly customisable and can be
+configured with various parameters to define meshes, solvers, data files, etc.
+
+<p>The configuration parameters are bundled into a single structure which is
+passed to the forward model driver, <a href="toastFwd.html">toastFwd</a>, or
+reconstruction driver, <a href="toastRecon.html">toastRecon</a>.
+
+<p>The structure is hierarchically defined of sub-structures that group logical
+components of the driver together. Below is a description of the structure and
+its components.
+
+<p>Some sub-structures can be used directly as input parameters for lower-level
+toast functions. For example, the <i>regul</i> sub-structure can be passed into the
+<a href="toastRegul.html">toastRegul</a> function for defining a regularisation
+object.
+
+<p>The field names in the table below are the entries in the parameter structure.
+For example, if the name of the parameter structure is <i>prm</i>, then the mesh file entry
+would be <i>prm.basis.meshfile</i>.
+
+<h2>Overview</h2>
+
+<p><table col="4" width="100%">
+
+<tr><td colspan="4" class="header">Measurement parameters</td></tr>
+<tr><td>meas.qmfile</td><td><i>string</i></td><td>Name of the file containing the source and detector descriptions.
+     This entry is not used if the hMesh entry (mesh handle) is present. In that case, the QM definitions are assumed to
+     already have been applied to the mesh object.</td><td>FR</td></tr>
+<tr><td>meas.src.type</td><td><i>string</i></td><td>Source type. Possible values:<br>
+    <code>NEUMANN</code> (source defined as boundary flux term)<br>
+    <code>ISOTROPIC</code> (source defined as internal isotropic source)</td><td>FR</td></tr>
+<tr><td>meas.src.prof</td><td><i>string</i></td><td>Source profile. Possible values:<br>
+    <code>GAUSSIAN</code> (source profile is Gaussian, with standard deviation defined by width parameter)<br>
+    <code>COSINE</code> (source profile is a cosine, with FWHM defined by width parameter)</td><td>FR</td></tr>
+<tr><td>meas.src.width</td><td><i>real</i></td><td>Source width [mm] for given profile</td><td>FR</td></tr>
+<tr><td>meas.det.prof</td><td><i>string</i></td><td>Detector profile. Possible values:<br>
+    <code>GAUSSIAN</code> (detector profile is Gaussian, with standard deviation defined by width parameter)<br>
+    <code>COSINE</code> (detector profile is a cosine, with FWHM defined by width parameter)</td><td>FR</td></tr>
+<tr><td>meas.det.width</td><td><i>real</i></td><td>Detector width [mm] for given profile</td><td>FR</td></tr>
+
+<tr><td colspan="4" class="header">Data parameters</td></tr>
+<tr><td>data.freq</td><td><i>real</i></td><td>Source modulation frequency [MHz]</td><td>FR</td></tr>
+<tr><td>data.lnampfile</td><td><i>string</i></td><td>Name of the file containing log amplitude measurement data. The forward solvers write their results
+into this file. The inverse solvers read from this file.</td><td>FR</td></tr>
+<tr><td>data.phasefile</td><td><i>string</i></td><td>Name of the file containing phase measurement data. The forward solvers write their results
+into this file. The inverse solvers read from this file.</td><td>FR</td></tr>
+<tr><td>data.useref</td><td><i>bool</i></td><td>If <i>true</i>, perform a difference reconstruction using the reference data defined in the data.ref
+substructure. If <i>false</i>, perform an absolute reconstruction. The default value is <i>false</i>, i.e. if this field is missing, an
+absolute reconstruction is performed, even if the data.ref substructure exists.</td><td>R</td></tr>
+<tr><td>data.ref.lnampfile</td><td><i>string</i></td><td>(optional) File name for log amplitude reference data. If present, a difference
+reconstruction is performed by subtracting the reference values from the data, and adding forward data for the provided initial parameter
+estimate.</td><td>R</td></tr>
+<tr><td>data.ref.phasefile</td><td><i>string</i></td><td>(optional) File name for phase reference data. If present, a difference
+reconstruction is performed by subtracting the reference values from the data, and adding forward data for the provided initial parameter
+estimate.</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Forward solver parameters</td></tr>
+<tr><td>fwdsolver.meshfile</td><td><i>string</i></td><td>Name of the file containing the toast mesh for the FEM forward solver.
+    Only used if the <i>fwdsolver.hmesh</i> entry is not present.</td><td>FR</td></tr>
+<tr><td>fwdsolver.hmesh</td><td><i>handle</i></td><td>(optional) Mesh handle. The associated mesh must contain a QM description
+    (see <a href="toastReadQM.html">toastReadQM</a>). If this field is present, the mesh associated with
+    the handle is used directly, and the <i>fwdsolver.meshfile</i> and <i>meas.qmfile</i> entries are ignored.</td><td>FR</td></tr>
+<tr><td>fwdsolver.method</td><td><i>string</i></td><td>Solver method for linear forward solver. Possible values:<br>
+    <code>DIRECT</code> (Direct solver using matrix factorisation. In Matlab scripts, this calls the backslash operator.
+    In toast mex files, this calls LU-decomposition.)<br>
+    <code>BICGSTAB</code> (Iterative stabilised bi-conjugate gradient solver)</td><td>FR</td></tr>
+<tr><td>fwdsolver.tol</td><td><i>real</i></td><td>Tolerance limit for linear solver (ignored for solver DIRECT)</td><td>FR</td></tr>    
+
+<tr><td colspan="4" class="header">Inverse solver parameters (general)</td></tr>
+<tr><td>solver.method</td><td><i>string</i></td><td>Solver method for the inverse solver. Possible values:<br>
+    <code>PCG</code> (Nonlinear conjugate gradient solver)<br>
+    <code>LM</code> (Gauss-Newton solver)</td><td>R</td></tr>
+<tr><td>solver.tol</td><td><i>real</i></td><td>Convergence criterion for the inverse solver</td><td>R</td></tr>
+<tr><td>solver.itmax</td><td><i>integer</i></td><td>Max. number of iterations</td><td>R</td></tr>
+<tr><td>solver.lsearch</td><td><i>bool</i></td><td>Flag for using a line search at each iteration.</td><td>R</td></tr>
+<tr><td>solver.step0</td><td><i>real</i></td><td>Initial step size for line search</td><td>R</td></tr>
+<tr><td>solver.basis.bdim</td><td><i>integer vector</i></td><td>Grid dimensions of the regular basis used by the inverse solver.
+    Size [1x2] or [1x3] depending on the dimension of the problem.</td><td>R</td></tr>
+<tr><td>solver.basis.hbasis</td><td><i>handle</i></td><td>(optional) Basis mapper handle. If this field is present, the handle is used
+    directly as the mapper instance. In this case, the <i>solver.basis.bdim</i> entry is ignored.</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Inverse solver parameters (Gauss-Newton)</td></tr>
+<tr><td>solver.krylov.method</td><td><i>string</i></td><td>Krylov solver method used for inverting the Hessian
+    at each GN linear step. Possible values:<br>
+    <code>bicgstab</code> (Biconjugate gradient stabilised)<br>
+    <code>gmres</code> (Generalised minimum residual - default)</td><td>R</td></tr>
+<tr><td>solver.krylov.tol</td><td><i>real</i></td><td>Krylov solver tolerance limit.</td><td>R</td></tr>
+<tr><td>solver.krylov.maxit</td><td><i>integer</i></td><td>Maximum number of Krylov (outer) iterations (default: 100)</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header"><a href="#prm_reg">Regularisation parameters (general)</a></td></tr>
+<tr><td>regul.method</td><td><i>string</i></td><td>Regularisation method. Possible values:<br>
+    <code>None</code> (no regularisation)<br>
+    <code>TK0</code> (0th order Tikhonov)<br>
+    <code>TK1</code> (1st order Tikhonov)<br>
+    <code>TV</code> (total variation)<br>
+    <code>Huber</code> (Huber regularisation)</td><td>R</td></tr>
+<tr><td>regul.tau</td><td><i>real</i></td><td>regularisation hyperparameter</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Regularisation parameters (TK0)</td></tr>
+<tr><td>regul.tk0.xs</td><td><i>real vector</i></td><td>
+Optional scaling vector. If not provided, xs=1 is assumed.
+</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Regularisation parameters (TV)</td></tr>
+<tr><td>regul.tv.beta</td><td><i>real</i></td><td>&beta; parameter for TV regularisation (only used if regul.method = 'TV')</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Regularisation parameters (Huber)</td></tr>
+<tr><td>regul.huber.eps</td><td><i>real</i></td><td>&epsilon; parameter for Huber regularisation (only used if regul.method = 'Huber')</td><td>R</td></tr>
+
+<tr><td colspan="4" class="header">Regularisation parameters (structural priors)</td></tr>
+<tr><td>regul.prior.refimg</td><td><i>real vector</i></td><td>Reference image in <a href="basis.html">b-basis</a> format.
+    This image is used to construct the diffusivity prior.</td><td>R</td></tr>
+<tr><td>regul.prior.smooth</td><td><i>real</i></td><td>Smoothing factor for the prior image. Smaller values decrease
+    the width of edge areas.</td><td>R</td></tr>
+<tr><td>regul.prior.threshold</td><td><i>real</i></td><td>Threshold value for the prior image. Larger values increase
+    the regularisation weight in edge areas.</td><td>R</td></tr>
+</table>
+Legend: F = used by toastFwd, R = used by toastRecon.
+
+<a name="prm_reg"><h2>Regularisation parameters [regul]</h2>
+<p>Defines the regularisation type, hyperparameter, type-specific parameters and
+structural prior parameters used by the inverse solver.
+<p>If the 'regul' field is not present in the structure passed to toastRecon, no
+regularisation is applied.
+
+<h2>See also</h2>
+<a href="toastReadParam.html">toastReadParam</a>,
+<a href="toastWriteParam.html">toastWriteParam</a>,
+<a href="toastFwd.html">toastFwd</a>,
+<a href="toastRecon.html">toastRecon</a>
+
+</div>
+
+</body>
+</html>

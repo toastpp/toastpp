@@ -1,0 +1,15 @@
+FC      = f77
+FCOPT   = -O4
+FCNOPT  = 
+FCINCL  = -I../ -I/usr/now/am2/include -I/usr/now/include \
+	  -I/usr/now/mpi/mpich/include
+FCLOAD  =
+PARLIB  = -L/usr/now/mpi/mpich/lib/solaris/am2 -L/usr/now/lib  \
+	  -L/usr/now/am2/lib -lmpi -lens -leutl -lglunix -lam2 \
+	  -lthread -lposix4 -lsocket -lnsl
+RANLIB  = touch
+
+BLAS    =
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =

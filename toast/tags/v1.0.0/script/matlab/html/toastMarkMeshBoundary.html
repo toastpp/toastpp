@@ -1,0 +1,66 @@
+<html>
+<head>
+<title>toastMarkMeshBoundary</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMarkMeshBoundary
+</div>
+<div class="param">
+
+<h1>toastMarkMeshBoundary</h1>
+<p>Create a TOAST mesh from vertex and index lists.
+
+<h2>Syntax</h2>
+<div class="code">
+bnd = toastMarkMeshBoundary (hMesh)<br>
+bnd = toastMarkMeshBoundary (hMesh, bnd)
+</div>
+
+<h2>Parameters</h2>
+<table>
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>bnd</td><td><i>integer [h]</i></td><td>[optional] list of boundary flags</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>bnd</td><td><i>integer [h]</i></td><td>list of applied boundary flags</td></tr>
+    </table>
+  </td></tr>
+</table>
+Dimensions: <i>h</i> = number of nodes (size of <a href="basis.html">h-basis</a>)
+
+<h2>Notes</h2>
+<p>Many mesh operations require the boundary nodes to be identified
+  in the mesh. If a mesh does not contain boundary information,
+  toastMarkMeshBoundary can be used to supply it. In addition, the
+  function can be used to label internal boundaries.
+ 
+<p>If toastMarkMeshBoundary is called without the second input
+  parameter, boundary nodes are identified automatically according
+  to their mesh connectivity.
+ 
+<p>If an explicit boundary label list is provided, this is used
+  instead. The length of <i>bnd</i> should be equal to the number of
+  nodes (see toastMeshNodeCount), and contain the following entries:
+ 
+<table col="2">
+<tr><td>0</td><td>internal node</td></tr>
+<tr><td>1</td><td>surface node</td></tr>
+<tr><td>2</td><td>internal boundary node</td></tr>
+</table>
+ 
+<p>In all cases, the list of boundary flags is returned.
+
+<h2>See also</h2>
+<a href="toastMeshNodeCount.html">toastMeshNodeCount</a>,
+<a href="toastMakeMesh.html">toastMakeMesh</a>
+
+</div>
+</body>
+</html>

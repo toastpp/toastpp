@@ -1,0 +1,17 @@
+include $(TOASTDIR)/Makefile.incl
+
+FC      = $(F77)
+#LD      = g++
+FCOPT   = $(FFLAGS) -funroll-all-loops -fno-f2c -O3
+FCNOPT  = 
+FCINCL  = -I../
+FCLOAD  = 
+PARLIB  =
+RANLIB  = touch
+
+BLAS    =
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =
+
+SHAREFLAG = -shared -Wl,-soname,$(SHAREDLIB)

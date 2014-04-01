@@ -1,0 +1,192 @@
+SHELL = /bin/sh
+
+# =======================================================================
+# TOAST directory Tree
+
+ifndef TOASTDIR
+TOASTDIR = $(PWD)
+endif
+TOASTVER = $(TOASTDIR)/@OBJDIR@
+ARCHDIR = @ARCHDIR@
+
+TSRC = $(TOASTDIR)/src
+TINC = $(TOASTDIR)/include
+TDOC = $(TOASTDIR)/doc
+
+TOASTOBJ = $(TOASTVER)/obj
+TBIN = $(TOASTVER)/bin
+TLIB = $(TOASTVER)/lib
+RPATH = @RPATH@
+
+# =======================================================================
+# Compilers and binutils
+
+CC       = @CC@
+CFLAGS   = @CFLAGS@
+CXX      = @CXX@
+CCFLAGS  = @CXXFLAGS@
+CCLIBS   = -L/usr/X11R6/lib -lm
+
+F77      = @F77@
+FFLAGS   = @FFLAGS@
+FLIBS    = @FLIBS@
+
+LD       = $(CXX)    # may need to be queried from configure
+LDFLAGS  = @LDFLAGS@
+
+SHLIB_LD      = @SHLIB_LD@
+SHLIB_CFLAGS  = @SHLIB_CFLAGS@
+SHLIB_LD_LIBS = @SHLIB_LD_LIBS@
+
+MAKE     = make
+RM       = rm -f
+RANLIB   = @RANLIB@
+
+LIB_SUFFIX = @LIB_SUFFIX@
+STLIB_SUFFIX = @STLIB_SUFFIX@
+SHLIB_SUFFIX = @SHLIB_SUFFIX@
+BLAS_LIB_SUFFIX = @BLAS_LIB_SUFFIX@
+LAPACK_LIB_SUFFIX = @LAPACK_LIB_SUFFIX@
+
+MAKE_LIB = @MAKE_LIB@
+
+ifndef MEXBIN
+MEXBIN = mex
+endif
+
+MEX      = $(MEXBIN) @MEXFLAGS@
+MEXEXT   = @MEXEXT@
+
+BUILD_FDOT = @TOAST_FDOT@
+OGLLIB = @OGLLIB@
+
+# =======================================================================
+# BLAS and LAPACK libraries (determined by configure)
+
+BLASLIB   = @BLASLIB@
+SPBLASLIB = -lfsbtk
+LAPACKLIB = @LAPACKLIB@
+
+# =======================================================================
+# ILUPACK support
+
+ILUPACKDIR = @ILUPACKDIR@
+ifdef ILUPACKDIR
+ILUPACKINC = -I$(ILUPACKDIR)/include
+ILUPACKLIBDIR = $(ILUPACKDIR)/lib/
+ILUPACKLIB = -L$(ILUPACKLIBDIR) 
+ILUFLAGS = -DHAVE_ILU
+endif
+
+# =======================================================================
+# Pthreads flags
+
+ENABLE_PTHREAD = @ENABLE_PTHREAD@
+
+# =======================================================================
+# MPI flags
+
+ENABLE_MPI = @ENABLE_MPI@
+MPIINCDIR = @MPIINCDIR@
+MPILIBDIR = @MPILIBDIR@
+
+# =======================================================================
+# CUDA support
+
+ENABLE_CUDA = @ENABLE_CUDA@
+CUDA_INSTALL_PATH = @CUDA_INSTALL_PATH@
+NVCC = $(CUDA_INSTALL_PATH)/bin/nvcc -arch=sm_20
+
+# =======================================================================
+# SuperLU support
+
+SUPERLUDIR = $(TOASTDIR)/numerics/SuperLU_4.3/SRC
+SUPERLUINC = -I$(SUPERLUDIR)
+SUPERLULIB = @SUPERLULIB@
+BUILD_SUPERLU = @BUILD_SUPERLU@
+SUPERLU_LOCAL_STATIC = @SUPERLU_LOCAL_STATIC@
+
+# =======================================================================
+# ParMETIS support
+
+ENABLE_PARMETIS = @ENABLE_PARMETIS@
+PARMETISINCDIR = @PARMETISINCDIR@
+PARMETISLIBDIR = @PARMETISLIBDIR@
+
+# =======================================================================
+# Scotch support
+
+ENABLE_SCOTCH = @ENABLE_SCOTCH@
+SCOTCHINCDIR = @SCOTCHINCDIR@
+SCOTCHLIBDIR = @SCOTCHLIBDIR@
+
+# =======================================================================
+# Zoltan support
+
+ENABLE_ZOLTAN = @ENABLE_ZOLTAN@
+ZOLTANINCDIR = @ZOLTANINCDIR@
+ZOLTANLIBDIR = @ZOLTANLIBDIR@
+
+# =======================================================================
+# Libraries
+
+LIBS      = @DL_LIBS@ @LIBS@ -lm
+TLIBS     = -lfe -lmath $(SUPERLULIB) -larpack $(LAPACKLIB) $(BLASLIB) \
+		$(SPBLASLIB) @TASKLIB@ $(FLIBS) $(ILUPACKLIB)
+
+ifeq ($(ENABLE_ZOLTAN),yes)
+	TINC  += -I$(ZOLTANINCDIR)
+	TLIBS += -L$(ZOLTANLIBDIR) -lzoltan
+endif
+
+ifeq ($(ENABLE_PARMETIS),yes)
+        TINC  += -I$(PARMETISINCDIR)
+	TLIBS += -L$(PARMETISLIBDIR) -lparmetis -lmetis
+endif
+
+ifeq ($(ENABLE_SCOTCH),yes)
+        TINC  += -I$(SCOTCHINCDIR)
+	TLIBS += -L$(SCOTCHLIBDIR) -lptscotch -lscotch -lscotcherr
+endif
+
+ifeq ($(ENABLE_PTHREAD),yes)
+	TLIBS += -lpthread
+endif
+
+ifeq ($(ENABLE_MPI),yes)
+	TINC  += -I$(MPIINCDIR)
+	TLIBS += -L$(MPILIBDIR) -lmpich -lmpl
+endif
+
+MATHLIB   = -L$(TLIB) -larpack @SUPERLULIB@ $(SPBLASLIB) $(LAPACKLIB) $(BLASLIB)
+FELIB     = -L$(TLIB) $(TLIBS)
+TOASTLIB  = -L$(TLIB) -ltoast $(TLIBS)
+TOASTCLIB = -L$(TLIB) -lctoast -ltoast $(TLIBS)
+STOASTLIB = -L$(TLIB) -lstoast $(TLIBS)
+
+GUIFLAGS  = -I$(TSRC)/libtcl @GUIFLAGS@
+GUILIBS   = -ltoasttcl @GUILIBS@
+
+GLLIB     = -L/usr/lib -L/usr/X11R6/lib -lglut -lGLU -lGL -lXmu -lXext -lX11 \
+	-lXi -ltogl
+
+ifeq ($(ENABLE_CUDA),yes)
+	LIBS += -L$(CUDA_INSTALL_PATH)/lib64 -lcudart -lcublas
+	CUDAINC = -I$(CUDA_INSTALL_PATH)/include -I$(TOASTDIR)/numerics/cuda
+endif
+
+# =======================================================================
+FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask $(SUPERLUINC) \
+            -I$(TSRC)/libmath -I$(TSRC)/libfe -I$(TSRC)/libdiffreg \
+            $(ILUPACKINC) $(CUDAINC) 
+TOASTINC  = $(FEINC) -I$(TSRC)/libstoast
+STOASTINC = $(FEINC) -I$(TSRC)/libstoast
+FDOTINC   = $(STOASTINC) -I$(TSRC)/libfdot
+INCLUDE   = $(TOASTINC)
+# =======================================================================
+
+# =======================================================================
+FEFLAGS   = $(CCFLAGS) $(ILUFLAGS) $(FEINC)
+STOASTFLAGS = $(CCFLAGS) $(ILUFLAGS) $(STOASTINC) $(RPATH)
+FLAGS = $(CCFLAGS) $(ILUFLAGS) $(INCLUDE)
+# =======================================================================

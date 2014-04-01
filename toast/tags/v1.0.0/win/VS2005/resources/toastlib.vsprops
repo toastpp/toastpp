@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="toastlib"
+	InheritedPropertySheets=".\toast.vsprops"
+	>
+	<Tool
+		Name="VCLinkerTool"
+		OutputFile="$(ToastLibDir)$(ProjectName).dll"
+		AdditionalLibraryDirectories=""
+		ImportLibrary="$(ToastLibDir)$(ProjectName).lib"
+	/>
+	<Tool
+		Name="VCPostBuildEventTool"
+		CommandLine="copy $(TargetPath) $(ToastMexDir)"
+	/>
+</VisualStudioPropertySheet>

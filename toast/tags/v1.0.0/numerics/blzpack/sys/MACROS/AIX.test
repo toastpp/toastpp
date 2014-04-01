@@ -1,0 +1,12 @@
+FC      = xlf
+FCOPT   = -O3 -qstrict
+FCNOPT  = 
+FCINCL  = -I../ -I/home/barad-dur/jwd/staff/osni/pvm3/include
+FCLOAD  =
+PARLIB  = -L$(PVM_ROOT)/lib/$(PVM_ARCH) -lfpvm3 -lgpvm3 -lpvm3
+RANLIB  = ranlib
+
+BLAS    =
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =

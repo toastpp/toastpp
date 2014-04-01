@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>Basis definitions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="definitions.html">Definitions</a> &gt;
+Basis definitions
+</div>
+
+<h1>Basis definitions</h1>
+<p>A <i>basis</i> is used to approximate a continuous function in space <i>f(<b>r</b>)</i>
+by an approximation <i>g(<b>r</b>)</i> = &Sigma;<i><sub>i</sub></i> <i>g<sub>i</sub> u<sub>i</sub>(<b>r</b>)</i>,
+where <i>g<sub>i</sub></i> are basis coefficients, and <i>u<sub>i</sub>(<b>r</b>)</i> are basis functions.
+
+<p>Given an <i>n</i>-dimensional basis <i>B = {u<sub>i</sub>}</i> over the domain,
+an image <i>f</i> can then be expressed by an <i>n</i>-dimensional coefficient vector
+<i>G = {g<sub>i</sub>)</i>.
+
+<p>TOAST uses a number of different basis definitions for specific tasks:
+<ul>
+<li><b>Mesh (h)</b>. A piecewise polynomial basis defined by an unstructured mesh.
+This basis is used by the forward solver module to define the finite element light transport model.
+<li><b>Grid (g)</b>. A piecewise bi- or tri-linear regular basis. The g-basis is generally used as an
+intermediate step to map between the forward and inverse bases. It is usually of higher resolution than the
+inverse basis.
+<li><b>Basis (b)</b>. A piecewise bi- or tri-linear regular basis for the inverse solver. This is the
+basis in which the reconstructed images are expressed. The b-basis defines a rectangular or box-shaped volume
+that may contain voxels which are outside the original object domain. It is useful for displaying reconstruction
+results.
+<li><b>Solution (s)</b>. A subset of the b-basis which excludes any voxels with no overlap with the
+object domain. All solution vectors in the inverse solver module are expressed in this basis.
+</ul>
+
+<p><img src="basis_h.gif">
+<img src="basis_g.gif">
+<img src="basis_b.gif">
+<img src="basis_s.gif">
+
+<h2>Basis mapping</h2>
+<p>A common task in a TOAST script is to map an image between different basis definitions. This can
+be done with the mapping functions provided by the <i>basis mapper</i> object. A basis mapper is
+created with the <a href="toastSetBasis.html">toastSetBasis</a> function:
+<div class="code">
+hBasis = toastSetBasis(hMesh,gdim,bdim)
+</div>
+where hMesh is a mesh handle (obtained for example by a call to <a href="toastReadMesh.html">toastReadMesh</a>),
+which defines the h-basis. gdim and bdim are integer vectors of size 2 or 3 defining the dimensions of the g-basis
+and b-basis, respectively. These bases are automatically aligned with the bounding box of the mesh.
+The s-basis is created by the basis mapper by checking the overlap of the b-basis with the h-basis.
+
+<p>The returned handle for the mapper object, hBasis, can then be used with one of the mapping functions
+to map an image from one basis to another, for example
+<div class="code">
+b_img = toastMapMeshToBasis (hBasis, h_img)
+</div>
+
+<p>If the last parameter in the call to toastSetBasis is omitted,
+<div class="code">
+hBasis = toastSetBasis(hMesh,dim)
+</div>
+then the intermediate (g) basis is not generated. In this case, g and b basis are considered equivalent,
+and the mapping between them is the identity. This is more efficient than specifying both gdim and bdim with
+identical dimensions.
+
+<p>Because the mapping between b and s basis only involves the removal of unsupported voxels, it can
+be implemented by a permutation array. You can obtain this array by a call to
+<a href="toastSolutionMask.html">toastSolutionMask</a>:
+<div class="code">
+mask = toastSolutionMask(hBasis)
+</div>
+To map from b to s basis:
+<div class="code">
+s_img = b_img(mask)
+</div>
+To map from s to b basis:
+<div class="code">
+b_img(mask) = s_img
+</div>
+
+<h2>Examples</h2>
+<p>Read a mesh, and create a basis mapper to map a nodal image into a regular grid that can be
+displayed by Matlab:
+<div class="code">
+hMesh = toastReadMesh('MyMesh.msh');<br>
+hBasis = toastSetBasis(hMesh,[128 128]);<br>
+h_img = toastReadNIM('nodal_mua.nim');<br>
+b_img = toastMapMeshToBasis(hBasis,h_img);<br>
+imagesc(reshape(b_img,64,64));<br>
+toastDeleteBasis(hBasis);<br>
+toastDeleteMesh(hMesh);
+</div>
+
+</body>
+</html>

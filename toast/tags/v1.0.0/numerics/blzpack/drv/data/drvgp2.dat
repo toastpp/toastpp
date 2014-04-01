@@ -1,0 +1,15 @@
+         2     : istor( 3) = number of required eigenpairs
+         2     : istor( 5) = number of vectors in a block   
+         0     : istor( 6) = maximum number of steps per run
+         0     : istor( 7) = number of starting vectors as input
+         0     : istor( 8) = number of eigenpairs given as input
+         1     : istor( 9) = problem type          
+         0     : istor(10) = spectrum slicing               
+         0     : istor(11) = solutions refinement        
+         5     : istor(12) = level of printing           
+         6     : istor(13) = file unit for output       
+  0.00E+00     : rstor( 1) = interval inferior limit (EIGL)
+  0.00E+00     : rstor( 2) = interval superior limit (EIGR)
+  0.00E+00     : rstor( 3) = threshold for convergence  
+   'A.dat'     : matrix file
+  'B1.dat'     : matrix file

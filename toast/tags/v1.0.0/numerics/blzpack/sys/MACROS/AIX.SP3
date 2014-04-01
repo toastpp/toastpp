@@ -1,0 +1,12 @@
+FC      = mpxlf90_r
+FCOPT   = -O3 -u -qfixed -qstrict
+FCNOPT  = -u -qfixed
+FCINCL  = -I../ -qmoddir=/scr -I/scr
+FCLOAD  =
+PARLIB  =
+RANLIB  = ranlib 
+
+BLAS    = -lblas
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =

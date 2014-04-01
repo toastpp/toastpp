@@ -1,0 +1,59 @@
+## 11/12/1999 ##########################################################
+#                                                                      #
+#  The directory blzpack/sys.                                          #
+#                                                                      #
+########################################################################
+
+   The current directory is organized as follows:
+
+   MACROS  : files that define options for the Fortran compiler, path
+             to the LAPACK library, BLAS library, linear solver etc
+   README  : this file
+   double  : intrisinc functions (double precision)
+   integer : intrisinc functions (integer)
+   single  : intrisinc functions (single precision)
+
+   Macros:
+   ------
+
+   FC      : required, defines the Fortran compiler name
+   FCOPT   : optional, defines options for the Fortran compiler with
+             optimization flags 
+   FCNOPT  : optional, defines options for the Fortran compiler without
+             optimization flags 
+   FCINCL  : required, defines paths for include files, such as -I../
+   FCLOAD  : optional, defines options for the loader
+   PARLIB  : optional, defines libraries for parallel interfaces
+   RANLIB  : required, it can be just `touch' 
+   BLAS    : optional, defines the path to the blas library 
+   EIGTB   : required, it should be either
+               tbcopy.1.f tbtrid.1.f (for EISPACK eigensolvers)
+             or
+               tbcopy.2.f tbtrid.2.f (for LAPACK eigensolvers)
+   LAPACK  : required if LAPACK eigensolvers are used, defines the
+             path to the LAPACK library, optional otherwise
+   SOLVER  : optional, defines the path to the linear solvers to be
+             used in the test drivers 
+
+   Notes:
+   -----
+
+ . One file from MACROS will be included in the Makefile that generates
+   libblzpack.a. That Makefile is located in blzpack/src/double and
+   blzpack/src/single.
+   
+ . The output of SILALG (given in the directory integer) is based on the
+   performance expected for the BLAS kernels on that particular machine,
+   for the kind of operations performed by BLZPACK. If no information on
+   the performance is available for a given platform the source provided
+   for the SUN workstations should be used.
+
+ . Linux MACROS used on a Dell Latitude CPi: MACROS/Linux.test
+
+ . SunOS MACROS for MPI used on the NOW at UC Berkeley: MACROS/SunOS.NOW
+
+ . SunOS MACROS for PVM used on a Sun Ultra 30 at LBNL: MACROS/SunOS.PVM
+
+ . AIX MACROS for PVM used on an IBM RS6K at UCB: MACROS/AIX.PVM
+
+end of README ##########################################################

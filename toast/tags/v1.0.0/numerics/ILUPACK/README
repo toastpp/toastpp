@@ -1,0 +1,67 @@
+in "users.mk" you find the set up to compile a main sample program, typically 
+located in the subdirectory "samples".
+If you type "make" (or sometimes "gmake") you will get a main executable program
+in the current directory, linked to its original binary in the subdirectory
+"samples/D" and "samples/Z". 
+
+From the command line you typically call your sample program like
+
+dmaingnl 1e-2 10 10 lnsp3937.rsa
+           ^   ^  ^     ^
+           ^   ^  ^   matrix
+           ^   ^  ^
+           ^   ^ elbow
+           ^   ^
+           ^ condest
+           ^
+drop tolerance
+
+o drop tolerance is a threshold used to drive the accuracy of the ILU
+o condest is the central novel feature of ILUPACK different from any 
+  other packages. With this parameter you control the scaled inverse
+  triangular factors. There is no general rule of thumb how to choose
+  condest. Numerical experience indicates that for PDE-type problems 
+  small number such at condest=5 works best. This makes ILUPACK to
+  behave closely to AMG methods. Larger choices of condest you have 
+  find out experimentally.
+o elbow is a suggestion of how much memory relative to the fill of your
+  source matrix you are willing to provide. If this parameter is too 
+  small, ILUPACK will automatically increase it.
+o matrix is a matrix in Harwell Boeing format (just for convenience)
+o For further details how to manipulate the ILUPACK set up please refer
+  to the sources in "samples/main*.c" or play around with the MATLAB
+  version that is set up in a similar (but more convenient) fashion.
+  Note however, these sources use several macros to allow for the 
+  compilation with different arithmetic (S/D/C/Z)
+o simple elementary examples that explain easily how to use ILUPACK can
+  be found in the subdirectory simple_examples/. A makefile is provided
+  as well. For 64 bit long integer make sure to use the correct options.
+o some sample matrices are distributed with ILUPACK to illustrate its 
+  behaviour. The can be read with the (S/D/C/Z)readmtc routine.
+   + lnsp3937.rua          real unsymmetric matrix
+   + aft02.cua             complex unsymmetric matrix
+   + mhd1280b.cha          complex Hermitian (pos. def.) matrix
+   + bcsstk17.rsa          real symmetric (pos. def.) matrix
+   + mplate.csa            complex symmetric matrix
+
+
+
+MATLAB mex source files are located in "matlabsrc" for a recent MATLAB 
+release. You have to compile these interfaces yourself entering the
+subdirectory "matlabsrc" and typing "make". If the mex environment
+doesnot complain, executables can be found in "mex".
+
+The libraries are located in one of the directories
+lib/GNU32           GNU compiler, 32 bit
+lib/GNU64           GNU compiler, 64 bit addressing, 32 bit integer
+lib/GNU64_long      GNU compiler, 64 bit addressing, 64 bit integer
+lib/INTEL32         INTEL compiler, 32 bit
+lib/INTEL64         INTEL compiler, 64 bit addressing, 32 bit integer
+lib/INTEL64_long    INTEL compiler, 64 bit addressing, 64 bit integer
+lib/PGI32           Portland compiler, 32 bit
+lib/PGI64           Portland compiler, 64 bit addressing, 32 bit integer
+lib/PGI64_long      Portland compiler, 64 bit addressing, 64 bit integer
+lib/aix             IBM AIX
+
+
+

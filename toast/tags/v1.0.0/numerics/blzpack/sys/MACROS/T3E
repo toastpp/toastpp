@@ -1,0 +1,12 @@
+FC      = f90
+FCOPT   = -eI -O3,inline4,unroll2
+FCNOPT  = -eI 
+FCINCL  = -I../
+FCLOAD  =
+PARLIB  =
+RANLIB  = ranlib
+
+BLAS    =
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =

@@ -1,0 +1,12 @@
+FC      = f77
+FCOPT   = +O4 +U77
+FCNOPT  = +U77
+FCINCL  = -I../
+FCLOAD  = +O4 +U77
+PARLIB  =
+RANLIB  = touch
+
+BLAS    =
+EIGTB   = tbcopy.1.f tbtrid.1.f
+LAPACK  =
+SOLVER  =

@@ -1,0 +1,72 @@
+<html>
+<head>
+<title>toastGetQM</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastGetQM
+</div>
+
+<div class="param">
+<h1>toastGetQM</h1>
+<p>Extract the source-detector connectivity from a mesh.
+
+<h2>Syntax</h2>
+<div class="code">
+LL = toastGetQM(hMesh)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>LL</td><td><i>sparse integer matrix [nm x nq]</i></td><td>source-detector connectivity matrix</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>Each column of the returned matrix corresponds to a source, and each row to
+  a detector of the measurement setup defined in the QM file loaded for the
+  mesh.
+<p>Nonzero entries exist only for the source-detector combinations for which
+  measurements were taken and which are registered in the link list.
+  The nonzero entries are numbered consecutively (starting from 1) and denote
+  the measurement position in the linear measurement vector.
+ 
+<h2>Examples</h2>
+<div class="code">
+  find(LL(:,i))
+</div>
+<p>Returns the detector indices used by source i. This is equivalent to row i
+  of the QM file link list, except that indices are 1-based.
+ 
+<div class="code">
+  nonzeros(LL(:,i))
+</div>
+<p>Contains the indices in the linear data vector of the measurements for
+  source i.
+ 
+<div class="code">
+  nonzeros(LL(j,:))
+</div>
+<p>Contains the indices in the linear data vector of the measurements for
+  detector j.
+ 
+<div class="code">
+  data_q1 = data(nonzeros(LL(:,1)))
+</div>
+<p>Extracts the measurements for source 1 from linear data vector 'data'.
+
+<h2>See also</h2>
+<a href="toastReadQM.html">toastReadQM</a>,
+<a href="toastSetQM.html">toastSetQM</a>
+
+</div>
+</body>
+</html>

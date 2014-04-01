@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="toastmex_win32"
+	OutputDirectory="$(SolutionDir)..\$(ConfigurationName)\obj\$(ProjectName)"
+	IntermediateDirectory="$(SolutionDir)..\$(ConfigurationName)\obj\$(ProjectName)"
+	InheritedPropertySheets=".\toast.vsprops;.\matlab_version.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="$(MatlabIncludeDir)"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="libmath.lib libfe.lib libstoast.lib libmx.lib libmex.lib libmat.lib"
+		OutputFile="$(ToastMexDir)$(ProjectName).mexw32"
+		AdditionalLibraryDirectories="$(MatlabLibDir)"
+		ModuleDefinitionFile="$(SolutionDir)matlab\resources\mexfunc.def"
+		ImportLibrary="$(ToastLibDir)$(ProjectName).lib"
+	/>
+	<Tool
+		Name="VCPostBuildEventTool"
+		CommandLine=""
+	/>
+	<UserMacro
+		Name="MatlabIncludeDir"
+		Value="$(MatlabDir)extern\include\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="MatlabLibDir"
+		Value="$(MatlabDir)extern\lib\win32\microsoft\"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

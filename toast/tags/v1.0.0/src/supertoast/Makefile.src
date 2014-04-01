@@ -1,0 +1,239 @@
+include $(TOASTDIR)/Makefile.incl
+
+VPATH = $(TSRC)/supertoast
+OPATH = $(TOASTOBJ)/supertoast
+BINS  = fwdfem fwdfem_cw fwdfem_tpsf
+BINS += supertoast supertoast_mw supertoast_cw_mw
+
+ifeq ($(ENABLE_MPI),yes)
+     BINS += fwdfem_zoltan
+#     BINS += supertoast_mpi supertoast_mw_mpi supertoast_cw_mw_mpi
+endif
+
+ifdef ENABLE_CUDA
+BINS += fwdfem_tpsf_cuda
+endif
+
+SUBDIRS = gridbasis++
+
+TOASTLIB = -L$(TLIB) -lsuperlu -lfe -lmath -lblzpack -larpack -llapack $(BLASLIB) $(SPBLASLIB) $(FLIBS)
+
+all:: $(BINS)
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
+	for i in $(SUBDIRS) ;\
+	do \
+	if test -d $(VPATH)/$$i ;\
+	then \
+		(mkdir -p $(OPATH)/$$i; \
+			cd $(OPATH)/$$i; \
+			cp $(VPATH)/$$i/Makefile.src ./Makefile; \
+			echo "making" all "in $$i..."; \
+			$(MAKE) $(MFLAGS) all); \
+	fi; \
+	done
+
+.cc.o :
+	$(CXX) $(STOASTFLAGS) -c $<
+
+
+fwdfem : fwdfem.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+fwdfem_cw : fwdfem_cw.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+fwdfem_tpsf : fwdfem_tpsf.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+fwdfem_tpsf_single : fwdfem_tpsf_single.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+fwdfem_tpsf_cuda : fwdfem_tpsf_cuda.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(STOASTLIB)
+
+fwdfem_zoltan : fwdfem_zoltan.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+supertoast : supertoast.o supertoast_util.o util.o solver.o solverlm.o \
+	solverpcg.o solverlin.o \
+	solverbfgs.o solverlbfgs.o solverart.o solverblockart.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
+
+supertoast_mw : supertoast_mw.o supertoast_util.o util.o solver_mw.o \
+	solverlm_mw.o solverpcg_mw.o solverlbfgs_mw.o solverlm2_mw.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
+
+supertoast_cw_mw : supertoast_cw_mw.o supertoast_util.o util.o solver_cw.o \
+	solverlm_cw_mw.o solverpcg_cw_mw.o solverlbfgs_cw_mw.o \
+	solverlm2_cw_mw.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
+
+supertoast_mpi : supertoast_mpi.o supertoast_util.o util.o solver.o \
+	solverlm_mpi.o solverpcg.o \
+	solverlin.o solverbfgs.o solverlbfgs.o solverart.o solverblockart.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
+
+supertoast_mw_mpi : supertoast_mw_mpi.o supertoast_util.o util.o \
+	solver_mw_mpi.o solverpcg_mw_mpi.o solverlm_mw_mpi.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+supertoast_cw_mw_mpi : supertoast_cw_mw.o supertoast_util.o util.o \
+	solver_cw_mw_mpi.o solverlm_cw_mw_mpi.o solverpcg_cw_mw_mpi.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+pmdf : pmdf.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+fwdfem_small : fwdfem_small.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+flufem : flufem.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flufem_rot : flufem_rot.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+gridbasis++ : gridbasis++.o util.o pscaler.o \
+	raster++.o solution++.o solver.o solverlm.o solverpcg.o \
+	solverlin.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+gridbasis_030308 : gridbasis_030308.o pparse.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FECLIB)
+
+gridbasis_mg : gridbasis_mg.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FECLIB)
+
+gridbasis_simon : gridbasis_simon.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FECLIB)
+
+gridbasis1 : gridbasis1.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FECLIB)
+
+gridbasis2 : gridbasis2.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FECLIB)
+
+supertoast2 : supertoast2.o util.o pparse.o pscaler.o fwdsolver.o source.o \
+	raster2.o solution.o of2.o regul2.o solver2.o solverlm2.o \
+	solverpcg2.o solverlin2.o solverbfgs2.o solverlbfgs2.o jacobian2.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+supertoast3 : supertoast3.o util.o pparse.o pscaler.o fwdsolver.o source.o \
+	raster3.o solution.o of3.o regul3.o solver.o solverlm3.o solverpcg3.o \
+	solverlin3.o jacobian3.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flutoast : flutoast.o util.o pparse.o pscaler.o fwdsolver.o raster.o \
+        solution.o fluof.o flusolver.o flusolverlm.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flutoast2 : flutoast2.o util.o pparse.o fwdsolver.o raster.o \
+        solution.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flutoast3 : flutoast3.o util.o pparse.o fwdsolver.o raster.o \
+        solution.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flutoast4 : flutoast4.o util.o pparse.o fwdsolver.o raster.o \
+        solution.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flutoast5 : flutoast5.o util.o pparse.o fwdsolver.o raster.o \
+        solution.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+flutoast6 : flutoast6.o util.o pparse.o tparse.o fwdsolver.o raster2.o \
+        source.o solution.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(TOASTLIB)
+
+test : test.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test1 : test1.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_sla : test_sla.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_superlu : test_superlu.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+testmat : testmat.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_grid : test_grid.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_qr : test_qr.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_block : test_block.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+test_basis : test_basis.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+test_adaptive : test_adaptive.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+test_intersection : test_intersection.o
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB)
+
+multigrid : multigrid.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+multigrid_unstrreg : multigrid_unstrreg.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $? $(CCLIBS) $(FELIB)
+
+dummy_main.o : dummy_main.c
+	gcc -c dummy_main.c
+
+drvsp1 : drvsp1.cc dummy_main.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $(CCLIBS) drvsp1.cc dummy_main.o \
+	-L../../lib -lmath -lblzpack -lf2c -lm -lg2c -I../libmath
+
+drvsp2 : drvsp2.cc dummy_main.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $(CCLIBS) drvsp2.cc dummy_main.o \
+	-L../../lib -lmath -lblzpack -lm -lg2c -I../libmath
+
+drvsp3 : drvsp3.cc dummy_main.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $(CCLIBS) drvsp3.cc dummy_main.o \
+	-L../../lib -lmath -lblzpack -lm -lg2c -I../libmath
+
+forward_refind : forward_refind.o fwdsolver.o solution.o source.o pparse.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+mapimage2 : mapimage2.cc raster2.o util.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+#diffuse_image : diffuse_image.cc raster2.o util.o regul2.o
+#	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+generic_diffuse_image : generic_diffuse_image.cc raster2.o util.o regul2.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+test_reg : test_reg.cc raster2.o util.o regul2.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+test_raster : test_raster.cc raster2.o util.o 
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+test_fullnewton : test_fullnewton.cc pparse.o tparse.o raster2.o fwdsolver.o \
+	solution.o source.o util.o pscaler.o jacobian2.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+test_edd : test_edd.cc
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
+
+tmp : tmp.o
+	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	for i in $(BINS) ; do \
+		($(RM) $(TBIN)/$$i); \
+	done

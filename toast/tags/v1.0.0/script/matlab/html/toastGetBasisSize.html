@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>toastGetBasisSize</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastGetBasisSize
+</div>
+
+<div class="param">
+<h1>toastGetBasisSize</h1>
+<p>Returns the grid dimensions of reconstruction basis.
+
+<h2>Syntax</h2>
+<div class="code">
+bdim = toastGetBasisSize(hBasis)<br>
+[bdim gdim] = toastGetBasisSize(hBasis)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>bdim</td><td><i>integer vector [1x2] or [1x3]</i></td><td>b-basis dimensions</td></tr>
+<tr><td></td>
+  <td>gdim</td><td><i>integer vector [1x2] or [1x3]</i></td><td>(optional) g-basis dimensions</td></tr>
+</table>
+
+<h2>Notes</h2>
+<p>Returns the grid size of the regular reconstruction basis (b-basis), and
+optionally the grid size of the high-resolution intermediate basis
+(g-basis). If the mapper instance was created without a third argument
+in the call to toastSetBasis, then bdim and gdim are identical.
+
+<p>The returned vectors are integer arrays of dimension 1x2 or 1x3,
+depending on the dimension of the problem.
+
+<h2>See also</h2>
+<a href="toastSetBasis.html">toastSetBasis</a>,
+<a href="basis.html">Basis definitions</a>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_fdot|Win32">
+      <Configuration>Release_fdot</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2F7BEE71-0116-4104-AE66-A434447F7178}</ProjectGuid>
+    <RootNamespace>libmath</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_fdot|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_fdot|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\resources\toastlib.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\resources\toastlib.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\resources\toastlib.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release_fdot|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release_fdot|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_fdot|Win32'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;..\..\..;..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMATH_EXPORTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>blas_win32.lib;lapack_win32.lib;SuperLU.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(ToastMexDir)" mkdir "$(ToastMexDir)"
+copy "$(TargetPath)" "$(ToastMexDir)"
+if not exist "$(ToastBinDir)" mkdir "$(ToastBinDir)"
+copy "$(TargetPath)" "$(ToastBinDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMATH_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level2</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(ToastMexDir)" mkdir "$(ToastMexDir)"
+copy "$(TargetPath)" "$(ToastMexDir)"
+if not exist "$(ToastBinDir)" mkdir "$(ToastBinDir)"
+copy "$(TargetPath)" "$(ToastBinDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_fdot|Win32'">
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMATH_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level2</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(ToastMexDir)" mkdir "$(ToastMexDir)"
+copy "$(TargetPath)" "$(ToastMexDir)"
+if not exist "$(ToastBinDir)" mkdir "$(ToastBinDir)"
+copy "$(TargetPath)" "$(ToastBinDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\libmath\cdmatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\complex.cc" />
+    <ClCompile Include="..\..\..\src\libmath\cr_cholesky.cc" />
+    <ClCompile Include="..\..\..\src\libmath\crmatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\crmatrix_cm.cc" />
+    <ClCompile Include="..\..\..\src\libmath\dgmatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\dnsmatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\error.cc" />
+    <ClCompile Include="..\..\..\src\libmath\fourn.cc" />
+    <ClCompile Include="..\..\..\src\libmath\gmres.cc" />
+    <ClCompile Include="..\..\..\src\libmath\gsmatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\ilutoast.cc" />
+    <ClCompile Include="..\..\..\src\libmath\mathdef.cc" />
+    <ClCompile Include="..\..\..\src\libmath\matrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\nr.cc" />
+    <ClCompile Include="..\..\..\src\libmath\precon.cc" />
+    <ClCompile Include="..\..\..\src\libmath\scomplex.cc" />
+    <ClCompile Include="..\..\..\src\libmath\scrmatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\symatrix.cc" />
+    <ClCompile Include="..\..\..\src\libmath\timing.cc" />
+    <ClCompile Include="..\..\..\src\libmath\util.cc" />
+    <ClCompile Include="..\..\..\src\libmath\vector.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\arch.h" />
+    <ClInclude Include="..\..\..\src\libmath\cdmatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\complex.h" />
+    <ClInclude Include="..\..\..\src\libmath\cr_cholesky.h" />
+    <ClInclude Include="..\..\..\src\libmath\crmatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\crmatrix_cm.h" />
+    <ClInclude Include="..\..\..\src\libmath\dgmatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\dnsmatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\error.h" />
+    <ClInclude Include="..\..\..\src\libmath\fourn.h" />
+    <ClInclude Include="..\..\..\src\libmath\gmres.h" />
+    <ClInclude Include="..\..\..\src\libmath\gsmatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\ilutoast.h" />
+    <ClInclude Include="..\..\..\src\libmath\mathdef.h" />
+    <ClInclude Include="..\..\..\src\libmath\mathlib.h" />
+    <ClInclude Include="..\..\..\src\libmath\matrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\nr.h" />
+    <ClInclude Include="..\..\..\src\libmath\precon.h" />
+    <ClInclude Include="..\..\..\src\libmath\scomplex.h" />
+    <ClInclude Include="..\..\..\src\libmath\scrmatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\symatrix.h" />
+    <ClInclude Include="..\..\..\src\libmath\timing.h" />
+    <ClInclude Include="..\..\..\src\libmath\util.h" />
+    <ClInclude Include="..\..\..\src\libmath\vector.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
