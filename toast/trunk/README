@@ -1,13 +1,11 @@
 Toast++ software suite for forward and inverse Modelling in Optical Tomography
 Copyright 2014 Martin Schweiger and Simon Arridge
 
-    The Toast homepage is located at www.toastplusplus.org and contains
+    The Toast++ homepage is located at www.toastplusplus.org and contains
     useful information and examples.
 
-    The Toast SVN repository can be found at
-    https://sourceforge.net/projects/toastpp/
-
-    For installation instructions, see INSTALL.
+    The Toast++ SVN repository and precompiled distribution packages can be
+    found at https://sourceforge.net/projects/toastpp/
 
     Toast++ is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,3 +19,65 @@ Copyright 2014 Martin Schweiger and Simon Arridge
 
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Installation from sources
+-------------------------
+
+    Check out a copy of the current Toast++ development code using the
+    command
+
+    svn checkout http://svn.code.sf.net/p/toastpp/code/ toastpp-code
+
+    If you are using a GUI-based SVN client, such as TortoiseSVN, just
+    point your repository URL to http://svn.code.sf.net/p/toastpp/code/
+    and check out the HEAD version.
+
+    For compilation and installation instructions, see file INSTALL in your
+    checked-out Toast++ source folder.
+
+
+Installation of a precompiled Toast++ package
+---------------------------------------------
+
+    Precompiled Toast++ packages for different computer platforms can be
+    found at
+
+    http://sourceforge.net/projects/toastpp/files/
+
+    You need to download two files:
+
+      - The "common" package (e.g. toast_v1.0.0_common.zip), containing
+        platform-independent files like Matlab scripts, data and help
+        files.
+
+      - One platform-dependent binary package (e.g. toast_v1.0.0_win64.zip),
+        containing the binary libraries, executables and mex files.
+
+    Currently Linux-64 and Windows-x64 platforms are supported.
+
+    Unzip and/or untar the two files into the same directory, and make sure
+    to retain the directory structure of the archives.
+
+
+Setting up and running Toast++
+------------------------------
+
+    On Linux systems, you need to set an environment variable TOASTDIR to your
+    Toast++ installation directory. This is required by some of the setup and
+    Matlab scripts. On Windows systems this can be skipped.
+
+    The easiest way to verify your installation and get started with Toast++
+    is with the Toast-Matlab toolbox.
+
+    Launch Matlab, navigate to the Toast++ installation directory, and run the
+    mtoast_install.m script. This sets up the Matlab search paths for Toast++.
+
+    Then, invoke the Toast++ demo page with
+
+        demo toolbox toast
+
+    and try the demos on that page.
+
+    Next, you could try the introductory examples on the toastplusplus.org
+    page, or the example scripts in the "test" subdirectory.
