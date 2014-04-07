@@ -6,7 +6,7 @@ Raster_HanningBlob::Raster_HanningBlob (const IVector &_bdim,
     : Raster_Blob (_bdim, _gdim, mesh, _sup, bb)
 {
     a2 = sup*sup;
-    fac = M_PI/sup;
+    fac = Pi/sup;
     scale = 0.5;
     scale *= ComputeBasisScale();
 
