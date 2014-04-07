@@ -153,7 +153,7 @@ double bessi0 (double x);
 // Returns the modified Bessel function I_0(x) for any real x
 // NR p. 237
 
-double bessi (int n, double x);
+MATHLIB double bessi (int n, double x);
 // Returns the modified Bessel function I_n(x) for any real x and n >= 2
 // NR p. 239
 
