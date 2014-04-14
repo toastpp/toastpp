@@ -155,6 +155,7 @@ distro_common::
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/script -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/test -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast2_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/readme.txt ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/license.html $(TOASTRELDIR)/gpl.txt; \
 	mv toast_common.zip $(TOASTRELDIR)
@@ -176,6 +177,7 @@ distro_bin_linux::
 	ln -T -s trunk $(TOASTRELDIR); \
 	tar czvf toast_bin_linux.tar.gz $(TOASTRELDIR)/$(ARCHDIR)/bin \
 	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTRELDIR)/$(ARCHDIR)/mex \
+	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTRELDIR)/$(ARCHDIR)/mex2 \
 	$(TOASTRELDIR)/toastenv.csh $(TOASTRELDIR)/toastenv.sh; \
 	mv toast_bin_linux.tar.gz $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz
 	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz"
