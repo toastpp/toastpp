@@ -67,11 +67,21 @@ Setting up and running Toast++
     Toast++ installation directory. This is required by some of the setup and
     Matlab scripts. On Windows systems this can be skipped.
 
+    Then, run (in bash shell)
+
+        source toastenv.sh
+
+    or (in csh shell)
+
+        source toastenv.csh
+
+    to set up the required toast search paths.
+
     The easiest way to verify your installation and get started with Toast++
     is with the Toast-Matlab toolbox.
 
     Launch Matlab, navigate to the Toast++ installation directory, and run the
-    mtoast_install.m script. This sets up the Matlab search paths for Toast++.
+    mtoast2_install.m script. This sets up the Matlab search paths for Toast++.
 
     Then, invoke the Toast++ demo page with
 
@@ -81,3 +91,22 @@ Setting up and running Toast++
 
     Next, you could try the introductory examples on the toastplusplus.org
     page, or the example scripts in the "test" subdirectory.
+
+
+Picking the Toast-interface in Matlab
+-------------------------------------
+Toast provides two interfaces to expose its functionality to Matlab:
+
+    - a legacy interface composed of top-level function with prefix 'toast',
+      e.g. toastReadMesh.
+
+    - a new interface based on Matlab class constructs (e.g. toastMesh for
+      the mesh class). Access to the Toast functionality is provided via
+      class members.
+
+To pick your interface, run the mtoast_install.m script (for the legacy
+interface) or mtoast2_install.m (for the new interface) from the command
+prompt. This will set the Matlab search paths to the correct directories.
+
+It is recommended to use the new interface. The legacy interface should only
+be used if you have existing Matlab-Toast code that depends on it.

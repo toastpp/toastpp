@@ -156,8 +156,10 @@ distro_common::
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/test -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast2_install.m ; \
-	zip -9    toast_common.zip $(TOASTRELDIR)/readme.txt ; \
-	zip -9    toast_common.zip $(TOASTRELDIR)/license.html $(TOASTRELDIR)/gpl.txt; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/README ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/COPYING ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/COPYRIGHT ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/INSTALL ; \
 	mv toast_common.zip $(TOASTRELDIR)
 
 distro_bin_win32::
