@@ -215,7 +215,39 @@ function runrecon_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 prm = getappdata(handles.figure1,'prm');
+prm.transient.callback.iter = @disp_iter;
 toastRecon(prm);
+
+function disp_iter(prm,res)
+figure(1);
+set(gcf,'Name','toastRecon');
+bdim = prm.solver.basis.bdim;
+if length(bdim) == 2
+    subplot(2,2,1), imagesc(reshape(res.bmua,bdim)), axis equal, axis tight, colorbar;
+    set(gca,'Units','normalized','OuterPosition',[0 0.5 0.5 0.5]);
+    title('initial \mu_a');
+    subplot(2,2,2), imagesc(reshape(res.bmus,bdim)), axis equal, axis tight, colorbar;
+    set(gca,'Units','normalized','OuterPosition',[0.5 0.5 0.5 0.5]);
+    title('initial \mu_s');
+    subplot(2,1,2);
+    semilogy(res.of);xlabel('iteration');axis tight;title(['Objective:']);
+    set(gca,'Units','normalized','OuterPosition',[0 0 1 0.5]);
+    drawnow;
+else
+    muamin=min(res.bmua);
+    muamax=max(res.bmua);
+    musmin=min(res.bmus);
+    musmax=max(res.bmus);
+    bmua = reshape(res.bmua,bdim');
+    bmus = reshape(res.bmus,bdim');
+    for i=1:4
+        idx = round(bdim(3)/4*(i-0.5));
+        subplot(4,2,i); imagesc(bmua(:,:,idx),[muamin muamax]); axis equal tight
+        subplot(4,2,i+4); imagesc(bmus(:,:,idx),[musmin musmax]); axis equal tight
+    end
+    drawnow
+    save recon_gui_res.mat res
+end
 
 
 % --- Executes on button press in prm_browse.
