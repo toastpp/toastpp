@@ -190,8 +190,12 @@ end % of toastRecon
 % =============================================================
 function [prm,localprm] = checkprm(prm)
 
+if ~isa(prm,'toastParam')
+    error('Expected a toastParam argument.');
+end
+
 % fill missing parameter entries
-if isfield(prm,'solver') == false || isfield(prm.solver,'method') == false || ischar(prm.solver.method) == false || length(prm.solver.method) == 0
+if isfield(prm.solver,'method') == false || ischar(prm.solver.method) == false || length(prm.solver.method) == 0
     prm.solver.method = 'PCG';
 end
 if isfield(prm.solver,'tol') == false || isnumeric(prm.solver.tol) == false
