@@ -179,7 +179,7 @@ distro_bin_linux::
 	ln -T -s trunk $(TOASTRELDIR); \
 	tar czvf toast_bin_linux.tar.gz $(TOASTRELDIR)/$(ARCHDIR)/bin \
 	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTRELDIR)/$(ARCHDIR)/mex \
-	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTRELDIR)/$(ARCHDIR)/mex2 \
+	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
 	$(TOASTRELDIR)/toastenv.csh $(TOASTRELDIR)/toastenv.sh; \
 	mv toast_bin_linux.tar.gz $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz
 	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz"
@@ -188,6 +188,7 @@ distro_bin_darwin::
 	cd ..; \
 	tar czvf toast_bin_darwin.tar.gz $(TOASTDIR)/$(ARCHDIR)/bin \
 	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTDIR)/$(ARCHDIR)/mex \
+	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
 	$(TOASTRELDIR)/toastenv.csh $(TOASTDIR)/toastenv.sh; \
 	mv toast_bin_darwin.tar.gz $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz
 	@echo “Darwin distro tarball created in $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz"
