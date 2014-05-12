@@ -8,8 +8,9 @@
 #include <fstream>
 
 using namespace std;
-void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type);
-void WriteEim (const RVector &eim, int imgno, char *eimname);
+void WriteEimHeader (const char *meshname, int imgsize, const char *eimname, 
+    const char *type);
+void WriteEim (const RVector &eim, int imgno, const char *eimname);
 
 struct MatList {      // material properties
     double E;         // Young's modulus
@@ -73,7 +74,8 @@ int main (void) {
 }
 
 
-void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type)
+void WriteEimHeader (const char *meshname, int imgsize, const char *eimname, 
+    const char *type)
 {
     ofstream ofs (eimname);
     ofs << "EIM" << endl;
@@ -83,7 +85,7 @@ void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type)
     ofs << "EndHeader" << endl;
 }
 
-void WriteEim (const RVector &eim, int imgno, char *eimname)
+void WriteEim (const RVector &eim, int imgno, const char *eimname)
 {
     ofstream ofs (eimname, ios::app);
     ofs << "Image " << imgno << endl;

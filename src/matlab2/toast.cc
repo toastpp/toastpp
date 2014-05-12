@@ -321,6 +321,14 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_SHAPEGRAD:
 	mtoast->ShapeGrad (nlhs, plhs, nrhs, prhs);
 	break;
+// Integral methods added by SP
+    case TOAST_INTFG:
+	mtoast->IntFG (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_INTGRADFGRADG:
+	mtoast->IntGradFGradG (nlhs, plhs, nrhs, prhs);
+	break;
+
 
 #ifdef FDOT
     // FDOT interface

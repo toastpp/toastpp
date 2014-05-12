@@ -37,11 +37,70 @@
 // ==========================================================================
 // Prototypes
 
+FELIB void AddToElMatrix (const Mesh &mesh, int el,
+    RGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToElMatrix (const Mesh &mesh, int el,
+    FGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToElMatrix (const Mesh &mesh, int el,
+    SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToElMatrix (const Mesh &mesh, int el,
+    CGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrix (const Mesh &mesh,
+    RGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrix (const Mesh &mesh,
+    FGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrix (const Mesh &mesh,
+    SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrix (const Mesh &mesh,
+    CGenericSparseMatrix &M, const RVector *coeff, int mode);
+
+FELIB void AddToSysMatrix (const Mesh &mesh,
+    CGenericSparseMatrix &M, const double coeff, int mode);
+
+FELIB void AddToSysMatrix (const Mesh &mesh,
+    SCGenericSparseMatrix &M, const double coeff, int mode);
+
+FELIB void AddToSysMatrix_elasticity (const Mesh &mesh,
+    RGenericSparseMatrix &M, const RVector &modulus,
+    const RVector &pratio);
+
+FELIB void AddToRHS_elasticity (const Mesh &mesh, RVector &rhs,
+    const RVector *coeff, int mode);
+
+FELIB void AddToRHS_thermal_expansion (const Mesh &mesh,
+    RVector &rhs, const RVector &modulus, const RVector &pratio,
+    const RVector &thermal_expansion, double deltaT);
+
+FELIB RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh,
+    const IVector &gdim, const Point *bbmin, const Point *bbmax,
+    const int *elref);
+
+FELIB void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
+    RGenericSparseMatrix &M, double E, double nu, int *nf);
+
+FELIB RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh,
+    const IVector &gdim, const Point *bbmin, const Point *bbmax,
+    const int *elref);
+
+FELIB RGenericSparseMatrix *NodeMapMatrix2 (const Mesh &mesh,
+    const IVector &gdim, const Point *bbmin = 0, const Point *bbmax = 0,
+    const int *elref = 0);
+
 FELIB RGenericSparseMatrix *Grid2LinPixMatrix (const IVector &gdim,
     const IVector &bdim, const int *elref = 0);
 
 FELIB RGenericSparseMatrix *LinPix2GridMatrix (const IVector &gdim,
     const IVector &bdim, const int *elref = 0);
+
+FELIB RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
+    const IVector &gdim, const int *elref = 0);
 
 FELIB void GenerateVoxelPositions (const Mesh &mesh, const IVector &gdim,
      const Point *bbmin, const Point *bbmax, RDenseMatrix &pos);
@@ -59,6 +118,15 @@ FELIB RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh,
 
 FELIB int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax);
+
+FELIB void RasterLinPixel (RVector &gf, const RVector &bf,
+    const IVector &gdim, const IVector &bdim, const int *elref = 0);
+
+FELIB void SubsampleCubPixel (const RVector &gf, RVector &bf,
+    const IVector &gdim, const IVector &bdim, const int *elref = 0);
+
+FELIB void RasterCubPixel (RVector &gf, const RVector &bf,
+    const IVector &gdim, const IVector &bdim, const int *elref = 0);
 
 FELIB Mesh *Lin2Quad (const Mesh &linmesh);
 
@@ -326,6 +394,7 @@ public:
 
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         SCGenericSparseMatrix &M, const RVector *coeff, int mode);
+
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         CGenericSparseMatrix &M, const RVector *coeff, int mode);
     // As above but for complex system matrix. Modes can also contain assembly
@@ -333,6 +402,7 @@ public:
 
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         CGenericSparseMatrix &M, const double coeff, int mode);
+
     friend FELIB void AddToSysMatrix (const Mesh &mesh,
         SCGenericSparseMatrix &M, const double coeff, int mode);
     // This version adds a component with constant coefficient 'coeff' to
@@ -346,8 +416,8 @@ public:
         const RVector *coeff, int mode);
     // Adds a component to an rhs vector, given the specified mode
 
-    friend FELIB void AddToRHS_thermal_expansion (const Mesh &mesh, RVector &rhs,
-        const RVector &modulus, const RVector &pratio,
+    friend FELIB void AddToRHS_thermal_expansion (const Mesh &mesh,
+        RVector &rhs, const RVector &modulus, const RVector &pratio,
 	const RVector &thermal_expansion, double deltaT);
 
     friend FELIB void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
@@ -397,9 +467,9 @@ public:
         const IVector &gdim, const Point *bbmin, const Point *bbmax,
 	const int *elref);
 
-    friend RGenericSparseMatrix *NodeMapMatrix2 (const Mesh &mesh,
-        const IVector &gdim, const Point *bbmin = 0, const Point *bbmax = 0,
-	const int *elref = 0);
+    friend FELIB RGenericSparseMatrix *NodeMapMatrix2 (const Mesh &mesh,
+        const IVector &gdim, const Point *bbmin, const Point *bbmax,
+	const int *elref);
 
     friend FELIB RGenericSparseMatrix *Grid2LinPixMatrix (const IVector &gdim,
         const IVector &bdim, const int *elref);
@@ -409,11 +479,11 @@ public:
     friend FELIB RGenericSparseMatrix *LinPix2GridMatrix (const IVector &gdim,
         const IVector &bdim, const int *elref);
 
-    friend RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
-        const IVector &gdim, const int *elref = 0);
+    friend FELIB RGenericSparseMatrix *CubicPix2GridMatrix (const IVector &bdim,
+        const IVector &gdim, const int *elref);
 
-    friend FELIB int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
-        const Point *bbmin, const Point *bbmax);
+    friend FELIB int *GenerateElementPixelRef (const Mesh &mesh,
+        const IVector &gdim, const Point *bbmin, const Point *bbmax);
     // Generate element index list for pixels in grid defined by gdim.
     // This list is required by GridMapMatrix and NodeMapMatrix
 
@@ -432,17 +502,17 @@ public:
     // information: elref[i] < 0 indicates that pixel i has no overlap with the
     // mesh. If elref==0 then full support is assumed.
 
-    friend void RasterLinPixel (RVector &gf, const RVector &bf,
-        const IVector &gdim, const IVector &bdim, const int *elref = 0);
+    friend FELIB void RasterLinPixel (RVector &gf, const RVector &bf,
+        const IVector &gdim, const IVector &bdim, const int *elref);
     // Inverse of SubsampleLinPixel: expand linear pixel basis into raster
     // image
 
-    friend void SubsampleCubPixel (const RVector &gf, RVector &bf,
-        const IVector &gdim, const IVector &bdim, const int *elref = 0);
+    friend FELIB void SubsampleCubPixel (const RVector &gf, RVector &bf,
+        const IVector &gdim, const IVector &bdim, const int *elref);
     // Same as SubsampleLinPixel, but for cubic pixel basis
 
-    friend void RasterCubPixel (RVector &gf, const RVector &bf,
-	const IVector &gdim, const IVector &bdim, const int *elref = 0);
+    friend FELIB void RasterCubPixel (RVector &gf, const RVector &bf,
+	const IVector &gdim, const IVector &bdim, const int *elref);
     // Same as RasterLinPixel, but for cubic pixels
 
     // I/O
