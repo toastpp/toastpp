@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>toastElementData</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastElementData
+</div>
+
+<div class="param">
+<h1>toastElementData</h1>
+<p>Return geometry data of a mesh element.
+
+<h2>Syntax</h2>
+<div class="code">
+[vtx,idx] = toastElementData(hMesh,el)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>el</td><td><i>integer</i></td><td>element index (&ge; 1)</td>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>vtx</td><td><i>real matrix</i></td><td><i>n</i> x <i>d</i> matrix containing
+  <i>n</i> <i>d</i>-dimensional node coordinates</td></tr>
+  <tr><td></td>
+  <td>idx</td><td><i>integer matrix</i></td><td>face vertex index list</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>Returns the node coordinates, and the element vertex index lists for each
+  face of a mesh element.
+ 
+<p>The returned vertex list is a real matrix of dimension <i>n</i> x <i>d</i>,
+  where <i>n</i> is the number of nodes in the element, and <i>d</i> is the
+  geometric dimension of the element (2 or 3).
+ 
+<p>The returned index list is an integer matrix of dimension <i>m</i> x <i>s</i>, where
+  <i>m</i> is the number of element faces, and <i>s</i> is the maximum number of nodes
+  associated with a face.
+  The index list is 1-based. For faces containing fewer than <i>s</i> nodes,
+  the unused entries are set to 0.
+  
+</div>  
+</body>
+</html>

@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>toastDataLinkList</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastDataLinkList
+</div>
+
+<h1>toastDataLinkList</h1>
+<p>Returns the permutation index array for a data or projection vector.
+
+<h2>Syntax</h2>
+<div class="code">
+perm = toastDataLinkList(hMesh)
+</div>
+
+<h2>Parameters</h2>
+<div class="param">
+<table>
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>perm</td><td><i>integer vector</i></td><td>permutation index array</td>
+</tr></table>
+</div>
+
+<h2>Notes</h2>
+<p>Given a measurement setup with <i>n</i> sources and <i>m</i> detectors,
+a maximum of <i>M</i> = <i>n</i> x <i>m</i> measurements could be obtained if all
+detectors were recorded for every source. In practice, the measurement set
+is often sparse, i.e. only a subset of detectors is recorded for any given
+source and the total number of measurements is <i>M'</i> &le; <i>M</i>.
+<p>toastDataLinkList allows to map between the full data array of size
+<i>M</i> and the sparse data array of size <i>M'</i>.
+The permutation array <i>perm</i> is of size <i>M'</i> and contains the
+indices in the range 1...<i>M</i> into the full data array.
+<p>Therefore
+<div class="code">
+perm = toastDataLinkList(hMesh);<br>
+D1 = D(perm);
+</div>
+extracts the actual measurement data from a full data array <i>D</i> into
+a condensed data array <i>D1</i>.
+<p>Conversely,
+<div class="code">
+D = zeros(n*m,1);<br>
+D(perm) = D1;
+</div>
+fills the actually utilised measurements of the full data vector <i>D</i>
+with the values of the condensed vector <i>D1</i>, leaving the unused entries
+at zero.
+
+</body>
+</html>

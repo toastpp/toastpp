@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>toastMeshBB</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMeshBB
+</div>
+
+<div class="param">
+<h1>toastMeshBB</h1>
+<p>Return the extents of the bounding box of the mesh.
+
+<h2>Syntax</h2>
+<div class="code">
+[bbmin bbmax] = toastMeshBB (hMesh)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>bbmin</td><td><i>real [d]</i></td><td>Lower left corner of the bounding box.</td></tr>
+<tr><td></td>
+  <td>bbmax</td><td><i>real [d]</i></td><td>Upper right corner of the bounding box.</td></tr>
+</table>
+<i>d</i> = domain dimension (2 or 3)
+
+<h2>Notes</h2>
+<p>This function returns the minimum and maximum corners of the bounding box enclosing
+  the mesh. The values of the bounding box corners are defined by the minimum and maximum
+  mesh vertex coordinate values in each axis.
+ 
+<p>Note that for meshes containing isoparametric elements (i.e. elements with curved boundaries)
+  the mesh bounding box may not be correctly represented by node positions.
+  This is not taken into account.
+
+</div>
+</body>
+</html>

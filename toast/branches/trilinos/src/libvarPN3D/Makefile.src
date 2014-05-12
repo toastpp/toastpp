@@ -1,0 +1,39 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libvarPN3D
+LIB = $(TLIB)/$(LIBNAME)$(LIB_SUFFIX)
+EXE = PN_varOrd  
+
+VPATH = $(TSRC)/libvarPN3D
+
+all:: $(EXE)
+
+LIBSRCS = PN_spatint.cc PN_angint.cc PN_boundint.cc phaseFunc.cc source.cc detector.cc pparse.cc toast_io.cc sphericalHarmonic_algebra.cc toast.cc 
+EXESRCS = PN_varOrd.cc  
+ 
+
+
+LIBOBJS = ${LIBSRCS:.cc=.o}
+EXEOBJS = ${EXESRCS:.cc=.o}
+
+HDRS = phaseFunc.h pparse.h PN_incl.h PN_spatint.h PN_angint.h PN_boundint.h quad_unitSphere.h source.h detector.h toast_io.h sphericalHarmonic_algebra.h toast.h 
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) -I$(ILUPACKDIR)/include $(SHLIB_CFLAGS) -c $<
+
+$(LIB): $(LIBOBJS)
+	@$(RM) $(LIB)
+	$(MAKE_LIB)
+	$(RANLIB) $(LIB)
+
+#$(EXE) : $(EXEOBJS) $(LIBOBJS)
+PN_varOrd: PN_varOrd.o $(LIBOBJS)
+	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -lpthread -L$(ILUPACKLIBDIR) -lilupack
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
+

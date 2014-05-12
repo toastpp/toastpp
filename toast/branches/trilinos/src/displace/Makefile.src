@@ -1,0 +1,91 @@
+include $(TOASTDIR)/Makefile.incl
+
+VPATH = $(TSRC)/displace
+
+BINS = teststrain displace displace_ui volume_ui initdisp recon tc_volchange elem_refinement pv_materials partialsize
+
+all::$(BINS)
+
+.cc.o :
+	$(CXX) $(FLAGS) $(INCLUDE) $(GUIFLAGS) -c $<
+
+recon1 : recon1.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB) $(LOCAL_INCLUDES) $(LOCAL_LIBRARIES)
+
+teststrain : teststrain.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+head : head.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+displace : displace.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+displace_ui : displace_ui.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+relax_ui : relax_ui.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+subregion : subregion.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+partialsize : partialsize.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+binaryregions : binaryregions.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+voxelate : voxelate.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+writeregions : writeregions.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+volume_ui : volume_ui.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+elem_refinement : elem_refinement.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+pv_materials : pv_materials.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+bonegrow : bonegrow.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+recon : recon.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+recon2 : recon2.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+tc_volchange : tc_volchange.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+disp_fwd : disp_fwd.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+disp_recon : disp_recon.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+initdisp : initdisp.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+mapdisp : mapdisp.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+lem : lem.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(GUILIBS) $(GLLIB) $(LIBS) $(FELIB)
+
+makevoxmesh : makevoxmesh.o
+	$(CXX) $(LDFLAGS) -o $(TBIN)/$@ $? $(LIBS) $(FELIB)
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	for i in $(BINS) ; do \
+		($(RM) $(TBIN)/$$i); \
+	done

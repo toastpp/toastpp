@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>TOAST Demo 7</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+<LINK REL="stylesheet" HREF="demo.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<body>
+<div class="header">
+   <div class="left"><a href="matlab:edit toast_demo7">Open source in the editor</a></div>
+   <div class="right"><a href="matlab:rundemo('toast_demo7')">Run this demo</a></div>
+</div>
+
+<div class="content">
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="matlab:demo toolbox toast">Demos</a> &gt;
+Demo 7
+</div>
+
+<table col="2">
+<tr><td width="64px"><img src="toast_demo7.png"></td>
+<td><h1>TOAST Demo 7: Multi-spectral reconstruction</h1></td>
+</tr></table>
+<p>This is a demonstration of a
+reconstruction of concentration C<sub>i</sub>
+of up to 4 absorbing agents from
+multiple wavelength data.
+
+<p>Each agent ('chromophore') has
+a distinct wavelength-dependent
+extinction coefficient &epsilon;<sub>i</sub>(&lambda;), shown in
+the graph on the right. You can
+click on individual data points to
+edit them. The resulting absorption
+coefficient at each wavelength is
+given by the sum over chromophore concentration times
+extinction coefficient:
+
+<p>&mu;(&lambda;) = &Sigma;<sub>i</sub> &epsilon;<sub>i</sub>(&lambda;) C<sub>i</sub>
+
+<p>Select the number of chromophores (1-4) and the number
+of wavelengths (1-4). The number
+of wavelengths should at least
+equal the number of chromophores, to avoid crosstalk. A
+set of random target concentrations is shown in the top row
+of images. The resulting
+absorption images at each
+wavelength are shown
+in the next row.
+
+<p>You can create a new set of
+random concentration targets
+by clicking the 'New distribution'
+button.
+
+<p>Click 'Run' to start. This will first generate the forward
+data from the target chromophore distributions at all wavelengths,
+and then use a Gauss-Newton solver to reconstruct the concentrations
+from homogeneous initial distributions, given the known extinction
+spectra.
+
+<p>This demo uses CW data and
+assumes known and wavelength-independent scattering. Code for
+more general problems that use frequency domain data for
+additionally reconstructing scattering images is available.
+
+</div>
+
+</body>
+</html>

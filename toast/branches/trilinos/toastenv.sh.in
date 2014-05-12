@@ -1,0 +1,45 @@
+# TOAST environment variables generated with configure
+# Run this with 'source toastenv.sh' from your sh/bash shell.
+
+if test "x$TOASTDIR" = x; then
+    echo "TOASTDIR environment variable not set!"
+    if test -f "mtoast_install.m" ; then
+	export TOASTDIR=$PWD
+    fi
+fi
+
+if test "x$TOASTDIR" = x ; then
+    echo "Cannot set the TOAST environment."
+else
+    echo "Using TOASTDIR = $TOASTDIR"
+    export TOASTVER=$TOASTDIR/@ARCHDIR@
+    export TOAST_SCRIPT_PATH=$TOASTDIR/script
+    export PYTHONPATH=$TOAST_SCRIPT_PATH/python/lib/python2.6/site-packages
+# NEED TO MAKE THIS GENERAL!!!
+    IFS=:
+
+# Add $TOASTVER/bin to path
+    EXEPATH="$TOASTVER/bin"
+    UPDATEPATH="yes"
+    for dir in $PATH ; do
+	if [ "$dir" = "$EXEPATH" ]; then
+	    UPDATEPATH="no"
+	fi
+    done
+    if [ "$UPDATEPATH" = "yes" ]; then
+	export PATH="$EXEPATH""$IFS""$PATH"
+    fi
+
+# Add $TOASTVER/lib to library path
+    LIBPATH="$TOASTVER/lib"
+    UPDATEPATH="yes"
+    for dir in $LD_LIBRARY_PATH ; do
+	if [ "$dir" = "$LIBPATH" ]; then
+	    UPDATEPATH="no"
+	fi
+    done
+    if [ "$UPDATEPATH" = "yes" ]; then
+	export LD_LIBRARY_PATH="$LIBPATH""$IFS""$LD_LIBRARY_PATH"
+    fi
+    echo "TOAST environment has been set."
+fi

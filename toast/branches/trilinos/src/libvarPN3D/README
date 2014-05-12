@@ -1,0 +1,102 @@
+PN_varOrd documentation
+	This command runs the variable order spherical harmonic expansion with finite elements in 2D and 3D based on the spatial mesh provided. 
+	Notes: 1. It has been coarse-grain-parallelized using pthreads to solve parallely for multiple sources.
+	       2. Uses P1 solution on the same mesh as a preconditioner making it faster compared to using Jacobi preconditioning.
+	       3. Has the capability to handle both 2D and 3D geometries.
+	       4. Can handle cosine, directed and laser source profiles.
+	       5. Highly memory optimized to run for 3D applications.
+	       6. Handles both vacuum and reflective boundary conditions.
+
+Inputs:
+	-nt(default=1)			Number of threads to be used in this computation (System dependant).
+	
+	-mesh				A standard TOAST format mesh which can be either in 2D or 3D.
+	
+	-qm(optional) 			A standard TOAST format QM file giving the source spatial distributions.
+	
+	-g(default=0)   		The parameter 'g' in Henyey-Greenstein phase function -1 <= g <= 1.
+	
+	-freq(default=100)   		Modulation frequency in MHz.
+	
+	-sap(default=1)			Source angular profile (0. Directed 1. Cosine 2. Uncollided line source).
+					NOTE:
+					    This angular profile is set for all the sources.
+	
+	-dir				File containing direction vectors along which the sources are to be pointed (2 components for 2D and 3 for 3D).
+					NOTE:
+					    If unspecified the edge normal (pointing inwards for boundary sources) is chosen as the direction. 
+											
+	-prefix				String input which is prefixed to the output files.
+	
+	-BCType(default='v')		Boundary conditions to be used ('v' for vacuum and 'r' for reflective boundary conditions).
+	
+	-ri_external(default=1.0)	Refractive index of the medium outside the tissue.
+	
+	-prm 				An input text file containing the absorption, scattering and refractive index for each element
+						in that particular order.
+	
+	-nodal_sphorder			An input text file containing the order of spherical harmonics to be used on each node.
+	
+	-nq(optional)			Specify the number of sources when a QM file has not been provided.
+					NOTE:
+						When this option is used, enter source node numbers in 0-based index when prompted.
+	
+	-nm(optional) 			Specify the number of detectors when a QM file has not been provided.
+					NOTE:
+						Enter the detector node numbers in 0-based index when prompted.
+
+Outputs:
+	<prefix>_re.nim		This file contains real part of photon density.
+				Read this file using Matlab TOAST with the command "toastReadNIM"
+	
+	<prefix>_im.nim		This file contains the imaginary part of photon density. 
+				Read as above.
+
+	<prefix>_time.txt	This file contains the time taken to solve for all the sources.
+	
+	<prefix>_Phi_re.sol	This is an ASCII file containing the real part of radiance (required for Jacobian construction).
+
+	<prefix>_Phi_im.sol	This is an ASCII file containing the imaginary part of radiance (required for Jacobian construction).
+
+	<prefix>_RHS_re.sol	This is an ASCII file containing the real part of the source vector (required for Jacobian construction).
+
+	<prefix>_RHS_im.sol	This is an ASCII file containing the imaginary part of the source vector (required for Jacobian construction).
+	
+	<prefix>_Det_re.sol 	This is an ASCII file containing the real part of the measurement vector (required for Jacobian construction).
+
+	<prefix>_Det_im.sol 	This is an ASCII file containing the imaginary part of the measurement vector (required for Jacobian construction).
+
+Warning:
+	1. Internal sources SHOULD NOT be specified using QM file. Use -nq and -nm options instead and DO NOT provide -qm option.
+	2. The forward solution computed using this code with reflection boundary conditions is not ready to be used in reconstruction yet. 
+
+Examples:
+	1. Uncollided line source with default directions using 2 sources 0 measurements and 2 threads 
+
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 2 -nt 2 -freq 100 -BCType 'v' -ri_external 1.0 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 
+
+	2. In the above example if you wish to set direction instead of the defaults add a file with -dir option
+
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 2 -nt 2 -freq 100 -BCType 'v' -ri_external 1.0 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 -dir circle25_32_dir.dir
+
+
+	3. In the above example if you wish to use reflecting boundary conditions instead of vaccuum boundary conditions, change -BCType to 'r'.
+
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/2D/meshes/circle25_32.msh -sap 2 -nt 2 -freq 100 -BCType 'r' -ri_external 1.0 -nQ 1 -nM 1 -prefix "test" -prm input_circle25_32_lo_P1tir.prm -nodal_sphorder circle25_32_P7.sph -g 0 -dir circle25_32_dir.dir
+
+
+	4. 3D case study using a QM file, 8 threads, cosine sources, reflective boundary conditions and g=0.9.
+	
+	$TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/3D/meshes/cyl3.msh -qm  $TOASTDIR/test/3D/meshes/cyl_3ring.qm -sap 1 -nt 8 -freq 100 -BCType 'r' -ri_external 1.0 -prefix "test" -prm input_cyl3.prm -nodal_sphorder cyl3_P7.sph -g 0.9
+
+	5. In the above example using a directed source instead of cosine profile, change -sap option to 0
+
+	 $TOASTVER/bin/PN_varOrd -mesh $TOASTDIR/test/3D/meshes/cyl3.msh -qm  $TOASTDIR/test/3D/meshes/cyl_3ring.qm -sap 0 -nt 8 -freq 100 -BCType 'r' -ri_external 1.0 -prefix "test" -prm input_cyl3.prm -nodal_sphorder cyl3_P7.sph -g 0.9
+
+
+Author:
+   Surya 10/05/2011.
+
+Email:
+   suryam08@gmail.com
+   Please print the output to a file and attach it with the email when seeking for help.    

@@ -1,0 +1,723 @@
+%======================================================================
+% Lanczos algorithm for symmetric matrices
+%======================================================================
+
+%----------------------------------------------------------------------
+% References available 
+%----------------------------------------------------------------------
+
+@article{BACR95,
+   author       = "J. Baglama and D. Calvetti and L. Reichel", 
+   title        = "{Iterative Methods for the Computation of a Few
+                   Eigenvalues of a Large Symmetric Matrix}",
+   journal      = "BIT",
+   year         = "1996",
+   volume       = "36",
+   pages        = "400-421"}
+
+@article{BOFU87,
+   author       = "S. W. Bostic and R. E. Fulton",
+   title        = "{Implementation of the Lanczos Method for Structural 
+                   Vibration Analysis on a Parallel Computer}",
+   journal      = "Computers \& Structures",
+   year         = "1987",
+   volume       = "25",
+   pages        = "395-403"}
+
+@article{CARS94,
+   author       = "D. Calvetti and L. Reichel and D. C. Sorensen",
+   title        = "{An Implicitly Restarted Lanczos Method for
+                   Large Symmetric Eigenvalue Problems}",
+   journal      = "ETNA",
+   year         = "1994",
+   volume       = "2",
+   pages        = "1-21"}
+
+@article{CHAN86,
+   author       = "S.-C. Chang",
+   title        = "{Lanczos Algorithm with Selective Reorthogonalization
+                   for Eigenvalue Extraction in Structural Dynamic
+                   and Stability Analysis}",
+   journal      = "Computers \& Structures",
+   year         = "1986",
+   volume       = "23",
+   pages        = "121-128"}
+
+@article{EDLT79,
+   author       = "J. T. Edwards and D. C. Licciardello and
+                   D. J. Thoules",
+   title        = "{Use of the Lanczos Method for Finding Complete
+                   Sets of Eigenvalues of Large Sparse
+                   Symmetric Matrices}",
+   journal      = "J. Inst. Maths. Applics.",
+   year         = "1979",
+   volume       = "23",
+   pages        = "277-283"}
+
+@article{ERRU80,
+   author       = "T. Ericsson and A. Ruhe",
+   title        = "{The Spectral Transformation Lanczos Method
+                   for the Numerical Solution of Large Sparse
+                   Generalized Symmetric Eigenvalue Problems}",
+   journal      = "Mathematics of Computation",
+   year         = "1980",
+   volume       = "35",
+   pages        = "1251-1268"}
+
+@inproceedings{GOUN77,
+   author       = "G. H. Golub and R. Underwood",
+   title        = "{The Block Lanczos Method for
+                   Computing Eigenvalues}",
+   booktitle    = "Mathematical Sotware III",
+   editor       = "J. R. Rice",
+   publisher    = "Academic Press, Inc.",
+   year         = "1977",
+   pages        = "361-377"}
+
+@article{GRLS94,
+   author       = "R. G. Grimes and J. G. Lewis and H. D. Simon",
+   title        = "{A Shifted Block Lanczos Algorithm for Solving Sparse
+                   Symmetric Eigenvalue Problems}",
+   journal      = "SIAM J. Matrix Anal. Appl.",
+   year         = "1994",
+   volume       = "15",
+   pages        = "228-272"}
+
+@article{GUCM84,  
+   author       = "V. K. Gupta and  J. G. Cole and W. D. Mock",
+   title        = "{A Cost-Effective Eigensolution Method for Large
+                   Systems with Rockwell Nastran}",
+   journal      = "Nuclear Engineering and Design",
+   year         = "1984",
+   volume       = "78",
+   pages        = "329-333"}
+
+@article{GULA88,
+   author       = "K. K. Gupta and C. L. Lawson",
+   title        = "{Development of a Block Lanczos Algorithm for Free
+                   Vibration Analysis of Spinning Structures}",
+   journal      = "Int. J. for Numer. Meth. in Eng.",
+   year         = "1988",
+   volume       = "26",
+   pages        = "1029-1037"}
+
+@inproceedings{JIXI85,
+   author       = "Q. Jiangning and Z. Xianglin",
+   title        = "{Tracking Reorthogonalization Lanczos Algorithm
+                   and its Applications}",
+   booktitle    = "Int. Conf. Finite Elements in Comp. Mech.",
+   year         = "1985",
+   pages        = "51-58",
+   publisher    = "Pergamon Press Ltd."}
+ 
+@inproceedings{KAPA76,   
+   author       = "W. Kahan and B. N. Parlett",
+   title        = "{How far Should You Go with the Lanczos Process?}",
+   booktitle    = "Sparse Matrix Computations",
+   editor       = "J. R. Bunch and D. J. Rose",
+   publisher    = "Academic Presss, Inc.",
+   year         = "1976",
+   pages        = "131-144"}
+
+@article{KHGA86, 
+   author       = "R. E. Khodari and M. Gattass",
+   title        = "{Algoritmo de Lanczos para o C\'alculo de
+                   Freq\"{u}\^encias e Modos de Vibra\c{c}\~ao 
+                   de Estruturas}",
+   journal      = "RBE, Caderno de Estruturas",
+   year         = "1986",
+   volume       = "4",
+   pages        = "75-101"}
+ 
+@article{KPPA89,
+   author       = "J. D. Kress and G. A. Parker and R. T. Pack and
+                   B. J. Archer and W. A. Cook",
+   title        = "{Comparison of Lanczos and Subspace Iterations
+                   for Hyperspherical Reaction Path Calculations}",
+   journal      = "Computer Physics Communications",
+   year         = "1989",
+   volume       = "53",
+   pages        = "91-108"}
+
+@article{KPPA89,
+   author       = "J. D. Kress and S. B. Woodruff and 
+                   G. A. Parker and R. T. Pack",
+   title        = "{Some Strategies for Enhancing the Performance
+                   of the Block Lanczos Method}",
+   journal      = "Computer Physics Communications",
+   year         = "1989",
+   volume       = "53",
+   pages        = "109-115"}
+
+@article{LANC50,
+   author       = "C. Lanczos",
+   title        = "{An Iteration Method for the Solution of the
+                   Eigenvalue Problem of Linear Differential 
+                   and Integral Operators}",
+   journal      = "J. of Res. of the Nat. Bur. of Stand.",
+   year         = "1950",
+   volume       = "45",
+   pages        = "255-282"}
+
+@inproceedings{LAGU90,
+   author       = "C. L. Lawson and K. K. Gupta",
+   title        = "{The Lanczos Algorithm for a Pure
+                   Imaginary Hermitian Matrix}",
+   booktitle    = "Reliable Numerical Computation",
+   year         = "1990",
+   editor       = "M. G. Cox and S. Hammarling",
+   pages        = "25-34",
+   publisher    = "Clarendon Press"}
+
+@article{MATT85a,
+   author       = "H. G. Matthies",       
+   title        = "{A Subspace Lanczos Method for the Generalized
+                   Symmetric Eigenproblem}",
+   journal      = "Computers \& Structures",        
+   year         = "1985",
+   volume       = "21",
+   pages        = "319-325"}
+
+@techreport{MEER97a,
+   author       = "K. Meerbergen",
+   title        = "{A Comparison Between the Lanczos and Arnoldi
+                   Methods with Shift-Invert Transformation}",
+   institution  = "LMS Numerical Technologies",
+   year         = "1997",
+   month        = "July",
+   address      = "Heverlee, Belgium"} 
+
+@article{MOSC93,
+   author       = "R. B. Morgan and D. S. Scott",       
+   title        = "{Preconditioning the Lanczos Algorithm for
+                   Sparse Symmetric Eigenvalue Problems}",
+   journal      = "SIAM J. Sci. Stat. Comput.",
+   year         = "1993",
+   volume       = "14",
+   pages        = "585-593"}
+
+@misc{NAST86,
+   title        = "{The Lanczos Method in MSC/Nastran, Version 65}",
+   howpublished = "MSC/Nastran Application Notes",
+   month        = "February",
+   year         = "1986",
+   note         = "The MacNeal-Schwendler Corporation"}
+
+@article{NOPT83,
+   author       = "B. Nour-Omid and B. N. Parlett and R. L. Taylor",
+   title        = "{Lanczos Versus Subspace Iteration for Solution
+                   of Eigenvalue Problems}",
+   journal      = "Int. J. for Numer. Meth. in Eng.",
+   year         = "1983",
+   volume       = "19",
+   pages        = "859-871"}
+
+@article{NOPE87,
+   author       = "B. Nour-Omid and B. N. Parlett and
+                   T. Ericsson and P. S. Jensen",
+   title        = "{How to Implement the Spectral Transformation}",
+   journal      = "Mathematics of Computation",
+   year         = "1987",
+   volume       = "48",
+   pages        = "663-673"}
+
+@article{NOOM89,
+   author       = "B. Nour-Omid",
+   title        = "{Applications of the Lanczos Method}",
+   journal      = "Computer Physics Communications",
+   year         = "1989",
+   volume       = "53",
+   pages        = "157-168"}
+
+@article{OJNE70,
+   author       = "I. U. Ojalvo and M. Newman",
+   title        = "{Vibration Modes of Large Structures by an
+                   Automatic Matrix-Reduction Method}",
+   journal      = "AIAA Journal",
+   year         = "1970",
+   volume       = "8",
+   pages        = "1234-1239"}
+
+@article{OJAL85,
+   author       = "I. U. Ojalvo",
+   title        = "{Proper Use of Lanczos Vectors for Large
+                   Eigenvalue Problems}",
+   journal      = "Computers \& Structures",
+   year         = "1985",
+   volume       = "20",
+   pages        = "115-120"}
+
+@article{PAIG70,
+   author       = "C. C. Paige",
+   title        = "{Practical Use of the Symmetric Lanczos
+                   Process with Re-orthogona\-lization}",
+   journal      = "BIT",
+   year         = "1970",
+   volume       = "10",
+   pages        = "183-195"}
+
+@article{PAIG72,
+   author       = "C. C. Paige",
+   title        = "{Computational Variants of the Lanczos
+                   Method for the Eigenproblem}",
+   journal      = "J. Inst. Maths. Applics.",
+   year         = "1972",
+   volume       = "10",
+   pages        = "373-381"}
+
+@inproceedings{PAIG81,   
+   author       = "C. C. Paige",
+   title        = "{Accuracy and Effectivenes of the Lanczos Algorithm
+                   for the Symmetric Eigenproblem}",
+   booktitle    = "Large Scale Matrix Problems",
+   editor       = "A. Bj{\"o}rck and R. J. Plemmons and H. Schneider",
+   publisher    = "Elsevier North Holand, Inc.",
+   year         = "1981",
+   pages        = "235-258"}
+
+@article{PASC79,
+   author       = "B. N. Parlett and D. S. Scott",
+   title        = "{The Lanczos Algorithm with Selective
+                   Orthogonalization}",
+   journal      = "Mathematics of Computation",
+   year         = "1979",
+   volume       = "33",
+   pages        = "217-238"}
+
+@article{PASS82,
+   author       = "B. N. Parlett and H. D. Simon and L. M. Stringer",
+   title        = "{On Estimating the Largest Eigenvalue  
+                   With the Lanczos Algorithm}",
+   journal      = "Mathematics of Computation",
+   year         = "1982",
+   volume       = "38",
+   pages        = "153-165"}
+
+@inproceedings{PAON85,
+   author       = "B. N. Parlett and B. Nour-Omid and J. Natvig",
+   title        = "{Implementation of Lanczos Algorithms on
+                   Vectors Computers}",
+   booktitle    = "Supercomputers Applications",
+   editor       = "R. W. Numrich",
+   publisher    = "Plenum Press",
+   year         = "1985",
+   pages        = "1-17"}
+
+@techreport{PAOL88,
+   author       = "B. N. Parlett and B. Nour-Omid and Z. A. Liu",
+   title        = "{How to Maintain Semi-orthogonality Among
+                   Lanczos Vectors}",
+   institution  = "Center for Pure and Applied Mathematics,
+                   University of California",
+   year         = "1988",
+   number       = "PAM-420",
+   address      = "Berkeley, USA"}
+
+@article{PANO89,
+   author       = "B. N. Parlett and B. Nour-Omid",
+   title        = "{Towards a Black Box Lanczos Program}",
+   journal      = "Computer Physics Communications",
+   year         = "1989",
+   volume       = "53",
+   pages        = "169-179"}
+
+@misc{PARL90a,
+   author       = "B. N. Parlett",
+   title        = "{Notes on Lanczos Algorithms for a SIAM Short Course
+                   on Large-Scale and Parallel Matrix Computations in
+                   Control, Systems and Signal Processing}",
+   month        = "November",
+   year         = "1990"}
+
+@inproceedings{PARL90b,
+   author       = "B. N. Parlett",
+   title        = "{Misconvergence in the Lanczos Algorithm}",
+   booktitle    = "Reliable Numerical Computation",
+   editor       = "M. G. Cox and S. Hammarling",
+   publisher    = "Clarendon Press",
+   year         = "1990",
+   pages        = "7-24"}
+
+@article{PARL_X,
+   author       = "B. N. Parlett",
+   title        = "{The Rewards for Maintaining Semi-orthogonality
+                   Among Lanczos Vectors}",
+   journal      = "XX",
+   year         = "XX",
+   volume       = "XX",
+   pages        = "XX"}
+
+@article{RUHE79,
+   author       = "A. Ruhe",
+   title        = "{Implementation Aspects of Band Lanczos 
+                   Algorithms for Computation of Eigenvalues
+                   of Large Sparse Symmetric Matrices}",
+   journal      = "Mathematics of Computation",
+   year         = "1979",
+   volume       = "33",
+   pages        = "680,687"}
+
+@article{SAAD80,
+   author       = "Y. Saad",
+   title        = "{On the Rates of Convergence of the Lanczos
+                   and the Block-Lanczos Methods}",
+   journal      = "SIAM J. Numer. Anal.",
+   year         = "1980",
+   volume       = "17",
+   pages        = "687-706"}
+
+@article{SCOT79,
+   author       = "D. S. Scott",
+   title        = "{How to Make the Lanczos Algorithm Converge Slowly}",
+   journal      = "Mathematics of Computation",
+   year         = "1979",
+   volume       = "33",
+   pages        = "239-247"}
+
+@article{SCOT82,
+   author       = "D. S. Scott",
+   title        = "{The Advantages of Inverted Operators in
+                   Rayleigh-Ritz Approximations}",
+   journal      = "SIAM J. Sci. Stat. Comput.",
+   year         = "1982",
+   volume       = "3",
+   pages        = "68-75"}
+
+@article{SCOT89,
+   author       = "D. S. Scott",
+   title        = "{Implementing Lanczos-Like Algorithms
+                   on Hypercube Architectures}",
+   journal      = "Computer Physics Communications",
+   year         = "1989",
+   volume       = "53",
+   pages        = "271-281"}
+
+@article{SIMO84a,
+   author       = "H. D. Simon",
+   title        = "{The Lanczos Algorithm with Partial
+                   Reorthogonalization}",
+   journal      = "Mathematics of Computation",
+   year         = "1984",
+   volume       = "42",
+   pages        = "115-142"}
+
+@article{SIMO84b,
+   author       = "H. D. Simon",
+   title        = "{Analysis of the Symmetric Lanczos Algorithm
+                   with Reorthogonalization Methods}",
+   journal      = "Linear Algebra and its Applications",
+   year         = "1984",
+   volume       = "61",
+   pages        = "101-131"}
+
+@article{SMHE83,
+   author       = "I. M. Smith and E. E. Heshmati",
+   title        = "{Use of a Lanczos Algorithm in Dynamic 
+                   Analysis of Structures}",
+   journal      = "Earthquake Eng. and Structural Dynamics",
+   year         = "1983",
+   volume       = "11",
+   pages        = "585-588"}
+
+@article{SOYA97,
+   author       = "D. C. Sorensen and C. Yang",
+   title        = "{Accelerating the Lanczos Algorithm via
+                   Polynomial Spectral Transformations}",
+   journal      = "XX",
+   year         = "1997",
+   volume       = "XX",
+   pages        = "XX"}
+
+@article{SBPM90,
+   author       = "O. Storaasli and S. Bostic and M. Patrick 
+                   and U. Mahajan and S. Ma",
+   title        = "{Three Parallel Computation Methods for
+                   Structural Vibration Analysis}",
+   journal      = "Earthquake Eng. and Structural Dynamics",
+   year         = "1983",
+   volume       = "11",
+   pages        = "585-588"}
+
+@article{VVOR82,  
+   author       = "H. A. Van der Vorst",
+   title        = "{A Generalized Lanczos Scheme}",
+   journal      = "Mathematics of Computation",    
+   year         = "1982",
+   volume       = "39",
+   pages        = "559-561"}
+
+@article{WAZU94,  
+   author       = "L.-W. Wang and A. Zunger",
+   title        = "{Large Scale Electronic Structure Calculation
+                   Using the Lanczos Method}",
+   journal      = "Comp. Material Science",    
+   year         = "1994",
+   volume       = "2",
+   pages        = "326-340"}
+
+@article{WERC83,  
+   author       = "V. I. Weingarten and R. K. Ramanathan and
+                   C. N. Chen",
+   title        = "{Lanczos Eigenvalue Algorithm for Large
+                   Structures on a Minicomputer}",
+   journal      = "Computers \& Structures",    
+   year         = "1983",
+   volume       = "16",
+   pages        = "253-257"}
+
+%----------------------------------------------------------------------
+% References available elsewhere
+%----------------------------------------------------------------------
+
+@inproceedings{BERR94,
+   author       = "M. W. Berry",
+   title        = "{A Survey of Public-Domain Lanczos-Based Software}",
+   booktitle    = "Proceedings of the Cornelius Lanczos
+                   International Centenary Conference",
+   editor       = "J. D. Brown and M. T. Chu and D. C. Ellison
+                   and R. J. Plemmons",
+   publisher    = "SIAM",
+   year         = "1994",
+   pages        = "332-334"}
+
+@techreport{GRLS88,
+   author       = "R. G. Grimes and J. G. Lewis and H. D. Simon",
+   title        = "{The Implementation of a Block Lanczos Algorithm
+                   with Reorthogonalization Methods}",
+   institution  = "Boeing Computer Services",
+   year         = "1988",
+   number       = "ETA-TR-91",
+   address      = "Seattle, USA"}
+
+@techreport{GRLS91,
+   author       = "R. G. Grimes and J. G. Lewis and H. D. Simon",
+   title        = "{A Shifted Block Lanczos Algorithm for Solving Sparse
+                   Symmetric Eigenvalue Problems}",
+   institution  = "Boeing Computer Services",
+   year         = "1991",
+   number       = "RNR-91-012",
+   address      = "Seattle, USA"}
+
+@techreport{JOPA89,
+   author       = "M. T. Jones and M. L. Patrick",
+   title        = "{The Use of Lanczos's Method to Solve the Large      
+                   Generalized Symmetric Definite Eigenvalue Problem}",
+   institution  = "ICASE",
+   year         = "1989",
+   number       = "89-69",
+   address      = "Hampton, USA"}
+
+@techreport{JOPA90a,
+   author       = "M. T. Jones and M. L. Patrick",
+   title        = "{The Use of Lanczos's Method to Solve the Large
+                   Generalized Symmetric Eigenvalue
+                   Problem in Parallel}",
+   institution  = "ICASE",
+   year         = "1990",
+   number       = "90-48",
+   address      = "Hampton, USA"}
+
+@techreport{JOPA90b,
+   author       = "M. T. Jones and M. L. Patrick",
+   title        = "{The Lanczos Algorithm for the Generalized 
+                   Symmetric Eigenproblem on Shared-Memory
+                   Architectures}",
+   institution  = "Argonne National Laboratory",
+   year         = "1990",
+   number       = "MCS-P182-0990",
+   address      = "Argonne, USA"}
+
+@techreport{LEWI77,
+   author       = "J. G. Lewis",
+   title        = "{Algorithms for Sparse Matrix Eigenvalue Problems}",
+   institution  = "Computer Science Dept., Stanford University",
+   year         = "1977",
+   number       = "STAN-CS-77-595",
+   address      = "Stanford, USA"}
+
+@inproceedings{NOMI87b,
+   author       = "B. Nour-Omid",
+   title        = "{The Lanczos Algorithm for Solution of 
+                   Large Generalized Eigenproblem}",
+   booktitle    = "The Finite Element Method",
+   editor       = "T. J. R. Hughes",
+   publisher    = "Prentice Hall International Editions",
+   address      = "Englewood Cliffs, USA",
+   year         = "1987",
+   pages        = "582-630"}
+
+@inproceedings{PARL93,
+   author       = "B. N. Parlett",
+   title        = "{Do We Fully Understand the Symmetric 
+                   Lanczos Algorithm Yet?}",
+   booktitle    = "Proceedings of the Cornelius Lanczos
+                   International Centenary Conference",
+   editor       = "J. D. Brown and M. T. Chu and D. C. Ellison
+                   and R. J. Plemmons",
+   publisher    = "SIAM",
+   year         = "1994",
+   pages        = "93-107"}
+
+@phdthesis{SCOT78,
+   author       = "D. S. Scott", 
+   title        = "{Analysis of the Symmetric Lanczos Process}",
+   school       = "University of California",
+   year         = "1978",
+   address      = "Berkeley, USA"}
+
+@phdthesis{UNDE75,
+   author       = "R. R. Underwood",
+   title        = "{An Iterative Block Lanczos Method for the Solution
+                   of Large Sparse Symmetric Eigenproblems}",
+   school       = "Computer Science Dept., Stanford University",
+   year         = "1975",
+   address      = "Stanford, USA"}
+%======================================================================
+% Books
+%======================================================================
+
+%----------------------------------------------------------------------
+% References available 
+%----------------------------------------------------------------------
+
+@book{BATH82,
+   author       = "K.-J. Bathe",
+   title        = "Finite Element Procedures in Engineering Analysis",
+   publisher    = "Prentice-Hall",
+   year         = "1982",
+   address      = "Englewood Cliffs, USA"}
+
+@book{CAME91,
+   author       = "S. L. Campbell and C. D. Meyer Jr.",
+   title        = "Generalized Inverses of Linear Transformations",
+   publisher    = "Dover",
+   year         = "1991",
+   address      = "Mineola, N.Y."}
+
+@book{CHAT88,
+   author       = "F. Chatelin",
+   title        = "Valeurs Propres de Matrices",
+   publisher    = "Masson",
+   year         = "1988",
+   address      = "Paris, France"}
+
+@book{DEMM97,
+   author       = "J. W. Demmel",
+   title        = "Applied Numerical Linear Algebra",
+   publisher    = "SIAM",
+   year         = "1997",
+   address      = "Philadelphia, USA"}
+
+@book{DDSV91,
+   author       = "J. J. Dongarra and I. S. Duff and D. C. Sorensen and
+                   H. A. Van der Vorst",
+   title        = "Solving Linear Systems on Vector and Shared
+                   Memory Computers",
+   publisher    = "SIAM",
+   year         = "1991",
+   address      = "Philadelphia, USA"}
+
+@book{GOVL89,
+   author       = "G. H. Golub and C. F. Van Loan",
+   title        = "Matrix Computations",
+   publisher    = "The Johns Hopkins University Press",
+   year         = "1996",
+   address      = "Baltimore, USA",
+   edition      = "third"}
+
+@book{HUGH87,
+   author       = "T. J. R. Hughes",
+   title        = "The Finite Element Method",
+   publisher    = "Prentice Hall International Editions",
+   year         = "1987"}
+
+@book{PARL80,
+   author       = "B. N. Parlett",
+   title        = "The Symmetric Eigenvalue Problem",
+   publisher    = "SIAM (Classics in Applied Mathematics)",
+   year         = "1998",
+   address      = "Philadelphia, USA"}
+
+@book{SAAD92,
+   author       = "Y. Saad",
+   title        = "Numerical Methods for Large Eigenvalue Problems",
+   publisher    = "Manchester University Press",
+   year         = "1992",
+   address      = "Manchester, England"}
+
+@book{TRBA97,
+   author       = "L. N. Trefethen and D. Bau III",
+   title        = "Numerical Linear Algebra",
+   publisher    = "SIAM",
+   year         = "1997",
+   address      = "Philadelphia, USA"}
+
+@book{WILK65,
+   author       = "J. H. Wilkinson",
+   title        = "The Algebraic Eigenvalue Problem",
+   publisher    = "Oxford University Press",
+   year         = "1965",
+   address      = "Oxford, England"}
+
+@book{ZITA89,
+   author       = "O. C. Zienkiewikz and R. L. Taylor",
+   title        = "The Finite Element Method",
+   volume       = "1 (Basic Formulation and Linear Problems),
+                   2 (Solid and Fluid Mechanics,
+                      Dynamics and Non-Linearity)",
+   publisher    = "McGraw Hill International Editions",
+   year         = "1989",
+   edition      = "fourth"}
+
+%----------------------------------------------------------------------
+% References available elsewhere
+%----------------------------------------------------------------------
+
+@book{CUWI85,
+   author       = "J. Cullum and R. Willoughby",
+   title        = "Lanczos Algorithms for Large Symmetric
+                   Eigenvalue Computations",
+   publisher    = "Birkhauser",
+   year         = "1985",
+   volume       = "I Theory, II Programs",
+   address      = "Boston, USA"}
+
+@book{DUER86,
+   author       = "I. S. Duff and A. M. Erisman and J. K. Reid",
+   title        = "Direct Methods for Sparse Matrices",
+   publisher    = "Clarendon Press",
+   year         = "1986",
+   address      = "Oxford, England"}
+
+@book{GBDM77,
+   author       = "B. S. Garbow and J. M. Boyle and J. J. Dongarra
+                   and C. B. Moler",
+   title        = "{Matrix Eigensystem Routines: Eispack
+                   Guide Extension}",
+   publisher    = "Springer Verlag",
+   year         = "1977",
+   volume       = "51",
+   series       = "Lecture Notes in Computer Science",
+   address      = "Berlin, Germany"}
+
+@book{GELI81,
+   author       = "A. George and J. W. H. Liu",
+   title        = "Computer Solution of Large Sparse Symmetric
+                   Positive Definite Systems",
+   publisher    = "Prentice Hall",
+   year         = "1981",
+   address      = "Englewood Cliffs, USA"}
+
+@book{STSU90,
+   author       = "G. W. Stewart and J. Sun",
+   title        = "Matrix Perturbation Theory",
+   publisher    = "Academic Press, Inc.",
+   year         = "1990",
+   address      = "San Diego, USA"}
+
+@book{WATK91,
+   author       = "D. S. Watkins",
+   title        = "Fundamentals of Matrix Computations",
+   publisher    = "John Wiley \& Sons",
+   year         = "1991",
+   address      = "New York, USA"}

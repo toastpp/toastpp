@@ -1,0 +1,40 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libparam2001
+LIB = $(LIBNAME)$(LIB_SUFFIX)
+VPATH = $(TSRC)/libparam2001
+
+all:: $(LIB)
+
+SRCS = 	surfacenet.cc diffusphere.cc optimizzz.cc usefulfan.cc  legendre.cc 
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = ${SRCS:.cc=.h}
+
+
+#%.cc: %.h
+#	touch $@
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+#	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) $(MATHLIB) -lmath   
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lfe -lmath $(MATHLIB)
+
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

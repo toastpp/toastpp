@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>toastReadMesh</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastReadMesh
+</div>
+
+<div class="param">
+<h1>toastReadMesh</h1>
+<p>Read a TOAST mesh from file.
+
+<h2>Syntax</h2>
+<div class="code">
+hMesh = toastReadMesh(meshfile)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>meshfile</td><td><i>string</i></td><td>mesh file name</td>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>Reads a TOAST mesh from a file and returns a handle. The mesh handle
+cannot be used by MATLAB directly but can be passed to other TOAST
+functions.
+<p>After use, the mesh should be de-allocated with
+<a href="toastDeleteMesh.html">toastDeleteMesh</a>.
+
+</div>
+</body>
+</html>

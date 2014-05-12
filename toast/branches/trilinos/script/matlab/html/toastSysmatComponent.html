@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>toastSysmat</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastSysmatComponent
+</div>
+
+<div class="param">
+<h1>toastSysmatComponent</h1>
+<p>Generate a component of an FEM system matrix.
+
+<h2>Syntax</h2>
+<div class="code">
+S = toastSysmatComponent (hMesh, prm, int_tp)<br>
+S = toastSysmatComponent (hMesh, prm, int_tp, 'EL')
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>prm</td><td><i>real array</i></td><td>nodal or element parameter</td></tr>
+  <tr><td></td>
+  <td>int_tp</td><td><i>string</i></td><td>integration type identifier</td></tr>
+  <tr><td></td>
+  <td>'EL'</td><td><i>literal</i></td><td>element basis flag</td></tr>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>S</td><td><i>complex sparse [h x h]</i></td><td>FEM system matrix component</td></tr>
+</tr></table>
+Dimensions: <i>h</i> = size of <a href="basis.html">h-basis</a>
+
+<h2>Notes</h2>
+<p>Returns a sparse complex h x h matrix (h: number of nodes in the mesh)
+  containing system matrix component S. S is constructed by integrating
+  the parameter (prm), given by its nodal or element-based values and a combination of shape
+  functions and shape function derivatives over all mesh elements.</p>
+
+<p>The type of integration is selected via the int_tp string. The following
+  are currently supported:
+
+<table>
+<tr><td>int_tp</td><td>integral</td></tr>
+<tr><td>'PDD'</td><td> &int; prm(<b>r</b>) D<sub>i</sub>(<b>r</b>) D<sub>j</sub>(<b>r</b>) d<b>r</b></td></tr>
+</table>
+where D<sub>i</sub>: shape function derivative for node i.</p>
+
+<p>If the 'EL' flag is present, the system matrix is calculated on an
+  element basis. Length(<i>prm</i>) in that case must be equal to the number of elements in the mesh.
+  Parameters are considered constant over each element, so parameter
+  distribution has discontinuities at element boundaries.</p>
+
+<p>If the 'EL flag is not present, a nodal basis is assumed for the parameter
+  distribution, i.e. length(<i>prm</i>) = <i>h</i>, and the FEM shape functions
+  F<sub>i</sub> are used to interpolate <i>prm</i> within each element:
+  <div class="eq">
+  prm(<b>r</b>) = &sum;<sub>i</sub> prm<sub>i</sub> F<sub>i</sub>(<b>r</b>)
+  </div>
+</p>
+
+<p>S is a building block for creating the FEM system matrix.</p>
+  
+<h2>See also</h2>
+  <a href="toastSysmat.html">toastSysmat</a>,
+  <a href="toastElmat.html">toastElmat</a>
+  
+</div>
+</body>
+</html>

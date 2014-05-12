@@ -1,0 +1,90 @@
+# where are the libraries for the Linux platform located
+# note that the platform will be added to this path!
+PLATFORM=aix
+
+# name of the PARDISO library
+PARDISO=libpardiso_P4AIX51_64.so
+
+# -------------------------------
+# C-preprocessor used for FORTRAN source codes
+CPP=cpp
+# preprocessor options
+CPPFLAGS=-P -w
+
+# -------------------------------
+# which C-compiler do we use
+CC=xlc
+# C compiler options
+CCFLAGS= -O4 -qcpluscmt -q64 -qipa
+#CCFLAGS= -g -qcpluscmt -q64 -qipa
+
+
+
+# -------------------------------
+# switch for names alias of fortran routines
+# -D__UNDERSCORE__   use this, if a fortran routine say "daxpy" has to be 
+#                    called from C using the name "daxpy_"
+# -D__CAPS__         use this, if a fortran routine say "daxpy" has to be
+#                    called from C using the name "DAXPY"
+# -D__2UNDERSCORES__ use this, if a fortran routine say "daxpy" has to be 
+#                    called from C using the name "daxpy__"
+# You can combine __CAPS__ with either __UNDERSCORE__ or __2UNDERSCORES__
+# to obtain names like "DAXPY_" or "DAXPY__"
+# SOLARIS OS:      -D__UNDERSCORE__
+# Red Hat Linux:   -D__UNDERSCORE__
+# IRIX:            -D__UNDERSCORE__
+# HP UX:
+# AIX:             none
+FORTRANNAMES=
+
+
+# decide whether integer should be 32 bit or 64 bit
+#LONGINTEGER=-D_LONG_INTEGER_
+LONGINTEGER=
+
+
+
+# -------------------------------
+# which fortran compiler is used
+FF=xlf90
+# its flags
+FFFLAGS=  -O4  -q64 -qipa=inline=auto:level=2 -qfixed
+#FFFLAGS=  -g -q64 -qipa=inline=auto:level=2 -qfixed
+
+
+# -------------------------------
+# Preprocessor + FORTRAN Compiler
+FCOMPILE=$(FF)  $(FFFLAGS)  -I$(INCDIR) -WF,$(ARITHMETIC) -WF,$(LONGINTEGER) -c -o $@ $*.F
+
+
+
+# -------------------------------
+# which linker do we use
+LD=$(FF)
+# its flags
+LDFLAGS=-q64 
+
+
+
+# -------------------------------
+# how do we create a library
+AR=ar
+# its flags
+ARFLAGS=-X64 ru
+
+
+# -------------------------------
+# how to update the library
+RL=ranlib
+# its flags
+RLFLAGS=-X64
+
+
+
+# -------------------------------
+# miscelaneous abbreviations
+CAT=cat
+RM=rm
+MV=mv
+CP=cp
+CPLN=cp
