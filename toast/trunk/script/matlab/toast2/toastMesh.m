@@ -961,6 +961,40 @@ classdef toastMesh < handle
             mvec = toast(uint32(19),obj.handle,varargin{:});
         end
         
+        function intvec = IntFG(obj, f, g);
+            % Integrate product of two real or complex functions over mesh.
+            %
+            % Syntax: mesh.IntFG(f, g)
+            %
+            % Parameters:
+            %       f [real array n x 1]:
+            %           First nodal function, real or complex double;
+            %
+            %       g [real array n x 1]:
+            %           Second nodal function, real or complex double;
+            %
+            % Samuel Powell, March 2014, UCL.
+            intvec = toast(uint32(4000),obj.handle,f,g);
+        end
+
+       
+        function intvec = IntGradFGradG(obj, f, g);
+            % Integrate product of the gradient of two real or complex
+	    % functions over mesh.
+            %
+            % Syntax: mesh.IntGradFGradG(f, g)
+            %
+            % Parameters:
+            %       f [real array n x 1]:
+            %           First nodal function, real or complex double.
+            %
+            %       g [real array n x 1]:
+            %           Second nodal function, real or complex double.
+            %
+            % Samuel Powell, March 2014, UCL.
+            intvec = toast(uint32(4001),obj.handle,f,g);
+        end
+
         function nn = NodeNeighbour (obj)
             % Generate the node neighbour matrix of the mesh.
             %

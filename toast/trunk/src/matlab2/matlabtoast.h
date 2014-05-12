@@ -184,6 +184,10 @@ public:
         const mxArray *prhs[]);
     void UnwrapPhase (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
+    void IntFG (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void IntGradFGradG (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
 
     // Methods defined in mtElement.cc
     void ElDof (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);

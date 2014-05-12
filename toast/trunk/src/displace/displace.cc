@@ -23,10 +23,11 @@ const bool add_displacements = true;
 
 void AddPerturbations (const Mesh &mesh, const IVector &matidx, RVector &te);
 void WriteNimHeader (char *meshname, int imgsize, char *nimname, char *type);
-void WriteNim (const RVector &nim, int imgno, char *nimname);
-void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type);
-void WriteEim (const RVector &eim, int imgno, char *eimname);
-RVector ReadEim (char *eimname);
+void WriteNim (const RVector &nim, int imgno, const char *nimname);
+void WriteEimHeader (const char *meshname, int imgsize, const char *eimname,
+    const char *type);
+void WriteEim (const RVector &eim, int imgno, const char *eimname);
+RVector ReadEim (const char *eimname);
 
 int main (void) {
     double tol = 1e-12;
@@ -597,7 +598,8 @@ void AddPerturbations (const Mesh &mesh, const IVector &matidx, RVector &te)
     } while (cmd == 1);
 }
 
-void WriteNimHeader (char *meshname, int imgsize, char *nimname, char *type)
+void WriteNimHeader (const char *meshname, int imgsize, const char *nimname,
+    const char *type)
 {
     ofstream ofs (nimname);
     ofs << "NIM" << endl;
@@ -607,7 +609,7 @@ void WriteNimHeader (char *meshname, int imgsize, char *nimname, char *type)
     ofs << "EndHeader" << endl;
 }
 
-void WriteNim (const RVector &nim, int imgno, char *nimname)
+void WriteNim (const RVector &nim, int imgno, const char *nimname)
 {
     ofstream ofs (nimname, ios::app);
     ofs << "Image " << imgno << endl;
@@ -616,7 +618,8 @@ void WriteNim (const RVector &nim, int imgno, char *nimname)
     ofs << endl;
 }
 
-void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type)
+void WriteEimHeader (const char *meshname, int imgsize, const char *eimname,
+    const char *type)
 {
     ofstream ofs (eimname);
     ofs << "EIM" << endl;
@@ -626,7 +629,7 @@ void WriteEimHeader (char *meshname, int imgsize, char *eimname, char *type)
     ofs << "EndHeader" << endl;
 }
 
-void WriteEim (const RVector &eim, int imgno, char *eimname)
+void WriteEim (const RVector &eim, int imgno, const char *eimname)
 {
     ofstream ofs (eimname, ios::app);
     ofs << "Image " << imgno << endl;
@@ -635,7 +638,7 @@ void WriteEim (const RVector &eim, int imgno, char *eimname)
     ofs << endl;
 }
 
-RVector ReadEim (char *eimname)
+RVector ReadEim (const char *eimname)
 {
     char cbuf[256];
     int i, imgsize = 0;

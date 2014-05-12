@@ -99,6 +99,10 @@
 #define TOAST_SETVERBOSITY    1000
 #define TOAST_THREADCOUNT     1001
 
+// Added by SP
+#define TOAST_INTFG           4000
+#define TOAST_INTGRADFGRADG   4001
+
 #ifdef FDOT
 // Fluorescence solver interface
 #define FDOT_MAKEFWD          2007
