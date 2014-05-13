@@ -226,6 +226,29 @@ test_fullnewton : test_fullnewton.cc pparse.o tparse.o raster2.o fwdsolver.o \
 test_edd : test_edd.cc
 	$(CXX) $(STOASTFLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(STOASTLIB) -llbfgs
 
+
+# BEGIN TRILINOS TESTING PART ================================
+# Trilinos environment
+include $(TRILINOSDIR)/include/Makefile.export.Trilinos
+TINCLUDE_DIRS=$(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)
+TLIBRARY_DIRS=$(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARY_DIRS)
+TLIBRARIES=$(Trilinos_LIBRARIES) $(Trilinos_TPL_LIBRARIES)
+TLINK_FLAGS=$(Trilinos_EXTRA_LD_FLAGS)
+
+#just assuming that epetra is turned on.
+TDEFINES=-DMYAPP_EPETRA
+
+test_trilinos : test_trilinos.cc
+	$(CXX) -o test_trilinos $^ $(STOASTFLAGS) $(TLINK_FLAGS) $(TINCLUDE_DIRS) $(TDEFINES) $(STOASTLIB) $(TLIBRARY_DIRS) $(TLIBRARIES)
+
+test_trilinos_zoltan : test_trilinos_zoltan.cc test_trilinos_zoltan_class.cc
+	$(CXX) -o test_trilinos_zoltan $^ $(STOASTFLAGS) $(TLINK_FLAGS) $(TINCLUDE_DIRS) $(TDEFINES) $(STOASTLIB) $(TLIBRARY_DIRS) $(TLIBRARIES)
+
+test_trilinos_zoltan2 : test_trilinos_zoltan2.cc
+	$(CXX) -o test_trilinos_zoltan2 $^ $(STOASTFLAGS) $(TLINK_FLAGS) $(TINCLUDE_DIRS) $(TDEFINES) $(STOASTLIB) $(TLIBRARY_DIRS) $(TLIBRARIES)
+# END TRILINOS TESTING PART ================================
+
+
 tmp : tmp.o
 	$(CXX) $(FLAGS) -o $(TBIN)/$@ $^ $(CCLIBS) $(FELIB)
 

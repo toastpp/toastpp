@@ -5,7 +5,6 @@
 #include "toastdef.h"
 #include "complex.h"
 
-#ifdef TOAST_MPI
 class TMPI {
 public:
     TMPI() {}
@@ -17,6 +16,5 @@ private:
     static int rank;
     static int size;
 };
-#endif
 
 #endif // !__TOASTMPI_H

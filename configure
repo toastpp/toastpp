@@ -681,6 +681,8 @@ MPILIBDIR
 MPIINCDIR
 ENABLE_MPI
 ENABLE_PTHREAD
+TRILINOSDIR
+ENABLE_TRILINOS
 ZOLTANLIBDIR
 ZOLTANINCDIR
 ENABLE_ZOLTAN
@@ -774,6 +776,8 @@ enable_zoltan
 with_zoltan_dir
 with_zoltan_incdir
 with_zoltan_libdir
+enable_trilinos
+with_trilinos_dir
 enable_threads
 enable_mpi
 with_mpi_dir
@@ -1436,6 +1440,7 @@ Optional Features:
   --enable-debug          build debug version
   --enable-prof           build profiling version
   --enable-zoltan         build with Zoltan load-balancing support
+  --enable-trilinos       build with Trilinos support
   --enable-threads        build pthreads parallel version
   --enable-mpi            build MPI distributed version
   --enable-cuda           enable CUDA GPU support
@@ -1467,6 +1472,7 @@ Optional Packages:
   --with-zoltan-dir       Zoltan source installation directory
   --with-zoltan-incdir    Zoltan include directory
   --with-zoltan-libdir    Zoltan library directory
+  --with-trilinos-dir     Trilinos installation root directory
   --with-mpi-dir       MPI source installation directory
   --with-mpi-incdir    MPI include directory
   --with-mpi-libdir    MPI library directory
@@ -10360,6 +10366,31 @@ fi
 
 fi
 
+
+
+
+
+# =========================================================================
+# Check whether the user wants to add Trilinos support
+
+# Check whether --enable-trilinos was given.
+if test "${enable_trilinos+set}" = set; then
+  enableval=$enable_trilinos; isok=$enableval
+else
+  isok=no
+fi
+
+if test "$isok" = "yes" ; then
+    ENABLE_TRILINOS=yes
+
+# Check whether --with-trilinos-dir was given.
+if test "${with_trilinos_dir+set}" = set; then
+  withval=$with_trilinos_dir; TRILINOSDIR=$withval
+else
+  TRILINOSDIR=${TRILINOSDIR}
+fi
+
+fi
 
 
 

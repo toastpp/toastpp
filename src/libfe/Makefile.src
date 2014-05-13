@@ -17,9 +17,8 @@ SRCS = 	point.cc node.cc ndlist.cc element.cc ellist.cc surface.cc \
 	ordmmd.cc rcm.cc meshopt.cc nim.cc \
 	refine_mesh.cc
 
-ifeq ($(ENABLE_MPI),yes)
-MATHLIB += -L$(MPILIBDIR) -lmpich -lmpl
-SRCS += mesh_mpi.cc
+ifeq ($(ENABLE_TRILINOS),yes)
+SRCS += mesh_zoltan.cc
 endif
 
 OBJS = ${SRCS:.cc=.o}

@@ -331,7 +331,7 @@ void TCompRowMatrixMPI<MT>::MPIinit ()
 
 template class MATHLIB TCompRowMatrixMPI<double>;
 template class MATHLIB TCompRowMatrixMPI<float>;
-template class MATHLIB TCompRowMatrixMPI<complex>;
+template class MATHLIB TCompRowMatrixMPI<toast::complex>;
 template class MATHLIB TCompRowMatrixMPI<scomplex>;
 template class MATHLIB TCompRowMatrixMPI<int>;
 

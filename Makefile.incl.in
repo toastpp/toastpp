@@ -91,6 +91,22 @@ MPIINCDIR = @MPIINCDIR@
 MPILIBDIR = @MPILIBDIR@
 
 # =======================================================================
+# Trilinos support
+
+ENABLE_TRILINOS = @ENABLE_TRILINOS@
+TRILINOSDIR = @TRILINOSDIR@
+ifeq ($(ENABLE_TRILINOS),yes)
+     include $(TRILINOSDIR)/include/Makefile.export.Trilinos
+     CXX=$(Trilinos_CXX_COMPILER)
+     CC=$(Trilinos_C_COMPILER)
+     FORT=$(Trilinos_Fortran_COMPILER)
+     CCFLAGS=$(Trilinos_CXX_COMPILER_FLAGS) $(USER_CXX_FLAGS) -DTOAST_TRILINOS -DNEED_EXPLICIT_INSTANTIATION -Wno-deprecated
+     CFLAGS=$(Trilinos_C_COMPILER_FLAGS) $(USERC_FLAGS)
+     FFLAGS=$(Trilinos_Fortran_COMPILER_FLAGS) $(USER_FORT_FLAGS)
+     LDFLAGS += $(Trilinos_EXTRA_LD_FLAGS)
+endif
+
+# =======================================================================
 # CUDA support
 
 ENABLE_CUDA = @ENABLE_CUDA@
@@ -137,6 +153,12 @@ TLIBS     = -lfe -lmath $(SUPERLULIB) -larpack $(LAPACKLIB) $(BLASLIB) \
 ifeq ($(ENABLE_ZOLTAN),yes)
 	TINC  += -I$(ZOLTANINCDIR)
 	TLIBS += -L$(ZOLTANLIBDIR) -lzoltan
+endif
+
+ifeq ($(ENABLE_TRILINOS),yes)
+     TINC += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)
+     TLIBS += $(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARY_DIRS) \
+     	   $(Trilinos_LIBRARIES) $(Trilinos_TPL_LIBRARIES)
 endif
 
 ifeq ($(ENABLE_PARMETIS),yes)
