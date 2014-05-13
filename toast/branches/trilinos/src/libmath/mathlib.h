@@ -56,6 +56,13 @@
 #include "crmatrix_mpi.h"
 #endif
 
+#ifdef TOAST_TRILINOS
+#include "toast_mpi.h"
+#include "dnsmatrix_mpi.h"
+#include "crmatrix_mpi.h"
+#include "crmatrix_trilinos.h"
+#endif
+
 #ifdef TOAST_PARALLEL
 #include "task.h"
 #endif
@@ -67,7 +74,7 @@ extern unsigned int flops_mul;
 
 #endif // !NO_MATH_HEADERS
 
-//#define SQR(x) ((x)*(x))
+#define SQR(x) ((x)*(x))
 #define CUBE(x) ((x)*(x)*(x))
 
 // The template implementation headers

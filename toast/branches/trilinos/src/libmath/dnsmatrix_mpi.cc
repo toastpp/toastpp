@@ -324,7 +324,7 @@ MPI_Datatype TDenseMatrixMPI<double>::MPIType() const
 }
 
 template<>
-MPI_Datatype TDenseMatrixMPI<complex>::MPIType() const
+MPI_Datatype TDenseMatrixMPI<toast::complex>::MPIType() const
 {
     return MPI_DOUBLE_COMPLEX;
 }
@@ -336,7 +336,7 @@ MPI_Datatype TDenseMatrixMPI<complex>::MPIType() const
 
 template class MATHLIB TDenseMatrixMPI<double>;
 template class MATHLIB TDenseMatrixMPI<float>;
-template class MATHLIB TDenseMatrixMPI<complex>;
+template class MATHLIB TDenseMatrixMPI<toast::complex>;
 template class MATHLIB TDenseMatrixMPI<scomplex>;
 template class MATHLIB TDenseMatrixMPI<int>;
 

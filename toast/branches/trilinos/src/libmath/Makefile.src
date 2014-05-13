@@ -45,6 +45,14 @@ SRCS += \
 	toast_mpi.cc
 endif
 
+ifeq ($(ENABLE_TRILINOS),yes)
+SRCS += \
+        crmatrix_trilinos.cc \
+	crmatrix_mpi.cc \
+	dnsmatrix_mpi.cc \
+	toast_mpi.cc
+endif
+
 #ifdef ENABLE_CUDA
 #SRCS += \
 	vector_cusp.cu \
@@ -86,6 +94,8 @@ endif
 %.o : %.cu $(CU_DEPS)
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) --compiler-options $(SHLIB_CFLAGS) -o $@ -c $<
 
+#crmatrix_trilinos.o : crmatrix_trilinos.cc
+#	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS) -c $< -o $@
 
 #fourn.o :: fourn.c
 #	gcc  $(FLAGS) $(SHLIB_CFLAGS) -c $?

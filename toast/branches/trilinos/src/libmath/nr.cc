@@ -1039,12 +1039,12 @@ void dfpmin (double p[], int n, double gtol, int *iter, double *fret,
     double den, fac, fad, fae, fp, stpmax, sum = 0.0, sumdg, sumxi, temp, test;
     double *dg, *g, *hdg, **hessin, *pnew, *xi;
 
-    dg = vector (1,n);
-    g = vector (1,n);
-    hdg = vector (1,n);
+    dg = ::vector (1,n);
+    g = ::vector (1,n);
+    hdg = ::vector (1,n);
     hessin = matrix (1,n,1,n);
-    pnew = vector (1,n);
-    xi = vector (1,n);
+    pnew = ::vector (1,n);
+    xi = ::vector (1,n);
     fp = (*func)(p);
     cout << "initial objective = " << fp << endl;
     (*dfunc)(p,g);
