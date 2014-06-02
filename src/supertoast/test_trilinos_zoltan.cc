@@ -15,7 +15,6 @@
 #include "source.h"
 #include "timing.h"
 #include "crmatrix_trilinos.h"
-#include "test_trilinos_zoltan_class.h"
 
 #define MAXREGION 100
 
@@ -259,23 +258,27 @@ createPreconditioner (const Teuchos::RCP<const TpetraMatrixType>& A,
   return prec;
 }
 
-template<class scalar_type>
-void assemble_clbk (zoltanMesh *mesh, void *data,
-     TCompRowMatrix<scalar_type> &localMatrix)
+// Callback function for matrix assembly
+template<class M>
+void clbkAssemble (TCompRowMatrix<M> &mat, zoltanMesh *mesh, void *data)
 {
     Solution *sol = (Solution*)data;
+
+    // Element-wise assembly
     RVector prm;
     prm = sol->GetParam(OT_CMUA);
-    mesh->AddToSysMatrix (localMatrix, &prm, ASSEMBLE_PFF);
+    mesh->AddToSysMatrix (mat, &prm, ASSEMBLE_PFF);
     prm = sol->GetParam(OT_CKAPPA);
-    mesh->AddToSysMatrix (localMatrix, &prm, ASSEMBLE_PDD);
+    mesh->AddToSysMatrix (mat, &prm, ASSEMBLE_PDD);
     prm = sol->GetParam(OT_C2A);
-    mesh->AddToSysMatrix (localMatrix, &prm, ASSEMBLE_BNDPFF);
+    mesh->AddToSysMatrix (mat, &prm, ASSEMBLE_BNDPFF);
 }
 
+// Create a CrsMatrix from a mesh graph and assemble it from a
+// solution instance
 template<class TpetraMatrixType>
-TCompRowMatrixTrilinos<typename TpetraMatrixType::scalar_type> createToastMatrix (
-    const Teuchos::RCP<const Teuchos::Comm<int> >& comm,
+TCompRowMatrixTrilinos<typename TpetraMatrixType::scalar_type>
+*createToastMatrix (const Teuchos::RCP<const Teuchos::Comm<int> >& comm,
     const Teuchos::RCP<typename TpetraMatrixType::node_type>& node,
     int m, int n, zoltanMesh *mesh, Solution *sol)
 {
@@ -284,8 +287,6 @@ TCompRowMatrixTrilinos<typename TpetraMatrixType::scalar_type> createToastMatrix
     using Teuchos::ArrayView;
     using Teuchos::RCP;
     using Teuchos::rcp;
-    using Teuchos::Time;
-    using Teuchos::TimeMonitor;
     using Teuchos::tuple;
 
     typedef TpetraMatrixType matrix_type;
@@ -295,14 +296,6 @@ TCompRowMatrixTrilinos<typename TpetraMatrixType::scalar_type> createToastMatrix
     int nlen = mesh->nlen();
     mesh->SparseRowStructure(rowptr, colidx, nzero);
     zoltanMesh::GraphData *graph = mesh->GetGraphData();
-
-    // Fetch the timer for sparse matrix creation.
-    RCP<Time> timer = TimeMonitor::lookupCounter ("Sparse matrix creation");
-    if (timer.is_null())
-	timer = TimeMonitor::getNewCounter ("Sparse matrix creation");
-
-    // Time the whole scope of this routine, not counting timer lookup.
-    TimeMonitor monitor (*timer);
 
     // Fetch typedefs from the Tpetra::CrsMatrix.
     typedef typename TpetraMatrixType::scalar_type scalar_type;
@@ -335,170 +328,13 @@ TCompRowMatrixTrilinos<typename TpetraMatrixType::scalar_type> createToastMatrix
 	rcp (new map_type (numGlobalElements, myNodeView, indexBase, comm,
 			   node));
 
+    // Construct the distributed matrix from the map
+    TCompRowMatrixTrilinos<scalar_type> *toastMat = 
+        new TCompRowMatrixTrilinos<scalar_type> (nlen, nlen, rowptr, colidx,
+            map);
 
-    TCompRowMatrixTrilinos<scalar_type> A(nlen,nlen,rowptr,colidx,map);
-    A.Assemble (comm, node, mesh, (void*)sol, assemble_clbk<scalar_type>);
-
-#ifdef UNDEF
-    // Create a Tpetra::Matrix using the Map, with a static allocation
-    // dictated by NumNz.
-    RCP<matrix_type> A = rcp (new matrix_type (map, NumNz,
-					       Tpetra::StaticProfile));
-  
-
-    // assemble local matrix into Tpetra matrix
-    double *Alocal_val = Alocal.ValPtr();
-    for (i = 0; i < numMyElements; i++) {
-	int rp = myRowptr[i];
-	ArrayView<int> cols (myColidx+rp, NumNz[i]);
-	ArrayView<double> vals (Alocal_val+rp, NumNz[i]);
-	A->insertGlobalValues (myGlobalElements[i], cols, vals);
-    }
-
-    // We are done with NumNZ; free it.
-    NumNz = Teuchos::null;
-
-    delete []rowptr;
-    delete []colidx;
-    delete []myRowptr;
-    delete []myColidx;
-
-    // Finish up the matrix.
-    A->fillComplete ();
-#endif
-    return A;
+    return toastMat;
 }
-
-#ifdef UNDEF
-// Create a CrsMatrix from a mesh graph
-template<class TpetraMatrixType>
-Teuchos::RCP<const TpetraMatrixType>
-createToastMatrix (const Teuchos::RCP<const Teuchos::Comm<int> >& comm,
-    const Teuchos::RCP<typename TpetraMatrixType::node_type>& node,
-    int m, int n, zoltanMesh *mesh, Solution *sol)
-{
-    using Teuchos::arcp;
-    using Teuchos::ArrayRCP;
-    using Teuchos::ArrayView;
-    using Teuchos::RCP;
-    using Teuchos::rcp;
-    using Teuchos::Time;
-    using Teuchos::TimeMonitor;
-    using Teuchos::tuple;
-
-    typedef TpetraMatrixType matrix_type;
-
-    int i, j;
-    int *rowptr, *colidx, nzero;
-    mesh->SparseRowStructure(rowptr, colidx, nzero);
-    zoltanMesh::GraphData *graph = mesh->GetGraphData();
-
-    // Fetch the timer for sparse matrix creation.
-    RCP<Time> timer = TimeMonitor::lookupCounter ("Sparse matrix creation");
-    if (timer.is_null())
-	timer = TimeMonitor::getNewCounter ("Sparse matrix creation");
-
-    // Time the whole scope of this routine, not counting timer lookup.
-    TimeMonitor monitor (*timer);
-
-    // Fetch typedefs from the Tpetra::CrsMatrix.
-    typedef typename TpetraMatrixType::scalar_type scalar_type;
-    typedef typename TpetraMatrixType::local_ordinal_type local_ordinal_type;
-    typedef typename TpetraMatrixType::global_ordinal_type global_ordinal_type;
-    typedef typename TpetraMatrixType::node_type node_type;
-
-    // create an ArrayView from the graph data
-    int *ndtp, nnd = 0;
-    mesh->GetNodeTypeList (&ndtp);
-    for (i = 0; i < mesh->nlen(); i++)
-	if (ndtp[i] == 2) nnd++;
-
-    std::vector<int> myNode(nnd);
-    for (i = j = 0; i < mesh->nlen(); i++)
-	     if (ndtp[i] == 2) myNode[j++] = i;
-    ArrayView<int> myNodeView(myNode);
-
-    // The type of the Tpetra::Map that describes how the matrix is distributed.
-    typedef Tpetra::Map<local_ordinal_type, global_ordinal_type, node_type> map_type;
-
-    // The global number of rows in the matrix A to create.
-    //const Tpetra::global_size_t numGlobalElements = (Tpetra::global_size_t)m;
-    const Tpetra::global_size_t numGlobalElements = (const Tpetra::global_size_t)m;
-
-    // Construct a Map that puts approximately the same number of
-    // equations on each processor.
-    const global_ordinal_type indexBase = 0;
-    RCP<const map_type > map = 
-	rcp (new map_type (numGlobalElements, myNodeView, indexBase, comm,
-			   node));
-
-
-    // Get update list and the number of equations that this MPI process
-    // owns.
-    const size_t numMyElements = map->getNodeNumElements();
-    ArrayView<const global_ordinal_type> myGlobalElements =
-	map->getNodeElementList();
-
-    // NumNz[i] will be the number of nonzero entries for the i-th
-    // global equation on this MPI process.
-    ArrayRCP<size_t> NumNz = arcp<size_t> (numMyElements);
-    int numNzero = 0;
-
-    // Assign number of elements for each row we are owning
-    for (size_t i = 0; i < numMyElements; ++i) {
-	global_ordinal_type r = myGlobalElements[i];
-	NumNz[i] = (size_t)(rowptr[r+1]-rowptr[r]);
-	numNzero += NumNz[i];
-    }
-
-    // Create a local matrix for the assembly
-    int *myRowptr = new int[numMyElements+1];
-    int *myColidx = new int[numNzero];
-    myRowptr[0] = 0;
-    for (i = 0; i < numMyElements; i++) {
-	myRowptr[i+1] = myRowptr[i] + NumNz[i];
-	for (j = 0; j < NumNz[i]; j++)
-	    myColidx[myRowptr[i]+j] = colidx[rowptr[myGlobalElements[i]]+j];
-    }
-    RCompRowMatrix Alocal(numMyElements, mesh->nlen(), myRowptr, myColidx);
-
-    // Element-wise assembly
-    RVector prm;
-    prm = sol->GetParam(OT_CMUA);
-    mesh->AddToSysMatrix (Alocal, &prm, ASSEMBLE_PFF);
-    prm = sol->GetParam(OT_CKAPPA);
-    mesh->AddToSysMatrix (Alocal, &prm, ASSEMBLE_PDD);
-    prm = sol->GetParam(OT_C2A);
-    mesh->AddToSysMatrix (Alocal, &prm, ASSEMBLE_BNDPFF);
-
-    // Create a Tpetra::Matrix using the Map, with a static allocation
-    // dictated by NumNz.
-    RCP<matrix_type> A = rcp (new matrix_type (map, NumNz,
-					       Tpetra::StaticProfile));
-  
-
-    // assemble local matrix into Tpetra matrix
-    double *Alocal_val = Alocal.ValPtr();
-    for (i = 0; i < numMyElements; i++) {
-	int rp = myRowptr[i];
-	ArrayView<int> cols (myColidx+rp, NumNz[i]);
-	ArrayView<double> vals (Alocal_val+rp, NumNz[i]);
-	A->insertGlobalValues (myGlobalElements[i], cols, vals);
-    }
-
-    // We are done with NumNZ; free it.
-    NumNz = Teuchos::null;
-
-    delete []rowptr;
-    delete []colidx;
-    delete []myRowptr;
-    delete []myColidx;
-
-    // Finish up the matrix.
-    A->fillComplete ();
-    return A;
-}
-#endif
 
 // ============================================================================
 
@@ -583,8 +419,6 @@ int main (int argc, char *argv[])
     SelectMeasurementProfile (pp, mprof, mwidth);
     RVector qvec = QVec_Gaussian (zmesh, zmesh.Q[0], qwidth, srctp);
 
-    walltic();
-
     // Partition the mesh over processes
     zoltanMesh::GraphData &myGraph = *zmesh.GetGraphData();
 
@@ -609,14 +443,19 @@ int main (int argc, char *argv[])
     Solution sol (OT_NPARAM, nnd);
     SelectInitialParams (pp, zmesh, sol);
 
-    TCompRowMatrixTrilinos<scalar_type> Atoast = createToastMatrix<matrix_type> (
-        comm, node, nnd, nnd, &zmesh, &sol);
-
-    RCP<const matrix_type> A = Atoast.GetMatrix();
+    walltic();
 
     // Create and populate distributed system matrix
-    //RCP<const matrix_type> A = createToastMatrix<matrix_type> (comm, node,
-    //    nnd, nnd, &zmesh, &sol);
+    TCompRowMatrixTrilinos<scalar_type> *Atoast = 
+        createToastMatrix<matrix_type> (comm, node, nnd, nnd, &zmesh, &sol);
+
+    double t_create = walltoc();
+    walltic();
+
+    // Assemble the matrix
+    Atoast->Assemble (&zmesh, (void*)&sol, clbkAssemble<scalar_type>);
+
+    RCP<const matrix_type> A = Atoast->GetMatrix();
 
     double t_assemble = walltoc();
     walltic();
@@ -675,7 +514,9 @@ int main (int argc, char *argv[])
 	std::ofstream ofs1("dbg1.dat");
 	ofs1 << x << std::endl;
 	ofs1.close();
-	std::cerr << "Wallclock timings: assemble = " << t_assemble << ", solve = " << t_solve << std::endl;
+	std::cerr << "Wallclock timings: creation = " << t_create
+		  << ", assemble = " << t_assemble << ", solve = " << t_solve
+		  << std::endl;
     }
 
     Zoltan_Destroy (&zz);
