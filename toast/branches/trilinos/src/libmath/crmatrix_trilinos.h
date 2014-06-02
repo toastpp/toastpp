@@ -42,7 +42,7 @@ public:
      * \param _map pointer to Tpetra::Map containing the row distribution.
      */
     TCompRowMatrixTrilinos (int rows, int cols, int *_rowptr, int *_colidx,
-        Teuchos::RCP<const map_type> _map);
+        Teuchos::RCP<const map_type>_map);
 
     virtual ~TCompRowMatrixTrilinos ();
 
@@ -51,6 +51,8 @@ public:
      */
     MatrixStorage StorageType() const
     { return MATRIX_COMPROW; }
+
+    void SetPartition (Teuchos::RCP<const map_type> _map);
 
     /**
      * \brief Retrieve a matrix element
@@ -170,17 +172,20 @@ public:
     Teuchos::RCP<matrix_type> GetMatrix ()
     { return teuchosMatrix; }
 
-    void Assemble (const Teuchos::RCP<const Teuchos::Comm<int> > &comm,
-		   const Teuchos::RCP<typename matrix_type::node_type>& node,
-		   zoltanMesh *mesh, void *data,
-		   void (*assemble_clbk)(zoltanMesh *mesh, void *data, 
-					 TCompRowMatrix<MT> &localMatrix));
+    void Assemble (zoltanMesh *mesh, void *data,
+                   void(*clbkAssemble)(TCompRowMatrix<MT>&,zoltanMesh*,void*));
 
 private:
     idxtype *rowptr;
     idxtype *colidx;
+    int numMyElements;
+    int numGlobElements;
+    size_t numNzero;
+    Teuchos::ArrayRCP<size_t>NumNz;
     Teuchos::RCP<const map_type> map;
     Teuchos::RCP<matrix_type> teuchosMatrix;
+    Teuchos::ArrayView<const int> myGlobalElements;
+    TCompRowMatrix<MT> toastMatrix;
 };
 
 #endif // !__TEST_TRILINOS_ZOLTAN_CLASS_H
