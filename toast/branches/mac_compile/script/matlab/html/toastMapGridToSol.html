@@ -1,0 +1,66 @@
+<html>
+<head>
+<title>toastMapGridToSol</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMapGridToSol
+</div>
+
+<div class="param">
+<h1>toastMapGridToSol</h1>
+<p>Map an image between two different basis representations: from g-basis to
+s-basis (see <a href="basis.html">Basis definitions</a>).
+
+<h2>Syntax</h2>
+<div class="code">
+simg = toastMapGridToSol (hBasis, gimg)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+<tr><td></td>
+  <td>gimg</td><td><i>real or complex [g]</i></td><td>image (basis coefficients) in g-basis expansion</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>simg</td><td><i>real or complex [s]</i></td><td>image (basis coefficients) mapped into s-basis expansion</td>
+</tr></table>
+Dimensions: <i>g</i> = size of <a href="basis.html">g-basis</a>,
+<i>s</i> = size of <a href="basis.html">s-basis</a>.
+
+<h2>Notes</h2>
+<p>Arbitrary functions can generally not be represented exactly in any of the
+basis expansions. Therefore, mapping from one basis to another may incur a
+loss, and mapping back to the first basis may not recover the original basis
+coefficients precisely.
+
+<p>Images can be real or complex-valued.
+
+<p>This function is similar to <a href="toastMapGridToBasis.html">toastMapGridToBasis</a>,
+but in addition it also removes any voxels from the coarser basis expansion that do not
+overlap with the problem domain. This represents the solution basis of the inverse solver.
+
+<p>Both g and s-basis are regular grids. The mapping between them is implemented
+as a bi- or tri-linear interpolation.
+
+<p>If the hBasis handle was created by a call to toastSetBasis with only a single
+regular grid parameter, then toastMapGridToSol is equivalent to
+<a href="toastMapBasisToSol.html">toastMapBasisToSol</a>.
+
+<h2>See also</h2>
+<a href="basis.html">Basis definitions</a>,
+<a href="toastSetBasis.html">toastSetBasis</a>,
+<a href="toastMapBasisToMesh.html">toastMapBasisToMesh</a>,
+<a href="toastMapGridToBasis.html">toastMapGridToBasis</a>,
+<a href="toastMapBasisToSol.html">toastMapBasisToSol</a>,
+<a href="toastSolutionMask.html">toastSolutionMask</a>
+</div>
+
+</body>
+</html>

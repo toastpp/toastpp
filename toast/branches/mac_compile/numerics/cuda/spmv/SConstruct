@@ -1,0 +1,56 @@
+env = Environment(CFLAGS='-O3')
+MMIO = env.Object('mmio.c')
+
+###############
+# Partitioner
+###############
+env = Environment()
+# libraries
+env.Append(LIBS = ['metis'])               
+env.Append(LIBPATH = ['metis/build/Linux-x86_64/'])
+
+# includes
+env.Append(CPPPATH = ['./'])
+env.Append(CPPPATH = ['./metis/include'])
+
+# flags
+env.Append(CPPFLAGS = ['-O3','-Wall'])
+env.Program('partition', ['partition.cxx',MMIO])
+
+
+###############
+# SpMV Driver
+###############
+env = Environment()
+env.Tool('nvcc', toolpath = ['.'])
+
+# libraries
+env.Append(LIBS = ['cudart'])
+env.Append(LIBPATH = ['/usr/local/cuda/lib64'])
+
+# includes
+env.Append(CPPPATH = ['./'])
+
+flags = ['']
+nvflags = ['-arch=sm_11','-Xptxas','-v','-Xcompiler','-Wall']
+
+
+mode = 'release'
+if ARGUMENTS.get('mode'):
+  mode = ARGUMENTS['mode']
+if mode == 'release':
+  nvflags.append('-O3')
+elif mode == 'debug':
+  nvflags.append('-g')
+elif mode == 'emurelease':
+  nvflags.append('-O3')
+  nvflags.append('-deviceemu')
+elif mode == 'emudebug':
+  nvflags.append('-g')
+  nvflags.append('-deviceemu')
+
+env.Append(CFLAGS = flags)
+env.Append(NVCCFLAGS = nvflags)
+
+env.Program('spmv', ['driver.cu',MMIO])
+

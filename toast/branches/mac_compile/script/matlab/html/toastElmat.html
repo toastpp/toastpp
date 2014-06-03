@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>toastElmat</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastElmat
+</div>
+
+<div class="param">
+<h1>toastElmat</h1>
+<p>Return an element matrix for a given mesh element. The matrix contains
+the integrals of a user-specified combination of nodal shape functions and
+shape function derivatives over the element volume. The dimension of the
+returned matrix depends on the requested integral. The element matrices are
+the building blocks for the FEM system matrices.
+
+<h2>Syntax</h2>
+<div class="code">
+E = toastElmat (hMesh, elidx, int_type, [extra_param])
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>elidx</td><td><i>integer</i></td><td>element index (>= 1)</td></tr>
+  <tr><td></td>
+  <td>int_type</td><td><i>string</i></td><td>integral type identifier (see below)</td></tr>
+  <tr><td></td>
+  <td>extra_param</td><td><i>-</i></td><td>any additional required parameters (type-dependent)</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>E</td><td><i>real array [dimension is type-dependent]</i></td><td>element matrix</td></tr>
+</tr></table>
+
+<h2>Notes</h2>
+<p>The following integral types are recognised by this function (F<sub>i</sub>: shape
+function for element node <i>i</i>, D<sub>i</sub>: shape function derivative for element node <i>i</i>,
+dF<sub>i</sub>/dx<sub>j</sub>: partial derivative of shape function for element node <i>i</i> with respect to coordinate <i>j</i>,
+<i>n</i>: number of nodes associated with the element, <i>d</i>: domain dimension):
+<table col="3">
+<tr><td>type string</td><td>Integral</td><td>Dimension of returned matrix</td></tr>
+<tr><td>F</td><td>&int; F<sub>i</sub> dr </td><td>n x 1</td></tr>
+<tr><td>FF</td><td>&int; F<sub>i</sub> F<sub>j</sub> dr</td><td>n x n</td></tr>
+<tr><td>FFF</td><td>&int; F<sub>i</sub> F<sub>j</sub> F<sub>k</sub> dr</td><td>n x n x n</td></tr>
+<tr><td>DD</td><td>&int; D<sub>i</sub> D<sub>j</sub> dr</td><td>n x n</td></tr>
+<tr><td>FD</td><td>&int; F<sub>i</sub> D<sub>j</sub> dr</td><td>n x n x d</td></tr>
+<tr><td>FDD</td><td>&int; F<sub>i</sub> D</sub>j</sub> D<sub>k</sub> dr</td><td>n x n x n</td></tr>
+<tr><td>dd</td><td>&int; dF<sub>i</sub>/dx<sub>j</sub> dF<sub>k</sub>/dx<sub>l</sub> dr</td><td>n x d x n x d</td></tr>
+<tr><td>BndF</td><td>&int; F<sub>i</sub> ds</td><td>n x 1</td></tr>
+<tr><td>BndFF</td><td>&int; F<sub>i</sub> F<sub>j</sub> ds</td><td>n x n</td></tr>
+</table>
+</p>
+<p>For boundary integrals ('BndF' and 'BndFF'), the integrals are
+performed over all boundary sides of the element (i.e. sides forming
+part of the mesh surface). 
+Alternatively, by specifying a 4th parameter (sideidx) to the call to toastElmat,
+the integral can be performed over a single side of the element (whether boundary side or not):
+<div class="code">
+E = toastElmat(hMesh, elidx, 'BndFF', sideidx)
+</div>
+where sideidx is the local side index (>= 1).
+<p>The returned matrix is of dimension n x n, where n is the number of nodes in the element. Nonzero entries are located at positions (i,j) where both nodes i and j belong to a boundary side, or to side 'sideidx', if applicable.</p>
+
+<h2>See also</h2>
+  <a href="toastSysmat.html">toastSysmat</a>,
+  <a href="toastMassmat.html">toastMassmat</a>
+  
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+include $(TOASTDIR)/Makefile.incl
+SHELL = /bin/csh
+VPATH = $(TSRC)/matlab
+
+SRCS =  toastBasisToMeshMatrix.cc \
+	toastBndmat.cc \
+	toastBndReflectionTerm.cc \
+	toastCatchErrors.cc \
+	toastDataLinkList.cc \
+	toastDeleteBasis.cc \
+	toastDeleteMesh.cc \
+	toastClearRegul.cc \
+	toastElementData.cc \
+	toastElementSize.cc \
+	toastElmat.cc \
+	toastFields.cc \
+	toastFindElement.cc \
+	toastGetBasisSize.cc \
+	toastGetQM.cc \
+	toastGridElref.cc \
+	toastGradient.cc \
+	toastGradientCW.cc \
+	toastImageGradient.cc \
+	toastIntFG.cc \
+	toastIntGradFGradG.cc \
+	toastJacobian.cc \
+	toastJacobianCW.cc \
+	toastKrylov.cc \
+	toastLabelRegion.cc \
+	toastLBFGS.cc \
+	toastMakeMesh.cc \
+	toastMapBasis.cc \
+	toastMapBasisToMesh.cc \
+	toastMapGridToBasis.cc \
+	toastMapGridToMesh.cc \
+	toastMapGridToSol.cc \
+	toastMapMeshToBasis.cc \
+	toastMapMeshToGrid.cc \
+	toastMapMeshToSol.cc \
+	toastMapSolToBasis.cc \
+	toastMapSolToGrid.cc \
+	toastMapSolToMesh.cc \
+	toastMarkMeshBoundary.cc \
+	toastMassmat.cc \
+	toastMeshBB.cc \
+	toastMeshBndIntersect.cc \
+	toastMeshData.cc \
+	toastMeshDimension.cc \
+	toastMeshElementCount.cc \
+	toastMeshLin2Quad.cc \
+	toastMeshNodeCount.cc \
+	toastMeshOpt.cc \
+	toastMeshReorder.cc \
+	toastMeshSize.cc \
+	toastMeshToBasisMatrix.cc \
+	toastMPos.cc \
+	toastMvec.cc \
+	toastPointCloud.cc \
+	toastQPos.cc \
+	toastQvec.cc \
+	toastReadComplexMatrix.cc \
+	toastReadComplexVector.cc \
+	toastReadMesh.cc \
+	toastReadNIM.cc \
+	toastReadQM.cc \
+	toastReadRealVector.cc \
+	toastRegul.cc \
+	toastRegulGradient.cc \
+	toastRegulHDiag.cc \
+	toastRegulHess.cc \
+	toastRegulHess1f.cc \
+	toastRegulKappa.cc \
+	toastRegulValue.cc \
+	toastRelaxMesh.cc \
+	toastSampleField.cc \
+	toastSetBasis.cc \
+	toastSetQM.cc \
+	toastSetThreadCount.cc \
+	toastSetVerbosity.cc \
+	toastShapeFunction.cc \
+	toastShapeFunctionGrad.cc \
+	toastSolutionMask.cc \
+	toastSurfData.cc \
+	toastSysmat.cc \
+	toastSysmatComponent.cc \
+	toastVolmat.cc \
+	toastWriteComplexHBMatrix.cc \
+	toastWriteComplexVector.cc \
+	toastWriteMesh.cc \
+	toastWriteNIM.cc \
+	toastWriteQM.cc \
+	toastWriteRealHBMatrix.cc \
+	toastWriteRealVector.cc \
+	construct_bem_matrix.cc \
+	toast_bem_matrix.cc \
+	toast_bem_Dk_matrix.cc \
+	surface_int.cc
+
+#SRCS += toastPNJacobian.cc\
+
+ifeq ($(BUILD_FDOT),1)
+SRCS += makeFDOTFwd.cc \
+	toastMakeProjectorList.cc \
+	toastDeleteProjectorList.cc \
+	toastProjectToField.cc \
+	toastProjectToImage.cc \
+	deleteFDOTFwd.cc \
+	FDOTAdjOp.cc \
+	FDOTExcit.cc \
+	FDOTFwdOpRatio.cc \
+	FDOTAdjOpRatio.cc \
+	FDOTFwdOp.cc \
+	FDOTSysmat.cc 
+endif
+
+# DG-related mex files
+SRCS += \
+       toastMakeNonconformingMesh.cc\
+       toastDGSysmat.cc\
+       toastDGRefineElements.cc\
+       toastNonconformingMeshData.cc
+
+OBJS = ${SRCS:.cc=.$(MEXEXT)}
+
+all:: $(OBJS)
+
+%.o : %.cc
+	$(MEX) -c $<
+
+%.$(MEXEXT) : %.cc toastmex.o util.o
+	$(MEX) $^
+
+clean::
+	rm -f *.$(MEXEXT)

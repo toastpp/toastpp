@@ -1,0 +1,100 @@
+# where are the libraries for the Linux platform located
+# note that the platform will be added to this path!
+PLATFORM=INTEL64
+
+# MATLAB mex file extension
+EXT=mexa64
+
+# -------------------------------
+# C-preprocessor used for FORTRAN source codes
+CPP=icc
+# preprocessor options
+CPPFLAGS=-E
+
+# -------------------------------
+# which C-compiler do we use
+CC=icc
+# C compiler options
+CCFLAGS= -O3 -fPIC
+#CCFLAGS= -g
+
+
+
+# -------------------------------
+# switch for names alias of fortran routines
+# -D__UNDERSCORE__   use this, if a fortran routine say "daxpy" has to be 
+#                    called from C using the name "daxpy_"
+# -D__CAPS__         use this, if a fortran routine say "daxpy" has to be
+#                    called from C using the name "DAXPY"
+# -D__2UNDERSCORES__ use this, if a fortran routine say "daxpy" has to be 
+#                    called from C using the name "daxpy__"
+# You can combine __CAPS__ with either __UNDERSCORE__ or __2UNDERSCORES__
+# to obtain names like "DAXPY_" or "DAXPY__"
+# SOLARIS OS:      -D__UNDERSCORE__
+# Red Hat Linux:   -D__UNDERSCORE__
+# SGI-Linux:       -D__UNDERSCORE__
+# AIX:             none
+FORTRANNAMES=-D__UNDERSCORE__
+
+
+# decide whether integer should be 32 bit or 64 bit
+#LONGINTEGER=-D_LONG_INTEGER_
+LONGINTEGER=
+#FLONGINTEGER=-D_LONG_INTEGER_
+FLONGINTEGER=
+
+
+
+# -------------------------------
+# which fortran compiler is used
+FF=ifort
+# its flags
+FFFLAGS=  -O3 -fpp -warn all -fPIC
+#FFFLAGS=  -g
+
+
+# -------------------------------
+# Preprocessor + FORTRAN Compiler
+FCOMPILE=$(FF)  $(FFFLAGS)  -I$(INCDIR) $(ARITHMETIC) $(LONGINTEGER) -c -o $@ $<
+
+#FCOMPILE=rm -rf $*.f;\
+#         $(CPP) $(CPPFLAGS) -I$(INCDIR) $(ARITHMETIC) $<  >$*.f;\
+#         $(FF)  $(FFFLAGS)  -I$(INCDIR) -c -o $@ $*.f;\
+#	 rm -rf $*.f
+
+
+# -------------------------------
+# which linker do we use
+LD=$(FF)
+# its flags
+LDFLAGS=-nofor_main
+#LDFLAGS=
+
+
+# Linux icc/ifort with MKL
+LIBS=-lilupack $(MUMPSLIB) $(PARDISOLIB) -lamd -lsparspak  -lblaslike -lmetis -lmkl_lapack -lmkl -lguide -lifcore -limf -lpthread -lm -lc 
+
+
+# -------------------------------
+# how do we create a library
+AR=ar
+# its flags
+ARFLAGS=ru
+
+
+
+# -------------------------------
+# how to update the library
+RL=ranlib
+# its flags
+RLFLAGS=
+
+
+
+# -------------------------------
+# miscelaneous abbreviations
+CAT=cat
+RM=rm
+MV=mv
+CP=cp
+CPLN=cp

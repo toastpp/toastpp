@@ -1,0 +1,32 @@
+include ../../Makefile.incl
+
+LIBNAME = libharmonics
+
+LIB = $(TLIB)/$(LIBNAME)@LIB_SUFFIX@
+
+all:: $(LIB)
+
+SRCS = 	surfacenet.cc diffusphere.cc optimizzz.cc usefulfan.cc legendre.cc 
+
+
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = ${SRCS:.cc=.h}
+
+%.cc: %.h
+	touch $@
+
+.cc.o :
+	@CXX@ @CXXFLAGS@ @SHLIB_CFLAGS@ $(INCLUDE) -c $<
+
+$(LIB): $(HDRS) $(OBJS)
+	@$(RM) $(LIB)
+	@MAKE_LIB@
+	@RANLIB@ $(LIB)
+
+clean:: 
+	$(RM) *.o *~
+	$(RM) $(TLIB)/$(LIBNAME).*
+
+distclean:: clean
+	$(RM) Makefile

@@ -1,0 +1,47 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libfe
+LIB = $(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libfe
+
+all:: $(LIB)
+
+SRCS = 	point.cc node.cc ndlist.cc element.cc ellist.cc surface.cc \
+	ptsource.cc timespec.cc mesh.cc param.cc qmmesh.cc \
+	tri3old.cc tri3.cc tri6.cc tri6_ip.cc tri10.cc tri10_ip.cc \
+	quad4.cc pix4.cc vox8.cc vox27.cc \
+	tet4.cc tet10.cc tet10_ip.cc wdg6.cc wdg18inf.cc \
+	tri3D3.cc tri3D6.cc line2d2.cc \
+	lin_qr.cc tri_qr.cc tet_qr.cc \
+	ordmmd.cc rcm.cc meshopt.cc nim.cc \
+	refine_mesh.cc
+
+ifeq ($(ENABLE_MPI),yes)
+MATHLIB += -L$(MPILIBDIR) -lmpich -lmpl
+SRCS += mesh_mpi.cc
+endif
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = ${SRCS:.cc=.h}
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lmath $(MATHLIB)
+
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

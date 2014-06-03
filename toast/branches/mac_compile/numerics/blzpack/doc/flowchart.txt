@@ -1,0 +1,469 @@
+## 09/25/1999 ##########################################################
+#                                                                      #
+#  Flowchart and Glossary of Subprograms                               #
+#                                                                      #
+#  Contents:                                                           #
+#                                                                      #
+#  1. Flowchart (calling tree) for BLZPACK                             #
+#  2. Glossary of Subprograms                                          #
+#  3. Interface for System Dependencies                                #
+#  4. Identification of Arguments                                      #
+#  5. BLAS Kernels                                                     #
+#  6. Intrinsic Functions                                              #
+#                                                                      #
+########################################################################
+
+
+1. Flowchart (call hierarchy) for BLZPACK
+=========================================
+                                                                        
+   The subprogram call hierarchy for the double precision version, in
+   alphabetical order, is as follows:
+
+   BLZDRD
+       BLZEIG
+           RVMNGR
+               DCOPY
+               LZIOOP
+                   SETLRM
+                       SIBTST
+               RVCOMP
+                   DAXPY
+                   DGEMM
+                   DGEMV
+               SETLRM (see above)
+               SETTO0
+           SETLRM (see above)
+           SETSSL
+               SITIME
+           SITIME
+           SSBEXT
+           SSCHEK
+               SSCLSD
+                   NEIGAB
+               SSSLCT
+                   NEIGAB
+               SSSTAT
+                   NEIGAB
+                   SETLRM (see above)
+                   SSMOVB
+           SSORGN
+               SETLRM (see above)
+               SSRSTR
+               SSSPLT
+           SSSPEC
+               LZPRT7
+               SIBTST
+               SSSIGL
+               SSSIGR
+           SSTRSF
+               EIGSRT
+                   DSWAP
+           TBEIGP
+               TBCONV
+                   RESNRM
+                   TBGMIN
+               TBTRID
+                   DCOPY
+                   DGEMV
+                   DSBTRD
+                   DSTEGR
+                   IDENTY
+                   SETLRM (see above)
+                   TBBRED
+                   TBCOPY
+                   TBIMQL
+                       PYTHAG
+       BLZEND
+           EIGCHK
+               DCOPY
+               EIGIDX
+               EIGSRT (see above)
+               NEIGAB
+               SETLRM (see above)
+           EIGPRT
+               SIBTST
+           LZIOOP (see above)
+           LZPRT6
+               LZERRS
+                   SIBTST
+               LZSTTS
+               LZTIME
+                   SITIME
+               LZWRNS
+                   SIBTST
+               SIBTST
+               SSHIST
+           SETLRM (see above)
+       BLZEXT
+           SITIME
+       BLZFCT
+           SETLRM (see above)
+           SSBNDS
+               NEIGAB
+               SETLRM (see above)
+               SETTO0
+               SITIME
+               SSMOVB
+           SSICHK
+               LZPRT2
+                   SIBTST
+               SETLRM (see above)
+               SETSSL (see above)
+               SSBACK
+                   LZPRT8
+                   SETLRM (see above)
+                   SIBTST
+               SSCHEK (see above)
+               SSORGN (see above)
+       BLZKLL
+           DCOPY
+           IDAMAX
+           LZPRT4
+               SIBTST
+           RVMNGR (see above)
+           SETLRM (see above)
+           SSTRSF (see above)
+           TBEIGP (see above)
+       BLZRBX
+           LZNRMX
+               DDOT
+               DSCAL
+               LZCOPY
+                   DCOPY
+               LZIOOP (see above)
+               PIDRED
+               SETLRM (see above)
+               SITIME
+       BLZSET
+           DATCHK
+               PIDRED
+               PIIRED
+               SETLRM (see above)
+           DATSET
+               LZHEAD
+               LZMMRY
+                   PIIRED
+                   SETLRM (see above)
+               LZRANG
+               PIINPE
+               PIIPID
+               SETLRM (see above)
+               SIBTST
+           LZPNTR
+           SETDFT
+               SETEPS
+           SILALG
+           SITIME
+       BLZSTP
+           LZHIST
+               LZPRT4 (see above)
+               QTBQ
+                   DGEMM
+                   LZPRT5
+               SETLRM (see above)
+               SIBTST
+           LZSTP1
+               LZCOPY (see above)
+               NORM2A
+                   SETTO0
+                   SSRANG
+                   TBBRED
+                   TBIMQL (see above)
+               QTBR
+                   DDOT
+                   DGEMM
+                   DGEMV
+                   PIDRED
+                   SETLRM (see above)
+               RQALPH
+                   DAXPY
+                   DGEMM
+                   DGEMV
+               RQBETA
+                   DAXPY
+                   DGEMV
+               SITIME
+           LZSTP2
+               IDENTY
+               LZCOPY (see above)
+               RFACTR
+                   MGSCHM
+                       DAXPY
+                       DDOT
+                       DGEMV
+                       DGER
+                       DSCAL
+                       PIDRED
+                       SETLRM (see above)
+                       SETTO0
+                   NORM2A (see above)
+                   SETLRM (see above)
+                   SETTO0
+                   UPBETA
+                       DTRMM
+               SITIME
+           LZSTP3
+               PURGE
+                   IDAMAX
+                   PORTH
+                       LZIOOP (see above)
+                       QTBR (see above)
+                       RQALPH (see above)
+                   REORTH
+                       QTBR (see above)
+                       RFACTR (see above)
+                       RQALPH (see above)
+                   RFACTR (see above)
+                   SORTH
+                       LZIOOP (see above)
+                       QTBR (see above)
+                       RQALPH (see above)
+               SETLRM (see above)
+               SETTO0
+               SITIME
+               UPETA
+               UPTAU
+                   DCOPY
+                   NORM2A (see above)
+           LZSTP4
+               DCOPY
+               LZCOPY (see above)
+               LZIOOP (see above)
+               TBALPH
+               TBBETA
+           LZSTP5
+               DCOPY
+               LZCHEK
+                   SETLRM (see above)
+                   SSNEED
+                       PIDRED
+                       SITIME
+                       TBILLC
+                           SSRANG
+                   TBILLC (see above)
+               LZPRT3
+                   SIBTST
+               SITIME
+               SSTRSF (see above)
+               TBEIGP (see above)
+           LZSTP6
+               LZCOPY (see above)
+       BLZSTR
+           LZCOPY (see above)
+           LZPRT1
+               SIBTST
+           RANDNR
+               PIIPID
+               SETTO0
+               SIRAND
+           RVMNGR (see above)
+           RVRSTR
+               DAXPY
+               SETTO0
+           SETTO0
+           SITIME
+           SORTH0
+               LZIOOP (see above)
+               QTBR (see above)
+               RQALPH (see above)
+           STARTR
+               DASUM
+               LZCOPY (see above)
+               PIDRED
+               PIIRED
+               SETLRM (see above)
+           STARTX
+               DASUM
+               PIDRED
+               PIIRED
+               SETLRM (see above)
+
+
+2. Glossary of Subprograms
+==========================
+                                                                        
+   The subprograms contained in BLZPACK are the following:
+
+   BLZDRD is the user interface
+   BLZEIG deals with the converged eigenvalues and eigenvectors
+   BLZEND finishes the Lanczos algorithm run
+   BLZEXT records the exit time
+   BLZFCT updates all computational subintervals
+   BLZKLL deals with a premature finalization
+   BLZRBX deals with the product (B)*(X)
+   BLZSET initializes basic variables
+   BLZSTP performs a Lanczos algorithm step 
+   BLZSTR prepares to start a Lanczos run
+   DATCHK checks the input data
+   DATSET initializes variables
+   EIGCHK checks the computed solutions
+   EIGIDX finds the closest or farthest converged eigenvalue
+   EIGPRT prints the eigenpairs
+   EIGSRT reorders eigensolutions in an ascending way
+   IDENTY initializes a matrix as identity
+   LZCHEK checks the status of the run
+   LZCOPY copies (X) into (Y)
+   LZERRS prints error messages
+   LZHEAD prints the BLZPACK header
+   LZHIST checks the run history
+   LZIOOP performs I/O operations
+   LZMMRY checks the workspace available
+   LZNRMX deals with the product (B)*(X)
+   LZPNTR defines pointers for the work array
+   LZPRT1 prints the run mode
+   LZPRT2 prints the computational subintervals
+   LZPRT3 prints the Ritz values
+   LZPRT4 prints the Ritz values
+   LZPRT5 prints the basis orthogonality level
+   LZPRT6 prints statistics, time table and exit messages
+   LZPRT7 prints the new shifts and farthest Ritz values
+   LZPRT8 checks whether SIGMA was applied too far
+   LZRANG checks the eigenvalue interval set by the user
+   LZSTP1 computes (R)=(V)-(Q_{j})*(ALPHA_{j})-(Q_{j-1})*(BETA_{j})
+   LZSTP2 factors (R) as (Q_{j+1})*(BETA_{j+1}) 
+   LZSTP3 factors (R) and controls orthogonality level
+   LZSTP4 stores (ALPHA), (BETA) and Lanczos vectors
+   LZSTP5 checks convergence
+   LZSTP6 sets (U) for reverse communication       
+   LZSTTS prints statistics for the Lanczos algorithm
+   LZTIME prints the CPU timing for the eigenanalysis
+   LZWRNS prints warning messages 
+   MGSCHM factors (R) as (Q)*(BETA)
+   NEIGAB counts the number of solutions computed in an interval
+   NORM2A computes the extreme singular values of a square matrix
+   PORTH  performs a partial reorthogonalization
+   PURGE  performs reorthogonalizations
+   PYTHAG finds SQRT(A**2+B**2) safely
+   QTBQ   computes and prints the basis orthogonality level
+   QTBR   computes (ALPHA)=(Q')*(B)*(R)
+   RANDNR generates random starting vectors
+   REORTH performs a local reorthogonalization
+   RESNRM computes the residual norm of a Ritz pair
+   RFACTR performs the factorization (R)=(Q)*(BETA)
+   RQALPH computes (R)=(R)-(Q)*(ALPHA)
+   RQBETA computes (R)=(R)-(Q)*(BETA')
+   RVCOMP computes the Ritz vectors (X)=(X)+(BASIS)*(S)
+   RVMNGR computes Ritz vectors
+   RVRSTR identifies the quasi-converged Ritz vectors
+   SETDFT sets defaults
+   SETEPS sets the roundoff unit
+   SETLRM sets error and warning messages
+   SETSSL sets the entries of SSLOG
+   SETTO0 fills a vector with zeros
+   SORTH  performs a selective orthogonalization
+   SORTH0 purges the starting vectors and sets TAU
+   SSBACK checks whether SIGMA was applied too far
+   SSBEXT tries to extend the bounds of the current subinterval
+   SSBNDS initializes the computational subintervals
+   SSCHEK checks convergence in all subintervals
+   SSCLSD checks whether all required eigenvalues were found
+   SSHIST prints the spectrum slicing history
+   SSICHK examines the inertia information before proceeding
+   SSMOVB inserts or closes a subinterval in ISINT and RSINT
+   SSNEED checks for the need of a new origin translation 
+   SSORGN sets the origin translation
+   SSRANG finds the extreme eigenvalues of the reduced problem
+   SSRSTR checks for a restart with SIGMA (origin translation)
+   SSSIGL defines an origin translation to the left  of SIGM
+   SSSIGR defines an origin translation to the right of SIGMA
+   SSSLCT selects a subinterval to be examined
+   SSSPEC examines the Ritz values spectrum
+   SSSPLT sets the origin translation for a subinterval
+   SSSTAT checks the status of each subinterval
+   SSTRSF transforms the eigenvalue spectrum from [THETA] to [RITZ]
+   STARTR checks the starting vectors defined by the user
+   STARTX checks the starting eigenvectors defined by the user
+   TBALPH inserts (ALPHA) into (TB)
+   TBBETA inserts (BETA) into (TB)
+   TBBRED reduces a real symmetric band matrix to tridiagonal form
+   TBCONV looks for converged THETA's, the eigenvalues of (TB)
+   TBCOPY copies (TB) into (TBREP) for tridiagonalization
+   TBEIGP solves the reduced eigenproblem (TB)*(S)=(S)*(THETA)
+   TBGMIN looks for the minimum gap in (THETA)
+   TBILLC checks whether the eigenvalue problem is ill conditioned
+   TBIMQL finds the eigenpairs of a symmetric tridiagonal matrix
+   TBTRID solves the reduced eigenproblem (TB)*(S)=(S)*(THETA)
+   UPBETA updates (BETA) as (BETA)=(DELTA)*(BETA)
+   UPETA  updates bounds for the partial reorthog. strategy
+   UPTAU  updates bounds for the selective orthog. strategy
+
+
+3. Interface for System Dependencies
+====================================
+
+   The system dependencies are identified by a ``SI'' as the first two
+   letters of the subprogram name:
+
+   SILALG: 
+     . dependencies for linear algebra computations
+     . called by BLZSET 
+   SIBTST: 
+     . interface for a a bit test function
+     . called by DATSET, EIGPRT, LZERRS, LZHIST, LZPRT1, LZPRT2,
+       LZPRT3, LZPRT4, LZPRT6, LZWRNS, SETLRM, SSBACK and SSSPEC
+   SIRAND:
+     . interface for a random number generator
+     . called by RANDNR 
+   SITIME: 
+     . interface for a CPU time function
+     . called by BLZEIG, BLZEXT, BLZSET, BLZSTR, LZNRMX, LZSTP1,   
+       LZSTP2, LZSTP3, LZSTP5, LZTIME, SETSSL, SSBNDS and SSNEED
+
+
+4. Identification of Arguments 
+==============================
+
+   The arguments of the subprograms are identified by a set of three
+   characters: 
+                                                                        
+   . the 1st character identifies the argument,
+         a, the argument is an array         
+         s, the argument is a scalar        
+   . the 2nd character identifies the argument type,
+         c, the argument is of type character
+         i, the argument is of type integer
+         l, the argument is of type logical
+         r, the argument is of type real
+   . the 3rd character identifies the argument status,
+         b, the argument is used as input and output
+         i, the argument is used as input          
+         o, the argument is used as output        
+         w, the argument is used as workspace     
+                                                                        
+   such that EPS (sri), for example, means that EPS is a scalar, real
+   and used as input.
+                                                                        
+
+5. BLAS Kernels
+===============
+
+   The following BLAS kernels are called in the double precision version
+   (or their equivalents in the single precision version):
+
+   level 1: 
+       dasum  : STARTR and STARTX 
+       daxpy  : MGSCHM, RQALPH, RQBETA, RVCOMP and RVRSTR
+       dcopy  : BLZKLL, EIGCHK, LZCOPY, LZSTP4, LZSTP5, RVMNGR, 
+                TBTRID.1 and TBTRID.2
+       ddot   : LZNRMX, MGSCHM and QTBR
+       dscal  : LZNRMX and MGSCHM
+       dswap  : EIGSRT 
+       idamax : BLZKLL and PURGE
+   level 2:
+       dgemv  : MGSCHM, QTBR, RQALPH, RQBETA, RVCOMP and TBTRID.2
+       dger   : MGSCHM
+   level 3: 
+       dgemm  : QTBQ, QTBR, RQALPH and RVCOMP 
+       dtrmm  : UPBETA
+                
+                                                        
+6. Intrinsic Functions
+======================
+
+   The following intrinsic functions are called in the double precision 
+   version (or their equivalents in the single precision version):
+
+   ABS,INT,LOG10,MAX,MIN,MOD,NINT,SIGN,SQRT and DBLE 
+
+end of flowchart.txt ###################################################

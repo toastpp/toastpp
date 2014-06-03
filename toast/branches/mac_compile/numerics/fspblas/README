@@ -1,0 +1,130 @@
+--------------------------------------------------------------------------
+***  For installation instructions, skip to Section 1.
+--------------------------------------------------------------------------
+  NIST FORTRAN SPARSE BLAS v. 0.5
+--------------------------------------------------------------------------
+ 
+  Author:
+     Karin A. Remington
+     National Institute of Standards and Technology
+ 
+  Based on the interface standard proposed in:
+   "A Revised Proposal for a Sparse BLAS Toolkit" by
+    S. Carney and K. Wu -- University of Minnesota
+    M. Heroux and G. Li -- Cray Research
+    R. Pozo and K.A. Remington -- NIST
+  See: http://www.cray.com/products/applications/support/scal/spblastk.ps
+ 
+  Contact:
+     Karin A. Remington, email: kremington@nist.gov
+--------------------------------------------------------------------------
+ 
+Contents:
+ 
+0.  Release Notes
+1.  Installation Intructions
+2.  Toolkit Interface
+ 
+-----------------------------
+Section 0.   Release Notes
+-----------------------------
+ 
+What's included:
+ 
+    The package includes support for the computational routines in
+  the Toolkit (see reference above), including matrix-multiply and 
+  triangular solve routines for the following sparse matrix formats:
+ 
+            csr -  compressed sparse row
+            csc -  compressed sparse column
+            coo -  coordinate  (matrix multiply only)
+            bsr -  block sparse row
+            bsc -  block sparse column
+            bco -  block coordinate (matrix multiply only)
+            vbr -  variable block row
+            dia -  diagonal 
+            ell -  Ellpack 
+            jad -  jagged diagonal
+            sky -  skyline
+            bdi -  block diagonal
+            bel -  block Ellpack
+ 
+What's  * NOT *  included:
+ 
+    The following is **NOT** included in this release:
+      --  support for non-contiguous block storage in the block formats
+      --  support for integrity checking for sparse matrix representations
+          (i.e. the routines 'XYYYCK' described in the Toolkit reference.
+ 
+What's required:
+ 
+    Minimum:  Fortran compiler
+              BLAS library (available through Netlib at URL:
+                            http://www.netlib.org/blas/blas.shar)
+               
+    Optional: C compiler (for performance testing routines)
+ 
+Testing:
+ 
+    The testing directories contain both matrix-multiply and triangular
+  solve testers for each supported storage scheme.  These testers can
+  be used as examples of subroutine usage.  The subdirectory ./test/matlab
+  contains .mat files containing the test matrices used in the Fortran
+  testing routines.  These files can be used along with the Fortran to
+  illustrate usage of the storage formats.
+ 
+    This distribution has been tested under the following OS/compiler
+  configurations:
+ 
+         sunos4.1.4:     SC3.0.1
+         sunsolaris2.5:  FORTRAN 77 4.0
+         AIX.4.1.5:      AIX XL Fortran Compiler 3.2 
+ 
+Bug reports:
+ 
+  Please send bug reports to kremington@nist.gov.
+ 
+---------------------------------------
+Section 1.   Installation Intructions
+---------------------------------------
+ 
+   The installation of the Sparse BLAS Toolkit is automated with
+the "make" utility.  To use "make" to build the library:
+ 
+   1.  Edit the file ./makefile.def to reflect your system setup:
+
+ 
+         - The minimum installation requires an Fortran compiler.
+         - An extended installation which includes C performance
+           testing routines is available.
+         - The archival process by default uses "ranlib". If this
+           is not available on your system, set HASRANLIB to 'f'.
+ 
+   2.  Type:
+ 
+       "make library"      to build the archive file ./lib/libsptk.a
+                           (tests are not built)
+       "make test"         to build and run the testers
+ 
+   3.  For space-saving cleanup, type "make clean" to remove all .o files.
+ 
+--------------------------------
+Section 2.   Toolkit Interface
+--------------------------------
+ 
+    The Toolkit interface, along with the decision trees for
+    calling the proper kernel routine for a given set of input
+    values are implemented in the ./src subdirectory.
+
+  
+    **********************************************************************
+  *  For a complete description of the Sparse BLAS Toolkit interface,      *
+ *    see: "A Revised Proposal for a Sparse BLAS Toolkit", an article by    *
+ *    S. Carney, M. Heroux, G. Li, R. Pozo, K. Remington and K. Wu.         *
+  *  http://www.cray.com/products/applications/support/scal/spblastk.ps    *
+    **********************************************************************
+ 
+ 
+
+
+

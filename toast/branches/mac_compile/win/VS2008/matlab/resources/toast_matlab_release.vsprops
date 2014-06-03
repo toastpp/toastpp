@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="toast_matlab_release"
+	OutputDirectory="$(ConfigurationName)"
+	IntermediateDirectory="$(ConfigurationName)"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;C:\Program Files\MATLAB\R2009a\extern\include&quot;;&quot;$(SolutionDir)..\..\..&quot;;&quot;$(SolutionDir)..\..\..\include&quot;;&quot;$(SolutionDir)..\..\..\src\libmath&quot;;&quot;$(SolutionDir)..\..\..\src\libfe&quot;;&quot;$(SolutionDir)..\..\..\src\libstoast&quot;"
+		PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS;MATLAB_MEX_FILE"
+		RuntimeLibrary="2"
+		WarningLevel="2"
+		Detect64BitPortabilityProblems="true"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="libmx.lib libmex.lib libmat.lib libstoast.lib libfe.lib libmath.lib SuperLU.lib blas_win32.lib"
+		OutputFile="$(OutDir)\$(ProjectName).mexw32"
+		LinkIncremental="1"
+		AdditionalLibraryDirectories="&quot;C:\Program Files\MATLAB\R2009a\extern\lib\win32\microsoft&quot;;&quot;$(SolutionDir)..\..\lib&quot;"
+		ModuleDefinitionFile="$(SolutionDir)resources\mexfunc.def"
+		SubSystem="2"
+	/>
+	<Tool
+		Name="VCPostBuildEventTool"
+		CommandLine=""
+	/>
+</VisualStudioPropertySheet>
