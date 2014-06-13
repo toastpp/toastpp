@@ -759,7 +759,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
     int resettp = 0;
     double prm, reg_prm[MAXREGION];
     int nparam = msol.nParam();
-    RVector param[nparam];
+    RVector *param = new RVector[nparam];
     int i, j, k, n, p, nreg, nregnode[MAXREGION];
 
     for (p = 0; p < nparam; p++) {
@@ -875,6 +875,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
     }
     g_refind = mean (param[msol.nmuaChromo+2]); // assuming homogeneous n
     
+    delete []param;
     //msol.SetParam (OT_CMUA, param[0]*c0/param[2]);
     //msol.SetParam (OT_CKAPPA, c0/(3*param[2]*(param[0]+param[1])));
     //for (i = 0; i < param[2].Dim(); i++)
