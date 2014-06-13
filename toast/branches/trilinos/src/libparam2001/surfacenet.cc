@@ -10,7 +10,6 @@
 #include "harmoniclib.h"
 #include "surfacenet.h" 
 
-using namespace toast;
 using namespace std;
 
 //============================================================//

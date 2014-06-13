@@ -22,12 +22,11 @@
 #endif
 
 #ifndef NO_MATH_HEADERS
+#include <complex>
 #include "util.h"
 #include "mathdef.h"
 #include "error.h"
 #include "nr.h"
-#include "complex.h"
-#include "scomplex.h"
 #include "vector.h"
 #include "matrix.h"
 #include "dgmatrix.h"

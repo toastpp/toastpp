@@ -3,7 +3,6 @@
 #include "felib.h"
 
 using namespace std;
-using namespace toast;
 
 bool ReadVector (char *name, RVector &data, int idx)
 {

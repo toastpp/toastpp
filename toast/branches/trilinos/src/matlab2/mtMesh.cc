@@ -9,7 +9,6 @@
 #include "toastmex.h"
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 

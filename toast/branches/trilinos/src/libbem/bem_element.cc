@@ -4,8 +4,6 @@
 #include "bem_element.h"
 #include "bem_surface.h"
 
-using namespace toast;
-
 BEM_Element::BEM_Element (BEM_Surface *s, IVector &ndidx)
 {
 	surf = s;

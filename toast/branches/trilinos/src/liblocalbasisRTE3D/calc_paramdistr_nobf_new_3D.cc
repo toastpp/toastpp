@@ -14,9 +14,6 @@
 #include "toast.h"
 #include "rte3D.h"
 
-using namespace toast;
-
-
 // generates some parameter distributions
 
 void calc_paramdistr_nobf_new_3D(RVector& sigma, RVector& sigmatot, RVector& intst, const Mesh& mesh, const RVector& muscat, const RVector& muabs, const RVector& g,const Mesh& S2mesh)

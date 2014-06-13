@@ -116,7 +116,7 @@ void TCompRowMatrixTrilinos<MT>::Assemble (zoltanMesh *mesh, void *data,
 
 template class MATHLIB TCompRowMatrixTrilinos<double>;
 //template class MATHLIB TCompRowMatrixTrilinos<float>;
-//template class MATHLIB TCompRowMatrixTrilinos<toast::complex>;
+template class MATHLIB TCompRowMatrixTrilinos<std::complex<double> >;
 //template class MATHLIB TCompRowMatrixTrilinos<scomplex>;
 //template class MATHLIB TCompRowMatrixTrilinos<int>;
 

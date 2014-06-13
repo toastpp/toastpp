@@ -3,7 +3,6 @@
 #include "felib.h"
 
 using namespace std;
-using namespace toast;
 
 bool ReadVector (char *name, CVector &data, int idx)
 {
@@ -57,9 +56,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double *pr = mxGetPr (plhs[0]);
     double *pi = mxGetPi (plhs[0]);
 
-    toast::complex *buf = data.data_buffer();
+    std::complex<double> *buf = data.data_buffer();
     for (int i = 0; i < data.Dim(); i++) {
-	pr[i] = buf[i].re;
-	pi[i] = buf[i].im;
+        pr[i] = buf[i].real();
+	pi[i] = buf[i].imag();
     }
 }

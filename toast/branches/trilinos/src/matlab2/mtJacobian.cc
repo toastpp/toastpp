@@ -7,7 +7,6 @@
 #include "toastmex.h"
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 // Prototypes
@@ -43,7 +42,7 @@ RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g);
 void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf);
 RVector PMDF_mua (const RVector &dphi, const RVector &aphi, double proj);
 CVector PMDF_mua (const CVector &dphi, const CVector &aphi);
-void PMDF_mua (const CVector &pmdf, toast::complex proj,
+void PMDF_mua (const CVector &pmdf, std::complex<double> proj,
     RVector &pmdf_mod, RVector &pmdf_arg);
 
 // =========================================================================
@@ -84,12 +83,9 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 	CVector *dphi = new CVector[nq];
 	for (i = 0; i < nq; i++) {
 	    dphi[i].New (n);
-	    toast::complex *v = dphi[i].data_buffer();
-	    for (j = 0; j < n; j++) {
-		v->re = *pr++;
-		v->im = *pi++;
-		v++;
-	    }
+	    std::complex<double> *v = dphi[i].data_buffer();
+	    for (j = 0; j < n; j++)
+	        *v++ = std::complex<double> (*pr++, *pi++);
 	}
 	// copy adjoint fields
 	const mxArray *mx_aphi = prhs[3];
@@ -101,12 +97,9 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 	CVector *aphi = new CVector[nm];
 	for (i = 0; i < nm; i++) {
 	    aphi[i].New (n);
-	    toast::complex *v = aphi[i].data_buffer();
-	    for (j = 0; j < n; j++) {
-		v->re = *pr++;
-		v->im = *pi++;
-		v++;
-	    }
+	    std::complex<double> *v = aphi[i].data_buffer();
+	    for (j = 0; j < n; j++)
+	        *v++ = std::complex<double> (*pr++, *pi++);
 	}
 	// copy projections
 	const mxArray *mx_proj = prhs[4];
@@ -115,12 +108,9 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 	CVector proj(nqm);
 	pr = mxGetPr (mx_proj);
 	pi = mxGetPi (mx_proj);
-	toast::complex *v = proj.data_buffer();
-	for (i = 0; i < nqm; i++) {
-	    v->re = *pr++;
-	    v->im = *pi++;
-	    v++;
-	}
+	std::complex<double> *v = proj.data_buffer();
+	for (i = 0; i < nqm; i++)
+	    *v++ = std::complex<double> (*pr++, *pi++);
 
 	CalcJacobian (mesh, raster, dphi, aphi, &proj, DATA_LOG,
 		      &plhs[0]);
@@ -555,13 +545,15 @@ CVector PMDF_mua (const CVector &dphi, const CVector &aphi)
 }
 
 // Extract modulation amplitude PMDF and phase PMDF from complex PMDF
-void PMDF_mua (const CVector &pmdf, toast::complex proj,
+void PMDF_mua (const CVector &pmdf, std::complex<double> proj,
     RVector &pmdf_mod, RVector &pmdf_arg)
 {
-    double idenom = 1.0/(proj.re*proj.re + proj.im*proj.im);
+    double idenom = 1.0/norm(proj);
     for (int i = 0; i < pmdf.Dim(); i++) {
-        pmdf_mod[i] = (pmdf[i].re*proj.re + pmdf[i].im*proj.im) * idenom;
-	pmdf_arg[i] = (pmdf[i].im*proj.re - pmdf[i].re*proj.im) * idenom;
+        pmdf_mod[i] = (pmdf[i].real()*proj.real() + pmdf[i].imag()*proj.imag())
+	    * idenom;
+	pmdf_arg[i] = (pmdf[i].imag()*proj.real() - pmdf[i].real()*proj.imag())
+	    * idenom;
     }
 }
 

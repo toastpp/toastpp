@@ -3,7 +3,6 @@
 
 #include <mpi.h>
 #include "toastdef.h"
-#include "complex.h"
 
 class TMPI {
 public:

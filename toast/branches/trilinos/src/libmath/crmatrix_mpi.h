@@ -244,8 +244,8 @@ public:
 
 typedef TCompRowMatrixMPI<double>   RCompRowMatrixMPI;
 typedef TCompRowMatrixMPI<float>    FCompRowMatrixMPI;
-typedef TCompRowMatrixMPI<toast::complex> CCompRowMatrixMPI;
-typedef TCompRowMatrixMPI<scomplex> SCCompRowMatrixMPI;
+typedef TCompRowMatrixMPI<std::complex<double> > CCompRowMatrixMPI;
+typedef TCompRowMatrixMPI<std::complex<float> > SCCompRowMatrixMPI;
 typedef TCompRowMatrixMPI<int>      ICompRowMatrixMPI;
 
 // ==========================================================================
@@ -254,8 +254,8 @@ typedef TCompRowMatrixMPI<int>      ICompRowMatrixMPI;
 #ifndef MATHLIB_IMPLEMENTATION
 extern template class MATHLIB TCompRowMatrixMPI<double>;
 extern template class MATHLIB TCompRowMatrixMPI<float>;
-extern template class MATHLIB TCompRowMatrixMPI<toast::complex>;
-extern template class MATHLIB TCompRowMatrixMPI<scomplex>;
+extern template class MATHLIB TCompRowMatrixMPI<std::complex<double> >;
+extern template class MATHLIB TCompRowMatrixMPI<std::complex<float> >;
 extern template class MATHLIB TCompRowMatrixMPI<int>;
 #endif // MATHLIB_IMPLEMENTATION
 

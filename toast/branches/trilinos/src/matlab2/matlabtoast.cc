@@ -4,7 +4,6 @@
 #include "timing.h"
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 
@@ -803,10 +802,10 @@ void MatlabToast::ReadVector (int nlhs, mxArray *plhs[], int nrhs,
 	plhs[0] = mxCreateDoubleMatrix (cdata.Dim(), 1, mxCOMPLEX);
 	double *pr = mxGetPr (plhs[0]);
 	double *pi = mxGetPi (plhs[0]);
-	toast::complex *buf = cdata.data_buffer();
+	std::complex<double> *buf = cdata.data_buffer();
 	for (int i = 0; i < cdata.Dim(); i++) {
-	    pr[i] = buf[i].re;
-	    pi[i] = buf[i].im;
+	    pr[i] = buf[i].real();
+	    pi[i] = buf[i].imag();
 	}
 	    
     } else if (rok) {

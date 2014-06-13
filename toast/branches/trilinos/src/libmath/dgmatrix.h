@@ -261,7 +261,7 @@ public:
 // ==========================================================================
 typedef TDiagMatrix<double>	RDiagMatrix;	// 'real'
 typedef TDiagMatrix<float>	FDiagMatrix;	// 'float'
-typedef TDiagMatrix<toast::complex>	CDiagMatrix;	// 'complex'
+typedef TDiagMatrix<std::complex<double> >	CDiagMatrix;	// 'complex'
 typedef TDiagMatrix<int>	IDiagMatrix;	// 'integer'
 typedef TDiagMatrix<double>	DiagMatrix;	// for backward compatibility
 // ==========================================================================

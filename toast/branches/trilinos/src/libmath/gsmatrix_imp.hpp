@@ -16,7 +16,6 @@
 #endif
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // QR factorisation and solver
@@ -291,16 +290,18 @@ int CG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
 #endif // CG_PARALLEL
 
 template<> // specialisation: complex
-inline int CG<toast::complex> (const CGenericSparseMatrix &A, const CVector &b,
-    CVector &x, double &tol, CPreconditioner *cprecon, int maxit)
+inline int CG<std::complex<double> > (const CGenericSparseMatrix &A,
+    const CVector &b, CVector &x, double &tol, CPreconditioner *cprecon,
+    int maxit)
 {
     // NOT IMPLEMENTED YET
     return 0;
 }
 
 template<> // specialisation: complex
-inline int CG<scomplex> (const SCGenericSparseMatrix &A, const SCVector &b,
-    SCVector &x, double &tol, SCPreconditioner *cprecon, int maxit)
+inline int CG<std::complex<float> > (const SCGenericSparseMatrix &A,
+    const SCVector &b, SCVector &x, double &tol, SCPreconditioner *cprecon,
+    int maxit)
 {
     // NOT IMPLEMENTED YET
     return 0;
@@ -366,8 +367,9 @@ int BiCG (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
 }
 
 template<> // specialisation: complex
-inline int BiCG<toast::complex> (const CGenericSparseMatrix &A, const CVector &b,
-    CVector &x, double &tol, CPreconditioner *cprecon, int maxit)
+inline int BiCG<std::complex<double> > (const CGenericSparseMatrix &A,
+    const CVector &b, CVector &x, double &tol, CPreconditioner *cprecon,
+    int maxit)
 {
     int i, niter, dim = x.Dim();
     double rho=0, alpha, aden, beta, bden, err, bnorm;
@@ -388,7 +390,7 @@ inline int BiCG<toast::complex> (const CGenericSparseMatrix &A, const CVector &b
 	}
 	bden = rho;
 	for (rho = 0.0, i = 0; i < dim; i++)
-	    rho += z[i].re*rd[i].re + z[i].im*rd[i].im;
+  	    rho += z[i].real()*rd[i].real() + z[i].imag()*rd[i].imag();
 	xASSERT(rho != 0.0, "BiCG solver fails");
 	if (!niter) {
 	    p = z;
@@ -396,29 +398,24 @@ inline int BiCG<toast::complex> (const CGenericSparseMatrix &A, const CVector &b
 	} else {
 	    beta = rho/bden;
 	    for (i = 0; i < dim; i++) {
-	        p[i].re  *= beta;  p[i].re += z[i].re;
-		p[i].im  *= beta;  p[i].im += z[i].im;
-		pd[i].re *= beta;  pd[i].re += zd[i].re;
-		pd[i].im *= beta;  pd[i].im += zd[i].im;
+	        p[i]  *= beta;  p[i]  += z[i];
+		pd[i] *= beta;  pd[i] += zd[i];
 	    }
 	}
 	A.Ax (p, q);
 	A.ATx (pd, qd);
 	for (aden = 0.0, i = 0; i < dim; i++)
-	    aden += pd[i].re*q[i].re + pd[i].im*q[i].im;
+	    aden += pd[i].real()*q[i].real() + pd[i].imag()*q[i].imag();
 	alpha = rho/aden;
 	for (i = 0; i < dim; i++) {
-	    x[i].re  += alpha*p[i].re;
-	    x[i].im  += alpha*p[i].im;
-	    r[i].re  -= alpha*q[i].re;
-	    r[i].im  -= alpha*q[i].im;
-	    rd[i].re -= alpha*qd[i].re;
-	    rd[i].im -= alpha*qd[i].im;
+	    x[i]  += p[i]*alpha;
+	    r[i]  -= q[i]*alpha;
+	    rd[i] -= qd[i]*alpha;
 	}
 
 	// check convergence
 	for (err = 0.0, i = 0; i < dim; i++)
-	    err += r[i].re*r[i].re + r[i].im*r[i].im;
+	    err += std::norm(r[i]);
 	err = sqrt (err);
 	//cerr << "BiCG tol=" << err/bnorm << endl;
 	if (err <= tol*bnorm) break;
@@ -525,8 +522,9 @@ inline int IterativeSolve (const SCGenericSparseMatrix &A, const SCVector &b,
 }
 
 template<> // specialisation for complex case
-inline int IterativeSolve<toast::complex> (const CGenericSparseMatrix &A, const CVector &b,
-    CVector &x, double &tol, CPreconditioner *precon, int maxit)
+inline int IterativeSolve<std::complex<double> > (const CGenericSparseMatrix &A,
+    const CVector &b, CVector &x, double &tol, CPreconditioner *precon,
+    int maxit)
 {
     int niter;
 

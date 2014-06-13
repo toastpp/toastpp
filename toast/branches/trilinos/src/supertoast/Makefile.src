@@ -244,6 +244,9 @@ test_trilinos : test_trilinos.cc
 test_trilinos_zoltan : test_trilinos_zoltan.cc test_trilinos_zoltan_class.cc
 	$(CXX) -o test_trilinos_zoltan $^ $(STOASTFLAGS) $(TLINK_FLAGS) $(TINCLUDE_DIRS) $(TDEFINES) $(STOASTLIB) $(TLIBRARY_DIRS) $(TLIBRARIES)
 
+test_trilinos_zoltan_cplx : test_trilinos_zoltan_cplx.cc test_trilinos_zoltan_class.cc
+	$(CXX) -o test_trilinos_zoltan_cplx $^ $(STOASTFLAGS) $(TLINK_FLAGS) $(TINCLUDE_DIRS) $(TDEFINES) $(STOASTLIB) $(TLIBRARY_DIRS) $(TLIBRARIES)
+
 test_trilinos_zoltan2 : test_trilinos_zoltan2.cc
 	$(CXX) -o test_trilinos_zoltan2 $^ $(STOASTFLAGS) $(TLINK_FLAGS) $(TINCLUDE_DIRS) $(TDEFINES) $(STOASTLIB) $(TLIBRARY_DIRS) $(TLIBRARIES)
 # END TRILINOS TESTING PART ================================

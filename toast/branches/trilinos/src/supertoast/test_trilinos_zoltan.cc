@@ -75,8 +75,8 @@ solve (std::ostream& out, MV& X, const MV& B, const OP& A, Teuchos::RCP<OP> M)
   // residual 2-norm, although you can change the meaning of the
   // convergence tolerance using other parameters.
   solverParams->set ("Num Blocks", 40);
-  solverParams->set ("Maximum Iterations", 400);
-  solverParams->set ("Convergence Tolerance", 1.0e-8);
+  solverParams->set ("Maximum Iterations", 1000);
+  solverParams->set ("Convergence Tolerance", 1.0e-10);
 
   // Create the GMRES solver using a "factory" and 
   // the list of solver parameters created above.
@@ -109,10 +109,10 @@ solve (std::ostream& out, MV& X, const MV& B, const OP& A, Teuchos::RCP<OP> M)
 
   if (result == Belos::Converged) {
     out << "The Belos solve took " << numIters << " iteration(s) to reach "
-      "a relative residual tolerance of " << 1.0e-8 << "." << std::endl;
+      "a relative residual tolerance of " << 1.0e-10 << "." << std::endl;
   } else {
     out << "The Belos solve took " << numIters << " iteration(s), but did not reach "
-      "a relative residual tolerance of " << 1.0e-8 << "." << std::endl;
+      "a relative residual tolerance of " << 1.0e-10 << "." << std::endl;
   }
 }
 

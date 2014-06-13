@@ -3,8 +3,6 @@
 #include "bemlib.h"
 #include "bem_tri6.h"
 
-using namespace toast;
-
 // Gaussian quadrature points
 
 const int n_gauss6=7;
@@ -68,7 +66,7 @@ CVector BEM_Triangle6::Integrate_Singular (BEM_Kernel *kernel, int nodep, const 
 
 	int icd; 
 	double det_J_r;
-	toast::complex kern1, kern2;
+	std::complex<double> kern1, kern2;
 	Point2D loc;
 
 	static RVector jac_tab(dimension+1), shapf(dimension);
@@ -358,7 +356,7 @@ CVector BEM_Triangle6::Integrate_Nonsingular (BEM_Kernel *kernel, const Point3D 
 	const int i_kern = 4;
 	int ic, icd;
 	double  a_wsj;
-	toast::complex kern1;
+	std::complex<double> kern1;
 	static RVector jac_tab(dimension+1);//, shapf(dimension);
 	static CVector kern_tab(i_kern);
 	CVector a_aux(dim2);

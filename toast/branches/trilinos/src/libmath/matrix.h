@@ -440,8 +440,8 @@ protected:
 
 typedef TMatrix<double>   RMatrix;	// 'double real'
 typedef TMatrix<float>    FMatrix;      // 'single real'
-typedef TMatrix<toast::complex>  CMatrix;	// 'complex'
-typedef TMatrix<scomplex> SCMatrix;     // 'single complex'
+typedef TMatrix<std::complex<double> >  CMatrix;	// 'complex'
+typedef TMatrix<std::complex<float> > SCMatrix;     // 'single complex'
 typedef TMatrix<int>      IMatrix;      // 'integer'
 
 

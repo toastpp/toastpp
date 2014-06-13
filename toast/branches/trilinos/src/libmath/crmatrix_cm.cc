@@ -14,35 +14,36 @@
 #include "supermatrix.h"
 //#include "zsp_defs.h"
 
-using namespace toast;
 using namespace std;
 
 SCCompRowMatrixMixed::SCCompRowMatrixMixed ()
-    : TCompRowMatrix<scomplex> ()
+  : TCompRowMatrix<std::complex<float> > ()
 {}
 
 SCCompRowMatrixMixed::SCCompRowMatrixMixed (int rows, int cols)
-    : TCompRowMatrix<scomplex> (rows, cols)
+  : TCompRowMatrix<std::complex<float> > (rows, cols)
 {}
 
 SCCompRowMatrixMixed::SCCompRowMatrixMixed (int rows, int cols,
-    const idxtype *_rowptr, const idxtype *_colidx, const scomplex *data)
-    : TCompRowMatrix<scomplex> (rows, cols, _rowptr, _colidx, data)
+    const idxtype *_rowptr, const idxtype *_colidx,
+    const std::complex<float> *data)
+  : TCompRowMatrix<std::complex<float> > (rows, cols, _rowptr, _colidx, data)
 {}
 
 SCCompRowMatrixMixed::SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m)
-    : TCompRowMatrix<scomplex> (m)
+  : TCompRowMatrix<std::complex<float> > (m)
 {}
 
 SCCompRowMatrixMixed::~SCCompRowMatrixMixed ()
 {}
 
-int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci, toast::complex *rv) const
+int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci,
+    std::complex<double> *rv) const
 {
     int i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
     for (i = 0; i < nz; i++) {
         ci[i] = colidx[r0+i];
-	rv[i] = (toast::complex)val[r0+i];
+	rv[i] = (std::complex<double>)val[r0+i];
     }
     return nz;
 }
@@ -54,12 +55,12 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b) const
     if (b.Dim() != rows) b.New(rows);
 
     int r, i, i2;
-    toast::complex br;
+    std::complex<double> br;
 
     for (r = i = 0; r < rows;) {
 	i2 = rowptr[r+1];
-	for (br = toast::complex(0,0); i < i2; i++)
-	    br += (toast::complex)val[i] * x[colidx[i]];
+	for (br = std::complex<double>(0,0); i < i2; i++)
+	    br += (std::complex<double>)val[i] * x[colidx[i]];
 	b[r++] = br;
     }
 }
@@ -73,15 +74,15 @@ void SCCompRowMatrixMixed::Ax (const CVector &x, CVector &b,
     idxtype r, i2;
     idxtype i = rowptr[r1];
     idxtype *pcolidx = colidx+i;
-    toast::complex br;
-    scomplex *pval = val+i;
+    std::complex<double> br;
+    std::complex<float> *pval = val+i;
 
     if (b.Dim() != rows) b.New (rows);
 
     for (r = r1; r < r2;) {
 	i2 = rowptr[r+1];
-	for (br = toast::complex(0,0); i < i2; i++)
-	    br += (toast::complex)(*pval++) * x[*pcolidx++];
+	for (br = std::complex<double>(0,0); i < i2; i++)
+	    br += (std::complex<double>)(*pval++) * x[*pcolidx++];
 	b[r++] = br;
     }
 }
@@ -96,7 +97,7 @@ void SCCompRowMatrixMixed::ATx (const CVector &x, CVector &b) const
     for (c = 0; c < cols; c++) b[c] = 0;
     for (i = c = 0; i < nval; i++) {
         while (colptr[c+1] <= i) c++;
-	b[c] += conj((toast::complex)val[vofs[i]]) * x[rowidx[i]];
+	b[c] += conj((std::complex<double>)val[vofs[i]]) * x[rowidx[i]];
     }
 }
 
@@ -117,13 +118,14 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
     int MAX_CYCLE = (maxit ? maxit : N+1);
     int j, k, l, cycle, n;
     double norm_b,norm_v,norm_x, tmp;
-    toast::complex h1, h2, r, sum;
-    TVector<toast::complex> y(MAX_GMRES_STEPS);
-    TVector<toast::complex> s(MAX_GMRES_STEPS+1);
-    TVector<toast::complex> c1(MAX_GMRES_STEPS);
-    TVector<toast::complex> c2(MAX_GMRES_STEPS);
-    TDenseMatrix<toast::complex> H(MAX_GMRES_STEPS,MAX_GMRES_STEPS+1);
-    TVector<toast::complex> *v = new TVector<toast::complex>[MAX_GMRES_STEPS+1];
+    std::complex<double> h1, h2, r, sum;
+    TVector<std::complex<double> > y(MAX_GMRES_STEPS);
+    TVector<std::complex<double> > s(MAX_GMRES_STEPS+1);
+    TVector<std::complex<double> > c1(MAX_GMRES_STEPS);
+    TVector<std::complex<double> > c2(MAX_GMRES_STEPS);
+    TDenseMatrix<std::complex<double> > H(MAX_GMRES_STEPS,MAX_GMRES_STEPS+1);
+    TVector<std::complex<double> > *v =
+        new TVector<std::complex<double> >[MAX_GMRES_STEPS+1];
     for (j = 0; j <= MAX_GMRES_STEPS; j++)
         v[j].New (N);
  
@@ -196,14 +198,14 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
  
 	    // for (n=0; n < N; n++) ctmp1[n] = v[j][n];
 
- 	    TVector<toast::complex> &vj1 = v[j+1];
+ 	    TVector<std::complex<double> > &vj1 = v[j+1];
 	    if (precon) precon->Apply (A*v[j], vj1);
 	    else        vj1 = A*v[j];
 
 	    /* modified Gram-Schmidt orthogonalization */
 	    for (k = 0; k <= j; k++) {
-	        TVector<toast::complex> &vk = v[k];
-                sum = toast::complex(0,0);
+	        TVector<std::complex<double> > &vk = v[k];
+                sum = std::complex<double>(0,0);
 		for (n = 0; n < N; n++) sum += vj1[n] * conj(vk[n]);
 		H(j,k) = sum;  // H(j,k) = C-innerproduct(v[j+1],v[k]);
 		for (n = 0; n < N; n++) vj1[n] -= sum * vk[n];

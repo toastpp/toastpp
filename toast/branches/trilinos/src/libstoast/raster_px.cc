@@ -2,7 +2,6 @@
 #include "stoastlib.h"
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // class Raster_Pixel

@@ -15,8 +15,6 @@
 #include "toastmex.h"
 #include "util.h"
 
-using namespace toast;
-
 // ============================================================================
 // ============================================================================
 // MATLAB entry point
@@ -40,11 +38,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < sn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < sn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_SolToBasis (img, bimg);
 	CopyVector (&plhs[0], bimg);
 

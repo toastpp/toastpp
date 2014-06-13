@@ -13,7 +13,6 @@
 #include "crmatrix_mpi.h"
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // Member definitions
@@ -331,8 +330,8 @@ void TCompRowMatrixMPI<MT>::MPIinit ()
 
 template class MATHLIB TCompRowMatrixMPI<double>;
 template class MATHLIB TCompRowMatrixMPI<float>;
-template class MATHLIB TCompRowMatrixMPI<toast::complex>;
-template class MATHLIB TCompRowMatrixMPI<scomplex>;
+template class MATHLIB TCompRowMatrixMPI<std::complex<double> >;
+template class MATHLIB TCompRowMatrixMPI<std::complex<float> >;
 template class MATHLIB TCompRowMatrixMPI<int>;
 
 #endif // NEED_EXPLICIT_INSTANTIATION

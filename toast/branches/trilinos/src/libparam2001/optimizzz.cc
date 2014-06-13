@@ -10,7 +10,6 @@
 #include "diffusphere.h"
 #include "optimizzz.h"
 #include "usefulfan.h"
-using namespace toast;
 
 //        Constructor Definition
 

@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <algorithm>
+#include <complex>
 
 #ifdef FEM_DEBUG
 #define MATH_DEBUG  		// switch on error checks
@@ -80,8 +81,37 @@ inline int pow (int base, int e)
 // inline float pow (float base, float e)
 // { return (float)pow ((double)base, (double)e); }
 
+inline float conj(float a)
+{ return a; }
+
+inline double conj(double a)
+{ return a; }
+
 inline bool iszero (double d)
 { return d == 0.0; }
+
+inline bool iszero (std::complex<double> d)
+{
+    return d.real() == 0 && d.imag() == 0;
+}
+
+inline bool operator> (const std::complex<double> &z1,
+		       const std::complex<double> &z2)
+{
+    return std::norm(z1) > std::norm(z2);
+}
+
+inline bool operator< (const std::complex<double> &z1,
+		       const std::complex<double> &z2)
+{
+    return std::norm(z1) < std::norm(z2);
+}
+
+inline std::complex<double> hadamard (const std::complex<double>& a,
+    const std::complex<double>& b)
+{
+    return std::complex<double> (a.real()*b.real(), a.imag()*b.imag());
+}
 
 inline int binomial_coeff (int n, int r)
 {

@@ -485,7 +485,6 @@ void zoltanMesh::AddToElMatrix (int el, CCompRowMatrixMPI &M, RVector *coeff,
     int mode) const
 {
     int i, j, is, js, nnode;
-    toast::complex entry;
 
     nnode = elist[el]->nNode();
     for (i = 0; i < nnode; i++) {
@@ -493,37 +492,38 @@ void zoltanMesh::AddToElMatrix (int el, CCompRowMatrixMPI &M, RVector *coeff,
 	if (nodeType[is] != 2) continue;
 	for (j = 0; j < nnode; j++) {
 	    js = elist[el]->Node[j];
+	    double re = 0.0, im = 0.0;
 	    switch (mode) {
 	    case ASSEMBLE_FF:
-		entry.re = elist[el]->IntFF (i, j);
+		re = elist[el]->IntFF (i, j);
 		break;
 	    case ASSEMBLE_DD:
-		entry.re = elist[el]->IntDD (i, j);
+		re = elist[el]->IntDD (i, j);
 		break;
 	    case ASSEMBLE_PFF:
-		entry.re = elist[el]->IntPFF (i, j, *coeff);
+		re = elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PDD:
-		entry.re = elist[el]->IntPDD (i, j, *coeff);
+		re = elist[el]->IntPDD (i, j, *coeff);
 		break;
 	    case ASSEMBLE_BNDPFF:
-		entry.re = elist[el]->BndIntPFF (i, j, *coeff);
+		re = elist[el]->BndIntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PFF_EL:
-		entry.re = elist[el]->IntFF (i, j) * (*coeff)[el];
+		re = elist[el]->IntFF (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_PDD_EL:
-		entry.re = elist[el]->IntDD (i, j) * (*coeff)[el];
+		re = elist[el]->IntDD (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_BNDPFF_EL:
-		entry.re = elist[el]->BndIntFF (i, j) * (*coeff)[el];
+		re = elist[el]->BndIntFF (i, j) * (*coeff)[el];
 		break;
 
 	    case ASSEMBLE_iPFF:
-	        entry.im = elist[el]->IntPFF (i, j, *coeff);
+	        im = elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    }
-	    M.Add (is, js, entry);
+	    M.Add (is, js, std::complex<double>(re,im));
 	}
     }
 

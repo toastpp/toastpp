@@ -39,13 +39,13 @@ MPI_Datatype TMPI::MPIType<float> ()
 }
 
 template<>
-MPI_Datatype TMPI::MPIType<toast::complex> ()
+MPI_Datatype TMPI::MPIType<std::complex<double> > ()
 {
     return MPI_DOUBLE_COMPLEX;
 }
 
 template<>
-MPI_Datatype TMPI::MPIType<scomplex> ()
+MPI_Datatype TMPI::MPIType<std::complex<float> > ()
 {
     return MPI_COMPLEX;
 }

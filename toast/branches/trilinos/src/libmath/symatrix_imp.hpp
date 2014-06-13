@@ -11,8 +11,6 @@
 #include <sstream>
 #include "mathlib.h"
 
-using namespace toast;
-
 // ==========================================================================
 // member definitions
 

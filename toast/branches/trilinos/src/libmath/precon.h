@@ -189,44 +189,44 @@ private:
 
 typedef TPreconditioner<double>         RPreconditioner;
 typedef TPreconditioner<float>          FPreconditioner;
-typedef TPreconditioner<toast::complex> CPreconditioner;
-typedef TPreconditioner<scomplex>       SCPreconditioner;
+typedef TPreconditioner<std::complex<double> > CPreconditioner;
+typedef TPreconditioner<std::complex<float> >       SCPreconditioner;
 typedef TPreconditioner<int>            IPreconditioner;
 
 typedef TPrecon_Null<double>            RPrecon_Null;
 typedef TPrecon_Null<float>             FPrecon_Null;
-typedef TPrecon_Null<toast::complex>    CPrecon_Null;
-typedef TPrecon_Null<scomplex>          SCPrecon_Null;
+typedef TPrecon_Null<std::complex<double> >    CPrecon_Null;
+typedef TPrecon_Null<std::complex<float> >          SCPrecon_Null;
 typedef TPrecon_Null<int>               IPrecon_Null;
 
 typedef TPrecon_Diag<double>            RPrecon_Diag;
 typedef TPrecon_Diag<float>             FPrecon_Diag;
-typedef TPrecon_Diag<toast::complex>    CPrecon_Diag;
-typedef TPrecon_Diag<scomplex>          SCPrecon_Diag;
+typedef TPrecon_Diag<std::complex<double> >    CPrecon_Diag;
+typedef TPrecon_Diag<std::complex<float> >          SCPrecon_Diag;
 typedef TPrecon_Diag<int>               IPrecon_Diag;
 
 typedef TPrecon_IC<double>              RPrecon_IC;
 typedef TPrecon_IC<float>               FPrecon_IC;
-typedef TPrecon_IC<toast::complex>      CPrecon_IC;
-typedef TPrecon_IC<scomplex>            SCPrecon_IC;
+typedef TPrecon_IC<std::complex<double> >      CPrecon_IC;
+typedef TPrecon_IC<std::complex<float> >            SCPrecon_IC;
 typedef TPrecon_IC<int>                 IPrecon_IC;
 
 typedef TPrecon_DILU<double>            RPrecon_DILU;
 typedef TPrecon_DILU<float>             FPrecon_DILU;
-typedef TPrecon_DILU<toast::complex>    CPrecon_DILU;
-typedef TPrecon_DILU<scomplex>          SCPrecon_DILU;
+typedef TPrecon_DILU<std::complex<double> >    CPrecon_DILU;
+typedef TPrecon_DILU<std::complex<float> >          SCPrecon_DILU;
 typedef TPrecon_DILU<int>               IPrecon_DILU;
 
 #ifdef HAVE_ILU
 typedef TPrecon_ILU<double>            RPrecon_ILU;
-typedef TPrecon_ILU<toast::complex>    CPrecon_ILU;
-typedef TPrecon_ILU<scomplex>          SCPrecon_ILU;
+typedef TPrecon_ILU<std::complex<double> >    CPrecon_ILU;
+typedef TPrecon_ILU<std::complex<float> >          SCPrecon_ILU;
 #endif // HAVE_ILU
 
 typedef TPrecon_CG_Multigrid<double>    RPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<float>     FPrecon_CG_Multigrid;
-typedef TPrecon_CG_Multigrid<toast::complex> CPrecon_CG_Multigrid;
-typedef TPrecon_CG_Multigrid<scomplex>  SCPrecon_CG_Multigrid;
+typedef TPrecon_CG_Multigrid<std::complex<double> > CPrecon_CG_Multigrid;
+typedef TPrecon_CG_Multigrid<std::complex<float> >  SCPrecon_CG_Multigrid;
 typedef TPrecon_CG_Multigrid<int>       IPrecon_CG_Multigrid;
 
 

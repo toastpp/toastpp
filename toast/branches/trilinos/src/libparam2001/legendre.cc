@@ -15,7 +15,6 @@
 //#include "complex.h"
 
 
-using namespace toast;
 using namespace std;
 //const double M_PI=3.141592653589793;
 int factorial(int i)
@@ -78,7 +77,7 @@ double plgndr(int l, int m, double x) //Computes the associated Legendre polynom
 
 
 
-toast::complex SphericalHarmonic(int l,int m, double thi, double fi)// calculates the spherical harmonic
+std::complex<double> SphericalHarmonic(int l,int m, double thi, double fi)// calculates the spherical harmonic
                                                          //of degree l order m at the (thi,fi) point
 { 
 
@@ -128,7 +127,7 @@ toast::complex SphericalHarmonic(int l,int m, double thi, double fi)// calculate
       im = (-1)*d1 * mon * d2 * p * i;
       //  cout <<re<<"  "<<im<<" i";
     }  
-  toast::complex z(re,im);
+  std::complex<double> z(re,im);
   //  cout << " complex z= " << z << endl;
   return z;   
 }

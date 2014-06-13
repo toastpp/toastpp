@@ -7,8 +7,6 @@
 #include "stoastlib.h"
 #include "timing.h"
 
-using namespace toast;
-
 // ============================================================================
 // Local prototypes
 
@@ -228,14 +226,14 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
 	    // map into solution basis: 1. absorption
 	    raster->Map_GridToSol (pmdf_mua, pmdf_basis);
 	    for (k = 0; k < slen; k++) {
-	        J(idx,k)          = pmdf_basis[k].re;
-	        J(idx+nQM,k)      = pmdf_basis[k].im;
+	        J(idx,k)          = pmdf_basis[k].real();
+	        J(idx+nQM,k)      = pmdf_basis[k].imag();
 	    }
 	    // map into solution basis: 2. diffusion
 	    raster->Map_GridToSol (pmdf_kap, pmdf_basis);
 	    for (k = 0; k < slen; k++) {
-	        J(idx,k+slen)     = pmdf_basis[k].re;
-	        J(idx+nQM,k+slen) = pmdf_basis[k].im;
+	        J(idx,k+slen)     = pmdf_basis[k].real();
+	        J(idx+nQM,k+slen) = pmdf_basis[k].imag();
 	    }
 
 	    idx++;
@@ -306,14 +304,14 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
 	    // map into solution basis: 1. absorption
 	    raster->Map_GridToSol (pmdf_mua, pmdf_basis);
 	    for (k = 0; k < slen; k++) {
-	        J(idx,k)          = pmdf_basis[k].re;
-	        J(idx+nQM,k)      = pmdf_basis[k].im;
+	        J(idx,k)          = pmdf_basis[k].real();
+	        J(idx+nQM,k)      = pmdf_basis[k].imag();
 	    }
 	    // map into solution basis: 2. diffusion
 	    raster->Map_GridToSol (pmdf_kap, pmdf_basis);
 	    for (k = 0; k < slen; k++) {
-	        J(idx,k+slen)     = pmdf_basis[k].re;
-	        J(idx+nQM,k+slen) = pmdf_basis[k].im;
+	        J(idx,k+slen)     = pmdf_basis[k].real();
+	        J(idx+nQM,k+slen) = pmdf_basis[k].imag();
 	    }
 
 	    idx++;
@@ -371,10 +369,10 @@ void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
 
 	    // map into solution basis
 	    for (k = 0; k < nsol; k++) {
-	        J(idx,k)          = -pmdf_mua[k].re;
-	        J(idx+nQM,k)      = -pmdf_mua[k].im;
-	        J(idx,k+nsol)     = -pmdf_kap[k].re;
-	        J(idx+nQM,k+nsol) = -pmdf_kap[k].im;
+	        J(idx,k)          = -pmdf_mua[k].real();
+	        J(idx+nQM,k)      = -pmdf_mua[k].imag();
+	        J(idx,k+nsol)     = -pmdf_kap[k].real();
+	        J(idx+nQM,k+nsol) = -pmdf_kap[k].imag();
 	    }
 
 	    idx++;
@@ -429,10 +427,10 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
 
 		// map into solution basis
 	    for (k = 0; k < nsol; k++) {
-	        J(idx,k)          = -pmdf_mua[k].re;
-	        J(idx+nQM,k)      = -pmdf_mua[k].im;
-	        J(idx,k+nsol)     = -pmdf_kap[k].re;
-	        J(idx+nQM,k+nsol) = -pmdf_kap[k].im;
+	        J(idx,k)          = -pmdf_mua[k].real();
+	        J(idx+nQM,k)      = -pmdf_mua[k].imag();
+	        J(idx,k+nsol)     = -pmdf_kap[k].real();
+	        J(idx+nQM,k+nsol) = -pmdf_kap[k].imag();
 	    }
 
 	    idx++;

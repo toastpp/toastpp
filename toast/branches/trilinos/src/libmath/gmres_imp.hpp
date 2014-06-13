@@ -2,8 +2,8 @@
 
 #include "mathlib.h"
 #include "timing.h"
+
 using namespace std;
-using namespace toast;
 
 #define VERBOSE_GMRES_LOCAL
 
