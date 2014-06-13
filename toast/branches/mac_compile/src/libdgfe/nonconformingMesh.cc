@@ -770,9 +770,9 @@ void DGAddToSysMatrixInteriorEdgeCont(NonconformingMesh &mesh, CGenericSparseMat
 	normal =  mesh.elist[e]->LNormal(eside);*/
 	
         //cout<<"Edge coords assigned.."<<endl; 
-	if((etop == ELID_TRI3)) 
+	if(etop == ELID_TRI3)
 		edge_length = l2norm(edge_coord[0] - (edge_coord[1]));
-	else if ((etop == ELID_TET4)){ 
+	else if (etop == ELID_TET4){ 
 		double a, b, c, p;
 		a = l2norm(edge_coord[0] - edge_coord[1]); b = l2norm(edge_coord[0] - edge_coord[2]); c = l2norm(edge_coord[1] - edge_coord[2]);
 		p = 0.5*(a+b+c); 

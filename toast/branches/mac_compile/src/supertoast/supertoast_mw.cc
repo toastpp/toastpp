@@ -586,7 +586,7 @@ void OutputProgramInfo ()
     pp.Lineout ("+-------------------------------------------------+");
     pp.Lineout (VERSION_STRING);
     sprintf (cbuf, "Executed %s", ctime(&tme));
-    if (host = getenv("HOST"))
+    if ((host = getenv("HOST")))
         sprintf (cbuf+strlen(cbuf), "on host %s ", host);
     sprintf (cbuf+strlen(cbuf), "(PID %d)", getpid());
     pp.Lineout (cbuf);
@@ -864,7 +864,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
 	    case 3:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
-		cin >> cbuf+4;
+		cin >> (cbuf+4);
 		ReadNim (cbuf+4, param[p]);
 		break;
 	    }
@@ -981,7 +981,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 	    case 4:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
-		cin >> cbuf+4;
+		cin >> (cbuf+4);
 		ReadNim (cbuf+4, param[p]);
 		break;
 	    }

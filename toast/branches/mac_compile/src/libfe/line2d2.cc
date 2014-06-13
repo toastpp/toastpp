@@ -548,7 +548,7 @@ RVector Line2D2::BndIntFCos (int side, const Surface *surf,
     RVector prm0(pdim);  surf2D->Point2Param (nlist[n0], prm0);
     RVector prm1(pdim);  surf2D->Point2Param (nlist[n1], prm1);
     s  = surf2D->ChordDiff (prm1, prm0); 
-    if (flip = (s < 0)) {
+    if ((flip = (s < 0))) {
         d0 = surf2D->ChordDiff (cntcos, prm1);
 	s = -s;
     } else {
