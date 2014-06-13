@@ -16,7 +16,6 @@
 #endif // HAVE_ILU
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // class TPreconditioner
@@ -286,12 +285,12 @@ inline void SCPreconMixed_DILU::Reset (const SCCompRowMatrixMixed *_A)
     // assumes symmetric A
     A = _A;
 
-    const toast::complex unit = toast::complex(1,0);
+    const std::complex<double> unit = std::complex<double>(1,0);
     int i, r, c, nz;
     dim = (A->nRows() < A->nCols() ? A->nRows() : A->nCols());
     CVector Ar(A->nCols());
     int *ci = new int[dim];
-    toast::complex *rv = new toast::complex[dim];
+    std::complex<double> *rv = new std::complex<double>[dim];
     if (ipivot.Dim() != dim) ipivot.New (dim);
     ipivot = MakeCVector (A->Diag());
     for (r = 0; r < dim; r++) {
@@ -307,21 +306,21 @@ inline void SCPreconMixed_DILU::Reset (const SCCompRowMatrixMixed *_A)
 inline void SCPreconMixed_DILU::Apply (const CVector &r, CVector &s)
 {
     int i, j, k, nz;
-    toast::complex sum;
+    std::complex<double> sum;
     CVector row(dim);
     CVector z(dim);
     int *ci = new int[dim];
-    toast::complex *rv = new toast::complex[dim];
+    std::complex<double> *rv = new std::complex<double>[dim];
     for (i = 0; i < dim; i++) {
         nz = A->SparseRow (i, ci, rv);
-	sum = toast::complex(0,0);
+	sum = std::complex<double>(0,0);
 	for (k = 0; k < nz; k++)
 	    if ((j = ci[k]) < i) sum += rv[k]*z[j];
 	z[i] = ipivot[i]*(r[i]-sum);
     }
     for (i = dim-1; i >= 0; i--) {
         nz = A->SparseRow (i, ci, rv);
-	sum = toast::complex(0,0);
+	sum = std::complex<double>(0,0);
 	for (k = 0; k < nz; k++)
 	    if ((j = ci[k]) > i) sum += rv[k]*s[j];
 	s[i] = z[i] - ipivot[i]*sum;

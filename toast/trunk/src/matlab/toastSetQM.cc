@@ -16,7 +16,6 @@
 #include "util.h"
 
 using namespace std;
-using namespace toast;
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {

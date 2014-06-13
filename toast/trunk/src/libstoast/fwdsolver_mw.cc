@@ -5,7 +5,6 @@
 #include "timing.h"
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 
@@ -202,6 +201,6 @@ void TFwdSolverMW<T>::Cleanup ()
 #ifdef NEED_EXPLICIT_INSTANTIATION
 
 template class STOASTLIB TFwdSolverMW<double>;
-template class STOASTLIB TFwdSolverMW<toast::complex>;
+template class STOASTLIB TFwdSolverMW<std::complex<double> >;
 
 #endif // NEED_EXPLICIT_INSTANTIATION

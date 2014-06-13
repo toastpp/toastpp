@@ -11,7 +11,6 @@
 //#define OUTPUT_FIELDS
 
 using namespace std;
-using namespace toast;
 
 // fix these extern references
 template<class T> extern void ImageGradient (const IVector &dim,
@@ -280,24 +279,24 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
 	CVector cproj(n);
 	//Project_cplx (mesh, q, dphi[q], cproj);
 	cproj = ProjectSingle (&mesh, q, mvec, dphi[q], DATA_LIN);
-	wqa = toast::complex(0,0);
+	wqa = std::complex<double>(0,0);
 	wqb = 0.0;
 
 	tic();
 	for (m = idx = 0; m < mesh.nM; m++) {
 	    if (!mesh.Connected (q, m)) continue;
 	    const CVector qs = mvec.Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
 	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
+	    wqa += qs * std::complex<double> (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * std::complex<double> (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;

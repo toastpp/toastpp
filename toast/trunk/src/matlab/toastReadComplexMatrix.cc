@@ -4,7 +4,6 @@
 #include "felib.h"
 
 using namespace std;
-using namespace toast;
 
 void ReadMatrix (char *name, CCompRowMatrix &data)
 {
@@ -30,16 +29,4 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     CopyMatrix (&plhs[0], data);
     return;
-
-#ifdef UNDEF
-    plhs[0] = mxCreateDoubleMatrix (data.nRows(), data.nCols(), mxCOMPLEX);
-    double *pr = mxGetPr (plhs[0]);
-    double *pi = mxGetPi (plhs[0]);
-
-    complex *buf = data.data_buffer();
-    for (int i = 0; i < data.Dim(); i++) {
-	pr[i] = buf[i].re;
-	pi[i] = buf[i].im;
-    }
-#endif
 }

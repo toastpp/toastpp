@@ -26,8 +26,11 @@
 #include "mathdef.h"
 #include "error.h"
 #include "nr.h"
-#include "complex.h"
-#include "scomplex.h"
+
+#include <complex>
+//#include "complex.h"
+//#include "scomplex.h"
+
 #include "vector.h"
 #include "matrix.h"
 #include "dgmatrix.h"

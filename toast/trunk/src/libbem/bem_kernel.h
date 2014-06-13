@@ -16,7 +16,7 @@ public:
 	 * \brief reset the wave number for the following calculations
 	 * \param newk new wave number
 	 */
-	void SetWavenumber (toast::complex newk) { k = newk; }
+	void SetWavenumber (std::complex<double> newk) { k = newk; }
 
 	/**
 	 * \brief Calculates the Greens function for the element at
@@ -28,7 +28,7 @@ public:
 	virtual CVector Calculate (BEM_Element *el, Point2D &loc, const Point3D &load) = 0;
 
 protected:
-	toast::complex k; ///< wave number
+	std::complex<double> k; ///< wave number
 };
 
 /**

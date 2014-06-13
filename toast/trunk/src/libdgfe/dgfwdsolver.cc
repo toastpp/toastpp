@@ -5,7 +5,6 @@
 #include "toast_mpi.h"
 #endif
 using namespace std;
-using namespace toast;
 
 template<class T>
 TDGFwdSolver<T>::TDGFwdSolver (LSOLVER linsolver, double tol)
@@ -22,7 +21,8 @@ TDGFwdSolver<T>::TDGFwdSolver (LSOLVER linsolver, double tol)
     SETUP_MPI();
 }
 template<>
-TDGFwdSolver<toast::complex>::TDGFwdSolver (LSOLVER linsolver, double tol)
+TDGFwdSolver<std::complex<double> >::TDGFwdSolver (LSOLVER linsolver,
+    double tol)
 {
     solvertp = linsolver;
     iterative_tol = tol;
@@ -77,7 +77,7 @@ TDGFwdSolver<T>::~TDGFwdSolver ()
     CLEANUP_MPI();
 }
 template<>
-TDGFwdSolver<toast::complex>::~TDGFwdSolver ()
+TDGFwdSolver<std::complex<double> >::~TDGFwdSolver ()
 {
     if (F)      delete F;
     if (FL)     delete FL;
@@ -125,7 +125,7 @@ void TDGFwdSolver<double>::Allocate (NonconformingMesh &mesh)
 }
 
 template<> 
-void TDGFwdSolver<toast::complex>::Allocate (NonconformingMesh &mesh)
+void TDGFwdSolver<std::complex<double> >::Allocate (NonconformingMesh &mesh)
 {
     int *rowptr, *colidx, nzero;
    
@@ -175,7 +175,8 @@ void TDGFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
 		    elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
 }
 template<> 
-void TDGFwdSolver<toast::complex>::AssembleSystemMatrix (const Solution &sol,
+void TDGFwdSolver<std::complex<double> >::AssembleSystemMatrix (
+    const Solution &sol,
     double omega, bool elbasis)
 {
     dASSERT(!meshptr->is_set_up, Setup() needs to be called on the mesh object before performing this operation);	
@@ -283,7 +284,9 @@ void TDGFwdSolver<double>::CalcField (const TVector<double> &qvec, TVector<doubl
 }
 
 template<>
-void TDGFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qvec, TVector<toast::complex> &cphi) const
+void TDGFwdSolver<std::complex<double> >::CalcField (
+    const TVector<std::complex<double> > &qvec,
+    TVector<std::complex<double> > &cphi) const
 {
     // calculate the complex field for a given source distribution
 
@@ -324,7 +327,8 @@ void TDGFwdSolver<toast::complex>::CalcField (const TVector<toast::complex> &qve
 }
 
 template<>
-void TDGFwdSolver<toast::complex>::SetLinSolver (char *solver, double tol)
+void TDGFwdSolver<std::complex<double> >::SetLinSolver (char *solver,
+    double tol)
 {
     if (!strcasecmp (solver, "DIRECT")) {
 	solvertp = LSOLVER_DIRECT;

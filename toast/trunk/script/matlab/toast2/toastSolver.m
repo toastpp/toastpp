@@ -128,7 +128,7 @@ classdef toastSolver < handle
         % =====================================================================
         
         function [ob,varargout] = objective (obj,prj,logx)
-            ob_data = sum(((obj.lprm.data-prj)./obj.lprm.sd).^2);
+            ob_data = full(sum(((obj.lprm.data-prj)./obj.lprm.sd).^2));
             ob_prior = 0;
                 
             if isfield(obj.lprm,'hReg') && obj.lprm.hReg ~= 0

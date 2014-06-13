@@ -12,7 +12,6 @@
 #include "fblas.h"
 
 using namespace std;
-using namespace toast;
 
 template<class MT>
 TDenseMatrix<MT>::TDenseMatrix (const TDenseMatrix<MT> &m,

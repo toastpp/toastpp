@@ -11,7 +11,6 @@
 #endif
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 // Prototypes
@@ -95,10 +94,8 @@ void MatlabToast::Gradient (int nlhs, mxArray *plhs[], int nrhs,
 	    phi = new CVector[nq];
 	    for (q = 0; q < nq; q++) {
 	        phi[q].New (nlen);
-		for (j = 0; j < nlen; j++) {
-		    phi[q][j].re = *pr++;
-		    phi[q][j].im = *pi++;
-		}
+		for (j = 0; j < nlen; j++)
+		    phi[q][j] = std::complex<double> (*pr++, *pi++);
 	    }
 	} else if (!strcasecmp(label,"Projections")) {
 	    proj = new RVector(mesh->nQM*2, mxGetPr (prhs[++i]));
@@ -174,23 +171,23 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 
 	CVector cproj(n);
 	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
-	wqa = toast::complex(0,0);
+	wqa = std::complex<double>(0,0);
 	//wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
 	    if (!mesh->Connected (q, m)) continue;
 	    const CVector qs = mvec.Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
 	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
+	    wqa += qs * std::complex<double> (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * std::complex<double> (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -437,23 +434,23 @@ void AddDataGradient2 (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 	CVector cproj(n);
 	//Project_cplx (*mesh, q, dphi[q], cproj);
 	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
-	wqa_row = toast::complex(0,0);
+	wqa_row = std::complex<double>(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
 	    if (!mesh->Connected (q, m)) continue;
 	    const CVector qs = mvec.Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
 	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa_row += qs * toast::complex (term*rp*dn, -term*ip*dn);
+	    wqa_row += qs * std::complex<double> (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa_row += qs * toast::complex (-term*ip*dn, -term*rp*dn);
+	    wqa_row += qs * std::complex<double> (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;

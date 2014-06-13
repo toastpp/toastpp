@@ -28,7 +28,6 @@
 #endif // ML_INTERFACE
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // member definitions
@@ -332,11 +331,13 @@ void TCompRowMatrix<MT>::Unlink ()
     TGenericSparseMatrix<MT>::Unlink();
 }
 
-inline TCompRowMatrix<toast::complex> cplx (const TCompRowMatrix<double> &A)
+inline TCompRowMatrix<std::complex<double> > cplx (
+    const TCompRowMatrix<double> &A)
 {
-    TCompRowMatrix<toast::complex> C(A.nRows(), A.nCols(), A.rowptr, A.colidx);
+    TCompRowMatrix<std::complex<double> > C(A.nRows(), A.nCols(), A.rowptr,
+					    A.colidx);
     for (int i = 0; i < A.nval; i++)
-	C.val[i].re = A.val[i];
+	C.val[i] = A.val[i];
     return C;
 }
 
@@ -1290,16 +1291,17 @@ void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
 // ==========================================================================
 
 template<class MT>
-void TCompRowMatrix<MT>::Ax_cplx (const TVector<toast::complex> &x,
-    TVector<toast::complex> &b) const
+void TCompRowMatrix<MT>::Ax_cplx (const TVector<std::complex<double> > &x,
+    TVector<std::complex<double> > &b) const
 {
     // Specialisation MT=double only (see below)
     xERROR("Method Ax_cplx not defined for return type");
 }
 
 template<>
-inline void TCompRowMatrix<double>::Ax_cplx (const TVector<toast::complex> &x,
-    TVector<toast::complex> &b) const
+inline void TCompRowMatrix<double>::Ax_cplx (
+    const TVector<std::complex<double> > &x,
+    TVector<std::complex<double> > &b) const
 {
     dASSERT(x.Dim() == cols, "Invalid size - vector x");
 
@@ -1315,11 +1317,10 @@ inline void TCompRowMatrix<double>::Ax_cplx (const TVector<toast::complex> &x,
 	i2 = rowptr[r+1];
 	b_re = b_im = 0.0;
 	for (; i < i2; i++) {
-	    b_re += x[*pcolidx].re * *pval;
-	    b_im += x[*pcolidx++].im * *pval++;
+	    b_re += x[*pcolidx].real() * *pval;
+	    b_im += x[*pcolidx++].imag() * *pval++;
 	}
-	b[r].re = b_re;
-	b[r++].im = b_im;
+	b[r++] = std::complex<double>(b_re, b_im);
     }
     INC_FLOPS_ADD (rowptr[rows]*2);
     INC_FLOPS_MUL (rowptr[rows]*2);
@@ -1347,8 +1348,9 @@ void TCompRowMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 }
 
 template<> // specialisation:: complex
-inline void TCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
-    TVector<toast::complex> &b) const
+inline void TCompRowMatrix<std::complex<double> >::ATx (
+    const TVector<std::complex<double> > &x,
+    TVector<std::complex<double> > &b) const
 {
     dASSERT(x.Dim() == rows, "Invalid size - vector x");
     dASSERT(b.Dim() == cols, "Invalid size - vector b");
@@ -1365,16 +1367,17 @@ inline void TCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &
 // ==========================================================================
 
 template<class MT>
-void TCompRowMatrix<MT>::ATx_cplx (const TVector<toast::complex> &x,
-    TVector<toast::complex> &b) const
+void TCompRowMatrix<MT>::ATx_cplx (const TVector<std::complex<double> > &x,
+    TVector<std::complex<double> > &b) const
 {
     // Specialisation MT=double only (see below)
     xERROR("Method ATx_cplx not defined for return type");
 }
 
 template<>
-inline void TCompRowMatrix<double>::ATx_cplx (const TVector<toast::complex> &x,
-    TVector<toast::complex> &b) const
+inline void TCompRowMatrix<double>::ATx_cplx (
+    const TVector<std::complex<double> > &x,
+    TVector<std::complex<double> > &b) const
 {
     dASSERT(x.Dim() == rows, "Invalid size - vector x");
     dASSERT(b.Dim() == cols, "Invalid size - vector b");
@@ -1382,11 +1385,11 @@ inline void TCompRowMatrix<double>::ATx_cplx (const TVector<toast::complex> &x,
     if (!col_access) SetColAccess(); // should not be necessary!
     int i, c;
 
-    for (c = 0; c < cols; c++) b[c].re = b[c].im = 0;
+    for (c = 0; c < cols; c++)
+        b[c] = std::complex<double>(0,0);
     for (i = c = 0; i < nval; i++) {
 	while (colptr[c+1] <= i) c++;
-	b[c].re += val[vofs[i]] * x[rowidx[i]].re;
-	b[c].im += val[vofs[i]] * x[rowidx[i]].im;
+	b[c] += val[vofs[i]] * x[rowidx[i]];
     }
 }
 
@@ -2366,8 +2369,9 @@ int ILUSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 }
 
 template<>
-inline int ILUSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
-    TVector<toast::complex> &x, double tol, double droptol, int maxit)
+inline int ILUSolve (TCompRowMatrix<std::complex<double> > &A,
+    const TVector<std::complex<double> > &b,
+    TVector<std::complex<double> > &x, double tol, double droptol, int maxit)
 {
 #ifdef HAVE_ILU
     return ILUSolveZGNL (A, b, x, tol, droptol, maxit);
@@ -2389,8 +2393,9 @@ int ILUSymSolve (TCompRowMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 }
 
 template<>
-inline int ILUSymSolve (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
-    TVector<toast::complex> &x, double tol, double droptol, int maxit)
+inline int ILUSymSolve (TCompRowMatrix<std::complex<double> > &A,
+    const TVector<std::complex<double> > &b,
+    TVector<std::complex<double> > &x, double tol, double droptol, int maxit)
 {
 #ifdef HAVE_ILU
     return ILUSolveZSYM (A, b, x, tol, droptol, maxit);
@@ -2985,14 +2990,14 @@ void TCompRowMatrix<MT>::ExportRCV (ostream &os)
 }
 
 template<> // specialisation: complex
-inline void TCompRowMatrix<toast::complex>::ExportRCV (ostream &os)
+inline void TCompRowMatrix<std::complex<double> >::ExportRCV (ostream &os)
 {
     int r, c, j;
     for (r = 0; r < this->rows; r++) {
 	for (j = rowptr[r]; j < rowptr[r+1]; j++) {
 	    c = colidx[j];
 	    os << r+1 << '\t' << c+1 << '\t'
-	       << this->val[j].re << '\t' << this->val[j].im << endl;
+	       << this->val[j].real() << '\t' << this->val[j].imag() << endl;
 	}
     }
 }
