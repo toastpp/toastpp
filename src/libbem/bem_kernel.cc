@@ -1,7 +1,5 @@
 #include "bem_kernel.h"
 
-using namespace toast;
-
 CVector BEM_Kernel_Helmholtz::Calculate (BEM_Element *el, Point2D &loc, const Point3D &load)
 {
   
@@ -11,7 +9,7 @@ CVector BEM_Kernel_Helmholtz::Calculate (BEM_Element *el, Point2D &loc, const Po
   //==================================================================
   int iic; 
   double xq, yq, zq, rpq1, rpq2, xpxq, ypyq, zpzq;
-  toast::complex krpq1, k_aux, e_aux;
+  std::complex<double> krpq1, k_aux, e_aux;
   static RVector shapf;
   static CVector kern_tab(4);
 
@@ -60,10 +58,10 @@ CVector BEM_Kernel_Domega::Calculate (BEM_Element *el, Point2D &loc, const Point
   int iic; 
   double xq, yq, zq, xpxq, ypyq, zpzq;
   double dst, dst2;
-  toast::complex krpq1, k_aux, e_aux, arg;
+  std::complex<double> krpq1, k_aux, e_aux, arg;
   static RVector shapf;
   static CVector kern_tab(4);
-  static toast::complex iunit = toast::complex(0,1);
+  static std::complex<double> iunit = std::complex<double>(0,1);
 
   // local coordinate system
   xq = 0.;    yq = 0.;    zq = 0.;
@@ -80,7 +78,7 @@ CVector BEM_Kernel_Domega::Calculate (BEM_Element *el, Point2D &loc, const Point
   double xp = load[0], yp = load[1], zp = load[2];
   xpxq=xq-xp; ypyq=yq-yp; zpzq=zq-zp;
 
-  toast::complex dkdomega = 1; // TODO iunit / (2*c*kappa*k);
+  std::complex<double> dkdomega = 1; // TODO iunit / (2*c*kappa*k);
 
   dst2 = (xpxq*xpxq+ypyq*ypyq+zpzq*zpzq);
   dst  = sqrt(dst2);
@@ -113,7 +111,7 @@ CVector BEM_Kernel_Dk::Calculate (BEM_Element *el, Point2D &loc, const Point3D &
   //==================================================================
   int iic; 
   double xq, yq, zq, rpq1, rpq2, xpxq, ypyq, zpzq;
-  toast::complex krpq1, k_aux, e_aux,  dk_aux;
+  std::complex<double> krpq1, k_aux, e_aux,  dk_aux;
   static RVector shapf;
   static CVector kern_tab(4);
 

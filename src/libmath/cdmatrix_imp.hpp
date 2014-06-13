@@ -13,7 +13,6 @@
 #include <string.h>
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // member definitions

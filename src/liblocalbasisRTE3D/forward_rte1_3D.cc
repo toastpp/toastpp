@@ -31,8 +31,6 @@ typedef unsigned pid_t;
 #define VARYDELTA
 #define USE_INTONSPHERE
 
-using namespace toast;
-
 #define MIN(A,B) ( (A) < (B) ? (A) : (B))
 
 class MyDataContext{
@@ -54,14 +52,14 @@ CDenseMatrix Aintscscx, Aintscssx, Aintssssx, Aintsccx, Aintsscx, Aintccx;
 CDenseMatrix apu1x, apu1scx, apu1ssx, apu1cx, Xmat;
 CVector A2x;
 
-const toast::complex *sintval, *sdxval, *sdyval, *sdzval;
+const std::complex<double> *sintval, *sdxval, *sdyval, *sdzval;
 const double *sxval, *syval, *szval; 
 const double *sdxxval, *sdxyval, *sdyxval, *sdyyval, *sdxzval, *sdzxval, *sdyzval, *sdzyval, *sdzzval; 
 const double *spsval, *spsdxval, *spsdyval, *spsdzval, *spata3_rteval, *spata3_sdmxval, *spata3_sdmyval, *spata3_sdmzval; 
 
 const double *aintval, *aintscval, *aintssval, *aintcval, *apu1val, *apu1scval, *apu1ssval, *apu1cval;
 const double *aintscscval, *aintscssval, *aintssssval, *aintsccval, *aintsscval, *aintccval;
-toast::complex *xmatval;
+std::complex<double> *xmatval;
 
 idxtype *browptr, *bcolidx;
 int nzb;
@@ -92,10 +90,10 @@ MyDataContext(QMMesh &spatMesh, Mesh &angMesh, RVector &delta, RVector &muabs, R
   	genmat_boundint_3D(spatMesh,  angMesh, A2, b1);
 	
 
-	Sint = Sint*toast::complex(0, w/c);
-   	Sdx = Sdx*toast::complex(0, w/c);
-  	Sdy = Sdy*toast::complex(0, w/c);
-   	Sdz = Sdz*toast::complex(0, w/c);
+	Sint = Sint*std::complex<double>(0, w/c);
+   	Sdx = Sdx*std::complex<double>(0, w/c);
+  	Sdy = Sdy*std::complex<double>(0, w/c);
+   	Sdz = Sdz*std::complex<double>(0, w/c);
 
 	int angN = angMesh.nlen();
 	angMesh.SparseRowStructure (browptr, bcolidx, nzb);
@@ -1199,13 +1197,13 @@ inline void RCAx(const RCompRowMatrix &A, const CVector& x, CVector &res)
     if (res.Dim() != A.nRows()) res.New(A.nRows());
 
     int r, i, i2;
-    toast::complex br;
+    std::complex<double> br;
     const double *aval;
     aval = A.ValPtr();
 
     for (r = i = 0; r < A.nRows();) {
 	i2 = A.rowptr[r+1];
-	for (br = toast::complex(0, 0); i < i2; i++)
+	for (br = std::complex<double>(0, 0); i < i2; i++)
 	    br += x[A.colidx[i]]*aval[i];
 	res[r++] = br;
     }
@@ -1231,7 +1229,8 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	*/
 	
 	/*Reshaping 'x' to 'x_{r}'*/
-	memcpy (ctxt->xmatval, x.data_buffer(), dof*sizeof(toast::complex));
+	memcpy (ctxt->xmatval, x.data_buffer(), dof*
+		sizeof(std::complex<double>));
 
 	int i, j, k, m, ra, ra1, ra2, rb, rb1, rb2;
     	int nr = ctxt->Xmat.nRows();
@@ -1244,15 +1243,23 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 	ctxt->Aintsscx.Zero(); ctxt->Aintccx.Zero();
 
 	/*Dereference the val pointers of Ax's*/
-	toast::complex *aintxval = ctxt->Aintx.data_buffer(); toast::complex *aintscxval = ctxt->Aintscx.data_buffer(); toast::complex *aintssxval = ctxt->Aintssx.data_buffer();
-	toast::complex *aintcxval = ctxt->Aintcx.data_buffer(); toast::complex *apu1xval = ctxt->apu1x.data_buffer(); toast::complex *apu1scxval = ctxt->apu1scx.data_buffer();  
-	toast::complex *apu1ssxval = ctxt->apu1ssx.data_buffer(); toast::complex *apu1cxval = ctxt->apu1cx.data_buffer(); 
-	toast::complex *aintscscxval = ctxt->Aintscscx.data_buffer(); toast::complex *aintscssxval = ctxt->Aintscssx.data_buffer();  
-	toast::complex *aintssssxval = ctxt->Aintssssx.data_buffer(); toast::complex *aintsccxval = ctxt->Aintsccx.data_buffer();  
-	toast::complex *aintsscxval = ctxt->Aintsscx.data_buffer();  toast::complex *aintccxval = ctxt->Aintccx.data_buffer();  
+	std::complex<double> *aintxval = ctxt->Aintx.data_buffer();
+	std::complex<double> *aintscxval = ctxt->Aintscx.data_buffer();
+	std::complex<double> *aintssxval = ctxt->Aintssx.data_buffer();
+	std::complex<double> *aintcxval = ctxt->Aintcx.data_buffer();
+	std::complex<double> *apu1xval = ctxt->apu1x.data_buffer();
+	std::complex<double> *apu1scxval = ctxt->apu1scx.data_buffer();  
+	std::complex<double> *apu1ssxval = ctxt->apu1ssx.data_buffer();
+	std::complex<double> *apu1cxval = ctxt->apu1cx.data_buffer(); 
+	std::complex<double> *aintscscxval = ctxt->Aintscscx.data_buffer();
+	std::complex<double> *aintscssxval = ctxt->Aintscssx.data_buffer();  
+	std::complex<double> *aintssssxval = ctxt->Aintssssx.data_buffer();
+	std::complex<double> *aintsccxval = ctxt->Aintsccx.data_buffer();  
+	std::complex<double> *aintsscxval = ctxt->Aintsscx.data_buffer();
+	std::complex<double> *aintccxval = ctxt->Aintccx.data_buffer();  
 
 	/*Computing x_{r}A^{T}*/
-	toast::complex xval;
+	std::complex<double> xval;
     	for (i = 0; i < nr; i++) {
 		for (j = 0; j < nc; j++) {
 			xval = ctxt->Xmat.Get(i, j);
@@ -1365,9 +1372,9 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
     {
 	for(int ia = 0; ia < angN; ia++)
 	{
-		toast::complex temp(0, 0);
-		for(int js = ctxt->Sint.rowptr[is]; js < ctxt->Sint.rowptr[is+1]; js++)
-		{
+	    std::complex<double> temp(0, 0);
+	    for(int js = ctxt->Sint.rowptr[is]; js < ctxt->Sint.rowptr[is+1]; js++)
+	        {
 			scol = ctxt->Sint.colidx[js];
 			temp += aintxval[scol*angN +  ia]*(ctxt->sintval[js] + ctxt->spata3_rteval[js]);
 			temp += aintscxval[scol*angN +  ia]*(ctxt->sdxval[js] + ctxt->spata3_sdmxval[js] - ctxt->sxval[js]);
@@ -1390,8 +1397,8 @@ inline CVector matrixFreeCaller(const CVector& x, void * context)
 
     /*Computing A_{2}x explicitly where A_{2} is the matrix resulting from boundary*/
     RCAx(ctxt->A2, x, ctxt->A2x);
-    toast::complex *res  = result.data_buffer();
-    toast::complex *arg1 = ctxt->A2x.data_buffer();
+    std::complex<double> *res  = result.data_buffer();
+    std::complex<double> *arg1 = ctxt->A2x.data_buffer();
     for (int i=0; i < dof; i++)
     	*res++ += *arg1++;
 
@@ -1409,8 +1416,8 @@ CVector getDiag(void * context)
     int nDim = spatN*angN;
     CVector result(nDim);
     int arow, brow;
-    toast::complex a0_rte, a0_sdm, a1_rte, a1_sdm;
-    toast::complex a0, a1, a2, a3, a4;
+    std::complex<double> a0_rte, a0_sdm, a1_rte, a1_sdm;
+    std::complex<double> a0, a1, a2, a3, a4;
     double  coeff = ctxt->w/ctxt->c;
 	
     for(int j=0; j < nDim; j++)
@@ -1546,7 +1553,7 @@ void genmat_sourcevalvector_3D(CCompRowMatrix& Svec, const Mesh& mesh, const Mes
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
 	    js = mesh.elist[el]->Node[is];
-	    sint(js,0) = toast::complex(1.0, 0);
+	    sint(js,0) = std::complex<double>(1.0, 0);
 	  }
 	  // get boundary normal...
 	  RVector nhat = mesh.ElDirectionCosine(el,sd);
@@ -1684,7 +1691,7 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_cosi
 	  for(int nd = 0; nd < mesh.elist[el]->nSideNode(sd); nd++) {
 	    is = mesh.elist[el]->SideNode(sd,nd);
 	    js = mesh.elist[el]->Node[is];
-	    sint(js,0) = toast::complex(1.0, 0);
+	    sint(js,0) = std::complex<double>(1.0, 0);
 	  }
 	  // get boundary normal...
 	  RVector nhat = mesh.ElDirectionCosine(el,sd);
@@ -1715,7 +1722,7 @@ const Mesh& S2mesh,  const CCompRowMatrix qvec, const int iq, const bool is_cosi
 	  }
 	  if(!is_cosine)
 		Angsvec(angMesh_node, 0) = 1.0;
-  	  Svec += kron(sint,Angsvec)*toast::complex(sweight, 0);		
+  	  Svec += kron(sint,Angsvec)*std::complex<double>(sweight, 0);		
 	} // end loop on element sides
      } // end loop on elements
    }

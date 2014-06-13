@@ -8,7 +8,11 @@
 #ifndef __DNSMATRIXMPI_H
 #define __DNSMATRIXMPI_H
 
-#include "mathlib.h"
+#include "toastdef.h"
+#include <complex>
+#include <string.h>
+#include "vector.h"
+#include "matrix.h"
 
 // ==========================================================================
 // Nonmember declarations
@@ -192,15 +196,15 @@ private:
 
 typedef TDenseMatrixMPI<double>   RDenseMatrixMPI;	// 'double real'
 typedef TDenseMatrixMPI<float>    FDenseMatrixMPI;    // 'single real'
-typedef TDenseMatrixMPI<toast::complex>  CDenseMatrixMPI;	// 'complex'
-typedef TDenseMatrixMPI<scomplex> SCDenseMatrixMPI;   // 'single complex'
+typedef TDenseMatrixMPI<std::complex<double> >  CDenseMatrixMPI; // 'complex'
+typedef TDenseMatrixMPI<std::complex<float> > SCDenseMatrixMPI;  // 'single complex'
 typedef TDenseMatrixMPI<int>      IDenseMatrixMPI;    // 'integer'
 
 #ifndef MATHLIB_IMPLEMENTATION
 extern template class MATHLIB TDenseMatrixMPI<double>;
 extern template class MATHLIB TDenseMatrixMPI<float>;
-extern template class MATHLIB TDenseMatrixMPI<toast::complex>;
-extern template class MATHLIB TDenseMatrixMPI<scomplex>;
+extern template class MATHLIB TDenseMatrixMPI<std::complex<double> >;
+extern template class MATHLIB TDenseMatrixMPI<std::complex<float> >;
 extern template class MATHLIB TDenseMatrixMPI<int>;
 #endif // MATHLIB_IMPLEMENTATION
 

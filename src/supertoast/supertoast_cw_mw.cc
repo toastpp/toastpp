@@ -16,7 +16,6 @@
 #endif // TOAST_MPI
 
 using namespace std;
-using namespace toast;
 
 // Max number of mesh regions
 #define MAXREGION 100

@@ -231,8 +231,8 @@ private:
 
 typedef TSymMatrix<double>   RSymMatrix;	// 'real'
 typedef TSymMatrix<float>    FSymMatrix;	// 'float'
-typedef TSymMatrix<toast::complex>  CSymMatrix;	// 'complex'
-typedef TSymMatrix<scomplex> SCSymMatrix;	// 'single complex'
+typedef TSymMatrix<std::complex<double> >  CSymMatrix;	// 'complex'
+typedef TSymMatrix<std::complex<float> > SCSymMatrix;	// 'single complex'
 typedef TSymMatrix<int>	     ISymMatrix;	// 'integer'
 
 // ==========================================================================

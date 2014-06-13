@@ -11,7 +11,6 @@
 #include "usefulfan.h"
  
 
-using namespace toast;
 using namespace std;
 //******************************************************************************
 //*                          useful functions                                  *

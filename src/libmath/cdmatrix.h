@@ -188,8 +188,8 @@ private:
 
 typedef TCoordMatrix<double>	RCoordMatrix;	// 'real'
 typedef TCoordMatrix<float>	FCoordMatrix;	// 'float'
-typedef TCoordMatrix<toast::complex>	CCoordMatrix;	// 'complex'
-typedef TCoordMatrix<scomplex>	SCCoordMatrix;	// 'single complex'
+typedef TCoordMatrix<std::complex<double> >	CCoordMatrix;	// 'complex'
+typedef TCoordMatrix<std::complex<float> >	SCCoordMatrix;	// 'single complex'
 typedef TCoordMatrix<int>	ICoordMatrix;	// 'integer'
 
 // ==========================================================================

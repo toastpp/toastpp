@@ -8,8 +8,6 @@
 #include "stoastlib.h"
 #include "fwdsolver_zslu.h"
 
-using namespace toast;
-
 // =========================================================================
 
 class ZSuperLU_engine {
@@ -206,16 +204,16 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     doublecomplex *qbuf = (doublecomplex*)qd.ValPtr();
     zCreate_Dense_Matrix (&B, m, nrhs, qbuf, m, SLU_DN, SLU_Z, SLU_GE);
 
-    toast::complex *x = new toast::complex[n*nrhs];
+    std::complex<double> *x = new std::complex<double>[n*nrhs];
     for (i = 0; i < nrhs; i++)
-	memcpy (x+(i*n), phi[i].data_buffer(), n*sizeof(toast::complex));
+        memcpy (x+(i*n), phi[i].data_buffer(), n*sizeof(std::complex<double>));
     doublecomplex *xbuf = (doublecomplex*)x;
     zCreate_Dense_Matrix (&X, n, nrhs, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
     engine->Solve (&B, &X);
     
     for (i = 0; i < nrhs; i++)
-        memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(toast::complex));
+        memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(std::complex<double>));
 
     Destroy_SuperMatrix_Store (&B);
     Destroy_SuperMatrix_Store (&X);

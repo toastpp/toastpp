@@ -111,13 +111,67 @@ public:
 	}
     }
 
+    void AddToElMatrix (int el, CCompRowMatrix &Mlocal,
+        RVector *coeff, int mode) const
+    {
+	int i, j, is, js, isl, nnode;
+	
+	nnode = elist[el]->nNode();
+	for (i = 0; i < nnode; i++) {
+	    is = elist[el]->Node[i];
+	    if (nodeType[is] != 2) continue; // node not owned
+	    isl = nodeGlobalToLocal[is];
+	    for (j = 0; j < nnode; j++) {
+		js = elist[el]->Node[j];
+		double re = 0.0, im = 0.0;
+		switch (mode) {
+		case ASSEMBLE_FF:
+		    re = elist[el]->IntFF (i, j);
+		    break;
+		case ASSEMBLE_DD:
+		    re = elist[el]->IntDD (i, j);
+		    break;
+		case ASSEMBLE_PFF:
+		    re = elist[el]->IntPFF (i, j, *coeff);
+		    break;
+		case ASSEMBLE_PDD:
+		    re = elist[el]->IntPDD (i, j, *coeff);
+		    break;
+		case ASSEMBLE_BNDPFF:
+		    re = elist[el]->BndIntPFF (i, j, *coeff);
+		    break;
+		case ASSEMBLE_PFF_EL:
+		    re = elist[el]->IntFF (i, j) * (*coeff)[el];
+		    break;
+		case ASSEMBLE_PDD_EL:
+		    re = elist[el]->IntDD (i, j) * (*coeff)[el];
+		    break;
+		case ASSEMBLE_BNDPFF_EL:
+		    re = elist[el]->BndIntFF (i, j) * (*coeff)[el];
+		    break;
+
+		case ASSEMBLE_iPFF:
+		    im = elist[el]->IntPFF (i, j, *coeff);
+		    break;
+		}
+		Mlocal.Add (isl, js, std::complex<double>(re,im));
+	    }
+	}
+    }
+
     void AddToSysMatrix (RCompRowMatrix &Mlocal,
         RVector *coeff, int mode) const
     {
-	int i, j, k, ncol, nnode, is, js, isl;
-	double entry;
+	for (int i = 0; i < nel; i++) {
+	    int el = ellist[i];
+	    AddToElMatrix (el, Mlocal, coeff, mode);
+	}
+    }
 
-	for (i = 0; i < nel; i++) {
+    void AddToSysMatrix (CCompRowMatrix &Mlocal,
+	RVector *coeff, int mode) const
+    {
+        for (int i = 0; i < nel; i++) {
 	    int el = ellist[i];
 	    AddToElMatrix (el, Mlocal, coeff, mode);
 	}

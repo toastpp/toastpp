@@ -26,8 +26,6 @@
 #include "fwdsolver.h"
 #include "util.h"
 
-using namespace toast;
-
 // =========================================================================
 // Implementation
 
@@ -87,8 +85,8 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 	if (raster) raster->Map_MeshToSol (dphi[i], sphi);
 	else        sphi = dphi[i];
 	for (j = 0; j < slen; j++) {
-	    pr[idx] = sphi[j].re;
-	    pi[idx] = sphi[j].im;
+	    pr[idx] = sphi[j].real();
+	    pi[idx] = sphi[j].imag();
 	    idx++;
 	}
     }
@@ -108,8 +106,8 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 	    if (raster) raster->Map_MeshToSol (aphi[i], sphi);
 	    else        sphi = aphi[i];
 	    for (j = 0; j < slen; j++) {
-		pr[idx] = sphi[j].re;
-		pi[idx] = sphi[j].im;
+	        pr[idx] = sphi[j].real();
+		pi[idx] = sphi[j].imag();
 		idx++;
 	    }
 	}

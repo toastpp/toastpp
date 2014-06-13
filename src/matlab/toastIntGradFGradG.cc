@@ -12,7 +12,6 @@
 #include "util.h"
 
 using namespace std;
-using namespace toast;
 
 template<class T>
 TVector<T> IntGradFGradG (const Mesh &mesh, const TVector<T> &f,

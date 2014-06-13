@@ -11,7 +11,6 @@
 #include <time.h>
 
 using namespace std;
-using namespace toast;
 
 #define PCG_RESET_INTERVAL 10
 #define DJTJ_LIMIT 1e-8

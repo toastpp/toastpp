@@ -23,7 +23,7 @@ template<class MT> class TCompRowMatrixTrilinos
 {
 public:
     typedef Kokkos::DefaultNode::DefaultNodeType node_type;
-    typedef Tpetra::CrsMatrix<double, int, int, node_type> matrix_type;
+    typedef Tpetra::CrsMatrix<MT, int, int, node_type> matrix_type;
     typedef Tpetra::Map<int, int, node_type> map_type;
   
     /**
