@@ -25,7 +25,6 @@
 #include "util.h"
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 // Implementation
@@ -178,12 +177,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	CVector *dphi = new CVector[nq];
 	for (i = 0; i < nq; i++) {
 	    dphi[i].New (n);
-	    toast::complex *v = dphi[i].data_buffer();
-	    for (j = 0; j < n; j++) {
-		v->re = *pr++;
-		v->im = *pi++;
-		v++;
-	    }
+	    std::complex<double> *v = dphi[i].data_buffer();
+	    for (j = 0; j < n; j++)
+	        *v++ = std::complex<double>(*pr++, *pi++);
 	}
 
 	// copy adjoint fields
@@ -196,12 +192,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	CVector *aphi = new CVector[nm];
 	for (i = 0; i < nm; i++) {
 	    aphi[i].New (n);
-	    toast::complex *v = aphi[i].data_buffer();
-	    for (j = 0; j < n; j++) {
-		v->re = *pr++;
-		v->im = *pi++;
-		v++;
-	    }
+	    std::complex<double> *v = aphi[i].data_buffer();
+	    for (j = 0; j < n; j++)
+	        *v++ = std::complex<double>(*pr++, *pi++);
 	}
 
 	// copy projections
@@ -211,12 +204,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	CVector proj(nqm);
 	pr = mxGetPr (mx_proj);
 	pi = mxGetPi (mx_proj);
-	toast::complex *v = proj.data_buffer();
-	for (i = 0; i < nqm; i++) {
-	    v->re = *pr++;
-	    v->im = *pi++;
-	    v++;
-	}
+	std::complex<double> *v = proj.data_buffer();
+	for (i = 0; i < nqm; i++)
+	    *v++ = std::complex<double>(*pr++, *pi++);
 
 	CalcJacobian (mesh, raster, dphi, aphi, &proj, DATA_LOG,
 		      &plhs[0]);

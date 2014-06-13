@@ -76,30 +76,56 @@ varargout{1} = handles.output;
 
 
 %% ===========================================================
+
+function prm = gen_data(prm)
+meshdir = '../../../test/3D/meshes/';
+meshfile = 'cyl4_blobs.msh';
+qmfile = prm.meas.qmfile;
+mesh = toastMesh([meshdir meshfile]);
+mesh.ReadQM(qmfile);
+n = mesh.NodeCount;
+nim = toastNim([meshdir 'mua_tgt_cyl4.nim']);
+mua = nim.Values;
+nim = toastNim([meshdir 'mus_tgt_cyl4.nim']);
+mus = nim.Values;
+ref = ones(n,1) * 1.4;
+freq = prm.data.freq;
+smat = dotSysmat(mesh,mua,mus,ref,freq);
+qvec = mesh.Qvec(prm.meas.src.type,prm.meas.src.prof,prm.meas.src.width);
+mvec = mesh.Mvec(prm.meas.det.prof,prm.meas.det.width);
+data = reshape(mvec.' * (smat\qvec), [], 1);
+lndata = log(data);
+prm.data.lnamp = real(lndata);
+prm.data.phase = imag(lndata);
+
+%% ===========================================================
+
 function init(handles)
 
+meshdir = '../../../test/3D/meshes/';
 prm = toastParam;
 %prm.basis.meshfile = 'vox32_2blobs.msh';
 %prm.basis.bdim = [25 30 20];
 %prm.data.lnampfile = 'fmod_head_vox32_3plane.fem';
 %prm.data.phasefile = 'farg_head_vox32_3plane.fem';
 %prm.meas.qmfile = 'vox32_3plane.qm';
-prm.fwdsolver.meshfile = 'cyl2.msh';
+prm.fwdsolver.meshfile = [meshdir 'cyl2.msh'];
 prm.solver.basis.bdim = [24 24 24];
-prm.data.lnampfile = 'fmod_cyl2_5ring_100MHz.fem';
-prm.data.phasefile = 'farg_cyl2_5ring_100MHz.fem';
+%prm.data.lnampfile = 'fmod_cyl2_5ring_100MHz.fem';
+%prm.data.phasefile = 'farg_cyl2_5ring_100MHz.fem';
 prm.data.freq = 100;
-prm.meas.qmfile = 'cyl_5ring.qm';
+%prm.meas.qmfile = 'cyl_5ring.qm';
+prm.meas.qmfile = [meshdir 'cyl_5ring.qm'];
 prm.meas.src = struct('type','Neumann','prof','Gaussian','width',2);
 prm.meas.det = struct('prof','Gaussian','width',2);
-prm.fwdsolver.method = 'BiCGSTAB';
-%prm.linsolver.method = 'DIRECT';
+%prm.fwdsolver.method = 'BiCGSTAB';
+prm.fwdsolver.method = 'DIRECT';
 prm.fwdsolver.tol = 1e-10;
 prm.fwdsolver.hmesh = toastMesh(prm.fwdsolver.meshfile);
 prm.fwdsolver.hmesh.ReadQM (prm.meas.qmfile);
 prm.solver.method = 'PCG';
 prm.solver.tol = 1e-8;
-prm.solver.step0 = 87;
+prm.solver.step0 = 1e-2;
 prm.solver.lsearch = true;
 prm.regul.method = 'None';
 prm.initprm.mua = struct('reset','HOMOG','val',0.01);
@@ -117,8 +143,11 @@ n = prm.fwdsolver.hmesh.NodeCount;
 %prm.bmus = bmus; clear bmus;
 %prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
 %prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
-prm.initprm.mua.mua = toastNim('mua_tgt_cyl2.nim');
-prm.initprm.mus.mus = toastNim('mus_tgt_cyl2.nim');
+
+%prm.initprm.mua.mua = toastNim('mua_tgt_cyl2.nim');
+%prm.initprm.mus.mus = toastNim('mus_tgt_cyl2.nim');
+prm.initprm.mua.mua = ones(n,1)*0.01;
+prm.initprm.mus.mus = ones(n,1)*1;
 prm.initprm.ref.ref = ones(n,1)*1.4;
 prm.initprm.mua.bmua = prm.solver.basis.hbasis.Map('M->B',prm.initprm.mua.mua);
 prm.initprm.mus.bmus = prm.solver.basis.hbasis.Map('M->B',prm.initprm.mus.mus);
@@ -160,6 +189,8 @@ if getappdata(handles.figure1,'isBusy') == false
     setappdata(handles.figure1,'isBusy',true);
     set(handles.pushbutton1,'String','Stop (may be delayed)');
     drawnow
+    % generate the forward data
+    prm = gen_data(prm);
     toastRecon(prm);
     setappdata(handles.figure1,'isBusy',false);
     set(handles.pushbutton1,'String','Run');

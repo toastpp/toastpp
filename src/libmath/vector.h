@@ -22,8 +22,9 @@
 #include <sstream>
 #include "mathdef.h"
 #include "error.h"
-#include "complex.h"
-#include "scomplex.h"
+//#include "complex.h"
+//#include "scomplex.h"
+#include <complex>
 #include "fblas.h"
 
 #ifdef USE_CBLAS
@@ -181,20 +182,20 @@ template<class VT>
 TVector<double> UnfoldComplex (const TVector<VT> &v);
 
 /* add specific function for CVector */
-MATHLIB TVector<float> Re(const TVector<scomplex> &vec);
-MATHLIB TVector<double> Re(const TVector<toast::complex> &vec);
-MATHLIB TVector<float> Im(const TVector<scomplex> &vec);
-MATHLIB TVector<double> Im(const TVector<toast::complex> &vec);
-MATHLIB TVector<double> Mod(const TVector<toast::complex> &vec);
-MATHLIB TVector<double> LogMod(const TVector<toast::complex> &vec);
-MATHLIB TVector<double> Arg (const TVector<toast::complex> &vec);
-MATHLIB TVector<toast::complex> Conj(const TVector<toast::complex> &vec); // obsolete
-MATHLIB void SelfConj(const TVector<toast::complex> &vec);
-MATHLIB TVector<toast::complex> Hadamard(const TVector<toast::complex> &a, const TVector<toast::complex> &b);
-MATHLIB void SetReal (TVector<toast::complex> &z, const TVector<double> &zre);
-MATHLIB void SetImag (TVector<toast::complex> &z, const TVector<double> &zim);
+MATHLIB TVector<float> Re(const TVector<std::complex<float> > &vec);
+MATHLIB TVector<double> Re(const TVector<std::complex<double> > &vec);
+MATHLIB TVector<float> Im(const TVector<std::complex<float> > &vec);
+MATHLIB TVector<double> Im(const TVector<std::complex<double> > &vec);
+MATHLIB TVector<double> Mod(const TVector<std::complex<double> > &vec);
+MATHLIB TVector<double> LogMod(const TVector<std::complex<double> > &vec);
+MATHLIB TVector<double> Arg (const TVector<std::complex<double> > &vec);
+MATHLIB TVector<std::complex<double> > Conj(const TVector<std::complex<double> > &vec); // obsolete
+MATHLIB void SelfConj(const TVector<std::complex<double> > &vec);
+MATHLIB TVector<std::complex<double> > Hadamard(const TVector<std::complex<double> > &a, const TVector<std::complex<double> > &b);
+MATHLIB void SetReal (TVector<std::complex<double> > &z, const TVector<double> &zre);
+MATHLIB void SetImag (TVector<std::complex<double> > &z, const TVector<double> &zim);
 
-MATHLIB TVector<toast::complex> MakeCVector (const TVector<scomplex> &v);
+MATHLIB TVector<std::complex<double> > MakeCVector (const TVector<std::complex<float> > &v);
 
 // ==========================================================================
 // class TVector
@@ -1060,8 +1061,8 @@ private:
 
 typedef TVector<double>          RVector;
 typedef TVector<float>           FVector;
-typedef TVector<toast::complex>  CVector;
-typedef TVector<scomplex>        SCVector;
+typedef TVector<std::complex<double> >  CVector;
+typedef TVector<std::complex<float> >   SCVector;
 typedef TVector<int>             IVector;
 
 #endif // !__VECTOR_H

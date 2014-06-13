@@ -2,7 +2,6 @@
 #include "stoastlib.h"
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // class Raster_Blob
@@ -232,7 +231,7 @@ void Raster_Blob::Map_BasisToMesh (const CVector &bvec, CVector &mvec) const
     if (mvec.Dim() != meshptr->nlen()) mvec.New(meshptr->nlen());
     for (i = 0; i < meshptr->nlen(); i++) {
 	RVector nv = NodeValues(i);
-	toast::complex sum = toast::complex(0,0);
+	std::complex<double> sum = std::complex<double>(0,0);
 	for (j = 0; j < slen; j++)
 	    sum += bvec[sol2basis[j]] * nv[j];
 	mvec[i] = sum;
@@ -270,7 +269,7 @@ void Raster_Blob::Map_SolToMesh (const CVector &bvec, CVector &mvec) const
     if (mvec.Dim() != meshptr->nlen()) mvec.New(meshptr->nlen());
     for (i = 0; i < meshptr->nlen(); i++) {
 	RVector nv = NodeValues(i);
-	toast::complex sum = toast::complex(0,0);
+	std::complex<double> sum = std::complex<double>(0,0);
 	for (j = 0; j < slen; j++)
 	    sum += bvec[j] * nv[j];
 	mvec[i] = sum;

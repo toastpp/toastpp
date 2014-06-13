@@ -7,7 +7,6 @@
 #include "toastmex.h"
 
 using namespace std;
-using namespace toast;
 
 // =========================================================================
 // Matlab interface
@@ -219,11 +218,9 @@ void MatlabToast::MapBasis (int nlhs, mxArray *plhs[], int nrhs,
 	double *pr = mxGetPr(prhs[2]);
 	double *pi = mxGetPi(prhs[2]);
 	CVector src(nsrc), tgt;
-	toast::complex *vptr = src.data_buffer();
-	for (int i = 0; i < nsrc; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = src.data_buffer();
+	for (int i = 0; i < nsrc; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	switch (srcid) {
 	case 'M':
 	    ASSERTARG(raster->mesh().nlen() == nsrc, 3,
@@ -413,11 +410,9 @@ void MatlabToast::MapMeshToBasis (int nlhs, mxArray *plhs[], int nrhs,
 	CVector img (bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = nim.data_buffer();
-	for (int i = 0; i < nn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = nim.data_buffer();
+	for (int i = 0; i < nn; i++)
+	    vptr[i] = std::complex<double>(pr[i], pi[i]);
 	raster->Map_MeshToBasis (nim, img);
 	CopyVector (&plhs[0], img);
 
@@ -453,11 +448,9 @@ void MatlabToast::MapMeshToGrid (int nlhs, mxArray *plhs[], int nrhs,
 	CVector img (gn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = nim.data_buffer();
-	for (int i = 0; i < nn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = nim.data_buffer();
+	for (int i = 0; i < nn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_MeshToGrid (nim, img);
 	CopyVector (&plhs[0], img);
 
@@ -494,11 +487,9 @@ void MatlabToast::MapMeshToSol (int nlhs, mxArray *plhs[], int nrhs,
 	CVector img (sn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = nim.data_buffer();
-	for (int i = 0; i < nn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = nim.data_buffer();
+	for (int i = 0; i < nn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_MeshToSol (nim, img);
 	CopyVector (&plhs[0], img);
 
@@ -534,11 +525,9 @@ void MatlabToast::MapBasisToMesh (int nlhs, mxArray *plhs[], int nrhs,
 	CVector nim (nn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < bn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < bn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_BasisToMesh (img, nim);
 	CopyVector (&plhs[0], nim);
 
@@ -575,11 +564,9 @@ void MatlabToast::MapSolToMesh (int nlhs, mxArray *plhs[], int nrhs,
 	CVector nim (nn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < sn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < sn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_SolToMesh (img, nim);
 	CopyVector (&plhs[0], nim);
 
@@ -616,11 +603,9 @@ void MatlabToast::MapSolToBasis (int nlhs, mxArray *plhs[], int nrhs,
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < sn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < sn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_SolToBasis (img, bimg);
 	CopyVector (&plhs[0], bimg);
 
@@ -657,11 +642,9 @@ void MatlabToast::MapSolToGrid (int nlhs, mxArray *plhs[], int nrhs,
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < sn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < sn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_SolToGrid (img, bimg);
 	CopyVector (&plhs[0], bimg);
 
@@ -698,11 +681,9 @@ void MatlabToast::MapGridToMesh (int nlhs, mxArray *plhs[], int nrhs,
 	CVector nim (nn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < gn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < gn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_GridToMesh (img, nim);
 	CopyVector (&plhs[0], nim);
 
@@ -739,11 +720,9 @@ void MatlabToast::MapGridToBasis (int nlhs, mxArray *plhs[], int nrhs,
 	CVector bimg(bn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < gn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < gn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_GridToBasis (img, bimg);
 	CopyVector (&plhs[0], bimg);
 
@@ -780,11 +759,9 @@ void MatlabToast::MapGridToSol (int nlhs, mxArray *plhs[], int nrhs,
 	CVector simg(sn);
 	double *pr = mxGetPr(prhs[1]);
 	double *pi = mxGetPi(prhs[1]);
-	toast::complex *vptr = img.data_buffer();
-	for (int i = 0; i < gn; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = img.data_buffer();
+	for (int i = 0; i < gn; i++)
+	    vptr[i] = std::complex<double> (pr[i], pi[i]);
 	raster->Map_GridToSol (img, simg);
 	CopyVector (&plhs[0], simg);
 

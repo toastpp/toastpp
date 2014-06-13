@@ -14,7 +14,6 @@
 #include "mathlib.h"
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // typedefs for specific instances of `TMatrix'
@@ -22,7 +21,7 @@ using namespace toast;
 // ==========================================================================
 typedef TMatrix<double>  RMatrix;	// 'real'
 typedef TMatrix<float>   FMatrix;	// 'float'
-typedef TMatrix<toast::complex> CMatrix;	// 'toast::complex'
+typedef TMatrix<std::complex<double> > CMatrix;	// 'toast::complex'
 typedef TMatrix<int>     IMatrix;	// 'integer'
 // ==========================================================================
 
@@ -227,8 +226,9 @@ int PCG (TVector<MT> (*Mv_clbk)( const TVector<MT> &v,
 
 template<> // specialisation: complex
 // should try to merge this into the templated version
-inline int BiPCG<toast::complex> (const CMatrix &A, const CVector &b, CVector &x,
-	double &tol, TPreconditioner<toast::complex> *cprecon, int maxit)
+inline int BiPCG<std::complex<double> > (const CMatrix &A, const CVector &b,
+    CVector &x, double &tol, TPreconditioner<std::complex<double> > *cprecon,
+    int maxit)
 {
     int i, niter, dim = x.Dim();
     double rho=0, alpha, aden, beta, bden, err, bnorm;
@@ -249,7 +249,7 @@ inline int BiPCG<toast::complex> (const CMatrix &A, const CVector &b, CVector &x
 	}
 	bden = rho;
 	for (rho = 0.0, i = 0; i < dim; i++)
-	    rho += z[i].re*rd[i].re + z[i].im*rd[i].im;
+  	    rho += z[i].real()*rd[i].real() + z[i].imag()*rd[i].imag();
 	    // is this equivalent to rho = re(conj(z) & rd) ?
 	xASSERT(rho != 0.0, "BiCG solver fails");
 	if (!niter) {
@@ -258,29 +258,24 @@ inline int BiPCG<toast::complex> (const CMatrix &A, const CVector &b, CVector &x
 	} else {
 	    beta = rho/bden;
 	    for (i = 0; i < dim; i++) {
-	        p[i].re  *= beta;  p[i].re += z[i].re;
-		p[i].im  *= beta;  p[i].im += z[i].im;
-		pd[i].re *= beta;  pd[i].re += zd[i].re;
-		pd[i].im *= beta;  pd[i].im += zd[i].im;
+	        p[i]  *= beta; p[i]  += z[i];
+		pd[i] *= beta; pd[i] += zd[i];
 	    }
 	}
 	A.Ax (p, q);
 	A.ATx (pd, qd);
 	for (aden = 0.0, i = 0; i < dim; i++)
-	    aden += pd[i].re*q[i].re + pd[i].im*q[i].im;
+  	    aden += pd[i].real()*q[i].real() + pd[i].imag()*q[i].imag();
 	alpha = rho/aden;
 	for (i = 0; i < dim; i++) {
-	    x[i].re  += alpha*p[i].re;
-	    x[i].im  += alpha*p[i].im;
-	    r[i].re  -= alpha*q[i].re;
-	    r[i].im  -= alpha*q[i].im;
-	    rd[i].re -= alpha*qd[i].re;
-	    rd[i].im -= alpha*qd[i].im;
+	    x[i]  += p[i] *alpha;
+	    r[i]  -= q[i] *alpha;
+	    rd[i] -= qd[i]*alpha;
 	}
 
 	// check convergence
 	for (err = 0.0, i = 0; i < dim; i++)
-	    err += r[i].re*r[i].re + r[i].im*r[i].im;
+	    err += std::norm(r[i]);
 	err = sqrt (err);
 	//cerr << "BiCG tol=" << err/bnorm << endl;
 	if (err <= tol*bnorm) break;
@@ -351,8 +346,9 @@ int BiPCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 // ==========================================================================
 
 template<> // specialisation: complex
-inline int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
-	CVector &x, double &tol, TPreconditioner<toast::complex> *precon, int maxit)
+inline int BiCGSTAB<std::complex<double> > (const CMatrix &A, const CVector &b,
+    CVector &x, double &tol, TPreconditioner<std::complex<double> > *precon,
+    int maxit)
 {
     int i, niter, dim = x.Dim();
     double err=0, bnorm, rho=0, rhop, alpha=0, beta, omega=0, aden, onum, oden;
@@ -364,16 +360,14 @@ inline int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
     for (niter = 0; niter < maxit; niter++) {
         rhop = rho;
         for (rho = 0.0, i = 0; i < dim; i++)
-	    rho += rd[i].re*r[i].re + rd[i].im*r[i].im;
+	    rho += rd[i].real()*r[i].real() + rd[i].imag()*r[i].imag();
 	xASSERT(rho != 0.0, "Bi-CGSTAB fails");
 	if (!niter) {
 	    p = r;
 	} else {
 	    beta = (rho*alpha)/(rhop*omega);
-	    for (i = 0; i < dim; i++) {
-	        p[i].re = r[i].re + beta * (p[i].re-omega*v[i].re);
-		p[i].im = r[i].im + beta * (p[i].im-omega*v[i].im);
-	    }
+	    for (i = 0; i < dim; i++)
+	        p[i] = r[i] + (p[i]-v[i]*omega)*beta;
 	}
 
 	if (precon) precon->Apply (p, pd);
@@ -381,25 +375,21 @@ inline int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
 
 	v = Ax(A,pd);
 	for (aden = 0.0, i = 0; i < dim; i++)
-	    aden += rd[i].re*v[i].re + rd[i].im*v[i].im;
+	    aden += rd[i].real()*v[i].real() + rd[i].imag()*v[i].imag();
 	alpha = rho/aden;
-	for (i = 0; i < dim; i++) {
-	    s[i].re = r[i].re - alpha*v[i].re;
-	    s[i].im = r[i].im - alpha*v[i].im;
-	}
+	for (i = 0; i < dim; i++)
+	    s[i] = r[i] - v[i]*alpha;
 	if (precon) precon->Apply (s, sd);
 	else        sd = s;
 	t = Ax(A,sd);
 	for (onum = oden = 0.0, i = 0; i < dim; i++) {
-	    onum += t[i].re*s[i].re + t[i].im*s[i].im;
-	    oden += t[i].re*t[i].re + t[i].im*t[i].im;
+	    onum += t[i].real()*s[i].real() + t[i].imag()*s[i].imag();
+	    oden += t[i].real()*t[i].real() + t[i].imag()*t[i].imag();
 	}
 	omega = onum/oden;
 	for (i = 0; i < dim; i++) {
-	    x[i].re += alpha*pd[i].re + omega*sd[i].re;
-	    x[i].im += alpha*pd[i].im + omega*sd[i].im;
-	    r[i].re = s[i].re - omega*t[i].re;
-	    r[i].im = s[i].im - omega*t[i].im;
+	    x[i] += pd[i]*alpha + sd[i]*omega;
+	    r[i] = s[i] - t[i]*omega;
 	}
 
 	// check convergence
@@ -421,8 +411,9 @@ inline int BiCGSTAB<toast::complex> (const CMatrix &A, const CVector &b,
 }
 
 template<> // specialisation: single complex
-inline int BiCGSTAB<scomplex> (const SCMatrix &A, const SCVector &b,
-    SCVector &x, double &tol, TPreconditioner<scomplex> *precon, int maxit)
+inline int BiCGSTAB<std::complex<float> > (const SCMatrix &A, const SCVector &b,
+    SCVector &x, double &tol, TPreconditioner<std::complex<float> > *precon,
+    int maxit)
 {
     int i, niter, dim = x.Dim();
     float err, bnorm, rho=0, rhop, alpha, beta, omega, aden, onum, oden;
@@ -434,41 +425,35 @@ inline int BiCGSTAB<scomplex> (const SCMatrix &A, const SCVector &b,
     for (niter = 0; niter < maxit; niter++) {
         rhop = rho;
         for (rho = 0.0, i = 0; i < dim; i++)
-	    rho += rd[i].re*r[i].re + rd[i].im*r[i].im;
+	    rho += rd[i].real()*r[i].real() + rd[i].imag()*r[i].imag();
 	xASSERT(rho != 0.0, "Bi-CGSTAB fails");
 	if (!niter) {
 	    p = r;
 	} else {
 	    beta = (rho*alpha)/(rhop*omega);
-	    for (i = 0; i < dim; i++) {
-	        p[i].re = r[i].re + beta * (p[i].re-omega*v[i].re);
-		p[i].im = r[i].im + beta * (p[i].im-omega*v[i].im);
-	    }
+	    for (i = 0; i < dim; i++)
+	        p[i] = r[i] + (p[i] - v[i]*omega)*beta;
 	}
 	if (precon) precon->Apply (p, pd);
 	else        pd = p;
 
 	v = Ax(A,pd);
 	for (aden = 0.0, i = 0; i < dim; i++)
-	    aden += rd[i].re*v[i].re + rd[i].im*v[i].im;
+	    aden += rd[i].real()*v[i].real() + rd[i].imag()*v[i].imag();
 	alpha = rho/aden;
-	for (i = 0; i < dim; i++) {
-	    s[i].re = r[i].re - alpha*v[i].re;
-	    s[i].im = r[i].im - alpha*v[i].im;
-	}
+	for (i = 0; i < dim; i++)
+	    s[i] = r[i] - v[i]*alpha;
 	if (precon) precon->Apply (s, sd);
 	else        sd = s;
 	t = Ax(A,sd);
 	for (onum = oden = 0.0, i = 0; i < dim; i++) {
-	    onum += t[i].re*s[i].re + t[i].im*s[i].im;
-	    oden += t[i].re*t[i].re + t[i].im*t[i].im;
+  	    onum += t[i].real()*s[i].real() + t[i].imag()*s[i].imag();
+	    oden += t[i].real()*t[i].real() + t[i].imag()*t[i].imag();
 	}
 	omega = onum/oden;
 	for (i = 0; i < dim; i++) {
-	    x[i].re += alpha*pd[i].re + omega*sd[i].re;
-	    x[i].im += alpha*pd[i].im + omega*sd[i].im;
-	    r[i].re = s[i].re - omega*t[i].re;
-	    r[i].im = s[i].im - omega*t[i].im;
+	    x[i] += pd[i]*alpha + sd[i]*omega;
+	    r[i] = s[i] - t[i]*omega;
 	}
 
 	// check convergence

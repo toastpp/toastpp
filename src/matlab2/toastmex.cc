@@ -5,7 +5,6 @@
 #include "toastmex.h"
 
 using namespace std;
-using namespace toast;
 
 static bool is64bit = (sizeof(mwIndex) == 8);
 
@@ -50,8 +49,8 @@ void CopyVector (mxArray **array, CVector &vec, VectorOrientation vo)
     double *pi = mxGetPi (tmp);
 
     for (i = 0; i < m; i++) {
-	pr[i] = vec[i].re;
-	pi[i] = vec[i].im;
+        pr[i] = vec[i].real();
+	pi[i] = vec[i].imag();
     }
 
     *array = tmp;
@@ -111,8 +110,8 @@ void CopyMatrix (mxArray **array, CDenseMatrix &mat)
 
     for (j = idx = 0; j < n; j++)
       for (i = 0; i < m; i++) {
-	pr[idx] = mat(i,j).re;
-	pi[idx] = mat(i,j).im;
+	pr[idx] = mat(i,j).real();
+	pi[idx] = mat(i,j).imag();
 	idx++;
       }
 
@@ -168,55 +167,37 @@ void CopyMatrix (mxArray **array, CCompRowMatrix &mat)
     int n = mat.nCols();
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    toast::complex *pval = mat.ValPtr();
+    std::complex<double> *pval = mat.ValPtr();
     int nz = rowptr[m];
     mwIndex *rcount = new mwIndex[n];
     mwIndex idx;
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
-   // mexPrintf("malloced the mex sparse matrix ..\n");
-    //getchar();
 
     for (i = 0; i < n; i++) rcount[i] = 0;
     for (i = 0; i < nz; i++) rcount[colidx[i]]++;
-    //mexPrintf("updated rcount \n");
-    //getchar();
 
     double  *pr = mxGetPr(tmp);
     double  *pi = mxGetPi(tmp);
     mwIndex *ir = mxGetIr(tmp);
     mwIndex *jc = mxGetJc(tmp);
 
-    //mexPrintf("obtained pointers pr, pi, ir, jc \n");
-    //getchar();
     jc[0] = 0;
     for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
-    //mexPrintf("Updated jc \n");
-    //getchar();
     for (i = 0; i < n; i++) rcount[i] = 0;
-     //mexPrintf("Updated rcount again ... \n");
-    //getchar();
 
     for (i = 0; i < m; i++)
 	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
 	    j = colidx[k];
 	    idx = jc[j]+rcount[j];
 	    ir[idx] = i;
-	    pr[idx] = pval[k].re;
-	    pi[idx] = pval[k].im;
-	    rcount[j]++;
-	    //mexPrintf("inside for loops %d %d %d %f %f %d\n", j, idx, i, pr[idx], pi[idx], rcount[j]);
-    	    //getchar();
-	
+	    pr[idx] = pval[k].real();
+	    pi[idx] = pval[k].imag();
+	    rcount[j]++;	
 	}
     delete []rcount;
-    //mexPrintf("deleted rcount \n");
-    //		getchar();
 
     *array = tmp;
-     //mexPrintf("tmp assigned ... exiting copymatrix routine ... \n");
-    //		getchar();
-
 }
 
 // ============================================================================
@@ -229,7 +210,7 @@ void CopyMatrix (mxArray **array, CSymCompRowMatrix &mat)
     int n = mat.nCols();
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    toast::complex *pval = mat.ValPtr();
+    std::complex<double> *pval = mat.ValPtr();
     mwIndex *rcount = new mwIndex[n];
     mwIndex idx;
 
@@ -265,15 +246,15 @@ void CopyMatrix (mxArray **array, CSymCompRowMatrix &mat)
 	    j = colidx[k];
 	    idx = jc[j]+rcount[j];
 	    ir[idx] = i;
-	    pr[idx] = pval[k].re;
-	    pi[idx] = pval[k].im;
+	    pr[idx] = pval[k].real();
+	    pi[idx] = pval[k].imag();
 	    rcount[j]++;
 
 	    if (j < i) { // off-diagonal element: transpose
 		idx = jc[i]+rcount[i];
 		ir[idx] = j;
-		pr[idx] = pval[k].re;
-		pi[idx] = pval[k].im;
+		pr[idx] = pval[k].real();
+		pi[idx] = pval[k].imag();
 		rcount[i]++;
 	    }
 	}
@@ -312,7 +293,7 @@ void CopyTMatrix (mxArray **array, CCompRowMatrix &mat)
 
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    toast::complex *pval = mat.ValPtr();
+    std::complex<double> *pval = mat.ValPtr();
     int nz = rowptr[n];
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
@@ -322,8 +303,8 @@ void CopyTMatrix (mxArray **array, CCompRowMatrix &mat)
     mwIndex *jc = mxGetJc (tmp);
 
     for (i = 0; i < nz; i++) {
-	pr[i] = pval[i].re;
-	pi[i] = pval[i].im;
+        pr[i] = pval[i].real();
+	pi[i] = pval[i].imag();
 	ir[i] = colidx[i];
     }
     for (i = 0; i <= n; i++)
@@ -386,13 +367,10 @@ void CopyVector (CVector &vec, const mxArray *array)
     double *pi = mxGetPi (array);
  
     vec.New((int)d);
-    toast::complex *val = vec.data_buffer();
+    std::complex<double> *val = vec.data_buffer();
    
-    for (mwIndex i = 0; i < d; i++) {
-	val[i].re = pr[i];
-	val[i].im = pi[i];
-    }
-    // memcpy (val, pr, d*sizeof(toast::complex));
+    for (mwIndex i = 0; i < d; i++)
+        val[i] = std::complex<double> (pr[i], pi[i]);
 }
 
 
@@ -478,11 +456,9 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
     colidx = mxGetIr (array);
 #endif
 
-    toast::complex *val = new toast::complex[nz];
-    for (mwIndex i = 0; i < nz; i++) {
-	val[i].re = pr[i];
-	val[i].im = pi[i];
-    }
+    std::complex<double> *val = new std::complex<double>[nz];
+    for (mwIndex i = 0; i < nz; i++)
+        val[i] = std::complex<double> (pr[i], pi[i]);
 
     mat.New ((int)n, (int)m);
     mat.Initialise (rowptr, colidx, val);

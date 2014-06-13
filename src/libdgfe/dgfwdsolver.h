@@ -127,11 +127,11 @@ public:
 // template typedefs
 
 typedef TDGFwdSolver<double>         RDGFwdSolver;
-typedef TDGFwdSolver<toast::complex> CDGFwdSolver;
+typedef TDGFwdSolver<std::complex<double> > CDGFwdSolver;
 
 #ifndef __DGFWDSOLVER_CC
 extern template class STOASTLIB TDGFwdSolver<double>;
-extern template class STOASTLIB TDGFwdSolver<toast::complex>;
+extern template class STOASTLIB TDGFwdSolver<std::complex<double> >;
 #endif // !__DGFWDSOLVER_CC
 
 

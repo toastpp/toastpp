@@ -528,8 +528,8 @@ STOASTLIB void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
 
 typedef TFwdSolver<float>          FFwdSolver;
 typedef TFwdSolver<double>         RFwdSolver;
-typedef TFwdSolver<scomplex>       SCFwdSolver;
-typedef TFwdSolver<toast::complex> CFwdSolver;
+typedef TFwdSolver<std::complex<float> > SCFwdSolver;
+typedef TFwdSolver<std::complex<double> > CFwdSolver;
 
 // ==========================================================================
 // extern declarations of FwdSolver (only required for VS)
@@ -537,8 +537,8 @@ typedef TFwdSolver<toast::complex> CFwdSolver;
 #ifndef __FWDSOLVER_CC
 extern template class STOASTLIB TFwdSolver<float>;
 extern template class STOASTLIB TFwdSolver<double>;
-extern template class STOASTLIB TFwdSolver<scomplex>;
-extern template class STOASTLIB TFwdSolver<toast::complex>;
+extern template class STOASTLIB TFwdSolver<std::complex<float> >;
+extern template class STOASTLIB TFwdSolver<std::complex<double> >;
 #endif // !__FWDSOLVER_CC
 
 #endif // !__FWDSOLVER_H

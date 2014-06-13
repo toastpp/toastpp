@@ -16,7 +16,6 @@
 #define MAX_NOFWLENGTH 50
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // external references

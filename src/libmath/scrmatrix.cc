@@ -18,7 +18,6 @@
 #include "mathlib.h"
 
 using namespace std;
-using namespace toast;
 
 template<class MT>
 void TSymCompRowMatrix<MT>::New (int nrows, int ncols)
@@ -338,8 +337,9 @@ void TSymCompRowMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 }
 
 template<>
-void TSymCompRowMatrix<toast::complex>::ATx (const TVector<toast::complex> &x,
-    TVector<toast::complex> &b) const
+void TSymCompRowMatrix<std::complex<double> >::ATx (
+    const TVector<std::complex<double> > &x,
+    TVector<std::complex<double> > &b) const
 {
     dASSERT(x.Dim() == cols,
         "Parameter 1 invalid size %d (expected %d)", x.Dim(), cols);
@@ -529,8 +529,8 @@ ostream &operator<< (ostream &os, const TSymCompRowMatrix<MT> &m)
 
 template class TSymCompRowMatrix<double>;
 template class TSymCompRowMatrix<float>;
-template class TSymCompRowMatrix<toast::complex>;
-template class TSymCompRowMatrix<scomplex>;
+template class TSymCompRowMatrix<std::complex<double> >;
+template class TSymCompRowMatrix<std::complex<float> >;
 template class TSymCompRowMatrix<int>;
 
 template bool CholeskyFactorize (const RSymCompRowMatrix &A, RCompRowMatrix &L,
