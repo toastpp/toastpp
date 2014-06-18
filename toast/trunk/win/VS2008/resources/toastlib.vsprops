@@ -6,6 +6,10 @@
 	InheritedPropertySheets=".\toast.vsprops"
 	>
 	<Tool
+		Name="VCCLCompilerTool"
+		PreprocessorDefinitions="_WIN32"
+	/>
+	<Tool
 		Name="VCLinkerTool"
 		OutputFile="$(ToastLibDir)$(ProjectName).dll"
 		AdditionalLibraryDirectories=""

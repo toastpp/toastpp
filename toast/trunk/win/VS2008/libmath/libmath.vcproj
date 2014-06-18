@@ -99,6 +99,86 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMATH_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories=""
+				IgnoreAllDefaultLibraries="false"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				LinkTimeCodeGeneration="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastBinDir)&quot; mkdir &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="2"
 			InheritedPropertySheets="..\resources\toastlib.vsprops"
@@ -151,6 +231,88 @@
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastBinDir)&quot; mkdir &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="NDEBUG;_USRDLL;LIBMATH_EXPORTS"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="2"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="libblas64.lib SuperLU_43.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories=""
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="false"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -256,173 +418,11 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBMATH_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				IgnoreAllDefaultLibraries="false"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				LinkTimeCodeGeneration="1"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastBinDir)&quot; mkdir &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
-			CharacterSet="0"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBMATH_EXPORTS"
-				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="2"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
-				AdditionalDependencies="libblas64.lib SuperLU_43.lib"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				IgnoreDefaultLibraryNames=""
-				GenerateDebugInformation="false"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastBinDir)&quot; mkdir &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release_fdot|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
@@ -450,7 +450,6 @@
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="2"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -508,10 +507,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\src\libmath\complex.cc"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\libmath\cr_cholesky.cc"
 				>
 			</File>
@@ -548,10 +543,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\libmath\scomplex.cc"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\libmath\scrmatrix.cc"
 				>
 			</File>
@@ -583,10 +574,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\libmath\cdmatrix_imp.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\libmath\complex.h"
 				>
 			</File>
 			<File
@@ -675,10 +662,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\libmath\precon_imp.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\libmath\scomplex.h"
 				>
 			</File>
 			<File

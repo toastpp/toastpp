@@ -7,7 +7,6 @@
 #include "mex.h"
 #include "util.h"
 using namespace std;
-using namespace toast;
 
 const double M_PI=3.141592653589793;
 //#define OUTPUT_SYSMAT 1
