@@ -616,7 +616,7 @@ void *single_gradient_data_engine (task_data *td)
     int glen = raster->GLen();
     int slen = raster->SLen();
     int dim  = raster->Dim();
-    toast::complex term;
+    std::complex<double> term;
     const IVector &gdim = raster->GDim();
     const RVector &gsize = raster->GSize();
     const int *elref = raster->Elref();
@@ -661,23 +661,27 @@ void *single_gradient_data_engine (task_data *td)
 
 	cproj = fws->ProjectSingle (q, *mvec, dphi[q], DATA_LIN);
 
-	wqa = toast::complex(0,0);
+	wqa = std::complex<double>(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
 	    if (!mesh->Connected (q, m)) continue;
 	    const CVector qs = mvec->Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
+	    term = std::complex<double>(
+	        -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]),
+		-2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]));
+
 	    // amplitude term
-	    term.re = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * toast::complex (term.re*rp*dn, -term.re*ip*dn);
+	    wqa += qs * std::complex<double> (term.real()*rp*dn,
+					      -term.real()*ip*dn);
 
 	    // phase term
-	    term.im = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * toast::complex (-term.im*ip*dn, -term.im*rp*dn);
+	    wqa += qs * std::complex<double> (-term.imag()*ip*dn,
+					      -term.imag()*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
