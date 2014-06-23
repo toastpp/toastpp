@@ -1,8 +1,13 @@
+#ifdef TOAST_THREAD
+
 #define __TASK_CC
+#define MATHLIB_IMPLEMENTATION
 //#define DEBUG_THREAD
 
 #include <sys/types.h>
+#if !defined(WIN32) && !defined(WIN64)
 #include <sys/sysinfo.h>
+#endif
 #if defined (sun)
 #include <thread.h>
 #include <unistd.h>
@@ -56,7 +61,7 @@ int Task::nProcessor ()
 #endif
 }
 
-void Task::Multiprocess (void *func(task_data*), void *data, int np)
+void Task::Multiprocess (void (*func)(task_data*), void *data, int np)
 {
     if (!np) np = nthread;
     int p;
@@ -80,7 +85,7 @@ void Task::Multiprocess (void *func(task_data*), void *data, int np)
     td[0].proc = 0;
     td[0].np   = np;
     td[0].data = data;
-    func (td);
+    (*func) (td);
 
     // wait for workers to finish
     for (p = 1; p < np; p++)
@@ -318,3 +323,5 @@ void *ThreadPool2::tpool_thread (void *context)
     }
     return NULL;
 }
+
+#endif // TOAST_THREAD

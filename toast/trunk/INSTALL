@@ -168,8 +168,9 @@ Library (http://www.mesa3d.org/) installed on your system.
 2.2.1 Preliminaries
 -------------------
 
-You will need Visual Studio 2005 or later to compile the toast libraries,
-executables and mex files.
+You will need Visual Studio 2008 or later to compile the toast libraries,
+executables and mex files. The VS project files included are for VS2008,
+but Visual Studio can convert them to later versions.
 
 Compiled BLAS and Lapack libraries are required. The VS project files should
 be configured to link them.
@@ -178,7 +179,50 @@ For compiling the source-level help documents you need doxygen
 (http://www.stack.nl/~dimitri/doxygen/)
 
 
-2.1.2 Compilation
+2.2.2 Support for external libraries
+------------------------------------
+Toast supports a number of optional external libraries that can enhance
+functionality and performance.
+
+To build Toast with linkings to these external libraries in Windows, you
+need to
+
+- download and install the libraries from their respective web sites
+- configure the Toast project files to link to them
+
+
+2.2.2.1 Pthreads support
+------------------------
+Toast can use threads to speed up certain operations on shared memory
+parallel (SMP) architectures. Toast is using the POSIX thread library
+(pthreads). To build Toast with pthreads support
+
+- download a Windows pthreads library for your architecture (Win32 or
+  x64), for example from here: http://sourceforge.net/projects/pthreads4w/
+
+- In visual Studio, open the Toast solution (<toast-root>\win\VS2008\toast.sln)
+
+- Open the Project Manager for the libmath project.
+
+- Open the "packages" property sheet.
+
+- Under Common Properties | General | Inherited Project Property Sheets, add
+  .\pthreads.vsprops
+
+- Click "Apply"
+
+- Open the "pthreads" property sheet that has now been inserted under "packages".
+
+- Go to Common Properties | User macros
+
+- Edit the "PthreadsDir", "PthreadsLibDir", "PthreadsIncludeDir" and
+  "PthreadsLibName" macros to your pthreads installation. If you are using
+  a common directory tree for your external Toast dependencies, you can make
+  use of the "ExtPackageDir" macro defined in the "packages" property sheet.
+  (you will have to edit the macro first).
+
+
+2.2.3 Compilation
 -----------------
 
 From the VS development environment, load the toast solution file located in
@@ -187,12 +231,21 @@ From the VS development environment, load the toast solution file located in
 
 and compile.
 
-For the matlab mex files, load
+For the matlab mex files (v.1), load
 
 	toast_matlab.sln
 
-and compile. Configuring the Matlab search path works as for the Linux version
-(see 2.1.3).
+and compile.
+
+To compile the mex files for the new Toast toolbox interface (v.2), load
+
+	toast_matlab2.sln
+
+and compile. (You can compile both interfaces, but your matlab script can
+only access one of the interfaces at a time).
+
+Configuring the Matlab search path for the toolbox v.1 or v.2 works as
+for the Linux version (see 2.1.3).
 
 
 

@@ -3,6 +3,8 @@
 #ifndef __TASK_H
 #define __TASK_H
 
+#ifdef TOAST_THREAD
+
 #include <pthread.h>
 
 #define NUMTHREAD 2
@@ -28,7 +30,7 @@ typedef struct {
 
 void Task_Init (int nth);
 
-class Task {
+class MATHLIB Task {
 public:
     Task() {}
 
@@ -51,7 +53,7 @@ public:
     static double GetThreadWallTiming () { return wtime; }
     // Wall clock (real) time spent inside Multiprocess()
 
-    static void Multiprocess (void *func(task_data*), void *data, int np = 0);
+    static void Multiprocess (void (*func)(task_data*), void *data, int np = 0);
     // run function 'func' in parallel. User data 'data' are passed to
     // each instance of 'func'. 'np' is the number of threads to create. If
     // np==0 then nthread is used
@@ -163,4 +165,5 @@ extern ThreadPool *g_tpool;
 #endif
 #endif
 
+#endif // TOAST_THREAD
 #endif // !__TASK_H

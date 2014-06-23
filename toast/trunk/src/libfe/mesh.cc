@@ -1862,7 +1862,7 @@ struct Assemble_Threaddata {
 };
 
 template<typename T>
-void *AddToSysMatrix_engine (task_data *td)
+void AddToSysMatrix_engine (task_data *td)
 {
     int el;
     int itask = td->proc;
