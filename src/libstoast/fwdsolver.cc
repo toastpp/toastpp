@@ -616,7 +616,7 @@ struct CALCFIELDS_THREADDATA {
 };
 
 template<class T>
-void *CalcFields_engine (task_data *td)
+void CalcFields_engine (task_data *td)
 {
     int itask = td->proc;
     int ntask = td->np;
@@ -642,14 +642,12 @@ void *CalcFields_engine (task_data *td)
 	if (err_max > thdata->res->rel_err) thdata->res->rel_err = err_max;
 	Task::UserMutex_unlock();
     }
-    
-    return NULL;
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
-template void *CalcFields_engine<double> (task_data *td);
-template void *CalcFields_engine<float> (task_data *td);
-template void *CalcFields_engine<std::complex<double> > (task_data *td);
-template void *CalcFields_engine<std::complex<float> > (task_data *td);
+template void CalcFields_engine<double> (task_data *td);
+template void CalcFields_engine<float> (task_data *td);
+template void CalcFields_engine<std::complex<double> > (task_data *td);
+template void CalcFields_engine<std::complex<float> > (task_data *td);
 #endif
 
 #endif // THREAD_LEVEL==2

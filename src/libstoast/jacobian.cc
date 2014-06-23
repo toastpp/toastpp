@@ -456,7 +456,7 @@ struct GENJAC_CW_GRID_THREADDATA {
     RDenseMatrix *Jkap;
 };
 
-void *GenerateJacobian_cw_grid_engine (task_data *td)
+void GenerateJacobian_cw_grid_engine (task_data *td)
 {
     int itask = td->proc;
     int ntask = td->np;
