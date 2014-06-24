@@ -8,7 +8,7 @@ TOASTRELDIR = toast
 # ========================================================
 # Making
 
-all::numerics toast matlab
+all::numerics toast
 
 toast::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
