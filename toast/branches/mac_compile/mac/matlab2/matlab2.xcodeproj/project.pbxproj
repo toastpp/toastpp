@@ -18,9 +18,6 @@
 		F229EA4D195C7C98003F34BC /* toastmex.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA40195C7C98003F34BC /* toastmex.cc */; };
 		F229EA4E195C7C98003F34BC /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA41195C7C98003F34BC /* util.cc */; };
 		F229EA60195C7E1A003F34BC /* libstoast.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA5F195C7E1A003F34BC /* libstoast.dylib */; };
-		F229EA64195C7FF4003F34BC /* libmat.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA61195C7FF4003F34BC /* libmat.dylib */; };
-		F229EA65195C7FF4003F34BC /* libmex.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA62195C7FF4003F34BC /* libmex.dylib */; };
-		F229EA66195C7FF4003F34BC /* libmx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA63195C7FF4003F34BC /* libmx.dylib */; };
 		F229EA6A195C8062003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA69195C8062003F34BC /* libfe.dylib */; };
 		F229EA6B195C8069003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA67195C803A003F34BC /* libmath.dylib */; };
 		F229EA6D195C8147003F34BC /* liblbfgs.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA6C195C8147003F34BC /* liblbfgs.dylib */; };
@@ -28,6 +25,9 @@
 		F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA39195C7C98003F34BC /* mtGradient.cc */; };
 		F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3A195C7C98003F34BC /* mtJacobian.cc */; };
 		F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */; };
+		F2F3614A195CC1F2001E7752 /* libmat.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2F36148195CC1F2001E7752 /* libmat.dylib */; };
+		F2F3614B195CC1F2001E7752 /* libmex.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2F36149195CC1F2001E7752 /* libmex.dylib */; };
+		F2F3614D195CC208001E7752 /* libmx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2F3614C195CC208001E7752 /* libmx.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,12 +59,12 @@
 		F229EA40195C7C98003F34BC /* toastmex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toastmex.cc; path = ../../src/matlab2/toastmex.cc; sourceTree = "<group>"; };
 		F229EA41195C7C98003F34BC /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/matlab2/util.cc; sourceTree = "<group>"; };
 		F229EA5F195C7E1A003F34BC /* libstoast.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstoast.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libstoast.dylib"; sourceTree = "<group>"; };
-		F229EA61195C7FF4003F34BC /* libmat.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmat.dylib; path = ../../../../../../Applications/MATLAB_R2014b.app/bin/maci64/libmat.dylib; sourceTree = "<group>"; };
-		F229EA62195C7FF4003F34BC /* libmex.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmex.dylib; path = ../../../../../../Applications/MATLAB_R2014b.app/bin/maci64/libmex.dylib; sourceTree = "<group>"; };
-		F229EA63195C7FF4003F34BC /* libmx.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmx.dylib; path = ../../../../../../Applications/MATLAB_R2014b.app/bin/maci64/libmx.dylib; sourceTree = "<group>"; };
 		F229EA67195C803A003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F229EA69195C8062003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
 		F229EA6C195C8147003F34BC /* liblbfgs.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblbfgs.dylib; path = ../../gcc_shared/lib/liblbfgs.dylib; sourceTree = "<group>"; };
+		F2F36148195CC1F2001E7752 /* libmat.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmat.dylib; path = ../../../../../../../Applications/MATLAB_R2013b.app/bin/maci64/libmat.dylib; sourceTree = "<group>"; };
+		F2F36149195CC1F2001E7752 /* libmex.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmex.dylib; path = ../../../../../../../Applications/MATLAB_R2013b.app/bin/maci64/libmex.dylib; sourceTree = "<group>"; };
+		F2F3614C195CC208001E7752 /* libmx.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmx.dylib; path = ../../../../../../../Applications/MATLAB_R2013b.app/bin/maci64/libmx.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,12 +72,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2F3614D195CC208001E7752 /* libmx.dylib in Frameworks */,
+				F2F3614A195CC1F2001E7752 /* libmat.dylib in Frameworks */,
+				F2F3614B195CC1F2001E7752 /* libmex.dylib in Frameworks */,
 				F229EA6D195C8147003F34BC /* liblbfgs.dylib in Frameworks */,
 				F229EA6B195C8069003F34BC /* libmath.dylib in Frameworks */,
 				F229EA6A195C8062003F34BC /* libfe.dylib in Frameworks */,
-				F229EA64195C7FF4003F34BC /* libmat.dylib in Frameworks */,
-				F229EA65195C7FF4003F34BC /* libmex.dylib in Frameworks */,
-				F229EA66195C7FF4003F34BC /* libmx.dylib in Frameworks */,
 				F229EA60195C7E1A003F34BC /* libstoast.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -88,12 +88,12 @@
 		F229EA25195C7B9D003F34BC = {
 			isa = PBXGroup;
 			children = (
+				F2F3614C195CC208001E7752 /* libmx.dylib */,
+				F2F36148195CC1F2001E7752 /* libmat.dylib */,
+				F2F36149195CC1F2001E7752 /* libmex.dylib */,
 				F229EA6C195C8147003F34BC /* liblbfgs.dylib */,
 				F229EA69195C8062003F34BC /* libfe.dylib */,
 				F229EA67195C803A003F34BC /* libmath.dylib */,
-				F229EA61195C7FF4003F34BC /* libmat.dylib */,
-				F229EA62195C7FF4003F34BC /* libmex.dylib */,
-				F229EA63195C7FF4003F34BC /* libmx.dylib */,
 				F229EA5F195C7E1A003F34BC /* libstoast.dylib */,
 				F229EA35195C7C98003F34BC /* matlabtoast.cc */,
 				F229EA36195C7C98003F34BC /* mtBasis.cc */,
@@ -276,26 +276,34 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libc++";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib/";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../lib/\"",
-					"$(SYSTEM_APPS_DIR)/MATLAB_R2014b.app/bin/maci64",
+					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MATLABROOT = /Applications/MATLAB_R2014b.app;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MATLABROOT = /Applications/MATLAB_R2013b.app;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
 					"-lmx",
 				);
 				PRODUCT_NAME = toast;
+				SDKROOT = macosx10.8;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(MATLABROOT)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Debug;
@@ -305,26 +313,31 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libc++";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib/";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../lib/\"",
-					"$(SYSTEM_APPS_DIR)/MATLAB_R2014b.app/bin/maci64",
+					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MATLABROOT = /Applications/MATLAB_R2014b.app;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MATLABROOT = /Applications/MATLAB_R2013b.app;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
 					"-lmx",
 				);
 				PRODUCT_NAME = toast;
+				SDKROOT = macosx10.8;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(MATLABROOT)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Release;
