@@ -478,6 +478,7 @@ GarbageCollection();
 MarkBoundary();
 Mesh::Setup();
 /* END ADDING INTERNAL EDGES*/
+    return 0;
 }
 
 
