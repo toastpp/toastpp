@@ -1,0 +1,387 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F229EA24195C7B51003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA23195C7B51003F34BC /* libmath.dylib */; };
+		F297DC5F195C197F00A7501F /* tri6_ip.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3A195C197F00A7501F /* tri6_ip.cc */; };
+		F297DC60195C197F00A7501F /* tri_qr.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3B195C197F00A7501F /* tri_qr.cc */; };
+		F297DC61195C197F00A7501F /* element.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3C195C197F00A7501F /* element.cc */; };
+		F297DC62195C197F00A7501F /* ellist.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3D195C197F00A7501F /* ellist.cc */; };
+		F297DC63195C197F00A7501F /* lin_qr.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3E195C197F00A7501F /* lin_qr.cc */; };
+		F297DC64195C197F00A7501F /* line2d2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3F195C197F00A7501F /* line2d2.cc */; };
+		F297DC65195C197F00A7501F /* mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC40195C197F00A7501F /* mesh.cc */; };
+		F297DC66195C197F00A7501F /* meshopt.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC41195C197F00A7501F /* meshopt.cc */; };
+		F297DC67195C197F00A7501F /* ndlist.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC42195C197F00A7501F /* ndlist.cc */; };
+		F297DC68195C197F00A7501F /* nim.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC43195C197F00A7501F /* nim.cc */; };
+		F297DC69195C197F00A7501F /* node.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC44195C197F00A7501F /* node.cc */; };
+		F297DC6A195C197F00A7501F /* ordmmd.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC45195C197F00A7501F /* ordmmd.cc */; };
+		F297DC6B195C197F00A7501F /* param.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC46195C197F00A7501F /* param.cc */; };
+		F297DC6C195C197F00A7501F /* pix4.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC47195C197F00A7501F /* pix4.cc */; };
+		F297DC6D195C197F00A7501F /* point.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC48195C197F00A7501F /* point.cc */; };
+		F297DC6E195C197F00A7501F /* ptsource.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC49195C197F00A7501F /* ptsource.cc */; };
+		F297DC6F195C197F00A7501F /* qmmesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC4A195C197F00A7501F /* qmmesh.cc */; };
+		F297DC70195C197F00A7501F /* quad4.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC4B195C197F00A7501F /* quad4.cc */; };
+		F297DC71195C197F00A7501F /* rcm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC4C195C197F00A7501F /* rcm.cc */; };
+		F297DC72195C197F00A7501F /* refine_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC4D195C197F00A7501F /* refine_mesh.cc */; };
+		F297DC73195C197F00A7501F /* surface.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC4E195C197F00A7501F /* surface.cc */; };
+		F297DC74195C197F00A7501F /* tet_qr.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC4F195C197F00A7501F /* tet_qr.cc */; };
+		F297DC75195C197F00A7501F /* tet4.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC50195C197F00A7501F /* tet4.cc */; };
+		F297DC76195C197F00A7501F /* tet10_ip.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC51195C197F00A7501F /* tet10_ip.cc */; };
+		F297DC77195C197F00A7501F /* tet10.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC52195C197F00A7501F /* tet10.cc */; };
+		F297DC78195C197F00A7501F /* timespec.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC53195C197F00A7501F /* timespec.cc */; };
+		F297DC79195C197F00A7501F /* tri3.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC54195C197F00A7501F /* tri3.cc */; };
+		F297DC7A195C197F00A7501F /* tri3D3.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC55195C197F00A7501F /* tri3D3.cc */; };
+		F297DC7B195C197F00A7501F /* tri3D6.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC56195C197F00A7501F /* tri3D6.cc */; };
+		F297DC7C195C197F00A7501F /* tri3old.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC57195C197F00A7501F /* tri3old.cc */; };
+		F297DC7D195C197F00A7501F /* tri6.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC58195C197F00A7501F /* tri6.cc */; };
+		F297DC7E195C197F00A7501F /* tri10_ip.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC59195C197F00A7501F /* tri10_ip.cc */; };
+		F297DC7F195C197F00A7501F /* tri10.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC5A195C197F00A7501F /* tri10.cc */; };
+		F297DC80195C197F00A7501F /* vox8.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC5B195C197F00A7501F /* vox8.cc */; };
+		F297DC81195C197F00A7501F /* vox27.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC5C195C197F00A7501F /* vox27.cc */; };
+		F297DC82195C197F00A7501F /* wdg6.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC5D195C197F00A7501F /* wdg6.cc */; };
+		F297DC83195C197F00A7501F /* wdg18inf.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC5E195C197F00A7501F /* wdg18inf.cc */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F229EA23195C7B51003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
+		F297DC33195C194700A7501F /* libfe.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libfe.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		F297DC3A195C197F00A7501F /* tri6_ip.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri6_ip.cc; path = ../../src/libfe/tri6_ip.cc; sourceTree = "<group>"; };
+		F297DC3B195C197F00A7501F /* tri_qr.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri_qr.cc; path = ../../src/libfe/tri_qr.cc; sourceTree = "<group>"; };
+		F297DC3C195C197F00A7501F /* element.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = element.cc; path = ../../src/libfe/element.cc; sourceTree = "<group>"; };
+		F297DC3D195C197F00A7501F /* ellist.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ellist.cc; path = ../../src/libfe/ellist.cc; sourceTree = "<group>"; };
+		F297DC3E195C197F00A7501F /* lin_qr.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lin_qr.cc; path = ../../src/libfe/lin_qr.cc; sourceTree = "<group>"; };
+		F297DC3F195C197F00A7501F /* line2d2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = line2d2.cc; path = ../../src/libfe/line2d2.cc; sourceTree = "<group>"; };
+		F297DC40195C197F00A7501F /* mesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh.cc; path = ../../src/libfe/mesh.cc; sourceTree = "<group>"; };
+		F297DC41195C197F00A7501F /* meshopt.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = meshopt.cc; path = ../../src/libfe/meshopt.cc; sourceTree = "<group>"; };
+		F297DC42195C197F00A7501F /* ndlist.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ndlist.cc; path = ../../src/libfe/ndlist.cc; sourceTree = "<group>"; };
+		F297DC43195C197F00A7501F /* nim.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nim.cc; path = ../../src/libfe/nim.cc; sourceTree = "<group>"; };
+		F297DC44195C197F00A7501F /* node.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = node.cc; path = ../../src/libfe/node.cc; sourceTree = "<group>"; };
+		F297DC45195C197F00A7501F /* ordmmd.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ordmmd.cc; path = ../../src/libfe/ordmmd.cc; sourceTree = "<group>"; };
+		F297DC46195C197F00A7501F /* param.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = param.cc; path = ../../src/libfe/param.cc; sourceTree = "<group>"; };
+		F297DC47195C197F00A7501F /* pix4.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pix4.cc; path = ../../src/libfe/pix4.cc; sourceTree = "<group>"; };
+		F297DC48195C197F00A7501F /* point.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = point.cc; path = ../../src/libfe/point.cc; sourceTree = "<group>"; };
+		F297DC49195C197F00A7501F /* ptsource.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ptsource.cc; path = ../../src/libfe/ptsource.cc; sourceTree = "<group>"; };
+		F297DC4A195C197F00A7501F /* qmmesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = qmmesh.cc; path = ../../src/libfe/qmmesh.cc; sourceTree = "<group>"; };
+		F297DC4B195C197F00A7501F /* quad4.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad4.cc; path = ../../src/libfe/quad4.cc; sourceTree = "<group>"; };
+		F297DC4C195C197F00A7501F /* rcm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rcm.cc; path = ../../src/libfe/rcm.cc; sourceTree = "<group>"; };
+		F297DC4D195C197F00A7501F /* refine_mesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = refine_mesh.cc; path = ../../src/libfe/refine_mesh.cc; sourceTree = "<group>"; };
+		F297DC4E195C197F00A7501F /* surface.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = surface.cc; path = ../../src/libfe/surface.cc; sourceTree = "<group>"; };
+		F297DC4F195C197F00A7501F /* tet_qr.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tet_qr.cc; path = ../../src/libfe/tet_qr.cc; sourceTree = "<group>"; };
+		F297DC50195C197F00A7501F /* tet4.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tet4.cc; path = ../../src/libfe/tet4.cc; sourceTree = "<group>"; };
+		F297DC51195C197F00A7501F /* tet10_ip.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tet10_ip.cc; path = ../../src/libfe/tet10_ip.cc; sourceTree = "<group>"; };
+		F297DC52195C197F00A7501F /* tet10.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tet10.cc; path = ../../src/libfe/tet10.cc; sourceTree = "<group>"; };
+		F297DC53195C197F00A7501F /* timespec.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timespec.cc; path = ../../src/libfe/timespec.cc; sourceTree = "<group>"; };
+		F297DC54195C197F00A7501F /* tri3.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri3.cc; path = ../../src/libfe/tri3.cc; sourceTree = "<group>"; };
+		F297DC55195C197F00A7501F /* tri3D3.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri3D3.cc; path = ../../src/libfe/tri3D3.cc; sourceTree = "<group>"; };
+		F297DC56195C197F00A7501F /* tri3D6.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri3D6.cc; path = ../../src/libfe/tri3D6.cc; sourceTree = "<group>"; };
+		F297DC57195C197F00A7501F /* tri3old.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri3old.cc; path = ../../src/libfe/tri3old.cc; sourceTree = "<group>"; };
+		F297DC58195C197F00A7501F /* tri6.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri6.cc; path = ../../src/libfe/tri6.cc; sourceTree = "<group>"; };
+		F297DC59195C197F00A7501F /* tri10_ip.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri10_ip.cc; path = ../../src/libfe/tri10_ip.cc; sourceTree = "<group>"; };
+		F297DC5A195C197F00A7501F /* tri10.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri10.cc; path = ../../src/libfe/tri10.cc; sourceTree = "<group>"; };
+		F297DC5B195C197F00A7501F /* vox8.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vox8.cc; path = ../../src/libfe/vox8.cc; sourceTree = "<group>"; };
+		F297DC5C195C197F00A7501F /* vox27.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vox27.cc; path = ../../src/libfe/vox27.cc; sourceTree = "<group>"; };
+		F297DC5D195C197F00A7501F /* wdg6.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wdg6.cc; path = ../../src/libfe/wdg6.cc; sourceTree = "<group>"; };
+		F297DC5E195C197F00A7501F /* wdg18inf.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wdg18inf.cc; path = ../../src/libfe/wdg18inf.cc; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F297DC30195C194700A7501F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F229EA24195C7B51003F34BC /* libmath.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F297DC2A195C194700A7501F = {
+			isa = PBXGroup;
+			children = (
+				F229EA23195C7B51003F34BC /* libmath.dylib */,
+				F297DC3A195C197F00A7501F /* tri6_ip.cc */,
+				F297DC3B195C197F00A7501F /* tri_qr.cc */,
+				F297DC3C195C197F00A7501F /* element.cc */,
+				F297DC3D195C197F00A7501F /* ellist.cc */,
+				F297DC3E195C197F00A7501F /* lin_qr.cc */,
+				F297DC3F195C197F00A7501F /* line2d2.cc */,
+				F297DC40195C197F00A7501F /* mesh.cc */,
+				F297DC41195C197F00A7501F /* meshopt.cc */,
+				F297DC42195C197F00A7501F /* ndlist.cc */,
+				F297DC43195C197F00A7501F /* nim.cc */,
+				F297DC44195C197F00A7501F /* node.cc */,
+				F297DC45195C197F00A7501F /* ordmmd.cc */,
+				F297DC46195C197F00A7501F /* param.cc */,
+				F297DC47195C197F00A7501F /* pix4.cc */,
+				F297DC48195C197F00A7501F /* point.cc */,
+				F297DC49195C197F00A7501F /* ptsource.cc */,
+				F297DC4A195C197F00A7501F /* qmmesh.cc */,
+				F297DC4B195C197F00A7501F /* quad4.cc */,
+				F297DC4C195C197F00A7501F /* rcm.cc */,
+				F297DC4D195C197F00A7501F /* refine_mesh.cc */,
+				F297DC4E195C197F00A7501F /* surface.cc */,
+				F297DC4F195C197F00A7501F /* tet_qr.cc */,
+				F297DC50195C197F00A7501F /* tet4.cc */,
+				F297DC51195C197F00A7501F /* tet10_ip.cc */,
+				F297DC52195C197F00A7501F /* tet10.cc */,
+				F297DC53195C197F00A7501F /* timespec.cc */,
+				F297DC54195C197F00A7501F /* tri3.cc */,
+				F297DC55195C197F00A7501F /* tri3D3.cc */,
+				F297DC56195C197F00A7501F /* tri3D6.cc */,
+				F297DC57195C197F00A7501F /* tri3old.cc */,
+				F297DC58195C197F00A7501F /* tri6.cc */,
+				F297DC59195C197F00A7501F /* tri10_ip.cc */,
+				F297DC5A195C197F00A7501F /* tri10.cc */,
+				F297DC5B195C197F00A7501F /* vox8.cc */,
+				F297DC5C195C197F00A7501F /* vox27.cc */,
+				F297DC5D195C197F00A7501F /* wdg6.cc */,
+				F297DC5E195C197F00A7501F /* wdg18inf.cc */,
+				F297DC34195C194700A7501F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F297DC34195C194700A7501F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F297DC33195C194700A7501F /* libfe.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F297DC31195C194700A7501F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F297DC32195C194700A7501F /* libfe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F297DC37195C194700A7501F /* Build configuration list for PBXNativeTarget "libfe" */;
+			buildPhases = (
+				F297DC2F195C194700A7501F /* Sources */,
+				F297DC30195C194700A7501F /* Frameworks */,
+				F297DC31195C194700A7501F /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libfe;
+			productName = libfe;
+			productReference = F297DC33195C194700A7501F /* libfe.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F297DC2B195C194700A7501F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = UCL;
+			};
+			buildConfigurationList = F297DC2E195C194700A7501F /* Build configuration list for PBXProject "libfe" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F297DC2A195C194700A7501F;
+			productRefGroup = F297DC34195C194700A7501F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F297DC32195C194700A7501F /* libfe */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F297DC2F195C194700A7501F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F297DC79195C197F00A7501F /* tri3.cc in Sources */,
+				F297DC6C195C197F00A7501F /* pix4.cc in Sources */,
+				F297DC68195C197F00A7501F /* nim.cc in Sources */,
+				F297DC7F195C197F00A7501F /* tri10.cc in Sources */,
+				F297DC7D195C197F00A7501F /* tri6.cc in Sources */,
+				F297DC67195C197F00A7501F /* ndlist.cc in Sources */,
+				F297DC65195C197F00A7501F /* mesh.cc in Sources */,
+				F297DC71195C197F00A7501F /* rcm.cc in Sources */,
+				F297DC7E195C197F00A7501F /* tri10_ip.cc in Sources */,
+				F297DC7A195C197F00A7501F /* tri3D3.cc in Sources */,
+				F297DC81195C197F00A7501F /* vox27.cc in Sources */,
+				F297DC73195C197F00A7501F /* surface.cc in Sources */,
+				F297DC6F195C197F00A7501F /* qmmesh.cc in Sources */,
+				F297DC6E195C197F00A7501F /* ptsource.cc in Sources */,
+				F297DC7B195C197F00A7501F /* tri3D6.cc in Sources */,
+				F297DC7C195C197F00A7501F /* tri3old.cc in Sources */,
+				F297DC74195C197F00A7501F /* tet_qr.cc in Sources */,
+				F297DC60195C197F00A7501F /* tri_qr.cc in Sources */,
+				F297DC6A195C197F00A7501F /* ordmmd.cc in Sources */,
+				F297DC61195C197F00A7501F /* element.cc in Sources */,
+				F297DC69195C197F00A7501F /* node.cc in Sources */,
+				F297DC78195C197F00A7501F /* timespec.cc in Sources */,
+				F297DC76195C197F00A7501F /* tet10_ip.cc in Sources */,
+				F297DC75195C197F00A7501F /* tet4.cc in Sources */,
+				F297DC62195C197F00A7501F /* ellist.cc in Sources */,
+				F297DC63195C197F00A7501F /* lin_qr.cc in Sources */,
+				F297DC64195C197F00A7501F /* line2d2.cc in Sources */,
+				F297DC82195C197F00A7501F /* wdg6.cc in Sources */,
+				F297DC77195C197F00A7501F /* tet10.cc in Sources */,
+				F297DC70195C197F00A7501F /* quad4.cc in Sources */,
+				F297DC6D195C197F00A7501F /* point.cc in Sources */,
+				F297DC66195C197F00A7501F /* meshopt.cc in Sources */,
+				F297DC83195C197F00A7501F /* wdg18inf.cc in Sources */,
+				F297DC80195C197F00A7501F /* vox8.cc in Sources */,
+				F297DC6B195C197F00A7501F /* param.cc in Sources */,
+				F297DC5F195C197F00A7501F /* tri6_ip.cc in Sources */,
+				F297DC72195C197F00A7501F /* refine_mesh.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F297DC35195C194700A7501F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F297DC36195C194700A7501F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F297DC38195C194700A7501F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				EXECUTABLE_PREFIX = "";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\"";
+			};
+			name = Debug;
+		};
+		F297DC39195C194700A7501F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				EXECUTABLE_PREFIX = "";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\"";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F297DC2E195C194700A7501F /* Build configuration list for PBXProject "libfe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F297DC35195C194700A7501F /* Debug */,
+				F297DC36195C194700A7501F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F297DC37195C194700A7501F /* Build configuration list for PBXNativeTarget "libfe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F297DC38195C194700A7501F /* Debug */,
+				F297DC39195C194700A7501F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F297DC2B195C194700A7501F /* Project object */;
+}
