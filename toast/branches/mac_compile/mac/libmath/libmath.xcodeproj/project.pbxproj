@@ -26,7 +26,21 @@
 		F297DCB7195C199F00A7501F /* timing.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA4195C199F00A7501F /* timing.cc */; };
 		F297DCB8195C199F00A7501F /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA5195C199F00A7501F /* util.cc */; };
 		F297DCB9195C199F00A7501F /* vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA6195C199F00A7501F /* vector.cc */; };
+		F2ED6501195CB13B006CD663 /* libmath.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F297DC8D195C199200A7501F /* libmath.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED6500195CB132006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../lib";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED6501195CB13B006CD663 /* libmath.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F297DC8D195C199200A7501F /* libmath.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libmath.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,6 +132,7 @@
 				F297DC89195C199200A7501F /* Sources */,
 				F297DC8A195C199200A7501F /* Frameworks */,
 				F297DC8B195C199200A7501F /* Headers */,
+				F2ED6500195CB132006CD663 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -258,13 +273,13 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				EXECUTABLE_PREFIX = "";
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/samuelpowell/Documents/mac_compile_xcode/mac/../gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/gcc_shared/lib,
+					"\"$(SRCROOT)/../../lib/\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../lib\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
 			name = Debug;
@@ -275,13 +290,13 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				EXECUTABLE_PREFIX = "";
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/samuelpowell/Documents/mac_compile_xcode/mac/../gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/gcc_shared/lib,
+					"\"$(SRCROOT)/../../lib/\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../lib\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
 			name = Release;

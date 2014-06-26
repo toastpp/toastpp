@@ -13,7 +13,21 @@
 		F2CAA169195C253D0002757F /* dgfwdsolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA166195C253D0002757F /* dgfwdsolver.cc */; };
 		F2CAA16A195C253D0002757F /* dgSource.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA167195C253D0002757F /* dgSource.cc */; };
 		F2CAA16B195C253D0002757F /* nonconformingMesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA168195C253D0002757F /* nonconformingMesh.cc */; };
+		F2ED64FF195CB12A006CD663 /* libdgfe.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA15F195C24F00002757F /* libdgfe.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED64FE195CB120006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../lib";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED64FF195CB12A006CD663 /* libdgfe.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F229EA13195C7982003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
@@ -80,6 +94,7 @@
 				F2CAA15B195C24F00002757F /* Sources */,
 				F2CAA15C195C24F00002757F /* Frameworks */,
 				F2CAA15D195C24F00002757F /* Headers */,
+				F2ED64FE195CB120006CD663 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -206,12 +221,10 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				EXECUTABLE_PREFIX = "";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
-				);
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../include\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/libdgfe\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Debug;
@@ -222,12 +235,10 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				EXECUTABLE_PREFIX = "";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
-				);
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../include\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/libdgfe\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Release;

@@ -27,7 +27,21 @@
 		F229EA6E195C8175003F34BC /* matlabtoast.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA35195C7C98003F34BC /* matlabtoast.cc */; };
 		F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA39195C7C98003F34BC /* mtGradient.cc */; };
 		F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3A195C7C98003F34BC /* mtJacobian.cc */; };
+		F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED64F5195CAFD8006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../darwin64/mex2";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = toast.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,6 +140,7 @@
 				F229EA2A195C7B9D003F34BC /* Sources */,
 				F229EA2B195C7B9D003F34BC /* Frameworks */,
 				F229EA2C195C7B9D003F34BC /* Headers */,
+				F2ED64F5195CAFD8006CD663 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -270,9 +285,8 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
+					"\"$(SRCROOT)/../../lib/\"",
 					"$(SYSTEM_APPS_DIR)/MATLAB_R2014b.app/bin/maci64",
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/gcc_shared/lib,
 				);
 				MACH_O_TYPE = mh_bundle;
 				MATLABROOT = /Applications/MATLAB_R2014b.app;
@@ -300,9 +314,8 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
+					"\"$(SRCROOT)/../../lib/\"",
 					"$(SYSTEM_APPS_DIR)/MATLAB_R2014b.app/bin/maci64",
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/gcc_shared/lib,
 				);
 				MACH_O_TYPE = mh_bundle;
 				MATLABROOT = /Applications/MATLAB_R2014b.app;
@@ -335,6 +348,7 @@
 				F229EA34195C7B9D003F34BC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

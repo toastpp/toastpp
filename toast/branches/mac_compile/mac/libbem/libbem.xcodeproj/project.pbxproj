@@ -17,7 +17,21 @@
 		F2CAA1A3195C4EF50002757F /* bem_surface.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19D195C4EF50002757F /* bem_surface.cc */; };
 		F2CAA1A4195C4EF50002757F /* bem_tri6.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19E195C4EF50002757F /* bem_tri6.cc */; };
 		F2CAA1A6195C4FB80002757F /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2CAA1A5195C4FB80002757F /* libsuperlu.dylib */; };
+		F2ED64FB195CB0D5006CD663 /* libbem.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA192195C4A6E0002757F /* libbem.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED64F9195CB0C2006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../lib";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED64FB195CB0D5006CD663 /* libbem.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F229EA1B195C79C4003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
@@ -93,6 +107,7 @@
 				F2CAA18E195C4A6E0002757F /* Sources */,
 				F2CAA18F195C4A6E0002757F /* Frameworks */,
 				F2CAA190195C4A6E0002757F /* Headers */,
+				F2ED64F9195CB0C2006CD663 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -223,13 +238,13 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				EXECUTABLE_EXTENSION = dylib;
 				EXECUTABLE_PREFIX = "";
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/samuelpowell/Documents/mac_compile_xcode/gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
+					"\"$(SRCROOT)/../../lib/\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../lib\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libbem\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Debug;
@@ -241,13 +256,13 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				EXECUTABLE_EXTENSION = dylib;
 				EXECUTABLE_PREFIX = "";
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/samuelpowell/Documents/mac_compile_xcode/gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
+					"\"$(SRCROOT)/../../lib/\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../lib\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libbem\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Release;

@@ -32,7 +32,21 @@
 		F229EA06195C784D003F34BC /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA05195C784D003F34BC /* libsuperlu.dylib */; };
 		F229EA08195C7857003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA07195C7857003F34BC /* libfe.dylib */; };
 		F229EA0A195C7865003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA09195C7865003F34BC /* libmath.dylib */; };
+		F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229E9CE195C7652003F34BC /* libstoast.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED64F7195CB08F006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../lib";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F229E9CE195C7652003F34BC /* libstoast.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libstoast.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,6 +151,7 @@
 				F229E9CA195C7652003F34BC /* Sources */,
 				F229E9CB195C7652003F34BC /* Frameworks */,
 				F229E9CC195C7652003F34BC /* Headers */,
+				F2ED64F7195CB08F006CD663 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -285,14 +300,13 @@
 					"$(inherited)",
 					NEED_EXPLICIT_INSTANTIATION,
 				);
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../lib/\"",
 					"$(inherited)",
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/mac/libmath/build/Debug,
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/mac/libfe/build/Debug,
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../lib\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
 			name = Debug;
@@ -303,14 +317,13 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				GCC_PREPROCESSOR_DEFINITIONS = NEED_EXPLICIT_INSTANTIATION;
+				LD_DYLIB_INSTALL_NAME = "@loaderpath/../lib/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../lib/\"",
 					"$(inherited)",
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/mac/libmath/build/Debug,
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/mac/libfe/build/Debug,
-					/Users/samuelpowell/Documents/mac_compile_xcdoe2/gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "\"$(SRCROOT)/../../lib\"";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
 			name = Release;
