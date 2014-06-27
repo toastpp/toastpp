@@ -187,8 +187,8 @@ distro_bin_linux::
 distro_bin_darwin::
 	cd ..; \
 	tar czvf toast_bin_darwin.tar.gz $(TOASTDIR)/$(ARCHDIR)/bin \
-	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTDIR)/$(ARCHDIR)/mex \
-	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
-	$(TOASTRELDIR)/toastenv.csh $(TOASTDIR)/toastenv.sh; \
+	$(TOASTDIR)/$(ARCHDIR)/lib $(TOASTDIR)/$(ARCHDIR)/mex \
+	$(TOASTDIR)/$(ARCHDIR)/mex2 \
+	$(TOASTDIR)/toastenv.csh $(TOASTDIR)/toastenv.sh; \
 	mv toast_bin_darwin.tar.gz $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz
-	@echo “Darwin distro tarball created in $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz"
+	@echo "Darwin distro tarball created in $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz"
