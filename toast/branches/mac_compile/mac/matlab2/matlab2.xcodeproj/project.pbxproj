@@ -276,7 +276,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_CXX_LIBRARY = "libc++";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
@@ -296,7 +296,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABROOT = /Applications/MATLAB_R2013b.app;
+				MATLABROOT = /Applications/MATLAB_R2014a.app;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
@@ -313,7 +313,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_CXX_LIBRARY = "libc++";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
@@ -330,7 +330,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABROOT = /Applications/MATLAB_R2013b.app;
+				MATLABROOT = /Applications/MATLAB_R2014a.app;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
