@@ -12,7 +12,6 @@
 #include "felib.h"
 
 using namespace std;
-using namespace toast;
 
 #define MESH_DIRICHLET BND_DIRICHLET
 #define MESH_ROBIN     BND_ROBIN
@@ -1765,40 +1764,40 @@ void AddToElMatrix (const Mesh &mesh, int el, SCGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int i, j, is, js, nnode;
-    scomplex entry;
 
     nnode = mesh.elist[el]->nNode();
     for (i = 0; i < nnode; i++) {
 	is = mesh.elist[el]->Node[i];
 	for (j = 0; j < nnode; j++) {
 	    js = mesh.elist[el]->Node[j];
+	    float re = 0.0f, im = 0.0f;
 	    switch (mode) {
 	    case ASSEMBLE_FF:
-	      entry.re = (float)mesh.elist[el]->IntFF (i, j);
+	        re = (float)mesh.elist[el]->IntFF (i, j);
 		break;
 	    case ASSEMBLE_DD:
-		entry.re = (float)mesh.elist[el]->IntDD (i, j);
+		re = (float)mesh.elist[el]->IntDD (i, j);
 		break;
 	    case ASSEMBLE_PFF:
-		entry.re = (float)mesh.elist[el]->IntPFF (i, j, *coeff);
+		re = (float)mesh.elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PDD:
-		entry.re = (float)mesh.elist[el]->IntPDD (i, j, *coeff);
+		re = (float)mesh.elist[el]->IntPDD (i, j, *coeff);
 		break;
 	    case ASSEMBLE_BNDPFF:
-		entry.re = (float)mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		re = (float)mesh.elist[el]->BndIntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PFF_EL:
-		entry.re = (float)mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		re = (float)mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_PDD_EL:
-		entry.re = (float)mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		re = (float)mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_BNDPFF_EL:
-		entry.re = (float)mesh.elist[el]->BndIntFF (i, j)*(*coeff)[el];
+		re = (float)mesh.elist[el]->BndIntFF (i, j)*(*coeff)[el];
 		break;
 	    }
-	    M.Add (is, js, entry);
+	    M.Add (is, js, std::complex<float>(re,im));
 	}
     }
 }
@@ -1807,44 +1806,44 @@ void AddToElMatrix (const Mesh &mesh, int el, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int i, j, is, js, nnode;
-    toast::complex entry;
 
     nnode = mesh.elist[el]->nNode();
     for (i = 0; i < nnode; i++) {
 	is = mesh.elist[el]->Node[i];
 	for (j = 0; j < nnode; j++) {
 	    js = mesh.elist[el]->Node[j];
+	    double re = 0.0, im = 0.0;
 	    switch (mode) {
 	    case ASSEMBLE_FF:
-		entry.re = mesh.elist[el]->IntFF (i, j);
+		re = mesh.elist[el]->IntFF (i, j);
 		break;
 	    case ASSEMBLE_DD:
-		entry.re = mesh.elist[el]->IntDD (i, j);
+		re = mesh.elist[el]->IntDD (i, j);
 		break;
 	    case ASSEMBLE_PFF:
-		entry.re = mesh.elist[el]->IntPFF (i, j, *coeff);
+		re = mesh.elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PDD:
-		entry.re = mesh.elist[el]->IntPDD (i, j, *coeff);
+		re = mesh.elist[el]->IntPDD (i, j, *coeff);
 		break;
 	    case ASSEMBLE_BNDPFF:
-		entry.re = mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		re = mesh.elist[el]->BndIntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PFF_EL:
-		entry.re = mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		re = mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_PDD_EL:
-		entry.re = mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		re = mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_BNDPFF_EL:
-		entry.re = mesh.elist[el]->BndIntFF (i, j) * (*coeff)[el];
+		re = mesh.elist[el]->BndIntFF (i, j) * (*coeff)[el];
 		break;
 
 	    case ASSEMBLE_iPFF:
-	        entry.im = mesh.elist[el]->IntPFF (i, j, *coeff);
+	        im = mesh.elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    }
-	    M.Add (is, js, entry);
+	    M.Add (is, js, std::complex<double>(re,im));
 	}
     }
 }
@@ -1863,7 +1862,7 @@ struct Assemble_Threaddata {
 };
 
 template<typename T>
-void *AddToSysMatrix_engine (task_data *td)
+void AddToSysMatrix_engine (task_data *td)
 {
     int el;
     int itask = td->proc;
@@ -1934,10 +1933,10 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
 {
 #ifdef TOAST_THREAD_ASSEMBLE
     if (M.StorageType() == MATRIX_COMPROW) {
-        Assemble_Threaddata<toast::complex> thdata = {
-	    &mesh, (TCompRowMatrix<toast::complex>*)&M, coeff, mode
+        Assemble_Threaddata<std::complex<double> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<double> >*)&M, coeff, mode
 	};
-	Task::Multiprocess (AddToSysMatrix_engine<toast::complex>,
+	Task::Multiprocess (AddToSysMatrix_engine<std::complex<double> >,
 			    (void*)&thdata);
     } else {
         xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
@@ -1955,10 +1954,10 @@ void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
 {
 #ifdef TOAST_THREAD_ASSEMBLE
     if (M.StorageType() == MATRIX_COMPROW) {
-        Assemble_Threaddata<scomplex> thdata = {
-	    &mesh, (TCompRowMatrix<scomplex>*)&M, coeff, mode
+        Assemble_Threaddata<std::complex<float> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<float> >*)&M, coeff, mode
 	};
-	Task::Multiprocess (AddToSysMatrix_engine<scomplex>,
+	Task::Multiprocess (AddToSysMatrix_engine<std::complex<float> >,
 			    (void*)&thdata);
     } else {
         xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
@@ -1974,7 +1973,6 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
     const double coeff, int mode)
 {
     int i, j, is, js, el, nnode;
-    toast::complex entry;
 
     for (el = 0; el < mesh.elen(); el++) {
         nnode = mesh.elist[el]->nNode();
@@ -1982,22 +1980,22 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
 	    is = mesh.elist[el]->Node[i];
 	    for (j = 0; j < nnode; j++) {
 	        js = mesh.elist[el]->Node[j];
+		double re = 0.0, im = 0.0;
 	        switch (mode) {
 		case ASSEMBLE_CFF:
-		    entry.re = mesh.elist[el]->IntFF (i, j) * coeff;
+		    re = mesh.elist[el]->IntFF (i, j) * coeff;
 		    break;
 		case ASSEMBLE_CDD:
-		    entry.re = mesh.elist[el]->IntDD (i, j) * coeff;
+		    re = mesh.elist[el]->IntDD (i, j) * coeff;
 		    break;
 		case ASSEMBLE_iCFF:
-		    entry.im = mesh.elist[el]->IntFF (i, j) * coeff;
+		    im = mesh.elist[el]->IntFF (i, j) * coeff;
 		    break;
 		case ASSEMBLE_iCDD:
-		    entry.im = mesh.elist[el]->IntDD (i, j) * coeff;
+		    im = mesh.elist[el]->IntDD (i, j) * coeff;
 		    break;
 		}
-		M.Add (is, js, entry);
-		//M(is, js) += entry;
+		M.Add (is, js, std::complex<double>(re,im));
 	    }
 	}
     }  
@@ -2007,7 +2005,6 @@ void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
     const double coeff, int mode)
 {
     int i, j, is, js, el, nnode;
-    scomplex entry;
 
     for (el = 0; el < mesh.elen(); el++) {
         nnode = mesh.elist[el]->nNode();
@@ -2015,21 +2012,22 @@ void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
 	    is = mesh.elist[el]->Node[i];
 	    for (j = 0; j < nnode; j++) {
 	        js = mesh.elist[el]->Node[j];
+		float re = 0.0f, im = 0.0f;
 	        switch (mode) {
 		case ASSEMBLE_CFF:
-  		    entry.re = (float)(mesh.elist[el]->IntFF (i, j) * coeff);
+  		    re = (float)(mesh.elist[el]->IntFF (i, j) * coeff);
 		    break;
 		case ASSEMBLE_CDD:
-		    entry.re = (float)(mesh.elist[el]->IntDD (i, j) * coeff);
+		    re = (float)(mesh.elist[el]->IntDD (i, j) * coeff);
 		    break;
 		case ASSEMBLE_iCFF:
-		    entry.im = (float)(mesh.elist[el]->IntFF (i, j) * coeff);
+		    im = (float)(mesh.elist[el]->IntFF (i, j) * coeff);
 		    break;
 		case ASSEMBLE_iCDD:
-		    entry.im = (float)(mesh.elist[el]->IntDD (i, j) * coeff);
+		    im = (float)(mesh.elist[el]->IntDD (i, j) * coeff);
 		    break;
 		}
-		M.Add (is, js, entry);
+		M.Add (is, js, std::complex<float>(re,im));
 	    }
 	}
     }  

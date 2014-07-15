@@ -19,7 +19,6 @@
 #define BYHAND
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // external references
@@ -268,7 +267,7 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	RVector gsize = raster.GSize();
 	IVector bdim = raster.BDim();
 	for (i = 0; i < gsize.Dim(); i++) scl *= gsize[i]/bdim[i];
-	qdelta_g *= toast::complex(1.0/scl,0);
+	qdelta_g *= std::complex<double>(1.0/scl,0);
 
 	// remap to mesh basis
 	raster.Map_GridToMesh (qdelta_g, qdelta_h);
@@ -278,7 +277,7 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	for (i = 0; i < mesh.elen(); i++) {
 	    Element *pel = mesh.elist[i];
 	    for (j = 0; j < pel->nNode(); j++) {
-		escl[pel->Node[j]].re += pel->IntF(j);
+		escl[pel->Node[j]] += pel->IntF(j);
 	    }
 	}
 	qdelta_h *= escl;
@@ -294,17 +293,17 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	    CVector proj (nm);
 	    Project_cplx (mesh, q, dphi_h[q], proj);
 	    for (i = 0; i < nm; i++) {
-		double scl = norm2 (proj[i]);
-		toast::complex c = projdelta[i]*conj(proj[i]);
+		double scl = norm (proj[i]);
+		std::complex<double> c = projdelta[i]*conj(proj[i]);
 		projdelta[i] = c/scl;
 	    }
 	}
 
 	// map data types into real vector
 	for (i = 0; i < nm; i++) {
-	    toast::complex proji = projdelta[i];
-	    y_h_delta[ofs_lnmod++] = proji.re;
-	    y_h_delta[ofs_phase++] = proji.im;
+	    std::complex<double> proji = projdelta[i];
+	    y_h_delta[ofs_lnmod++] = proji.real();
+	    y_h_delta[ofs_phase++] = proji.imag();
 	}
     }
     // scale with sd
@@ -403,16 +402,16 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	    for (i = 0; i < dim; i++)
 		res[ofs] -= pds_alpha_grad[q][i] & pas_grad[i];
 	    if (FWS.GetDataScaling() == DATA_LOG) {
-		double scl = norm2 (proj[q][mm]);
-		toast::complex c = res[ofs]*conj(proj[q][mm]);
+		double scl = norm (proj[q][mm]);
+		std::complex<double> c = res[ofs]*conj(proj[q][mm]);
 		res[ofs] = c/scl;
 	    }
 	}
     }
     // copy result to real vector and scale with sd
     for (i = 0; i < nqm; i++) {
-	rres[i]     = re(res[i]) / sd[i];
-	rres[i+nqm] = im(res[i]) / sd[i+nqm];
+	rres[i]     = real(res[i]) / sd[i];
+	rres[i+nqm] = imag(res[i]) / sd[i+nqm];
     }
 
     delete []pd_grad;
@@ -479,23 +478,23 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	CVector cproj(n);
 	Project_cplx (mesh, q, dphi_h[q], cproj);
-	wqa = toast::complex(0,0);
+	wqa = std::complex<double>(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh.nM; m++) {
 	    if (!mesh.Connected (q, m)) continue;
 	    const CVector qs = mvec.Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
 	    term = /* -2.0 * */ b_mod[idx] /* / (ype[idx]*s_mod[idx]) */;
-	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
+	    wqa += qs * std::complex<double> (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = /* -2.0 * */ b_arg[idx] /* / (ype[idx]*s_arg[idx]) */;
-	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * std::complex<double> (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -610,15 +609,16 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	    double yre = ysd[ofs], yim = ysd[ofs+nqm];
 	    if (FWS.GetDataScaling() == DATA_LOG) {
 		// rescale for log data (lnamp + phase)
-		toast::complex logscl = proj[q][mm]/norm2 (proj[q][mm]);
-		toast::complex logdat = toast::complex(yre,yim) * logscl;
-		yre = logdat.re;
-		yim = logdat.im;
+	        std::complex<double> logscl = proj[q][mm]/norm (proj[q][mm]);
+		std::complex<double> logdat = std::complex<double>(yre,yim) *
+		    logscl;
+		yre = logdat.real();
+		yim = logdat.imag();
 	    }
 	    for (i = 0; i < slen; i++) {
 		// apply data to PMDF; write to real vector
-		rres[i]      -= das[i].re*yre + das[i].im*yim;
-		rres[i+slen] -= dbs[i].re*yre + dbs[i].im*yim;
+	        rres[i]      -= das[i].real()*yre + das[i].imag()*yim;
+		rres[i+slen] -= dbs[i].real()*yre + dbs[i].imag()*yim;
 	    }
 	}
     }
@@ -698,19 +698,19 @@ RVector ImplicitHessianScaling (const QMMesh &mesh, const Raster &raster,
 		db += pd_grad[q][i] * pa_grad[i];
 	    raster.Map_GridToSol (db, dbs);
 	    if (FWS.GetDataScaling() == DATA_LOG) {
-		double scl = norm2 (proj[q][mm]);
+		double scl = norm (proj[q][mm]);
 		das *= (conj(proj[q][mm])/scl);
 		dbs *= (conj(proj[q][mm])/scl);
 	    }
 	    for (i = 0; i < slen; i++) { // data scaling
-		das[i].re /= sd[ofs];
-		dbs[i].re /= sd[ofs];
-		das[i].im /= sd[ofs+nqm];
-		dbs[i].im /= sd[ofs+nqm];
+	        das[i] = std::complex<double> (
+	            das[i].real()/sd[ofs],das[i].imag()/sd[ofs+nqm]);
+		dbs[i] = std::complex<double> (
+		    dbs[i].real()/sd[ofs],dbs[i].imag()/sd[ofs+nqm]);
 	    }
 	    for (i = 0; i < slen; i++) {
-		M[i]      += norm2 (das[i]);
-		M[i+slen] += norm2 (dbs[i]);
+		M[i]      += norm (das[i]);
+		M[i+slen] += norm (dbs[i]);
 	    }
 	}
     }
@@ -783,8 +783,8 @@ RVector ExplicitHessianScaling1 (const QMMesh &mesh, const Raster &raster,
 	    db += pd_grad[i] * pa_grad[i];
     raster.Map_GridToSol (db, dbs);
     for (i = 0; i < slen; i++) {
-		M[i]      += norm2 (das[i]);
-		M[i+slen] += norm2 (dbs[i]);
+		M[i]      += norm (das[i]);
+		M[i+slen] += norm (dbs[i]);
     }
     delete []pd_grad;
     delete []pa_grad;

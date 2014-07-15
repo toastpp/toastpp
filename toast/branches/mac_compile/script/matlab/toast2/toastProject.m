@@ -46,8 +46,9 @@ switch upper(solver)
         nm = size(mvec,2);
 
         % incomplete LU factorisation of smat
-        ilu_setup.type = 'ilutp';
-        ilu_setup.droptol = 1e-2;
+        %ilu_setup.type = 'ilutp';
+        %ilu_setup.droptol = 1e-2;
+        ilu_setup.type = 'nofill';
         [L U] = ilu(smat,ilu_setup);
         
         for i=1:nq

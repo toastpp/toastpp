@@ -3,7 +3,6 @@
 #include "timing.h"
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // class Raster_CubicPixel

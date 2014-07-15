@@ -8,7 +8,6 @@
 #include "harmoniclib.h"
 #include "diffusphere.h"
 #include "surfacenet.h" 
-using namespace toast;
 
 void DiffuSphere::read_net(char *name)
 {

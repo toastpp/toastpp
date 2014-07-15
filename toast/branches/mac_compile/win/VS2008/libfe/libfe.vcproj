@@ -102,7 +102,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -258,7 +258,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -419,7 +419,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>

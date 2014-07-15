@@ -20,20 +20,20 @@ BEM_Region::~BEM_Region ()
 	delete kernel;
 }
 
-toast::complex BEM_Region::WaveNumberMinus () const
+std::complex<double> BEM_Region::WaveNumberMinus () const
 {
 	double kappa = 1.0/(3.0*(mua+mus)); // diffusion coefficient [mm]
 	double c = 0.3e12/ref;              // speed of light [mm/s]
 	double omega = 2.0*pi*freq;         // angular velocity [cycles/s]
-	return sqrt(toast::complex (mua/kappa, -omega/(c*kappa)));
+	return sqrt(std::complex<double> (mua/kappa, -omega/(c*kappa)));
 }
 
-toast::complex BEM_Region::WaveNumber () const // the wavenumber with plus
+std::complex<double> BEM_Region::WaveNumber () const // the wavenumber with plus
 {
 	double kappa = 1.0/(3.0*(mua+mus)); // diffusion coefficient [mm]
 	double c = 0.3e12/ref;              // speed of light [mm/s]
 	double omega = 2.0*pi*freq;         // angular velocity [cycles/s]
-	return sqrt(toast::complex (mua/kappa, +omega/(c*kappa)));
+	return sqrt(std::complex<double> (mua/kappa, +omega/(c*kappa)));
 }
 
 

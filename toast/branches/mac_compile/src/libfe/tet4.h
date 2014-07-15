@@ -101,8 +101,7 @@ public:
     RSymMatrix IntPFF (const RVector& P) const;
     double IntPFF (int i, int j, const RVector& P) const;
     double IntFDD (int i, int j, int k) const;
-    RSymMatrix IntPDD (const RVector& P) const
-    { ERROR_UNDEF; return RSymMatrix(); }
+    RSymMatrix IntPDD (const RVector& P) const;
     double IntPDD (int i, int j, const RVector &P) const;
 
     double IntFd (int i, int j, int k) const;

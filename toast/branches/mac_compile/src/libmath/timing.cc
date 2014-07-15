@@ -31,7 +31,7 @@ static double tick_per_sec ()
 {
     clock_t ticks_per_second;
 
-#if defined (_WIN32) || defined(_WIN64)
+#if defined (WIN32) || defined(WIN64)
     ticks_per_second = 100;
 #else
 #ifndef CLK_TCK

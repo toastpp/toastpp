@@ -14,7 +14,6 @@
 #include "timing.h"
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // external references

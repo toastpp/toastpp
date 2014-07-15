@@ -440,8 +440,8 @@ private:
 
 typedef TDenseMatrix<double>   RDenseMatrix;	// 'double real'
 typedef TDenseMatrix<float>    FDenseMatrix;    // 'single real'
-typedef TDenseMatrix<toast::complex>  CDenseMatrix;	// 'complex'
-typedef TDenseMatrix<scomplex> SCDenseMatrix;   // 'single complex'
+typedef TDenseMatrix<std::complex<double> >  CDenseMatrix;	// 'complex'
+typedef TDenseMatrix<std::complex<float> > SCDenseMatrix;   // 'single complex'
 typedef TDenseMatrix<int>      IDenseMatrix;    // 'integer'
 
 #ifndef MATHLIB_IMPLEMENTATION

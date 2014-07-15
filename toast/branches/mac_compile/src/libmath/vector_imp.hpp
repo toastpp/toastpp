@@ -24,7 +24,6 @@
 #endif
 
 using namespace std;
-using namespace toast;
 
 // ==========================================================================
 // member definitions
@@ -331,17 +330,28 @@ void TVector<VT>::Copy (const TVector<VT> &v,
 // --------------------------------------------------------------------------
 
 template<>
-inline bool TVector<toast::complex>::Clip (toast::complex vmin, toast::complex vmax)
+inline bool TVector<std::complex<double> >::Clip (std::complex<double> vmin, std::complex<double> vmax)
 {
     // toast::complex version: clip real and imaginary parts separately
 
     bool clip = false;
+    double vmin_re = vmin.real();
+    double vmin_im = vmin.imag();
+    double vmax_re = vmax.real();
+    double vmax_im = vmax.imag();
 
     for (int i = 0; i < size; i++) {
-        if      (data[i].re < vmin.re) data[i].re = vmin.re, clip = true;
-	else if (data[i].re > vmax.re) data[i].re = vmax.re, clip = true;
-        if      (data[i].im < vmin.im) data[i].im = vmin.im, clip = true;
-	else if (data[i].im > vmax.im) data[i].im = vmax.im, clip = true;
+      double d_re = data[i].real();
+      double d_im = data[i].imag();
+      bool d_clip = false;
+      if (d_re < vmin_re) d_re = vmin_re, d_clip = true;
+      if (d_re > vmax_re) d_re = vmax_re, d_clip = true;
+      if (d_im < vmin_im) d_im = vmin_im, d_clip = true;
+      if (d_im > vmax_im) d_im = vmax_im, d_clip = true;
+      if (d_clip) {
+	  data[i] = std::complex<double>(d_re,d_im);
+	  clip = true;
+      }
     }
     return clip;
 }
@@ -627,8 +637,8 @@ inline TVector<float> &TVector<float>::operator*= (const float &s)
     return *this;
 }
 template<>
-inline TVector<toast::complex> &TVector<toast::complex>::operator*=
-    (const toast::complex &s)
+inline TVector<std::complex<double> > &TVector<std::complex<double> >::operator*=
+(const std::complex<double> &s)
 {
     const int incr = 1;
     zscal_(size, s, data, incr);
@@ -1021,14 +1031,14 @@ inline float dot (const TVector<float> &v1, const TVector<float> &v2)
     return sdot_(size, v1.data, incr, v2.data, incr);
 }
 template<>
-inline toast::complex dot (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
+inline std::complex<double> dot (const TVector<std::complex<double> > &v1, const TVector<std::complex<double> > &v2)
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     const int incr = 1;
     int size = v1.size;
     dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
 			       (dcomplex*)v2.data, &incr);
-    return toast::complex(z.r, z.i);
+    return std::complex<double>(z.r, z.i);
 }
 #endif // USE_BLAS_LEVEL1
 
@@ -1044,16 +1054,16 @@ VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
 // --------------------------------------------------------------------------
 
 template<>
-inline toast::complex doth (const TVector<toast::complex> &v1, const TVector<toast::complex> &v2)
+inline std::complex<double> doth (const TVector<std::complex<double> > &v1, const TVector<std::complex<double> > &v2)
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
 #ifdef USE_BLAS_LEVEL1
     const int incr = 1;
     int size = v1.size;
     dcomplex z = zdotc_(size, v1.data, incr, v2.data, incr);
-    return toast::complex(z.r, z.i);
+    return std::complex<double>(z.r, z.i);
 #else
-    toast::complex d = (toast::complex)0;
+    std::complex<double> d = (std::complex<double>)0;
     for (int i = 0; i < v1.size; i++) d += conj(v1[i]) * v2[i];
     return d;
 #endif // USE_BLAS_LEVEL1
@@ -1081,7 +1091,7 @@ inline double l2norm (const TVector<float> &v)
     return (double)snrm2_((int&)v.size, v.data, incr);
 }
 template<>
-inline double l2norm (const TVector<toast::complex> &v)
+inline double l2norm (const TVector<std::complex<double> > &v)
 {
     const int incr = 1;
     return dznrm2_((int&)v.size, v.data, incr);
@@ -1299,7 +1309,7 @@ template<>
 inline bool visnan (const CVector &v)
 {
     for (int i = 0; i < v.size; i++)
-	if (cisnan(v[i])) return true;
+        if (isnan(v[i].real()) || isnan(v[i].imag())) return true;
     return false;
 }
 
@@ -1307,7 +1317,7 @@ template<>
 inline bool visnan (const SCVector &v)
 {
     for (int i = 0; i < v.size; i++)
-	if (cisnan(v[i])) return true;
+        if (isnan(v[i].real()) || isnan(v[i].imag())) return true;
     return false;
 }
 

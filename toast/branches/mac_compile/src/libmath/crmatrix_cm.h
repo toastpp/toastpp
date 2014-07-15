@@ -34,17 +34,18 @@ int GMRES (const SCCompRowMatrixMixed &A, const CVector &b, CVector &x,
 // ==========================================================================
 // class SCCompRowMatrixMixed
 
-class SCCompRowMatrixMixed: public TCompRowMatrix<scomplex> {
+class SCCompRowMatrixMixed: public TCompRowMatrix<std::complex<float> > {
 public:
     // constructors, destructor
     SCCompRowMatrixMixed ();
     SCCompRowMatrixMixed (int rows, int cols);
     SCCompRowMatrixMixed (int rows, int cols,
-        const idxtype *_rowptr, const idxtype *_colidx, const scomplex *data = 0);
+        const idxtype *_rowptr, const idxtype *_colidx,
+        const std::complex<float> *data = 0);
     SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m);
     ~SCCompRowMatrixMixed ();
 
-    int SparseRow (int r, idxtype *ci, toast::complex *rv) const;
+    int SparseRow (int r, idxtype *ci, std::complex<double> *rv) const;
 
     // matrix x vector methods using double precision vectors
     void Ax (const CVector &x, CVector &b) const;

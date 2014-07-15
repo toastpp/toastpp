@@ -239,7 +239,7 @@ public:
     // return a submatrix of dimension rows x c2-c1 consisting of the block
     // (0 ... rows-1) x (c1 ... c2-1)
 
-    friend TCompRowMatrix<toast::complex> cplx
+    friend TCompRowMatrix<std::complex<double> > cplx
     (const TCompRowMatrix<double> &A);
     // type conversion
 
@@ -371,13 +371,14 @@ public:
     void Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2) const;
     void ATx (const TVector<MT> &x, TVector<MT> &b) const;
 
-    void Ax_cplx (const TVector<toast::complex> &x, TVector<toast::complex> &b)
+    void Ax_cplx (const TVector<std::complex<double> > &x,
+		  TVector<std::complex<double> > &b)
 	const;
     // special case: multiply with complex vector (only instantiated for
     // real matrix)
 
-    void ATx_cplx (const TVector<toast::complex> &x,
-	TVector<toast::complex> &b)const;
+    void ATx_cplx (const TVector<std::complex<double> > &x,
+		   TVector<std::complex<double> > &b)const;
     // special case: multiply transpose with complex vector (only instantiated
     // for real matrix)
 
@@ -622,8 +623,8 @@ friend int ML_getrow<> (ML_Operator *Amat, int N_requested_rows,
 
 typedef TCompRowMatrix<double>	 RCompRowMatrix;	// 'real'
 typedef TCompRowMatrix<float>	 FCompRowMatrix;	// 'float'
-typedef TCompRowMatrix<toast::complex> CCompRowMatrix;	// 'complex'
-typedef TCompRowMatrix<scomplex> SCCompRowMatrix;	// 'single complex'
+typedef TCompRowMatrix<std::complex<double> > CCompRowMatrix;	// 'complex'
+typedef TCompRowMatrix<std::complex<float> > SCCompRowMatrix;	// 'single complex'
 typedef TCompRowMatrix<int>	 ICompRowMatrix;	// 'integer'
 
 // ==========================================================================
@@ -633,8 +634,8 @@ typedef TCompRowMatrix<int>	 ICompRowMatrix;	// 'integer'
 //#ifndef __CRMATRIX_CC
 extern template class MATHLIB TCompRowMatrix<double>;
 extern template class MATHLIB TCompRowMatrix<float>;
-extern template class MATHLIB TCompRowMatrix<toast::complex>;
-extern template class MATHLIB TCompRowMatrix<scomplex>;
+extern template class MATHLIB TCompRowMatrix<std::complex<double> >;
+extern template class MATHLIB TCompRowMatrix<std::complex<float> >;
 extern template class MATHLIB TCompRowMatrix<int>;
 #endif // !__CRMATRIX_CC
 

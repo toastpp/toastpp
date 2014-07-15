@@ -333,8 +333,8 @@ protected:
 
 typedef TGenericSparseMatrix<double>	RGenericSparseMatrix;	// 'real'
 typedef TGenericSparseMatrix<float>	FGenericSparseMatrix;	// 'float'
-typedef TGenericSparseMatrix<toast::complex> CGenericSparseMatrix; // 'complex'
-typedef TGenericSparseMatrix<scomplex>	SCGenericSparseMatrix;	// 's. complex'
+typedef TGenericSparseMatrix<std::complex<double> > CGenericSparseMatrix; // 'complex'
+typedef TGenericSparseMatrix<std::complex<float> >  SCGenericSparseMatrix;	// 's. complex'
 typedef TGenericSparseMatrix<int>	IGenericSparseMatrix;	// 'integer'
 
 

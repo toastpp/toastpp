@@ -30,7 +30,6 @@
 #include "util.h"
 
 using namespace std;
-using namespace toast;
 
 // ============================================================================
 
@@ -82,11 +81,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	double *pr = mxGetPr(prhs[2]);
 	double *pi = mxGetPi(prhs[2]);
 	CVector src(nsrc), tgt;
-	toast::complex *vptr = src.data_buffer();
-	for (int i = 0; i < nsrc; i++) {
-	    vptr[i].re = pr[i];
-	    vptr[i].im = pi[i];
-	}
+	std::complex<double> *vptr = src.data_buffer();
+	for (int i = 0; i < nsrc; i++)
+	    vptr[i] = std::complex<double>(pr[i], pi[i]);
 	switch (srcid) {
 	case 'M':
 	    if (raster->mesh().nlen() != nsrc) {

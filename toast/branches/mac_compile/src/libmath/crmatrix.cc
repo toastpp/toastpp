@@ -23,11 +23,11 @@
 #endif // ML_INTERFACE
 
 using namespace std;
-using namespace toast;
 
 template<>
-void LU (TCompRowMatrix<toast::complex> &A, const TVector<toast::complex> &b,
-    TVector<toast::complex> &x)
+void LU (TCompRowMatrix<std::complex<double> > &A,
+    const TVector<std::complex<double> > &b,
+    TVector<std::complex<double> > &x)
 {
     int n = b.Dim();
     char fact   = 'N';

@@ -12,7 +12,6 @@
 #include "legendre.h"
 #include "pplot3d.h"
 
-using namespace toast;
 using namespace std;
 
 
@@ -70,7 +69,7 @@ CVector  myCCompRowMatrix::DiagATA ()
       for(int j=0;j<At.nCols();j++)
 	{
 	  //  cerr<<i<<"  " <<At(i,j)<<endl;
-	  if(At.Get(i,j)!=0)  Diag[i]+=At(i,j)*At(i,j); 
+	  if(At.Get(i,j) != 0.0)  Diag[i]+=At(i,j)*At(i,j); 
 	}
     }
  
@@ -89,7 +88,7 @@ CCompRowMatrix myCCompRowMatrix::AttA ()
   At.Transpone();
 
   int i, j,k;//, n = nCols();
-  toast::complex at_ik, at_jk;
+  std::complex<double> at_ik, at_jk;
   // cerr<<"A"<<endl;
   //CCoordMatrix ata(At.nRows(), At.nRows());
   CDenseMatrix ata2(At.nRows(), At.nRows());
@@ -99,7 +98,7 @@ CCompRowMatrix myCCompRowMatrix::AttA ()
       {
       for(k=0;k<At.nCols();k++)
 	{
-	  if((at_ik = At.Get(i,k))!=0 && (at_jk = At.Get(j,k))!=0)
+	  if((at_ik = At.Get(i,k))!=0.0 && (at_jk = At.Get(j,k))!=0.0)
 	    {
 	      ata2(i,j)+=at_ik*at_jk;
 	    }

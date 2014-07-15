@@ -15,7 +15,6 @@
 #include "mathlib.h"
 
 using namespace std;
-using namespace toast;
 
 NonconformingMesh::NonconformingMesh()
 {
@@ -577,42 +576,42 @@ void DGAddToElMatrix (NonconformingMesh &mesh, int el, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int i, j, is, js, nnode;
-    toast::complex entry;
     
     nnode = mesh.elist[el]->nNode();
     for (i = 0; i < nnode; i++) {
 	is =  nnode*el + i;
 	for (j = 0; j < nnode; j++) {
 	    js = nnode*el + j;
+	    double re = 0.0, im = 0.0;
 	    switch (mode) {
 	    case ASSEMBLE_FF:
-		entry.re = mesh.elist[el]->IntFF (i, j);
+		re = mesh.elist[el]->IntFF (i, j);
 		break;
 	    case ASSEMBLE_DD:
-		entry.re = mesh.elist[el]->IntDD (i, j);
+		re = mesh.elist[el]->IntDD (i, j);
 		break;
 	    case ASSEMBLE_PFF:
-		entry.re = mesh.elist[el]->IntPFF (i, j, *coeff);
+		re = mesh.elist[el]->IntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PDD:
-		entry.re = mesh.elist[el]->IntPDD (i, j, *coeff);
+		re = mesh.elist[el]->IntPDD (i, j, *coeff);
 		break;
 	    case ASSEMBLE_PFF_EL:
-		entry.re = mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
+		re = mesh.elist[el]->IntFF (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_PDD_EL:
-		entry.re = mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
+		re = mesh.elist[el]->IntDD (i, j) * (*coeff)[el];
 		break;
 	    case ASSEMBLE_BNDPFF:
-		entry.re = mesh.elist[el]->BndIntPFF (i, j, *coeff);
+		re = mesh.elist[el]->BndIntPFF (i, j, *coeff);
 		break;
 	    case ASSEMBLE_BNDPFF_EL:
-		entry.re = mesh.elist[el]->BndIntFF (i, j)* (*coeff)[el];
+		re = mesh.elist[el]->BndIntFF (i, j)* (*coeff)[el];
 		break;
 
 
 	   }
-	    M.Add (is, js, entry);
+	    M.Add (is, js, std::complex<double>(re,im));
 	}
     }
 }
@@ -670,8 +669,7 @@ void DGAddToSysMatrix (NonconformingMesh &mesh, CGenericSparseMatrix &M,
     const RVector *coeff, int mode)
 {
     int el;
-    toast::complex entry;
-     for (el = 0; el < mesh.elen(); el++) {
+    for (el = 0; el < mesh.elen(); el++) {
 	DGAddToElMatrix (mesh, el, M, coeff, mode);
     }
 }
@@ -680,28 +678,28 @@ void DGAddToSysMatrix (NonconformingMesh &mesh, CGenericSparseMatrix &M,
     const double coeff, int mode)
 {
     int i, j, is, js, el, nnode;
-    toast::complex entry;
     for (el = 0; el < mesh.elen(); el++) {
         nnode = mesh.elist[el]->nNode();
 	for (i = 0; i < nnode; i++) {
 	    is = nnode*el +  i;
 	    for (j = 0; j < nnode; j++) {
 	        js = nnode*el + j;
+		double re = 0.0, im = 0.0;
 	        switch (mode) {
 		case ASSEMBLE_CFF:
-		    entry.re = mesh.elist[el]->IntFF (i, j) * coeff;
+		    re = mesh.elist[el]->IntFF (i, j) * coeff;
 		    break;
 		case ASSEMBLE_CDD:
-		    entry.re = mesh.elist[el]->IntDD (i, j) * coeff;
+		    re = mesh.elist[el]->IntDD (i, j) * coeff;
 		    break;
 		case ASSEMBLE_iCFF:
-		    entry.im = mesh.elist[el]->IntFF (i, j) * coeff;
+		    im = mesh.elist[el]->IntFF (i, j) * coeff;
 		    break;
 		case ASSEMBLE_iCDD:
-		    entry.im = mesh.elist[el]->IntDD (i, j) * coeff;
+		    im = mesh.elist[el]->IntDD (i, j) * coeff;
 		    break;
 		}
-		M.Add (is, js, entry);
+		M.Add (is, js, std::complex<double>(re,im));
 	   }
 	}
     }  
