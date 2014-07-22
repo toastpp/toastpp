@@ -96,7 +96,9 @@ int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 {
     dASSERT(A.rows == A.cols, "Matrix not square");
     dASSERT(b.Dim() == A.rows, "Dimension mismatch");
-    dASSERT(x.Dim() == A.rows, "Dimension mismatch");
+
+    if (x.Dim() != A.rows)
+	x.New(A.rows);
 
     double dnew, dold, alpha, beta;
     double err=0, bnorm;

@@ -25,6 +25,7 @@
 #include "mwsolution.h"
 #include "raster.h"
 #include "raster_px.h"
+#include "raster_px2.h"
 #include "raster_cp.h"
 #include "raster_bl.h"
 #include "raster_gb.h"
