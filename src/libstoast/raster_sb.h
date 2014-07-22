@@ -14,7 +14,7 @@ public:
         double _sup, RDenseMatrix *bb = 0);
 
 protected:
-    double Value_nomask (const Point &p, int i) const;
+    double Value_nomask (const Point &p, int i, bool is_solidx=true) const;
 
 private:
     double xi[5]; // cubic B-spline nodes

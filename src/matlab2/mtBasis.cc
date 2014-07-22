@@ -62,6 +62,8 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else if (!strcasecmp (optionstr, "ALPHA")) {
 		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
+		} else if (!strcasecmp (optionstr, "LINEAR_V2")) {
+		    basistp = 7;
 		} else {
 		    ASSERTARG(false, 1, "unexpected value");
 		}
@@ -100,6 +102,9 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	break;
     case 6:
 	raster = new Raster_SplineBlob (bdim, gdim, mesh, blobrad, bb);
+	break;
+    case 7:
+	raster = new Raster_Pixel2 (bdim, bdim, mesh, bb);
 	break;
     }
 

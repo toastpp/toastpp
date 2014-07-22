@@ -1,11 +1,14 @@
 // -*-C++-*-
 
-#ifndef __RASTER_PX_H
-#define __RASTER_PX_H
+#ifndef __RASTER_PX2_H
+#define __RASTER_PX2_H
 
 /**
- * \file Implements class Raster_Pixel (simple pixel/voxel based image
+ * \file Implements class Raster_Pixel2 (simple pixel/voxel based image
  *   representation).
+ *
+ * This is a replacement for Raster_Pixel. It uses a more accurate
+ * mapping algorithm, but isn't yet fully functional.
  */
 
 #include "raster.h"
@@ -14,7 +17,7 @@
 /**
  * \brief Pixel (or voxel) basis representation.
  */
-class STOASTLIB Raster_Pixel: public Raster {
+class STOASTLIB Raster_Pixel2: public Raster {
 public:
     /**
      * \brief Pixel basis constructor.
@@ -29,13 +32,13 @@ public:
      * \note The mesh pointer must remain valid for the lifetime of the basis
      *   instance.
      */
-    Raster_Pixel (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
+    Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
         RDenseMatrix *bb = 0);
 
     /**
      * \brief Pixel basis destructor.
      */
-    ~Raster_Pixel ();
+    ~Raster_Pixel2 ();
 
     /**
      * \brief Value of basis function b_i at point p
@@ -139,6 +142,8 @@ public:
      */
     const RGenericSparseMatrix &Basis2MeshMatrix() const { return *CI; }
 
+
+
 private:
     bool grid_is_basis;       ///< grid and basis dimensions identical?
     RGenericSparseMatrix *G;  ///< transformation grid->basis
@@ -146,6 +151,16 @@ private:
     RGenericSparseMatrix *C;  ///< transformation mesh->basis
     RGenericSparseMatrix *CI; ///< transformation basis->mesh
     RCompRowMatrix *D;        ///< map basis->solution (limited support)
+    RCompRowMatrix *Buu;      ///< mesh mass matrix for mapping
+    RCompRowMatrix *Buv;      ///< mixed mapping matrix
+
+    /**
+     * \brief Returns pointer to mixed mapping matrix
+     */
+    RCompRowMatrix *CreateMixedMassmat () const;
+
+    int SutherlandHodgman (int el, int xgrid, int ygrid, Point *clip_poly,
+        int npoly) const;
 };
     
-#endif // !__RASTER_PX_H
+#endif // !__RASTER_PX2_H

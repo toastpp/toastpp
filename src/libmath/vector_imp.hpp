@@ -564,7 +564,7 @@ TVector<VT> TVector<VT>::operator/ (const TVector<VT> &v) const
 template<class VT>
 TVector<VT> TVector<VT>::operator/ (const VT &s) const
 {
-    dASSERT(s, "Attempt to divide by zero");
+    //dASSERT(s, "Attempt to divide by zero");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) tmp.data[i] = data[i] / s;
     return tmp;
@@ -825,7 +825,7 @@ TVector<VT> inv (const TVector<VT> &v)
     const VT one = (VT)1;
     TVector<VT> tmp(v.size);
     for (int i = 0; i < v.size; i++) {
-        dASSERT (v[i], "Attempt to divide by zero");
+        //dASSERT (v[i], "Attempt to divide by zero");
         tmp[i] = one/v[i];
     }
     return tmp;
