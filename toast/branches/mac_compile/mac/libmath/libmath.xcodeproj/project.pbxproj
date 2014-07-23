@@ -10,7 +10,6 @@
 		F229EA21195C7B15003F34BC /* libarpack.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F297DC94195C199F00A7501F /* libarpack.dylib */; };
 		F229EA22195C7B15003F34BC /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F297DC95195C199F00A7501F /* libsuperlu.dylib */; };
 		F297DCA9195C199F00A7501F /* arpack.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC96195C199F00A7501F /* arpack.cc */; };
-		F297DCAA195C199F00A7501F /* complex.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC97195C199F00A7501F /* complex.cc */; };
 		F297DCAB195C199F00A7501F /* cr_cholesky.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC98195C199F00A7501F /* cr_cholesky.cc */; };
 		F297DCAC195C199F00A7501F /* crmatrix_cm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC99195C199F00A7501F /* crmatrix_cm.cc */; };
 		F297DCAD195C199F00A7501F /* crmatrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC9A195C199F00A7501F /* crmatrix.cc */; };
@@ -21,7 +20,6 @@
 		F297DCB2195C199F00A7501F /* mathdef.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC9F195C199F00A7501F /* mathdef.cc */; };
 		F297DCB3195C199F00A7501F /* nr.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA0195C199F00A7501F /* nr.cc */; };
 		F297DCB4195C199F00A7501F /* precon.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA1195C199F00A7501F /* precon.cc */; };
-		F297DCB5195C199F00A7501F /* scomplex.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA2195C199F00A7501F /* scomplex.cc */; };
 		F297DCB6195C199F00A7501F /* scrmatrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA3195C199F00A7501F /* scrmatrix.cc */; };
 		F297DCB7195C199F00A7501F /* timing.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA4195C199F00A7501F /* timing.cc */; };
 		F297DCB8195C199F00A7501F /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA5195C199F00A7501F /* util.cc */; };
@@ -47,7 +45,6 @@
 		F297DC94195C199F00A7501F /* libarpack.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarpack.dylib; path = ../../gcc_shared/lib/libarpack.dylib; sourceTree = "<group>"; };
 		F297DC95195C199F00A7501F /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = ../../gcc_shared/lib/libsuperlu.dylib; sourceTree = "<group>"; };
 		F297DC96195C199F00A7501F /* arpack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arpack.cc; path = ../../src/libmath/arpack.cc; sourceTree = "<group>"; };
-		F297DC97195C199F00A7501F /* complex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = complex.cc; path = ../../src/libmath/complex.cc; sourceTree = "<group>"; };
 		F297DC98195C199F00A7501F /* cr_cholesky.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cr_cholesky.cc; path = ../../src/libmath/cr_cholesky.cc; sourceTree = "<group>"; };
 		F297DC99195C199F00A7501F /* crmatrix_cm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crmatrix_cm.cc; path = ../../src/libmath/crmatrix_cm.cc; sourceTree = "<group>"; };
 		F297DC9A195C199F00A7501F /* crmatrix.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crmatrix.cc; path = ../../src/libmath/crmatrix.cc; sourceTree = "<group>"; };
@@ -58,7 +55,6 @@
 		F297DC9F195C199F00A7501F /* mathdef.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mathdef.cc; path = ../../src/libmath/mathdef.cc; sourceTree = "<group>"; };
 		F297DCA0195C199F00A7501F /* nr.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nr.cc; path = ../../src/libmath/nr.cc; sourceTree = "<group>"; };
 		F297DCA1195C199F00A7501F /* precon.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = precon.cc; path = ../../src/libmath/precon.cc; sourceTree = "<group>"; };
-		F297DCA2195C199F00A7501F /* scomplex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scomplex.cc; path = ../../src/libmath/scomplex.cc; sourceTree = "<group>"; };
 		F297DCA3195C199F00A7501F /* scrmatrix.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scrmatrix.cc; path = ../../src/libmath/scrmatrix.cc; sourceTree = "<group>"; };
 		F297DCA4195C199F00A7501F /* timing.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timing.cc; path = ../../src/libmath/timing.cc; sourceTree = "<group>"; };
 		F297DCA5195C199F00A7501F /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/libmath/util.cc; sourceTree = "<group>"; };
@@ -84,7 +80,6 @@
 				F297DC94195C199F00A7501F /* libarpack.dylib */,
 				F297DC95195C199F00A7501F /* libsuperlu.dylib */,
 				F297DC96195C199F00A7501F /* arpack.cc */,
-				F297DC97195C199F00A7501F /* complex.cc */,
 				F297DC98195C199F00A7501F /* cr_cholesky.cc */,
 				F297DC99195C199F00A7501F /* crmatrix_cm.cc */,
 				F297DC9A195C199F00A7501F /* crmatrix.cc */,
@@ -95,7 +90,6 @@
 				F297DC9F195C199F00A7501F /* mathdef.cc */,
 				F297DCA0195C199F00A7501F /* nr.cc */,
 				F297DCA1195C199F00A7501F /* precon.cc */,
-				F297DCA2195C199F00A7501F /* scomplex.cc */,
 				F297DCA3195C199F00A7501F /* scrmatrix.cc */,
 				F297DCA4195C199F00A7501F /* timing.cc */,
 				F297DCA5195C199F00A7501F /* util.cc */,
@@ -179,8 +173,6 @@
 				F297DCAD195C199F00A7501F /* crmatrix.cc in Sources */,
 				F297DCAF195C199F00A7501F /* fourn.cc in Sources */,
 				F297DCAB195C199F00A7501F /* cr_cholesky.cc in Sources */,
-				F297DCAA195C199F00A7501F /* complex.cc in Sources */,
-				F297DCB5195C199F00A7501F /* scomplex.cc in Sources */,
 				F297DCB2195C199F00A7501F /* mathdef.cc in Sources */,
 				F297DCA9195C199F00A7501F /* arpack.cc in Sources */,
 				F297DCB9195C199F00A7501F /* vector.cc in Sources */,
@@ -272,7 +264,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				EXECUTABLE_PREFIX = "";
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
@@ -292,7 +284,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				EXECUTABLE_PREFIX = "";
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (

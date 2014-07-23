@@ -32,6 +32,7 @@
 		F229EA06195C784D003F34BC /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA05195C784D003F34BC /* libsuperlu.dylib */; };
 		F229EA08195C7857003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA07195C7857003F34BC /* libfe.dylib */; };
 		F229EA0A195C7865003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA09195C7865003F34BC /* libmath.dylib */; };
+		F25A48C719804D0500656531 /* raster_px2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F25A48C619804D0500656531 /* raster_px2.cc */; };
 		F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229E9CE195C7652003F34BC /* libstoast.dylib */; };
 /* End PBXBuildFile section */
 
@@ -75,6 +76,7 @@
 		F229EA05195C784D003F34BC /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = ../../gcc_shared/lib/libsuperlu.dylib; sourceTree = "<group>"; };
 		F229EA07195C7857003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
 		F229EA09195C7865003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
+		F25A48C619804D0500656531 /* raster_px2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_px2.cc; path = ../../src/libstoast/raster_px2.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 		F229E9C5195C7652003F34BC = {
 			isa = PBXGroup;
 			children = (
+				F25A48C619804D0500656531 /* raster_px2.cc */,
 				F229EA09195C7865003F34BC /* libmath.dylib */,
 				F229EA07195C7857003F34BC /* libfe.dylib */,
 				F229EA05195C784D003F34BC /* libsuperlu.dylib */,
@@ -206,6 +209,7 @@
 				F229E9F3195C7749003F34BC /* pparse.cc in Sources */,
 				F229E9FA195C7749003F34BC /* raster_px.cc in Sources */,
 				F229E9F4195C7749003F34BC /* pscaler.cc in Sources */,
+				F25A48C719804D0500656531 /* raster_px2.cc in Sources */,
 				F229E9EB195C7749003F34BC /* fwdsolver_cslu.cc in Sources */,
 				F229EA00195C7749003F34BC /* source.cc in Sources */,
 				F229E9F9195C7749003F34BC /* raster_hb.cc in Sources */,
@@ -296,7 +300,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					NEED_EXPLICIT_INSTANTIATION,
@@ -319,7 +323,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				GCC_PREPROCESSOR_DEFINITIONS = NEED_EXPLICIT_INSTANTIATION;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
