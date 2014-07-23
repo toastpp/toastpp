@@ -1265,7 +1265,7 @@ double l2normsq (const TVector<VT> &v)
 {
     double term, sum = 0.0;
     for (int i = 0; i < v.size; i++) {
-	term = norm (v[i]);
+        term = std::abs(v[i]);
 	sum += term*term;
     }
     return sum;
