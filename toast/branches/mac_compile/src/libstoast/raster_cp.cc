@@ -262,7 +262,8 @@ double Raster_CubicPixel::Value (const IVector &basisgrd, const Point &p)
 
 // ==========================================================================
 
-double Raster_CubicPixel::Value_nomask (const Point &p, int i) const
+double Raster_CubicPixel::Value_nomask (const Point &p, int i, bool is_solidx)
+    const
 {
     // to be done
     return 0.0;

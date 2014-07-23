@@ -20,12 +20,20 @@ Raster_SplineBlob::Raster_SplineBlob (const IVector &_bdim,
     ComputeNodeValues();
 }
 
-double Raster_SplineBlob::Value_nomask (const Point &p, int i) const
+double Raster_SplineBlob::Value_nomask (const Point &p, int i, bool is_solidx)
+    const
 {
-    RANGE_CHECK (i >= 0 && i < slen);
+    int ib;
+    if (is_solidx) {
+	RANGE_CHECK (i >= 0 && i < slen);
+	ib = GetBasisIdx(i);
+    } else {
+	RANGE_CHECK (i >= 0 && i < blen);
+	ib = i;
+    }
     int d;
     IVector b;
-    GetBasisIndices(GetBasisIdx(i),b);
+    GetBasisIndices(ib,b);
     RVector r(dim);
     for (d = 0; d < dim; d++) {
 	r[d] = (b[d]-npad) + (bbmin[d]-p[d])*igrid[d];

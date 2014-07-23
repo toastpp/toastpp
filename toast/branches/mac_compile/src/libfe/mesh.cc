@@ -1671,6 +1671,19 @@ void Mesh::WriteVtk (ostream &os, const RVector &nim)
 // Nonmember functions
 // =========================================================================
 
+// Return the mass matrix for a mesh
+RCompRowMatrix *Mesh::MassMatrix () const
+{
+    idxtype *rowptr, *colidx;
+    int nzero, n = nlen();
+    SparseRowStructure (rowptr, colidx, nzero);
+    RCompRowMatrix *M = new RCompRowMatrix (n,n,rowptr,colidx);
+    delete []rowptr;
+    delete []colidx;
+    AddToSysMatrix (*this, *M, (RVector*)0, ASSEMBLE_FF);
+    return M;
+}
+
 // Add a component to element matrix 'M', given 'mesh' and 'el'
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal or element coefficients are given by 'coeff'
