@@ -152,12 +152,15 @@ private:
     RGenericSparseMatrix *CI; ///< transformation basis->mesh
     RCompRowMatrix *D;        ///< map basis->solution (limited support)
     RCompRowMatrix *Buu;      ///< mesh mass matrix for mapping
+    RCompRowMatrix *Bvv;      ///< pixel mass matrix for mapping
     RCompRowMatrix *Buv;      ///< mixed mapping matrix
 
     /**
      * \brief Returns pointer to mixed mapping matrix
      */
     RCompRowMatrix *CreateMixedMassmat () const;
+
+    RCompRowMatrix *CreatePixelMassmat () const;
 
     int SutherlandHodgman (int el, int xgrid, int ygrid, Point *clip_poly,
         int npoly) const;

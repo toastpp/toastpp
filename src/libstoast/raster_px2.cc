@@ -37,7 +37,16 @@ Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
     // Compute the matrices for the least squares mapping between
     // mesh and pixel basis
     Buu = meshptr->MassMatrix();
+    Bvv = CreatePixelMassmat();
     Buv = CreateMixedMassmat();
+
+    // DEBUG
+    ofstream ofs1("Buv.dat");
+    Buv->ExportRCV (ofs1);
+    ofstream ofs2("Bvv.dat");
+    Bvv->ExportRCV (ofs2);
+    ofstream ofs3("Buu.dat");
+    Buu->ExportRCV (ofs3);
 
     // formulate basis->solution mapping in sparse matrix
     idxtype *rowptr = new idxtype[slen+1];
@@ -73,6 +82,7 @@ Raster_Pixel2::~Raster_Pixel2 ()
     }
     delete D;
     delete Buu;
+    delete Bvv;
     delete Buv;
 }
 
@@ -140,7 +150,8 @@ void Raster_Pixel2::Map_BasisToGrid (const CVector &bvec, CVector &gvec) const
 
 void Raster_Pixel2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
 {
-    C->Ax (mvec, bvec);
+    double tol = 1e-10;
+    PCG (*Bvv, ATx(*Buv,mvec), bvec, tol);
 }
 
 // ==========================================================================
@@ -148,20 +159,7 @@ void Raster_Pixel2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
 void Raster_Pixel2::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
 {
     double tol = 1e-10;
-
-    ofstream ofs1("bvec.dat");
-    ofs1 << bvec << std::endl;
-
-    ofstream ofs2("Buu.dat");
-    Buu->ExportRCV(ofs2);
-
-    ofstream ofs3("Buv.dat");
-    Buv->ExportRCV(ofs3);
-
-    RVector tmp = Ax(*Buv,bvec);
-    PCG (*Buu, tmp, mvec, tol);
-
-    //PCG (*Buu, Ax(*Buv,bvec), mvec, tol);
+    PCG (*Buu, Ax(*Buv,bvec), mvec, tol);
 }
 
 // ==========================================================================
@@ -478,4 +476,99 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 	    }
     }
     return new RCompRowMatrix (Buv);
+}
+
+RCompRowMatrix *Raster_Pixel2::CreatePixelMassmat () const
+{
+    // neighbour stencils
+    static const int nstencil2 = 9;
+    static const int nstencil3 = 27;
+
+    // integral weights on unit square for 2D problems
+    static const double w2[3] = {
+	1.0/9.0,  // diagonal
+	1.0/18.0, // edge neighbours
+	1.0/36.0  // diagonal neighbours
+    }; 
+    // integral weights on unit cube for 3D problems
+    static const double w3[4] = {
+	1.0/27.0,  // diagonal
+	1.0/54.0,  // edge neighbours
+	1.0/108.0, // side diagonal neighbours
+	1.0/216.0  // volume diagonal neighbour
+    };
+
+    int i, j, k, k0, k1, r, c, nstencil;
+    double scale = 1.0;
+    RVector d(dim);
+    for (i = 0; i < dim; i++) {
+	d[i] = bbsize[i]/(bdim[i]-1.0);
+	scale = scale*d[i];
+    }
+
+    nstencil = (dim==2 ? nstencil2 : nstencil3);
+    int *stencil = new int[nstencil];
+    if (dim == 2) {
+	for (j = 0; j < 3; j++)
+	    for (i = 0; i < 3; i++) {
+		stencil[i+j*3] = (i-1) + (j-1)*bdim[0];
+	    }
+    } else {
+	for (k = 0; k < 3; k++)
+	    for (j = 0; j < 3; j++)
+		for (i = 0; i < 3; i++) {
+		    stencil[i+(j+k*3)*3] =
+			(i-1) + ((j-1) + (k-1)*bdim[1])*bdim[0];
+		}
+    }
+
+    // evaluate sparse matrix structure
+    int *nrowentry = new int[blen];
+    int nentry = 0;
+    for (r = 0; r < blen; r++) {
+	nrowentry[r] = 0;
+	for (i = 0; i < nstencil; i++) {
+	    c = r + stencil[i];
+	    if (c >= 0 && c < blen) nrowentry[r]++;
+	}
+	nentry += nrowentry[r];
+    }
+
+    int *rowptr = new int[blen+1];
+    int *colidx = new int[nentry];
+	
+    rowptr[0] = 0;
+    for (r = i = 0; r < blen; r++) {
+	rowptr[r+1] = rowptr[r] + nrowentry[r];
+	for (j = 0; j < nstencil; j++) {
+	    c = r + stencil[j];
+	    if (c >= 0 && c < blen)
+		colidx[i++] = c;
+	}
+    }
+ 
+    RCompRowMatrix *M = new RCompRowMatrix (blen, blen, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+    delete []stencil;
+    delete []nrowentry;
+
+    // fill matrix
+    // WARNING: Currently only supports 2D
+    for (j = 0; j < bdim[1]-1; j++) {
+	for (i = 0; i < bdim[0]-1; i++) {
+	    int base = i + j*bdim[0];
+	    for (k1 = 0; k1 < 4; k1++) {
+		int idx1 = base + k1%2 + (k1/2)*bdim[0];
+		for (k0 = 0; k0 < 4; k0++) {
+		    int idx0 = base + k0%2 + (k0/2)*bdim[0];
+		    double v = (k0 == k1 ? w2[0] :
+				k0+k1==3 ? w2[2] : w2[1])*scale;
+		    (*M)(idx0,idx1) += v;
+		}
+	    }
+	}
+    }
+    
+    return M;
 }
