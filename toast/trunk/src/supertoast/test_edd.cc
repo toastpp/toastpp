@@ -1130,7 +1130,7 @@ void SelectInitialElParams (ParamParser &pp,  Mesh &mesh)
 	    case 4:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
-		cin >> cbuf+4;
+		cin >> (cbuf+4);
 		ReadNim (cbuf+4, param[p]);
 		break;
 		*/

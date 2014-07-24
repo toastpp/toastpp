@@ -48,12 +48,13 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     unsigned int funcid;
 
-    if (mxIsUint32 (prhs[0])) {
+    if (nrhs> 0 && mxIsUint32 (prhs[0])) {
 	funcid = *(unsigned int*)mxGetData (prhs[0]);
 	nrhs--;
 	prhs++;
-    } else {
-	mexErrMsgTxt ("toast: Invalid toast driver call: integer function id expected in first argument.");
+    }
+    else {
+        mexErrMsgTxt ("toast: Invalid toast driver call: integer function id expected in first argument.");
     }
 
     ProvideToast();
