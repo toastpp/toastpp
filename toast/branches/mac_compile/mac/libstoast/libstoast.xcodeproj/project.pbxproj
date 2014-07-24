@@ -96,7 +96,6 @@
 		F229E9C5195C7652003F34BC = {
 			isa = PBXGroup;
 			children = (
-				F25A48C619804D0500656531 /* raster_px2.cc */,
 				F229EA09195C7865003F34BC /* libmath.dylib */,
 				F229EA07195C7857003F34BC /* libfe.dylib */,
 				F229EA05195C784D003F34BC /* libsuperlu.dylib */,
@@ -105,6 +104,7 @@
 				F229E9D7195C7749003F34BC /* fwdsolver_zslu.cc */,
 				F229E9D8195C7749003F34BC /* fwdsolver.cc */,
 				F229E9D9195C7749003F34BC /* jacobian.cc */,
+				F25A48C619804D0500656531 /* raster_px2.cc */,
 				F229E9DA195C7749003F34BC /* lsearch.cc */,
 				F229E9DB195C7749003F34BC /* mwsolution.cc */,
 				F229E9DC195C7749003F34BC /* of.cc */,

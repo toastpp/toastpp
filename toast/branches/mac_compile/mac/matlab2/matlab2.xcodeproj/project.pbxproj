@@ -270,6 +270,7 @@
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"char16_t=UINT16_T",
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -277,7 +278,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib/";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../lib/\"",
 					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
@@ -311,7 +312,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib/";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../lib/\"",
 					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
