@@ -73,7 +73,7 @@ TVector<VT>::TVector (int dim, VT *values, CopyMode cmode)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
-    if (ext_data = (cmode==SHALLOW_COPY)) {
+    if ((ext_data = (cmode==SHALLOW_COPY))) {
 	Link (values, dim);
     } else {
 	Allocate (dim);
@@ -119,7 +119,7 @@ TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
     dASSERT(ofs+dim <= v.Dim(),
 	"Data block of reference vector must be contained in original vector");
     base_nref = 0;
-    if (ext_data = v.ext_data) {
+    if ((ext_data = v.ext_data)) {
 	Link (v.data + ofs, dim);
 	// raw link to v's data buffer without reference counting
 	// i.e. v must remain valid throughout the lifetime of this
@@ -1265,7 +1265,7 @@ double l2normsq (const TVector<VT> &v)
 {
     double term, sum = 0.0;
     for (int i = 0; i < v.size; i++) {
-	term = norm (v[i]);
+        term = std::abs(v[i]);
 	sum += term*term;
     }
     return sum;

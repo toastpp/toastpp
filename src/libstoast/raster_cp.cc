@@ -94,7 +94,7 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 	    }
 	}
 
-	if (g_rownz[i] = nz) {
+	if ((g_rownz[i] = nz)) {
 	    g_colidx[i] = new int[nz];
 	    g_val[i] = new double[nz];
 	    nz_tot += nz;
