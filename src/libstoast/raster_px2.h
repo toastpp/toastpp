@@ -132,24 +132,9 @@ public:
      */
     void Map_SolToMesh (const RVector &svec, RVector &mvec) const;
 
-    /**
-     * \brief Return the mesh->basis transformation matrix.
-     */
-    const RGenericSparseMatrix &Mesh2BasisMatrix() const { return *C; }
-
-    /**
-     * \brief Return the basis->mesh transformation matrix.
-     */
-    const RGenericSparseMatrix &Basis2MeshMatrix() const { return *CI; }
-
-
 
 private:
     bool grid_is_basis;       ///< grid and basis dimensions identical?
-    RGenericSparseMatrix *G;  ///< transformation grid->basis
-    RGenericSparseMatrix *GI; ///< transformation basis->grid
-    RGenericSparseMatrix *C;  ///< transformation mesh->basis
-    RGenericSparseMatrix *CI; ///< transformation basis->mesh
     RCompRowMatrix *D;        ///< map basis->solution (limited support)
     RCompRowMatrix *Buu;      ///< mesh mass matrix for mapping
     RCompRowMatrix *Bvv;      ///< pixel mass matrix for mapping
