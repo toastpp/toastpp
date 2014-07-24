@@ -13,40 +13,14 @@ Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
 {
     int i, j;
 
-    if (bdim == gdim) {
-	// basis and grid are identical
-	G  = NULL;
-	GI = NULL;
-	C  = B;
-	CI = BI;
-    } else {
-	// set up mapping between high-res grid and native pixel basis
-	G  = Grid2LinPixMatrix (gdim, bdim, gelref);
-	((RCompRowMatrix*)G)->Shrink();
-	GI = LinPix2GridMatrix (gdim, bdim, gelref);
-	((RCompRowMatrix*)GI)->Shrink();
-	// set up mapping between mesh and native pixel basis
-	C = new RCompRowMatrix;
-	((RCompRowMatrix*)G)->AB (*(RCompRowMatrix*)B, *(RCompRowMatrix*)C);
-	((RCompRowMatrix*)C)->Shrink();
-	CI = new RCompRowMatrix;
-	((RCompRowMatrix*)BI)->AB (*(RCompRowMatrix*)GI, *(RCompRowMatrix*)CI);
-	((RCompRowMatrix*)CI)->Shrink();
-    }
+    xASSERT(bdim==gdim,
+	    "This basis type doesn't support intemediate grid basis");
 
     // Compute the matrices for the least squares mapping between
     // mesh and pixel basis
     Buu = meshptr->MassMatrix();
     Bvv = CreatePixelMassmat();
     Buv = CreateMixedMassmat();
-
-    // DEBUG
-    ofstream ofs1("Buv.dat");
-    Buv->ExportRCV (ofs1);
-    ofstream ofs2("Bvv.dat");
-    Bvv->ExportRCV (ofs2);
-    ofstream ofs3("Buu.dat");
-    Buu->ExportRCV (ofs3);
 
     // formulate basis->solution mapping in sparse matrix
     idxtype *rowptr = new idxtype[slen+1];
@@ -72,14 +46,6 @@ Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
 
 Raster_Pixel2::~Raster_Pixel2 ()
 {
-    if (G)  {
-	delete G;
-	delete C;
-    }
-    if (GI) {
-	delete GI;
-	delete CI;
-    }
     delete D;
     delete Buu;
     delete Bvv;
@@ -118,32 +84,28 @@ double Raster_Pixel2::Value_nomask (const Point &p, int i, bool is_solidx) const
 
 void Raster_Pixel2::Map_GridToBasis (const RVector &gvec, RVector &bvec) const
 {
-    if (G) G->Ax (gvec, bvec);
-    else   bvec = gvec;
+    bvec = gvec; // NOP
 }
 
 // ==========================================================================
 
 void Raster_Pixel2::Map_GridToBasis (const CVector &gvec, CVector &bvec) const
 {
-    if (G) ((RCompRowMatrix*)G)->Ax_cplx (gvec, bvec);
-    else   bvec = gvec;
+    bvec = gvec; // NOP
 }
 
 // ==========================================================================
 
 void Raster_Pixel2::Map_BasisToGrid (const RVector &bvec, RVector &gvec) const
 {
-    if (GI) GI->Ax (bvec, gvec);
-    else    gvec = bvec;
+    gvec = bvec; // NOP
 }
 
 // ==========================================================================
 
 void Raster_Pixel2::Map_BasisToGrid (const CVector &bvec, CVector &gvec) const
 {
-    if (GI) ((RCompRowMatrix*)GI)->Ax_cplx (bvec, gvec);
-    else    gvec = bvec;
+    gvec = bvec; // NOP
 }
 
 // ==========================================================================
@@ -266,7 +228,7 @@ static void poly_free(poly p)
     free(p->v);
     free(p);
 }
- 
+
 static void poly_append(poly p, vec v)
 {
     if (p->len >= p->alloc) {
@@ -275,6 +237,11 @@ static void poly_append(poly p, vec v)
 	p->v = (vec)realloc(p->v, sizeof(vec_t) * p->alloc);
     }
     p->v[p->len++] = *v;
+}
+
+static void poly_reset(poly p)
+{
+    p->len = 0;
 }
  
 /* this works only if all of the following are true:
@@ -315,8 +282,10 @@ static void poly_edge_clip(poly sub, vec x0, vec x1, int left, poly res)
 static poly poly_clip(poly sub, poly clip)
 {
 	int i;
-	poly p1 = poly_new(), p2 = poly_new(), tmp;
- 
+	static poly p1 = poly_new(), p2 = poly_new();
+	poly tmp;
+	poly_reset(p1); poly_reset(p2);
+
 	int dir = poly_winding(clip);
 	poly_edge_clip(sub, clip->v + clip->len - 1, clip->v, dir, p2);
 	for (i = 0; i < clip->len - 1; i++) {
@@ -328,7 +297,7 @@ static poly poly_clip(poly sub, poly clip)
 		poly_edge_clip(p1, clip->v + i, clip->v + i + 1, dir, p2);
 	}
  
-	poly_free(p1);
+	//poly_free(p1);
 	return p2;
 }
  
@@ -391,7 +360,7 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
 
 RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 {
-    int i, j, k, m, el, nel = meshptr->elen();
+    int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
     int imin, imax, jmin, jmax;
     double b;
@@ -401,8 +370,73 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     double dx = xrange/(bdim[0]-1.0);
     double dy = yrange/(bdim[1]-1.0);
 
-    RCoordMatrix Buv(meshptr->nlen(), blen);
+    // quadrature rule for local triangle
+    const double *wght;
+    const Point *absc;
+    int np = QRule_tri_4_6 (&wght, &absc);
 
+    // pass 1: determine matrix fill structure
+    int *nimin = new int[n];
+    int *nimax = new int[n];
+    int *njmin = new int[n];
+    int *njmax = new int[n];
+    for (i = 0; i < n; i++) {
+	nimin[i] = bdim[0];
+	njmin[i] = bdim[1];
+	nimax[i] = njmax[i] = -1;
+    }
+    for (el = 0; el < nel; el++) {
+	Element *pel = meshptr->elist[el];
+	// element bounding box
+	double exmin = meshptr->nlist[pel->Node[0]][0];
+	double exmax = meshptr->nlist[pel->Node[0]][0];
+	double eymin = meshptr->nlist[pel->Node[0]][1];
+	double eymax = meshptr->nlist[pel->Node[0]][1];
+	for (j = 1; j < pel->nNode(); j++) {
+	    exmin = min (exmin, meshptr->nlist[pel->Node[j]][0]);
+	    exmax = max (exmax, meshptr->nlist[pel->Node[j]][0]);
+	    eymin = min (eymin, meshptr->nlist[pel->Node[j]][1]);
+	    eymax = max (eymax, meshptr->nlist[pel->Node[j]][1]);
+	}
+	// determine which pixels overlap the element
+	imin = max (0, (int)floor((bdim[0]-1) * (exmin-bbmin[0])/xrange));
+	imax = min (bdim[0]-2, (int)floor((bdim[0]-1) * (exmax-bbmin[0])/xrange));
+	jmin = max (0, (int)floor((bdim[1]-1) * (eymin-bbmin[1])/yrange));
+	jmax = min (bdim[1]-2, (int)floor((bdim[1]-1) * (eymax-bbmin[1])/yrange));
+	for (i = 0; i < pel->nNode(); i++) {
+	    int nidx = pel->Node[i];
+	    if (imin < nimin[nidx]) nimin[nidx] = imin;
+	    if (imax > nimax[nidx]) nimax[nidx] = imax;
+	    if (jmin < njmin[nidx]) njmin[nidx] = jmin;
+	    if (jmax > njmax[nidx]) njmax[nidx] = jmax;
+	}
+    }
+
+    int *rowptr = new int[n+1];
+    rowptr[0] = 0;
+    for (r = 0; r < n; r++) {
+	int nentry = (nimax[r]-nimin[r]+2)*(njmax[r]-njmin[r]+2);
+	rowptr[r+1] = rowptr[r]+nentry;
+    }
+    int nz = rowptr[n];
+    int *colidx = new int[nz];
+    for (r = k = 0; r < n; r++) {
+	for (j = njmin[r]; j <= njmax[r]+1; j++) {
+	    for (i = nimin[r]; i <= nimax[r]+1; i++) {
+		colidx[k++] = i + j*bdim[0];
+	    }
+	}
+    }
+
+    RCompRowMatrix *Buv = new RCompRowMatrix (n, blen, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+    delete []nimin;
+    delete []nimax;
+    delete []njmin;
+    delete []njmax;
+
+    // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
 	xASSERT(pel->Type() == ELID_TRI3, "Currently only implemented for 3-noded triangles");
@@ -424,11 +458,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 	imax = min (bdim[0]-2, (int)floor((bdim[0]-1) * (exmax-bbmin[0])/xrange));
 	jmin = max (0, (int)floor((bdim[1]-1) * (eymin-bbmin[1])/yrange));
 	jmax = min (bdim[1]-2, (int)floor((bdim[1]-1) * (eymax-bbmin[1])/yrange));
-
-	// quadrature rule for local triangle
-	const double *wght;
-	const Point *absc;
-	int np = QRule_tri_4_6 (&wght, &absc);
 
 	// perform subdivision for every intersecting pixel
 	const int npoly = 10;
@@ -468,15 +497,20 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 			    b = Value_nomask (glob, idx_j, false);
 			    for (ii = 0; ii < 3; ii++) {
 				idx_i = pel->Node[ii];
-				Buv(idx_i, idx_j) += v*b*fun[ii];
+				(*Buv)(idx_i, idx_j) += v*b*fun[ii];
 			    }
 			}
 		    }
 		}
 	    }
     }
-    return new RCompRowMatrix (Buv);
+
+    Buv->Shrink();
+    return Buv;
 }
+
+// ==========================================================================
+// Creates the pixel-pixel mass matrix (Bvv)
 
 RCompRowMatrix *Raster_Pixel2::CreatePixelMassmat () const
 {
