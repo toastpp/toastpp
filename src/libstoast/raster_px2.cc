@@ -8,8 +8,8 @@ using namespace std;
 // class Raster_Pixel2 (v.2)
 
 Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
-    Mesh *mesh, RDenseMatrix *bb)
-    : Raster (_bdim, _gdim, mesh, bb)
+    Mesh *mesh, RDenseMatrix *bb, double _map_tol)
+: Raster (_bdim, _gdim, mesh, bb), map_tol(_map_tol)
 {
     int i, j;
 
@@ -21,6 +21,9 @@ Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
     Buu = meshptr->MassMatrix();
     Bvv = CreatePixelMassmat();
     Buv = CreateMixedMassmat();
+
+    Buu_precon = new RPrecon_IC; Buu_precon->Reset (Buu);
+    Bvv_precon = new RPrecon_IC; Bvv_precon->Reset (Bvv);
 
     // formulate basis->solution mapping in sparse matrix
     idxtype *rowptr = new idxtype[slen+1];
@@ -50,6 +53,8 @@ Raster_Pixel2::~Raster_Pixel2 ()
     delete Buu;
     delete Bvv;
     delete Buv;
+    delete Buu_precon;
+    delete Bvv_precon;
 }
 
 // ==========================================================================
@@ -112,16 +117,18 @@ void Raster_Pixel2::Map_BasisToGrid (const CVector &bvec, CVector &gvec) const
 
 void Raster_Pixel2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
 {
-    double tol = 1e-10;
-    PCG (*Bvv, ATx(*Buv,mvec), bvec, tol);
+    double tol = map_tol;
+    int nit = PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
+    //std::cerr << "Map_MeshToBasis: niter=" << nit << std:: endl;
 }
 
 // ==========================================================================
 
 void Raster_Pixel2::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
 {
-    double tol = 1e-10;
-    PCG (*Buu, Ax(*Buv,bvec), mvec, tol);
+    double tol = map_tol;
+    int nit = PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
+    //std::cerr << "Map_BasisToMesh: niter=" << nit << std:: endl;
 }
 
 // ==========================================================================

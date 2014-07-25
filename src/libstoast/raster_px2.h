@@ -23,17 +23,18 @@ public:
      * \brief Pixel basis constructor.
      * \param _bdim basis dimensions (the length of this vector is 2 or 3,
      *   corresponding to the mesh dimension).
-     * \param _gdim High-res grid dimensions (the length of this vector is 2
-     *   or 3, corresponding to the mesh dimension).
+     * \param _gdim Not used by this basis type. Must be identical to _bdim.
      * \param mesh pointer to mesh instance
      * \param bb bounding box for the basis representation (size 2x3 or 3x3)
+     * \param _map_tol Tolerance limit for least-squares solver in
+     *   Map_MeshToBasis and Map_BasisToMesh
      * \note If the bounding box is not provided, it is calculated from the
      *   mesh geometry.
      * \note The mesh pointer must remain valid for the lifetime of the basis
      *   instance.
      */
     Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
-        RDenseMatrix *bb = 0);
+        RDenseMatrix *bb = 0, double _map_tol=1e-10);
 
     /**
      * \brief Pixel basis destructor.
@@ -139,6 +140,10 @@ private:
     RCompRowMatrix *Buu;      ///< mesh mass matrix for mapping
     RCompRowMatrix *Bvv;      ///< pixel mass matrix for mapping
     RCompRowMatrix *Buv;      ///< mixed mapping matrix
+
+    RPrecon_IC *Buu_precon;   ///< preconditioner for basis->mesh map
+    RPrecon_IC *Bvv_precon;   ///< preconditioner for mesh->basis map
+    double map_tol;           ///< tolerance limit for least squares basis map
 
     /**
      * \brief Returns pointer to mixed mapping matrix
