@@ -28,11 +28,11 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 
 void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
     const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J);
+    bool logdata, RDenseMatrix &J);
 
 void CalcJacobianCW (const QMMesh &mesh,
     const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J);
+    bool logdata, RDenseMatrix &J);
 
 void Project (const QMMesh &mesh, int q, const RVector &phi,
     RVector &proj);
@@ -158,8 +158,7 @@ void MatlabToast::JacobianCW (int nlhs, mxArray *plhs[], int nrhs,
     int n = mesh->nlen();
 
     // raster
-    Raster *raster = GetBasis(prhs[1]);
-    ASSERTARG(raster, 2, "Basis not found");
+    Raster *raster = GetBasis(prhs[1], 0, true);
 
     // source vectors
     RCompRowMatrix qvec;
@@ -178,7 +177,7 @@ void MatlabToast::JacobianCW (int nlhs, mxArray *plhs[], int nrhs,
     char solver[128];
     double tol = 1e-10;
     mxGetString (prhs[7], solver, 128);
-    if (nrhs >= 10) tol = mxGetScalar (prhs[8]);
+    if (nrhs >= 9) tol = mxGetScalar (prhs[8]);
 	
     CalcJacobianCW (mesh, raster, qvec, mvec, mua, mus, ref,
 		  solver, tol, &plhs[0]);
@@ -322,7 +321,7 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 	c2a[i] = c0/(2.0*ref[i]*A_Keijzer (ref[i]));
     msol.SetParam (OT_C2A, c2a);
 
-    bool logparam = true; // make user-definable
+    bool logdata = true; // make user-definable
 
     // build the field vectors
     dphi = new RVector[nQ];
@@ -341,9 +340,9 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     int nprm = slen;
     RDenseMatrix J(ndat,nprm);
     if (raster)
-	CalcJacobianCW (*raster, *mesh, dphi, aphi, logparam, J);
+	CalcJacobianCW (*raster, *mesh, dphi, aphi, logdata, J);
     else
-	CalcJacobianCW (*mesh, dphi, aphi, logparam, J);
+	CalcJacobianCW (*mesh, dphi, aphi, logdata, J);
 
     delete []dphi;
     delete []aphi;
@@ -355,7 +354,7 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 
 void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
     const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J)
+    bool logdata, RDenseMatrix &J)
 {
     int i, j, jj, k, idx, dim, nQ, nM, nQM, slen, glen;
     const RGenericSparseMatrix &B = raster.Mesh2GridMatrix();
@@ -391,7 +390,7 @@ void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
 	ImageGradient (gdim, gsize, cdfield, cdfield_grad,
 		       raster.Elref());
 
-	if (logparam) {
+	if (logdata) {
 	    proj.New (mesh.nQMref[i]);
 	    Project (mesh, i, dphi[i], proj);
 	}
@@ -404,7 +403,7 @@ void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
 			   raster.Elref());
 
 	    PMDF_mua (cdfield, cafield[j], pmdf_mua);
-	    if (logparam) pmdf_mua /= proj[jj];
+	    if (logdata) pmdf_mua /= proj[jj];
 
 	    // map into solution basis
 	    raster.Map_GridToSol (pmdf_mua, pmdf_basis);
@@ -425,7 +424,7 @@ void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
 
 void CalcJacobianCW (const QMMesh &mesh,
     const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J)
+    bool logdata, RDenseMatrix &J)
 {
     cerr << "Jacobian: using mesh basis" << endl;
     cerr << "Dim: " << J.nRows() << " x " << J.nCols() << endl;
@@ -449,7 +448,7 @@ void CalcJacobianCW (const QMMesh &mesh,
 
 	    if (!mesh.Connected (i,j)) continue;
 	    pmdf_mua = IntFG (mesh, dphi[i], aphi[j]);
-	    if (logparam) pmdf_mua /= proj[jj];
+	    if (logdata) pmdf_mua /= proj[jj];
 
 	    // map into solution basis
 	    for (k = 0; k < n; k++)

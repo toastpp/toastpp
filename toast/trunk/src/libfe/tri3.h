@@ -96,6 +96,15 @@ public:
     double SideSize (int sd, const NodeList &nlist) const;
     // returns length of side 'sd'
 
+    /**
+     * \brief Returns determinant of Jacobian
+     * \param loc evaluation point (ignored for this element type)
+     * \param nlist mesh node list (not required for this element type)
+     * \return 2*Size()
+     */
+    double DetJ (const Point &loc, const NodeList *nlist = 0) const
+    { return Size()*2.0; }
+
     Point Local (const NodeList& nlist, const Point& glob) const;
     // returns the local coordinate corresponding to global coordinate 'glob'
 
