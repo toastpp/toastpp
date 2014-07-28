@@ -5,6 +5,7 @@
 
 #include "matlabtoast.h"
 #include "toastmex.h"
+#include "fwdsolver.h"
 
 using namespace std;
 
@@ -27,15 +28,17 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     char *solver, double tol, mxArray **res);
 
 void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
+    const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
     bool logdata, RDenseMatrix &J);
 
 void CalcJacobianCW (const QMMesh &mesh,
+    const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
     bool logdata, RDenseMatrix &J);
 
-void Project (const QMMesh &mesh, int q, const RVector &phi,
-    RVector &proj);
+//void Project (const QMMesh &mesh, int q, const RVector &phi,
+//    RVector &proj);
 
 RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g);
 
@@ -340,9 +343,9 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     int nprm = slen;
     RDenseMatrix J(ndat,nprm);
     if (raster)
-	CalcJacobianCW (*raster, *mesh, dphi, aphi, logdata, J);
+	CalcJacobianCW (*raster, *mesh, mvec, dphi, aphi, logdata, J);
     else
-	CalcJacobianCW (*mesh, dphi, aphi, logdata, J);
+	CalcJacobianCW (*mesh, mvec, dphi, aphi, logdata, J);
 
     delete []dphi;
     delete []aphi;
@@ -353,6 +356,7 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 // ============================================================================
 
 void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
+    const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
     bool logdata, RDenseMatrix &J)
 {
@@ -391,8 +395,9 @@ void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
 		       raster.Elref());
 
 	if (logdata) {
-	    proj.New (mesh.nQMref[i]);
-	    Project (mesh, i, dphi[i], proj);
+	    proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
+	    //proj.New (mesh.nQMref[i]);
+	    //Project (mesh, i, dphi[i], proj);
 	}
 
 	for (j = jj = 0; j < nM; j++) {
@@ -422,7 +427,7 @@ void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
 // ============================================================================
 // This version doesn't use base mapping and works directly on the mesh basis
 
-void CalcJacobianCW (const QMMesh &mesh,
+void CalcJacobianCW (const QMMesh &mesh, const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
     bool logdata, RDenseMatrix &J)
 {
@@ -441,8 +446,9 @@ void CalcJacobianCW (const QMMesh &mesh,
 
     for (i = idx = 0; i < nQ; i++) {
 
-	proj.New (mesh.nQMref[i]);
-	Project (mesh, i, dphi[i], proj);
+	proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
+	//proj.New (mesh.nQMref[i]);
+	//Project (mesh, i, dphi[i], proj);
 
 	for (j = jj = 0; j < nM; j++) {
 
@@ -462,7 +468,7 @@ void CalcJacobianCW (const QMMesh &mesh,
 
 // ============================================================================
 // generate a projection from a field - real case
-
+/*
 void Project (const QMMesh &mesh, int q, const RVector &phi,
     RVector &proj)
 {
@@ -486,7 +492,7 @@ void Project (const QMMesh &mesh, int q, const RVector &phi,
 	proj[i] = dphi;
     }
 }
-
+*/
 // ============================================================================
 
 RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g)
