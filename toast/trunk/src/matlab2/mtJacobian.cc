@@ -9,6 +9,8 @@
 
 using namespace std;
 
+unsigned int verb;
+
 // =========================================================================
 // Prototypes
 // =========================================================================
@@ -27,27 +29,6 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     const RVector &mua, const RVector &mus, const RVector &ref,
     char *solver, double tol, mxArray **res);
 
-void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
-    const RCompRowMatrix &mvec,
-    const RVector *dphi, const RVector *aphi,
-    bool logdata, RDenseMatrix &J);
-
-void CalcJacobianCW (const QMMesh &mesh,
-    const RCompRowMatrix &mvec,
-    const RVector *dphi, const RVector *aphi,
-    bool logdata, RDenseMatrix &J);
-
-//void Project (const QMMesh &mesh, int q, const RVector &phi,
-//    RVector &proj);
-
-RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g);
-
-void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf);
-RVector PMDF_mua (const RVector &dphi, const RVector &aphi, double proj);
-CVector PMDF_mua (const CVector &dphi, const CVector &aphi);
-void PMDF_mua (const CVector &pmdf, std::complex<double> proj,
-    RVector &pmdf_mod, RVector &pmdf_arg);
-
 // =========================================================================
 // Matlab interface
 // =========================================================================
@@ -58,6 +39,8 @@ void PMDF_mua (const CVector &pmdf, std::complex<double> proj,
 void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
+    verb = verbosity;
+
     // mesh
     QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
     ASSERTARG(mesh, 1, "Mesh not found");
@@ -155,6 +138,8 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::JacobianCW (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
+    verb = verbosity;
+
     // mesh
     QMMesh *mesh = (QMMesh*)GetMesh(prhs[0]);
     ASSERTARG(mesh, 1, "Mesh not found");
@@ -342,223 +327,10 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     int ndat = mesh->nQM;
     int nprm = slen;
     RDenseMatrix J(ndat,nprm);
-    if (raster)
-	CalcJacobianCW (*raster, *mesh, mvec, dphi, aphi, logdata, J);
-    else
-	CalcJacobianCW (*mesh, mvec, dphi, aphi, logdata, J);
+    GenerateJacobian_cw (raster, mesh, mvec, dphi, aphi, DATA_LOG, &J);
 
     delete []dphi;
     delete []aphi;
 
     CopyMatrix (res, J);
 }                                                                              
-
-// ============================================================================
-
-void CalcJacobianCW (const Raster &raster, const QMMesh &mesh,
-    const RCompRowMatrix &mvec,
-    const RVector *dphi, const RVector *aphi,
-    bool logdata, RDenseMatrix &J)
-{
-    int i, j, jj, k, idx, dim, nQ, nM, nQM, slen, glen;
-    const RGenericSparseMatrix &B = raster.Mesh2GridMatrix();
-    const IVector &gdim = raster.GDim();
-    const IVector &bdim = raster.BDim();
-    const RVector &gsize = raster.GSize();
-    dim  = raster.Dim();
-    glen = raster.GLen();
-    slen = raster.SLen();
-    nQ   = mesh.nQ;
-    nM   = mesh.nM;
-    nQM  = mesh.nQM;
-
-    RVector pmdf_mua(glen);
-    RVector pmdf_basis(slen);
-    RVector proj;
-    RVector cdfield(glen);
-    RVector *cafield = new RVector[nM];
-    RVector *cdfield_grad = new RVector[dim];
-    RVector *cafield_grad = new RVector[dim];
-
-    // resample all measurement fields to fine grid
-    //cout << "Allocating " << glen*nM*8*2 << " bytes for cafield" << endl;
-    for (i = 0; i < nM; i++) {
-        cafield[i].New (glen);
-	raster.Map_MeshToGrid (aphi[i], cafield[i]);
-    }
-
-    for (i = idx = 0; i < nQ; i++) {
-
-        // resample field and field gradient for source i to fine grid
-	raster.Map_MeshToGrid (dphi[i], cdfield);
-	ImageGradient (gdim, gsize, cdfield, cdfield_grad,
-		       raster.Elref());
-
-	if (logdata) {
-	    proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
-	    //proj.New (mesh.nQMref[i]);
-	    //Project (mesh, i, dphi[i], proj);
-	}
-
-	for (j = jj = 0; j < nM; j++) {
-	    if (!mesh.Connected (i,j)) continue;
-
-	    // measurement field gradient
-	    ImageGradient (gdim, gsize, cafield[j], cafield_grad,
-			   raster.Elref());
-
-	    PMDF_mua (cdfield, cafield[j], pmdf_mua);
-	    if (logdata) pmdf_mua /= proj[jj];
-
-	    // map into solution basis
-	    raster.Map_GridToSol (pmdf_mua, pmdf_basis);
-	    for (k = 0; k < slen; k++)
-	        J(idx,k) = pmdf_basis[k];
-
-	    idx++;
-	    jj++;
-	}
-    }
-    delete []cafield;
-    delete []cdfield_grad;
-    delete []cafield_grad;
-}
-
-// ============================================================================
-// This version doesn't use base mapping and works directly on the mesh basis
-
-void CalcJacobianCW (const QMMesh &mesh, const RCompRowMatrix &mvec,
-    const RVector *dphi, const RVector *aphi,
-    bool logdata, RDenseMatrix &J)
-{
-    cerr << "Jacobian: using mesh basis" << endl;
-    cerr << "Dim: " << J.nRows() << " x " << J.nCols() << endl;
-
-    int i, j, jj, k, n, idx, dim, nQ, nM, nQM, slen, glen;
-    n    = mesh.nlen();
-    nQ   = mesh.nQ;
-    nM   = mesh.nM;
-    nQM  = mesh.nQM;
-
-    RVector pmdf_mua (n);
-    RVector cdfield(n);
-    RVector proj;
-
-    for (i = idx = 0; i < nQ; i++) {
-
-	proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
-	//proj.New (mesh.nQMref[i]);
-	//Project (mesh, i, dphi[i], proj);
-
-	for (j = jj = 0; j < nM; j++) {
-
-	    if (!mesh.Connected (i,j)) continue;
-	    pmdf_mua = IntFG (mesh, dphi[i], aphi[j]);
-	    if (logdata) pmdf_mua /= proj[jj];
-
-	    // map into solution basis
-	    for (k = 0; k < n; k++)
-	        J(idx,k) = -pmdf_mua[k];
-
-	    idx++;
-	    jj++;
-	}
-    }
-}
-
-// ============================================================================
-// generate a projection from a field - real case
-/*
-void Project (const QMMesh &mesh, int q, const RVector &phi,
-    RVector &proj)
-{
-    int i, m, el, nv, dim, nd, in;
-    double dphi;
-    double c2a;
-
-    for (i = 0; i < mesh.nQMref[q]; i++) {
-	m = mesh.QMref[q][i];
-	el = mesh.Mel[m];
-	nv = mesh.elist[el]->nNode();
-	dim = mesh.elist[el]->Dimension();
-	dphi = 0.0;
-	
-	RVector fun = mesh.elist[el]->GlobalShapeF (mesh.nlist, mesh.M[m]);
-	for (in = 0; in < nv; in++) {
-	    nd = mesh.elist[el]->Node[in];
-	    c2a = mesh.plist[nd].C2A();   // reflection parameter
-	    dphi += phi[nd]*fun[in]*c2a;
-	}
-	proj[i] = dphi;
-    }
-}
-*/
-// ============================================================================
-
-RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g)
-{
-    dASSERT(f.Dim() == mesh.nlen(), Wrong vector size);
-    dASSERT(g.Dim() == mesh.nlen(), Wrong vector size);
-
-    int el, nnode, *node, i, j, k, nj, nk, bs;
-    double sum;
-    Element *pel;
-    RVector tmp(mesh.nlen());
-
-    for (el = 0; el < mesh.elen(); el++) {
-        pel   = mesh.elist[el];
-	nnode = pel->nNode();
-	node  = pel->Node;
-	for (i = 0; i < nnode; i++) {
-	    bs = node[i];
-	    for (j = 0; j < nnode; j++) {
-	        nj = node[j];
-		sum = (f[nj] * g[nj]) * pel->IntFFF(i,j,j);
-		for (k = 0; k < j; k++) {
-		    nk = node[k];
-		    sum += (f[nj]*g[nk] + f[nk]*g[nj]) * pel->IntFFF(i,j,k);
-		}
-		tmp[bs] += sum;
-	    }
-	}
-    }
-    return tmp;
-}
-
-// ============================================================================
-// PMDF calculations
-
-// absorption PMDF (real)
-void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf)
-{
-    int i, len = pmdf.Dim();
-    for (i = 0; i < len; i++)
-        pmdf[i] = -dphi[i]*aphi[i];
-}
-
-// Intensity PMDF for absorption, given the direct and adjoint fields
-// and measurement proj for the given source-detector pair
-RVector PMDF_mua (const RVector &dphi, const RVector &aphi, double proj)
-{
-    return (dphi*aphi) / proj;
-}
-
-// Complex PMDF for absorption, given the direct and adjoint fields
-CVector PMDF_mua (const CVector &dphi, const CVector &aphi)
-{
-    return -(dphi*aphi);
-}
-
-// Extract modulation amplitude PMDF and phase PMDF from complex PMDF
-void PMDF_mua (const CVector &pmdf, std::complex<double> proj,
-    RVector &pmdf_mod, RVector &pmdf_arg)
-{
-    double idenom = 1.0/norm(proj);
-    for (int i = 0; i < pmdf.Dim(); i++) {
-        pmdf_mod[i] = (pmdf[i].real()*proj.real() + pmdf[i].imag()*proj.imag())
-	    * idenom;
-	pmdf_arg[i] = (pmdf[i].imag()*proj.real() - pmdf[i].real()*proj.imag())
-	    * idenom;
-    }
-}
-

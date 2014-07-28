@@ -82,7 +82,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	}
     }
 
-    Raster *raster;
+    Raster *raster = 0;
     switch (basistp) {
     case 0:
 	raster = new Raster_Pixel (bdim, gdim, mesh, bb);
@@ -110,6 +110,8 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	raster = new Raster_Pixel2 (bdim, bdim, mesh, bb, maptol);
 	break;
     }
+    if (raster)
+	mexLock(); // prevent mex file unloading while basis is allocated
 
     plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
     uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
@@ -125,6 +127,7 @@ void MatlabToast::ClearBasis (int nlhs, mxArray *plhs[], int nrhs,
 {
     Raster *raster = GETBASIS_SAFE(0);
     delete raster;
+    mexUnlock();
     if (verbosity >= 1)
         mexPrintf ("<Basis object deleted>\n");
 }
