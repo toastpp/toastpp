@@ -87,12 +87,19 @@ void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
     const CCompRowMatrix &mvec, const CVector *dphi, const CVector *aphi,
     DataScale dscale, RDenseMatrix &J)
 {
+    if (toastVerbosity > 0)
+	std::cout << "Jacobian:" << std::endl;
+
     if (raster == RASTER_NDBASIS)
 	GenerateJacobian_mesh (mesh, mvec, dphi, aphi, dscale, J, false);
     else if (raster == RASTER_ELBASIS)
 	GenerateJacobian_mesh (mesh, mvec, dphi, aphi, dscale, J, true);
     else
 	GenerateJacobian_grid (raster, mesh, mvec, dphi, aphi, dscale, J);
+
+    if (toastVerbosity > 0)
+	std::cout << "--> Dimensions......" << J.nRows() << 'x' << J.nCols()
+		  << std::endl;
 }
 
 // ============================================================================
@@ -103,12 +110,19 @@ void GenerateJacobian (const Raster *raster, const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
     DataScale dscale, RDenseMatrix &J)
 {
+    if (toastVerbosity > 0)
+	std::cout << "Jacobian:" << std::endl;
+
     if (raster == RASTER_NDBASIS)
 	GenerateJacobian_mesh (mesh, dphi, aphi, proj, dscale, J, false);
     else if (raster == RASTER_ELBASIS)
 	GenerateJacobian_mesh (mesh, dphi, aphi, proj, dscale, J, true);
     else
 	GenerateJacobian_grid (raster, mesh, dphi, aphi, proj, dscale, J);
+
+    if (toastVerbosity > 0)
+	std::cout << "--> Dimensions......" << J.nRows() << 'x' << J.nCols()
+		  << std::endl;
 }
 
 // ============================================================================
@@ -119,12 +133,24 @@ void GenerateJacobian_cw (const Raster *raster, const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap)
 {
+    if (toastVerbosity > 0)
+	std::cout << "Jacobian:" << std::endl;
+
     if (raster == RASTER_NDBASIS)
 	GenerateJacobian_cw_mesh (mesh, dphi, aphi, Jmua, Jkap, false);
     else if (raster == RASTER_ELBASIS)
 	GenerateJacobian_cw_mesh (mesh, dphi, aphi, Jmua, Jkap, true);
     else
 	GenerateJacobian_cw_grid (raster, mesh, dphi, aphi, Jmua, Jkap);
+
+    if (toastVerbosity > 0) {
+	if (Jmua)
+	    std::cout << "--> Dim(Jmua)......." << Jmua->nRows() << 'x'
+		      << Jmua->nCols() << std::endl;
+	if (Jkap)
+	    std::cout << "--> Dim(Jkap)......." << Jkap->nRows() << 'x'
+		      << Jkap->nCols() << std::endl;
+    }
 }
 
 // ============================================================================
@@ -144,6 +170,10 @@ void GenerateJacobian_cw (const Raster *raster, const QMMesh *mesh,
 	if (Jmua) Jmua->RowScale (iproj);
 	if (Jkap) Jkap->RowScale (iproj);
     }
+
+    if (toastVerbosity > 0)
+	std::cout << "--> Data scale......"
+		  << (dscale == DATA_LOG ? "LOG":"LIN") << std::endl;
 }
 
 // ============================================================================
@@ -173,6 +203,9 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
     const CCompRowMatrix &mvec, const CVector *dphi, const CVector *aphi,
     DataScale dscale, RDenseMatrix &J)
 {
+    if (toastVerbosity > 0)
+	std::cout << "--> Basis...........Grid" << std::endl;
+
     int i, j, jj, k, idx, dim, nQ, nM, nQM, slen, glen;
     const IVector &gdim = raster->GDim();
     const IVector &bdim = raster->BDim();
@@ -254,6 +287,9 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
     DataScale dscale, RDenseMatrix &J)
 {
+    if (toastVerbosity > 0)
+	std::cout << "--> Basis...........Grid" << std::endl;
+
     int i, j, jj, k, idx, dim, nQ, nM, nQM, slen, glen;
     const IVector &gdim = raster->GDim();
     const IVector &bdim = raster->BDim();
@@ -332,6 +368,10 @@ void GenerateJacobian_mesh (const QMMesh *mesh, const CCompRowMatrix &mvec,
     const CVector *dphi, const CVector *aphi,
     DataScale dscale, RDenseMatrix &J, bool elbasis)
 {
+    if (toastVerbosity > 0)
+	std::cout << "--> Basis...........Mesh ("
+		  << (elbasis ? "elements":"nodal") << std::endl;
+
     int i, j, jj, k, n, nsol, idx, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
@@ -389,6 +429,10 @@ void GenerateJacobian_mesh (const QMMesh *mesh,
     const CVector *dphi, const CVector *aphi, const CVector *proj,
     DataScale dscale, RDenseMatrix &J, bool elbasis)
 {
+    if (toastVerbosity > 0)
+	std::cout << "--> Basis...........Mesh ("
+		  << (elbasis ? "elements":"nodal") << std::endl;
+
     int i, j, jj, k, n, nsol, idx, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
@@ -555,6 +599,9 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap)
 {
+    if (toastVerbosity > 0)
+	std::cout << "--> Basis...........Grid" << std::endl;
+
     double t0 = walltic();
 
 #if THREAD_LEVEL==2
@@ -675,6 +722,10 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap, bool elbasis)
 {
+    if (toastVerbosity > 0)
+	std::cout << "--> Basis...........Mesh ("
+		  << (elbasis ? "elements":"nodal") << ')' << std::endl;
+
     int i, j, k, n, nsol, idx, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
