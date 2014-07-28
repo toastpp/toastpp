@@ -370,7 +370,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
     int imin, imax, jmin, jmax;
-    double b;
+    double b, djac;
 
     double xrange = bbmax[0]-bbmin[0];
     double yrange = bbmax[1]-bbmin[1];
@@ -446,7 +446,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
-	xASSERT(pel->Type() == ELID_TRI3, "Currently only implemented for 3-noded triangles");
+	//xASSERT(pel->Type() == ELID_TRI3, "Currently only implemented for 3-noded triangles");
 
 	// element bounding box
 	double exmin = meshptr->nlist[pel->Node[0]][0];
@@ -476,7 +476,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 	    n3[i].New(2);
 	}
 	int nv;
-	RVector fun(3);
+	RVector fun;
 	double v;
 	for (i = imin; i <= imax; i++)
 	    for (j = jmin; j <= jmax; j++) {
@@ -491,10 +491,11 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 		    n3[2][0] = poly[k+2][0];
 		    n3[2][1] = poly[k+2][1];
 		    t3.Initialise(n3);
-		    double djac = t3.Size()*2.0;
+		    //double djac = t3.Size()*2.0;
 		    
 		    // map quadrature points into global frame
 		    for (m = 0; m < np; m++) {
+			djac = t3.DetJ(absc[m], &n3);
 			Point glob = t3.Global(n3, absc[m]);
 			Point loc = pel->Local(meshptr->nlist, glob);
 			fun = pel->LocalShapeF (loc);
@@ -502,7 +503,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 			for (jj = 0; jj < 4; jj++) {
 			    idx_j = i + jj%2 + (j+jj/2)*bdim[0];
 			    b = Value_nomask (glob, idx_j, false);
-			    for (ii = 0; ii < 3; ii++) {
+			    for (ii = 0; ii < fun.Dim(); ii++) {
 				idx_i = pel->Node[ii];
 				(*Buv)(idx_i, idx_j) += v*b*fun[ii];
 			    }
