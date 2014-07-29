@@ -26,6 +26,8 @@ if length(toastver) == 0
             toastver = [toastdir '\win\Win32\Release'];
         case 'PCWIN64'
             toastver = [toastdir '\win\x64\Release'];
+        case 'MACI64'
+            toastver = [toastdir '/darwin64'];
         otherwise
             disp('Warning: could not determine location of mex files')
             disp('Please edit the matlab path manually')
@@ -115,6 +117,10 @@ addpath (mexp);
 if ~nogui
     disp(['Adding search path ' mexp])
 end
+
+
+rmpath ([toastdir '/script/matlab/toast2']); % remove toast2 script directory
+
 
 if nargin == 0 || nogui==false
     % open path tool GUI to allow user to modify and save the toast paths

@@ -136,7 +136,8 @@ public:
      * This does not check for mesh support
      * \sa Value
      */
-    virtual double Value_nomask (const Point &p, int i) const = 0;
+    virtual double Value_nomask (const Point &p, int i, bool is_solidx=true)
+	const = 0;
 
     /**
      * \brief Map a real-valued field from mesh to grid representation.

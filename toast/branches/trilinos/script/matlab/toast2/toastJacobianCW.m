@@ -2,13 +2,13 @@ function J = toastJacobianCW(mesh,basis,varargin)
 % Jacobian for DOT continuous wave problem for mua parameter
 %
 % Syntax: J = toastJacobianCW (mesh, basis, qvec, mvec, mua, mus, ref,
-%                              freq, solver, tol)
+%                              solver, tol)
 %
 % Parameters:
 %         mesh [toastMesh object]:
 %             mesh object
 %         basis [toastBasis object]:
-%             basis mapper object
+%             basis mapper object (or 0 to return Jacobian in mesh basis)
 %         qvec [nlen x nq sparse matrix]:
 %             array of source column vectors
 %         mvec [nlen x nm sparse matrix]:
@@ -28,8 +28,9 @@ function J = toastJacobianCW(mesh,basis,varargin)
 %         J: [nqm x slen dense real matrix]:
 %             Jacobian matrix
 %
-% Notes:  Calculates the derivative of the continuous wave intensity data
-%         with respect to the absorption coefficients of the forward operator.
+% Notes:  Calculates the derivative of the logarithm of the CW amplitude
+%         data with respect to the absorption coefficients of the forward
+%         operator.
 %
 %         The returned matrix is of size nqm x slen, where nqm is the number
 %         of measurements, and slen is the dimension of the reconstruction

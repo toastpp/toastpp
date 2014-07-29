@@ -616,7 +616,7 @@ struct CALCFIELDS_THREADDATA {
 };
 
 template<class T>
-void *CalcFields_engine (task_data *td)
+void CalcFields_engine (task_data *td)
 {
     int itask = td->proc;
     int ntask = td->np;
@@ -642,14 +642,12 @@ void *CalcFields_engine (task_data *td)
 	if (err_max > thdata->res->rel_err) thdata->res->rel_err = err_max;
 	Task::UserMutex_unlock();
     }
-    
-    return NULL;
 }
 #ifdef NEED_EXPLICIT_INSTANTIATION
-template void *CalcFields_engine<double> (task_data *td);
-template void *CalcFields_engine<float> (task_data *td);
-template void *CalcFields_engine<toast::complex> (task_data *td);
-template void *CalcFields_engine<scomplex> (task_data *td);
+template void CalcFields_engine<double> (task_data *td);
+template void CalcFields_engine<float> (task_data *td);
+template void CalcFields_engine<std::complex<double> > (task_data *td);
+template void CalcFields_engine<std::complex<float> > (task_data *td);
 #endif
 
 #endif // THREAD_LEVEL==2
@@ -678,7 +676,7 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
 #if THREAD_LEVEL==2
 
         //dASSERT(g_tpool, ThreadPool not initialised);
-        static CALCFIELDS_THREADDATA<toast::complex> thdata;
+        static CALCFIELDS_THREADDATA<std::complex<double> > thdata;
 	thdata.F      = F;
 	thdata.qvec   = &qvec;
 	thdata.phi    = phi;
@@ -687,10 +685,10 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
 	thdata.maxit  = iterative_maxit;
 	thdata.res    = res;
 #ifdef UNDEF
-	g_tpool->ProcessSequence (CalcFields_engine<toast::complex>, &thdata,
+	g_tpool->ProcessSequence (CalcFields_engine<std::complex<double> >, &thdata,
 				  0, nq, 1);
 #endif
-	Task::Multiprocess (CalcFields_engine<toast::complex>, &thdata);
+	Task::Multiprocess (CalcFields_engine<std::complex<double> >, &thdata);
 #else
         CVector *qv = new CVector[nq];
 	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);

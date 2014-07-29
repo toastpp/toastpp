@@ -25,6 +25,7 @@ void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
     double *etp = mxGetPr (prhs[2]);
 
     Mesh *mesh = new QMMesh;;
+    mexLock(); // prevent mex file unloading while mesh is allocated
 
     // create node list
     mesh->nlist.New (nvtx);
@@ -154,6 +155,8 @@ void MatlabToast::ReadMesh (int nlhs, mxArray *plhs[], int nrhs,
 	mexErrMsgTxt ("ReadMesh: Mesh file not found.");
 
     QMMesh *mesh = new QMMesh;
+    mexLock(); // prevent mex file unloading while mesh is allocated
+
     ifstream ifs(meshname);
     ifs >> *mesh;
     if (!ifs.good())
@@ -677,6 +680,8 @@ void MatlabToast::ClearMesh (int nlhs, mxArray *plhs[], int nrhs,
 {
     Mesh *mesh = GETMESH_SAFE(0);
     delete mesh;
+    mexUnlock();
+
     if (verbosity >= 1)
         mexPrintf ("<Mesh object deleted>\n");
 }

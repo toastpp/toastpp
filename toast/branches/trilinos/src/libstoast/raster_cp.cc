@@ -94,7 +94,7 @@ Raster_CubicPixel::Raster_CubicPixel (const IVector &_bdim,
 	    }
 	}
 
-	if (g_rownz[i] = nz) {
+	if ((g_rownz[i] = nz)) {
 	    g_colidx[i] = new int[nz];
 	    g_val[i] = new double[nz];
 	    nz_tot += nz;
@@ -262,7 +262,8 @@ double Raster_CubicPixel::Value (const IVector &basisgrd, const Point &p)
 
 // ==========================================================================
 
-double Raster_CubicPixel::Value_nomask (const Point &p, int i) const
+double Raster_CubicPixel::Value_nomask (const Point &p, int i, bool is_solidx)
+    const
 {
     // to be done
     return 0.0;

@@ -42,7 +42,8 @@ public:
      */
     virtual double Value (const Point &p, int i) const;
 
-    virtual double Value_nomask (const Point &p, int i) const = 0;
+    virtual double Value_nomask (const Point &p, int i, bool is_solidx=true)
+	const = 0;
 
     /**
      * \brief Fill return all basis function values at a given mesh node

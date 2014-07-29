@@ -1,5 +1,6 @@
 #define STOASTLIB_IMPLEMENTATION
 #include "stoastlib.h"
+#include "tri_qr.h"
 
 using namespace std;
 
@@ -70,9 +71,9 @@ Raster_Pixel::~Raster_Pixel ()
 
 // ==========================================================================
 
-double Raster_Pixel::Value_nomask (const Point &p, int i) const
+double Raster_Pixel::Value_nomask (const Point &p, int i, bool is_solidx) const
 {
-    int bi = sol2basis[i];
+    int bi = (is_solidx ? sol2basis[i] : i);
     int iz = (dim < 3 ? 0 : bi / (bdim[0]*bdim[1]));
     bi -= iz*bdim[0]*bdim[1];
     int iy = bi/bdim[0];

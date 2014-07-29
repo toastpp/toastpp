@@ -80,7 +80,7 @@ struct Qvec_Threaddata {
     CCompRowMatrix *qvec;
 };
 
-void *Qvec_engine (task_data *td)
+void Qvec_engine (task_data *td)
 {
     int i, j, ii;
     int itask = td->proc;
@@ -214,7 +214,7 @@ struct Mvec_Threaddata {
     CCompRowMatrix *mvec;
 };
 
-void *Mvec_engine (task_data *td)
+void Mvec_engine (task_data *td)
 {
     int i, j, ii;
     int itask = td->proc;

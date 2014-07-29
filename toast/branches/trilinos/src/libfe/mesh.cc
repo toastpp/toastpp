@@ -1671,6 +1671,19 @@ void Mesh::WriteVtk (ostream &os, const RVector &nim)
 // Nonmember functions
 // =========================================================================
 
+// Return the mass matrix for a mesh
+RCompRowMatrix *Mesh::MassMatrix () const
+{
+    idxtype *rowptr, *colidx;
+    int nzero, n = nlen();
+    SparseRowStructure (rowptr, colidx, nzero);
+    RCompRowMatrix *M = new RCompRowMatrix (n,n,rowptr,colidx);
+    delete []rowptr;
+    delete []colidx;
+    AddToSysMatrix (*this, *M, (RVector*)0, ASSEMBLE_FF);
+    return M;
+}
+
 // Add a component to element matrix 'M', given 'mesh' and 'el'
 // Element matrix type is defined by 'mode' (see mesh.h)
 // nodal or element coefficients are given by 'coeff'
@@ -1862,7 +1875,7 @@ struct Assemble_Threaddata {
 };
 
 template<typename T>
-void *AddToSysMatrix_engine (task_data *td)
+void AddToSysMatrix_engine (task_data *td)
 {
     int el;
     int itask = td->proc;
@@ -1933,10 +1946,10 @@ void AddToSysMatrix (const Mesh &mesh, CGenericSparseMatrix &M,
 {
 #ifdef TOAST_THREAD_ASSEMBLE
     if (M.StorageType() == MATRIX_COMPROW) {
-        Assemble_Threaddata<toast::complex> thdata = {
-	    &mesh, (TCompRowMatrix<toast::complex>*)&M, coeff, mode
+        Assemble_Threaddata<std::complex<double> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<double> >*)&M, coeff, mode
 	};
-	Task::Multiprocess (AddToSysMatrix_engine<toast::complex>,
+	Task::Multiprocess (AddToSysMatrix_engine<std::complex<double> >,
 			    (void*)&thdata);
     } else {
         xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");
@@ -1954,10 +1967,10 @@ void AddToSysMatrix (const Mesh &mesh, SCGenericSparseMatrix &M,
 {
 #ifdef TOAST_THREAD_ASSEMBLE
     if (M.StorageType() == MATRIX_COMPROW) {
-        Assemble_Threaddata<scomplex> thdata = {
-	    &mesh, (TCompRowMatrix<scomplex>*)&M, coeff, mode
+        Assemble_Threaddata<std::complex<float> > thdata = {
+	    &mesh, (TCompRowMatrix<std::complex<float> >*)&M, coeff, mode
 	};
-	Task::Multiprocess (AddToSysMatrix_engine<scomplex>,
+	Task::Multiprocess (AddToSysMatrix_engine<std::complex<float> >,
 			    (void*)&thdata);
     } else {
         xERROR("AddToSysMatrix: parallel assembly requires CompRowMatrix");

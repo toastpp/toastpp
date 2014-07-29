@@ -398,6 +398,16 @@ public:
     { ERROR_UNDEF; return 0; }
 
     /**
+     * \brief Returns determinant of Jacobian at a given point inside the
+     *   element in the local frame.
+     * \param loc evaluation point in local coordinates
+     * \param nlist node list of the associated mesh
+     * \return det(J)
+     */
+    virtual double DetJ (const Point &loc, const NodeList *nlist = 0) const
+    { ERROR_UNDEF; return 0.0; }
+
+    /**
      * \brief Checks if a local point coordinate is inside the element.
      * \param loc point in local coordinates
      * \param pad Apply padding to the element to ensure that boundary points

@@ -107,6 +107,11 @@ inline bool operator< (const std::complex<double> &z1,
     return std::norm(z1) < std::norm(z2);
 }
 
+inline bool operator! (const std::complex<double> &z)
+{
+    return z.real() == 0 && z.imag() == 0;
+}
+
 inline std::complex<double> hadamard (const std::complex<double>& a,
     const std::complex<double>& b)
 {

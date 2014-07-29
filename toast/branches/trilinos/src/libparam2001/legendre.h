@@ -11,7 +11,7 @@ int factorial(int i);
 
 double plgndr(int l, int m, double x);
 
-toast::complex SphericalHarmonic(int l,int m, double thi, double fi); // calculates the spherical harmonic
+std::complex<double> SphericalHarmonic(int l,int m, double thi, double fi); // calculates the spherical harmonic
                                                                //of degree l order m
                                                                // at the (thi,fi) point
 #endif

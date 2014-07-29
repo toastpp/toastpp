@@ -224,6 +224,8 @@ double Pixel4::IntPFF (int i, int j, const RVector &P) const
 	    return fac * (P[Node[0]]+3*P[Node[1]]+3*P[Node[2]]+9*P[Node[3]]);
 	}
     }
+    
+    return 0;
 }
 
 void Pixel4::ComputeIntDD () const

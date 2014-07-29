@@ -33,10 +33,10 @@ using namespace std;
 void PMDF_mua (const RVector &dphi, const RVector &aphi, RVector &pmdf);
 void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
     const RCompRowMatrix &mvec, const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J);
+    bool logdata, RDenseMatrix &J);
 void GenerateJacobian (const QMMesh &mesh, const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J);
+    bool logdata, RDenseMatrix &J);
 
 // =========================================================================
 // Implementation
@@ -71,7 +71,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 	c2a[i] = c0/(2.0*ref[i]*A_Keijzer (ref[i]));
     msol.SetParam (OT_C2A, c2a);
 
-    bool logparam = true; // make user-definable
+    bool logdata = true; // make user-definable
 
     // build the field vectors
     dphi = new RVector[nQ];
@@ -90,9 +90,9 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     int nprm = slen;
     RDenseMatrix J(ndat,nprm);
     if (raster)
-	GenerateJacobian (*raster, *mesh, mvec, dphi, aphi, logparam, J);
+	GenerateJacobian (*raster, *mesh, mvec, dphi, aphi, logdata, J);
     else
-	GenerateJacobian (*mesh, mvec, dphi, aphi, logparam, J);
+	GenerateJacobian (*mesh, mvec, dphi, aphi, logdata, J);
 
     delete []dphi;
     delete []aphi;
@@ -167,7 +167,7 @@ void PMDF_mua (const CVector &pmdf, std::complex<double> proj,
 
 void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
     const RCompRowMatrix &mvec, const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J)
+    bool logdata, RDenseMatrix &J)
 {
     int i, j, jj, k, idx, dim, nQ, nM, nQM, slen, glen;
     const RGenericSparseMatrix &B = raster.Mesh2GridMatrix();
@@ -203,7 +203,7 @@ void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
 	ImageGradient (gdim, gsize, cdfield, cdfield_grad,
 		       raster.Elref());
 
-	if (logparam)
+	if (logdata)
 	    proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
 
 	for (j = jj = 0; j < nM; j++) {
@@ -214,7 +214,7 @@ void GenerateJacobian (const Raster &raster, const QMMesh &mesh,
 			   raster.Elref());
 
 	    PMDF_mua (cdfield, cafield[j], pmdf_mua);
-	    if (logparam) pmdf_mua /= proj[jj];
+	    if (logdata) pmdf_mua /= proj[jj];
 
 	    // map into solution basis
 	    raster.Map_GridToSol (pmdf_mua, pmdf_basis);
@@ -266,7 +266,7 @@ RVector IntFG (const Mesh &mesh, const RVector &f, const RVector &g)
 
 void GenerateJacobian (const QMMesh &mesh, const RCompRowMatrix &mvec,
     const RVector *dphi, const RVector *aphi,
-    bool logparam, RDenseMatrix &J)
+    bool logdata, RDenseMatrix &J)
 {
     cerr << "Jacobian: using mesh basis" << endl;
     cerr << "Dim: " << J.nRows() << " x " << J.nCols() << endl;
@@ -283,14 +283,14 @@ void GenerateJacobian (const QMMesh &mesh, const RCompRowMatrix &mvec,
 
     for (i = idx = 0; i < nQ; i++) {
 
-	if (logparam)
+	if (logdata)
 	    proj = ProjectSingle (&mesh, i, mvec, dphi[i], DATA_LIN);
 
 	for (j = jj = 0; j < nM; j++) {
 
 	    if (!mesh.Connected (i,j)) continue;
 	    pmdf_mua = IntFG (mesh, dphi[i], aphi[j]);
-	    if (logparam) pmdf_mua /= proj[jj];
+	    if (logdata) pmdf_mua /= proj[jj];
 
 	    // map into solution basis
 	    for (k = 0; k < n; k++)
@@ -332,7 +332,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     char solver[128];
     double tol = 1e-10;
     mxGetString (prhs[7], solver, 128);
-    if (nrhs >= 10) tol = mxGetScalar (prhs[8]);
+    if (nrhs >= 9) tol = mxGetScalar (prhs[8]);
 	
     CalcJacobian (mesh, raster, qvec, mvec, mua, mus, ref,
 		  solver, tol, &plhs[0]);

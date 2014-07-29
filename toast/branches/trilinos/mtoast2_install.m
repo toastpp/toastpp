@@ -26,6 +26,8 @@ if length(toastver) == 0
             toastver = [toastdir '\win\Win32\Release'];
         case 'PCWIN64'
             toastver = [toastdir '\win\x64\Release'];
+        case 'MACI64'
+            toastver = [toastdir '/darwin64'];
         otherwise
             disp('Warning: could not determine location of mex files')
             disp('Please edit the matlab path manually')

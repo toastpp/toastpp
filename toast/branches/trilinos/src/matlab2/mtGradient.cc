@@ -241,7 +241,7 @@ struct AddDataGradient_Threaddata {
     RVector *grad;
 };
 
-void *AddDataGradient_engine (task_data *td)
+void AddDataGradient_engine (task_data *td)
 {
     int i, j, q, m, n, idx, ofs_mod, ofs_arg;
     int itask = td->proc;
@@ -261,7 +261,7 @@ void *AddDataGradient_engine (task_data *td)
     int glen = raster->GLen();
     int slen = raster->SLen();
     int dim  = raster->Dim();
-    toast::complex term;
+    double term;
     const IVector &gdim = raster->GDim();
     const RVector &gsize = raster->GSize();
     const int *elref = raster->Elref();
@@ -306,23 +306,23 @@ void *AddDataGradient_engine (task_data *td)
 
 	cproj = fws->ProjectSingle (q, *mvec, dphi[q], DATA_LIN);
 
-	wqa = toast::complex(0,0);
+	wqa = std::complex<double>(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
 	    if (!mesh->Connected (q, m)) continue;
 	    const CVector qs = mvec->Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
-	    term.re = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * toast::complex (term.re*rp*dn, -term.re*ip*dn);
+	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
+	    wqa += qs * std::complex<double> (term*rp*dn, -term*ip*dn);
 
 	    // phase term
-	    term.im = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * toast::complex (-term.im*ip*dn, -term.im*rp*dn);
+	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
+	    wqa += qs * std::complex<double> (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;

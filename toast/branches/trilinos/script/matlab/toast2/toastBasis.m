@@ -10,8 +10,8 @@ classdef toastBasis < handle
             %
             % Syntax: basis = toastBasis(mesh, bdim)
             %         basis = toastBasis(..., gdim)
-            %         basis = toastBasis(..., gridfunc)
             %         basis = toastBasis(..., bb)
+            %         basis = toastBasis(..., gridfunc [,gridargs])
             %
             % Parameters:
             %         mesh [object]:
@@ -20,11 +20,21 @@ classdef toastBasis < handle
             %             grid dimensions
             %         gdim [integer array d]:
             %             dimensions for intermediate grid
-            %         gridfunc [string]:
-            %             basis functions to use for the regular grid:
-            %             'LINEAR' or 'CUBIC'
             %         bb [real matrix d x 2]:
             %             bounding box for grid coverage
+            %         gridfunc [string]:
+            %             basis functions to use for the regular grid.
+            %             Currently supported are:
+            %                  LINEAR
+            %                  LINEAR_V2 (experimental)
+            %                  CUBIC
+            %                  BLOB_GAUSS
+            %                  BLOB_BESSEL
+            %                  BLOB_HANNING
+            %                  BLOB_RAMP
+            %                  BLOB_SPLINE
+            %             Note that some basis types may support additional
+            %             input parameters (see notes).
             %
             % Return values:
             %         basis [object]:
@@ -44,6 +54,25 @@ classdef toastBasis < handle
             %         The shape functions used on the regular grid can be
             %         selected with the gridfunc string, to either 'LINEAR'
             %         (bi/tri-linear, default), or 'CUBIC' (bi/tri-cubic).
+	    %
+            %         There is also an experimental 'LINEAR_V2' map type,
+            %         which is similar to 'LINEAR', but uses a more accurate
+            %         mapping algorithm. It currently works only in 2D for
+            %         meshes composed of 3-noded triangles. This basis type
+            %         supports an additional scalar tolerance parameter for
+            %         the mapping, using key 'MAPTOL'.
+            %
+	    %         In addition, there is a family of bases with radially
+            %         symmetric basis functions (BLOB_xxx). They differ in
+            %         the radial profile of the basis function. Currently
+            %         supported in this group are BLOB_RAMP (linear profile)
+            %         BLOB_GAUSS (truncated Gaussian), BLOB_BESSEL (Kaiser-
+            %         Bessel), BLOB_HANNING (Hanning function), and
+            %         BLOB_SPLINE (cubic spline profile).
+	    %         All blob basis types support an additional scalar
+	    %         support radius parameter, using key 'RADIUS'.
+	    %         BLOB_GAUSS also supports scalar parameter 'SIGMA'.
+	    %         BLOB_BESSEL also supports scalar parameter 'ALPHA'.
             %
             %         By default, the regular voxel grid is sized so that
             %         it has the same size as the bounding box of the mesh.

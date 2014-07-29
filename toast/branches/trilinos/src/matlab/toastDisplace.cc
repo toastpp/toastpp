@@ -7,9 +7,8 @@
 #include "mex.h"
 #include "util.h"
 using namespace std;
-using namespace toast;
 
-const double M_PI=3.141592653589793;
+//const double Pi=3.141592653589793;
 //#define OUTPUT_SYSMAT 1
 //#define OUTPUT_SOLUTION 1
 //#define OUTPUT_RHS 1
@@ -18,7 +17,7 @@ const double M_PI=3.141592653589793;
 //#define EXPORT_REGION_IMAGE
 #define ENCODE_STRAINENERGY
 //#define OUTPUT 1
-//#define SOLVEIT 1
+#define SOLVEIT 1
 #define SANJAY 1 // debugging. 1 for debug. 0 for no debug.
 
 #define BIGSPRING 1e7
@@ -199,7 +198,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		RVector dir(dim);
 		double vf, angle;
 		angle = vfam[0];
-		angle *= M_PI/180.0;
+		angle *= Pi/180.0;
 		dir[0] = cos (angle);
 		dir[2] = sin (angle);
 		vf=vfam[1];
