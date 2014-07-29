@@ -38,6 +38,8 @@ TCompRowMatrixTrilinos<MT>::~TCompRowMatrixTrilinos ()
     if (rowptr) delete []rowptr;
     if (colidx) delete []colidx;
     NumNz = Teuchos::null; // is this necessary for a managed pointer?
+    map = Teuchos::null;
+    teuchosMatrix = Teuchos::null;
 }
 
 // --------------------------------------------------------------------------

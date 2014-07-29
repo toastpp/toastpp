@@ -42,7 +42,7 @@ public:
      * This does not check for mesh support
      * \sa Value
      */
-    double Value_nomask (const Point &p, int i) const;
+    double Value_nomask (const Point &p, int i, bool is_solidx=true) const;
 
     /**
      * \brief Map a real-valued field from grid to basis representation.

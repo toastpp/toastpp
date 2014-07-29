@@ -8,7 +8,7 @@ TOASTRELDIR = toast
 # ========================================================
 # Making
 
-all::numerics toast matlab
+all::numerics toast
 
 toast::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
@@ -185,10 +185,10 @@ distro_bin_linux::
 	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz"
 
 distro_bin_darwin::
+	ln  -s $(PWD) ../$(TOASTRELDIR); \
 	cd ..; \
-	tar czvf toast_bin_darwin.tar.gz $(TOASTDIR)/$(ARCHDIR)/bin \
-	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTDIR)/$(ARCHDIR)/mex \
-	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
-	$(TOASTRELDIR)/toastenv.csh $(TOASTDIR)/toastenv.sh; \
-	mv toast_bin_darwin.tar.gz $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz
-	@echo “Darwin distro tarball created in $(TOASTDIR)/toast_bin_$(ARCHDIR).tar.gz"
+	zip -9 -r toast_bin_darwin64.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
+		$(TOASTRELDIR)/$(ARCHDIR)/lib \
+		$(TOASTRELDIR)/$(ARCHDIR)/mex2 ; \
+	mv toast_bin_darwin64.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip 
+	@echo "Darwin distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"

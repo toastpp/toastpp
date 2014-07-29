@@ -3,8 +3,12 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="toastlib"
-	InheritedPropertySheets=".\toast.vsprops"
+	InheritedPropertySheets="$(SolutionDir)resources\toast.vsprops;.\packages.vsprops"
 	>
+	<Tool
+		Name="VCCLCompilerTool"
+		PreprocessorDefinitions="_WIN32"
+	/>
 	<Tool
 		Name="VCLinkerTool"
 		OutputFile="$(ToastLibDir)$(ProjectName).dll"

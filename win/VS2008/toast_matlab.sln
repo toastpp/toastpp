@@ -162,6 +162,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastDisplace", "matlab\toa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastMapBasis", "matlab\toastMapBasis\toastMapBasis.vcproj", "{A5F60A16-790F-4024-BD02-BB9B2F0DE8BE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toastSysmatComponent", "matlab\toastSysmatComponent\toastSysmatComponent.vcproj", "{81C02B83-F961-47CC-B42B-259C159C93A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -1144,6 +1146,18 @@ Global
 		{A5F60A16-790F-4024-BD02-BB9B2F0DE8BE}.Release|Win32.Build.0 = Release|Win32
 		{A5F60A16-790F-4024-BD02-BB9B2F0DE8BE}.Release|x64.ActiveCfg = Release|x64
 		{A5F60A16-790F-4024-BD02-BB9B2F0DE8BE}.Release|x64.Build.0 = Release|x64
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Debug|Win32.Build.0 = Debug|Win32
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Debug|x64.ActiveCfg = Debug|x64
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Debug|x64.Build.0 = Debug|x64
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release_fdot|Win32.ActiveCfg = Release_fdot|Win32
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release_fdot|Win32.Build.0 = Release_fdot|Win32
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release_fdot|x64.ActiveCfg = Release_fdot|x64
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release_fdot|x64.Build.0 = Release_fdot|x64
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release|Win32.ActiveCfg = Release|Win32
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release|Win32.Build.0 = Release|Win32
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release|x64.ActiveCfg = Release|x64
+		{81C02B83-F961-47CC-B42B-259C159C93A8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

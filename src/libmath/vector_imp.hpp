@@ -73,7 +73,7 @@ TVector<VT>::TVector (int dim, VT *values, CopyMode cmode)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
-    if (ext_data = (cmode==SHALLOW_COPY)) {
+    if ((ext_data = (cmode==SHALLOW_COPY))) {
 	Link (values, dim);
     } else {
 	Allocate (dim);
@@ -119,7 +119,7 @@ TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
     dASSERT(ofs+dim <= v.Dim(),
 	"Data block of reference vector must be contained in original vector");
     base_nref = 0;
-    if (ext_data = v.ext_data) {
+    if ((ext_data = v.ext_data)) {
 	Link (v.data + ofs, dim);
 	// raw link to v's data buffer without reference counting
 	// i.e. v must remain valid throughout the lifetime of this
@@ -564,7 +564,7 @@ TVector<VT> TVector<VT>::operator/ (const TVector<VT> &v) const
 template<class VT>
 TVector<VT> TVector<VT>::operator/ (const VT &s) const
 {
-    dASSERT(s, "Attempt to divide by zero");
+    //dASSERT(s, "Attempt to divide by zero");
     TVector<VT> tmp(size);
     for (int i = 0; i < size; i++) tmp.data[i] = data[i] / s;
     return tmp;
@@ -825,7 +825,7 @@ TVector<VT> inv (const TVector<VT> &v)
     const VT one = (VT)1;
     TVector<VT> tmp(v.size);
     for (int i = 0; i < v.size; i++) {
-        dASSERT (v[i], "Attempt to divide by zero");
+        //dASSERT (v[i], "Attempt to divide by zero");
         tmp[i] = one/v[i];
     }
     return tmp;
@@ -1265,7 +1265,7 @@ double l2normsq (const TVector<VT> &v)
 {
     double term, sum = 0.0;
     for (int i = 0; i < v.size; i++) {
-	term = norm (v[i]);
+        term = std::abs(v[i]);
 	sum += term*term;
     }
     return sum;

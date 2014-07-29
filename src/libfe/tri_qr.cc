@@ -13,7 +13,7 @@
 #include "felib.h"
 #include "tri_qr.h"
 
-int QRule_tri_1_1 (const double **wght, const Point **absc)
+FELIB int QRule_tri_1_1 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 1
@@ -31,7 +31,7 @@ int QRule_tri_1_1 (const double **wght, const Point **absc)
     return 1;
 }
 
-int QRule_tri_2_3 (const double **wght, const Point **absc)
+FELIB int QRule_tri_2_3 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 2
@@ -49,7 +49,7 @@ int QRule_tri_2_3 (const double **wght, const Point **absc)
     return 3;
 }
 
-int QRule_tri_3_6 (const double **wght, const Point **absc)
+FELIB int QRule_tri_3_6 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 3
@@ -71,7 +71,7 @@ int QRule_tri_3_6 (const double **wght, const Point **absc)
     return 6;
 }
 
-int QRule_tri_4_6 (const double **wght, const Point **absc)
+FELIB int QRule_tri_4_6 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 4
@@ -95,7 +95,7 @@ int QRule_tri_4_6 (const double **wght, const Point **absc)
     return 6;
 }
 
-int QRule_tri_4_9 (const double **wght, const Point **absc)
+FELIB int QRule_tri_4_9 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 4
@@ -119,7 +119,7 @@ int QRule_tri_4_9 (const double **wght, const Point **absc)
     return 9;
 }
 
-int QRule_tri_5_7 (const double **wght, const Point **absc)
+FELIB int QRule_tri_5_7 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 5
@@ -145,7 +145,7 @@ int QRule_tri_5_7 (const double **wght, const Point **absc)
     return 7;
 }
 
-int QRule_tri_6_12 (const double **wght, const Point **absc)
+FELIB int QRule_tri_6_12 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 6
@@ -177,7 +177,7 @@ int QRule_tri_6_12 (const double **wght, const Point **absc)
     return 12;
 }
 
-int QRule_tri_7_12 (const double **wght, const Point **absc)
+FELIB int QRule_tri_7_12 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 7
@@ -209,7 +209,7 @@ int QRule_tri_7_12 (const double **wght, const Point **absc)
     return 12;
 }
 
-int QRule_tri_7_15 (const double **wght, const Point **absc)
+FELIB int QRule_tri_7_15 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 7
@@ -245,7 +245,7 @@ int QRule_tri_7_15 (const double **wght, const Point **absc)
     return 15;
 }
 
-int QRule_tri_9_19 (const double **wght, const Point **absc)
+FELIB int QRule_tri_9_19 (const double **wght, const Point **absc)
 {
     // Region: Triangle
     // Degree: 9

@@ -419,6 +419,20 @@ double Tetrahedron4::IntPDD (int i, int j, const RVector &P) const
     return res * IntFDD (0,i,j); // IntFDD(k,i,j) is independent of k
 }
 
+RSymMatrix Tetrahedron4::IntPDD (const RVector &P) const
+{
+    RSymMatrix pdd(4);
+    double res = 0.0;
+    for (int k = 0; k < 4; k++)
+	res += P[Node[k]]; // IntFDD(k,i,j) is independent of k
+    for (int i = 0; i < 4; i++) {
+	for (int j = 0; j <= i; j++) {
+	    pdd(i,j) = res * IntFDD (0,i,j);
+	}
+    }
+    return pdd;
+}
+
 //Mixed Elements
 double Tetrahedron4::IntFd (int i, int j, int k) const
 {

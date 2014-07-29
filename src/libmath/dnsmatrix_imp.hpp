@@ -823,14 +823,14 @@ MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai)
     case 1:
         d = A(0,0);
 	if (Ai) {
-	    xASSERT(norm(d) > detmin, "Matrix singular");
+	    xASSERT(std::abs(d) > detmin, "Matrix singular");
 	    Ai->Set (0,0,(MT)1/d);
 	}
 	break;
     case 2:
         d = A(0,0)*A(1,1) - A(0,1)*A(1,0);
 	if (Ai) {
-	    xASSERT(norm(d) > detmin, "Matrix singular");
+	    xASSERT(std::abs(d) > detmin, "Matrix singular");
 	    Ai->Set(0,0, A(1,1)/d);
 	    Ai->Set(0,1,-A(0,1)/d);
 	    Ai->Set(1,0,-A(1,0)/d);
@@ -842,7 +842,7 @@ MT det (const TDenseMatrix<MT> &A, TDenseMatrix<MT> *Ai)
 	  A(0,1) * (A(1,0)*A(2,2) - A(2,0)*A(1,2)) +
 	  A(0,2) * (A(1,0)*A(2,1) - A(2,0)*A(1,1));
       if (Ai) {
-	  xASSERT(norm(d) > detmin, "Matrix singular");
+	  xASSERT(std::abs(d) > detmin, "Matrix singular");
 	  Ai->Set(0,0, ( A(1,1)*A(2,2) - A(2,1)*A(1,2))/d);
 	  Ai->Set(1,0, (-A(1,0)*A(2,2) + A(2,0)*A(1,2))/d);
 	  Ai->Set(2,0, ( A(1,0)*A(2,1) - A(2,0)*A(1,1))/d);

@@ -20,6 +20,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     RDenseMatrix *bb = 0;
     double blobrad = 1.0;
     double blobarg = 1.0;
+    double maptol = 1e-10;
 
     // mesh
     ASSERTARG(nrhs > 0, 0, "Too few parameters provided");
@@ -62,6 +63,10 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else if (!strcasecmp (optionstr, "ALPHA")) {
 		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
+		} else if (!strcasecmp (optionstr, "LINEAR_V2")) {
+		    basistp = 7;
+		} else if (!strcasecmp (optionstr, "MAPTOL")) {
+		    maptol = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else {
 		    ASSERTARG(false, 1, "unexpected value");
 		}
@@ -77,7 +82,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	}
     }
 
-    Raster *raster;
+    Raster *raster = 0;
     switch (basistp) {
     case 0:
 	raster = new Raster_Pixel (bdim, gdim, mesh, bb);
@@ -101,7 +106,12 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     case 6:
 	raster = new Raster_SplineBlob (bdim, gdim, mesh, blobrad, bb);
 	break;
+    case 7:
+	raster = new Raster_Pixel2 (bdim, bdim, mesh, bb, maptol);
+	break;
     }
+    if (raster)
+	mexLock(); // prevent mex file unloading while basis is allocated
 
     plhs[0] = mxCreateNumericMatrix (1, 1, mxUINT64_CLASS, mxREAL);
     uint64_T *ptr = (uint64_T*)mxGetData (plhs[0]);
@@ -117,6 +127,7 @@ void MatlabToast::ClearBasis (int nlhs, mxArray *plhs[], int nrhs,
 {
     Raster *raster = GETBASIS_SAFE(0);
     delete raster;
+    mexUnlock();
     if (verbosity >= 1)
         mexPrintf ("<Basis object deleted>\n");
 }

@@ -1,0 +1,90 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Martin Schweiger">
+<title>Toast++ Windows installation</title>
+<link rel="stylesheet" href="../toastdoc.css" type="TEXT/CSS">
+</head>
+
+<body>
+<div class="menu">
+<p><a href="../start.html">Toast++</a> &gt; <a href="install.html">Installation Guide</a> &gt; Windows installation</p></div>
+
+<h1>Toast++ Windows installation</h1>
+
+<h2>Prerequisites</h2>
+<h3>Compiler</h3>
+<p>You will need Visual Studio 2008 or later to compile the toast libraries,
+executables and mex files. The VS project files included are for VS2008,
+but Visual Studio can convert them to later versions.</p>
+
+<h3>Matlab toolbox</h3>
+<p>For compiling the Matlab toolbox, you need the Matlab mex compiler for your Matlab version. The toolbox has been tested with Matlab 2012b. Later versions may or may not work.</p>
+
+<h3>Documentation</h3>
+<p>If you want to compile the source-level documentation, you need doxygen (found at <a href="http://www.stack.nl/~dimitri/doxygen/">http://www.stack.nl/~dimitri/doxygen/</a>).</p>
+
+<h3>External libraries</h3>
+<p>Toast++ can make use of optional external libraries for including additional functionality and improving performance. See next section for details.</p>
+
+<h2>Support for external libraries</h2>
+<p>Toast supports a number of optional external libraries that can enhance
+functionality and performance.<p>
+
+<p>To build Toast with linkings to these external libraries in Windows, you
+need to</p>
+<ul>
+<li>download and install the libraries from their respective web sites</li>
+<li>configure the Toast project files to link to them</li>
+</ul>
+
+<h3>Pthreads support</h3>
+<p>Toast can use threads to speed up certain operations on shared memory
+parallel (SMP) architectures. Toast is using the POSIX thread library
+(pthreads). To build Toast with pthreads support</p>
+
+<ul>
+<li>download a Windows pthreads library for your architecture (Win32 or
+  x64), for example from here: <a href="http://sourceforge.net/projects/pthreads4w/">http://sourceforge.net/projects/pthreads4w/</a></li>
+<li>In visual Studio, open the Toast solution (&lt;toast-root&gt;\win\VS2008\toast.sln)</li>
+<li>Open the Project Manager for the libmath project.</li>
+<li>Open the "packages" property sheet.</li>
+<li>Under Common Properties | General | Inherited Project Property Sheets, add
+  .\pthreads.vsprops</li>
+<li>Click "Apply"</li>
+<li>Open the "pthreads" property sheet that has now been inserted under "packages".</li>
+<li>Go to Common Properties | User macros</li>
+<li>Edit the "PthreadsDir", "PthreadsLibDir", "PthreadsIncludeDir" and
+  "PthreadsLibName" macros to your pthreads installation. If you are using
+  a common directory tree for your external Toast dependencies, you can make
+  use of the "ExtPackageDir" macro defined in the "packages" property sheet.
+  (you will have to edit the macro first).</li>
+</ul>
+
+
+<h2>Compilation</h2>
+<h3>Core libraries</h3>
+<p>From the VS development environment, load the toast solution file located in</p>
+<p class="code">win/VS2008/toast.sln</p>
+<p>Set the target configuration and platform (e.g. "Release" and "x64"), and build all. If you are using a later version of Visual Studio, you may have to let it convert the solution and project files.</p>
+
+<h3>Matlab bindings</h3>
+<p>After building the core libraries, you can also compile the mex files for the Matlab bindings. Load either of the</p>
+<p class="code">toast_matlab.sln&nbsp;&nbsp;<emph>or</emph>&nbsp;&nbsp;toast2_matlab.sln</p>
+<p>solution files and build. (You can compile both interfaces, but your matlab script can
+only access one of the interfaces at a time).</p>
+<p>Once the mex files have been built, from inside Matlab, run the script</p>
+<p class="code">mtoast_install&nbsp;&nbsp;&nbsp;&nbsp;<font style="color:green">% for interface v1, or</font><br />
+mtoast2_install&nbsp;&nbsp;&nbsp;<font style="color:green">% for interface v2</font></p>
+<p>This will open the Matlab path tool and allow you to save the paths for the Toast++ toolbox, so Matlab can locate them in future sessions. If the script finds Toast paths already present in the path list (e.g. from a previous installation) you should delete them when prompted. Note that if you don't have write access to the Matlab installation directories, Matlab will offer to save the paths in a local directory. In that case, you will have to start Matlab from that directory if you want it to load the paths. Otherwise, you will have to run mtoast_install or mtoast2_install again.</p>
+
+<h3>Miscellaneous</h3>
+<p>To bild the source-level documentation, you need to have Doxygen installed on your system. Run</p>
+<p class="code">doxygen Doxyfile</p>
+<p>inside the</p>
+<p class="code">&lt;toast-root&gt;/src/doc/devel</p>
+<p>directory.</p>
+
+</body>
+</html>

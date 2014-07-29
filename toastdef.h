@@ -3,6 +3,11 @@
 // A list of DEFINEs which fine tune TOAST compilation options
 // ==========================================================================
 
+#ifndef __TOASTDEF_H
+#define __TOASTDEF_H
+
+#include "arch.h"
+
 #if defined(WIN32)||defined(WIN64)
 #define NEED_EXPLICIT_INSTANTIATION   // JK in Windows (VS2005) explicit instantiation is required
 #endif
@@ -99,3 +104,5 @@
 //#define MPI_FWDSOLVER
 
 #endif
+
+#endif // !__TOASTDEF_H

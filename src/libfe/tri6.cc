@@ -1212,7 +1212,7 @@ RVector Triangle6::BndIntFCos (int side, const Surface *surf,
     RVector prm1(pdim);  surf2D->Point2Param (nlist[n1], prm1);
     RVector prm2(pdim);  surf2D->Point2Param (nlist[n2], prm2);
     s  = surf2D->ChordDiff (prm1, prm0);
-    if (flip = (s < 0)) {
+    if ((flip = (s < 0))) {
         g = surf2D->ChordDiff (prm2, prm1);
 	d0 = surf2D->ChordDiff (cntcos, prm1);
 	s = -s;

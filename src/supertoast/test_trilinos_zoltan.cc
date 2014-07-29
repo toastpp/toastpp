@@ -182,8 +182,8 @@ createPreconditioner (const Teuchos::RCP<const TpetraMatrixType>& A,
   using Teuchos::ParameterList;
   using Teuchos::RCP;
   using Teuchos::rcp;
-  using Teuchos::Time;
-  using Teuchos::TimeMonitor;
+  //using Teuchos::Time;
+  //using Teuchos::TimeMonitor;
   using std::endl;
 
   // Fetch the typedefs defined by Tpetra::CrsMatrix.
@@ -213,9 +213,9 @@ createPreconditioner (const Teuchos::RCP<const TpetraMatrixType>& A,
                                   global_ordinal_type, node_type> prec_type;
 
   // Create timers to show how long it takes for Ifpack2 to do various operations.
-  RCP<Time> initTimer = TimeMonitor::getNewCounter ("Ifpack2::Preconditioner::initialize");
-  RCP<Time> computeTimer = TimeMonitor::getNewCounter ("Ifpack2::Preconditioner::compute");
-  RCP<Time> condestTimer = TimeMonitor::getNewCounter ("Ifpack2::Preconditioner::condest");
+  //RCP<Time> initTimer = TimeMonitor::getNewCounter ("Ifpack2::Preconditioner::initialize");
+  //RCP<Time> computeTimer = TimeMonitor::getNewCounter ("Ifpack2::Preconditioner::compute");
+  //RCP<Time> condestTimer = TimeMonitor::getNewCounter ("Ifpack2::Preconditioner::condest");
 
   err << "Creating ILUT preconditioner" << endl 
       << "-- Configuring" << endl;
@@ -234,7 +234,7 @@ createPreconditioner (const Teuchos::RCP<const TpetraMatrixType>& A,
 
   err << "-- Initializing" << endl;
   {
-    TimeMonitor mon (*initTimer);
+      //TimeMonitor mon (*initTimer);
     prec->initialize();
   }
 
@@ -242,7 +242,7 @@ createPreconditioner (const Teuchos::RCP<const TpetraMatrixType>& A,
   // (e.g., does the incomplete factorization).
   err << "-- Computing" << endl;
   {
-    TimeMonitor mon (*computeTimer);
+      //TimeMonitor mon (*computeTimer);
     prec->compute();
   }
 
@@ -250,7 +250,7 @@ createPreconditioner (const Teuchos::RCP<const TpetraMatrixType>& A,
     err << "-- Estimating condition number" << endl;
     magnitude_type condest = STM::one();
     {
-      TimeMonitor mon (*condestTimer);
+	//TimeMonitor mon (*condestTimer);
       condest = prec->computeCondEst (Ifpack2::Cheap);
     }
     out << endl << "Ifpack2 preconditioner's estimated condition number: " << condest << endl;
@@ -520,6 +520,8 @@ int main (int argc, char *argv[])
     }
 
     Zoltan_Destroy (&zz);
+    delete Atoast;
+    std::cerr << "Got to end in proc " << myRank << std::endl;
     return 0;
 }
 
@@ -889,44 +891,3 @@ void OutputPartition (const Teuchos::RCP<const Teuchos::Comm<int> >& comm,
 
     delete []parts;
 }
-
-#ifdef UNDEF
-template<class MT> class TCompRowMatrixTrilinosTest
-{
-public:
-    typedef Kokkos::DefaultNode::DefaultNodeType node_type;
-    typedef Tpetra::CrsMatrix<double, int, int, node_type> matrix_type;
-    typedef Tpetra::Map<int, int, node_type> map_type;
-  
-    TCompRowMatrixTrilinosTest() {}
-
-    void tmp (const Teuchos::RCP<const Teuchos::Comm<int> > &comm,
-	      const Teuchos::RCP<typename matrix_type::node_type>& node);
-
-private:
-    Teuchos::RCP<const map_type> map;
-};
-
-template<class MT>
-void TCompRowMatrixTrilinosTest<MT>::tmp (
-    const Teuchos::RCP<const Teuchos::Comm<int> >& comm,
-    const Teuchos::RCP<typename matrix_type::node_type>& node)
-{
-    using Teuchos::ArrayView;
-    using Teuchos::ArrayRCP;
-    using Teuchos::RCP;
-    using Teuchos::arcp;
-
-    const Tpetra::global_size_t numGlobalElements = (const Tpetra::global_size_t)100;
-    const size_t numMyElements = 10;
-    const int indexBase = 0;
-
-    std::vector<int> myNode(numGlobalElements);
-    ArrayView<int> myNodeView(myNode);
-
-    ArrayRCP<size_t> NumNz = arcp<size_t> (numMyElements);
-
-    RCP<matrix_type> A = rcp (new matrix_type (map, NumNz,
-					       Tpetra::StaticProfile));
-}
-#endif

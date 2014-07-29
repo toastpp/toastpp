@@ -571,7 +571,7 @@ void OutputProgramInfo ()
     pp.Lineout ("+-------------------------------------------------+");
     pp.Lineout (VERSION_STRING);
     sprintf (cbuf, "Executed %s", ctime(&tme));
-    if (host = getenv("HOST"))
+    if ((host = getenv("HOST")))
         sprintf (cbuf+strlen(cbuf), "on host %s ", host);
     sprintf (cbuf+strlen(cbuf), "(PID %d)", getpid());
     pp.Lineout (cbuf);
@@ -758,7 +758,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
     int resettp = 0;
     double prm, reg_prm[MAXREGION];
     int nparam = msol.nParam();
-    RVector param[nparam];
+    RVector *param = new RVector[nparam];
     int i, j, k, n, p, nreg, nregnode[MAXREGION];
 
     for (p = 0; p < nparam; p++) {
@@ -849,7 +849,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
 	    case 3:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
-		cin >> cbuf+4;
+		cin >> (cbuf+4);
 		ReadNim (cbuf+4, param[p]);
 		break;
 	    }
@@ -874,6 +874,7 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
     }
     g_refind = mean (param[msol.nmuaChromo+2]); // assuming homogeneous n
     
+    delete []param;
     //msol.SetParam (OT_CMUA, param[0]*c0/param[2]);
     //msol.SetParam (OT_CKAPPA, c0/(3*param[2]*(param[0]+param[1])));
     //for (i = 0; i < param[2].Dim(); i++)
@@ -964,7 +965,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 	    case 4:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
-		cin >> cbuf+4;
+		cin >> (cbuf+4);
 		ReadNim (cbuf+4, param[p]);
 		break;
 	    }

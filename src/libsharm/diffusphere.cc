@@ -11,7 +11,6 @@
 #include "felib.h"
 #include "sharmlib.h"
 #include "diffusphere.h"
-using namespace toast;
 using namespace std;
 
 

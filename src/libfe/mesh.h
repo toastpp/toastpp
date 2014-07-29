@@ -360,6 +360,10 @@ public:
     // scans through mesh structure and marks nodes on the mesh surface
     // as boundary nodes
 
+    RCompRowMatrix *MassMatrix () const;
+    // Dynamically allocates a mass matrix for the mesh and returns a
+    // pointer to it. Caller is responsible for deallocation when done.
+
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
         RGenericSparseMatrix &M, const RVector *coeff, int mode);
     // Assembles nodal coefficient vector 'coeff' into element matrix 'M'

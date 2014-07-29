@@ -419,7 +419,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
@@ -447,7 +447,6 @@
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="2"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -674,6 +673,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\libstoast\raster_px2.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\libstoast\raster_rb.cc"
 				>
 			</File>
@@ -869,6 +872,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\libstoast\raster_px.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\libstoast\raster_px2.h"
 				>
 			</File>
 			<File

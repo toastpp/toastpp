@@ -1,0 +1,358 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F229EA43195C7C98003F34BC /* mtBasis.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA36195C7C98003F34BC /* mtBasis.cc */; };
+		F229EA44195C7C98003F34BC /* mtElement.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA37195C7C98003F34BC /* mtElement.cc */; };
+		F229EA45195C7C98003F34BC /* mtField.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA38195C7C98003F34BC /* mtField.cc */; };
+		F229EA48195C7C98003F34BC /* mtMesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3B195C7C98003F34BC /* mtMesh.cc */; };
+		F229EA49195C7C98003F34BC /* mtQMvec.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3C195C7C98003F34BC /* mtQMvec.cc */; };
+		F229EA4A195C7C98003F34BC /* mtRegul.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3D195C7C98003F34BC /* mtRegul.cc */; };
+		F229EA4B195C7C98003F34BC /* toast.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3E195C7C98003F34BC /* toast.cc */; };
+		F229EA4C195C7C98003F34BC /* toastlbfgs.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3F195C7C98003F34BC /* toastlbfgs.cc */; };
+		F229EA4D195C7C98003F34BC /* toastmex.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA40195C7C98003F34BC /* toastmex.cc */; };
+		F229EA4E195C7C98003F34BC /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA41195C7C98003F34BC /* util.cc */; };
+		F229EA60195C7E1A003F34BC /* libstoast.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA5F195C7E1A003F34BC /* libstoast.dylib */; };
+		F229EA6A195C8062003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA69195C8062003F34BC /* libfe.dylib */; };
+		F229EA6B195C8069003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA67195C803A003F34BC /* libmath.dylib */; };
+		F229EA6D195C8147003F34BC /* liblbfgs.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA6C195C8147003F34BC /* liblbfgs.dylib */; };
+		F229EA6E195C8175003F34BC /* matlabtoast.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA35195C7C98003F34BC /* matlabtoast.cc */; };
+		F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA39195C7C98003F34BC /* mtGradient.cc */; };
+		F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3A195C7C98003F34BC /* mtJacobian.cc */; };
+		F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED64F5195CAFD8006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../darwin64/mex2";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = toast.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
+		F229EA35195C7C98003F34BC /* matlabtoast.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = matlabtoast.cc; path = ../../src/matlab2/matlabtoast.cc; sourceTree = "<group>"; };
+		F229EA36195C7C98003F34BC /* mtBasis.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtBasis.cc; path = ../../src/matlab2/mtBasis.cc; sourceTree = "<group>"; };
+		F229EA37195C7C98003F34BC /* mtElement.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtElement.cc; path = ../../src/matlab2/mtElement.cc; sourceTree = "<group>"; };
+		F229EA38195C7C98003F34BC /* mtField.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtField.cc; path = ../../src/matlab2/mtField.cc; sourceTree = "<group>"; };
+		F229EA39195C7C98003F34BC /* mtGradient.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtGradient.cc; path = ../../src/matlab2/mtGradient.cc; sourceTree = "<group>"; };
+		F229EA3A195C7C98003F34BC /* mtJacobian.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtJacobian.cc; path = ../../src/matlab2/mtJacobian.cc; sourceTree = "<group>"; };
+		F229EA3B195C7C98003F34BC /* mtMesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtMesh.cc; path = ../../src/matlab2/mtMesh.cc; sourceTree = "<group>"; };
+		F229EA3C195C7C98003F34BC /* mtQMvec.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtQMvec.cc; path = ../../src/matlab2/mtQMvec.cc; sourceTree = "<group>"; };
+		F229EA3D195C7C98003F34BC /* mtRegul.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtRegul.cc; path = ../../src/matlab2/mtRegul.cc; sourceTree = "<group>"; };
+		F229EA3E195C7C98003F34BC /* toast.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toast.cc; path = ../../src/matlab2/toast.cc; sourceTree = "<group>"; };
+		F229EA3F195C7C98003F34BC /* toastlbfgs.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toastlbfgs.cc; path = ../../src/matlab2/toastlbfgs.cc; sourceTree = "<group>"; };
+		F229EA40195C7C98003F34BC /* toastmex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toastmex.cc; path = ../../src/matlab2/toastmex.cc; sourceTree = "<group>"; };
+		F229EA41195C7C98003F34BC /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/matlab2/util.cc; sourceTree = "<group>"; };
+		F229EA5F195C7E1A003F34BC /* libstoast.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstoast.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libstoast.dylib"; sourceTree = "<group>"; };
+		F229EA67195C803A003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
+		F229EA69195C8062003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
+		F229EA6C195C8147003F34BC /* liblbfgs.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblbfgs.dylib; path = ../../gcc_shared/lib/liblbfgs.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F229EA2B195C7B9D003F34BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F229EA6D195C8147003F34BC /* liblbfgs.dylib in Frameworks */,
+				F229EA6B195C8069003F34BC /* libmath.dylib in Frameworks */,
+				F229EA6A195C8062003F34BC /* libfe.dylib in Frameworks */,
+				F229EA60195C7E1A003F34BC /* libstoast.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F229EA25195C7B9D003F34BC = {
+			isa = PBXGroup;
+			children = (
+				F229EA6C195C8147003F34BC /* liblbfgs.dylib */,
+				F229EA69195C8062003F34BC /* libfe.dylib */,
+				F229EA67195C803A003F34BC /* libmath.dylib */,
+				F229EA5F195C7E1A003F34BC /* libstoast.dylib */,
+				F229EA35195C7C98003F34BC /* matlabtoast.cc */,
+				F229EA36195C7C98003F34BC /* mtBasis.cc */,
+				F229EA37195C7C98003F34BC /* mtElement.cc */,
+				F229EA38195C7C98003F34BC /* mtField.cc */,
+				F229EA39195C7C98003F34BC /* mtGradient.cc */,
+				F229EA3A195C7C98003F34BC /* mtJacobian.cc */,
+				F229EA3B195C7C98003F34BC /* mtMesh.cc */,
+				F229EA3C195C7C98003F34BC /* mtQMvec.cc */,
+				F229EA3D195C7C98003F34BC /* mtRegul.cc */,
+				F229EA3E195C7C98003F34BC /* toast.cc */,
+				F229EA3F195C7C98003F34BC /* toastlbfgs.cc */,
+				F229EA40195C7C98003F34BC /* toastmex.cc */,
+				F229EA41195C7C98003F34BC /* util.cc */,
+				F229EA2F195C7B9D003F34BC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F229EA2F195C7B9D003F34BC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F229EA2C195C7B9D003F34BC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F229EA2D195C7B9D003F34BC /* matlab2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F229EA32195C7B9D003F34BC /* Build configuration list for PBXNativeTarget "matlab2" */;
+			buildPhases = (
+				F229EA2A195C7B9D003F34BC /* Sources */,
+				F229EA2B195C7B9D003F34BC /* Frameworks */,
+				F229EA2C195C7B9D003F34BC /* Headers */,
+				F2ED64F5195CAFD8006CD663 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = matlab2;
+			productName = matlab2;
+			productReference = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F229EA26195C7B9D003F34BC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = UCL;
+			};
+			buildConfigurationList = F229EA29195C7B9D003F34BC /* Build configuration list for PBXProject "matlab2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F229EA25195C7B9D003F34BC;
+			productRefGroup = F229EA2F195C7B9D003F34BC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F229EA2D195C7B9D003F34BC /* matlab2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F229EA2A195C7B9D003F34BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F229EA4B195C7C98003F34BC /* toast.cc in Sources */,
+				F229EA6E195C8175003F34BC /* matlabtoast.cc in Sources */,
+				F229EA48195C7C98003F34BC /* mtMesh.cc in Sources */,
+				F229EA4D195C7C98003F34BC /* toastmex.cc in Sources */,
+				F229EA49195C7C98003F34BC /* mtQMvec.cc in Sources */,
+				F229EA44195C7C98003F34BC /* mtElement.cc in Sources */,
+				F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */,
+				F229EA4E195C7C98003F34BC /* util.cc in Sources */,
+				F229EA4A195C7C98003F34BC /* mtRegul.cc in Sources */,
+				F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */,
+				F229EA43195C7C98003F34BC /* mtBasis.cc in Sources */,
+				F229EA45195C7C98003F34BC /* mtField.cc in Sources */,
+				F229EA4C195C7C98003F34BC /* toastlbfgs.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F229EA30195C7B9D003F34BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F229EA31195C7B9D003F34BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F229EA33195C7B9D003F34BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"char16_t=UINT16_T",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../lib/\"",
+					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
+				);
+				MACH_O_TYPE = mh_bundle;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MATLABROOT = /Applications/MATLAB_R2013b.app;
+				OTHER_LDFLAGS = (
+					"-lmat",
+					"-lmex",
+					"-lmx",
+				);
+				PRODUCT_NAME = toast;
+				SDKROOT = macosx10.8;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(MATLABROOT)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
+			};
+			name = Debug;
+		};
+		F229EA34195C7B9D003F34BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = mexmaci64;
+				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../lib/\"",
+					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
+				);
+				MACH_O_TYPE = mh_bundle;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MATLABROOT = /Applications/MATLAB_R2013b.app;
+				OTHER_LDFLAGS = (
+					"-lmat",
+					"-lmex",
+					"-lmx",
+				);
+				PRODUCT_NAME = toast;
+				SDKROOT = macosx10.8;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(MATLABROOT)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F229EA29195C7B9D003F34BC /* Build configuration list for PBXProject "matlab2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F229EA30195C7B9D003F34BC /* Debug */,
+				F229EA31195C7B9D003F34BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F229EA32195C7B9D003F34BC /* Build configuration list for PBXNativeTarget "matlab2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F229EA33195C7B9D003F34BC /* Debug */,
+				F229EA34195C7B9D003F34BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F229EA26195C7B9D003F34BC /* Project object */;
+}

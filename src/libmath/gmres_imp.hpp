@@ -121,7 +121,7 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
 	/* GMRES iteration */
         j = -1;
         cycle++;
-        while ((norm_x=norm(s[j+1])) > elim*norm_b
+          while ((norm_x=std::abs(s[j+1])) > elim*norm_b
                 && (j < (MAX_GMRES_STEPS-1))
                 && (cycle < MAX_CYCLE)
 		)
