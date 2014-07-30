@@ -25,7 +25,7 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order);
 // =========================================================================
 // MAIN 
 
-int CalcMvec (const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
+int CalcMvec (const QMMesh *mesh, SRC_PROFILE mprof, double mwidth, const RVector *ref,
     mxArray **res) 
 {
     int n, nM;
@@ -52,7 +52,10 @@ int CalcMvec (const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
 	    m = CompleteTrigSourceVector (*mesh, i);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh->plist[j].C2A();
+	if (ref) {
+	    const RVector &rref = *ref;
+	    for (j = 0; j < n; j++) m[j] *= c0/(2.0*rref[j]*A_Keijzer(rref[j]));
+	}
 	mvec.SetRow (i, m);
     }
 
@@ -125,9 +128,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     char cbuf[256];
 
-    //int hMesh = (int)mxGetScalar (prhs[0]);
-    //QMMesh *mesh = (QMMesh*)hMesh;
     QMMesh *mesh = (QMMesh*)Handle2Ptr (mxGetScalar (prhs[0]));
+    int n = mesh->nlen();
 
     SRC_PROFILE mprof;
     mxGetString (prhs[1], cbuf, 256);
@@ -137,6 +139,26 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else mexErrMsgTxt ("Invalid measurement profile");
 
     double mwidth = mxGetScalar (prhs[2]);
+    RVector ref(n);
+    bool apply_c2a = true;
 
-    CalcMvec (mesh, mprof, mwidth, &plhs[0]);
+    if (nrhs >= 4) {
+	int len = mxGetM(prhs[3])*mxGetN(prhs[3]);
+	if ((len != 1 && len != n) || !mxIsDouble(prhs[3])) {
+	    char cbuf[256];
+	    sprintf (cbuf, "Mvec: parameter 4: expected double scalar or double vector of length %d", n);
+	    mexErrMsgTxt (cbuf);
+	}
+	if (len == 1) {
+	    double ref_homog = mxGetScalar(prhs[3]);
+	    if (ref_homog) ref = mxGetScalar(prhs[3]);
+	    else apply_c2a = false;
+	} else
+	    CopyVector (ref, prhs[3]);
+    } else {
+	mexWarnMsgTxt("Mvec: Using nodal refractive index values stored with mesh");
+	ref = mesh->plist.N();
+    }
+    
+    CalcMvec (mesh, mprof, mwidth, (apply_c2a ? &ref:0), &plhs[0]);
 }
