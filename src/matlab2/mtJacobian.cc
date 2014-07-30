@@ -113,6 +113,11 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 	CCompRowMatrix mvec;
 	CopyTMatrix (mvec, prhs[3]);
 
+    // bounds check on optical parameters
+    ASSERTARG(mxGetM(prhs[4]) == n, 5, "Unexpected size");
+    ASSERTARG(mxGetM(prhs[5]) == n, 6, "Unexpected size");
+    ASSERTARG(mxGetM(prhs[6]) == n, 7, "Unexpected size");
+        
 	// nodal optical parameters
 	RVector mua (n, mxGetPr (prhs[4]));
 	RVector mus (n, mxGetPr (prhs[5]));
@@ -155,12 +160,18 @@ void MatlabToast::JacobianCW (int nlhs, mxArray *plhs[], int nrhs,
     // measurement vectors
     RCompRowMatrix mvec;
     CopyTMatrix (mvec, prhs[3]);
+    
+    // bounds check on optical parameters
+    ASSERTARG(mxGetM(prhs[4]) == n, 5, "Unexpected size");
+    ASSERTARG(mxGetM(prhs[5]) == n, 6, "Unexpected size");
+    ASSERTARG(mxGetM(prhs[6]) == n, 7, "Unexpected size");
 
     // nodal optical parameters
     RVector mua (n, mxGetPr (prhs[4]));
     RVector mus (n, mxGetPr (prhs[5]));
     RVector ref (n, mxGetPr (prhs[6]));
-
+    
+    
     // linear solver parameters
     char solver[128];
     double tol = 1e-10;
