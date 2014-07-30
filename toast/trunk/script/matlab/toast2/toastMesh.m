@@ -934,6 +934,7 @@ classdef toastMesh < handle
             % Generate a sparse matrix of measurement column vectors.
             %
             % Syntax: mvec = mesh.Mvec (mprof, mwidth)
+            %         mvec = mesh.Mvec (mprof, mwidth, ref)
             %
             % Parameters:
             %         mprof [string]:
@@ -941,6 +942,9 @@ classdef toastMesh < handle
             %             'TrigBasis')
             %         mwidth [real]:
             %             measurement radius [mm]
+            %         ref [real, or real vector n]:
+            %             refractive index used for computing the mvec
+            %             operator scaling.
             %
             % Return values:
             %         mvec [complex sparse matrix n x nm]:
@@ -955,6 +959,21 @@ classdef toastMesh < handle
             %         sparse n x nm matrix, where n is the mesh node count,
             %         and nm is the number of detectors. The mesh must
             %         contain measurement definitions (see ReadQM).
+            %
+            %         The boundary operator is normally scaled with a
+            %         factor of c/2A, where c is the speed of light, and A
+            %         is a term incorporating the refractive index mismatch
+            %         at the boundary. This scaling factor is computed from
+            %         the 'ref' term passed to Mvec (either as a vector of
+            %         length n of nodal values, or as a scalar if the
+            %         refractive index is homogeneous.
+            %
+            %         To avoid scaling with the c/2A term altogether, set
+            %         the 'ref' parameter to 0.
+            %
+            %         Warning: if 'ref' is omitted, Mvec uses the
+            %         refractive index values stored with the mesh. This
+            %         behaviour may change in future versions.
             %
             % See also:
             %         toastMesh, READQM, QVEC, MPOS
