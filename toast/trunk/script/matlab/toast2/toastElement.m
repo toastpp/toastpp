@@ -61,6 +61,35 @@ classdef toastElement < handle
             size = toast(uint32(10),obj.mesh.handle,obj.elid);
         end
         
+        function reg = Region(obj,newreg)
+            % Set or retrieve the element region index.
+            %
+            % Syntax: reg = el.Region()
+            %         el.Region (newreg)
+            %
+            % Parameters:
+            %         newreg [int]:
+            %             new region index to be assigned to the element
+            %
+            % Return values:
+            %         reg [int]:
+            %             current element region index
+            %
+            % Notes:
+            %         The region index in an integer value associated with
+            %         an element. It can be used to store element-specific
+            %         application data, typically a region label for
+            %         segmented meshes.
+            %
+            % See also:
+            %         toastMesh/Region
+            if nargin > 1
+                reg = toast(uint32(85),obj.mesh.handle,obj.elid,newreg);
+            else
+                reg = toast(uint32(85),obj.mesh.handle,obj.elid);
+            end
+        end
+        
 	    function [evtx,eidx,eltp] = Data(obj)
             % Return the geometry of the mesh element.
             %

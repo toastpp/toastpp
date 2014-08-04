@@ -99,6 +99,53 @@ void MatlabToast::ElData (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::ElRegion (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Mesh *mesh = GETMESH_SAFE(0);
+
+    int idx = (int)mxGetScalar(prhs[1]) - 1; // convert to zero-based
+    if (idx < -1 || idx >= mesh->elen())
+        mexErrMsgTxt ("Region: element index out of range");
+
+    if (idx == -1) { // apply to all mesh elements
+
+	if (nrhs > 2) { // set all region indices
+	    xASSERT(mxIsNumeric(prhs[2]) && mxGetM(prhs[2])*mxGetN(prhs[2]) ==
+		    mesh->elen(), "toastMesh/Region requires array of length mesh.ElementCount of numeric region indices");
+	    double *pr = mxGetPr(prhs[2]);
+	    for (idx = 0; idx < mesh->elen(); idx++) {
+		int reg = (int)(pr[idx]+0.5);
+		mesh->elist[idx]->SetRegion (reg);
+	    }
+	}
+	if (nlhs > 0) { // return array of region indices
+	    plhs[0] = mxCreateDoubleMatrix (mesh->elen(), 1, mxREAL);
+	    double *pr = mxGetPr(plhs[0]);
+	    for (idx = 0; idx < mesh->elen(); idx++) {
+		pr[idx] = mesh->elist[idx]->Region();
+	    }
+	}
+
+    } else {
+
+	Element *pel = mesh->elist[idx];
+    
+	if (nrhs > 2) { // set region index
+	    xASSERT(mxIsNumeric(prhs[2]), "toastElement/Region requires numeric region index");
+	    int reg = (int)(mxGetScalar(prhs[2])+0.5);
+	    pel->SetRegion (reg);
+	}
+	if (nlhs > 0) { // return region index
+	    int reg = pel->Region();
+	    plhs[0] = mxCreateDoubleScalar (reg);
+	}
+
+    }
+}
+
+// =========================================================================
+
 void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {

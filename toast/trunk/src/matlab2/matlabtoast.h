@@ -195,6 +195,7 @@ public:
         const mxArray *prhs[]);
     void ElData (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void ElRegion (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void ElMat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);

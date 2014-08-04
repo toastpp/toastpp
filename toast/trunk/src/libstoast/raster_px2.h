@@ -13,6 +13,9 @@
 
 #include "raster.h"
 
+void Tetsplit (Mesh *mesh, int el, int cut_orient, double cut_pos);
+// exported temporarily
+
 // =========================================================================
 /**
  * \brief Pixel (or voxel) basis representation.
@@ -149,6 +152,7 @@ private:
      * \brief Returns pointer to mixed mapping matrix
      */
     RCompRowMatrix *CreateMixedMassmat () const;
+    RCompRowMatrix *CreateMixedMassmat_tet4 () const;
 
     RCompRowMatrix *CreatePixelMassmat () const;
 

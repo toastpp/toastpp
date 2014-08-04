@@ -81,6 +81,9 @@ public:
     int SideNode (int side, int node) const;
     double SideSize (int sd, const NodeList &nlist) const;
 
+    double DetJ (const Point &loc, const NodeList *nlist = 0) const
+    { return Size()*6.0; }
+
     Point Local (const NodeList& nlist, const Point& glob) const;
     Point NodeLocal (int node) const;
     Point SurfToLocal (int side, const Point &p) const;
