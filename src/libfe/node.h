@@ -47,7 +47,9 @@ public:
     // as operator= but reallocates *this, so dimensions need not be the same
 
     // assignment operators
-    Node &operator= (const Node& nd);
+    Node &operator= (const Node &nd);
+
+    Node &operator= (const Point &pt);
 
     // relational operators
     bool operator== (const Node& nd) const;

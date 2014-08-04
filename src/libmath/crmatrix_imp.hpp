@@ -2981,6 +2981,7 @@ template<class MT>
 void TCompRowMatrix<MT>::ExportRCV (ostream &os)
 {
     int r, c, j;
+    os << std::scientific << std::setprecision(10);
     for (r = 0; r < this->rows; r++) {
 	for (j = rowptr[r]; j < rowptr[r+1]; j++) {
 	    c = colidx[j];
