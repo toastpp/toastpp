@@ -2,6 +2,7 @@
 #include "stoastlib.h"
 #include "tri_qr.h"
 #include "tet_qr.h"
+#include "timing.h"
 
 using namespace std;
 
@@ -545,9 +546,35 @@ public:
     void SubSetup()
     {
 	for (int el=0; el < elen_used; el++)
-	    elist[el]->Initialise(nlist);
+	    if (elist[el]->Region() >= 0)
+		elist[el]->Initialise(nlist);
 	for (int el=0; el < elen_used; el++)
-	    elist[el]->PostInitialisation(nlist);
+	    if (elist[el]->Region() >= 0)
+		elist[el]->PostInitialisation(nlist);
+    }
+
+    friend std::ostream& operator<< (std::ostream& o, BufMesh &mesh)
+    {
+	o << "MeshData 5.0\n\n";
+	o << "NodeList " << mesh.nlen_used << " 1" << std::endl;
+	o.precision(10);
+	for (int i = 0; i < mesh.nlen_used; i++)
+	    o << "N[" << mesh.nlist[i][0] << " " << mesh.nlist[i][1] << " "
+	      << mesh.nlist[i][2] << "]R0" << std::endl;
+	o << "\nElementList " << mesh.elen_used << std::endl;
+	for (int i = 0; i < mesh.elen_used; i++)
+	    o << "c " << mesh.elist[i]->Node[0]+1 << " " << mesh.elist[i]->Node[1]+1
+	      << " " << mesh.elist[i]->Node[2]+1 << " " << mesh.elist[i]->Node[3]+1
+	      << " R" << mesh.elist[i]->Region() << std::endl;
+	o << "\n[ParameterList]N" << std::endl;
+	o << "Size " << mesh.nlen_used << std::endl;
+	o << "Param1 MUA" << std::endl;
+	o << "Param2 KAPPA" << std::endl;
+	o << "Param3 N" << std::endl;
+	o << "Data" << std::endl;
+	for (int i = 0; i < mesh.nlen_used; i++)
+	    o << "0.01 0.33 1.4" << std::endl;
+	return o;
     }
 
     int nlen_used, elen_used;
@@ -556,6 +583,9 @@ public:
 RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 {
     void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos);
+    void Tetsplit_cube (BufMesh *mesh, double xmin, double xmax,
+			double ymin, double ymax, double zmin, double zmax,
+			int reg);
 
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
@@ -568,7 +598,8 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
     double dx = xrange/(bdim[0]-1.0);
     double dy = yrange/(bdim[1]-1.0);
     double dz = zrange/(bdim[2]-1.0);
-    double xmin, xmax, ymin, ymax, zmin, zmax, djac, b, v;
+    double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v;
+    int stride_i = bdim[0], stride_j = stride_i*bdim[1];
 
     // quadrature rule for local tetrahedron
     const double *wght;
@@ -657,6 +688,8 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
     submesh.nlen_used = 0;
     submesh.elen_used = 0;
 
+    double t_split = 0.0, t_integrate = 0.0;
+
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
 	std::cout << "Buv: processing el " << el << " of " << nel << std::endl;
@@ -689,6 +722,8 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	kmin = max (0, (int)floor((bdim[2]-1) * (ezmin-bbmin[2])/zrange));
 	kmax = min (bdim[2]-2, (int)floor((bdim[2]-1) * (ezmax-bbmin[2])/zrange));
 
+	tic();
+
 	// Create a mesh containing this single element
 	for (i = 0; i < 4; i++) {
 	    submesh.elist[0]->Node[i] = i;
@@ -698,14 +733,12 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	submesh.elen_used = 1;
 	submesh.nlen_used = 4;
 
-#ifdef UNDEF
 	// DEBUG
-	submesh.SubSetup();
-	double orig_size = submesh.CalcFullSize();
+	//submesh.SubSetup();
 	//ofstream ofs1("dbg1.msh");
 	//ofs1 << submesh << std::endl;
-	std::cout << "Initial element size: " << orig_size << std::endl;
-#endif
+	//double orig_size = submesh.CalcFullSize();
+	//std::cout << "Initial element size: " << orig_size << std::endl;
 
 	// perform subdivisions along x-cutting planes
 	for (i = imin; i < imax; i++) {
@@ -718,23 +751,21 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	}
 	    
-#ifdef UNDEF
 	// DEBUG
+	//submesh.SubSetup();
 	//ofstream ofs2("dbg2.msh");
 	//ofs2 << submesh << std::endl;
-	submesh.SubSetup();
-	double sz = 0.0;
-	std::cout << "Subdiv element sizes: " << std::endl;
-	for (i = 0; i < submesh.elen_used; i++) {
-	    double s = submesh.elist[i]->Size();
-	    std::cout << s << std::endl;
-	    sz += s;
-	    if (s <= 0)
-		std::cerr << "**** x-split: El size(" << el << ',' << i
-			  << ")=" << s << std::endl;
-	}
-	std::cout << "Total: " << sz << std::endl;
-#endif
+	//double sz = 0.0;
+	//std::cout << "Subdiv element sizes: " << std::endl;
+	//for (i = 0; i < submesh.elen_used; i++) {
+	//    double s = submesh.elist[i]->Size();
+	//    std::cout << s << std::endl;
+	//    sz += s;
+	//    if (s <= 0)
+	//	std::cerr << "**** x-split: El size(" << el << ',' << i
+	//		  << ")=" << s << std::endl;
+	//}
+	//std::cout << "Total: " << sz << std::endl;
 
 	// perform subdivisions along y-cutting planes
 	for (j = jmin; j < jmax; j++) {
@@ -747,23 +778,21 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	}
 	    
-#ifdef UNDEF
 	// DEBUG
+	//submesh.SubSetup();
 	//ofstream ofs3("dbg3.msh");
 	//ofs3 << submesh << std::endl;
-	submesh.SubSetup();
-	sz = 0.0;
-	std::cout << "Subdiv element sizes: " << std::endl;
-	for (i = 0; i < submesh.elen_used; i++) {
-	    double s = submesh.elist[i]->Size();
-	    std::cout << s << std::endl;
-	    sz += s;
-	    if (s <= 0)
-		std::cerr << "**** y-split: El size(" << el << ',' << i
-			  << ")=" << s << std::endl;
-	}
-	std::cout << "Total: " << sz << std::endl;
-#endif
+	//sz = 0.0;
+	//std::cout << "Subdiv element sizes: " << std::endl;
+	//for (i = 0; i < submesh.elen_used; i++) {
+	//    double s = submesh.elist[i]->Size();
+	//    std::cout << s << std::endl;
+	//    sz += s;
+	//    if (s <= 0)
+	//	std::cerr << "**** y-split: El size(" << el << ',' << i
+	//		  << ")=" << s << std::endl;
+	//}
+	//std::cout << "Total: " << sz << std::endl;
 
 	// perform subdivisions along z-cutting planes
 	for (k = kmin; k < kmax; k++) {
@@ -776,37 +805,64 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	}
 
-#ifdef UNDEF
 	// DEBUG
+	//submesh.SubSetup();
 	//ofstream ofs4("dbg4.msh");
 	//ofs4 << submesh << std::endl;
-	submesh.SubSetup();
-	sz = 0.0;
-	std::cout << "Subdiv element sizes: " << std::endl;
-	for (i = 0; i < submesh.elen_used; i++) {
-	    double s = submesh.elist[i]->Size();
-	    std::cout << s << std::endl;
-	    sz += s;
-	    if (s <= 0)
-		std::cerr << "**** z-split: El size(" << el << ',' << i
-			  << ")=" << s << std::endl;
+	//sz = 0.0;
+	//std::cout << "Subdiv element sizes: " << std::endl;
+	//for (i = 0; i < submesh.elen_used; i++) {
+	//    double s = submesh.elist[i]->Size();
+	//    std::cout << s << std::endl;
+	//    sz += s;
+	//    if (s <= 0)
+	//	std::cerr << "**** z-split: El size(" << el << ',' << i
+	//		  << ")=" << s << std::endl;
+	//}
+	//std::cout << "Total: " << sz << std::endl;
+
+	t_split += toc();
+	tic();
+
+	// for any voxel cells completely inside the element,
+	// replace the subdivided elements by a simple 6-tetra
+	// subdivision to reduce the number of elements for the
+	// integral
+	for (k = kmin; k <= kmax; k++) {
+	    zmax = (zmin = bbmin[2] + dz*k) + dz;
+	    for (j = jmin; j <= jmax; j++) {
+		ymax = (ymin = bbmin[1] + dy*j) + dy;
+		for (i = imin; i <= imax; i++) {
+		    xmax = (xmin = bbmin[0] + dx*i) + dx;
+		    if (pel->GContains(Point3D(xmin,ymin,zmin),false) &&
+			pel->GContains(Point3D(xmax,ymin,zmin),false) &&
+			pel->GContains(Point3D(xmin,ymax,zmin),false) &&
+			pel->GContains(Point3D(xmax,ymax,zmin),false) &&
+			pel->GContains(Point3D(xmin,ymin,zmax),false) &&
+			pel->GContains(Point3D(xmax,ymin,zmax),false) &&
+			pel->GContains(Point3D(xmin,ymax,zmax),false) &&
+			pel->GContains(Point3D(xmax,ymax,zmax),false)) {
+			int reg = (i-imin) + (j-jmin) << 10 + (k-kmin) << 20;
+			for (m = 0; m < submesh.elen_used; m++)
+			    if (submesh.elist[m]->Region() == reg)
+				submesh.elist[m]->SetRegion(-1); // mark disabled
+			Tetsplit_cube (&submesh, xmin, xmax, ymin, ymax,
+				       zmin, zmax, reg);
+		    }
+		}
+	    }
 	}
-	std::cout << "Total: " << sz << std::endl;
-#endif
+
 
 	// now perform quadrature on all sub-elements
-	submesh.SubSetup();
-	int nskipped = 0;
+	//submesh.SubSetup();
+	//double sz = 0.0; // DEBUG
 	for (i = 0; i < submesh.elen_used; i++) {
 	    Element *psel = submesh.elist[i];
-	    if (psel->Size() <= orig_size*1e-10) {
-		nskipped++;
-		continue;
-	    }
-	    // TEMPORARY: skip tiny subelements
 
 	    // find the voxel cell containing the sub-tet
 	    int reg = psel->Region();
+	    if (reg < 0) continue; // disabled
 	    int ci = imin + reg & 0x3FF;
 	    int cj = jmin + (reg >> 10) & 0x3FF;
 	    int ck = kmin + (reg >> 20) & 0x3FF;
@@ -820,20 +876,24 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 		v = wght[m] * djac;
 		// loop over the vertices of the voxel cell
 		for (jj = 0; jj < 8; jj++) {
-		    idx_j = cellidx + jj%2 + ((jj/2)%2)*bdim[0] +
-			(jj/4)*bdim[0]*bdim[1];
-		    b = Value_nomask (glob, idx_j, false);
+		    idx_j = cellidx + (jj&1) + ((jj>>1)&1)*stride_i
+		    	+ (jj>>2)*stride_j;
+		    //idx_j = cellidx + jj%2 + ((jj/2)%2)*bdim[0] +
+		    //	(jj/4)*bdim[0]*bdim[1];
+		    vb = v*Value_nomask (glob, idx_j, false);
 		    for (ii = 0; ii < fun.Dim(); ii++) {
 			idx_i = pel->Node[ii];
-			(*Buv)(idx_i, idx_j) += v*b*fun[ii];
+			(*Buv)(idx_i, idx_j) += vb*fun[ii];
 		    }
 		}
 	    }
-	    
+	    //sz += psel->Size();
 	}
-	std::cout << "skipped: " << nskipped << " of " << submesh.elen_used
-		  << " sub-elements" << std::endl;
+	t_integrate += toc();
     }
+
+    std::cout << "#### t_split = " << t_split << std::endl;
+    std::cout << "#### t_integrate = " << t_integrate << std::endl;
 
     Buv->Shrink();
     return Buv;
@@ -1122,7 +1182,153 @@ int CalcIntersections_tet(Mesh *mesh, int el, int cut_orient, double cut_pos, Po
     }
 }
 
+// Split a tetrahedron that has one node on one side of the cutting plane,
+// the other 3 on the other side, into 4 subtets.
+// 'inode' is the index of the single node (0..3)
+// isect is a list of 3 global points defining the intersections of the
+// tet edges with the cutting plane
+// On exit, the returned mesh has modified element el, added the 3 additional
+// tetrahedra, and appended the additional nodes to its node list
+// If mod_el_idx is set, it should point to an integer array of length >= 4,
+// and will receive the indices of the 4 modified/added tetrahedra
+// Return value is the number of modified/added elements (4)
 
+int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
+		   int *mod_el_idx=0)
+{
+    int i, j;
+
+    Element *pel[4];
+    pel[0] = mesh->elist[el];
+
+    xASSERT(pel[0]->Type() == ELID_TET4, "Currently only works with 4-noded tetrahedra");
+
+    NodeList &nlist = mesh->nlist;
+
+    if (mod_el_idx) {
+	mod_el_idx[0] = el;
+	for (i = 0; i < 3; i++)
+	    mod_el_idx[i+1] = mesh->elen_used+i;
+    }
+
+    // grow element list if required
+    int ebuf = mesh->elen();
+    if (mesh->elen_used+3 > ebuf)
+	for (i = 0; i < mesh->elen_used+3-ebuf; i++)
+	    mesh->elist.Append(new Tetrahedron4);
+    
+    for (i = 1; i < 4; i++)
+	pel[i] = mesh->elist[mesh->elen_used++];
+
+    // grow node list if required
+    int nbuf = mesh->nlen();
+    if (mesh->nlen_used+3 > nbuf) {
+	nlist.Append(mesh->nlen_used+3-nbuf);
+	for (i = mesh->nlen_used; i < mesh->nlen(); i++)
+	    nlist[i].New(3);
+    }
+    int nlen = mesh->nlen_used;
+    mesh->nlen_used += 3;
+
+    int nidx[10];
+    for (i = 0; i < 4; i++)
+	nidx[i] = pel[0]->Node[i];
+    for (i = 0; i < 3; i++)
+	nidx[i+4] = nlen+i;
+
+    for (i = 0; i < 3; i++)
+	nlist[nlen+i] = isect[i];
+
+    switch (inode) {
+    case 0:
+	pel[0]->Node[0] = nidx[0];
+	pel[0]->Node[1] = nidx[4];
+	pel[0]->Node[2] = nidx[5];
+	pel[0]->Node[3] = nidx[6];
+
+	pel[1]->Node[0] = nidx[2];
+	pel[1]->Node[1] = nidx[1];
+	pel[1]->Node[2] = nidx[3];
+	pel[1]->Node[3] = nidx[5];
+	
+	pel[2]->Node[0] = nidx[5];
+	pel[2]->Node[1] = nidx[4];
+	pel[2]->Node[2] = nidx[1];
+	pel[2]->Node[3] = nidx[6];
+	
+	pel[3]->Node[0] = nidx[1];
+	pel[3]->Node[1] = nidx[6];
+	pel[3]->Node[2] = nidx[3];
+	pel[3]->Node[3] = nidx[5];
+	break;
+    case 1:
+	pel[0]->Node[0] = nidx[1];
+	pel[0]->Node[1] = nidx[5];
+	pel[0]->Node[2] = nidx[4];
+	pel[0]->Node[3] = nidx[6];
+
+	pel[1]->Node[0] = nidx[0];
+	pel[1]->Node[1] = nidx[2];
+	pel[1]->Node[2] = nidx[3];
+	pel[1]->Node[3] = nidx[4];
+	
+	pel[2]->Node[0] = nidx[4];
+	pel[2]->Node[1] = nidx[5];
+	pel[2]->Node[2] = nidx[2];
+	pel[2]->Node[3] = nidx[6];
+	
+	pel[3]->Node[0] = nidx[2];
+	pel[3]->Node[1] = nidx[6];
+	pel[3]->Node[2] = nidx[3];
+	pel[3]->Node[3] = nidx[4];
+	break;
+    case 2:
+	pel[0]->Node[0] = nidx[2];
+	pel[0]->Node[1] = nidx[4];
+	pel[0]->Node[2] = nidx[5];
+	pel[0]->Node[3] = nidx[6];
+
+	pel[1]->Node[0] = nidx[1];
+	pel[1]->Node[1] = nidx[0];
+	pel[1]->Node[2] = nidx[3];
+	pel[1]->Node[3] = nidx[5];
+	
+	pel[2]->Node[0] = nidx[5];
+	pel[2]->Node[1] = nidx[4];
+	pel[2]->Node[2] = nidx[0];
+	pel[2]->Node[3] = nidx[6];
+	
+	pel[3]->Node[0] = nidx[0];
+	pel[3]->Node[1] = nidx[6];
+	pel[3]->Node[2] = nidx[3];
+	pel[3]->Node[3] = nidx[5];
+	break;
+    case 3:
+	pel[0]->Node[0] = nidx[3];
+	pel[0]->Node[1] = nidx[5];
+	pel[0]->Node[2] = nidx[4];
+	pel[0]->Node[3] = nidx[6];
+
+	pel[1]->Node[0] = nidx[0];
+	pel[1]->Node[1] = nidx[1];
+	pel[1]->Node[2] = nidx[2];
+	pel[1]->Node[3] = nidx[4];
+	
+	pel[2]->Node[0] = nidx[4];
+	pel[2]->Node[1] = nidx[5];
+	pel[2]->Node[2] = nidx[1];
+	pel[2]->Node[3] = nidx[6];
+	
+	pel[3]->Node[0] = nidx[1];
+	pel[3]->Node[1] = nidx[6];
+	pel[3]->Node[2] = nidx[2];
+	pel[3]->Node[3] = nidx[4];
+	break;
+    }
+    return 4;
+}
+
+#ifdef UNDEF
 // Split a tetrahedron that has one node on one side of the cutting plane,
 // the other 3 on the other side, into 8 subtets.
 // 'inode' is the index of the single node (0..3)
@@ -1222,7 +1428,7 @@ int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
 	    
     return 8;
 }
-
+#endif
 
 // Split a tetrahedron that has two nodes on either side of the cutting plane,
 // into 6 subtets.
@@ -1344,7 +1550,7 @@ void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos)
 
     // compute the intersection points
     int i, nisect;
-    int elidx[8];
+    int elidx[6];
     static Point isect[4];
     if (!isect[0].Dim())
 	for (i = 0; i < 4; i++) isect[i].New(3);
@@ -1399,4 +1605,73 @@ void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos)
 		mesh->elist[elidx[i]]->SetRegion (regidx);
 	
     }
+}
+
+
+// Add 6 tetrahedra to the mesh subdividing a voxel cell given by its
+// extents
+void Tetsplit_cube (BufMesh *mesh, double xmin, double xmax,
+		    double ymin, double ymax, double zmin, double zmax,
+		    int reg)
+{
+    int i;
+
+    // grow element list if required
+    int ebuf = mesh->elen();
+    if (mesh->elen_used+6 > ebuf)
+	for (i = 0; i < mesh->elen_used+6-ebuf; i++)
+	    mesh->elist.Append (new Tetrahedron4);
+
+    Element *pel[6];
+    for (i = 0; i < 6; i++) {
+	pel[i] = mesh->elist[mesh->elen_used++];
+	pel[i]->SetRegion (reg);
+    }
+
+    // grow node list if required
+    int nbuf = mesh->nlen();
+    if (mesh->nlen_used+8 > nbuf) {
+	mesh->nlist.Append(mesh->nlen_used+8-nbuf);
+	for (i = mesh->nlen_used; i < mesh->nlen(); i++)
+	    mesh->nlist[i].New(3);
+    }
+    int nlen = mesh->nlen_used;
+    mesh->nlen_used += 6;
+
+    for (i = 0; i < 8; i++) {
+	Node &nd = mesh->nlist[nlen+i];
+	nd[0] = (i%2 ? xmax:xmin);
+	nd[1] = ((i/2)%2 ? ymax:ymin);
+	nd[2] = (i/4 ? zmax:zmin);
+    }
+
+    pel[0]->Node[0] = nlen+0;
+    pel[0]->Node[1] = nlen+1;
+    pel[0]->Node[2] = nlen+2;
+    pel[0]->Node[3] = nlen+5;
+
+    pel[1]->Node[0] = nlen+4;
+    pel[1]->Node[1] = nlen+6;
+    pel[1]->Node[2] = nlen+5;
+    pel[1]->Node[3] = nlen+2;
+
+    pel[2]->Node[0] = nlen+0;
+    pel[2]->Node[1] = nlen+4;
+    pel[2]->Node[2] = nlen+5;
+    pel[2]->Node[3] = nlen+2;
+
+    pel[3]->Node[0] = nlen+3;
+    pel[3]->Node[1] = nlen+2;
+    pel[3]->Node[2] = nlen+1;
+    pel[3]->Node[3] = nlen+6;
+
+    pel[4]->Node[0] = nlen+7;
+    pel[4]->Node[1] = nlen+5;
+    pel[4]->Node[2] = nlen+6;
+    pel[4]->Node[3] = nlen+1;
+
+    pel[5]->Node[0] = nlen+3;
+    pel[5]->Node[1] = nlen+7;
+    pel[5]->Node[2] = nlen+6;
+    pel[5]->Node[3] = nlen+1;
 }
