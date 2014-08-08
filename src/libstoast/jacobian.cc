@@ -273,6 +273,13 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
 	    jj++;
 	}
     }
+
+    // scale with voxel size
+    double sz = 1.0;
+    for (i = 0; i < dim; i++)
+	sz *= gsize[i] / (bdim[i]-1.0);
+    J *= sz;
+
     delete []cafield;
     delete []cdfield_grad;
     delete []cafield_grad;    
@@ -357,6 +364,12 @@ void GenerateJacobian_grid (const Raster *raster, const QMMesh *mesh,
     delete []cafield;
     delete []cdfield_grad;
     delete []cafield_grad;    
+
+    // scale with voxel size
+    double sz = 1.0;
+    for (i = 0; i < dim; i++)
+	sz *= gsize[i] / (bdim[i]-1.0);
+    J *= sz;
 }
 
 
@@ -708,6 +721,13 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 	delete []cafield_grad;
     }
 #endif // !THREAD_LEVEL
+
+    // scale with voxel size
+    double sz = 1.0;
+    for (i = 0; i < dim; i++)
+	sz *= gsize[i] / (bdim[i]-1.0);
+    if (Jmua) *Jmua *= sz;
+    if (Jkap) *Jkap *= sz;
 
     std::cerr << "T(Jacobian) = " << walltoc(t0) << std::endl;
 }

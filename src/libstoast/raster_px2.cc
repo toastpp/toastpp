@@ -751,6 +751,35 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	}
 	    
+#ifdef UNDEF
+	// DEBUG: compare integral over original element with sum
+	// over sub elements
+	submesh.SubSetup();
+	double sum = 0.0, sum_orig = 0.0;
+	for (m = 0; m < np; m++) {
+	    djac = pel->DetJ(absc[m], &meshptr->nlist);
+	    fun = pel->LocalShapeF (absc[m]);
+	    v = wght[m] * djac;
+	    for (ii = 0; ii < fun.Dim(); ii++) {
+		sum_orig += v*fun[ii];
+	    }
+	}
+
+	for (i = 0; i < submesh.elen_used; i++) {
+	    Element *psel = submesh.elist[i];
+	    for (m = 0; m < np; m++) {
+		djac = psel->DetJ(absc[m], &submesh.nlist);
+		Point glob = psel->Global (submesh.nlist, absc[m]);
+		Point loc = pel->Local(meshptr->nlist, glob);
+		fun = pel->LocalShapeF (loc);
+		v = wght[m] * djac;
+		for (ii = 0; ii < fun.Dim(); ii++) {
+		    sum += v*fun[ii];
+		}
+	    }
+	}
+#endif
+
 	// DEBUG
 	//submesh.SubSetup();
 	//ofstream ofs2("dbg2.msh");
@@ -855,7 +884,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 
 
 	// now perform quadrature on all sub-elements
-	//submesh.SubSetup();
+	submesh.SubSetup();
 	//double sz = 0.0; // DEBUG
 	for (i = 0; i < submesh.elen_used; i++) {
 	    Element *psel = submesh.elist[i];
@@ -1192,7 +1221,6 @@ int CalcIntersections_tet(Mesh *mesh, int el, int cut_orient, double cut_pos, Po
 // If mod_el_idx is set, it should point to an integer array of length >= 4,
 // and will receive the indices of the 4 modified/added tetrahedra
 // Return value is the number of modified/added elements (4)
-
 int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
 		   int *mod_el_idx=0)
 {
@@ -1246,20 +1274,20 @@ int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
 	pel[0]->Node[2] = nidx[5];
 	pel[0]->Node[3] = nidx[6];
 
-	pel[1]->Node[0] = nidx[2];
+	pel[1]->Node[0] = nidx[4];
 	pel[1]->Node[1] = nidx[1];
-	pel[1]->Node[2] = nidx[3];
-	pel[1]->Node[3] = nidx[5];
+	pel[1]->Node[2] = nidx[5];
+	pel[1]->Node[3] = nidx[6];
 	
-	pel[2]->Node[0] = nidx[5];
-	pel[2]->Node[1] = nidx[4];
-	pel[2]->Node[2] = nidx[1];
-	pel[2]->Node[3] = nidx[6];
+	pel[2]->Node[0] = nidx[1];
+	pel[2]->Node[1] = nidx[2];
+	pel[2]->Node[2] = nidx[5];
+	pel[2]->Node[3] = nidx[3];
 	
-	pel[3]->Node[0] = nidx[1];
-	pel[3]->Node[1] = nidx[6];
-	pel[3]->Node[2] = nidx[3];
-	pel[3]->Node[3] = nidx[5];
+	pel[3]->Node[0] = nidx[6];
+	pel[3]->Node[1] = nidx[1];
+	pel[3]->Node[2] = nidx[5];
+	pel[3]->Node[3] = nidx[3];
 	break;
     case 1:
 	pel[0]->Node[0] = nidx[1];
@@ -1267,20 +1295,20 @@ int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
 	pel[0]->Node[2] = nidx[4];
 	pel[0]->Node[3] = nidx[6];
 
-	pel[1]->Node[0] = nidx[0];
+	pel[1]->Node[0] = nidx[5];
 	pel[1]->Node[1] = nidx[2];
-	pel[1]->Node[2] = nidx[3];
-	pel[1]->Node[3] = nidx[4];
+	pel[1]->Node[2] = nidx[4];
+	pel[1]->Node[3] = nidx[6];
 	
-	pel[2]->Node[0] = nidx[4];
-	pel[2]->Node[1] = nidx[5];
-	pel[2]->Node[2] = nidx[2];
-	pel[2]->Node[3] = nidx[6];
+	pel[2]->Node[0] = nidx[2];
+	pel[2]->Node[1] = nidx[0];
+	pel[2]->Node[2] = nidx[4];
+	pel[2]->Node[3] = nidx[3];
 	
-	pel[3]->Node[0] = nidx[2];
-	pel[3]->Node[1] = nidx[6];
-	pel[3]->Node[2] = nidx[3];
-	pel[3]->Node[3] = nidx[4];
+	pel[3]->Node[0] = nidx[6];
+	pel[3]->Node[1] = nidx[2];
+	pel[3]->Node[2] = nidx[4];
+	pel[3]->Node[3] = nidx[3];
 	break;
     case 2:
 	pel[0]->Node[0] = nidx[2];
@@ -1288,20 +1316,20 @@ int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
 	pel[0]->Node[2] = nidx[5];
 	pel[0]->Node[3] = nidx[6];
 
-	pel[1]->Node[0] = nidx[1];
+	pel[1]->Node[0] = nidx[4];
 	pel[1]->Node[1] = nidx[0];
-	pel[1]->Node[2] = nidx[3];
-	pel[1]->Node[3] = nidx[5];
+	pel[1]->Node[2] = nidx[5];
+	pel[1]->Node[3] = nidx[6];
 	
-	pel[2]->Node[0] = nidx[5];
-	pel[2]->Node[1] = nidx[4];
-	pel[2]->Node[2] = nidx[0];
-	pel[2]->Node[3] = nidx[6];
+	pel[2]->Node[0] = nidx[0];
+	pel[2]->Node[1] = nidx[1];
+	pel[2]->Node[2] = nidx[5];
+	pel[2]->Node[3] = nidx[3];
 	
-	pel[3]->Node[0] = nidx[0];
-	pel[3]->Node[1] = nidx[6];
-	pel[3]->Node[2] = nidx[3];
-	pel[3]->Node[3] = nidx[5];
+	pel[3]->Node[0] = nidx[6];
+	pel[3]->Node[1] = nidx[0];
+	pel[3]->Node[2] = nidx[5];
+	pel[3]->Node[3] = nidx[3];
 	break;
     case 3:
 	pel[0]->Node[0] = nidx[3];
@@ -1309,20 +1337,20 @@ int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
 	pel[0]->Node[2] = nidx[4];
 	pel[0]->Node[3] = nidx[6];
 
-	pel[1]->Node[0] = nidx[0];
+	pel[1]->Node[0] = nidx[5];
 	pel[1]->Node[1] = nidx[1];
-	pel[1]->Node[2] = nidx[2];
-	pel[1]->Node[3] = nidx[4];
+	pel[1]->Node[2] = nidx[4];
+	pel[1]->Node[3] = nidx[6];
 	
-	pel[2]->Node[0] = nidx[4];
-	pel[2]->Node[1] = nidx[5];
-	pel[2]->Node[2] = nidx[1];
-	pel[2]->Node[3] = nidx[6];
+	pel[2]->Node[0] = nidx[1];
+	pel[2]->Node[1] = nidx[0];
+	pel[2]->Node[2] = nidx[4];
+	pel[2]->Node[3] = nidx[2];
 	
-	pel[3]->Node[0] = nidx[1];
-	pel[3]->Node[1] = nidx[6];
-	pel[3]->Node[2] = nidx[2];
-	pel[3]->Node[3] = nidx[4];
+	pel[3]->Node[0] = nidx[6];
+	pel[3]->Node[1] = nidx[1];
+	pel[3]->Node[2] = nidx[4];
+	pel[3]->Node[3] = nidx[2];
 	break;
     }
     return 4;
@@ -1508,6 +1536,7 @@ int Tetsplit_2_2 (BufMesh *mesh, int el, int *inode, const Point *isect,
     int (&local_nidx)[6][4] = (inode[1] == 1 ? local_nidx_a :
 			       inode[1] == 2 ? local_nidx_b :
 			       local_nidx_c);
+
 #ifdef UNDEF
     int local_nidx_a[6][4] = {
 	{inode[0],inode[1],6,7},{5,inode[0],4,7},{4,inode[0],6,7},
@@ -1550,7 +1579,7 @@ void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos)
 
     // compute the intersection points
     int i, nisect;
-    int elidx[6];
+    int elidx[8];
     static Point isect[4];
     if (!isect[0].Dim())
 	for (i = 0; i < 4; i++) isect[i].New(3);
@@ -1577,11 +1606,11 @@ void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos)
 
 	// modify slice indices for all sub-tetrahedra that ended up right of the cutting plane
 	for (i = 0; i < nelidx; i++)
-	    if (Tet_extends_right (mesh, elidx[i], cut_orient, cut_pos))
-		mesh->elist[elidx[i]]->SetRegion (regidx + (1 << cut_orient*10));
-	    else
+	    if (Tet_extends_right (mesh, elidx[i], cut_orient, cut_pos)) {
+		mesh->elist[elidx[i]]->SetRegion (regidx + (1 << (cut_orient*10)));
+	    } else {
 		mesh->elist[elidx[i]]->SetRegion (regidx);
-
+	    }
 	
     } else if (nisect == 4) {
 
@@ -1599,11 +1628,11 @@ void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos)
 
 	// modify slice indices for all sub-tetrahedra that ended up right of the cutting plane
 	for (i = 0; i < nelidx; i++)
-	    if (Tet_extends_right (mesh, elidx[i], cut_orient, cut_pos))
-		mesh->elist[elidx[i]]->SetRegion (regidx + (1 << cut_orient*10));
-	    else
+	    if (Tet_extends_right (mesh, elidx[i], cut_orient, cut_pos)) {
+		mesh->elist[elidx[i]]->SetRegion (regidx + (1 << (cut_orient*10)));
+	    } else {
 		mesh->elist[elidx[i]]->SetRegion (regidx);
-	
+	    }
     }
 }
 
