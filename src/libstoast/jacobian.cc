@@ -612,13 +612,20 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     const RVector *dphi, const RVector *aphi,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap)
 {
+    int i, dim, glen, slen;
+    const IVector &gdim = raster->GDim();
+    const IVector &bdim = raster->BDim();
+    const RVector &gsize = raster->GSize();
+    dim  = raster->Dim();
+    glen = raster->GLen();
+    slen = raster->SLen();
+
     if (toastVerbosity > 0)
 	std::cout << "--> Basis...........Grid" << std::endl;
 
     double t0 = walltic();
 
 #if THREAD_LEVEL==2
-    int slen = raster->SLen();
     int nqm  = mesh->nQM;
     if (Jmua) Jmua->New (nqm, slen);
     if (Jkap) Jkap->New (nqm, slen);
@@ -631,13 +638,7 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     thdata.Jkap   = Jkap;
     Task::Multiprocess (GenerateJacobian_cw_grid_engine, &thdata);
 #else
-    int i, j, k, idx, dim, nQ, nM, nQM, slen, glen;
-    const IVector &gdim = raster->GDim();
-    const IVector &bdim = raster->BDim();
-    const RVector &gsize = raster->GSize();
-    dim  = raster->Dim();
-    glen = raster->GLen();
-    slen = raster->SLen();
+    int j, k, idx, nQ, nM, nQM;
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
