@@ -596,7 +596,7 @@ struct SINGLEGRADIENT_THREADDATA {
     RVector *grad;
 };
 
-void *single_gradient_data_engine (task_data *td)
+void single_gradient_data_engine (task_data *td)
 {
     int i, j, q, m, n, idx, ofs_mod, ofs_arg;
     int itask = td->proc;
