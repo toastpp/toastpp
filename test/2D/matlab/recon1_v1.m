@@ -37,23 +37,24 @@ mwidth = 2;                             % detector width
 % ======================================================================
 
 % Initialisations
+toastCatchErrors();
 c0 = 0.3;
 cm = c0/refind;
 
 %% Generate target data
 
 % Set up mesh geometry
-mesh_fwd = toastMesh(meshfile_fwd);
-mesh_fwd.ReadQM (qmfile);
-dmask = mesh_fwd.DataLinkList;
-qvec = mesh_fwd.Qvec (qtype, qprof, qwidth);
-mvec = mesh_fwd.Mvec (mprof, mwidth, refind);
-nlen = mesh_fwd.NodeCount;
+hmesh_fwd = toastReadMesh(meshfile_fwd);
+toastReadQM (hmesh_fwd, qmfile);
+dmask = toastDataLinkList (hmesh_fwd);
+qvec = toastQvec (hmesh_fwd, qtype, qprof, qwidth);
+mvec = toastMvec (hmesh_fwd, mprof, mwidth);
+nlen = toastMeshNodeCount (hmesh_fwd);
 nqm  = length(dmask);
 
 % Target parameters
-mua_tgt = toastNim(muafile).Values;
-mus_tgt = toastNim(musfile).Values;
+mua_tgt = toastReadNIM(muafile);
+mus_tgt = toastReadNIM(musfile);
 kap_tgt = 1./(3*(mua_tgt+mus_tgt));
 ref_tgt = ones(nlen,1) * refind;
 
@@ -62,7 +63,7 @@ mua_range = [0.015 0.055];
 mus_range = [1 4.5];
 
 % Solve forward problem
-phi = toastFields (mesh_fwd, 0, qvec, mua_tgt, mus_tgt, ref_tgt, freq, 'direct');
+phi = toastFields (hmesh_fwd, 0, qvec, mvec, mua_tgt, mus_tgt, ref_tgt, freq);
 data = projection (phi, mvec, dmask);
 
 % Add noise
@@ -74,23 +75,23 @@ lnamp_tgt = data(1:nqm);
 phase_tgt = data(nqm+1:end);
 
 % Map target parameters to images for display
-basis_fwd = toastBasis (mesh_fwd, grd);
-bmua_tgt = basis_fwd.Map ('M->B', mua_tgt);
-bmus_tgt = basis_fwd.Map ('M->B', mus_tgt);
-bkap_tgt = basis_fwd.Map ('M->B', kap_tgt);
+hraster_fwd = toastSetBasis (hmesh_fwd, grd);
+bmua_tgt = toastMapBasis (hraster_fwd, 'M->B', mua_tgt);
+bmus_tgt = toastMapBasis (hraster_fwd, 'M->B', mus_tgt);
+bkap_tgt = toastMapBasis (hraster_fwd, 'M->B', kap_tgt);
 
 % Clear objects
-clear basis_fwd;
-clear mesh_fwd;
+toastDeleteBasis (hraster_fwd);
+toastDeleteMesh (hmesh_fwd);
 
 %% Solve inverse problem
 
 % Set up mesh geometry
-mesh = toastMesh (meshfile_inv);
-mesh.ReadQM (qmfile);
-qvec = mesh.Qvec (qtype, qprof, qwidth);
-mvec = mesh.Mvec (mprof, mwidth, refind);
-nlen = mesh.NodeCount;
+hmesh = toastReadMesh (meshfile_inv);
+toastReadQM (hmesh, qmfile);
+qvec = toastQvec (hmesh, qtype, qprof, qwidth);
+mvec = toastMvec (hmesh, mprof, mwidth);
+nlen = toastMeshNodeCount (hmesh);
 
 % Initial parameter estimates
 mua = ones(nlen,1) * 0.025;
@@ -99,10 +100,11 @@ ref = ones(nlen,1) * refind;
 kap = 1./(3*(mua+mus));
 
 % Solution basis
-basis = toastBasis (mesh, grd);
+hraster = toastSetBasis (hmesh, grd);
+solmask = toastSolutionMask (hraster);
 
 % Initial projections
-phi = toastFields (mesh, 0, qvec, mua, mus, ref, freq);
+phi = toastFields (hmesh, 0, qvec, mvec, mua, mus, ref, freq);
 proj = projection (phi, mvec, dmask);
 lnamp = proj(1:nqm);
 phase = proj(nqm+1:end);
@@ -113,15 +115,15 @@ sd_phase = ones(size(phase)) * norm(phase_tgt-phase);
 sd = [sd_lnmod;sd_phase];
 
 % Map parameter estimates to solution basis
-bmua = basis.Map ('M->B', mua);
-bmus = basis.Map ('M->B', mus);
+bmua = toastMapBasis (hraster, 'M->B', mua);
+bmus = toastMapBasis (hraster, 'M->B', mus);
 bmua_itr(1,:) = bmua;
 bmus_itr(1,:) = bmus;
-bkap = basis.Map ('M->B', kap);
+bkap = toastMapBasis (hraster, 'M->B', kap);
 bcmua = bmua*cm;
 bckap = bkap*cm;
-scmua = basis.Map ('B->S', bcmua);
-sckap = basis.Map ('B->S', bckap);
+scmua = toastMapBasis (hraster, 'B->S', bcmua);
+sckap = toastMapBasis (hraster, 'B->S', bckap);
 slen = length(scmua);
 
 % Vector of unknowns
@@ -130,10 +132,10 @@ logx = log(x);
 p = length(logx);
 
 figure(1);
-subplot(2,2,1), imagesc(reshape(bmua_tgt,grd), mua_range), axis equal tight off; colorbar; colormap('gray'); title('\mu_a target');
-subplot(2,2,2), imagesc(reshape(bmus_tgt,grd), mus_range), axis equal tight off; colorbar; colormap('gray'); title('\mu_s target');
-subplot(2,2,3), imagesc(reshape(bmua,grd), mua_range), axis equal tight off; colorbar; colormap('gray'); title ('\mu_a recon');
-subplot(2,2,4), imagesc(reshape(bmus,grd), mus_range), axis equal tight off; colorbar; colormap('gray'); title ('\mu_s recon');
+subplot(2,2,1), imagesc(reshape(bmua_tgt,grd), mua_range), axis equal tight off; colorbar; title('\mu_a target');
+subplot(2,2,2), imagesc(reshape(bmus_tgt,grd), mus_range), axis equal tight off; colorbar; title('\mu_s target');
+subplot(2,2,3), imagesc(reshape(bmua,grd), mua_range), axis equal tight off; colorbar; title ('\mu_a recon');
+subplot(2,2,4), imagesc(reshape(bmus,grd), mus_range), axis equal tight off; colorbar; title ('\mu_s recon');
 drawnow
 
 step = 1.0; % initial step length for line search
@@ -141,7 +143,7 @@ step = 1.0; % initial step length for line search
 % Create regularisation object
 %hReg = toastRegul ('LAPLACIAN', hBasis, logx, tau);
 %hReg = toastRegul('TK1',hBasis,logx,tau);
-reg = toastRegul ('TV', basis, logx, tau, 'Beta', beta);
+hReg = toastRegul ('TV', hraster, logx, tau, 'Beta', beta);
 
 %tgtmua=toastReadNIM('../meshes/tgt_mua_ellips_tri10.nim');
 %tgtmus=toastReadNIM('../meshes/tgt_mus_ellips_tri10.nim');
@@ -153,13 +155,13 @@ reg = toastRegul ('TV', basis, logx, tau, 'Beta', beta);
 %toastDeleteBasis(hBasis2);
 %toastDeleteMesh(hMesh2);
 %btgt = [btgtmua; btgtkap];
-%reg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta, 'KapRefImage', ...
+%hReg = toastRegul ('TV', hBasis, logx, tau, 'Beta', beta, 'KapRefImage', ...
 %                   btgt, 'KapRefScale', 1, 'KapRefPMThreshold', 0.1);
 
 % initial data error (=2 due to data scaling)
-err0 = objective (proj, data, sd, reg, logx);  %initial error
-err = err0;                                    % current error
-errp = inf;                                    % previous error
+err0 = privObjective (proj, data, sd, hReg, logx);  %initial error
+err = err0;                                         % current error
+errp = inf;                                         % previous error
 erri(1) = err0;
 itr = 1; % iteration counter
 fprintf (1, '\n**** INITIAL ERROR %f\n\n', err);
@@ -171,7 +173,7 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     
     % Construct the Jacobian
     fprintf (1,'Calculating Jacobian\n');
-    J = toastJacobian (mesh, basis, qvec, mvec, mua, mus, ref, freq, 'direct');
+    J = toastJacobian (hmesh, hraster, qvec, mvec, mua, mus, ref, freq, 'direct');
 
     % data normalisation
     for i = 1:m
@@ -186,7 +188,7 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     %J = J * spdiags (x,0,p,p);
     
     % Normalisation of Hessian
-    psiHdiag = reg.HDiag (logx);
+    psiHdiag = toastRegulHDiag (hReg, logx);
     for i = 1:p
         M(i) = sum(J(:,i) .* J(:,i));
         M(i) = M(i) + psiHdiag(i);
@@ -199,12 +201,12 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     
     % Gradient of cost function
     r = J' * (2*(data-proj)./sd);
-    r = r - reg.Gradient (logx) .* M';
+    r = r - toastRegulGradient (hReg, logx) .* M';
     
     if Himplicit == true
         % Update with implicit Krylov solver
         fprintf (1, 'Entering Krylov solver\n');
-        dx = toastKrylov (x, J, r, M, 0, reg, tolKrylov);
+        dx = toastKrylov (x, J, r, M, 0, hReg, tolKrylov);
     else
         % Update with explicit Hessian
         H = J' * J;
@@ -219,10 +221,10 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     % Line search
     fprintf (1, 'Entering line search\n');
     step0 = step;
-    [step, err] = toastLineSearch (logx, dx, step0, err, @objective_ls);
+    [step, err] = toastLineSearch (logx, dx, step0, err, @objective);
     if errp-err <= tolGN
         dx = r; % try steepest descent
-        [step, err] = toastLineSearch (logx, dx, step0, err, @objective_ls);
+        [step, err] = toastLineSearch (logx, dx, step0, err, @objective);
     end
 
     % Add update to solution
@@ -235,20 +237,20 @@ while (itr <= itrmax) && (err > tolGN*err0) && (errp-err > tolGN)
     smua = scmua/cm;
     skap = sckap/cm;
     smus = 1./(3*skap) - smua;
-    mua  = basis.Map ('S->M', smua);
-    mus  = basis.Map ('S->M', smus);
-    bmua = basis.Map ('S->B', smua);
-    bmus = basis.Map ('S->B', smus);
+    mua  = toastMapBasis (hraster, 'S->M', smua);
+    mus  = toastMapBasis (hraster, 'S->M', smus);
+    bmua = toastMapBasis (hraster, 'S->B', smua);
+    bmus = toastMapBasis (hraster, 'S->B', smus);
 
     figure(1);
-    subplot(2,2,3), imagesc(reshape(bmua,grd), mua_range), axis equal tight off; colorbar; colormap(gray); title ('\mu_a recon');
-    subplot(2,2,4), imagesc(reshape(bmus,grd), mus_range), axis equal tight off; colorbar; colormap(gray); title ('\mu_s recon');
+    subplot(2,2,3), imagesc(reshape(bmua,grd), mua_range), axis equal, axis tight, colorbar('horiz'); colormap(gray);
+    subplot(2,2,4), imagesc(reshape(bmus,grd), mus_range), axis equal, axis tight, colorbar('horiz'); colormap(gray);
     drawnow
     
-    proj = projection(toastFields(mesh,0,qvec,mua,mus,ref,freq,'direct'),mvec,dmask);
+    proj = toastProject (hmesh, mua, mus, ref, freq, qvec, mvec);
 
     % update objective function
-    err = objective (proj, data, sd, reg, logx);
+    err = privObjective (proj, data, sd, hReg, logx);
     itr = itr+1;
     erri(itr) = err;
     bmua_itr(itr,:) = bmua;
@@ -260,52 +262,25 @@ dlmwrite('recon.dat', erri);
 disp('recon1: finished')
 
     % =====================================================================
-    % Run the forward solver for photon density field phi, given
-    % parameters logx
-    function phi = fwd(mesh,basis,logx,ref,freq,qvec)
-        x_ = exp(logx);
-        cm_ = 0.3./ref;
-        scmua_ = x_(1:length(x_)/2);
-        sckap_ = x_(length(x_)/2+1:end);
-        cmua_ = basis.Map('S->M', scmua_);
-        ckap_ = basis.Map('S->M', sckap_);
-        mua_  = cmua_ ./ cm_;
-        kap_  = ckap_ ./ cm_;
-        mus_  = 1./(3*kap_) - mua_;
-        phi = toastFields(mesh,0,qvec,mua_,mus_,ref,freq,'direct');
-    end
-    
-    % =====================================================================
     % Projection of photon density fields to boundary data
-    function prj = projection(phi,mvec,dmask)
-        gamma_ = mvec.' * phi;
-        gamma_ = reshape (gamma_, [], 1);
-        gamma_ = gamma_(dmask);
-        lgamma_ = log(gamma_);
-        lnamp_ = real(lgamma_);
-        phase_ = imag(lgamma_);
-        prj = [lnamp_; phase_];
-    end
-
-    % =====================================================================
-    % objective function
+    function prj_ = projection(phi_,mvec_,dmask_)
     
-    function [p,p_data,p_prior] = objective(proj,data,sd,reg,logx)
-        p_data = full(sum(((data-proj)./sd).^2));
-        if nargin >= 5
-            p_prior = full(reg.Value(logx));
-        else
-            p_prior = 0;
-        end
-        p = p_data + p_prior;
+    gamma_ = mvec_.' * phi_;
+    gamma_ = reshape (gamma_, [], 1);
+    gamma_ = gamma_(dmask_);
+    lgamma_ = log(gamma_);
+    lnamp_ = real(lgamma_);
+    phase_ = imag(lgamma_);
+    prj_ = [lnamp_; phase_];
     end
 
     % =====================================================================
     % Callback function for objective evaluation (called by toastLineSearch)
-    function p = objective_ls(logx)
-        proj_ = projection(fwd(mesh,basis,logx,ref,freq,qvec),mvec,dmask);
-        [p, p_data, p_prior] = objective (proj_, data, sd, reg, logx);
-        fprintf (1, '    [LH: %f, PR: %f]\n', p_data, p_prior);
+    function p = objective(x)
+
+    proj = privProject (hmesh, hraster, x, ref, freq, qvec, mvec);
+    [p, p_data, p_prior] = privObjective (proj, data, sd, hReg, x);
+    fprintf (1, '    [LH: %f, PR: %f]\n', p_data, p_prior);
     end
 
 end
