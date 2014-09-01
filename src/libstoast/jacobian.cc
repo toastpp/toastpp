@@ -668,7 +668,6 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     for (i = 0; i < nM; i++) {
         cafield[i].New (glen);
 	raster->Map_MeshToGrid (aphi[i], cafield[i]);
-
 	if (Jkap) {
 	    cafield_grad[i] = new RVector[dim];
 	    ImageGradient (gdim, gsize, cafield[i], cafield_grad[i]);
@@ -679,7 +678,6 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 
         // resample field for source i to fine grid
 	raster->Map_MeshToGrid (dphi[i], cdfield);
-
 	// generate gradient
 	if (Jkap)
 	    ImageGradient (gdim, gsize, cdfield, cdfield_grad,
@@ -692,7 +690,6 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
 	    // absorption component
 	    if (Jmua) {
 		pmdf = PMDF_mua (cdfield, cafield[j]);
-
 		// map into solution basis
 		raster->Map_GridToSol (pmdf, pmdf_basis);
 		memcpy (Jmua_ptr, pmdf_basis.data_buffer(),
