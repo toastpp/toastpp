@@ -193,7 +193,7 @@ template<>
 void TFwdSolver<double>::Allocate ()
 {
     idxtype *rowptr, *colidx;
-	int nzero;
+    int nzero;
     int n = meshptr->nlen();
 
     // allocate system matrix

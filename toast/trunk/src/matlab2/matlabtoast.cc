@@ -384,32 +384,44 @@ void MatlabToast::WriteNIM (int nlhs, mxArray *plhs[], int nrhs,
 void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 		 double freq, bool elbasis, mxArray **res)
 {
-    int n = (elbasis ? mesh->elen() : mesh->nlen());
+    int nlen = mesh->nlen();
+    int elen = mesh->elen();
+    int n = (elbasis ? elen : nlen);
 
     // Set optical coefficients
-    Solution sol (OT_NPARAM, n);
-    sol.SetParam (OT_CMUA, mua*c0/ref);
-    sol.SetParam (OT_CKAPPA, c0/(3.0*ref*(mua+mus)));
+    RVector cmua = mua*c0/ref;
+    RVector ckappa = c0/(3.0*ref*(mua+mus));
     RVector c2a(n);
     for (int i = 0; i < n; i++)
 	c2a[i] = c0/(2.0*ref[i]*A_Keijzer (ref[i]));
-    sol.SetParam (OT_C2A, c2a);
+
+    int nz, *rowptr, *colidx;
+    mesh->SparseRowStructure (rowptr, colidx, nz);
 
     if (freq) { // complex-valued system matrix
-        // Create forward solver to initialise system matrix
-        CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
-	FWS.SetDataScaling (DATA_LOG);
 	double omega = freq * 2.0*Pi*1e-6;
-	FWS.Allocate ();
-	FWS.AssembleSystemMatrix (sol, omega, elbasis);
-	CopyMatrix (res, *FWS.F);
+	CCompRowMatrix F(nlen, nlen, rowptr, colidx);
+	AddToSysMatrix (*mesh, F, &cmua,
+			elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+	AddToSysMatrix (*mesh, F, &ckappa,
+			elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+	AddToSysMatrix (*mesh, F, &c2a,
+			elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+	AddToSysMatrix (*mesh, F, omega, ASSEMBLE_iCFF);
+	CopyMatrix (res, F);
     } else { // real-valued problem
-        RFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
-	FWS.SetDataScaling (DATA_LOG);
-	FWS.Allocate ();
-	FWS.AssembleSystemMatrix (sol, 0, elbasis);
-	CopyMatrix (res, *FWS.F);
+	RCompRowMatrix F(nlen, nlen, rowptr, colidx);
+	AddToSysMatrix (*mesh, F, &cmua,
+			elbasis ? ASSEMBLE_PFF_EL:ASSEMBLE_PFF);
+	AddToSysMatrix (*mesh, F, &ckappa,
+			elbasis ? ASSEMBLE_PDD_EL:ASSEMBLE_PDD);
+	AddToSysMatrix (*mesh, F, &c2a,
+			elbasis ? ASSEMBLE_BNDPFF_EL:ASSEMBLE_BNDPFF);
+	CopyMatrix (res, F);
     }
+
+    delete []rowptr;
+    delete []colidx;
 }
 
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
