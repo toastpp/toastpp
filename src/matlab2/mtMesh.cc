@@ -523,17 +523,9 @@ void MatlabToast::Massmat (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
-
-    int nz, nlen = mesh->nlen();
-    idxtype *rowptr, *colidx;
-
-    mesh->SparseRowStructure (rowptr, colidx, nz);
-    RCompRowMatrix B (nlen, nlen, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
-
-    AddToSysMatrix (*mesh, B, (RVector*)0, ASSEMBLE_FF);
-    CopyMatrix (&plhs[0], B);
+    RCompRowMatrix *B = mesh->MassMatrix();
+    CopyMatrix (&plhs[0], *B);
+    delete B;
 }
 
 // =========================================================================
