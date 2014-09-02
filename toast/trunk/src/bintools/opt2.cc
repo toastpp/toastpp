@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
 	return 1;
     }
 
-    Reorder (mesh, perm);
+    mesh.Reorder (IVector (len, perm, SHALLOW_COPY));
     delete []perm;
     cout << mesh;
     return 0;

@@ -221,8 +221,20 @@ public:
     int NdFind (const Point &pt, double &dist) const;
     // returns the number of the node closest to pt and its distance
 
-    void Reorder (int *nindex, int *iindex);
-    // reorder node list such that N_new[i] = N_old[nindex[i]]
+    /**
+     * \brief Re-order mesh nodes.
+     *
+     * This method reorders the mesh nodes such that N[i] <- N[perm[i]].
+     * The node list is rearranged, as well as the indices in the element
+     * list.
+     * \param perm Permutation list (must be of length nlen() and contain
+     *   all indices from 0 to nlen()-1)
+     * \note After calling this method, any node-based arrays defined for
+     *   the original mesh (e.g. nodal parameter lists or fields) must
+     *   be updated with the same permutation list to conform to the
+     *   modified mesh.
+     */
+    void Reorder (const IVector &perm);
 
     double ElDist (int el1, int el2) const;
     // returns the distance between the centres of elements el1 and el2
@@ -338,7 +350,7 @@ public:
     // straight line from pt1 to pt2
 
     void ResetCoeff_homog (ParameterType prmtp, double val)
-	{ plist.SetParam (prmtp, val); }
+    	{ plist.SetParam (prmtp, val); }
     // resets the coefficient `prmtp' (as defined in param.h) throughout the
     // mesh to homogeneous value `val'
 

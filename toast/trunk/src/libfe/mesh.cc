@@ -276,29 +276,31 @@ double Mesh::ElDist (int el1, int el2) const
     return length (ElCentre(el1) - ElCentre(el2));
 }
 
-void Mesh::Reorder (int *nindex, int *iindex)
+void Mesh::Reorder (const IVector &perm)
 {
-  NodeList ntmp;
-  ParameterList ptmp;
-  int nd, el;
+    dASSERT(perm.Dim() == nlen(),
+	    "Mesh::Reorder: permutation vector has unexpected length");
 
-  ntmp.New (nlist.Len()); // reorder nodes
-  ptmp.New (plist.Len());
+    int i, j, ii, ij, nds = nlen(), els = elen();
+    IVector iperm(nds);
 
-  for (nd=0; nd<nlist.Len(); nd++) {
-    ntmp[nd].New (nlist[nindex[nd]].Dim());
-    ntmp[nd] = nlist[nindex[nd]];
-    ptmp[nd] = plist[nindex[nd]];
-  }
-  for (nd=0; nd<nlist.Len(); nd++) {
-      nlist[nd] = ntmp[nd];
-      plist[nd] = ptmp[nd];
-  }
-  ntmp.New (0);
+    for (i = 0; i < nds; i++) iperm[perm[i]] = i;
 
-  for (el=0; el<elist.Len(); el++)
-    for (nd=0; nd<elist[el]->nNode(); nd++)
-      elist[el]->Node[nd] = iindex[elist[el]->Node[nd]];
+    // reorder node indices in element list
+    for (i = 0; i < els; i++)
+        for (j = 0; j < elist[i]->nNode(); j++)
+	    elist[i]->Node[j] = iperm[elist[i]->Node[j]];
+
+    // reorder node and parameter lists
+    for (i = 0; i < nds; i++) {
+        j = perm[i];
+	ii = iperm[i], ij = iperm[j];
+        if (i == j) continue;
+	nlist.Swap (i, j);
+	plist.Swap (i, j);
+	perm[ii] = j, perm[ij] = i;
+	iperm[i] = ij, iperm[j] = ii;
+    }
 }
 
 void Mesh::ScaleMesh (double scale)

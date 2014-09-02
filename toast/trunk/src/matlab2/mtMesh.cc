@@ -257,34 +257,14 @@ void MatlabToast::MeshReorder (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     Mesh *mesh = GETMESH_SAFE(0);
-    int nds = mesh->nlen();
-    int els = mesh->elen();
-    int i, j, ii, ij;
     double *pr = mxGetPr(prhs[1]);
-    int *perm = new int[nds];
-    int *iperm = new int[nds];
 
-    for (i = 0; i < nds; i++) {
+    int nlen = mesh->nlen();
+    IVector perm(nlen);
+    for (int i = 0; i < nlen; i++)
 	perm[i] = (int)(pr[i]-0.5); // switch to 0-based
-	iperm[perm[i]] = i;
-    }
-
-    for (i = 0; i < els; i++)
-	for (j = 0; j < mesh->elist[i]->nNode(); j++)
-	    mesh->elist[i]->Node[j] = iperm[mesh->elist[i]->Node[j]];
-
-    for (i = 0; i < nds; i++) {
-	j = perm[i];
-	ii = iperm[i], ij = iperm[j];
-	if (i == j) continue;
-	mesh->nlist.Swap(i,j);
-	mesh->plist.Swap(i,j);
-	perm[ii] = j, perm[ij] = i;
-	iperm[i] = ij, iperm[j] = ii;
-    }
-
-    delete []perm;
-    delete []iperm;
+    
+    mesh->Reorder(perm);
 }
 
 // =========================================================================
