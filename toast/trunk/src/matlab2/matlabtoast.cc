@@ -426,14 +426,20 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 
 void CalcBndSysmat (QMMesh *mesh, RVector &ref, mxArray **res)
 {
-    int n = mesh->nlen();
-    CFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
-    FWS.SetDataScaling (DATA_LOG);
-    FWS.Allocate ();
-    RVector prm(n);
-    for (int i = 0; i < n; i++) prm[i] = c0/ref[i];
-    AddToSysMatrix (*mesh, *FWS.F, &prm, ASSEMBLE_BNDPFF);
-    CopyMatrix (res, *FWS.F);
+    int nz, nlen = mesh->nlen();
+    idxtype *rowptr, *colidx;
+
+    mesh->SparseRowStructure (rowptr, colidx, nz);
+    RCompRowMatrix BF(nlen, nlen, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    RVector prm(nlen);
+    for (int i = 0; i < nlen; i++)
+	prm[i] = c0/ref[i];
+
+    AddToSysMatrix (*mesh, BF, &prm, ASSEMBLE_BNDPFF);
+    CopyMatrix (res, BF);
 }
 
 void CalcBndFactors (QMMesh *mesh, RVector &ref, mxArray **res)
