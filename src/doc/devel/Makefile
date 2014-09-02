@@ -1,8 +1,7 @@
 all:: doc
 
 doc::
-	cd $(TOASTDIR)/src; \
-	doxygen doc/devel/Doxyfile >& doc/devel/doxygen.log
+	doxygen Doxyfile
 	cd $(TOASTDIR)/doc/devel/latex; \
 	latex refman.tex; \
 	latex refman.tex; \
