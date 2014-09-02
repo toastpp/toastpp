@@ -544,14 +544,16 @@ void MatlabToast::Massmat (int nlhs, mxArray *plhs[], int nrhs,
 {
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
-    int n = mesh->nlen();
+    int nz, nlen = mesh->nlen();
+    idxtype *rowptr, *colidx;
 
-    // Create forward solver to initialise system matrix
-    RFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
-    FWS.AssembleMassMatrix (mesh);
+    mesh->SparseRowStructure (rowptr, colidx, nz);
+    RCompRowMatrix B (nlen, nlen, rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
 
-    // Return system matrix to MATLAB
-    CopyMatrix (&plhs[0], *FWS.B);
+    AddToSysMatrix (*mesh, B, (RVector*)0, ASSEMBLE_FF);
+    CopyMatrix (&plhs[0], B);
 }
 
 // =========================================================================

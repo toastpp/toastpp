@@ -386,7 +386,10 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
 {
     int nlen = mesh->nlen();
     int elen = mesh->elen();
-    int n = (elbasis ? elen : nlen);
+    int nz, n = (elbasis ? elen : nlen);
+    idxtype *rowptr, *colidx;
+
+    mesh->SparseRowStructure (rowptr, colidx, nz);
 
     // Set optical coefficients
     RVector cmua = mua*c0/ref;
@@ -394,9 +397,6 @@ void CalcSysmat (QMMesh *mesh, RVector &mua, RVector &mus, RVector &ref,
     RVector c2a(n);
     for (int i = 0; i < n; i++)
 	c2a[i] = c0/(2.0*ref[i]*A_Keijzer (ref[i]));
-
-    int nz, *rowptr, *colidx;
-    mesh->SparseRowStructure (rowptr, colidx, nz);
 
     if (freq) { // complex-valued system matrix
 	double omega = freq * 2.0*Pi*1e-6;
