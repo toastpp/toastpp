@@ -5,9 +5,15 @@
 //#define DEBUG_THREAD
 
 #include <sys/types.h>
-#if !defined(WIN32) && !defined(WIN64)
+#if !defined(WIN32) && !defined(WIN64) && !defined(__APPLE__)
 #include <sys/sysinfo.h>
 #endif
+
+// On OS X, include sysctl to get no. cores
+#if defined(__APPLE__)
+#include <sys/sysctl.h>
+#endif
+
 #if defined (sun)
 #include <thread.h>
 #include <unistd.h>
@@ -55,6 +61,12 @@ int Task::nProcessor ()
 #elif defined (sun)
     //cerr << "sunos" << endl;
     return sysconf(_SC_NPROCESSORS_ONLN);
+#elif defined(__APPLE__)
+    size_t len;
+    unsigned int ncpu;
+    len = sizeof(ncpu);
+    sysctlbyname ("hw.ncpu",&ncpu,&len,NULL,0);
+    return ncpu;
 #else
     //cerr << "unknown" << endl;
     return 1;
