@@ -28,7 +28,7 @@ typedef struct {
     void *data;
 } task_data;
 
-void Task_Init (int nth);
+MATHLIB void Task_Init (int nth);
 
 class MATHLIB Task {
 public:

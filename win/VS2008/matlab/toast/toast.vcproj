@@ -243,7 +243,7 @@
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(SolutionDir)resources\toastmex_win64.vsprops"
+			InheritedPropertySheets="$(SolutionDir)resources\toastmex_win64.vsprops;..\..\resources\packages.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>

@@ -1533,7 +1533,7 @@ int Tetsplit_2_2 (BufMesh *mesh, int el, int *inode, const Point *isect,
     int local_nidx_c[6][4] = { // split 03-12
 	{5,7,4,2},{4,7,6,1},{2,7,4,1},
 	{5,7,0,4},{4,7,3,6},{7,3,0,4}};
-    int (&local_nidx)[6][4] = (inode[1] == 1 ? local_nidx_a :
+    int (*local_nidx)[4] = (inode[1] == 1 ? local_nidx_a :
 			       inode[1] == 2 ? local_nidx_b :
 			       local_nidx_c);
 

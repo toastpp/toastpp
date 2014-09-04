@@ -13,7 +13,7 @@
 #include "felib.h"
 #include "tet_qr.h"
 
-int QRule_tet_1_1 (const double **wght, const Point **absc)
+FELIB int QRule_tet_1_1 (const double **wght, const Point **absc)
 {
     // Region: Tetrahedron
     // Degree: 1
@@ -31,7 +31,7 @@ int QRule_tet_1_1 (const double **wght, const Point **absc)
     return 1;
 }
 
-int QRule_tet_2_4 (const double **wght, const Point **absc)
+FELIB int QRule_tet_2_4 (const double **wght, const Point **absc)
 {
     // Region: Tetrahedron
     // Degree: 2
@@ -53,7 +53,7 @@ int QRule_tet_2_4 (const double **wght, const Point **absc)
     return 4;
 }
 
-int QRule_tet_4_14 (const double **wght, const Point **absc)
+FELIB int QRule_tet_4_14 (const double **wght, const Point **absc)
 {
     // Region: Tetrahedron
     // Degree: 4
@@ -86,7 +86,7 @@ int QRule_tet_4_14 (const double **wght, const Point **absc)
     return 14;
 }
 
-int QRule_tet_6_24 (const double **wght, const Point **absc)
+FELIB int QRule_tet_6_24 (const double **wght, const Point **absc)
 {
     // Region: Tetrahedron
     // Degree: 6
