@@ -18,7 +18,9 @@ function [th,ncore] = toastThreadCount (th_set)
 
 [th0,ncore0] = toast(uint32(1001));
 if nargin > 0
-    if th_set > 0 && th_set < 1
+    if th_set == 0
+        th_set = ncore0;
+    elseif th_set < 1
         th_set = max(1, round(th_set*ncore0));
     end
     toast(uint32(1001),th_set);
