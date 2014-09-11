@@ -726,27 +726,37 @@ classdef toastMesh < handle
             toast(uint32(13),obj.handle,qmname);
         end
         
-        function WriteQM(obj,qmname)
+        function WriteQM(obj,qmname,qp,mp,dll)
             % Write source-detector definitions to a file.
             %
-            % Syntax: mesh.WriteQM (fname)
+            % Syntax: mesh.WriteQM (qmname,qp,mp,dll)
             %
             % Parameters:
-            %         fname [string]:
+            %         qmname [string]:
             %             QM output file name
+            %         qp [real array nq x dim]
+            %             source positions
+            %         mp [real array nm x dim]
+            %             detector positions
+            %         dll [sparse matrix of size nm x nq]
             %
             % Notes:  Writes the source-detector definitions associated
             %         with the mesh to a file.
             %
-            %         The source-detector definitions consist of
-            %         - a list of source positions
-            %         - a list of detector positions
-            %         - a link list, enumerating the detectors used for
-            %           each of the sources.
+            %         qp contains a list of nq source coordinates,
+            %         mp contains a list of nm detector coordinates.
+            %         dll is a sparse matrix of size nm x nq, defining
+            %         the source-detector measurement pairs. Each
+            %         nonzero entry in dll indicates that the measurement
+            %         for the corresponding source-detector pair should be
+            %         computed.
+            %
+            %         If any of qp, mp or dll are set to empty [],
+            %         the values stored in the mesh are used instead.
             %
             % See also:
             %         toastMesh, READQM, DATALINKLIST, QPOS, MPOS
-	        toast(uint32(16),obj.handle,qmname);
+	        toast(uint32(16),obj.handle,qmname,qp,mp,dll);
         end
 
         function linklist = DataLinkList(obj,format)

@@ -164,15 +164,30 @@ public:
      */
     Mesh ();
 
+    /**
+     * \brief Destructor
+     */
     virtual ~Mesh ();
-    // destructor
 
+    /**
+     * \brief Initialise the mesh.
+     *
+     * This method should be called once the mesh geometry (i.e. the
+     *   node and element lists) have been defined and after any changes in
+     *   these lists.
+     * \param mark_boundary If true, this method marks boundary nodes based
+     *   on the mesh connectivity defined in the element list. If false, the
+     *   boundary flags remain unchanged.
+     */
     void Setup (bool mark_boundary=true);
-    // call this once the node list and element list have been assigned to
-    // let the mesh perform its setup stuff
 
+    /**
+     * \brief Copy geometry from another mesh.
+     * \param mesh Source mesh to be copied.
+     * \note This method replaces the current mesh geometry with that of the
+     *   argument.
+     */
     void Copy (const Mesh &mesh);
-    // copy `mesh' to *this
   
     /**
      * \brief Mesh dimension
@@ -183,21 +198,31 @@ public:
 
     /**
      * \brief Number of mesh nodes
-     * \return Returns the length of the node list
+     * \return Length of the node list
      */
     int nlen() const { return nlist.Len(); }
 
     /**
      * \brief Number of mesh elements
-     * \return Returns the length of the element list
+     * \return Length of the element list
      */
     int elen() const { return elist.Len(); }
 
+    /**
+     * \brief Number of internal (non-boundary) nodes
+     * \return Number of internal nodes
+     * \note The return value is only valid if boundary nodes have been
+     *   identified, e.g. after Setup().
+     */
     int ilen() const { return priv_ilen; }
-    // number of nodes excluding Dirichlet nodes
 
+    /**
+     * \brief Number of boundary nodes
+     * \return Number of boundary nodes
+     * \note The return value is only valid if boundary nodes have been
+     *   identified, e.g. after Setup().
+     */
     int nbnd() const { return priv_nbnd; }
-    // number of boundary nodes (valid after Setup)
 
     RDenseMatrix ElGeom (int el) const;
     // returns a matrix containing the global coordinates of all nodes of
