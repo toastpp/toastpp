@@ -55,7 +55,7 @@ module includes code for projecting source distributions onto a mesh surface,
 and exitance measurements from the mesh surface to an imaging system. The
 projection code requires the libraries and header files of the Mesa 3D Graphics
 Library (http://www.mesa3d.org/) installed on your system (tested with version 6.5.3).
-If Mesa is not installed in a standard system location, you can specify the directories with the --with-mesa=&lt;path&gt;, --with-mesa-incdir=&lt;path&gt; and --with-mesa-libdir=&lt;path&gt; configuration options.
+If Mesa is not installed in a standard system location, you can specify the directories with the --with-mesa=&lt;path&gt;, --with-mesa-includedir=&lt;path&gt; and --with-mesa-libdir=&lt;path&gt; configuration options. You may also have to adapt your LD_LIBRARY_PATH and LD_RUN_PATH environment variables accordingly.
 </li>
 </ul>
 <p>After configuring, set the Toast++ environment by running</p>
@@ -64,7 +64,7 @@ source&nbsp;toastenv.sh&nbsp;&nbsp;&nbsp;&nbsp;<font style="color:green"># for b
 
 <h2>Compilation</h2>
 <h3>Core libraries</h3>
-<p>To build the Toast++ libraries, including the included external maths libraries, type</p>
+<p>To build the Toast++ libraries, including the 3rd-party dependencies, type</p>
 <p class="code">make</p>
 
 <h3>Matlab bindings</h3>

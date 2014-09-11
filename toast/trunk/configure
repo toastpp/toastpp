@@ -769,7 +769,7 @@ with_tix
 with_blt
 with_ilu
 with_mesa
-with_mesa_incdir
+with_mesa_includedir
 with_mesa_libdir
 enable_fdot
 enable_debug
@@ -9799,14 +9799,14 @@ else
 fi
 
 
-# Check whether --with-mesa_incdir was given.
-if test "${with_mesa_incdir+set}" = set; then
-  withval=$with_mesa_incdir; MESAINCDIR=$withval
+# Check whether --with-mesa-includedir was given.
+if test "${with_mesa_includedir+set}" = set; then
+  withval=$with_mesa_includedir; MESAINCDIR=$withval
 fi
 
 
 
-# Check whether --with-mesa_libdir was given.
+# Check whether --with-mesa-libdir was given.
 if test "${with_mesa_libdir+set}" = set; then
   withval=$with_mesa_libdir; MESALIBDIR="$withval"
 fi
