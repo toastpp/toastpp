@@ -45,10 +45,19 @@ void Node::Copy (const Node &nd)
 
 Node &Node::operator= (const Node& nd)
 {
-    dASSERT(size == nd.Dim(), "Nodes have different dimension.");
+    if (size != nd.Dim()) New (nd.Dim());
     Point::operator=(nd);
     bndtp  = nd.bndtp;
     region = nd.region;
+    return *this;
+}
+
+Node &Node::operator= (const Point &pt)
+{
+    if (size != pt.Dim()) New (pt.Dim());
+    Point::operator=(pt);
+    bndtp = 0;
+    region = 0;
     return *this;
 }
 

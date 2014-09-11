@@ -1,15 +1,22 @@
 /**
- * \mainpage TOAST Source Documentation
+ * \mainpage Toast++ Source Documentation
  *
- * TOAST is a collection of libraries and applications for the numerical
- * solution of partial differential equations with a finite element method.
+ * Toast++ is an open-source collection of libraries and applications for the
+ * numerical solution of partial differential equations with the finite element
+ * method.
  *
- * Originally, TOAST has been developed for modelling diffuse light transport
- * in scattering media, but more recently has been adapted to linear elastic
- * modelling of soft tissue deformation.
+ * Toast++ has been developed for modelling diffuse light transport
+ * in scattering media, but can also be adapted to other problems, such as
+ * linear elastic modelling of soft tissue deformation.
  *
- * TOAST is written entirely in C++ (linking to some external numerics
- * libraries). A MATLAB interface is currently under development.
+ * This documentation covers the C++ interface to the Toast++ core libraries.
+ * Documentation for the high-level Matlab and Python interfaces to Toast++
+ * is available in separate documents.
  *
- * TOAST is maintained by Martin Schweiger and Simon Arridge.
+ * For details on Toast++, see http://toastplusplus.org.
+ * Sources and binary packages are available at http://sourceforge.net/projects/toastpp.
+ *
+ * Toast++ is maintained by Martin Schweiger at University College London.
+ *
+ * It is licensed under the GNU General Public License version 3.0 (GPLv3). For details please see file COPYING in the Toast++ root directory.
  */

@@ -16,4 +16,8 @@
 		Name="VCPostBuildEventTool"
 		CommandLine=""
 	/>
+	<UserMacro
+		Name="LibCopyDir"
+		Value="$(ToastBinDir)"
+	/>
 </VisualStudioPropertySheet>

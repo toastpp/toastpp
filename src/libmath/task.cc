@@ -5,20 +5,24 @@
 //#define DEBUG_THREAD
 
 #include <sys/types.h>
-#if !defined(WIN32) && !defined(WIN64)
-#include <sys/sysinfo.h>
-#endif
-#if defined (sun)
-#include <thread.h>
-#include <unistd.h>
-#elif defined (__sgi)
-#include <sys/sysmp.h>
-#endif
 #include <iostream>
 #include <stdio.h>
 #include "mathlib.h"
 #include "task.h"
 #include "timing.h"
+
+#if defined(_WIN32)
+#include <Windows.h>
+#elif defined (__APPLE__)
+#include <sys/sysctl.h>
+#elif defined (sun)
+#include <thread.h>
+#include <unistd.h>
+#elif defined (__sgi)
+#include <sys/sysmp.h>
+#else
+#include <sys/sysinfo.h>
+#endif
 
 // comment this out to autodetect number of processors
 // #define FIXEDNUMPROC 2
@@ -34,7 +38,7 @@ bool Task::is_multiprocessing = false;
 
 pthread_mutex_t Task::user_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void Task_Init (int nth)
+MATHLIB void Task_Init (int nth)
 {
     if (!nth) nth = Task::nProcessor();
     Task::SetThreadCount (nth);
@@ -55,6 +59,16 @@ int Task::nProcessor ()
 #elif defined (sun)
     //cerr << "sunos" << endl;
     return sysconf(_SC_NPROCESSORS_ONLN);
+#elif defined(__APPLE__)
+    size_t len;
+    unsigned int ncpu;
+    len = sizeof(ncpu);
+    sysctlbyname ("hw.ncpu",&ncpu,&len,NULL,0);
+    return ncpu;
+#elif defined(_WIN32)
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo( &sysinfo );
+	return (int)sysinfo.dwNumberOfProcessors;
 #else
     //cerr << "unknown" << endl;
     return 1;
