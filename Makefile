@@ -154,6 +154,7 @@ distro_common::
 	ln -T -s trunk $(TOASTRELDIR); \
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/script -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/test -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
+	zip -9 -r toast_common.zip $(TOASTRELDIR)/doc -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast2_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/README ; \

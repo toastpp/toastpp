@@ -559,24 +559,50 @@ void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
     char qmname[256];
     int i, j;
 
-    CopyMatrix (qpos, prhs[0]);
-    CopyMatrix (mpos, prhs[1]);
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
-    ASSERTARG(mxIsSparse(prhs[2]), 3, "expected sparse matrix.");
-    CopyTMatrix (lnk, prhs[2]);
+    mxGetString (prhs[1], qmname, 256);
+
+    CopyMatrix (qpos, prhs[2]);
+    if (qpos.nRows() == 0 && qpos.nCols() == 0) {
+	qpos.New(mesh->nQ,mesh->Dimension());
+	for (i = 0; i < mesh->nQ; i++)
+	    for (j = 0; j < mesh->Dimension(); j++)
+		qpos(i,j) = mesh->Q[i][j];
+    }
+
+    CopyMatrix (mpos, prhs[3]);
+    if (mpos.nRows() == 0 && mpos.nCols() == 0) {
+	mpos.New(mesh->nM,mesh->Dimension());
+	for (i = 0; i < mesh->nM; i++)
+	    for (j = 0; j < mesh->Dimension(); j++)
+		mpos(i,j) = mesh->M[i][j];
+    }
 
     int dim = qpos.nCols();
     int nq = qpos.nRows();
     int nm = mpos.nRows();
     
-    if (nq != lnk.nRows() || nm != lnk.nCols()) {
-	char cbuf[256];
-	sprintf (cbuf, "Invalid dimension (was: %d x %d, expected %d x %d)",
-		 lnk.nCols(), lnk.nRows(), nm, nq);
-	ASSERTARG(0, 3, cbuf);
-    }
+    if (mxGetM(prhs[4]) && mxGetN(prhs[4])) {
+	ASSERTARG(mxIsSparse(prhs[4]), 4, "expected sparse matrix.");
+	CopyTMatrix (lnk, prhs[4]);
 
-    mxGetString (prhs[3], qmname, 256);
+	if (nq != lnk.nRows() || nm != lnk.nCols()) {
+	    char cbuf[256];
+	    sprintf (cbuf, "Invalid dimension (was: %d x %d, expected %d x %d)",
+		     lnk.nCols(), lnk.nRows(), nm, nq);
+	    ASSERTARG(0, 4, cbuf);
+	}
+    } else {
+	lnk.New(nq, nm);
+	for (i = 0; i < nq; i++) {
+	    RVector qlnk(nm);
+	    for (j = 0; j < nm; j++)
+		if (mesh->Connected (i,j))
+		    qlnk[j] = 1.0;
+	    lnk.SetRow (i, qlnk);
+	}
+    }
 
     ofstream ofs(qmname);
     ofs << "QM file" << endl;
