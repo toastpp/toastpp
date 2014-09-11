@@ -74,7 +74,9 @@ source&nbsp;toastenv.sh&nbsp;&nbsp;&nbsp;&nbsp;<font style="color:green"># for b
 <p class="code">$HOME/.matlab/&lt;matlab-version&gt;/mexopts.sh</p>
 <p>Edit this file by appending the line</p>
 <p class="code">. $TOASTVER/mexopts.incl</p>
-<p>to the end of it (don't forget the single dot at the beginning of the line). This will tell the mex compiler about Toast-specific libraries and include paths. Then, in the Toast++ main directory, type</p>
+<p>to the end of it (don't forget the single dot at the beginning of the line). This will tell the mex compiler about Toast-specific libraries and include paths.  Note: This only works for Matlab versions up to 2013. Newer versions use a different mechanism for mex configuration, which Toast hasn't been adapted to yet.</p>
+
+<p>Then, in the Toast++ main directory, type</p>
 <p class="code">make&nbsp;matlab&nbsp;&nbsp;&nbsp;&nbsp;<font style="color:green"># for interface v1, and/or</font><br />
 make&nbsp;matlab2&nbsp;&nbsp;&nbsp;<font style="color:green"># for interface v2</font></p>
 <p>Once the mex files have been built, from inside Matlab, run the script</p>

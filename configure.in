@@ -285,7 +285,9 @@ if test "$isok" = "yes" ; then
     if test "x$MESALIBDIR" != "x" ; then
 	OGLLIB="-L$MESALIBDIR $OGLLIB"
     fi
-    OGLINC="-I$MESAINCDIR"
+    if test "x$MESAINCDIR" != "x" ; then
+	OGLINC="-I$MESAINCDIR"
+    fi
 else
     TOAST_FDOT=0
 fi
