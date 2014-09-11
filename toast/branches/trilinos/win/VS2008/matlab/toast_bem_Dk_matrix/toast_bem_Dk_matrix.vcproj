@@ -293,7 +293,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libbem.lib"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

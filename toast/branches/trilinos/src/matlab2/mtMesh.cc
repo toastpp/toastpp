@@ -1,3 +1,4 @@
+
 // ========================================================================
 // Implementation of class MatlabToast
 // mesh-related methods
@@ -256,34 +257,14 @@ void MatlabToast::MeshReorder (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     Mesh *mesh = GETMESH_SAFE(0);
-    int nds = mesh->nlen();
-    int els = mesh->elen();
-    int i, j, ii, ij;
     double *pr = mxGetPr(prhs[1]);
-    int *perm = new int[nds];
-    int *iperm = new int[nds];
 
-    for (i = 0; i < nds; i++) {
+    int nlen = mesh->nlen();
+    IVector perm(nlen);
+    for (int i = 0; i < nlen; i++)
 	perm[i] = (int)(pr[i]-0.5); // switch to 0-based
-	iperm[perm[i]] = i;
-    }
-
-    for (i = 0; i < els; i++)
-	for (j = 0; j < mesh->elist[i]->nNode(); j++)
-	    mesh->elist[i]->Node[j] = iperm[mesh->elist[i]->Node[j]];
-
-    for (i = 0; i < nds; i++) {
-	j = perm[i];
-	ii = iperm[i], ij = iperm[j];
-	if (i == j) continue;
-	mesh->nlist.Swap(i,j);
-	mesh->plist.Swap(i,j);
-	perm[ii] = j, perm[ij] = i;
-	iperm[i] = ij, iperm[j] = ii;
-    }
-
-    delete []perm;
-    delete []iperm;
+    
+    mesh->Reorder(perm);
 }
 
 // =========================================================================
@@ -481,21 +462,20 @@ void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
     RCompRowMatrix F(n, n, rowptr, colidx);
     delete []rowptr;
     delete []colidx;
+    
 
     if (!strcasecmp (integral_type, "FF")) {
 	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
     } else if (!strcasecmp (integral_type, "DD")) {
 	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_DD);
     } else if (!strcasecmp (integral_type, "PFF")) {
-      //Assert (n == prm.Dim(), "Argument 3: wrong size");
-	AddToSysMatrix (*mesh, F, &prm,
+        AddToSysMatrix (*mesh, F, &prm,
             elbasis ? ASSEMBLE_PFF_EL : ASSEMBLE_PFF);
     } else if (!strcasecmp (integral_type, "PDD")) {
-      // Assert (n == prm.Dim(), "Argument 3: wrong size");
-	AddToSysMatrix (*mesh, F, &prm,
+        AddToSysMatrix (*mesh, F, &prm,
             elbasis ? ASSEMBLE_PDD_EL : ASSEMBLE_PDD);
     } else if (!strcasecmp (integral_type, "BNDPFF")) {
-	AddToSysMatrix (*mesh, F, &prm,
+        AddToSysMatrix (*mesh, F, &prm,
             elbasis ? ASSEMBLE_BNDPFF_EL : ASSEMBLE_BNDPFF);
     }
 
@@ -509,7 +489,6 @@ void MatlabToast::SysmatComponent (int nlhs, mxArray *plhs[],
   QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     RVector prm;
-    int n;
     bool elbasis = false;
     char integral_type[32] = "";
 
@@ -519,16 +498,21 @@ void MatlabToast::SysmatComponent (int nlhs, mxArray *plhs[],
 	mexErrMsgTxt ("Parameter 2: string expected");
     }
 
-    if (nrhs >= 3)
-        CopyVector (prm, prhs[2]);
 
     if (nrhs >= 4 && mxIsChar(prhs[3])) {
 	char cbuf[32];
 	mxGetString (prhs[3], cbuf, 32);
 	elbasis = (strcasecmp (cbuf, "EL") == 0);
     }
-    if (elbasis) n = mesh->elen();
-    else         n = mesh->nlen();
+    
+    if (nrhs >= 3) {
+        CopyVector (prm, prhs[2]);
+        xAssert ( (elbasis ? mesh->elen() : mesh->nlen())
+                 == prm.Dim(), (char*)"Argument 3: wrong size");
+
+    }
+    
+    
 
     CalcSysmatComponent (mesh, prm, integral_type, elbasis, &plhs[0]);
 }
@@ -539,15 +523,9 @@ void MatlabToast::Massmat (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
-
-    int n = mesh->nlen();
-
-    // Create forward solver to initialise system matrix
-    RFwdSolver FWS (mesh, LSOLVER_DIRECT, 1e-10);
-    FWS.AssembleMassMatrix (mesh);
-
-    // Return system matrix to MATLAB
-    CopyMatrix (&plhs[0], *FWS.B);
+    RCompRowMatrix *B = mesh->MassMatrix();
+    CopyMatrix (&plhs[0], *B);
+    delete B;
 }
 
 // =========================================================================

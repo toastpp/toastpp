@@ -17,19 +17,19 @@
 #include <math.h>
 #include "point.h"
 
-int QRule_tet_1_1 (const double **wght, const Point **absc);
+FELIB int QRule_tet_1_1 (const double **wght, const Point **absc);
 // Degree: 1, Points: 1
 // Ref: www.cs.kuleuven.ac.be/~nines/research/ecf/Formules/t3-1-1s.html
 
-int QRule_tet_2_4 (const double **wght, const Point **absc);
+FELIB int QRule_tet_2_4 (const double **wght, const Point **absc);
 // Degree: 2, Points: 4
 // Ref: www.cs.kuleuven.ac.be/~nines/research/ecf/Formules/t3-2-4bs.html
 
-int QRule_tet_4_14 (const double **wght, const Point **absc);
+FELIB int QRule_tet_4_14 (const double **wght, const Point **absc);
 // Degree: 2, Points: 14
 // Ref: www.cs.kuleuven.ac.be/~nines/research/ecf/Formules/t3-4-14s.html
 
-int QRule_tet_6_24 (const double **wght, const Point **absc);
+FELIB int QRule_tet_6_24 (const double **wght, const Point **absc);
 // Degree: 4, Points: 24
 // Ref: www.cs.kuleuven.ac.be/~nines/research/ecf/Formules/t3-6-24s.html
 

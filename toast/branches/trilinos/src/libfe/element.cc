@@ -311,7 +311,8 @@ istream &operator>> (istream& i, Element &el)
     for(int k = 0;cbuf[k] !='\n';k++)
     {
       if (cbuf[k] == 'R') {
-	  el.region = cbuf[k+1]-'0';
+	  sscanf (cbuf+k+1, "%d", &el.region);
+	  //el.region = cbuf[k+1]-'0';
           break;
       }
     };

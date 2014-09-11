@@ -19,38 +19,6 @@ int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
 	     int *totnod, int tsz);
 
 // ============================================================================
-// Reorder node and parameter lists, and node indices in the element list
-// according to permutation vector `perm'
-
-FELIB void Reorder (Mesh &mesh, int *perm)
-{
-    int i, j, ii, ij, nds = mesh.nlen(), els = mesh.elen();
-    int *iperm = new int[nds];
-
-    for (i = 0; i < nds; i++) iperm[perm[i]] = i;
-
-    // reorder node indices in element list
-
-    for (i = 0; i < els; i++)
-        for (j = 0; j < mesh.elist[i]->nNode(); j++)
-	    mesh.elist[i]->Node[j] = iperm[mesh.elist[i]->Node[j]];
-
-    // reorder node and parameter lists
-
-    for (i = 0; i < nds; i++) {
-        j = perm[i];
-	ii = iperm[i], ij = iperm[j];
-        if (i == j) continue;
-	mesh.nlist.Swap (i, j);
-	mesh.plist.Swap (i, j);
-	perm[ii] = j, perm[ij] = i;
-	iperm[i] = ij, iperm[j] = ii;
-    }
-
-    delete []iperm;
-}
-
-// ============================================================================
 // Sort boundary nodes to the end of the node list
 // This only reorders the permutation vector `perm', not the node list itself
 // Returns the number of boundary nodes found

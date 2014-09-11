@@ -24,6 +24,8 @@
 		F297DCB7195C199F00A7501F /* timing.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA4195C199F00A7501F /* timing.cc */; };
 		F297DCB8195C199F00A7501F /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA5195C199F00A7501F /* util.cc */; };
 		F297DCB9195C199F00A7501F /* vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA6195C199F00A7501F /* vector.cc */; };
+		F2D67FC819B7022E009C8818 /* task.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2D67FC619B7022E009C8818 /* task.cc */; };
+		F2D67FC919B7022E009C8818 /* vector_MT.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2D67FC719B7022E009C8818 /* vector_MT.cc */; };
 		F2ED6501195CB13B006CD663 /* libmath.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F297DC8D195C199200A7501F /* libmath.dylib */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +61,8 @@
 		F297DCA4195C199F00A7501F /* timing.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timing.cc; path = ../../src/libmath/timing.cc; sourceTree = "<group>"; };
 		F297DCA5195C199F00A7501F /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/libmath/util.cc; sourceTree = "<group>"; };
 		F297DCA6195C199F00A7501F /* vector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vector.cc; path = ../../src/libmath/vector.cc; sourceTree = "<group>"; };
+		F2D67FC619B7022E009C8818 /* task.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = task.cc; path = ../../src/libmath/task.cc; sourceTree = "<group>"; };
+		F2D67FC719B7022E009C8818 /* vector_MT.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vector_MT.cc; path = ../../src/libmath/vector_MT.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +98,8 @@
 				F297DCA4195C199F00A7501F /* timing.cc */,
 				F297DCA5195C199F00A7501F /* util.cc */,
 				F297DCA6195C199F00A7501F /* vector.cc */,
+				F2D67FC619B7022E009C8818 /* task.cc */,
+				F2D67FC719B7022E009C8818 /* vector_MT.cc */,
 				F297DC8E195C199200A7501F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -172,6 +178,7 @@
 				F297DCAE195C199F00A7501F /* error.cc in Sources */,
 				F297DCAD195C199F00A7501F /* crmatrix.cc in Sources */,
 				F297DCAF195C199F00A7501F /* fourn.cc in Sources */,
+				F2D67FC919B7022E009C8818 /* vector_MT.cc in Sources */,
 				F297DCAB195C199F00A7501F /* cr_cholesky.cc in Sources */,
 				F297DCB2195C199F00A7501F /* mathdef.cc in Sources */,
 				F297DCA9195C199F00A7501F /* arpack.cc in Sources */,
@@ -182,6 +189,7 @@
 				F297DCB0195C199F00A7501F /* gsmatrix.cc in Sources */,
 				F297DCAC195C199F00A7501F /* crmatrix_cm.cc in Sources */,
 				F297DCB6195C199F00A7501F /* scrmatrix.cc in Sources */,
+				F2D67FC819B7022E009C8818 /* task.cc in Sources */,
 				F297DCB7195C199F00A7501F /* timing.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,11 +274,13 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				EXECUTABLE_PREFIX = "";
+				GCC_UNROLL_LOOPS = YES;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../lib/\"",
 				);
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.8;
@@ -286,11 +296,15 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				EXECUTABLE_PREFIX = "";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
+				GCC_UNROLL_LOOPS = YES;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../lib/\"",
 				);
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.8;

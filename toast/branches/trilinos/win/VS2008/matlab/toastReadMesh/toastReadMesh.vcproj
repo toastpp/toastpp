@@ -320,7 +320,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(ProjectDir)..\..\..\dll\blas_win32.dll $(ProjectDir)..\..\..\$(ConfigurationName)\mex&#x0D;&#x0A;copy $(ProjectDir)..\..\..\dll\lapack_win32.dll $(ProjectDir)..\..\..\$(ConfigurationName)\mex&#x0D;&#x0A;"
+				CommandLine="copy $(ProjectDir)..\..\..\contrib\dll\blas_win32.dll $(ProjectDir)..\..\..\$(PlatformName)\$(ConfigurationName)\mex&#x0D;&#x0A;copy $(ProjectDir)..\..\..\contrib\dll\lapack_win32.dll $(ProjectDir)..\..\..\$(PlatformName)\$(ConfigurationName)\mex&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

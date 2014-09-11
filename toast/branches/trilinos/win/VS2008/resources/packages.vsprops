@@ -3,7 +3,12 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="packages"
+	InheritedPropertySheets=".\pthreads.vsprops"
 	>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories=""
+	/>
 	<UserMacro
 		Name="ExtPackageDir"
 		Value="D:\src\packages\"

@@ -272,7 +272,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"char16_t=UINT16_T",
 					"DEBUG=1",
-					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -281,11 +280,11 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../lib/\"",
-					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
+					"$(SYSTEM_APPS_DIR)/$(MATLABVER)/bin/maci64",
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABROOT = /Applications/MATLAB_R2013b.app;
+				MATLABVER = MATLAB_R2014a.app;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
@@ -293,7 +292,7 @@
 				);
 				PRODUCT_NAME = toast;
 				SDKROOT = macosx10.8;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(MATLABROOT)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Debug;
 		};
@@ -307,7 +306,10 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					TOAST_THREAD,
+					"char16_t=UINT16_T",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -315,11 +317,11 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../../lib/\"",
-					"$(SYSTEM_APPS_DIR)/MATLAB_R2013b.app/bin/maci64",
+					"$(SYSTEM_APPS_DIR)/$(MATLABVER)/bin/maci64",
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABROOT = /Applications/MATLAB_R2013b.app;
+				MATLABVER = MATLAB_R2014a.app;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
@@ -327,7 +329,7 @@
 				);
 				PRODUCT_NAME = toast;
 				SDKROOT = macosx10.8;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(MATLABROOT)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Release;
 		};

@@ -211,16 +211,19 @@ struct Mvec_Threaddata {
     QMMesh *mesh;
     SRC_PROFILE mprof;
     double mwidth;
+    RVector *ref;
     CCompRowMatrix *mvec;
 };
 
 void Mvec_engine (task_data *td)
 {
+    const double c0 = 0.3;
     int i, j, ii;
     int itask = td->proc;
     int ntask = td->np;
     Mvec_Threaddata *thdata = (Mvec_Threaddata*)td->data;
     QMMesh *mesh = thdata->mesh;
+    RVector *ref = thdata->ref;
     int n = mesh->nlen();
     int nm = mesh->nM;
     int m0 = (itask*nm)/ntask;
@@ -247,7 +250,10 @@ void Mvec_engine (task_data *td)
 	    m = CompleteTrigSourceVector (*mesh, i);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh->plist[j].C2A();
+	if (ref) {
+	    RVector &rref = *ref;
+	    for (j = 0; j < n; j++) m[j] *= c0/(2.0*rref[j]*A_Keijzer(rref[j]));
+	}
 	mvec_part.SetRow (i-m0, m);
     }
 
@@ -260,6 +266,7 @@ void Mvec_engine (task_data *td)
 void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
+    const double c0 = 0.3;
     char cbuf[256];
 
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
@@ -279,7 +286,27 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
     n = mesh->nlen();
     nM = mesh->nM;
     CCompRowMatrix mvec;
+    RVector ref(n);
+    bool apply_c2a = true;
 
+    if (nrhs >= 4) {
+	int len = mxGetM(prhs[3])*mxGetN(prhs[3]);
+	if ((len != 1 && len != n) || !mxIsDouble(prhs[3])) {
+	    char cbuf[256];
+	    sprintf (cbuf, "Mvec: parameter 3: expected double scalar or double vector of length %d", n);
+	    mexErrMsgTxt (cbuf);
+	}
+	if (len == 1) {
+	    double ref_homog = mxGetScalar(prhs[3]);
+	    if (ref_homog) ref = mxGetScalar(prhs[3]);
+	    else apply_c2a = false;
+	} else
+	    CopyVector (ref, prhs[3]);
+    } else {
+	mexWarnMsgTxt("Mvec: Using nodal refractive index values stored with mesh");
+	ref = mesh->plist.N();
+    }
+    
     // build the measurement vectors
     mvec.New (nM, n);
 #ifndef TOAST_THREAD_MATLAB_QMVEC
@@ -298,7 +325,8 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
 	    m = CompleteTrigSourceVector (*mesh, i);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh->plist[j].C2A();
+	if (apply_c2a)
+	    for (j = 0; j < n; j++) m[j] *= c0/(2.0*ref[j]*A_Keijzer(ref[j]));
 	mvec.SetRow (i, m);
     }
 #else
@@ -306,6 +334,7 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
 	mesh,
 	mprof,
 	mwidth,
+	(apply_c2a ? &ref : 0),
 	&mvec
     };
     Task::Multiprocess (Mvec_engine, &thdata);

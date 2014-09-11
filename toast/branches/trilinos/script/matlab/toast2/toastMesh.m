@@ -377,6 +377,37 @@ classdef toastMesh < handle
 	        size = toast(uint32(59),obj.handle);
         end
 
+        function reg = Region(obj,newreg)
+            % Set or retrieve the element region indices.
+            %
+            % Syntax: reg = mesh.Region()
+            %         mesh.Region (newreg)
+            %
+            % Parameters:
+            %         newreg [int array]:
+            %             array of region indices to be assigned to the
+            %             mesh elements. newreg must be of length
+            %             mesh.elen()
+            %
+            % Return values:
+            %         reg [int array]:
+            %             array of current mesh element region indices
+            %
+            % Notes:
+            %         The region index in an integer value associated with
+            %         an element. It can be used to store element-specific
+            %         application data, typically a region label for
+            %         segmented meshes.
+            %
+            % See also:
+            %         toastElement/Region
+            if nargin > 1
+                reg = toast(uint32(85),obj.handle,0,newreg);
+            else
+                reg = toast(uint32(85),obj.handle,0);
+            end
+        end
+        
         function [vtx,idx,eltp] = Data(obj)
             % Return the mesh geometry.
             %
@@ -934,6 +965,7 @@ classdef toastMesh < handle
             % Generate a sparse matrix of measurement column vectors.
             %
             % Syntax: mvec = mesh.Mvec (mprof, mwidth)
+            %         mvec = mesh.Mvec (mprof, mwidth, ref)
             %
             % Parameters:
             %         mprof [string]:
@@ -941,6 +973,9 @@ classdef toastMesh < handle
             %             'TrigBasis')
             %         mwidth [real]:
             %             measurement radius [mm]
+            %         ref [real, or real vector n]:
+            %             refractive index used for computing the mvec
+            %             operator scaling.
             %
             % Return values:
             %         mvec [complex sparse matrix n x nm]:
@@ -955,6 +990,21 @@ classdef toastMesh < handle
             %         sparse n x nm matrix, where n is the mesh node count,
             %         and nm is the number of detectors. The mesh must
             %         contain measurement definitions (see ReadQM).
+            %
+            %         The boundary operator is normally scaled with a
+            %         factor of c/2A, where c is the speed of light, and A
+            %         is a term incorporating the refractive index mismatch
+            %         at the boundary. This scaling factor is computed from
+            %         the 'ref' term passed to Mvec (either as a vector of
+            %         length n of nodal values, or as a scalar if the
+            %         refractive index is homogeneous.
+            %
+            %         To avoid scaling with the c/2A term altogether, set
+            %         the 'ref' parameter to 0.
+            %
+            %         Warning: if 'ref' is omitted, Mvec uses the
+            %         refractive index values stored with the mesh. This
+            %         behaviour may change in future versions.
             %
             % See also:
             %         toastMesh, READQM, QVEC, MPOS

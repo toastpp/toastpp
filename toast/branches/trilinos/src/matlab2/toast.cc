@@ -313,6 +313,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_ELEMENTDATA:
 	mtoast->ElData (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_ELEMENTREGION:
+	mtoast->ElRegion (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_ELMAT:
 	mtoast->ElMat (nlhs, plhs, nrhs, prhs);
 	break;

@@ -174,15 +174,24 @@ public:
     void Copy (const Mesh &mesh);
     // copy `mesh' to *this
   
+    /**
+     * \brief Mesh dimension
+     * \return Returns the mesh dimension (2 or 3)
+     */
     int Dimension() const 
     { return (elen() ? elist[0]->Dimension() : 0); }
-    // mesh dimensionality
 
+    /**
+     * \brief Number of mesh nodes
+     * \return Returns the length of the node list
+     */
     int nlen() const { return nlist.Len(); }
-    // returns size of node list
 
+    /**
+     * \brief Number of mesh elements
+     * \return Returns the length of the element list
+     */
     int elen() const { return elist.Len(); }
-    // returns size of element list
 
     int ilen() const { return priv_ilen; }
     // number of nodes excluding Dirichlet nodes
@@ -211,8 +220,12 @@ public:
     // returns the direction cosine of side 'sd' of element 'el' at
     // local point 'p'
 
+    /**
+     * \brief Returns the mesh area or volume.
+     * \return Mesh area (for 2-D meshes) or volume (for 3-D meshes)
+     * \note The return value is the sum of all element areas or volumes.
+     */
     double FullSize () const;
-    // returns the total area or volume of the mesh (= sum of all elements)
 
     int ElFind (const Point &pt) const;
     // returns the number of the element which contains the global coordinate
@@ -221,8 +234,20 @@ public:
     int NdFind (const Point &pt, double &dist) const;
     // returns the number of the node closest to pt and its distance
 
-    void Reorder (int *nindex, int *iindex);
-    // reorder node list such that N_new[i] = N_old[nindex[i]]
+    /**
+     * \brief Re-order mesh nodes.
+     *
+     * This method reorders the mesh nodes such that N[i] <- N[perm[i]].
+     * The node list is rearranged, as well as the indices in the element
+     * list.
+     * \param perm Permutation list (must be of length nlen() and contain
+     *   all indices from 0 to nlen()-1)
+     * \note After calling this method, any node-based arrays defined for
+     *   the original mesh (e.g. nodal parameter lists or fields) must
+     *   be updated with the same permutation list to conform to the
+     *   modified mesh.
+     */
+    void Reorder (const IVector &perm);
 
     double ElDist (int el1, int el2) const;
     // returns the distance between the centres of elements el1 and el2
@@ -338,7 +363,7 @@ public:
     // straight line from pt1 to pt2
 
     void ResetCoeff_homog (ParameterType prmtp, double val)
-	{ plist.SetParam (prmtp, val); }
+    	{ plist.SetParam (prmtp, val); }
     // resets the coefficient `prmtp' (as defined in param.h) throughout the
     // mesh to homogeneous value `val'
 
@@ -360,9 +385,16 @@ public:
     // scans through mesh structure and marks nodes on the mesh surface
     // as boundary nodes
 
+    /**
+     * \brief Returns the mass matrix for the mesh.
+     *
+     * Allocates a sparse matrix and fills it by executing the Element::IntFF
+     * operation (integral of product of two shape functions) over the
+     * elements.
+     * \return pointer to dynamically allocated mass matrix
+     * \note The user is responsible for deleting the matrix after use.
+     */
     RCompRowMatrix *MassMatrix () const;
-    // Dynamically allocates a mass matrix for the mesh and returns a
-    // pointer to it. Caller is responsible for deallocation when done.
 
     friend FELIB void AddToElMatrix (const Mesh &mesh, int el,
         RGenericSparseMatrix &M, const RVector *coeff, int mode);

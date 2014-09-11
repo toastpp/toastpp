@@ -227,7 +227,7 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
     }
 }
 
-#else
+#else // multithreaded version
 
 struct AddDataGradient_Threaddata {
     const QMMesh *mesh;
