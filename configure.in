@@ -263,12 +263,12 @@ else
     MESALIB="-lOSMesa"
 fi
 
-AC_ARG_WITH(mesa_incdir,
+AC_ARG_WITH(mesa-includedir,
     [  --with-mesa-includedir  Path to Mesa 3D include directory]
     [                          This should contain the GL subdirectory],
        MESAINCDIR=$withval,)
 
-AC_ARG_WITH(mesa_libdir,
+AC_ARG_WITH(mesa-libdir,
     [  --with-mesa-libdir      Path to Mesa 3D library directory]
     [                          This should contain libOSMesa.so etc.],
        MESALIBDIR="$withval",)
