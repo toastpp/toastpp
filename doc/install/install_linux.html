@@ -54,7 +54,9 @@ Note that the debugging version will be slower.</li>
 module includes code for projecting source distributions onto a mesh surface,
 and exitance measurements from the mesh surface to an imaging system. The
 projection code requires the libraries and header files of the Mesa 3D Graphics
-Library (http://www.mesa3d.org/) installed on your system.</li>
+Library (http://www.mesa3d.org/) installed on your system (tested with version 6.5.3).
+If Mesa is not installed in a standard system location, you can specify the directories with the --with-mesa=&lt;path&gt;, --with-mesa-incdir=&lt;path&gt; and --with-mesa-libdir=&lt;path&gt; configuration options.
+</li>
 </ul>
 <p>After configuring, set the Toast++ environment by running</p>
 <p class="code">source&nbsp;toastenv.csh&nbsp;&nbsp;&nbsp;<font style="color:green"># for csh, or</font><br />

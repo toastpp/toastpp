@@ -59,6 +59,7 @@ MEXEXT   = @MEXEXT@
 
 BUILD_FDOT = @TOAST_FDOT@
 OGLLIB = @OGLLIB@
+OGLINC = @OGLINC@
 
 # =======================================================================
 # BLAS and LAPACK libraries (determined by configure)
@@ -178,7 +179,7 @@ endif
 # =======================================================================
 FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask $(SUPERLUINC) \
             -I$(TSRC)/libmath -I$(TSRC)/libfe -I$(TSRC)/libdiffreg \
-            $(ILUPACKINC) $(CUDAINC) 
+            $(ILUPACKINC) $(OGLINC) $(CUDAINC)
 TOASTINC  = $(FEINC) -I$(TSRC)/libstoast
 STOASTINC = $(FEINC) -I$(TSRC)/libstoast
 FDOTINC   = $(STOASTINC) -I$(TSRC)/libfdot

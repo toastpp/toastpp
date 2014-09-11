@@ -640,6 +640,7 @@ ac_subst_vars='LTLIBOBJS
 MATLAB_TOASTFLAGS
 CUDA_INSTALL_PATH
 ENABLE_CUDA
+OGLINC
 OGLLIB
 TOAST_FDOT
 RPATH
@@ -767,6 +768,9 @@ with_tk
 with_tix
 with_blt
 with_ilu
+with_mesa
+with_mesa_incdir
+with_mesa_libdir
 enable_fdot
 enable_debug
 enable_prof
@@ -1464,6 +1468,16 @@ Optional Packages:
                               Default is auto-search for BLT
   --with-ilu=PATH         Path to ILUPACK base directory
                               If not specified, no ILU support is provided
+  --with-mesa=PATH        Path to Mesa 3D base directory
+                              This should contain the header files in include/GL
+                              and the Mesa libraries in lib. You can also use
+                              the --with-mesa-incdir and --with-mesa-libdir
+                              options.
+                              If not specified, default system paths are used
+  --with-mesa-includedir  Path to Mesa 3D include directory
+                              This should contain the GL subdirectory
+  --with-mesa-libdir      Path to Mesa 3D library directory
+                              This should contain libOSMesa.so etc.
   --with-zoltan-dir       Zoltan source installation directory
   --with-zoltan-incdir    Zoltan include directory
   --with-zoltan-libdir    Zoltan library directory
@@ -9764,6 +9778,41 @@ fi
 
 
 # ========================================================================
+# Check if Mesa custom path is requested
+
+
+# Check whether --with-mesa was given.
+if test "${with_mesa+set}" = set; then
+  withval=$with_mesa; MESADIR=$withval
+else
+  MESADIR="default"
+fi
+
+if test "$MESADIR" = "default" ; then
+    MESAINCDIR=""
+    MESALIBDIR=""
+    MESALIB="-lOSMesa"
+else
+    MESAINCDIR="$MESADIR/include"
+    MESALIBDIR="$MESADIR/lib"
+    MESALIB="-lOSMesa"
+fi
+
+
+# Check whether --with-mesa_incdir was given.
+if test "${with_mesa_incdir+set}" = set; then
+  withval=$with_mesa_incdir; MESAINCDIR=$withval
+fi
+
+
+
+# Check whether --with-mesa_libdir was given.
+if test "${with_mesa_libdir+set}" = set; then
+  withval=$with_mesa_libdir; MESALIBDIR="$withval"
+fi
+
+
+# ========================================================================
 # Check if FMT support is requested
 
 # Check whether --enable-fdot was given.
@@ -9775,7 +9824,11 @@ fi
 
 if test "$isok" = "yes" ; then
     TOAST_FDOT=1
-    OGLLIB="-lOSMesa"
+    OGLLIB=$MESALIB
+    if test "x$MESALIBDIR" != "x" ; then
+	OGLLIB="-L$MESALIBDIR $OGLLIB"
+    fi
+    OGLINC="-I$MESAINCDIR"
 else
     TOAST_FDOT=0
 fi
@@ -10917,6 +10970,7 @@ fi
 
 
 #AC_SUBST(TASKDIR)
+
 
 
 

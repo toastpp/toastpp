@@ -243,6 +243,37 @@ AC_ARG_WITH(ilu,
        ILUPACKDIR=$withval, ILUPACKDIR="")
 
 # ========================================================================
+# Check if Mesa custom path is requested
+
+AC_ARG_WITH(mesa,
+    [  --with-mesa=PATH        Path to Mesa 3D base directory]
+    [                          This should contain the header files in include/GL]
+    [                          and the Mesa libraries in lib. You can also use]
+    [                          the --with-mesa-incdir and --with-mesa-libdir]
+    [                          options.]
+    [                          If not specified, default system paths are used],
+       MESADIR=$withval, MESADIR="default")
+if test "$MESADIR" = "default" ; then
+    MESAINCDIR=""
+    MESALIBDIR=""
+    MESALIB="-lOSMesa"
+else
+    MESAINCDIR="$MESADIR/include"
+    MESALIBDIR="$MESADIR/lib"
+    MESALIB="-lOSMesa"
+fi
+
+AC_ARG_WITH(mesa_incdir,
+    [  --with-mesa-includedir  Path to Mesa 3D include directory]
+    [                          This should contain the GL subdirectory],
+       MESAINCDIR=$withval,)
+
+AC_ARG_WITH(mesa_libdir,
+    [  --with-mesa-libdir      Path to Mesa 3D library directory]
+    [                          This should contain libOSMesa.so etc.],
+       MESALIBDIR="$withval",)
+
+# ========================================================================
 # Check if FMT support is requested
 
 AC_ARG_ENABLE(fdot,
@@ -250,7 +281,11 @@ AC_ARG_ENABLE(fdot,
     [isok=$enableval], [isok=no])
 if test "$isok" = "yes" ; then
     TOAST_FDOT=1
-    OGLLIB="-lOSMesa"
+    OGLLIB=$MESALIB
+    if test "x$MESALIBDIR" != "x" ; then
+	OGLLIB="-L$MESALIBDIR $OGLLIB"
+    fi
+    OGLINC="-I$MESAINCDIR"
 else
     TOAST_FDOT=0
 fi
@@ -807,6 +842,7 @@ AC_SUBST(ILUPACKDIR)
 AC_SUBST(RPATH)
 AC_SUBST(TOAST_FDOT)
 AC_SUBST(OGLLIB)
+AC_SUBST(OGLINC)
 AC_SUBST(ENABLE_CUDA)
 AC_SUBST(CUDA_INSTALL_PATH)
 AC_SUBST(MATLAB_TOASTFLAGS)
