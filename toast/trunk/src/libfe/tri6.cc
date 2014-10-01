@@ -337,6 +337,23 @@ RVector Triangle6::LocalShapeF (const Point &loc) const
     return fun;
 }
 
+void Triangle6::LocalShapeF (const Point &loc, RVector *fun) const
+{
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
+    if (fun->Dim() != 6)
+        fun->New(6);
+    double L0 = 1.0-loc[0]-loc[1];
+    double L1 = loc[0];
+    double L2 = loc[1];
+    double *f = fun->data_buffer();
+    f[0] = L0 * (2.0*L0 - 1.0);
+    f[1] = L1 * (2.0*L1 - 1.0);
+    f[2] = L2 * (2.0*L2 - 1.0);
+    f[3] = 4.0*L0*L1;
+    f[4] = 4.0*L1*L2;
+    f[5] = 4.0*L0*L2;
+}
+
 RDenseMatrix Triangle6::LocalShapeD (const Point &loc) const
 {
     dASSERT(loc.Dim() == 2, "Invalid point dimension");

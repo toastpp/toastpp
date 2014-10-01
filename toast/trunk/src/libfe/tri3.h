@@ -128,9 +128,23 @@ public:
     // returns TRUE if point 'glob' (in global coordinates) is within the
     // element. nlist is the mesh node coordinate list
 
+    /**
+     * \brief Return the values of all shape functions for a point inside
+     *   the element, given in local coordinates.
+     * \param loc point in local coordinates
+     * \return Vector of shape function values u_i(loc) (i=0..2)
+     */
     RVector LocalShapeF (const Point &loc) const;
-    // vector of shape functions u_i(loc) at point 'loc' given in local
-    // element coordinates
+
+    /**
+     * \brief Return the values of all shape functions for a point inside
+     *   the element, given in local coordinates.
+     * \param [in] loc point in local coordinates
+     * \param [out] fun pointer to vector receiving the function values
+     * \note fun must point to a valid RVector.
+     * \note If the length of fun != 3 on entry, fun is resized to 3.
+     */
+    void LocalShapeF (const Point &loc, RVector *fun) const;
 
     RDenseMatrix LocalShapeD (const Point &loc) const;
     // 2x3 matrix of shape function derivatives (d u_j)/(d x_i) at point 'loc'

@@ -20,16 +20,27 @@ Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
 
     // Compute the matrices for the least squares mapping between
     // mesh and pixel basis
+    tic();
     Buu = meshptr->MassMatrix();
+    double t_uu = toc();
+    tic();
     Bvv = CreatePixelMassmat();
+    double t_vv = toc();
+    tic();
     Buv = CreateMixedMassmat();
+    double t_uv = toc();
 
+    std::cerr << "Raster_Pixel2 timings:\nt(Buu) = " << t_uu
+	 << "\nt(Bvv) = " << t_vv << "\nt(Buv) = " << t_uv << std::endl;
+
+#ifdef UNDEF
     ofstream ofs1("Buu.dat");
     Buu->ExportRCV(ofs1);
     ofstream ofs2("Buv.dat");
     Buv->ExportRCV(ofs2);
     ofstream ofs3("Bvv.dat");
     Bvv->ExportRCV(ofs3);
+#endif
 
     Buu_precon = new RPrecon_IC; Buu_precon->Reset (Buu);
     Bvv_precon = new RPrecon_IC; Bvv_precon->Reset (Bvv);
@@ -298,9 +309,9 @@ static void poly_edge_clip(poly sub, vec x0, vec x1, int left, poly res)
 static poly poly_clip(poly sub, poly clip)
 {
 	int i;
-	static poly p1 = poly_new(), p2 = poly_new();
+	poly p1 = poly_new(), p2 = poly_new();
 	poly tmp;
-	poly_reset(p1); poly_reset(p2);
+	//poly_reset(p1); poly_reset(p2);
 
 	int dir = poly_winding(clip);
 	poly_edge_clip(sub, clip->v + clip->len - 1, clip->v, dir, p2);
@@ -313,7 +324,7 @@ static poly poly_clip(poly sub, poly clip)
 		poly_edge_clip(p1, clip->v + i, clip->v + i + 1, dir, p2);
 	}
  
-	//poly_free(p1);
+	poly_free(p1);
 	return p2;
 }
  
@@ -322,12 +333,12 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
 {
     int i,j;
 
-    static int nlocal = 10;
-    static Point *list = new Point[nlocal];
-    if (nlocal < npoly) {
-	delete []list;
-	list = new Point[nlocal=npoly];
-    }
+    //static int nlocal = 10;
+    Point *list = new Point[npoly];
+    //if (nlocal < npoly) {
+    //	delete []list;
+    //	list = new Point[nlocal=npoly];
+    //}
 
     double xmin = bbmin[0] +
 	(bbmax[0]-bbmin[0])*(double)xgrid/(double)(bdim[0]-1);
@@ -357,14 +368,19 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
     poly_t clipper = {4, 0, clip};
 
     poly res = poly_clip (&subject, &clipper);
-    if (res->len > npoly) return -1;
-
-    for (i = 0; i < res->len; i++) {
-	clip_poly[i].New(2);
-	clip_poly[i][0] = res->v[i].x;
-	clip_poly[i][1] = res->v[i].y;
+    int len = res->len;
+    if (len > npoly) {
+	len = -1;
+    } else {
+	for (i = 0; i < len; i++) {
+	    clip_poly[i].New(2);
+	    clip_poly[i][0] = res->v[i].x;
+	    clip_poly[i][1] = res->v[i].y;
+	}
     }
-    return res->len;
+    poly_free(res);
+    delete []list;
+    return len;
 }
 
 // ==========================================================================
@@ -373,6 +389,127 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
 // Calculates overlaps between a triangle and a pixel, subdivides the triangle
 // and performs the integral over the sub-triangles using a numerical
 // quadrature rule
+
+#if THREAD_LEVEL==2
+struct CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA {
+    const Raster_Pixel2 *raster;
+    RCompRowMatrix *Buv;
+    Mesh *mesh;
+    const IVector *bdim;
+    const Point *bbmin;
+    const Point *bbmax;
+};
+
+void CreateMixedMassmat_tri_pass2_engine (task_data *td)
+{
+    int itask = td->proc;
+    int ntask = td->np;
+    CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA *thdata =
+	(CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA*)td->data;
+    Mesh *mesh = thdata->mesh;
+    int nel = mesh->elen();
+    int el0 = (itask*nel)/ntask;
+    int el1 = ((itask+1)*nel)/ntask;
+    const Raster_Pixel2 *raster = thdata->raster;
+    RCompRowMatrix *Buv = thdata->Buv;
+    const IVector &bdim = *thdata->bdim;
+    const Point &bbmin = *thdata->bbmin;
+    const Point &bbmax = *thdata->bbmax;
+    double xrange = bbmax[0]-bbmin[0];
+    double yrange = bbmax[1]-bbmin[1];
+
+    std::cerr << "thread " << itask << ", elrange=" << el0 << "-" << el1
+	      << std::endl;
+
+    const idxtype *rowptr, *colidx;
+    Buv->GetSparseStructure (&rowptr, &colidx);
+    RCompRowMatrix Buv_local(Buv->nRows(), Buv->nCols(), rowptr, colidx);
+
+    int i, j, k, m, el, ii, jj, idx_i, idx_j, imin, imax, jmin, jmax;
+    double b, djac;
+
+    // quadrature rule for local triangle
+    const double *wght;
+    const Point *absc;
+    int np = QRule_tri_4_6 (&wght, &absc);
+
+    for (el = el0; el < el1; el++) {
+	Element *pel = mesh->elist[el];
+
+	// element bounding box
+	double exmin = mesh->nlist[pel->Node[0]][0];
+	double exmax = mesh->nlist[pel->Node[0]][0];
+	double eymin = mesh->nlist[pel->Node[0]][1];
+	double eymax = mesh->nlist[pel->Node[0]][1];
+	for (j = 1; j < pel->nNode(); j++) {
+	    exmin = min (exmin, mesh->nlist[pel->Node[j]][0]);
+	    exmax = max (exmax, mesh->nlist[pel->Node[j]][0]);
+	    eymin = min (eymin, mesh->nlist[pel->Node[j]][1]);
+	    eymax = max (eymax, mesh->nlist[pel->Node[j]][1]);
+	}
+
+	// determine which pixels overlap the element
+	imin = max (0, (int)floor((bdim[0]-1) * (exmin-bbmin[0])/xrange));
+	imax = min (bdim[0]-2, (int)floor((bdim[0]-1) * (exmax-bbmin[0])/xrange));
+	jmin = max (0, (int)floor((bdim[1]-1) * (eymin-bbmin[1])/yrange));
+	jmax = min (bdim[1]-2, (int)floor((bdim[1]-1) * (eymax-bbmin[1])/yrange));
+
+	// perform subdivision for every intersecting pixel
+	const int npoly = 10;
+	Point poly[npoly];
+	Triangle3 t3;
+	NodeList n3(3);
+	for (i = 0; i < 3; i++) {
+	    t3.Node[i] = i;
+	    n3[i].New(2);
+	}
+	int nv;
+	RVector fun;
+	double v;
+	for (i = imin; i <= imax; i++)
+	    for (j = jmin; j <= jmax; j++) {
+		nv = raster->SutherlandHodgman (el, i, j, poly, npoly);
+
+		// split into nv-2 triangles
+		for (k = 0; k < nv-2; k++) {
+		    n3[0][0] = poly[0][0];
+		    n3[0][1] = poly[0][1];
+		    n3[1][0] = poly[k+1][0];
+		    n3[1][1] = poly[k+1][1];
+		    n3[2][0] = poly[k+2][0];
+		    n3[2][1] = poly[k+2][1];
+		    t3.Initialise(n3);
+		    //double djac = t3.Size()*2.0;
+		    
+		    // map quadrature points into global frame
+		    for (m = 0; m < np; m++) {
+			djac = t3.DetJ(absc[m], &n3);
+			Point glob = t3.Global(n3, absc[m]);
+			Point loc = pel->Local(mesh->nlist, glob);
+			pel->LocalShapeF (loc, &fun);
+			v = wght[m] * djac;
+			for (jj = 0; jj < 4; jj++) {
+			    idx_j = i + jj%2 + (j+jj/2)*bdim[0];
+			    b = raster->Value_nomask (glob, idx_j, false);
+			    for (ii = 0; ii < fun.Dim(); ii++) {
+				idx_i = pel->Node[ii];
+				Buv_local(idx_i, idx_j) += v*b*fun[ii];
+			    }
+			}
+		    }
+		}
+	    }
+    }
+    // now add thread contribution into global matrix
+    double *v = Buv->ValPtr();
+    const double *vloc = Buv_local.ValPtr();
+    int nz = Buv->nVal();
+    Task::UserMutex_lock();
+    for (i = 0; i < nz; i++)
+	v[i] += vloc[i];
+    Task::UserMutex_unlock();
+}
+#endif
 
 RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 {
@@ -395,6 +532,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     const Point *absc;
     int np = QRule_tri_4_6 (&wght, &absc);
 
+    tic();
     // pass 1: determine matrix fill structure
     int *nimin = new int[n];
     int *nimax = new int[n];
@@ -431,7 +569,9 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 	    if (jmax > njmax[nidx]) njmax[nidx] = jmax;
 	}
     }
+    std::cerr << "Pass 1: t=" << toc() << std::endl;
 
+    tic();
     int *rowptr = new int[n+1];
     rowptr[0] = 0;
     for (r = 0; r < n; r++) {
@@ -455,7 +595,19 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     delete []nimax;
     delete []njmin;
     delete []njmax;
+    std::cerr << "post-Pass 1: t=" << toc() << std::endl;
 
+    tic();
+#if THREAD_LEVEL==2
+    static CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA thdata;
+    thdata.raster = this;
+    thdata.Buv = Buv;
+    thdata.mesh = meshptr;
+    thdata.bdim = &bdim;
+    thdata.bbmin = &bbmin;
+    thdata.bbmax = &bbmax;
+    Task::Multiprocess (CreateMixedMassmat_tri_pass2_engine, &thdata);
+#else
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
@@ -525,8 +677,13 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 		}
 	    }
     }
+#endif
+    std::cerr << "Pass 2: t=" << toc() << std::endl;
 
+    tic();
     Buv->Shrink();
+    std::cerr << "post-Pass 2: t=" << toc() << std::endl;
+
     return Buv;
 }
 
