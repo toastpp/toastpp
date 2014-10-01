@@ -312,7 +312,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
@@ -335,7 +335,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};

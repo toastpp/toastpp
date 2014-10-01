@@ -291,7 +291,7 @@
 					"-lmx",
 				);
 				PRODUCT_NAME = toast;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Debug;
@@ -328,7 +328,7 @@
 					"-lmx",
 				);
 				PRODUCT_NAME = toast;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
 			name = Release;
