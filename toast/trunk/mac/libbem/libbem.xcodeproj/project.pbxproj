@@ -10,6 +10,7 @@
 		F229EA1E195C79C4003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA1B195C79C4003F34BC /* libfe.dylib */; };
 		F229EA1F195C79C4003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA1C195C79C4003F34BC /* libmath.dylib */; };
 		F229EA20195C79C4003F34BC /* libstoast.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA1D195C79C4003F34BC /* libstoast.dylib */; };
+		F2C7AC4C19B99E850092FFB9 /* libbem.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA192195C4A6E0002757F /* libbem.dylib */; };
 		F2CAA19F195C4EF50002757F /* bem_element.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA199195C4EF50002757F /* bem_element.cc */; };
 		F2CAA1A0195C4EF50002757F /* bem_kernel.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19A195C4EF50002757F /* bem_kernel.cc */; };
 		F2CAA1A1195C4EF50002757F /* bem_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19B195C4EF50002757F /* bem_mesh.cc */; };
@@ -17,7 +18,6 @@
 		F2CAA1A3195C4EF50002757F /* bem_surface.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19D195C4EF50002757F /* bem_surface.cc */; };
 		F2CAA1A4195C4EF50002757F /* bem_tri6.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19E195C4EF50002757F /* bem_tri6.cc */; };
 		F2CAA1A6195C4FB80002757F /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2CAA1A5195C4FB80002757F /* libsuperlu.dylib */; };
-		F2ED64FB195CB0D5006CD663 /* libbem.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA192195C4A6E0002757F /* libbem.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,7 +27,7 @@
 			dstPath = "$(SRCROOT)/../../lib";
 			dstSubfolderSpec = 0;
 			files = (
-				F2ED64FB195CB0D5006CD663 /* libbem.dylib in CopyFiles */,
+				F2C7AC4C19B99E850092FFB9 /* libbem.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,7 +246,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libbem\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};
@@ -268,7 +268,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libbem\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
 			};

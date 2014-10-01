@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		F229EA1A195C79B4003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA19195C79B4003F34BC /* libmath.dylib */; };
+		F2C7AC4D19B99F230092FFB9 /* libbemdiff.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA17E195C498B0002757F /* libbemdiff.dylib */; };
 		F2CAA186195C499A0002757F /* bemdiff.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA185195C499A0002757F /* bemdiff.cc */; };
-		F2ED64FD195CB10D006CD663 /* libbemdiff.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA17E195C498B0002757F /* libbemdiff.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -19,7 +19,7 @@
 			dstPath = "$(SRCROOT)/../../lib";
 			dstSubfolderSpec = 0;
 			files = (
-				F2ED64FD195CB10D006CD663 /* libbemdiff.dylib in CopyFiles */,
+				F2C7AC4D19B99F230092FFB9 /* libbemdiff.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,7 +214,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\"";
 			};
@@ -236,7 +236,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\"";
 			};
