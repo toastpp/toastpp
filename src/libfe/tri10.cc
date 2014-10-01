@@ -510,6 +510,30 @@ RVector Triangle10::LocalShapeF (const Point &loc) const
     return fun;
 }
 
+void Triangle10::LocalShapeF (const Point &loc, RVector *fun) const
+{
+    dASSERT(loc.Dim() == 2, "Invalid point dimension");
+    if (fun->Dim() != 10)
+        fun->New(10);
+    double L0 = 1.0-loc[0]-loc[1];
+    double L1 = loc[0];
+    double L2 = loc[1];
+    double f0 = L0*(3.0*L0-1.0);
+    double f1 = L1*(3.0*L1-1.0);
+    double f2 = L2*(3.0*L2-1.0);
+    double *f = fun->data_buffer();
+    f[0] = 0.5 * f0 * (3.0*L0-2.0);
+    f[1] = 0.5 * f1 * (3.0*L1-2.0);
+    f[2] = 0.5 * f2 * (3.0*L2-2.0);
+    f[3] = 4.5 * L1 * f0;
+    f[4] = 4.5 * L0 * f1;
+    f[5] = 4.5 * L2 * f1;
+    f[6] = 4.5 * L1 * f2;
+    f[7] = 4.5 * L0 * f2;
+    f[8] = 4.5 * L2 * f0;
+    f[9] = 27.0 * L0 * L1 * L2;
+}
+
 RDenseMatrix Triangle10::LocalShapeD (const Point &loc) const
 {
     dASSERT(loc.Dim() == 2, "Invalid point dimension");

@@ -468,6 +468,9 @@ public:
      */
     virtual RVector LocalShapeF (const Point &loc) const = 0;
 
+    virtual void LocalShapeF (const Point &loc, RVector *fun) const
+    { *fun = LocalShapeF (loc); }
+
     /**
      * \brief Returns the values of the shape function derivatives at a local
      *   point.

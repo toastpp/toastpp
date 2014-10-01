@@ -234,11 +234,22 @@ bool Triangle3::GContains (const Point& glob, const NodeList& nlist) const
 RVector Triangle3::LocalShapeF (const Point &loc) const
 {
     dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
-    static RVector fun(3);
+    RVector fun(3);
     fun[0] = 1.0 - loc[0] - loc[1];
     fun[1] = loc[0];
     fun[2] = loc[1];
     return fun;
+}
+
+void Triangle3::LocalShapeF (const Point &loc, RVector *fun) const
+{
+    dASSERT(loc.Dim() == 2, "Argument 1 invalid dimension");
+    if (fun->Dim() != 3)
+        fun->New(3);
+    double *f = fun->data_buffer();
+    f[0] = 1.0 - loc[0] - loc[1];
+    f[1] = loc[0];
+    f[2] = loc[1];
 }
 
 RDenseMatrix Triangle3::LocalShapeD (const Point &loc) const

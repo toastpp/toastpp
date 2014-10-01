@@ -76,7 +76,24 @@ public:
     bool LContains (const Point& loc, bool pad = true) const;
     bool GContains (const Point& glob, const NodeList& nlist) const;
 
+    /**
+     * \brief Return the values of all shape functions for a point inside
+     *   the element, given in local coordinates.
+     * \param loc point in local coordinates
+     * \return Vector of shape function values u_i(loc) (i=0..5)
+     */
     RVector LocalShapeF (const Point &loc) const;
+
+    /**
+     * \brief Return the values of all shape functions for a point inside
+     *   the element, given in local coordinates.
+     * \param [in] loc point in local coordinates
+     * \param [out] fun pointer to vector receiving the function values
+     * \note fun must point to a valid RVector.
+     * \note If the length of fun != 6 on entry, fun is resized to 6.
+     */
+    void LocalShapeF (const Point &loc, RVector *fun) const;
+
     RDenseMatrix LocalShapeD (const Point &loc) const;
     RVector GlobalShapeF (const NodeList& nlist, const Point& glob) const;
     RDenseMatrix GlobalShapeD (const NodeList& nlist, const Point& glob) const;

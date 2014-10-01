@@ -158,6 +158,10 @@ private:
 
     int SutherlandHodgman (int el, int xgrid, int ygrid, Point *clip_poly,
         int npoly) const;
+
+#if THREAD_LEVEL==2
+    friend void CreateMixedMassmat_tri_pass2_engine (task_data *td);
+#endif
 };
     
 #endif // !__RASTER_PX2_H
