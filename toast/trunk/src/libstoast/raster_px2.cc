@@ -20,18 +20,9 @@ Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
 
     // Compute the matrices for the least squares mapping between
     // mesh and pixel basis
-    tic();
     Buu = meshptr->MassMatrix();
-    double t_uu = toc();
-    tic();
     Bvv = CreatePixelMassmat();
-    double t_vv = toc();
-    tic();
     Buv = CreateMixedMassmat();
-    double t_uv = toc();
-
-    std::cerr << "Raster_Pixel2 timings:\nt(Buu) = " << t_uu
-	 << "\nt(Bvv) = " << t_vv << "\nt(Buv) = " << t_uv << std::endl;
 
 #ifdef UNDEF
     ofstream ofs1("Buu.dat");
@@ -391,11 +382,9 @@ int Raster_Pixel2::SutherlandHodgman (int el, int xgrid, int ygrid,
 // quadrature rule
 
 #if THREAD_LEVEL==2
-struct CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA {
+struct CREATEMIXEDMASSMAT_PASS2_THREADDATA {
     const Raster_Pixel2 *raster;
     RCompRowMatrix *Buv;
-    Mesh *mesh;
-    const IVector *bdim;
     const Point *bbmin;
     const Point *bbmax;
 };
@@ -404,22 +393,19 @@ void CreateMixedMassmat_tri_pass2_engine (task_data *td)
 {
     int itask = td->proc;
     int ntask = td->np;
-    CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA *thdata =
-	(CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA*)td->data;
-    Mesh *mesh = thdata->mesh;
-    int nel = mesh->elen();
+    CREATEMIXEDMASSMAT_PASS2_THREADDATA *thdata =
+	(CREATEMIXEDMASSMAT_PASS2_THREADDATA*)td->data;
+    const Raster_Pixel2 *raster = thdata->raster;
+    const Mesh &mesh = raster->mesh();
+    const IVector &bdim = raster->BDim();
+    int nel = mesh.elen();
     int el0 = (itask*nel)/ntask;
     int el1 = ((itask+1)*nel)/ntask;
-    const Raster_Pixel2 *raster = thdata->raster;
     RCompRowMatrix *Buv = thdata->Buv;
-    const IVector &bdim = *thdata->bdim;
     const Point &bbmin = *thdata->bbmin;
     const Point &bbmax = *thdata->bbmax;
     double xrange = bbmax[0]-bbmin[0];
     double yrange = bbmax[1]-bbmin[1];
-
-    std::cerr << "thread " << itask << ", elrange=" << el0 << "-" << el1
-	      << std::endl;
 
     const idxtype *rowptr, *colidx;
     Buv->GetSparseStructure (&rowptr, &colidx);
@@ -434,18 +420,18 @@ void CreateMixedMassmat_tri_pass2_engine (task_data *td)
     int np = QRule_tri_4_6 (&wght, &absc);
 
     for (el = el0; el < el1; el++) {
-	Element *pel = mesh->elist[el];
+	Element *pel = mesh.elist[el];
 
 	// element bounding box
-	double exmin = mesh->nlist[pel->Node[0]][0];
-	double exmax = mesh->nlist[pel->Node[0]][0];
-	double eymin = mesh->nlist[pel->Node[0]][1];
-	double eymax = mesh->nlist[pel->Node[0]][1];
+	double exmin = mesh.nlist[pel->Node[0]][0];
+	double exmax = mesh.nlist[pel->Node[0]][0];
+	double eymin = mesh.nlist[pel->Node[0]][1];
+	double eymax = mesh.nlist[pel->Node[0]][1];
 	for (j = 1; j < pel->nNode(); j++) {
-	    exmin = min (exmin, mesh->nlist[pel->Node[j]][0]);
-	    exmax = max (exmax, mesh->nlist[pel->Node[j]][0]);
-	    eymin = min (eymin, mesh->nlist[pel->Node[j]][1]);
-	    eymax = max (eymax, mesh->nlist[pel->Node[j]][1]);
+	    exmin = min (exmin, mesh.nlist[pel->Node[j]][0]);
+	    exmax = max (exmax, mesh.nlist[pel->Node[j]][0]);
+	    eymin = min (eymin, mesh.nlist[pel->Node[j]][1]);
+	    eymax = max (eymax, mesh.nlist[pel->Node[j]][1]);
 	}
 
 	// determine which pixels overlap the element
@@ -485,7 +471,7 @@ void CreateMixedMassmat_tri_pass2_engine (task_data *td)
 		    for (m = 0; m < np; m++) {
 			djac = t3.DetJ(absc[m], &n3);
 			Point glob = t3.Global(n3, absc[m]);
-			Point loc = pel->Local(mesh->nlist, glob);
+			Point loc = pel->Local(mesh.nlist, glob);
 			pel->LocalShapeF (loc, &fun);
 			v = wght[m] * djac;
 			for (jj = 0; jj < 4; jj++) {
@@ -501,12 +487,12 @@ void CreateMixedMassmat_tri_pass2_engine (task_data *td)
 	    }
     }
     // now add thread contribution into global matrix
-    double *v = Buv->ValPtr();
-    const double *vloc = Buv_local.ValPtr();
+    double *bval = Buv->ValPtr();
+    const double *blocval = Buv_local.ValPtr();
     int nz = Buv->nVal();
     Task::UserMutex_lock();
     for (i = 0; i < nz; i++)
-	v[i] += vloc[i];
+	bval[i] += blocval[i];
     Task::UserMutex_unlock();
 }
 #endif
@@ -532,7 +518,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     const Point *absc;
     int np = QRule_tri_4_6 (&wght, &absc);
 
-    tic();
     // pass 1: determine matrix fill structure
     int *nimin = new int[n];
     int *nimax = new int[n];
@@ -569,9 +554,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 	    if (jmax > njmax[nidx]) njmax[nidx] = jmax;
 	}
     }
-    std::cerr << "Pass 1: t=" << toc() << std::endl;
 
-    tic();
     int *rowptr = new int[n+1];
     rowptr[0] = 0;
     for (r = 0; r < n; r++) {
@@ -595,20 +578,16 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
     delete []nimax;
     delete []njmin;
     delete []njmax;
-    std::cerr << "post-Pass 1: t=" << toc() << std::endl;
 
-    tic();
+    // pass 2: fill the matrix
 #if THREAD_LEVEL==2
-    static CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA thdata;
+    static CREATEMIXEDMASSMAT_PASS2_THREADDATA thdata;
     thdata.raster = this;
     thdata.Buv = Buv;
-    thdata.mesh = meshptr;
-    thdata.bdim = &bdim;
     thdata.bbmin = &bbmin;
     thdata.bbmax = &bbmax;
     Task::Multiprocess (CreateMixedMassmat_tri_pass2_engine, &thdata);
 #else
-    // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
 	//xASSERT(pel->Type() == ELID_TRI3, "Currently only implemented for 3-noded triangles");
@@ -678,12 +657,8 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
 	    }
     }
 #endif
-    std::cerr << "Pass 2: t=" << toc() << std::endl;
 
-    tic();
     Buv->Shrink();
-    std::cerr << "post-Pass 2: t=" << toc() << std::endl;
-
     return Buv;
 }
 
@@ -736,6 +711,204 @@ public:
 
     int nlen_used, elen_used;
 };
+
+#if THREAD_LEVEL==2
+void CreateMixedMassmat_tet_pass2_engine (task_data *td)
+{
+    void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos);
+    void Tetsplit_cube (BufMesh *mesh, double xmin, double xmax,
+			double ymin, double ymax, double zmin, double zmax,
+			int reg);
+
+    int itask = td->proc;
+    int ntask = td->np;
+    CREATEMIXEDMASSMAT_PASS2_THREADDATA *thdata =
+	(CREATEMIXEDMASSMAT_PASS2_THREADDATA*)td->data;
+    const Raster_Pixel2 *raster = thdata->raster;
+    const Mesh &mesh = raster->mesh();
+    const IVector &bdim = raster->BDim();
+    int nel = mesh.elen();
+    int el0 = (itask*nel)/ntask;
+    int el1 = ((itask+1)*nel)/ntask;
+    RCompRowMatrix *Buv = thdata->Buv;
+    const Point &bbmin = *thdata->bbmin;
+    const Point &bbmax = *thdata->bbmax;
+    double xrange = bbmax[0]-bbmin[0];
+    double yrange = bbmax[1]-bbmin[1];
+    double zrange = bbmax[2]-bbmin[2];
+    double dx = xrange/(bdim[0]-1.0);
+    double dy = yrange/(bdim[1]-1.0);
+    double dz = zrange/(bdim[2]-1.0);
+
+    const idxtype *rowptr, *colidx;
+    Buv->GetSparseStructure (&rowptr, &colidx);
+    RCompRowMatrix Buv_local(Buv->nRows(), Buv->nCols(), rowptr, colidx);
+
+    // quadrature rule for local tetrahedron
+    const double *wght;
+    const Point *absc;
+    int np = QRule_tet_4_14 (&wght, &absc);
+
+    BufMesh submesh;
+    submesh.elist.Append(new Tetrahedron4);
+    submesh.nlist.New(4);
+    submesh.nlen_used = 0;
+    submesh.elen_used = 0;
+
+    int i, j, k, m, el, ii, jj, imin, imax, jmin, jmax, kmin, kmax;
+    int idx_i, idx_j;
+    double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v;
+    int stride_i = bdim[0], stride_j = stride_i*bdim[1];
+    RVector fun;
+
+    for (el = el0; el < el1; el++) {
+	const Element *pel = mesh.elist[el];
+	xASSERT(pel->Type() == ELID_TET4, "Currently only implemented for 4-noded tetrahedra");
+
+	double orig_size = pel->Size();
+
+	// element bounding box
+	double exmin = mesh.nlist[pel->Node[0]][0];
+	double exmax = mesh.nlist[pel->Node[0]][0];
+	double eymin = mesh.nlist[pel->Node[0]][1];
+	double eymax = mesh.nlist[pel->Node[0]][1];
+	double ezmin = mesh.nlist[pel->Node[0]][2];
+	double ezmax = mesh.nlist[pel->Node[0]][2];
+	for (j = 1; j < pel->nNode(); j++) {
+	    exmin = min (exmin, mesh.nlist[pel->Node[j]][0]);
+	    exmax = max (exmax, mesh.nlist[pel->Node[j]][0]);
+	    eymin = min (eymin, mesh.nlist[pel->Node[j]][1]);
+	    eymax = max (eymax, mesh.nlist[pel->Node[j]][1]);
+	    ezmin = min (ezmin, mesh.nlist[pel->Node[j]][2]);
+	    ezmax = max (ezmax, mesh.nlist[pel->Node[j]][2]);
+	}
+
+	// determine which pixels overlap the element
+	imin = max (0, (int)floor((bdim[0]-1) * (exmin-bbmin[0])/xrange));
+	imax = min (bdim[0]-2, (int)floor((bdim[0]-1) * (exmax-bbmin[0])/xrange));
+	jmin = max (0, (int)floor((bdim[1]-1) * (eymin-bbmin[1])/yrange));
+	jmax = min (bdim[1]-2, (int)floor((bdim[1]-1) * (eymax-bbmin[1])/yrange));
+	kmin = max (0, (int)floor((bdim[2]-1) * (ezmin-bbmin[2])/zrange));
+	kmax = min (bdim[2]-2, (int)floor((bdim[2]-1) * (ezmax-bbmin[2])/zrange));
+
+	// Create a mesh containing this single element
+	for (i = 0; i < 4; i++) {
+	    submesh.elist[0]->Node[i] = i;
+	    submesh.nlist[i] = mesh.nlist[pel->Node[i]];
+	}
+	submesh.elist[0]->SetRegion(0);
+	submesh.elen_used = 1;
+	submesh.nlen_used = 4;
+
+	// perform subdivisions along x-cutting planes
+	for (i = imin; i < imax; i++) {
+	    int elen = submesh.elen_used;
+	    double cut_pos = bbmin[0] + (i+1)*dx;
+	    for (m = 0; m < elen; m++) {
+		int subreg = submesh.elist[m]->Region() & 0x3FF;
+		if (subreg >= i-imin)
+		    Tetsplit (&submesh, m, 0, cut_pos);
+	    }
+	}
+	    
+	// perform subdivisions along y-cutting planes
+	for (j = jmin; j < jmax; j++) {
+	    int elen = submesh.elen_used;
+	    double cut_pos = bbmin[1] + (j+1)*dy;
+	    for (m = 0; m < elen; m++) {
+		int subreg = (submesh.elist[m]->Region() >> 10) & 0x3FF;
+		if (subreg >= j-jmin)
+		    Tetsplit (&submesh, m, 1, cut_pos);
+	    }
+	}
+	    
+	// perform subdivisions along z-cutting planes
+	for (k = kmin; k < kmax; k++) {
+	    int elen = submesh.elen_used;
+	    double cut_pos = bbmin[2] + (k+1)*dz;
+	    for (m = 0; m < elen; m++) {
+		int subreg = (submesh.elist[m]->Region() >> 20) & 0x3FF;
+		if (subreg >= k-kmin)
+		    Tetsplit (&submesh, m, 2, cut_pos);
+	    }
+	}
+
+	// for any voxel cells completely inside the element,
+	// replace the subdivided elements by a simple 6-tetra
+	// subdivision to reduce the number of elements for the
+	// integral
+	for (k = kmin; k <= kmax; k++) {
+	    zmax = (zmin = bbmin[2] + dz*k) + dz;
+	    for (j = jmin; j <= jmax; j++) {
+		ymax = (ymin = bbmin[1] + dy*j) + dy;
+		for (i = imin; i <= imax; i++) {
+		    xmax = (xmin = bbmin[0] + dx*i) + dx;
+		    if (pel->GContains(Point3D(xmin,ymin,zmin),false) &&
+			pel->GContains(Point3D(xmax,ymin,zmin),false) &&
+			pel->GContains(Point3D(xmin,ymax,zmin),false) &&
+			pel->GContains(Point3D(xmax,ymax,zmin),false) &&
+			pel->GContains(Point3D(xmin,ymin,zmax),false) &&
+			pel->GContains(Point3D(xmax,ymin,zmax),false) &&
+			pel->GContains(Point3D(xmin,ymax,zmax),false) &&
+			pel->GContains(Point3D(xmax,ymax,zmax),false)) {
+			int reg = (i-imin) + (j-jmin) << 10 + (k-kmin) << 20;
+			for (m = 0; m < submesh.elen_used; m++)
+			    if (submesh.elist[m]->Region() == reg)
+				submesh.elist[m]->SetRegion(-1); // mark disabled
+			Tetsplit_cube (&submesh, xmin, xmax, ymin, ymax,
+				       zmin, zmax, reg);
+		    }
+		}
+	    }
+	}
+
+	// now perform quadrature on all sub-elements
+	submesh.SubSetup();
+	//double sz = 0.0; // DEBUG
+	for (i = 0; i < submesh.elen_used; i++) {
+	    const Element *psel = submesh.elist[i];
+
+	    // find the voxel cell containing the sub-tet
+	    int reg = psel->Region();
+	    if (reg < 0) continue; // disabled
+	    int ci = imin + reg & 0x3FF;
+	    int cj = jmin + (reg >> 10) & 0x3FF;
+	    int ck = kmin + (reg >> 20) & 0x3FF;
+	    int cellidx = ci + (cj + ck*bdim[1])*bdim[0];
+	    // map quadrature points into global frame
+	    for (m = 0; m < np; m++) {
+		djac = psel->DetJ(absc[m], &submesh.nlist);
+		Point glob = psel->Global (submesh.nlist, absc[m]);
+		Point loc = pel->Local(mesh.nlist, glob);
+		pel->LocalShapeF (loc, &fun);
+		v = wght[m] * djac;
+		// loop over the vertices of the voxel cell
+		for (jj = 0; jj < 8; jj++) {
+		    idx_j = cellidx + (jj&1) + ((jj>>1)&1)*stride_i
+		    	+ (jj>>2)*stride_j;
+		    //idx_j = cellidx + jj%2 + ((jj/2)%2)*bdim[0] +
+		    //	(jj/4)*bdim[0]*bdim[1];
+		    vb = v*raster->Value_nomask (glob, idx_j, false);
+		    for (ii = 0; ii < fun.Dim(); ii++) {
+			idx_i = pel->Node[ii];
+			Buv_local(idx_i, idx_j) += vb*fun[ii];
+		    }
+		}
+	    }
+	    //sz += psel->Size();
+	}
+    }
+
+    // now add thread contribution into global matrix
+    double *bval = Buv->ValPtr();
+    const double *blocval = Buv_local.ValPtr();
+    int nz = Buv->nVal();
+    Task::UserMutex_lock();
+    for (i = 0; i < nz; i++)
+	bval[i] += blocval[i];
+    Task::UserMutex_unlock();
+}
+#endif
 
 RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 {
@@ -845,11 +1018,16 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
     submesh.nlen_used = 0;
     submesh.elen_used = 0;
 
-    double t_split = 0.0, t_integrate = 0.0;
-
     // pass 2: fill the matrix
+#if THREAD_LEVEL==2
+    static CREATEMIXEDMASSMAT_PASS2_THREADDATA thdata;
+    thdata.raster = this;
+    thdata.Buv = Buv;
+    thdata.bbmin = &bbmin;
+    thdata.bbmax = &bbmax;
+    Task::Multiprocess (CreateMixedMassmat_tet_pass2_engine, &thdata);
+#else
     for (el = 0; el < nel; el++) {
-	std::cout << "Buv: processing el " << el << " of " << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	xASSERT(pel->Type() == ELID_TET4, "Currently only implemented for 4-noded tetrahedra");
 
@@ -878,8 +1056,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	jmax = min (bdim[1]-2, (int)floor((bdim[1]-1) * (eymax-bbmin[1])/yrange));
 	kmin = max (0, (int)floor((bdim[2]-1) * (ezmin-bbmin[2])/zrange));
 	kmax = min (bdim[2]-2, (int)floor((bdim[2]-1) * (ezmax-bbmin[2])/zrange));
-
-	tic();
 
 	// Create a mesh containing this single element
 	for (i = 0; i < 4; i++) {
@@ -1007,9 +1183,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	//}
 	//std::cout << "Total: " << sz << std::endl;
 
-	t_split += toc();
-	tic();
-
 	// for any voxel cells completely inside the element,
 	// replace the subdivided elements by a simple 6-tetra
 	// subdivision to reduce the number of elements for the
@@ -1075,11 +1248,8 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	    //sz += psel->Size();
 	}
-	t_integrate += toc();
     }
-
-    std::cout << "#### t_split = " << t_split << std::endl;
-    std::cout << "#### t_integrate = " << t_integrate << std::endl;
+#endif
 
     Buv->Shrink();
     return Buv;
@@ -1737,8 +1907,8 @@ void Tetsplit (BufMesh *mesh, int el, int cut_orient, double cut_pos)
     // compute the intersection points
     int i, nisect;
     int elidx[8];
-    static Point isect[4];
-    if (!isect[0].Dim())
+    /*static*/ Point isect[4];
+    //if (!isect[0].Dim())
 	for (i = 0; i < 4; i++) isect[i].New(3);
     nisect = CalcIntersections_tet (mesh, el, cut_orient, cut_pos, isect);
 
