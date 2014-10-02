@@ -175,7 +175,7 @@ int Tetrahedron4::SideNode (int side, int node) const
 {
     dASSERT(side >= 0 && side < 4, "Side index out of range");
     dASSERT(node >= 0 && node < 3, "Node index out of range");
-    static int SN[4][3] = {{0,1,2},{0,3,1},{0,2,3},{1,3,2}};
+    static const int SN[4][3] = {{0,1,2},{0,3,1},{0,2,3},{1,3,2}};
     return SN[side][node];
 }
 
