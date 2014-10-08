@@ -47,5 +47,13 @@ function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,varar
 % respect to the optical parameters.
 % The returned gradient vector is with respect to the inverse solution basis
 % defined by basis, rather than the nodal mesh basis.
+%
+% Note:  If the modulation frequency (freq) is set to 0, toastGradient
+%        computes the gradient for a steady-state problem. In that case,
+%        data, sd and proj (if provided) can be of length nqm and only
+%        contain the log amplitude component, omitting the phase component.
+%        (if a phase component is present, it is ignored).
+%        Likewise, qvec, mvec and phi (if provided) can be real-valued, as
+%        the imaginary component is ignored.
 
 p = toast(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,varargin{:});

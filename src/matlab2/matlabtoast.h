@@ -202,6 +202,12 @@ public:
     void ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
 
+protected:
+    void GradientReal (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GradientCplx (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+
 private:
     static void ErrorHandler (char *msg);
 
