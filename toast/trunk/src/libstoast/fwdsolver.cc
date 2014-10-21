@@ -338,7 +338,7 @@ template<>
 void TFwdSolver<double>::AssembleSystemMatrix (const Solution &sol,
     double omega, bool elbasis)
 {
-	xASSERT (meshptr, "Mesh reference not defined."); 
+    xASSERT (meshptr, "Mesh reference not defined."); 
     xASSERT(omega==0, "Nonzero omega parameter not allowed here");
     // real version
 
@@ -360,9 +360,9 @@ template<>
 void TFwdSolver<std::complex<float> >::AssembleSystemMatrix (
     const Solution &sol, double omega, bool elbasis)
 {
-	xASSERT (meshptr, "Mesh reference not defined."); 
+    xASSERT (meshptr, "Mesh reference not defined."); 
 
-	// complex version
+    // complex version
     RVector prm;
 
     // To improve accuracy, we assemble the system matrix in double
