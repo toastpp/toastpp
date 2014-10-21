@@ -136,6 +136,20 @@ public:
      */
     void Map_SolToMesh (const RVector &svec, RVector &mvec) const;
 
+    /**
+     * \brief Single-element system matrix assembly
+     *
+     * Assemble single-element contribution for element "el" into global
+     * system matrix M, where coefficients (where applicable) are given in pixel
+     * basis.
+     * \param el element index (>= 0)
+     * \param M global system matrix
+     * \param pxcoeff pointer to coefficient vector in pixel basis (only
+     *   required for integration modes involving a parameter distribution)
+     * \param mode integration type index
+     */
+    void AddToElMatrix (int el, RGenericSparseMatrix &M,
+        const RVector *pxcoeff, int mode) const;
 
 private:
     bool grid_is_basis;       ///< grid and basis dimensions identical?
@@ -152,9 +166,16 @@ private:
      * \brief Returns pointer to mixed mapping matrix
      */
     RCompRowMatrix *CreateMixedMassmat () const;
+    RCompRowMatrix *CreateMixedMassmat_tri () const;
     RCompRowMatrix *CreateMixedMassmat_tet4 () const;
 
     RCompRowMatrix *CreatePixelMassmat () const;
+
+    void AddToElMatrix_tri (int el, RGenericSparseMatrix &M,
+        const RVector *pxcoeff, int mode) const;
+
+    void AddToElMatrix_tet (int el, RGenericSparseMatrix &M,
+        const RVector *pxcoeff, int mode) const;
 
     int SutherlandHodgman (int el, int xgrid, int ygrid, Point *clip_poly,
         int npoly) const;
