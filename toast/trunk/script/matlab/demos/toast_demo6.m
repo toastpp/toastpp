@@ -77,22 +77,32 @@ varargout{1} = handles.output;
 
 %% ===========================================================
 
-function prm = gen_data(prm)
+function prm = load_target(prm)
 meshdir = '../../../test/3D/meshes/';
 meshfile = 'cyl4_blobs.msh';
 qmfile = prm.meas.qmfile;
-mesh = toastMesh([meshdir meshfile]);
-mesh.ReadQM(qmfile);
-n = mesh.NodeCount;
+prm.user.target.mesh = toastMesh([meshdir meshfile]);
+prm.user.target.mesh.ReadQM(qmfile);
+prm.user.target.basis = toastBasis(prm.user.target.mesh, prm.solver.basis.bdim);
 nim = toastNim([meshdir 'mua_tgt_cyl4.nim']);
-mua = nim.Values;
+prm.user.target.mua = nim.Values;
+prm.user.target.bmua = prm.user.target.basis.Map('M->B', prm.user.target.mua);
 nim = toastNim([meshdir 'mus_tgt_cyl4.nim']);
-mus = nim.Values;
+prm.user.target.mus = nim.Values;
+prm.user.target.bmus = prm.user.target.basis.Map('M->B', prm.user.target.mus);
+
+%% ===========================================================
+
+function prm = gen_data(prm)
+mesh = prm.user.target.mesh;
+n = mesh.NodeCount;
+mua = prm.user.target.mua;
+mus = prm.user.target.mus;
 ref = ones(n,1) * 1.4;
 freq = prm.data.freq;
 smat = dotSysmat(mesh,mua,mus,ref,freq);
 qvec = mesh.Qvec(prm.meas.src.type,prm.meas.src.prof,prm.meas.src.width);
-mvec = mesh.Mvec(prm.meas.det.prof,prm.meas.det.width);
+mvec = mesh.Mvec(prm.meas.det.prof,prm.meas.det.width,ref);
 data = reshape(mvec.' * (smat\qvec), [], 1);
 lndata = log(data);
 prm.data.lnamp = real(lndata);
@@ -110,7 +120,7 @@ prm = toastParam;
 %prm.data.phasefile = 'farg_head_vox32_3plane.fem';
 %prm.meas.qmfile = 'vox32_3plane.qm';
 prm.fwdsolver.meshfile = [meshdir 'cyl2.msh'];
-prm.solver.basis.bdim = [24 24 24];
+prm.solver.basis.bdim = [32 32 32];
 %prm.data.lnampfile = 'fmod_cyl2_5ring_100MHz.fem';
 %prm.data.phasefile = 'farg_cyl2_5ring_100MHz.fem';
 prm.data.freq = 100;
@@ -138,11 +148,9 @@ prm.transient.callback.iter = @callback_vis; % iteration callback from recon
 prm.solver.basis.hbasis = toastBasis(prm.fwdsolver.hmesh,prm.solver.basis.bdim,'Linear');
 %prm.smask = toastSolutionMask(prm.basis.hBasis);
 n = prm.fwdsolver.hmesh.NodeCount;
-%load toast_demo6.mat
-%prm.bmua = bmua; clear bmua;
-%prm.bmus = bmus; clear bmus;
-%prm.mua = toastMapBasisToMesh(prm.basis.hBasis,prm.bmua);
-%prm.mus = toastMapBasisToMesh(prm.basis.hBasis,prm.bmus);
+
+% load target data
+prm = load_target(prm);
 
 %prm.initprm.mua.mua = toastNim('mua_tgt_cyl2.nim');
 %prm.initprm.mus.mus = toastNim('mus_tgt_cyl2.nim');
@@ -173,9 +181,9 @@ set(handles.slider2,'Value',lprm.cs_mus);
 
 setappdata(handles.figure1,'lprm',lprm);
 
-showiso(handles,prm.initprm.mua.bmua,0.015,prm.initprm.mus.bmus,1.5,1);
-showcs(handles,prm.initprm.mua.bmua,lprm.cs_mua,0.005,0.02,handles.axes2);
-showcs(handles,prm.initprm.mus.bmus,lprm.cs_mus,0.5,2,handles.axes8);
+showiso(handles,prm.user.target.bmua,0.015,prm.user.target.bmus,1.5,1);
+showcs(handles,prm.user.target.bmua,lprm.cs_mua,0.005,0.02,handles.axes2);
+showcs(handles,prm.user.target.bmus,lprm.cs_mus,0.5,2,handles.axes8);
 tic
 
 % --- Executes on button press in pushbutton1.
@@ -307,9 +315,7 @@ pmin = bb(1,:);
 pmax = bb(2,:);
 nvtx = size(vtx,1);
 msize=pmax-pmin;
-col = zeros(nvtx,3); col(:,2)=1;
-patch('Vertices',vtx,'Faces',idx,'FaceVertexCData',col,'FaceColor', ...
-        'interp','EdgeColor','none','FaceAlpha',0.3);
+
 bmua = reshape(bmua,nx,ny,nz);
 [f,v] = isosurface(bmua,thres_mua);
 if length(v) > 0
@@ -321,7 +327,7 @@ if length(v) > 0
     end
     p = patch('Faces',f,'Vertices',v);
     isonormals(bmua,p);
-    set(p,'FaceColor','red','EdgeColor','none');
+    set(p,'FaceColor',[1 0.5 0.5],'EdgeColor','none');
 end
 
 bmus = reshape(bmus,nx,ny,nz);
@@ -335,13 +341,17 @@ if length(v) > 0
     end
     p = patch('Faces',f,'Vertices',v);
     isonormals(bmus,p);
-    set(p,'FaceColor','blue','EdgeColor','none');
+    set(p,'FaceColor',[0.5 0.5 1],'EdgeColor','none');
 end
+
+col = zeros(nvtx,3); col(:,2)=1;
+patch('Vertices',vtx,'Faces',idx,'FaceVertexCData',col,'FaceColor', ...
+        'interp','EdgeColor','none','FaceAlpha',0.0);
 
 daspect([1 1 1])
 view(-57,40);
 axis equal;axis tight
-camlight
+light('Position',[-20,0,0]);
 lighting gouraud
 
 % ============================================================
@@ -375,7 +385,8 @@ prm = getappdata(handles.figure1,'prm');
 lprm = getappdata(handles.figure1,'lprm');
 lprm.cs_mua = round(get(hObject,'Value'));
 setappdata(handles.figure1,'lprm',lprm);
-showcs(handles,prm.bmua,lprm.cs_mua,0.005,0.02,handles.axes2);
+bmua = prm.user.target.bmua;
+showcs(handles,bmua,lprm.cs_mua,0.005,0.02,handles.axes2);
 if length(lprm.res_mua) > 0
     showcs(handles,lprm.res_mua,lprm.cs_mua,max(0.005,min(lprm.res_mua)),min(0.02,max(lprm.res_mua)),handles.axes4);
 end
@@ -405,7 +416,8 @@ prm = getappdata(handles.figure1,'prm');
 lprm = getappdata(handles.figure1,'lprm');
 lprm.cs_mus = round(get(hObject,'Value'));
 setappdata(handles.figure1,'lprm',lprm);
-showcs(handles,prm.bmus,lprm.cs_mus,0.5,2,handles.axes8);
+bmus = prm.user.target.bmus;
+showcs(handles,bmus,lprm.cs_mus,0.5,2,handles.axes8);
 if length(lprm.res_mus) > 0
     showcs(handles,lprm.res_mus,lprm.cs_mus,max(0.5,min(lprm.res_mus)),min(2,max(lprm.res_mus)),handles.axes9);
 end

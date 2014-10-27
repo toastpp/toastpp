@@ -215,6 +215,13 @@ classdef toastSolver < handle
                         prm.solver.krylov.maxit = 100;
                     end
             end
+            if isfield(prm.regul,'basis') == false
+                if isfield(prm.solver,'basis') == true && isfield(prm.solver.basis,'hbasis') == true
+                    prm.regul.basis = prm.solver.basis.hbasis;
+                else
+                    error('Missing basis handle in control parameter structure');
+                end
+            end
         end
         
         function localprm = setup(this,prm)
