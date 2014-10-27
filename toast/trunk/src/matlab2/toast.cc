@@ -96,6 +96,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_SYSMAT:
 	mtoast->Sysmat (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_SYSMATBASIS:
+	mtoast->Sysmat_basis (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_VOLMAT:
 	mtoast->Volmat (nlhs, plhs, nrhs, prhs);
 	break;

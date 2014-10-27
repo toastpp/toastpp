@@ -28,7 +28,7 @@
 #define TOAST_MESHREORDER       84
 #define TOAST_ELEMENTSIZE       10
 #define TOAST_ELEMENTDATA       11
-#define TOAST_ELEMENTREGION     85 // end
+#define TOAST_ELEMENTREGION     85
 #define TOAST_FINDELEMENT       12
 #define TOAST_SHAPEFUNC         57
 #define TOAST_SHAPEGRAD         58
@@ -45,6 +45,7 @@
 #define TOAST_WRITENIM          56
 #define TOAST_SYSMAT            23
 #define TOAST_SYSMATCOMPONENT   74
+#define TOAST_SYSMATBASIS       86 // end
 #define TOAST_MASSMAT           24
 #define TOAST_VOLMAT            65
 #define TOAST_BNDMAT            61
