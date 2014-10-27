@@ -33,7 +33,7 @@ c0 = 0.3;           % speed of light in vacuum [mm/ps]
 
 % ----------------------------------------------------------------------
 % Read a TOAST mesh definition from file.
-if isfield(prm,'fwdsolver') && isfield(prm.fwdsolver,'hmesh')
+if isfield(prm.fwdsolver,'hmesh')
     LPRM.hMesh = prm.fwdsolver.hmesh;
 else
     LPRM.hMesh = toastMesh (prm.fwdsolver.meshfile);
@@ -44,7 +44,7 @@ dmask = LPRM.hMesh.DataLinkList ();
 
 % ----------------------------------------------------------------------
 % Set up the mapper between FEM and solution bases
-if isfield(prm,'solver') && isfield(prm.solver,'basis') && isfield(prm.solver.basis,'hbasis')
+if isfield(prm.solver,'basis') && isfield(prm.solver.basis,'hbasis')
     LPRM.hBasis = prm.solver.basis.hbasis;
 else
     LPRM.hBasis = toastBasis (LPRM.hMesh, prm.solver.basis.bdim, 'Linear');
