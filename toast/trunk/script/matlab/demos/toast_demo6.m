@@ -22,7 +22,7 @@ function varargout = toast_demo6(varargin)
 
 % Edit the above text to modify the response to help toast_demo6
 
-% Last Modified by GUIDE v2.5 05-Jun-2008 12:24:39
+% Last Modified by GUIDE v2.5 27-Oct-2014 17:33:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -105,6 +105,8 @@ qvec = mesh.Qvec(prm.meas.src.type,prm.meas.src.prof,prm.meas.src.width);
 mvec = mesh.Mvec(prm.meas.det.prof,prm.meas.det.width,ref);
 data = reshape(mvec.' * (smat\qvec), [], 1);
 lndata = log(data);
+% add noise
+lndata = lndata + lndata.*prm.user.noiselevel.*randn(size(lndata));
 prm.data.lnamp = real(lndata);
 prm.data.phase = imag(lndata);
 
@@ -194,6 +196,8 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 
 if getappdata(handles.figure1,'isBusy') == false
     prm = getappdata(handles.figure1,'prm');
+    prm.regul.tau = sscanf(get(handles.edit1,'String'),'%f');
+    prm.user.noiselevel = sscanf(get(handles.edit2,'String'),'%f');
     setappdata(handles.figure1,'isBusy',true);
     set(handles.pushbutton1,'String','Stop (may be delayed)');
     drawnow
@@ -222,7 +226,7 @@ lprm.res_mus = res.bmus;
 setappdata(handles.figure1,'lprm',lprm);
 
 axes(handles.axes5);
-semilogy(res.of); axis tight
+plot(res.of); axis tight
 set(handles.axes5,'FontSize',7);
 toc
 tic
@@ -267,21 +271,18 @@ function popupmenu2_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns popupmenu2 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu2
 prm = getappdata(handles.figure1,'prm');
-switch get(hObject,'Value')
+switch get(handles.popupmenu2,'Value')
     case 1
         prm.regul = struct ('method','None');
     case 2
         prm.regul = struct ('method','TK1', ...
-            'tau',1e-4, ...
             'prior',struct ('refname','','smooth',1,'threshold',0.1));
     case 3
         prm.regul = struct ('method','TV', ...
-            'tau',1e-4, ...
             'prior',struct ('refname','','smooth',1,'threshold',0.1), ...
             'tv',struct ('beta',0.01));
     case 4
         prm.regul = struct ('method','Huber', ...
-            'tau',1e-4, ...
             'prior',struct ('refname','','smooth',1,'threshold',0.1), ...
             'huber',struct ('eps',0.01));
 end
@@ -315,38 +316,29 @@ pmin = bb(1,:);
 pmax = bb(2,:);
 nvtx = size(vtx,1);
 msize=pmax-pmin;
-
+[x,y,z] = meshgrid([pmin(1):msize(1)/(nx-1):pmax(1)], ...
+                   [pmin(2):msize(2)/(ny-1):pmax(2)], ...
+                   [pmin(3):msize(3)/(nz-1):pmax(3)]);
+               
 bmua = reshape(bmua,nx,ny,nz);
-[f,v] = isosurface(bmua,thres_mua);
+[f,v] = isosurface(x,y,z,bmua,thres_mua);
 if length(v) > 0
-    v = [v(:,2) v(:,1) v(:,3)];
-    for i=1:size(v,1)
-        v(i,1) = v(i,1)/nx*msize(1) + pmin(1);
-        v(i,2) = v(i,2)/ny*msize(2) + pmin(2);
-        v(i,3) = v(i,3)/nz*msize(3) + pmin(3);
-    end
     p = patch('Faces',f,'Vertices',v);
-    isonormals(bmua,p);
+    isonormals(x,y,z,bmua,p);
     set(p,'FaceColor',[1 0.5 0.5],'EdgeColor','none');
 end
 
 bmus = reshape(bmus,nx,ny,nz);
-[f,v] = isosurface(bmus,thres_mus);
+[f,v] = isosurface(x,y,z,bmus,thres_mus);
 if length(v) > 0
-    v = [v(:,2) v(:,1) v(:,3)];
-    for i=1:size(v,1)
-        v(i,1) = v(i,1)/nx*msize(1) + pmin(1);
-        v(i,2) = v(i,2)/ny*msize(2) + pmin(2);
-        v(i,3) = v(i,3)/nz*msize(3) + pmin(3);
-    end
     p = patch('Faces',f,'Vertices',v);
-    isonormals(bmus,p);
+    isonormals(x,y,z,bmus,p);
     set(p,'FaceColor',[0.5 0.5 1],'EdgeColor','none');
 end
 
 col = zeros(nvtx,3); col(:,2)=1;
 patch('Vertices',vtx,'Faces',idx,'FaceVertexCData',col,'FaceColor', ...
-        'interp','EdgeColor','none','FaceAlpha',0.0);
+        'interp','EdgeColor','none','FaceAlpha',0.2);
 
 daspect([1 1 1])
 view(-57,40);
@@ -435,3 +427,49 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
+
+
+
+function edit1_Callback(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit1 as text
+%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit2_Callback(hObject, eventdata, handles)
+% hObject    handle to edit2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit2 as text
+%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
