@@ -56,6 +56,8 @@ public:
     void QPos (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MPos (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Sysmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void Sysmat_basis (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
     void Volmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Bndmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void BndReflectionTerm (int nlhs, mxArray *plhs[], int nrhs,

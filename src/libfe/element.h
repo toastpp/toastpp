@@ -398,6 +398,20 @@ public:
     { ERROR_UNDEF; return 0; }
 
     /**
+     * Returns the Jacobian matrix of global wrt. local coordinates,
+     * evaluated at local point loc
+     */
+    double Jacobian (const Point &loc, const NodeList *nlist, RDenseMatrix &J)
+	const;
+
+    /**
+     * Returns the inverse of the Jacobian matrix of global wrt. local
+     * coordinates, evaluated at local point loc
+     */
+    double IJacobian (const Point &loc, const NodeList *nlist,
+	RDenseMatrix &IJ) const;
+
+    /**
      * \brief Returns determinant of Jacobian at a given point inside the
      *   element in the local frame.
      * \param loc evaluation point in local coordinates

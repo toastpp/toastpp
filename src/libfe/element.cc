@@ -295,6 +295,53 @@ int Element::SubdivisionLevel () const
     return (subdivdata ? subdivdata->level : 0);
 }
 
+double Element::Jacobian (const Point &loc, const NodeList *nlist,
+    RDenseMatrix &J) const
+{
+    RDenseMatrix der = LocalShapeD (loc);
+    int i, j, k, n, dim = Dimension();
+    for (i = 0; i < dim; i++) {
+	for (j = 0; j < dim; j++) {
+	    double v = 0.0;
+	    for (k = 0; k < nNode(); k++) {
+		n = Node[k];
+		v += der(i,k)*(*nlist)[n][j];
+	    }
+	    J(i,j) = v;
+	}
+    }
+    if (dim == 2) return J(0,0)*J(1,1) - J(1,0)*J(0,1);
+    else          return J(0,0) * (J(1,1)*J(2,2) - J(2,1)*J(1,2)) -
+		         J(0,1) * (J(1,0)*J(2,2) - J(2,0)*J(1,2)) +
+		         J(0,2) * (J(1,0)*J(2,1) - J(2,0)*J(1,1));
+}
+
+double Element::IJacobian (const Point &loc, const NodeList *nlist,
+    RDenseMatrix &IJ) const
+{
+    int dim = Dimension();
+    RDenseMatrix J(dim,dim);
+    double d = Jacobian (loc, nlist, J);
+    double id = 1.0/d;
+    if (dim == 2) {
+	IJ(0,0) = J(1,1)*id;
+	IJ(0,1) = J(0,1)*(-id);
+	IJ(1,0) = J(1,0)*(-id);
+	IJ(1,1) = J(0,0)*id;
+    } else {
+	IJ(0,0) = ( J(1,1)*J(2,2) - J(2,1)*J(1,2)) * id;
+	IJ(1,0) = (-J(1,0)*J(2,2) + J(2,0)*J(1,2)) * id;
+	IJ(2,0) = ( J(1,0)*J(2,1) - J(2,0)*J(1,1)) * id;
+	IJ(0,1) = (-J(0,1)*J(2,2) + J(2,1)*J(0,2)) * id;
+	IJ(1,1) = ( J(0,0)*J(2,2) - J(2,0)*J(0,2)) * id;
+	IJ(2,1) = (-J(0,0)*J(2,1) + J(2,0)*J(0,1)) * id;
+	IJ(0,2) = ( J(0,1)*J(1,2) - J(1,1)*J(0,2)) * id;
+	IJ(1,2) = (-J(0,0)*J(1,2) + J(1,0)*J(0,2)) * id;
+	IJ(2,2) = ( J(0,0)*J(1,1) - J(1,0)*J(0,1)) * id;
+    }
+    return d;
+}
+
 istream &operator>> (istream& i, Element &el)
 {
     char cbuf[200];
