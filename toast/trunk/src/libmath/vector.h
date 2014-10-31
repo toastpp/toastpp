@@ -117,6 +117,9 @@ template<class VT>
 VT sum (const TVector<VT> &v);
 
 template<class VT>
+VT prod (const TVector<VT> &v);
+
+template<class VT>
 VT mean (const TVector<VT> &v);
 
 template<class VT>
@@ -734,6 +737,12 @@ public:
      * \return \f$ \sum_i^{v.Dim()} v_i \f$
      */
     friend VT sum<> (const TVector<VT> &v);
+
+    /**
+     * \brief Product of elements
+     * \return \f$ \Prod_i^{v.Dim()} v_i \$f
+     */
+    friend VT prod<> (const TVector<VT> &v);
 
     /**
      * \brief Mean value of elements

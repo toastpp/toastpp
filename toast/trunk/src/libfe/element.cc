@@ -76,6 +76,14 @@ void Element::Initialise (const NodeList& nlist)
     }
 }
 
+RVector Element::IntF () const
+{
+    RVector intf(nNode());
+    for (int i = 0; i < nNode(); i++)
+	intf[i] = IntF(i);
+    return intf;
+}
+
 void Element::operator= (const Element& el)
 {
     dASSERT(Type() == el.Type(), "Assignment of incompatible element types.");

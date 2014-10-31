@@ -4,66 +4,27 @@
 
 using namespace std;
 
-// ==========================================================================
+// =========================================================================
 // class Raster_Pixel2 (v.2)
+// =========================================================================
 
 Raster_Pixel2::Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim,
     Mesh *mesh, RDenseMatrix *bb, double _map_tol)
-: Raster (_bdim, _gdim, mesh, bb), map_tol(_map_tol)
+: Raster2 (_bdim, _gdim, mesh, bb, _map_tol)
 {
-    int i, j;
-
-    xASSERT(bdim==gdim,
-	    "This basis type doesn't support intemediate grid basis");
-
-    // Compute the matrices for the least squares mapping between
-    // mesh and pixel basis
-    tic();
-    Buu = meshptr->MassMatrix();
-    double t_uu = toc();
-    tic();
-    Bvv = CreatePixelMassmat();
-    double t_vv = toc();
-    tic();
-    Buv = CreateMixedMassmat();
-    double t_uv = toc();
-
-    Buu_precon = new RPrecon_IC; Buu_precon->Reset (Buu);
-    Bvv_precon = new RPrecon_IC; Bvv_precon->Reset (Bvv);
-
-    // formulate basis->solution mapping in sparse matrix
-    idxtype *rowptr = new idxtype[slen+1];
-    idxtype *colidx = new idxtype[slen];
-    double *val = new double[slen];
-    for (i = 0; i <= slen; i++) rowptr[i] = i; // each row has one entry
-    for (i = 0; i < slen; i++) val[i] = 1.0;
-    for (i = j = 0; i < blen; i++)
-        if (bsupport[i] > 0.0) colidx[j++] = i;
-    D = new RCompRowMatrix (slen, blen, rowptr, colidx, val);
-
-    delete []rowptr;
-    delete []colidx;
-    delete []val;
-
     if (toastVerbosity > 0) {
-        cout << "--> Type............" << (mesh->Dimension() == 2 ? "Bi":"Tri")
-	     << "-linear" << endl;
+        cout << "--> Type............"
+	     << (mesh->Dimension() == 2 ? "Bi":"Tri") << "-linear" << endl;
     }
 }
 
-// ==========================================================================
+// =========================================================================
 
 Raster_Pixel2::~Raster_Pixel2 ()
 {
-    delete D;
-    delete Buu;
-    delete Bvv;
-    delete Buv;
-    delete Buu_precon;
-    delete Bvv_precon;
 }
 
-// ==========================================================================
+// =========================================================================
 
 double Raster_Pixel2::Value_nomask (const Point &p, int i, bool is_solidx) const
 {
@@ -73,8 +34,8 @@ double Raster_Pixel2::Value_nomask (const Point &p, int i, bool is_solidx) const
     int iy = bi/bdim[0];
     int ix = bi - iy*bdim[0];
 
-    double intvx = (bbmax[0]-bbmin[0])/(double)(bdim[0]-1);
-    double intvy = (bbmax[1]-bbmin[1])/(double)(bdim[1]-1);
+    double intvx = bbsize[0]/(double)(bdim[0]-1);
+    double intvy = bbsize[1]/(double)(bdim[1]-1);
 
     double dx = fabs(bbmin[0] + ix*intvx - p[0]);
     double vx = max(0.0, 1.0-dx/intvx);
@@ -83,7 +44,7 @@ double Raster_Pixel2::Value_nomask (const Point &p, int i, bool is_solidx) const
     double v = vx*vy;
 
     if (dim > 2) {
-	double intvz = (bbmax[2]-bbmin[2])/(double)(bdim[2]-1);
+	double intvz = bbsize[2]/(double)(bdim[2]-1);
 	double dz = fabs(bbmin[2] + iz*intvz - p[2]);
 	double vz = max(0.0, 1.0-dz/intvz);
 	v *= vz;
@@ -91,105 +52,10 @@ double Raster_Pixel2::Value_nomask (const Point &p, int i, bool is_solidx) const
     return v;
 }
 
-// ==========================================================================
-
-void Raster_Pixel2::Map_GridToBasis (const RVector &gvec, RVector &bvec) const
-{
-    bvec = gvec; // NOP
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_GridToBasis (const CVector &gvec, CVector &bvec) const
-{
-    bvec = gvec; // NOP
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_BasisToGrid (const RVector &bvec, RVector &gvec) const
-{
-    gvec = bvec; // NOP
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_BasisToGrid (const CVector &bvec, CVector &gvec) const
-{
-    gvec = bvec; // NOP
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
-{
-    double tol = map_tol;
-    int nit = PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
-{
-    double tol = map_tol;
-    int nit = PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_BasisToSol (const RVector &bvec, RVector &svec) const
-{
-    D->Ax (bvec, svec);
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_SolToBasis (const RVector &svec, RVector &bvec) const
-{
-    D->ATx (svec, bvec);
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_MeshToSol (const RVector &mvec, RVector &svec) const
-{
-    RVector bvec(blen);
-    Map_MeshToBasis (mvec, bvec);
-    Map_BasisToSol (bvec, svec);
-}
-
-// ==========================================================================
-
-void Raster_Pixel2::Map_SolToMesh (const RVector &svec, RVector &mvec) const
-{
-    RVector bvec(blen);
-    Map_SolToBasis (svec, bvec);
-    Map_BasisToMesh (bvec, mvec);
-}
-
-
-// ==========================================================================
-// Creates the mixed-basis mass matrix (Buv)
-
-RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
-{
-    switch (meshptr->elist[0]->Type()) {
-    case ELID_TRI3:
-    case ELID_TRI6:
-    case ELID_TRI10:
-	return CreateMixedMassmat_tri();
-    case ELID_TET4:
-	return CreateMixedMassmat_tet4();
-    default:
-	xERROR("Raster_Pixel2: Unsupported element type");
-	return 0;
-    }
-}
-
-// ==========================================================================
+// =========================================================================
 // Creates the pixel-pixel mass matrix (Bvv)
 
-RCompRowMatrix *Raster_Pixel2::CreatePixelMassmat () const
+RCompRowMatrix *Raster_Pixel2::CreateBasisMassmat () const
 {
     // neighbour stencils
     static const int nstencil2 = 9;
@@ -313,7 +179,25 @@ RCompRowMatrix *Raster_Pixel2::CreatePixelMassmat () const
 }
 
 // ==========================================================================
-// Creates a mixed mass matrix 
+// Creates the mixed-basis mass matrix (Buv)
+
+RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
+{
+    switch (meshptr->elist[0]->Type()) {
+    case ELID_TRI3:
+    case ELID_TRI6:
+    case ELID_TRI10:
+	return CreateMixedMassmat_tri();
+    case ELID_TET4:
+	return CreateMixedMassmat_tet4();
+    default:
+	xERROR("Raster_Pixel2: Unsupported element type");
+	return 0;
+    }
+}
+
+// ==========================================================================
+// Adds contribution from single element to system matrix
 
 void Raster_Pixel2::AddToElMatrix (int el,
     RGenericSparseMatrix &M, const RVector *pxcoeff, int mode) const

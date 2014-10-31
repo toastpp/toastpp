@@ -65,6 +65,8 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 		    blobarg = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else if (!strcasecmp (optionstr, "LINEAR_V2")) {
 		    basistp = 7;
+		} else if (!strcasecmp (optionstr, "CONST")) {
+		    basistp = 8;
 		} else if (!strcasecmp (optionstr, "MAPTOL")) {
 		    maptol = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else {
@@ -107,7 +109,12 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	raster = new Raster_SplineBlob (bdim, gdim, mesh, blobrad, bb);
 	break;
     case 7:
-	raster = new Raster_Pixel2 (bdim, bdim, mesh, bb, maptol);
+	raster = Raster2::Create<Raster_Pixel2> (bdim, bdim, mesh, bb,
+						 maptol);
+	break;
+    case 8:
+	raster = Raster2::Create<Raster_CPixel> (bdim, bdim, mesh, bb,
+						 maptol);
 	break;
     }
     if (raster)

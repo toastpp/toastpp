@@ -548,6 +548,15 @@ public:
     virtual double IntF (int i) const = 0;
 
     /**
+     * \brief Integrals of shape functions over the element.
+     * \return vector of integrals
+     *   \f[ \int_\Omega u_i(\vec{r}) d\vec{r} \f]
+     *   for all element nodes i
+     * \sa IntF(int)
+     */
+    virtual RVector IntF () const;
+
+    /**
      * \brief Integrals of all products of two shape functions over the
      *   element.
      * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
