@@ -12,7 +12,8 @@ SRCS = 	solution.cc mwsolution.cc source.cc fwdsolver.cc fwdsolver_zslu.cc \
         pscaler.cc pparse.cc lsearch.cc \
 	raster.cc raster_px.cc raster_cp.cc raster_bl.cc raster_gb.cc \
 	raster_bb.cc raster_hb.cc raster_rb.cc raster_sb.cc \
-	raster_px2.cc raster_px2_tri.cc raster_px2_tet.cc
+	raster2.cc raster_px2.cc raster_px2_tri.cc raster_px2_tet.cc \
+	raster_cpx.cc raster_cpx_tri.cc raster_cpx_tet.cc sh.cc tetsplit.cc
 
 # Only build projector classes if FDOT support is required
 ifeq ($(BUILD_FDOT),1)

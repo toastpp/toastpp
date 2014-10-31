@@ -1192,6 +1192,17 @@ VT sum (const TVector<VT> &v)
 // ==========================================================================
 
 template<class VT>
+VT prod (const TVector<VT> &v)
+{
+    if (v.size == 0) return 0;
+    VT sum = (VT)1;
+    for (int i = 0; i < v.size; i++) sum *= v[i];
+    return sum;
+}
+
+// ==========================================================================
+
+template<class VT>
 VT mean (const TVector<VT> &v)
 {
     if (v.size == 0) return 0;
