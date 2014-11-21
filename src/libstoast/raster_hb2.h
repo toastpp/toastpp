@@ -24,7 +24,6 @@ protected:
     double RadValue (double r) const;
 
 private:
-    double a2;
     double fac;
 };
 

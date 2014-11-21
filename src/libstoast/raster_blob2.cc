@@ -26,14 +26,14 @@ double Raster_Blob2::Value_nomask (const Point &p, int i, bool is_solidx) const
     double intvx = bbsize[0]/(double)(bdim[0]-1);
     double intvy = bbsize[1]/(double)(bdim[1]-1);
 
-    double dx = igrid[0] * fabs(bbmin[0] + ix*intvx - p[0]);
-    double dy = igrid[1] * fabs(bbmin[1] + iy*intvy - p[1]);
+    double dx = fabs(bbmin[0] + ix*intvx - p[0]);
+    double dy = fabs(bbmin[1] + iy*intvy - p[1]);
 
     double dst2 = dx*dx + dy*dy;;
 
     if (dim > 2) {
 	double intvz = bbsize[2]/(double)(bdim[2]-1);
-	double dz = igrid[2] * fabs(bbmin[2] + iz*intvz - p[2]);
+	double dz = fabs(bbmin[2] + iz*intvz - p[2]);
 	dst2 += dz*dz;
     }
     
