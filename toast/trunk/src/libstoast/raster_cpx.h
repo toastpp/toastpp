@@ -27,6 +27,21 @@ public:
      */
     double Value_nomask (const Point &p, int i, bool is_solidx=true) const;
   
+    /**
+     * \brief Single-element system matrix assembly
+     *
+     * Assemble single-element contribution for element "el" into global
+     * system matrix M, where coefficients (where applicable) are given in
+     * pixel basis.
+     * \param el element index (>= 0)
+     * \param M global system matrix
+     * \param pxcoeff pointer to coefficient vector in pixel basis (only
+     *   required for integration modes involving a parameter distribution)
+     * \param mode integration type index
+     */
+    void AddToElMatrix (int el, RGenericSparseMatrix &M,
+        const RVector *pxcoeff, int mode) const;
+
 protected:
     /**
      * \brief Pixel basis constructor
@@ -49,6 +64,9 @@ protected:
     RCompRowMatrix *CreateMixedMassmat () const;
     RCompRowMatrix *CreateMixedMassmat_tri () const;
     RCompRowMatrix *CreateMixedMassmat_tet4 () const;
+
+    void AddToElMatrix_tri (int el, RGenericSparseMatrix &M,
+        const RVector *pxcoeff, int mode) const;
 
 private:
     int SutherlandHodgman (int el, int xgrid, int ygrid, Point *clip_poly,
