@@ -27,37 +27,36 @@ double Raster_Blob2::MC_integral_2D(double basis_dst) const
 	} else v2 = v1;
 	sum += v1*v2;
     }
-    return sum/(double)nsample*4.0*sup*sup/(igrid[0]*igrid[1]);
+    return sum/(double)nsample*4.0*sup*sup;
 }
 
 RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tri () const
 {
-    // neighbour stencils
-    static const int range = 4;
-    static const int nstencil_x = range*2+1;
-    static const int nstencil_y = nstencil_x;
-    static const int nstencil = nstencil_x * nstencil_y;
-    // Note: we may have to expand the stencil if the support radius is so
-    // large that more than direct edge and diagonal neighbours have overlap
-
     int i, j, k, r, c;
-    int c0i, c0j, c0k, c1i, c1j, c1k;
     double dx, dy, dst;
     RVector d(dim);
     for (i = 0; i < dim; i++) {
 	d[i] = bbsize[i]/(bdim[i]-1.0);
     }
 
-    double w[nstencil];        // store distance-dependent weights
-    double wdst[nstencil];     // stored distances
-    int nw = 0;                // number of stored weights
+    // neighbour stencils
+    int range = (int)ceil(2.0*sup/d[0]); // assumes isotropic grid spacing
+    int nstencil_x = range*2+1;
+    int nstencil_y = nstencil_x;
+    int nstencil = nstencil_x * nstencil_y;
 
-    int stencil[nstencil];     // relative stencil indices
-    double stencilw[nstencil]; // stencil weights
+    std::cerr << "range=" << range << std::endl;
+
+    double *w = new double[nstencil];    // store distance-dependent weights
+    double *wdst = new double[nstencil]; // stored distances
+    int nw = 0;                          // number of stored weights
+
+    int *stencil = new int[nstencil];        // relative stencil indices
+    double *stencilw = new double[nstencil]; // stencil weights
     for (j = 0; j < nstencil_y; j++) {
-	dy = (double)(j-range);
+	dy = (double)(j-range)*d[1];
 	for (i = 0; i < nstencil_x; i++) {
-	    dx = (double)(i-range);
+	    dx = (double)(i-range)*d[0];
 	    dst = sqrt(dx*dx+dy*dy);
 	    for (k = 0; k < nw; k++) { // check if weight is available
 		if (fabs(wdst[k]-dst) < 1e-10)
@@ -72,6 +71,8 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tri () const
 	    stencil[i+j*nstencil_x] = (i-range) + (j-range)*bdim[0];
 	}
     }
+    delete []w;
+    delete []wdst;
 
     // evaluate sparse matrix structure
     int *nrowentry = new int[blen];
@@ -87,35 +88,32 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tri () const
 
     int *rowptr = new int[blen+1];
     int *colidx = new int[nentry];
-	
-    rowptr[0] = 0;
-    for (r = i = 0; r < blen; r++) {
-	rowptr[r+1] = rowptr[r] + nrowentry[r];
-	for (j = 0; j < nstencil; j++) {
-	    c = r + stencil[j];
-	    if (c >= 0 && c < blen)
-		colidx[i++] = c;
-	}
-    }
- 
-    RCompRowMatrix *M = new RCompRowMatrix (blen, blen, rowptr, colidx);
-    delete []rowptr;
-    delete []colidx;
-    delete []nrowentry;
+    double *val = new double[nentry];
 
-    // fill matrix
-    for (j = 0; j < bdim[1]; j++) {
-	for (i = 0; i < bdim[0]; i++) {
-	    int idx0 = i + j*bdim[0];
-	    for (k = 0; k < nstencil; k++) {
-		int idx1 = idx0 + stencil[k];
-		if (idx1 >= 0 && idx1 < blen)
-		    (*M)(idx0,idx1) += stencilw[k];
+    rowptr[0] = 0;
+    for (r = j = 0; r < blen; r++) {
+	rowptr[r+1] = rowptr[r] + nrowentry[r];
+	for (i = 0; i < nstencil; i++) {
+	    c = r + stencil[i];
+	    if (c >= 0 && c < blen) {
+		colidx[j] = c;
+		val[j] = stencilw[i];
+		j++;
 	    }
 	}
     }
-    
-    return M;
+    xASSERT(j == nentry, "Inconsistency!");
+    delete []stencil;
+    delete []stencilw;
+
+    RCompRowMatrix *Bvv = new RCompRowMatrix (blen, blen, rowptr, colidx, val);
+    delete []rowptr;
+    delete []colidx;
+    delete []val;
+    delete []nrowentry;
+
+    Bvv->Shrink();
+    return Bvv;
 }
 
 RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tri () const
@@ -132,7 +130,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tri () const
     double yrange = bbmax[1]-bbmin[1];
     double dx = xrange/(bdim[0]-1.0);
     double dy = yrange/(bdim[1]-1.0);
-    double radlimit2 = sup*sup/(igrid[0]*igrid[1]);
+    double radlimit2 = sup*sup;
     
     // quadrature rule for local triangle
     const double *wght;

@@ -6,7 +6,6 @@ Raster_Blob2_HB::Raster_Blob2_HB (const IVector &_bdim, const IVector &_gdim,
     Mesh *mesh, double _sup, double shapeprm, RDenseMatrix *bb, double _map_tol)
 : Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, bb, _map_tol)
 {
-    a2 = sup*sup;
     fac = Pi/sup;
 }
 
