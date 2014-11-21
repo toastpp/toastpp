@@ -67,6 +67,16 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 		    basistp = 7;
 		} else if (!strcasecmp (optionstr, "CONST")) {
 		    basistp = 8;
+		} else if (!strcasecmp (optionstr, "BLOB_RAMP2")) {
+		    basistp = 9;
+		} else if (!strcasecmp (optionstr, "BLOB_BESSEL2")) {
+		    basistp = 10;
+		} else if (!strcasecmp (optionstr, "BLOB_SPLINE2")) {
+		    basistp = 11;
+		} else if (!strcasecmp (optionstr, "BLOB_HANNING2")) {
+		    basistp = 12;
+		} else if (!strcasecmp (optionstr, "BLOB_GAUSS2")) {
+		    basistp = 13;
 		} else if (!strcasecmp (optionstr, "MAPTOL")) {
 		    maptol = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else {
@@ -97,7 +107,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	break;
     case 3:
 	raster = new Raster_BesselBlob (bdim, gdim, mesh, blobarg, blobrad,
-					bb);
+	    bb);
 	break;
     case 4:
 	raster = new Raster_HanningBlob (bdim, gdim, mesh, blobrad, bb);
@@ -110,11 +120,31 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	break;
     case 7:
 	raster = Raster2::Create<Raster_Pixel2> (bdim, bdim, mesh, bb,
-						 maptol);
+	    maptol);
 	break;
     case 8:
 	raster = Raster2::Create<Raster_CPixel> (bdim, bdim, mesh, bb,
-						 maptol);
+            maptol);
+	break;
+    case 9:
+	raster = Raster_Blob2::Create<Raster_Blob2_RB> (bdim, bdim, mesh,
+	    blobrad, blobarg, bb, maptol);
+	break;
+    case 10:
+	raster = Raster_Blob2::Create<Raster_Blob2_BB> (bdim, bdim, mesh,
+	    blobrad, blobarg, bb, maptol);
+	break;
+    case 11:
+	raster = Raster_Blob2::Create<Raster_Blob2_SB> (bdim, bdim, mesh,
+	    blobrad, blobarg, bb, maptol);
+	break;
+    case 12:
+	raster = Raster_Blob2::Create<Raster_Blob2_HB> (bdim, bdim, mesh,
+	    blobrad, blobarg, bb, maptol);
+	break;
+    case 13:
+	raster = Raster_Blob2::Create<Raster_Blob2_GB> (bdim, bdim, mesh,
+	    blobrad, blobarg, bb, maptol);
 	break;
     }
     if (raster)

@@ -122,6 +122,21 @@ public:
      */
     void Map_SolToMesh (const RVector &svec, RVector &mvec) const;
 
+    /**
+     * \brief Single-element system matrix assembly
+     *
+     * Assemble single-element contribution for element "el" into global
+     * system matrix M, where coefficients (where applicable) are given in
+     * pixel basis.
+     * \param el element index (>= 0)
+     * \param M global system matrix
+     * \param pxcoeff pointer to coefficient vector in pixel basis (only
+     *   required for integration modes involving a parameter distribution)
+     * \param mode integration type index
+     */
+    virtual void AddToElMatrix (int el, RGenericSparseMatrix &M,
+        const RVector *pxcoeff, int mode) const = 0;
+
 protected:
     /**
      * \brief Basis constructor.
@@ -168,11 +183,11 @@ protected:
 
     RCompRowMatrix *D;      ///< map basis->solution (limited support)
 
-private:
+public:
     /**
      * \brief Polymorphic class initialisation, called by Create().
      */
-    void Init();
+    virtual void Init();
 };
 
 #endif // !__RASTER2_H

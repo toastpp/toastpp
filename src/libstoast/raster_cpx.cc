@@ -74,3 +74,22 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat () const
     }
 }
 
+// ==========================================================================
+// Adds contribution from single element to system matrix
+
+void Raster_CPixel::AddToElMatrix (int el,
+    RGenericSparseMatrix &M, const RVector *pxcoeff, int mode) const
+{
+    switch (meshptr->elist[0]->Type()) {
+    case ELID_TRI3:
+    //case ELID_TRI6:
+    //case ELID_TRI10:
+	AddToElMatrix_tri (el, M, pxcoeff, mode);
+	break;
+    case ELID_TET4:
+	//AddToElMatrix_tet (el, M, pxcoeff, mode);
+	break;
+    default:
+	xERROR("Raster_Pixel2: Unsupported element type");
+    }
+}

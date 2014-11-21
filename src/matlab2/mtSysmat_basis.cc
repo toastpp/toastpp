@@ -2,7 +2,7 @@
 #include "toastmex.h"
 #include "util.h"
 
-static void CalcSysmat (const Raster_Pixel2 *raster, RVector &mua, RVector &mus,
+static void CalcSysmat (const Raster2 *raster, RVector &mua, RVector &mus,
 		 RVector &ref, double freq, mxArray **res)
 {
     int i, nz;
@@ -29,9 +29,9 @@ static void CalcSysmat (const Raster_Pixel2 *raster, RVector &mua, RVector &mus,
     raster->Map_BasisToMesh(c2a, hc2a);
 
     for (i = 0; i < nel; i++) {
-    	raster->AddToElMatrix (i, K, &cmua, ASSEMBLE_PFF);
+	raster->AddToElMatrix (i, K, &cmua, ASSEMBLE_PFF);
 	raster->AddToElMatrix (i, K, &ckap, ASSEMBLE_PDD);
-    	raster->AddToElMatrix (i, K, &hc2a, ASSEMBLE_BNDPFF);
+	raster->AddToElMatrix (i, K, &hc2a, ASSEMBLE_BNDPFF);
     }
     CopyMatrix (res, K);
 }
@@ -39,7 +39,7 @@ static void CalcSysmat (const Raster_Pixel2 *raster, RVector &mua, RVector &mus,
 void MatlabToast::Sysmat_basis (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    Raster_Pixel2 *raster = (Raster_Pixel2*)GETBASIS_SAFE(0);
+    Raster2 *raster = (Raster2*)GETBASIS_SAFE(0);
 
     RVector mua, mus, ref;
     double freq;
