@@ -942,7 +942,6 @@ void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
 {
     int m = mxGetM (prhs[1]);
     int n = mxGetN (prhs[1]);
-    int nprm = 2; // for now
 
     // copy current solution
     RVector x(n);
@@ -967,8 +966,10 @@ void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
     Regularisation *reg = GetRegul(prhs[5]);
     ASSERTARG(reg, 6, "Regularisation instance not found");
     RCompRowMatrix *RHess = 0;
-    if (reg)
+    if (reg) {
+        int nprm = reg->GetNParam();
 	RHess = new RCompRowMatrix (BuildRHessian (reg, x, nprm));
+    }
 
     // copy tolerance
     double tol = mxGetScalar (prhs[6]);
