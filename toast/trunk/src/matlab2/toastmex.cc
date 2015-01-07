@@ -18,7 +18,7 @@ static bool is64bit = (sizeof(mwIndex) == 8);
 // ============================================================================
 // Copy a dense RVector from TOAST to MATLAB format
 
-void CopyVector (mxArray **array, RVector &vec, VectorOrientation vo)
+void CopyVector (mxArray **array, const RVector &vec, VectorOrientation vo)
 {
     int i, m = vec.Dim();
     mxArray *tmp;
@@ -37,7 +37,7 @@ void CopyVector (mxArray **array, RVector &vec, VectorOrientation vo)
 // ============================================================================
 // Copy a dense CVector from TOAST to MATLAB format
 
-void CopyVector (mxArray **array, CVector &vec, VectorOrientation vo)
+void CopyVector (mxArray **array, const CVector &vec, VectorOrientation vo)
 {
     int i, m = vec.Dim();
     mxArray *tmp;
@@ -79,7 +79,7 @@ void CopyVector (mxArray **array, const IVector &vec, VectorOrientation vo)
 // ============================================================================
 // Copy a dense matrix from TOAST to MATLAB format
 
-void CopyMatrix (mxArray **array, RDenseMatrix &mat)
+void CopyMatrix (mxArray **array, const RDenseMatrix &mat)
 {
     int m = mat.nRows();
     int n = mat.nCols();
@@ -98,7 +98,7 @@ void CopyMatrix (mxArray **array, RDenseMatrix &mat)
 // ============================================================================
 // Copy a complex dense matrix from TOAST to MATLAB format
 
-void CopyMatrix (mxArray **array, CDenseMatrix &mat)
+void CopyMatrix (mxArray **array, const CDenseMatrix &mat)
 {
     int m = mat.nRows();
     int n = mat.nCols();
@@ -121,14 +121,14 @@ void CopyMatrix (mxArray **array, CDenseMatrix &mat)
 // ============================================================================
 // Copy a sparse matrix from TOAST to MATLAB format
 
-void CopyMatrix (mxArray **array, RCompRowMatrix &mat)
+void CopyMatrix (mxArray **array, const RCompRowMatrix &mat)
 {
     int i, j, k;
     int m = mat.nRows();
     int n = mat.nCols();
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    double *pval = mat.ValPtr();
+    const double *pval = mat.ValPtr();
     int nz = rowptr[m];
     mwIndex *rcount = new mwIndex[n];
     mwIndex idx;
@@ -160,14 +160,14 @@ void CopyMatrix (mxArray **array, RCompRowMatrix &mat)
 // ============================================================================
 // Copy a sparse matrix from TOAST to MATLAB format
 
-void CopyMatrix (mxArray **array, CCompRowMatrix &mat)
+void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
 {
     int i, j, k;
     int m = mat.nRows();
     int n = mat.nCols();
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    std::complex<double> *pval = mat.ValPtr();
+    const std::complex<double> *pval = mat.ValPtr();
     int nz = rowptr[m];
     mwIndex *rcount = new mwIndex[n];
     mwIndex idx;
@@ -203,14 +203,14 @@ void CopyMatrix (mxArray **array, CCompRowMatrix &mat)
 // ============================================================================
 // Copy a symmetric sparse matrix from TOAST to MATLAB format
 
-void CopyMatrix (mxArray **array, CSymCompRowMatrix &mat)
+void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
 {
     int i, j, k, nz;
     int m = mat.nRows();
     int n = mat.nCols();
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    std::complex<double> *pval = mat.ValPtr();
+    const std::complex<double> *pval = mat.ValPtr();
     mwIndex *rcount = new mwIndex[n];
     mwIndex idx;
 
@@ -266,7 +266,7 @@ void CopyMatrix (mxArray **array, CSymCompRowMatrix &mat)
 // ============================================================================
 // Transpose and copy a dense matrix from TOAST to MATLAB format
 
-void CopyTMatrix (mxArray **array, RDenseMatrix &mat)
+void CopyTMatrix (mxArray **array, const RDenseMatrix &mat)
 {
     int n = mat.nRows();
     int m = mat.nCols();
@@ -285,7 +285,7 @@ void CopyTMatrix (mxArray **array, RDenseMatrix &mat)
 // ============================================================================
 // Transpose and copy a sparse matrix from TOAST to MATLAB format
 
-void CopyTMatrix (mxArray **array, CCompRowMatrix &mat)
+void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat)
 {
     int i;
     int m = mat.nCols();
@@ -293,7 +293,7 @@ void CopyTMatrix (mxArray **array, CCompRowMatrix &mat)
 
     int *rowptr = mat.rowptr;
     int *colidx = mat.colidx;
-    std::complex<double> *pval = mat.ValPtr();
+    const std::complex<double> *pval = mat.ValPtr();
     int nz = rowptr[n];
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);

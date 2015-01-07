@@ -25,19 +25,21 @@ typedef enum {
 // =========================================================================
 // TOAST -> MATLAB interface conversions
 
-void CopyVector (mxArray **array, RVector &vec, VectorOrientation vo=COLVEC);
-void CopyVector (mxArray **array, CVector &vec, VectorOrientation vo=COLVEC);
+void CopyVector (mxArray **array, const RVector &vec,
+    VectorOrientation vo=COLVEC);
+void CopyVector (mxArray **array, const CVector &vec,
+    VectorOrientation vo=COLVEC);
 void CopyVector (mxArray **array, const IVector &vec,
     VectorOrientation vo=COLVEC);
 
-void CopyMatrix (mxArray **array, RDenseMatrix &mat);
-void CopyMatrix (mxArray **array, CDenseMatrix &mat);
-void CopyMatrix (mxArray **array, RCompRowMatrix &mat);
-void CopyMatrix (mxArray **array, CCompRowMatrix &mat);
-void CopyMatrix (mxArray **array, CSymCompRowMatrix &mat);
+void CopyMatrix (mxArray **array, const RDenseMatrix &mat);
+void CopyMatrix (mxArray **array, const CDenseMatrix &mat);
+void CopyMatrix (mxArray **array, const RCompRowMatrix &mat);
+void CopyMatrix (mxArray **array, const CCompRowMatrix &mat);
+void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat);
 
-void CopyTMatrix (mxArray **array, RDenseMatrix &mat);
-void CopyTMatrix (mxArray **array, CCompRowMatrix &mat);
+void CopyTMatrix (mxArray **array, const RDenseMatrix &mat);
+void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat);
 
 
 // =========================================================================

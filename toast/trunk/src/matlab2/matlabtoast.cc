@@ -964,7 +964,6 @@ void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
 
     // regularisation handle
     Regularisation *reg = GetRegul(prhs[5]);
-    ASSERTARG(reg, 6, "Regularisation instance not found");
     RCompRowMatrix *RHess = 0;
     if (reg) {
         int nprm = reg->GetNParam();

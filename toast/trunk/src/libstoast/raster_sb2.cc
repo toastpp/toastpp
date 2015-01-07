@@ -3,8 +3,9 @@
 #include "raster_sb2.h"
 
 Raster_Blob2_SB::Raster_Blob2_SB (const IVector &_bdim, const IVector &_gdim,
-    Mesh *mesh, double _sup, double shapeprm, RDenseMatrix *bb, double _map_tol)
-: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, bb, _map_tol)
+    Mesh *mesh, double _sup, double shapeprm, double diagscale,
+    RDenseMatrix *bb, double _map_tol)
+: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb, _map_tol)
 {
     int i, j;
     for (i = 0; i <= 4; i++)

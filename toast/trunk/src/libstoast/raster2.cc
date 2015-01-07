@@ -17,6 +17,10 @@ Raster2::Raster2 (const IVector &_bdim, const IVector &_gdim,
     Buv = 0;
     Buu_precon = 0;
     Bvv_precon = 0;
+    Buu_Cholesky_L = 0;
+    Buu_Cholesky_d = 0;
+    Bvv_Cholesky_L = 0;
+    Bvv_Cholesky_d = 0;
     D = 0;
 }
 
@@ -27,15 +31,84 @@ Raster2::~Raster2 ()
     if (Buu) delete Buu;
     if (Bvv) delete Bvv;
     if (Buv) delete Buv;
-    if (Buu_precon) delete Buu_precon;
-    if (Bvv_precon) delete Bvv_precon;
-    if (D) delete D;
+    if (Buu_precon) {
+	std::cerr << "have Buu_precon" << std::endl;
+	delete Buu_precon;
+    }
+    if (Bvv_precon) {
+	std::cerr << "have Bvv_precon" << std::endl;
+	delete Bvv_precon;
+    }
+    if (Buu_Cholesky_L) {
+	std::cerr << "have Buu_Cholesky_L" << std::endl;
+	delete Buu_Cholesky_L;
+    }
+    if (Buu_Cholesky_d) {
+	std::cerr << "have Buu_Cholesky_d" << std::endl;
+	delete Buu_Cholesky_d;
+    }
+    if (Bvv_Cholesky_L) {
+	std::cerr << "have Bvv_Cholesky_L" << std::endl;
+	delete Bvv_Cholesky_L;
+    }
+    if (Bvv_Cholesky_d) {
+	std::cerr << "have Bvv_Cholesky_d" << std::endl;
+	delete Bvv_Cholesky_d;
+    }
+    if (D) {
+	std::cerr << "have D" << std::endl;
+	delete D;
+    }
+    std::cerr << "done" << std::endl;
 }
 
 // =========================================================================
 
 void Raster2::Init ()
 {
+    std::cerr << "raster2 init" << std::endl;
+
+    if (Buu) {
+	std::cerr << "delete Buu" << std::endl;
+	delete Buu;
+    }
+    if (Bvv) {
+	std::cerr << "delete Bvv" << std::endl;
+	delete Bvv;
+    }
+    if (Buv) {
+	std::cerr << "delete Buv" << std::endl;
+	delete Buv;
+    }
+    if (Buu_precon) {
+	std::cerr << "delete Buu_precon" << std::endl;
+	delete Buu_precon;
+    }
+    if (Bvv_precon) {
+	std::cerr << "delete Bvv_precon" << std::endl;
+	delete Bvv_precon;
+    }
+    if (Buu_Cholesky_L) {
+	std::cerr << "delete Buu_Cholesky_L" << std::endl;
+	delete Buu_Cholesky_L;
+    }
+    if (Buu_Cholesky_d) {
+	std::cerr << "delete Buu_Cholesky_d" << std::endl;
+	delete Buu_Cholesky_d;
+    }
+    if (Bvv_Cholesky_L) {
+	std::cerr << "delete Bvv_Cholesky_L" << std::endl;
+	delete Bvv_Cholesky_L;
+    }
+    if (Bvv_Cholesky_d) {
+	std::cerr << "delete Bvv_Cholesky_d" << std::endl;
+	delete Bvv_Cholesky_d;
+    }
+    if (D) {
+	std::cerr << "delete D" << std::endl;
+	delete D;
+    }
+
     // mass matrix for mesh basis
     Buu = meshptr->MassMatrix();
     // mass matrix for intrinsic basis
@@ -47,8 +120,34 @@ void Raster2::Init ()
     D = CreateSolMapper();
 
     // preconditioners
-    Buu_precon = new RPrecon_IC; Buu_precon->Reset (Buu);
-    Bvv_precon = new RPrecon_IC; Bvv_precon->Reset (Bvv);
+    if (map_tol) {
+	std::cerr << "tick 1" << std::endl;
+	Buu_precon = new RPrecon_IC; Buu_precon->Reset (Buu);
+	Bvv_precon = new RPrecon_IC; Bvv_precon->Reset (Bvv);
+	Buu_Cholesky_L = 0;
+	Buu_Cholesky_d = 0;
+	Bvv_Cholesky_L = 0;
+	Bvv_Cholesky_d = 0;
+    } else {
+	Buu_precon = 0;
+	Bvv_precon = 0;
+	int nlen = meshptr->nlen();
+	int *rowptr, *colidx;
+	Buu->SymbolicCholeskyFactorize (rowptr, colidx);
+	Buu_Cholesky_L = new RCompRowMatrix(nlen, nlen, rowptr, colidx);
+	delete []rowptr;
+	delete []colidx;
+	Buu_Cholesky_d = new RVector(nlen);
+	Bvv->SymbolicCholeskyFactorize (rowptr, colidx);
+	Bvv_Cholesky_L = new RCompRowMatrix(blen, blen, rowptr, colidx);
+	delete []rowptr;
+	delete []colidx;
+	Bvv_Cholesky_d = new RVector(blen);
+	CholeskyFactorize (*Buu, *Buu_Cholesky_L, *Buu_Cholesky_d, true);
+	CholeskyFactorize (*Bvv, *Bvv_Cholesky_L, *Bvv_Cholesky_d, true);
+    }
+
+    glen = slen = blen;
 }
 
 // =========================================================================
@@ -83,48 +182,136 @@ void Raster2::Map_BasisToGrid (const CVector &bvec, CVector &gvec) const
 
 void Raster2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
 {
-    double tol = map_tol;
-    int nit = PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
+    if (map_tol) {
+	std::cerr << "mesh to basis pcg" << std::endl;
+	double tol = map_tol;
+	int nit = PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
+    } else {
+	std::cerr << "mesh to basis cholesky" << std::endl;
+	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, mvec, bvec);
+    }
+}
+
+// =========================================================================
+
+void Raster2::Map_MeshToBasis (const CVector &mvec, CVector &bvec) const
+{
+    int nit = 0;
+    RVector bvec_tmp(bvec.Dim());
+    RVector mvec_tmp(mvec.Dim());
+
+    mvec_tmp = Re(mvec);
+    if (map_tol) {
+	double tol = map_tol;
+	nit += PCG (*Bvv, ATx(*Buv,mvec_tmp), bvec_tmp, tol, Bvv_precon);
+    } else {
+	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, mvec_tmp, bvec_tmp);
+    }
+    SetReal(bvec, bvec_tmp);
+
+    mvec_tmp = Im(mvec);
+    if (map_tol) {
+	double tol = map_tol;
+	nit += PCG (*Bvv, ATx(*Buv,mvec_tmp), bvec_tmp, tol, Bvv_precon);
+    } else {
+	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, mvec_tmp, bvec_tmp);
+    }
+    SetImag(bvec, bvec_tmp);
 }
 
 // =========================================================================
 
 void Raster2::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
 {
-    double tol = map_tol;
-    int nit = PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
+    if (map_tol) {
+	double tol = map_tol;
+	int nit = PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
+    } else {
+	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, bvec, mvec);
+    }
+}
+
+// =========================================================================
+
+void Raster2::Map_BasisToMesh (const CVector &bvec, CVector &mvec) const
+{
+    int nit = 0;
+    RVector bvec_tmp(bvec.Dim());
+    RVector mvec_tmp(mvec.Dim());
+
+    bvec_tmp = Re(bvec);
+    if (map_tol) {
+	double tol = map_tol;
+	nit += PCG (*Buu, Ax(*Buv,bvec_tmp), mvec_tmp, tol, Buu_precon);
+    } else {
+	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, bvec_tmp, mvec_tmp);
+    }
+    SetReal(mvec, mvec_tmp);
+
+    bvec_tmp = Im(bvec);
+    if (map_tol) {
+	double tol = map_tol;
+	nit += PCG (*Buu, Ax(*Buv,bvec_tmp), mvec_tmp, tol, Buu_precon);
+    } else {
+	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, bvec_tmp, mvec_tmp);
+    }
+    SetImag(mvec, mvec_tmp);
 }
 
 // =========================================================================
 
 void Raster2::Map_BasisToSol (const RVector &bvec, RVector &svec) const
 {
-    D->Ax (bvec, svec);
+    svec = bvec;
+}
+
+// =========================================================================
+
+void Raster2::Map_BasisToSol (const CVector &bvec, CVector &svec) const
+{
+    svec = bvec;
 }
 
 // =========================================================================
 
 void Raster2::Map_SolToBasis (const RVector &svec, RVector &bvec) const
 {
-    D->ATx (svec, bvec);
+    bvec = svec;
+}
+
+// =========================================================================
+
+void Raster2::Map_SolToBasis (const CVector &svec, CVector &bvec) const
+{
+    bvec = svec;
 }
 
 // =========================================================================
 
 void Raster2::Map_MeshToSol (const RVector &mvec, RVector &svec) const
 {
-    RVector bvec(blen);
-    Map_MeshToBasis (mvec, bvec);
-    Map_BasisToSol (bvec, svec);
+    Map_MeshToBasis (mvec, svec);
+}
+
+// =========================================================================
+
+void Raster2::Map_MeshToSol (const CVector &mvec, CVector &svec) const
+{
+    Map_MeshToBasis (mvec, svec);
 }
 
 // =========================================================================
 
 void Raster2::Map_SolToMesh (const RVector &svec, RVector &mvec) const
 {
-    RVector bvec(blen);
-    Map_SolToBasis (svec, bvec);
-    Map_BasisToMesh (bvec, mvec);
+    Map_BasisToMesh (svec, mvec);
+}
+
+// =========================================================================
+
+void Raster2::Map_SolToMesh (const CVector &svec, CVector &mvec) const
+{
+    Map_BasisToMesh (svec, mvec);
 }
 
 // =========================================================================

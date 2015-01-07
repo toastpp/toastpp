@@ -19,10 +19,10 @@ class STOASTLIB Raster_Blob2: public Raster2 {
 public:
     template<class T>
     static Raster2 *Create (const IVector &_bdim, const IVector &_gdim,
-        Mesh *mesh, double _sup, double shapeprm, RDenseMatrix *bb=0,
-        double _map_tol=1e-10)
+        Mesh *mesh, double _sup, double shapeprm, double diagscale,
+        RDenseMatrix *bb=0, double _map_tol=1e-10)
     {
-        T *raster = new T(_bdim, _gdim, mesh, _sup, shapeprm, bb,
+        T *raster = new T(_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb,
 	    _map_tol);
 	raster->Init();
 	return raster;
@@ -40,7 +40,7 @@ public:
      * \param _map_tol tolerance for linear solver in mapping
      */
     Raster_Blob2 (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
-        double _sup, double shapeprm, RDenseMatrix *bb=0,
+	double _sup, double shapeprm, double diagscale, RDenseMatrix *bb=0,
         double _map_tol=1e-10);
 
     /**
@@ -64,9 +64,14 @@ protected:
     int SutherlandHodgman (int el, double px, double py, Point *clip_poly,
         int npoly) const;
 
-    double sup;    ///< support radius
-    double sprm;   ///< shape parameter for basis types that use it
-    RVector igrid; ///< inverse grid spacing
+    int SutherlandHodgman (const Point *p0, int np0,
+	const Point *p1, int np1,
+	Point *clip_poly, const int npoly) const;
+
+    double sup;     ///< support radius
+    double sprm;    ///< shape parameter for basis types that use it
+    double dgscale; ///< diagonal scaling factor
+    RVector igrid;  ///< inverse grid spacing
 private:
     RCompRowMatrix *CreateBasisMassmat () const;
     RCompRowMatrix *CreateBasisMassmat_tri () const;

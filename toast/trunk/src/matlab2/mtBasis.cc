@@ -21,6 +21,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     double blobrad = 1.0;
     double blobarg = 1.0;
     double maptol = 1e-10;
+    double dgscale = 0.1;
 
     // mesh
     ASSERTARG(nrhs > 0, 0, "Too few parameters provided");
@@ -77,8 +78,12 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 		    basistp = 12;
 		} else if (!strcasecmp (optionstr, "BLOB_GAUSS2")) {
 		    basistp = 13;
+		} else if (!strcasecmp (optionstr, "CONST_TREE")) {
+		    basistp = 14;
 		} else if (!strcasecmp (optionstr, "MAPTOL")) {
 		    maptol = mxGetScalar(mxGetCell(prhs[2], ++i));
+		} else if (!strcasecmp (optionstr, "DIAGSCALE")) {
+		    dgscale = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else {
 		    ASSERTARG(false, 1, "unexpected value");
 		}
@@ -128,23 +133,27 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	break;
     case 9:
 	raster = Raster_Blob2::Create<Raster_Blob2_RB> (bdim, bdim, mesh,
-	    blobrad, blobarg, bb, maptol);
+            blobrad, blobarg, dgscale, bb, maptol);
 	break;
     case 10:
 	raster = Raster_Blob2::Create<Raster_Blob2_BB> (bdim, bdim, mesh,
-	    blobrad, blobarg, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol);
 	break;
     case 11:
 	raster = Raster_Blob2::Create<Raster_Blob2_SB> (bdim, bdim, mesh,
-	    blobrad, blobarg, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol);
 	break;
     case 12:
 	raster = Raster_Blob2::Create<Raster_Blob2_HB> (bdim, bdim, mesh,
-	    blobrad, blobarg, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol);
 	break;
     case 13:
 	raster = Raster_Blob2::Create<Raster_Blob2_GB> (bdim, bdim, mesh,
-	    blobrad, blobarg, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol);
+	break;
+    case 14:
+	raster = Raster2::Create<Raster_CPixel_Tree> (bdim, bdim, mesh, bb,
+            maptol);
 	break;
     }
     if (raster)
@@ -221,15 +230,117 @@ void MatlabToast::GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::GetBasisBuu (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetBuu());
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisBvv (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetBvv());
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisBuv (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetBuv());
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
 void MatlabToast::BasisValue (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     Raster *raster = GETBASIS_SAFE(0);
     RVector pt;
     CopyVector (pt, prhs[1]);
-    int idx = (int)mxGetScalar(prhs[2]) - 1;
 
-    plhs[0] = mxCreateDoubleScalar(raster->Value(pt, idx));
+    int m = mxGetM(prhs[2]), n = mxGetN(prhs[2]);
+    if (m*n == 1) { // scalar: assume this is basis index
+	bool is_solidx = true;
+	int idx = (int)mxGetScalar(prhs[2]) - 1;
+	if (nrhs > 3 && mxIsChar(prhs[3])) {
+	    char cbuf[256];
+	    mxGetString(prhs[3], cbuf, 256);
+	    if (!strcasecmp(cbuf,"FULLIDX"))
+		is_solidx = false;
+	}
+	plhs[0] = mxCreateDoubleScalar(raster->Value(pt, idx, is_solidx));
+    } else { // vector: assume this is coefficient vector
+	RVector coeff;
+	CopyVector (coeff, prhs[2]);
+	bool mask = true;
+	if (nrhs > 3 && mxIsChar(prhs[3])) {
+	    char cbuf[256];
+	    mxGetString(prhs[3], cbuf, 256);
+	    if (!strcasecmp(cbuf,"NOMASK"))
+		mask = false;
+	}
+	plhs[0] = mxCreateDoubleScalar(raster->Value(pt, coeff, mask));
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisSupportArea (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    // basis handle
+    Raster *raster = GETBASIS_SAFE(0);
+
+    int idx = (int)(mxGetScalar(prhs[1])-0.5);
+    RDenseMatrix sa = raster->SupportArea(idx);
+    CopyMatrix (&plhs[0], sa);
+}
+
+// =========================================================================
+
+void MatlabToast::BasisRefine (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    // basis handle
+    Raster *raster = GETBASIS_SAFE(0);
+
+    RVector ridx;
+    CopyVector (ridx, prhs[1]);
+
+    int nidx = ridx.Dim();
+    int *idx = new int[nidx];
+    for (int i = 0; i < nidx; i++)
+	idx[i] = (int)(ridx[i]-0.5);
+
+    raster->Refine (idx, nidx);
+    delete []idx;
 }
 
 // =========================================================================

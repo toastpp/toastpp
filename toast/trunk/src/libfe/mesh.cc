@@ -219,6 +219,8 @@ double Mesh::FullSize () const
 
 int Mesh::ElFind (const Point &pt) const
 {
+    // NOT THREADSAFE!
+
     int el, d1, d2, i;
 
     // we start the search from the previously found element, hoping

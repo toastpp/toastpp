@@ -45,7 +45,7 @@
 #define TOAST_WRITENIM          56
 #define TOAST_SYSMAT            23
 #define TOAST_SYSMATCOMPONENT   74
-#define TOAST_SYSMATBASIS       86 // end
+#define TOAST_SYSMATBASIS       86
 #define TOAST_MASSMAT           24
 #define TOAST_VOLMAT            65
 #define TOAST_BNDMAT            61
@@ -59,6 +59,11 @@
 #define TOAST_BASIS_BLEN        72
 #define TOAST_BASIS_SLEN        73
 #define TOAST_BASIS_VALUE       81
+#define TOAST_BASIS_BUU         87
+#define TOAST_BASIS_BVV         88
+#define TOAST_BASIS_BUV         89
+#define TOAST_BASIS_SUPPORTAREA 90
+#define TOAST_BASIS_REFINE      91 // end
 #define TOAST_MAPBASIS          29
 #define TOAST_MAPMESHTOBASIS    30
 #define TOAST_MAPMESHTOGRID     31

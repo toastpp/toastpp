@@ -41,6 +41,7 @@
 #include "raster_sb2.h"
 #include "raster_hb2.h"
 #include "raster_gb2.h"
+#include "raster_cpx_tree.h"
 #include "source.h"
 #include "of.h"
 #include "jacobian.h"

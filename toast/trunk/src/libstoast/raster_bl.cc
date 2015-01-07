@@ -120,9 +120,9 @@ void Raster_Blob::ComputeNodeValues ()
     delete []data;
 }
 
-double Raster_Blob::Value (const Point &p, int i) const
+double Raster_Blob::Value (const Point &p, int i, bool is_solidx) const
 {
-    double v = Value_nomask (p, i);
+    double v = Value_nomask (p, i, is_solidx);
     return (v && meshptr->ElFind (p) >= 0 ? v : 0.0);
 }
 

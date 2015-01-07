@@ -40,7 +40,7 @@ public:
      * \param p point coordinates
      * \param i linear basis index
      */
-    virtual double Value (const Point &p, int i) const;
+    virtual double Value (const Point &p, int i, bool is_solidx=true) const;
 
     virtual double Value_nomask (const Point &p, int i, bool is_solidx=true)
 	const = 0;
