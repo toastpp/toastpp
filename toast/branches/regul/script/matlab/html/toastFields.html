@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>toastFields</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastFields
+</div>
+
+<div class="param">
+<h1>toastFields</h1>
+<p>Calculate direct and adjoint fields.
+
+<h2>Syntax</h2>
+<div class="code">
+[dphi,aphi] = toastFields (hMesh, hBasis, qvec, mvec, mua, mus, ref, freq, solver, tol)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+  <tr><td></td>
+  <td>qvec</td><td><i>complex sparse matrix [n x nq]</i></td><td>array of source column vectors</td></tr>
+  <tr><td></td>
+  <td>mvec</td><td><i>complex sparse matrix [n x nm]</i></td><td>array of measurement column vectors</td></tr>
+  <tr><td></td>
+  <td>mua</td><td><i>real vector [n]</i></td><td>nodal absorption coefficients</td></tr>
+  <tr><td></td>
+  <td>mus</td><td><i>real vector [n]</i></td><td>nodal reduced scattering coefficients</td></tr>
+  <tr><td></td>
+  <td>ref</td><td><i>real vector [n]</i></td><td>nodal refractive index</td></tr>
+  <tr><td></td>
+  <td>freq</td><td><i>real</i></td><td>source modulation frequency [MHz]</td></tr>
+  <tr><td></td>
+  <td>solver</td><td><i>string</i></td><td>linear solver (DIRECT, CG, BICG, BICGSTAB, GMRES, or GAUSSSEIDEL)</td></tr>
+  <tr><td></td>
+  <td>tol</td><td><i>real</i></td><td>solver tolerance (ignored for DIRECT solver)</td></tr>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>dphi</td><td><i>complex matrix [g x nq]</i></td><td>direct fields for all sources</td></tr>
+  <tr><td></td>
+  <td>aphi</td><td><i>complex matrix [g x nm]</i></td><td>adjoint fields for all detectors</td>
+</tr></table>
+Dimensions: <i>n</i>=mesh node number, <i>nq</i>=source count, <i>nm</i>=detector count,
+<i>g</i>=grid basis dimension.
+
+<h2>Notes</h2>
+<p>Calculates the direct and adjoint fields for given optical
+  coefficients, and returns them as complex column vectors in dphi and aphi,
+  mapped into grid basis.
+<p>Adjoint field matrix (aphi) is optional.
+
+</div>
+</body>
+</html>

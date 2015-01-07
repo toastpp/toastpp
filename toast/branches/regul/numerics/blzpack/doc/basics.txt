@@ -1,0 +1,106 @@
+## 09/25/1999 ##########################################################
+#                                                                      #
+#  basics.txt gives a very rough idea about the algorithm implemented  #
+#  in BLZPACK.                                                         #
+#                                                                      #
+########################################################################
+
+   Definitions:
+
+   P : number of vectors in a block                                  
+   N : dimension of the matrices (A) and (B)                         
+   (Q_j) and (R_j) are N x P matrices                                
+   (ALPHA_j) and (BETA_j) are P x P matrices
+                                                                     
+   Computational scheme:
+
+   -----------------------------------------------------------------
+
+   Set (Q_0)=(0) and (BETA_1)=(0)                                    
+   Set (Q_1), such that 
+
+              (Q'_1)*(Q_1)=(I) for the standard problem or
+              (Q'_1)*(B)*(Q_1)=(I) for the generalized problem
+
+   For the generalized problem: 
+
+              define SIGMA and factor (A)-SIGMA*(B)=(L)*(D)*(L')
+                                                                        
+   Lanczos loop (basis generation), j=1,2,...                        
+                                                                        
+      a) compute (R_j) as                                               
+
+         (R_j) = (B)*(Q_j) for the standard problem or
+         (L)*(D)*(L')*(R_j) = (B)*(Q_j) for the generalized problem     
+                                                                        
+      b) (R_j)     <--- (R_j) - (Q_j-1)*(BETA_j')                       
+                                                                        
+      c) (ALPHA_j) <--- (Q'_j)*(R_j) for the standard problem or 
+         (ALPHA_j) <--- (Q'_j)*(B)*(R_j) for the generalized problem    
+                                                                        
+      d) (R_j)     <--- (R_j) - (Q_j)*(ALPHA_j)                         
+                                                                        
+      e) factorize (R_j): (R_j) = (Q_j+1)*(BETA_j+1)                    
+
+         (Q_j+1')*(Q_j+1) = (I) for the standard problem or             
+         (Q_j+1')*(B)*(Q_j+1) = (I) for the generalized problem         
+                                                                        
+      f) monitor the orthogonality level
+
+      g) solve (TB_j)*(s) = (s)*(theta) and check for convergence
+
+   -----------------------------------------------------------------
+
+                | alpha_1,1  alpha_1,2  ... alpha_1,P |              
+                | alpha_2,1  alpha_2,2  ... alpha_2,P |              
+   (ALPHA_j)  = |     .          .              .     |              
+                |     .          .              .     |              
+                | alpha_P,1  alpha_P,2  ... alpha_P,P |              
+                                                                     
+                | beta_1,1   beta_1,2   ... beta_1,P  |              
+                |     0      beta_2,2   ... beta_2,P  |              
+   (BETA_j)   = |     .          .              .     |              
+                |     .          .              .     |              
+                |     0          0      ... beta_P,P  |              
+                                                                        
+   after j steps, j < N :                                            
+                                                                     
+                | ALPHA_1    BETA_2'                         |       
+                | BETA_2    ALPHA_2    BETA_3'               |       
+                |            BETA_3   ALPHA_3    .           |       
+   (TB_j)     = |                   .         .    .         |       
+                |                     .         .    .       |       
+                |                       .         .  BETA_j' |       
+                |                           BETA_j  ALPHA_j  |       
+                                                                        
+   [Q_j]      = [ (Q_1)  (Q_2)  ... (Q_j) ]                          
+                                                                        
+   (TB_j)*(s) = (s)*(theta)                                           
+                                                                        
+   one approximate eigenpair (eig,(x)) is given by:                  
+                                                                        
+      eig ~ theta, for the standard problem or
+      eig ~ SIGMA + 1/theta, for the generalized problem           
+
+   and
+
+      (x) ~ [Q_j]*(s)                                             
+                                                                        
+
+   References:
+
+ . J. Cullum and R. Willoughby, "Lanczos Algorithms for Large Symmetric
+   Eigenvalue Computations", I Theory, II Programs, Birkhauser, 1985;
+ . G. H. Golub and C. F. Van Loan, 'Matrix Computations', The Johns
+   Hopkins University Press, London, England, 1989;
+ . R. G. Grimes, J. G. Lewis and H. D. Simon, 'A Shifted Block Lanczos
+   Algorithm for Solving Sparse Symmetric Eigenvalue Problems', SIAM
+   J. Matrix Anal. Appl., Vol. 15, pp. 228-272, 1994;
+ . T. J. R. Hughes, "The Finite Element Method", ch. 10, written by
+   B. Nour-Omid, Prentice Hall Inc., 1987;  
+ . O. A. Marques, 'BLZPACK: Description and User's Guide', CERFACS
+   Report TR/PA/95/30, Toulouse, France, 1995;
+ . B. N. Parlett, 'The Symmetric Eigenvalue Problem', Prentice Hall,
+   Englewood Cliffs, USA, 1980.
+   
+end of basics.txt ######################################################

@@ -1,0 +1,19 @@
+This library produces a binary which can used to run local basis FEM simulation using RTE for the case 'g=0'. 
+Note that the 'g' has been limited to zero for time efficiency.
+
+Angular meshes of different levels of refinement have been provided here
+octohedron.msh - a simple octohedron
+octohedronR2.msh - Octohedron refined 2 levels
+octohedronR3.msh - Octohedron refined 3 levels
+octohedronR4.msh - Octohedron refined 4 levels
+octohedronR5.msh - Octohedron refined 5 levels
+octohedronR6.msh - Octohedron refined 6 levels
+
+Usage 
+1. $TOASTVER/bin/rte3D_localbasis <spatial mesh name> <angular mesh name> < <input file name>
+
+2. $TOASTVER/bin/rte3D_localbasis <spatial mesh name> <angular mesh name> <QM file name> < <input file name>
+
+eg: $TOASTVER/bin/rte3D_localbasis cube10.msh octohedronR2.msh < inputfile.txt
+
+The input file can be generated using the MATLAB script 'generateInputFile.m'.

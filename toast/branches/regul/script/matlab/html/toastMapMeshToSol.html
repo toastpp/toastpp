@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>toastMapMeshToSol</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastMapMeshToSol
+</div>
+
+<div class="param">
+<h1>toastMapMeshToSol</h1>
+<p>Map an image between two different basis representations: from h-basis to
+s-basis (see <a href="basis.html">Basis definitions</a>).
+
+<h2>Syntax</h2>
+<div class="code">
+simg = toastMapBasisToSol (hBasis, himg)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+<tr><td></td>
+  <td>himg</td><td><i>real or complex [h]</i></td><td>image (basis coefficients) in (nodal) h-basis expansion</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>simg</td><td><i>real or complex [s]</i></td><td>image (basis coefficients) mapped into (masked regular) s-basis expansion</td>
+</tr></table>
+Dimensions: <i>h</i> = size of <a href="basis.html">h-basis</a>,
+<i>s</i> = size of <a href="basis.html">s-basis</a>.
+
+<h2>Notes</h2>
+<p>Arbitrary functions can generally not be represented exactly in any of the
+basis expansions. Therefore, mapping from one basis to another may incur a
+loss, and mapping back to the first basis may not recover the original basis
+coefficients precisely.
+
+<p>Images can be real or complex-valued.
+
+<p>This function is similar to toastMapMeshToBasis, but in addition it also
+removes any voxels that do not overlap with the problem domain defined by the
+mesh. The s-basis represents the solution basis of the inverse solver.
+
+<h2>See also</h2>
+<a href="basis.html">Basis definitions</a>,
+<a href="toastSetBasis.html">toastSetBasis</a>,
+<a href="toastMapMeshToBasis.html">toastMapMeshToBasis</a>,
+<a href="toastMapBasisToMesh.html">toastMapBasisToMesh</a>,
+<a href="toastMapGridToMesh.html">toastMapGridToMesh</a>,
+<a href="toastMapGridToBasis.html">toastMapGridToBasis</a>,
+<a href="toastMapGridToSol.html">toastMapGridToSol</a>
+</div>
+
+</body>
+</html>

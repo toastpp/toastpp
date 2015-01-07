@@ -1,0 +1,40 @@
+#!/bin/csh
+# 09/25/1999 ###########################################################
+#                                                                      #
+# cleaner is a script file to perform cleaning operations.             #
+# =======                                                              #
+#                                                                      #
+# usage:                                                               #
+#                                                                      #
+#      cleaner [-o]                                                    #
+#                                                                      #
+########################################################################
+
+@ narg = $#argv
+
+if ( -e ./src/double/MACROS ) then
+   rm -f ./src/double/*.o
+   rm -f ./src/double/MACROS
+   rm -f ./src/double/blzaux.f
+endif
+if ( -e ./src/single/MACROS ) then
+   rm -f ./src/single/*.o
+   rm -f ./src/single/MACROS
+   rm -f ./src/single/blzaux.f
+endif
+
+if ( $narg == 0 ) then
+   rm -f ./drv/data/*.x
+   rm -f ./drv/data/*.out
+   rm -f ./drv/double/*.o
+   rm -f ./drv/double/*.x
+   rm -f ./drv/double/MACROS
+   rm -f ./drv/single/*.o
+   rm -f ./drv/single/*.x
+   rm -f ./drv/single/MACROS
+   if ( -e ./lib/libblzpack.a ) rm -f ./lib/libblzpack.a
+   if ( -e ./lib/precision ) rm -f ./lib/precision
+   if ( -e ./lib/install ) rm -f ./lib/install
+endif
+
+# end of cleaner #######################################################

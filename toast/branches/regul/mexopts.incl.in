@@ -1,0 +1,49 @@
+# ===========================================================================
+# Toast-specific compiler and linker options for compiling toast-matlab
+# functions with mex.
+#
+#                  !!! IMPORTANT !!!
+#
+# Add the following line to the _END_ of your mexopts.sh file:
+#
+# 	. $TOASTVER/mexopts.incl
+#
+# If you have multiple toast binary targets and want to pick a specific one
+# for matlab, use something like this:
+#
+#	. $TOASTDIR/gcc3.4.6_shared/mexopts.incl
+#
+# ===========================================================================
+
+TOAST_SRC="$TOASTDIR/src"
+
+TOAST_INC="-I$TOASTDIR -I$TOASTDIR/include -I$TOAST_SRC/libmath -I$TOAST_SRC/libfe -I$TOAST_SRC/libstoast -I$TOAST_SRC/libbemdiff -I$TOAST_SRC/libbem -I$TOAST_SRC/libdgfe -I$TOASTDIR/numerics/SuperLU_4.3/SRC -I$TOASTDIR/numerics/ILUPACK/include"
+
+TOAST_LIB="-L $TOASTDIR/@OBJDIR@/lib -ldgfe -lbemdiff -lbem -lstoast -lfe -lmath -larpack @SUPERLULIB@ @LAPACKLIB@ @BLASLIB@ -lfsbtk -llbfgs @FLIBS@"
+
+if test "@TOAST_FDOT@" = "1" ; then
+	TOAST_INC="$TOAST_INC @OGLINC@ -I$TOAST_SRC/libfdot -DFDOT"
+	TOAST_LIB="$TOAST_LIB -lfdot @OGLLIB@"
+fi
+
+TOAST_FLAG="-Wno-deprecated $TOAST_INC @MATLAB_TOASTFLAGS@"
+
+if test "$Arch" = "maci" -o "$Arch" = "maci64"; then
+	TOAST_FLAG="$TOAST_FLAG -Wl,-rpath,$TOASTVER/lib"
+fi
+
+
+# ===========================================================================
+# BEM-specific settings (uncomment for compiling matlab-bem
+# ===========================================================================
+#    TOAST_INC="$TOAST_INC -I $TOAST_SRC/libbemadj3d"
+#    TOAST_LIB="$TOAST_LIB -lbemadj3d"
+#    TOAST_FLAG="-Wno-deprecated $TOAST_INC"
+# ===========================================================================
+# end BEM-specific settings
+# ===========================================================================
+
+
+
+CXXFLAGS="$CXXFLAGS $TOAST_FLAG"
+CXXLIBS="$CXXLIBS $TOAST_LIB"

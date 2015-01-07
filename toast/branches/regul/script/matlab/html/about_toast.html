@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>What is TOAST?</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt; 
+<a href="about.html">Getting started</a> &gt;
+What is TOAST?
+</div>
+
+<h1>What is TOAST?</h1>
+<p>TOAST is a software suite for image reconstruction in optical diffusion tomography (ODT).
+ODT seeks to recover the spatial distribution of the optical parameters of a scattering object from
+boundary measurements of light transmission between a set of infrared light sources and a set of detectors.
+<p>The main application of ODT is in medical imaging, where the optical parameters are related to important
+physiological tissue parameters such as the oxygenation level of blood and tissue.
+<p>Parameter reconstruction in ODT is a nonlinear ill-posed inverse problem. Infrared light is highly
+scattered in biological tissues, and propagates as a diffuse photon density wave rather than in a straight
+path. The spatital sensitivity distribution of a measurement (photon measurement density function, PMDF)
+depends itself on the unknown optical parameters.
+<p>TOAST uses a model-based iterative approach to the ODT reconstruction problem. A numerical model of
+diffuse light transport is applied to the current parameter estimate at each step, and an objective function
+is defined as a norm of the difference between measurement and model data. The reconstruction problem is then
+formulated in terms of minimisation of the objective function. The problem is linearised around the current
+estimate at each step to find an update direction and update step.
+
+<h2>TOAST Features</h2>
+<ul>
+<li>Available for Windows and Linux platforms.
+<li>Diffusion light transport model using a finite element (FEM) forward solver.
+<li>Can be applied to 2D and 3D problems.
+<li>Multiple element types (triangles, tetrahedra, pixels, voxels) and multiple orders of polynomial
+shape functions (linear, quadratic cubic) to accommodate different problem geometries.
+<li>Selection of inverse solvers (gradient-type, Newton-type)
+<li>Selection of regularisation methods
+</ul>
+
+<h2>Where to get TOAST</h2>
+TOAST is being developed by Martin Schweiger and Simon Arridge at University College London, UK. The TOAST
+executables for Windows and Linux can be downloaded for free from the
+<a href="http://web4.cs.ucl.ac.uk/research/vis/toast/">TOAST web site</a>.
+<p>&nbsp;
+
+<table bgcolor="#FFFFB0" border="2px">
+<tr><td>
+Why 'TOAST'?<br>
+TOAST stands for 'Time-resolved Optical Absorption and Scattering Tomography'. Although the current version
+of TOAST emphasizes frequency-domain measurement systems, we have kept the acronym, because 'FOAST' hasn't
+got quite the same ring to it.
+</td></tr>
+</table>
+
+</body>
+</html>

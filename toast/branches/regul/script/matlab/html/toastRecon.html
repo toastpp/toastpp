@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>toastRecon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastRecon
+</div>
+
+<div class="param">
+<h1>toastRecon</h1>
+<p>The TOAST inverse solver for image reconstruction in optical tomography.
+
+<h2>Syntax</h2>
+<div class="code">
+toastRecon (prm)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>prm</td><td><i>struct</i></td><td>contains options and parameters for the inverse solver</td></tr>
+</table>
+
+<h2>Notes</h2>
+<p>This is a high-level function that contains the TOAST nonlinear iterative inverse solver for reconstructing absorption and scattering images from frequency-domain boundary data of light transillumination.
+
+<p>The solver uses a regularised Gauss-Newton scheme or nonlinear conjugate gradient scheme to iteratively minimise an objective function defined as a least-squares difference between measurements and forward model parameters for a given estimate of optical coefficients.
+
+<p>All model parameters and options are provided by the 'prm' input argument.
+For a description of the prm structure, see <a href="prm.html">Parameter
+structure</a>.
+
+<p>prm can either be generated manually, read from a file with <a href="toastReadParam.html">toastReadParam</a>, or defined interactively with a GUI tool,
+<a href="recon_gui.html">recon_gui</a>.
+
+<h2>See also</h2>
+<a href="prm.html">Parameter structure</a>,
+<a href="toastReadParam.html">toastReadParam</a>,
+<a href="recon_gui.html">recon_gui</a>,
+<a href="toastFwd.html">toastFwd</a>
+
+</div>
+</body>
+</html>

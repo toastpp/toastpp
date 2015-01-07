@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>toastLineSearch</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastLineSearch
+</div>
+
+<h1>toastLineSearch</h1>
+<p>1-D approximate minimisation of an objective function &Psi;(x) along a given search direction.
+
+<h2>Syntax</h2>
+<div class="code">
+[s pmin] = toastLineSearch (x0, d, s0, p0, func, ...)
+</div>
+
+<h2>Parameters</h2>
+<div class="param">
+<table>
+<tr><td><b>[In]</b></td>
+  <td>x0</td><td><i>real [n]</i></td><td>current parameter estimate x<sub>0</sub></td></tr>
+  <tr><td></td>
+  <td>d</td><td><i>real [n]</i></td><td>search direction</td></tr>
+  <tr><td></td>
+  <td>s0</td><td><i>real</i></td><td>initial step size</td></tr>
+  <tr><td></td>
+  <td>p0</td><td><i>real</i></td><td>initial value of objective function &Psi;(x<sub>0</sub>)</td></tr>
+  <tr><td></td>
+  <td>func</td><td><i>function pointer</i></td><td>callback function for objective evaluation. Format:<br>
+     function p = func(x, ...)</td></tr>
+  <tr><td></td>
+  <td>...</td><td><i></i></td><td>any additional parameters to be passed to func</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>s</td><td><i>real</i></td><td>final step size</td></tr>
+<tr><td></td>
+  <td>pmin</td><td><i>real</i></td><td>final value of objective function, &Psi;(x<sub>0</sub> + sd)</td></tr>
+    </table>
+  </td></tr>
+</table>
+</div>
+ 
+<h2>Notes</h2>
+<p>Performs an approximate minimisation of a function &Psi;(x<sub>0</sub> + s*d),
+  where x<sub>0</sub> is the initial parameter set, d is the search direction, and s
+  is the step size being optimised.
+  
+<p>x0 and d must be provided as vectors of equal size. The actual size n is of no
+  importance to toastLineSearch, because it simply passes the trial step x0+s*d on
+  to the callback function func.
+
+<p>toastLineSearch is independent of the actual realisation of &Psi;. The calling
+  function must provide a pointer to a function which evaluates &Psi; for given x.  
+
+<p>toastLineSearch works by first bracketing the minimum, and then performing a quadratic
+  interpolation step. d is required to be a downhill direction in the vicinity of x<sub>0</sub>.
+
+</body>
+</html>

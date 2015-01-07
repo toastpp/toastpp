@@ -1,0 +1,56 @@
+<html>
+<head>
+<title>toastLabelRegion</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastLabelRegion
+</div>
+
+<div class="param">
+<h1>toastLabelRegion</h1>
+<p>Assign node labels within a volume defined by a surface.
+
+<h2>Syntax</h2>
+<div class="code">
+L = toastLabelRegion (hMesh, vtx, idx, val)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+<tr><td></td>
+  <td>vtx</td><td><i>real matrix [h x 3]</i></td><td>matrix of h surface vertices</td></tr>
+<tr><td></td>
+  <td>idx</td><td><i>integer matrix [f x 3]</i></td><td>matrix of f surface triangle indices</td></tr>
+<tr><td></td>
+  <td>val</td><td><i>integer</i></td><td>label value for internal nodes</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>L</td><td><i>integer vector [h]</i></td><td>array of new mesh labels</td>
+</tr></table>
+
+<h2>Notes</h2>
+<p>Given a mesh and a closed surface composed of triangles, this function
+  assigns a region label to each mesh node inside the surface. Labels of
+  external nodes remain unchanged.
+ 
+<p>The surface is defined by vertex coordinates (vtx) and a list of triangles,
+  each of which is represented by a triplet of node indices (1-based).
+  The surface must be closed.
+ 
+<p>When calling toastLabelRegion repeatedly for concentric shells, start with
+  the outermost one and work your way inside, since the labels in the external
+  region remain untouched.
+ 
+<p>The list of modified node labels is returned by the function, but the mesh
+  associated with hMesh is also directly updated, so writing out the mesh
+  with toastWriteMesh will contain the new label settings.
+</div>
+</body>
+</html>

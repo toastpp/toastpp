@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>toastJacobian</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastJacobian
+</div>
+
+<h1>toastJacobian</h1>
+<p>Return the frequecny-domain Jacobian matrix of the forward operator.
+
+<h2>Syntax</h2>
+<div class="code">
+J = toastJacobian (hMesh, hBasis, qvec, mvec, mua, mus, ref, freq, solver, tol)
+</div>
+
+<h2>Parameters</h2>
+<div class="param">
+<table>
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>hBasis</td><td><i>handle</i></td><td>basis mapper handle</td></tr>
+  <tr><td></td>
+  <td>qvec</td><td><i>complex sparse matrix [h x nq]</i></td><td>array of source vectors</td></tr>
+  <tr><td></td>
+  <td>mvec</td><td><i>complex sparse matrix [h x nm]</i></td><td>array of measurement vectors</td></tr>
+  <tr><td></td>
+  <td>mua</td><td><i>real vector [h]</i></td><td>nodal absorption coefficients</td></tr>
+  <tr><td></td>
+  <td>mus</td><td><i>real vector [h]</i></td><td>nodal scattering coefficients</td></tr>
+  <tr><td></td>
+  <td>ref</td><td><i>real vector [h]</i></td><td>nodal refractive index values</td></tr>
+  <tr><td></td>
+  <td>freq</td><td><i>real</i></td><td>source modulation frequency [MHz]</td></tr>
+  <tr><td></td>
+  <td>solver</td><td><i>string</i></td><td>linear solver method [DIRECT | CG | BICG | BICGSTAB | GMRES | GAUSSSEIDEL]</td></tr>
+  <tr><td></td>
+  <td>tol</td><td><i>real</i></td><td>solver tolerance (ignored for solver DIRECT)</td>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>J</td><td><i>real matrix [2nqm x 2s]</i></td><td>Jacobian matrix</td>
+</tr></table>
+</div>
+<p>Dimensions: <i>h</i> = size of <a href="basis.html">h-basis</a>,
+ <i>s</i> = size of <a href="basis.html">s-basis</a>,
+ <i>nq</i> = number of sources,
+ <i>nm</i> = number of detectors,
+ <i>nqm</i> = number of measurements
+ 
+<h2>Notes</h2>
+<p>Calculates the derivative of the data (log amplitude and phase) with respect
+  to the coefficients (absorption and diffusion) of the forward operator.
+  J consists of 4 blocks: d lnmod / d mua (top left), d lnmod / d kappa (top
+  right), d phase / d mua (bottom left), and d phase / d kappa (bottom right).
+  Dimension of J is 2nqm x 2s, where nqm is the number of measurements, and s is
+  the dimension of the reconstruction basis.
+ 
+<p>Please be aware that the returned Jacobian must be interpreted as a pointwise
+  function dy/dx(<b>r</b>) over the domain. To a apply it to an area of perturbation
+  of finite size, J must be integrated over that area. Specifically, if J is to be
+  applied to the voxel grid of the regular g- or b-<a href="basis.html">basis</a>
+  definition, all elements of J must be multiplied by the voxel size. For example,
+  <div class="code">
+  [bbmin bbmax] = toastMeshBB(hMesh);<br>
+  voxsize = prod ((bbmax-bbmin) ./ gdim);<br>
+  J = J * voxsize;
+  </div>
+<p>where gdim contains the grid dimensions of the appropriate regular voxel basis. Note
+  that neglecting this scaling is usually not critical, since for a regular basis it
+  only amounts to a constant scaling factor.
+
+<p>If hBasis is set to 0, the Jacobian is constructed directly in the mesh
+  basis. s in that case is equal to the number of nodes.
+
+</body>
+</html>

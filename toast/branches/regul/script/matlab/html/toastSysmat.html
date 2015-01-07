@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>toastSysmat</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastSysmat
+</div>
+
+<div class="param">
+<h1>toastSysmat</h1>
+<p>Generate an FEM system matrix for solving the frequency-domain diffusion equation.
+
+<h2>Syntax</h2>
+<div class="code">
+S = toastSysmat (hMesh, mua, mus, ref, freq)
+</div>
+
+<h2>Parameters</h2>
+<table bgcolor="#F0F0FF">
+<tr><td><b>[In]</b></td>
+  <td>hMesh</td><td><i>handle</i></td><td>mesh handle</td></tr>
+  <tr><td></td>
+  <td>mua</td><td><i>real [h]</i></td><td>nodal absorption coefficient values [1/mm]</td></tr>
+  <tr><td></td>
+  <td>mus</td><td><i>real [h]</i></td><td>nodal reduced scattering coefficient values [1/mm]</td></tr>
+  <tr><td></td>
+  <td>ref</td><td><i>real [h]</i></td><td>nodal refractive index values [1/mm]</td></tr>
+  <tr><td></td>
+  <td>freq</td><td><i>real</i></td><td>source modulation frequency [MHz]</td></tr>
+</tr>
+<tr><td><b>[Out]</b></td>
+  <td>S</td><td><i>complex sparse [h x h]</i></td><td>FEM system matrix for frequency domain diffusion equation</td></tr>
+</tr></table>
+Dimensions: <i>h</i> = size of <a href="basis.html">h-basis</a>
+
+<h2>Notes</h2>
+<p>Returns a sparse complex h x h matrix (h: number of nodes in the mesh)
+  containing system matrix S. S is the sum of three components: an
+  absorption-dependent real matrix of products of element shape functions, a
+  diffusion-dependent real matrix of products of element shape function
+  derivatives, and a frequency-dependent imaginary matrix of products of
+  element shape functions.
+ 
+<p>S is required for the evaluation of the frequency-domain FEM diffusion
+  equation. Given a source vector Q of size h, the FEM solution for the
+  nodal photon density distribution &Phi; is obtained by solving
+  <div class="code">
+  S&Phi; = Q
+  </div>
+ 
+<p>If the source modulation frequency is set to 0, the imaginary part of S
+  is zero. In this case, the real part can be used to solve the steady-state
+  diffusion equation, or, in combination with the <a href="toastMassmat.html">mass matrix</a>,
+  it can be used to solve the time-dependent diffusion equation.
+  
+<h2>See also</h2>
+  <a href="toastMassmat.html">toastMassmat</a>,
+  <a href="toastFields.html">toastFields</a>
+  
+</div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>toastKrylov</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="functions_alpha.html">Functions</a> &gt;
+toastKrylov
+</div>
+
+<h1>toastKrylov</h1>
+<p>Solves the linear system H&Delta;x=g iteratively with a GMRES (generalised
+minimum residual) solver, using an impicit representation of H.
+
+<h2>Syntax</h2>
+<div class="code">
+[dx flag] = toastKrylov (x, J, g, M, lambda, hReg, tol)
+</div>
+
+<h2>Parameters</h2>
+<div class="param">
+<table>
+<tr><td><b>[In]</b></td>
+  <td>x</td><td><i>real vector [2s]</i></td><td>current estimate of solution vector</td></tr>
+  <tr><td></td>
+  <td>J</td><td><i>real matrix [2nqm x 2s]</i></td><td>Jacobian matrix</td></tr>
+  <tr><td></td>
+  <td>g</td><td><i>real vector [2s]</i></td><td>gradient vector</td></tr>
+  <tr><td></td>
+  <td>M</td><td><i>real vector [2s]</i></td><td>diagonal scaling matrix for Hessian H</td></tr>
+  <tr><td></td>
+  <td>lambda</td><td><i>real</i></td><td>Levenberg-Marquardt control parameter &lambda;</td></tr>
+  <tr><td></td>
+  <td>hReg</td><td><i>handle</i></td><td>regularisation instance handle</td></tr>
+  <tr><td></td>
+  <td>tol</td><td><i>real</i></td><td>tolerance limit for GMRES solver</td></tr>
+<tr><td><b>[Out]</b></td>
+  <td>dx</td><td><i>real vector [2s]</i></td><td>solution of linear system</td></tr>
+<tr><td></td>
+  <td>flag</td><td><i>struct</i></td><td>(optional) solve statistics. The
+    structure contains the following fields:
+    <p><table class="inline" col="3">
+    <tr><td>flag.iter</td><td><i>integer</i></td><td>number of (major) iterations</td></tr>
+    <tr><td>flag.time</td><td><i>real</i></td><td>solve CPU time [s]</td></tr>
+    <tr><td>flag.res</td><td><i>real</i></td><td>relative residual on exit</td></tr>
+    </table>
+  </td></tr>
+</table>
+</div>
+<p>Dimensions: <i>s</i> = size of <a href="basis.html">s-basis</a>,
+ <i>nqm</i> = number of measurements
+ 
+<h2>Notes</h2>
+<p>The Krylov solver is the core component of the Gauss-Newton iterative solver for the
+nonlinear inverse problem. It solves the linear problem
+<div class="code">
+&Delta;x<sub>i</sub> = x<sub>i+1</sub> - x<sub>i</sub> = H<sub>i</sub><sup>-1</sup> g<sub>i</sub>
+</div>
+at iteration i, where the Hessian H is approximated by
+<div class="code">
+H<sub>i</sub> = H(x<sub>i</sub>) = J<sup>T</sup>(x<sub>i</sub>) J(x<sub>i</sub>) + M<sub>i</sub> &psi;"(x<sub>i</sub>) M<sub>i</sub> + &lambda; I,
+</div>
+where J is the Jacobian, &psi; is the regularisation operator, M is a diagonal scaling
+matrix, and &lambda; is the Levenberg-Marquardt control parameter.
+
+<p>Note that the scaling matrix M is assumed to have already been applied to the Jacobian
+J on input.
+
+<h2>Alternatives</h2>
+<p>An alternative to calling toastKrylov is to use of one of Matlab's built-in Krylov solvers, such
+as bicgstab or gmres, using their implicit matrix interface (i.e. providing a function
+pointer that performs the required matrix-vector products). Example:
+<div class="code">
+J = toastJacobian (...);<br>
+HessReg = toastRegulHess (...);<br>
+dx = bicgstab (@Hx, g, tol);<br>
+...<br>
+function z = Hx(x)    % Krylov matrix-vector callback<br>
+&nbsp; z = J' * (J*x);     % apply Gauss-Newton term<br>
+&nbsp; z = z + HessReg*x;  % apply Hessian of regularisation term<br>
+end
+</div>
+It is convenient to nest the callback function for the Krylov matrix-vector product
+into the scope of the calling function, so that it has access to any required data
+structures (such as the Jacobian J and Hessian of the regularisation term, HessReg,
+in the example above).
+
+<h2>See also</h2>
+<a href="toastJacobian.html">toastJacobian</a>,
+<a href="toastRegulHess.html">toastRegulHess</a>
+</body>
+</html>

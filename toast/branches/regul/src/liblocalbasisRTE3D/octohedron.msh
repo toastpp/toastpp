@@ -1,0 +1,34 @@
+MeshData 5.0
+
+NodeList 6 1
+B[ 0 0 1]R0
+B[ 1 0 0]R0
+B[ 0 1 0]R0
+B[ -1 0 0]R0
+B[ 0 -1 0]R0
+B[ 0 0 -1]R0
+
+ElementList 8
+p   1 2 3
+p   1 3 4
+p   1 4 5
+p   1 5 2
+p   6 3 2
+p   6 4 3
+p   6 5 4 
+p   6 2 5
+
+[ParameterList]
+Size 6
+Param1 MUA
+Param2 KAPPA
+Param3 N
+Data
+0.01 0.330033 1.4
+0.01 0.330033 1.4
+0.01 0.330033 1.4
+0.01 0.330033 1.4
+0.01 0.330033 1.4
+0.01 0.330033 1.4
+
+

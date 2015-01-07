@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>TOAST Demo 5</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<LINK REL="stylesheet" HREF="toast.css" TYPE="TEXT/CSS">
+<LINK REL="stylesheet" HREF="demo.css" TYPE="TEXT/CSS">
+</head>
+
+<body>
+<body>
+<div class="header">
+   <div class="left"><a href="matlab:edit toast_demo5">Open source in the editor</a></div>
+   <div class="right"><a href="matlab:rundemo('toast_demo5')">Run this demo</a></div>
+</div>
+
+<div class="content">
+<div class="navbar">
+<a href="toast.html">TOAST</a> &gt;
+<a href="matlab:demo toolbox toast">Demos</a> &gt;
+Demo 5
+</div>
+
+<table col="2">
+<tr><td width="64px"><img src="toast_demo5.png"></td>
+<td><h1>TOAST Demo 5: Structural priors</h1></td>
+</tr></table>
+<p>The reconstruction can be
+improved by introducing prior
+knowledge about the expected
+structure of the images.
+
+<p>In this example, the prior is used
+to scale down the regularisation
+parameter along known edges in
+the images. This prevents the
+edges to be smoothed out by the
+prior.
+
+<p>Select one of the prior references.
+Adjust the smoothing factor
+(smaller values make the edge
+areas thinner and increase
+background noise), the
+threshold value (larger values
+decrease the magnitude of the
+edge scaling) and hyperparameter
+(balancing the relative weighting
+between prior and likelihood
+terms).
+
+<p>Then click 'Run' to start the
+reconstruction.
+
+
+</div>
+
+</body>
+</html>

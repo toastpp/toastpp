@@ -1,0 +1,91 @@
+#!/bin/csh
+########################################################################
+#                                                                      #
+# .d2s is a script file that creates the single precision version of   #
+# ==== BLZPACK from the double precision version.                      #
+#                                                                      #
+# usage:                                                               #
+#                                                                      #
+#     .d2s                                                             #
+#                                                                      #
+########################################################################
+
+# source files #########################################################
+
+cd ./src/double
+
+foreach file ( *.f )
+   echo '* single precision version:' $file 
+   sed -e s/"DOUBLE PRECISION"/"REAL            "/g $file | \
+   sed -e s/"DSBTRD"/"SSBTRD"/g                           | \
+   sed -e s/"DSTEGR"/"SSTEGR"/g                           | \
+   sed -e s/"PIDGTR"/"PISGTR"/g                           | \
+   sed -e s/"PIDRED"/"PISRED"/g                           | \
+   sed -e s/"IDAMAX"/"ISAMAX"/g                           | \
+   sed -e s/"DASUM"/"SASUM"/g                             | \
+   sed -e s/"DAXPY"/"SAXPY"/g                             | \
+   sed -e s/"DCOPY"/"SCOPY"/g                             | \
+   sed -e s/"DGEMM"/"SGEMM"/g                             | \
+   sed -e s/"DGEMV"/"SGEMV"/g                             | \
+   sed -e s/"DSCAL"/"SSCAL"/g                             | \
+   sed -e s/"DSWAP"/"SSWAP"/g                             | \
+   sed -e s/"DTRMM"/"STRMM"/g                             | \
+   sed -e s/"DDOT"/"SDOT"/g                               | \
+   sed -e s/"DGER"/"SGER"/g                               | \
+   sed -e s/"DBLE"/"REAL"/g                               | \
+   sed -e s/"0D0"/"0E0"/g                                 | \
+   sed -e s/"0D+"/"0E+"/g                                 > \
+   ! ../single/$file
+end
+
+cd ../single
+sed -e s/"BLZDRD"/"BLZDRS"/g blzdrd.f > ! blzdrs.f
+rm blzdrd.f
+
+# drivers ##############################################################
+
+cd ../../drv/double
+
+foreach file ( drvgp*.f drvsp*.f drvmpi.f drvpvm.f prteig.f )
+   echo '* single precision version:' $file 
+   sed -e s/"MPI_DOUBLE_PRECISION"/"MPI_REAL            "/g $file | \
+   sed -e s/"DOUBLE PRECISION"/"REAL            "/g               | \
+   sed -e s/"PIDGTR"/"PISGTR"/g                                   | \
+   sed -e s/"BLZDRD"/"BLZDRS"/g                                   | \
+   sed -e s/"MA47AD"/"MA47A "/g                                   | \
+   sed -e s/"MA47BD"/"MA47B "/g                                   | \
+   sed -e s/"MA47CD"/"MA47C "/g                                   | \
+   sed -e s/"MA47ID"/"MA47I "/g                                   | \
+   sed -e s/"DAXPY"/"SAXPY"/g                                     | \
+   sed -e s/"DCOPY"/"SCOPY"/g                                     | \
+   sed -e s/"DGEMM"/"SGEMM"/g                                     | \
+   sed -e s/"DSYMM"/"SSYMM"/g                                     | \
+   sed -e s/"REAL8"/"REAL4"/g                                     | \
+   sed -e s/"0D0"/"0E0"/g                                         > \
+   ! ../single/$file
+end
+
+# systems dependencies #################################################
+
+cd ../../sys/double
+
+foreach file ( *.f )
+   echo '* single precision version:' $file 
+   sed -e s/"DOUBLE PRECISION"/"REAL            "/g $file | \
+   sed -e s/"DBLE"/"REAL"/g                               > \
+   ! ../single/$file
+end
+
+# interfaces ###########################################################
+
+cd ../../etc/double
+
+foreach file ( MPI.f PVM.f SEQ.f rstorr.f )
+   echo '* single precision version:' $file 
+   sed -e s/"MPI_DOUBLE_PRECISION"/"MPI_REAL            "/g $file | \
+   sed -e s/"DOUBLE PRECISION"/"REAL            "/g               | \
+   sed -e s/"PIDGTR"/"PISGTR"/g                                   | \
+   sed -e s/"PIDRED"/"PISRED"/g                                   | \
+   sed -e s/"REAL8"/"REAL4"/g                                     > \
+   ! ../single/$file
+end

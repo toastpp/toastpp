@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="pthreads"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(PthreadsIncludeDir)&quot;"
+		PreprocessorDefinitions="TOAST_THREAD"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="$(PthreadsLibName)"
+		AdditionalLibraryDirectories="&quot;$(PthreadsLibDir)&quot;"
+	/>
+	<Tool
+		Name="VCPreBuildEventTool"
+		CommandLine="if not exist &quot;$(ToastBinDir)&quot; mkdir &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;copy &quot;$(PthreadsDllDir)$(PthreadsDllName)&quot; &quot;$(ToastBinDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastMexDir)&quot; mkdir &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;copy &quot;$(PthreadsDllDir)$(PthreadsDllName)&quot; &quot;$(ToastMexDir)&quot;&#x0D;&#x0A;if not exist &quot;$(ToastMex2Dir)&quot; mkdir &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(PthreadsDllDir)$(PthreadsDllName)&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;"
+	/>
+	<UserMacro
+		Name="PthreadsDir"
+		Value="$(ExtPackageDir)pthreads\Pre-built.2\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="PthreadsLibDir"
+		Value="$(PthreadsDir)lib\x64\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="PthreadsIncludeDir"
+		Value="$(PthreadsDir)include\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="PthreadsDllDir"
+		Value="$(PthreadsDir)dll\x64\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="PthreadsLibName"
+		Value="pthreadVC2.lib"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="PthreadsDllName"
+		Value="pthreadVC2.dll"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

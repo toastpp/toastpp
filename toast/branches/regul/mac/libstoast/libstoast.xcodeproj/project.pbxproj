@@ -1,0 +1,368 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F229E9EB195C7749003F34BC /* fwdsolver_cslu.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9D5195C7749003F34BC /* fwdsolver_cslu.cc */; };
+		F229E9EC195C7749003F34BC /* fwdsolver_mw.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9D6195C7749003F34BC /* fwdsolver_mw.cc */; };
+		F229E9ED195C7749003F34BC /* fwdsolver_zslu.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9D7195C7749003F34BC /* fwdsolver_zslu.cc */; };
+		F229E9EE195C7749003F34BC /* fwdsolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9D8195C7749003F34BC /* fwdsolver.cc */; };
+		F229E9EF195C7749003F34BC /* jacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9D9195C7749003F34BC /* jacobian.cc */; };
+		F229E9F0195C7749003F34BC /* lsearch.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9DA195C7749003F34BC /* lsearch.cc */; };
+		F229E9F1195C7749003F34BC /* mwsolution.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9DB195C7749003F34BC /* mwsolution.cc */; };
+		F229E9F2195C7749003F34BC /* of.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9DC195C7749003F34BC /* of.cc */; };
+		F229E9F3195C7749003F34BC /* pparse.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9DD195C7749003F34BC /* pparse.cc */; };
+		F229E9F4195C7749003F34BC /* pscaler.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9DE195C7749003F34BC /* pscaler.cc */; };
+		F229E9F5195C7749003F34BC /* raster_bb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9DF195C7749003F34BC /* raster_bb.cc */; };
+		F229E9F6195C7749003F34BC /* raster_bl.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E0195C7749003F34BC /* raster_bl.cc */; };
+		F229E9F7195C7749003F34BC /* raster_cp.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E1195C7749003F34BC /* raster_cp.cc */; };
+		F229E9F8195C7749003F34BC /* raster_gb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E2195C7749003F34BC /* raster_gb.cc */; };
+		F229E9F9195C7749003F34BC /* raster_hb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E3195C7749003F34BC /* raster_hb.cc */; };
+		F229E9FA195C7749003F34BC /* raster_px.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E4195C7749003F34BC /* raster_px.cc */; };
+		F229E9FB195C7749003F34BC /* raster_rb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E5195C7749003F34BC /* raster_rb.cc */; };
+		F229E9FC195C7749003F34BC /* raster_sb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E6195C7749003F34BC /* raster_sb.cc */; };
+		F229E9FD195C7749003F34BC /* raster.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E7195C7749003F34BC /* raster.cc */; };
+		F229E9FE195C7749003F34BC /* regul.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E8195C7749003F34BC /* regul.cc */; };
+		F229E9FF195C7749003F34BC /* solution.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E9195C7749003F34BC /* solution.cc */; };
+		F229EA00195C7749003F34BC /* source.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9EA195C7749003F34BC /* source.cc */; };
+		F229EA06195C784D003F34BC /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA05195C784D003F34BC /* libsuperlu.dylib */; };
+		F229EA08195C7857003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA07195C7857003F34BC /* libfe.dylib */; };
+		F229EA0A195C7865003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA09195C7865003F34BC /* libmath.dylib */; };
+		F25A48C719804D0500656531 /* raster_px2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F25A48C619804D0500656531 /* raster_px2.cc */; };
+		F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229E9CE195C7652003F34BC /* libstoast.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2ED64F7195CB08F006CD663 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../lib";
+			dstSubfolderSpec = 0;
+			files = (
+				F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F229E9CE195C7652003F34BC /* libstoast.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libstoast.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		F229E9D5195C7749003F34BC /* fwdsolver_cslu.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fwdsolver_cslu.cc; path = ../../src/libstoast/fwdsolver_cslu.cc; sourceTree = "<group>"; };
+		F229E9D6195C7749003F34BC /* fwdsolver_mw.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fwdsolver_mw.cc; path = ../../src/libstoast/fwdsolver_mw.cc; sourceTree = "<group>"; };
+		F229E9D7195C7749003F34BC /* fwdsolver_zslu.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fwdsolver_zslu.cc; path = ../../src/libstoast/fwdsolver_zslu.cc; sourceTree = "<group>"; };
+		F229E9D8195C7749003F34BC /* fwdsolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fwdsolver.cc; path = ../../src/libstoast/fwdsolver.cc; sourceTree = "<group>"; };
+		F229E9D9195C7749003F34BC /* jacobian.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jacobian.cc; path = ../../src/libstoast/jacobian.cc; sourceTree = "<group>"; };
+		F229E9DA195C7749003F34BC /* lsearch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lsearch.cc; path = ../../src/libstoast/lsearch.cc; sourceTree = "<group>"; };
+		F229E9DB195C7749003F34BC /* mwsolution.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mwsolution.cc; path = ../../src/libstoast/mwsolution.cc; sourceTree = "<group>"; };
+		F229E9DC195C7749003F34BC /* of.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = of.cc; path = ../../src/libstoast/of.cc; sourceTree = "<group>"; };
+		F229E9DD195C7749003F34BC /* pparse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pparse.cc; path = ../../src/libstoast/pparse.cc; sourceTree = "<group>"; };
+		F229E9DE195C7749003F34BC /* pscaler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pscaler.cc; path = ../../src/libstoast/pscaler.cc; sourceTree = "<group>"; };
+		F229E9DF195C7749003F34BC /* raster_bb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_bb.cc; path = ../../src/libstoast/raster_bb.cc; sourceTree = "<group>"; };
+		F229E9E0195C7749003F34BC /* raster_bl.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_bl.cc; path = ../../src/libstoast/raster_bl.cc; sourceTree = "<group>"; };
+		F229E9E1195C7749003F34BC /* raster_cp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_cp.cc; path = ../../src/libstoast/raster_cp.cc; sourceTree = "<group>"; };
+		F229E9E2195C7749003F34BC /* raster_gb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_gb.cc; path = ../../src/libstoast/raster_gb.cc; sourceTree = "<group>"; };
+		F229E9E3195C7749003F34BC /* raster_hb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_hb.cc; path = ../../src/libstoast/raster_hb.cc; sourceTree = "<group>"; };
+		F229E9E4195C7749003F34BC /* raster_px.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_px.cc; path = ../../src/libstoast/raster_px.cc; sourceTree = "<group>"; };
+		F229E9E5195C7749003F34BC /* raster_rb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_rb.cc; path = ../../src/libstoast/raster_rb.cc; sourceTree = "<group>"; };
+		F229E9E6195C7749003F34BC /* raster_sb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_sb.cc; path = ../../src/libstoast/raster_sb.cc; sourceTree = "<group>"; };
+		F229E9E7195C7749003F34BC /* raster.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster.cc; path = ../../src/libstoast/raster.cc; sourceTree = "<group>"; };
+		F229E9E8195C7749003F34BC /* regul.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = regul.cc; path = ../../src/libstoast/regul.cc; sourceTree = "<group>"; };
+		F229E9E9195C7749003F34BC /* solution.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = solution.cc; path = ../../src/libstoast/solution.cc; sourceTree = "<group>"; };
+		F229E9EA195C7749003F34BC /* source.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = source.cc; path = ../../src/libstoast/source.cc; sourceTree = "<group>"; };
+		F229EA05195C784D003F34BC /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = ../../gcc_shared/lib/libsuperlu.dylib; sourceTree = "<group>"; };
+		F229EA07195C7857003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
+		F229EA09195C7865003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
+		F25A48C619804D0500656531 /* raster_px2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_px2.cc; path = ../../src/libstoast/raster_px2.cc; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F229E9CB195C7652003F34BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F229EA0A195C7865003F34BC /* libmath.dylib in Frameworks */,
+				F229EA08195C7857003F34BC /* libfe.dylib in Frameworks */,
+				F229EA06195C784D003F34BC /* libsuperlu.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F229E9C5195C7652003F34BC = {
+			isa = PBXGroup;
+			children = (
+				F229EA09195C7865003F34BC /* libmath.dylib */,
+				F229EA07195C7857003F34BC /* libfe.dylib */,
+				F229EA05195C784D003F34BC /* libsuperlu.dylib */,
+				F229E9D5195C7749003F34BC /* fwdsolver_cslu.cc */,
+				F229E9D6195C7749003F34BC /* fwdsolver_mw.cc */,
+				F229E9D7195C7749003F34BC /* fwdsolver_zslu.cc */,
+				F229E9D8195C7749003F34BC /* fwdsolver.cc */,
+				F229E9D9195C7749003F34BC /* jacobian.cc */,
+				F25A48C619804D0500656531 /* raster_px2.cc */,
+				F229E9DA195C7749003F34BC /* lsearch.cc */,
+				F229E9DB195C7749003F34BC /* mwsolution.cc */,
+				F229E9DC195C7749003F34BC /* of.cc */,
+				F229E9DD195C7749003F34BC /* pparse.cc */,
+				F229E9DE195C7749003F34BC /* pscaler.cc */,
+				F229E9DF195C7749003F34BC /* raster_bb.cc */,
+				F229E9E0195C7749003F34BC /* raster_bl.cc */,
+				F229E9E1195C7749003F34BC /* raster_cp.cc */,
+				F229E9E2195C7749003F34BC /* raster_gb.cc */,
+				F229E9E3195C7749003F34BC /* raster_hb.cc */,
+				F229E9E4195C7749003F34BC /* raster_px.cc */,
+				F229E9E5195C7749003F34BC /* raster_rb.cc */,
+				F229E9E6195C7749003F34BC /* raster_sb.cc */,
+				F229E9E7195C7749003F34BC /* raster.cc */,
+				F229E9E8195C7749003F34BC /* regul.cc */,
+				F229E9E9195C7749003F34BC /* solution.cc */,
+				F229E9EA195C7749003F34BC /* source.cc */,
+				F229E9CF195C7652003F34BC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F229E9CF195C7652003F34BC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F229E9CE195C7652003F34BC /* libstoast.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F229E9CC195C7652003F34BC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F229E9CD195C7652003F34BC /* libstoast */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F229E9D2195C7652003F34BC /* Build configuration list for PBXNativeTarget "libstoast" */;
+			buildPhases = (
+				F229E9CA195C7652003F34BC /* Sources */,
+				F229E9CB195C7652003F34BC /* Frameworks */,
+				F229E9CC195C7652003F34BC /* Headers */,
+				F2ED64F7195CB08F006CD663 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libstoast;
+			productName = libstoast;
+			productReference = F229E9CE195C7652003F34BC /* libstoast.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F229E9C6195C7652003F34BC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = UCL;
+			};
+			buildConfigurationList = F229E9C9195C7652003F34BC /* Build configuration list for PBXProject "libstoast" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F229E9C5195C7652003F34BC;
+			productRefGroup = F229E9CF195C7652003F34BC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F229E9CD195C7652003F34BC /* libstoast */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F229E9CA195C7652003F34BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F229E9F1195C7749003F34BC /* mwsolution.cc in Sources */,
+				F229E9FC195C7749003F34BC /* raster_sb.cc in Sources */,
+				F229E9EF195C7749003F34BC /* jacobian.cc in Sources */,
+				F229E9FE195C7749003F34BC /* regul.cc in Sources */,
+				F229E9F6195C7749003F34BC /* raster_bl.cc in Sources */,
+				F229E9EE195C7749003F34BC /* fwdsolver.cc in Sources */,
+				F229E9F7195C7749003F34BC /* raster_cp.cc in Sources */,
+				F229E9F0195C7749003F34BC /* lsearch.cc in Sources */,
+				F229E9FD195C7749003F34BC /* raster.cc in Sources */,
+				F229E9EC195C7749003F34BC /* fwdsolver_mw.cc in Sources */,
+				F229E9F3195C7749003F34BC /* pparse.cc in Sources */,
+				F229E9FA195C7749003F34BC /* raster_px.cc in Sources */,
+				F229E9F4195C7749003F34BC /* pscaler.cc in Sources */,
+				F25A48C719804D0500656531 /* raster_px2.cc in Sources */,
+				F229E9EB195C7749003F34BC /* fwdsolver_cslu.cc in Sources */,
+				F229EA00195C7749003F34BC /* source.cc in Sources */,
+				F229E9F9195C7749003F34BC /* raster_hb.cc in Sources */,
+				F229E9F2195C7749003F34BC /* of.cc in Sources */,
+				F229E9FF195C7749003F34BC /* solution.cc in Sources */,
+				F229E9FB195C7749003F34BC /* raster_rb.cc in Sources */,
+				F229E9F8195C7749003F34BC /* raster_gb.cc in Sources */,
+				F229E9ED195C7749003F34BC /* fwdsolver_zslu.cc in Sources */,
+				F229E9F5195C7749003F34BC /* raster_bb.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F229E9D0195C7652003F34BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F229E9D1195C7652003F34BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F229E9D3195C7652003F34BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					NEED_EXPLICIT_INSTANTIATION,
+				);
+				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../lib/\"",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.9;
+				SYMROOT = build;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
+			};
+			name = Debug;
+		};
+		F229E9D4195C7652003F34BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NEED_EXPLICIT_INSTANTIATION,
+					TOAST_THREAD,
+				);
+				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../lib/\"",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.9;
+				SYMROOT = build;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F229E9C9195C7652003F34BC /* Build configuration list for PBXProject "libstoast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F229E9D0195C7652003F34BC /* Debug */,
+				F229E9D1195C7652003F34BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F229E9D2195C7652003F34BC /* Build configuration list for PBXNativeTarget "libstoast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F229E9D3195C7652003F34BC /* Debug */,
+				F229E9D4195C7652003F34BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F229E9C6195C7652003F34BC /* Project object */;
+}

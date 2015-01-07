@@ -1,0 +1,34 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libdgfe
+LIB = $(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libdgfe
+
+all:: $(LIB)
+
+SRCS = 	nonconformingMesh.cc dgfwdsolver.cc dgSource.cc
+
+OBJS = ${SRCS:.cc=.o}
+HDRS = nonconformingMesh.h dgfwdsolver.h dgSource.h
+
+%.o : %.cc $(HDRS)
+	$(CXX) -fPIC $(STOASTINC) -c $<
+
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $^
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $^ $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) -lstoast -lfe -lmath $(MATHLIB)
+	
+clean:: 
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)

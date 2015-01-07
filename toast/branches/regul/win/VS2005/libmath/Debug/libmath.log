@@ -1,0 +1,2591 @@
+﻿Build started 09/11/2011 14:49:44.
+     1>Project "C:\Files\TOAST\win32\VS2005\libmath\libmath.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Debug\libmath.unsuccessfulbuild".
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I. /I..\..\.. /I..\..\..\include /IC:\Files\TOAST\win32\VS2005\..\..\ /IC:\Files\TOAST\win32\VS2005\..\..\include /IC:\Files\TOAST\win32\VS2005\..\..\src\libmath /IC:\Files\TOAST\win32\VS2005\..\..\src\libfe /IC:\Files\TOAST\win32\VS2005\..\..\src\libstoast /IC:\Files\TOAST\win32\VS2005\..\..\src\libbemdiff /IC:\Files\TOAST\win32\VS2005\..\..\src\libbem /IC:\Files\TOAST\win32\VS2005\..\..\numerics\SuperLU_4.1\SRC /IC:\Files\TOAST\win32\VS2005\..\..\numerics\ILUPACK\include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D LIBMATH_EXPORTS /D _CRT_SECURE_NO_DEPRECATE /D _CRT_SECURE_NO_DEPRECATE /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\src\libmath\cdmatrix.cc ..\..\..\src\libmath\complex.cc ..\..\..\src\libmath\cr_cholesky.cc ..\..\..\src\libmath\crmatrix.cc ..\..\..\src\libmath\crmatrix_cm.cc ..\..\..\src\libmath\dgmatrix.cc ..\..\..\src\libmath\dnsmatrix.cc ..\..\..\src\libmath\error.cc ..\..\..\src\libmath\fourn.cc ..\..\..\src\libmath\gmres.cc ..\..\..\src\libmath\gsmatrix.cc ..\..\..\src\libmath\ilutoast.cc ..\..\..\src\libmath\matrix.cc ..\..\..\src\libmath\nr.cc ..\..\..\src\libmath\precon.cc ..\..\..\src\libmath\scomplex.cc ..\..\..\src\libmath\scrmatrix.cc ..\..\..\src\libmath\symatrix.cc ..\..\..\src\libmath\timing.cc ..\..\..\src\libmath\util.cc ..\..\..\src\libmath\vector.cc
+         vector.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\matrix.h(534) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\matrix.h(541) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\precon.h(263) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.cc(925) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.cc(1070) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+         util.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         timing.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         symatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         scrmatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         scomplex.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         precon.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\precon.h(103): warning C4251: 'TPrecon_IC<MT>::L' : class 'TCompRowMatrix<MT>' needs to have dll-interface to be used by clients of class 'TPrecon_IC<MT>'
+                 with
+                 [
+                     MT=float
+                 ]
+                 c:\files\toast\src\libmath\precon.cc(443) : see reference to class template instantiation 'TPrecon_IC<MT>' being compiled
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\precon.h(103): warning C4251: 'TPrecon_IC<MT>::L' : class 'TCompRowMatrix<MT>' needs to have dll-interface to be used by clients of class 'TPrecon_IC<MT>'
+                 with
+                 [
+                     MT=double
+                 ]
+                 c:\files\toast\src\libmath\precon.cc(450) : see reference to class template instantiation 'TPrecon_IC<MT>' being compiled
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\precon.h(103): warning C4251: 'TPrecon_IC<MT>::L' : class 'TCompRowMatrix<MT>' needs to have dll-interface to be used by clients of class 'TPrecon_IC<MT>'
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+                 c:\files\toast\src\libmath\precon.cc(457) : see reference to class template instantiation 'TPrecon_IC<MT>' being compiled
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\precon.h(103): warning C4251: 'TPrecon_IC<MT>::L' : class 'TCompRowMatrix<MT>' needs to have dll-interface to be used by clients of class 'TPrecon_IC<MT>'
+                 with
+                 [
+                     MT=scomplex
+                 ]
+                 c:\files\toast\src\libmath\precon.cc(464) : see reference to class template instantiation 'TPrecon_IC<MT>' being compiled
+                 with
+                 [
+                     MT=scomplex
+                 ]
+         nr.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         matrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\matrix.cc(500): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\files\toast\src\libmath\matrix.cc(543): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+         ilutoast.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         gsmatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         gmres.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         fourn.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         error.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         dnsmatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         dgmatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         crmatrix_cm.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         crmatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         cr_cholesky.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         complex.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(209): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(210): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(211): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(212): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\cdmatrix.h(213): warning C4910: 'TCoordMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         Generating Code...
+         Compiling...
+         cdmatrix.cc
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\complex.h(342): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\scomplex.h(219): error C3861: 'isnan': identifier not found
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1451) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1451): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=double
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1452) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1452): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=float
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1453) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1453): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1454) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1454): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\vector.h(757): warning C4396: 'l2norm' : the inline specifier cannot be used when a friend declaration refers to a specialization of a function template
+                 c:\files\toast\src\libmath\vector.h(1455) : see reference to class template instantiation 'TVector<VT>' being compiled
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\vector.h(1455): warning C4910: 'TVector<VT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     VT=int
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(242): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=double
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(243): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=float
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(244): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=toast::complex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(245): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=scomplex
+                 ]
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+     1>c:\files\toast\src\libmath\symatrix.h(246): warning C4910: 'TSymMatrix<MT>' : '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+                 with
+                 [
+                     MT=int
+                 ]
+         Generating Code...
+     1>Done Building Project "C:\Files\TOAST\win32\VS2005\libmath\libmath.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:19.36

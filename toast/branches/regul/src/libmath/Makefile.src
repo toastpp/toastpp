@@ -1,0 +1,132 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libmath
+LIB = $(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libmath
+
+all:: $(LIB)
+
+SRCS = \
+	mathdef.cc \
+	util.cc \
+	timing.cc \
+	vector.cc \
+	gsmatrix.cc \
+	crmatrix.cc \
+	scrmatrix.cc \
+	crmatrix_cm.cc \
+	precon.cc \
+	nr.cc \
+	error.cc \
+	cr_cholesky.cc \
+	arpack.cc \
+	fourn.cc \
+	ilutoast.cc
+
+ifdef USE_BLZPACK
+SRCS += \
+	eigpair.cc
+endif
+
+ifdef ENABLE_PTHREAD
+SRCS += \
+	task.cc \
+	vector_MT.cc
+endif
+
+ifeq ($(ENABLE_MPI),yes)
+MATHLIB += -L$(MPILIBDIR) -lmpich -lmpl
+SRCS += \
+	crmatrix_mpi.cc \
+	dnsmatrix_mpi.cc \
+	toast_mpi.cc
+endif
+
+#ifdef ENABLE_CUDA
+#SRCS += \
+	vector_cusp.cu \
+#	crmatrix_cusp.cc
+#endif
+
+OBJS = ${SRCS:.cc=.o} 
+HDRS := $(wildcard *.h)
+
+#--------------------------------------------------------------------
+# CUDA support
+
+SPMVDIR = $(TOASTDIR)/numerics/cuda/spmv
+CUINC = -I$(SPMVDIR)
+
+CUSRCS = toastcuda.cu toastspmv.cu
+
+CUBINDIR := cuda
+PTXDIR := cuda
+
+$(CUBINDIR)/%.cubin : $(VPATH)/%.cu
+	mkdir -p $(CUBINDIR)
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) -o $@ -cubin $<
+
+$(PTXDIR)/%.ptx : $(VPATH)/%.cu
+	mkdir -p $(PTXDIR)
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) -o $@ -ptx $<
+
+ifeq ($(ENABLE_CUDA),yes)
+OBJS += ${CUSRCS:.cu=.o}
+CUBINS = ${CUSRCS:%.cu=$(CUBINDIR)/%.cubin}
+PTXBINS = ${CUSRCS:%.cu=$(CUBINDIR)/%.ptx}
+endif
+
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS)  -I$(ILUPACKDIR)/include $(SHLIB_CFLAGS) -c $<
+
+%.o : %.cu $(CU_DEPS)
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) $(CUINC) --compiler-options $(SHLIB_CFLAGS) -o $@ -c $<
+
+
+#fourn.o :: fourn.c
+#	gcc  $(FLAGS) $(SHLIB_CFLAGS) -c $?
+#
+
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS) fourn.o ilupack $(CUBINS) $(PTXBINS)
+	@$(RM) $@
+	ar cr $@ $(OBJS) $(ILUPACKSTATIC)
+	$(RANLIB) $@
+	make ilupack_clean
+
+# make shared version of library
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS) fourn.o ilupack $(CUBINS) $(PTXBINS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(MATHLIB) $(ILUPACKSTATIC)
+	make ilupack_clean
+
+ilupack::
+ifdef ILUPACKDIR
+ifeq '$(LIB_SUFFIX)' '.a'
+# if we are building a static library, the ILUPACK binaries need to be
+# unpacked and repacked directly into libmath.a
+	rm -rf /tmp/ilupack_expand
+	mkdir /tmp/ilupack_expand
+	pushd /tmp/ilupack_expand;\
+	ar x ${ILUPACKLIBDIR}/libilupack.a;\
+	ar x ${ILUPACKLIBDIR}/libamd.a;\
+	ar x ${ILUPACKLIBDIR}/libsparspak.a;\
+	ar x ${ILUPACKLIBDIR}/libblaslike.a;\
+	popd
+ILUPACKSTATIC = /tmp/ilupack_expand/*
+else
+ILUPACKSTATIC = ${ILUPACKLIBDIR}/libilupack.a ${ILUPACKLIBDIR}/libmumps.a ${ILUPACKLIBDIR}/libamd.a ${ILUPACKLIBDIR}/libsparspak.a ${ILUPACKLIBDIR}/libmetis.a ${ILUPACKLIBDIR}/liblapack.a ${ILUPACKLIBDIR}/libblaslike.a ${ILUPACKLIBDIR}/libblas.a 
+endif
+endif
+
+ilupack_clean::
+	rm -rf /tmp/ilupack_expand
+
+clean::  ilupack_clean
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
