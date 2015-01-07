@@ -7,8 +7,10 @@
 // =========================================================================
 
 Raster_Blob2::Raster_Blob2 (const IVector &_bdim, const IVector &_gdim,
-    Mesh *mesh, double _sup, double shapeprm, RDenseMatrix *bb, double _map_tol)
-: Raster2 (_bdim, _gdim, mesh, bb, _map_tol), sup(_sup), sprm(shapeprm)
+    Mesh *mesh, double _sup, double shapeprm, double diagscale,
+    RDenseMatrix *bb, double _map_tol)
+: Raster2 (_bdim, _gdim, mesh, bb, _map_tol), sup(_sup), sprm(shapeprm),
+  dgscale(diagscale)
 {
     igrid.New(dim);
     for (int i = 0; i < dim; i++)

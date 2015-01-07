@@ -80,6 +80,7 @@ public:
      * \param [out] bvec field vector in basis representation
      */
     void Map_MeshToBasis (const RVector &mvec, RVector &bvec) const;
+    void Map_MeshToBasis (const CVector &mvec, CVector &bvec) const;
 
     /**
      * \brief Map a real-valued field from basis to mesh representation.
@@ -87,6 +88,7 @@ public:
      * \param [out] mvec field vector in mesh representation
      */
     void Map_BasisToMesh (const RVector &bvec, RVector &mvec) const;
+    void Map_BasisToMesh (const CVector &bvec, CVector &mvec) const;
 
     /**
      * \brief Map a real-valued field from basis to solution representation.
@@ -96,6 +98,7 @@ public:
      *   while the 'solution' representation has the masked voxels removed.
      */
     void Map_BasisToSol (const RVector &bvec, RVector &svec) const;
+    void Map_BasisToSol (const CVector &bvec, CVector &svec) const;
 
     /**
      * \brief Map a real-valued field from solution to basis representation.
@@ -106,6 +109,7 @@ public:
      * \note The masked voxels in bvec are set to zero.
      */
     void Map_SolToBasis (const RVector &svec, RVector &bvec) const;
+    void Map_SolToBasis (const CVector &svec, CVector &bvec) const;
 
     /**
      * \brief Map a real-valued field from mesh to solution representation.
@@ -114,6 +118,7 @@ public:
      * \param [out] svec field vector in solution representation
      */
     void Map_MeshToSol (const RVector &mvec, RVector &svec) const;
+    void Map_MeshToSol (const CVector &mvec, CVector &svec) const;
 
     /**
      * \brief Map a real-valued field from solution to mesh representation.
@@ -121,6 +126,19 @@ public:
      * \param [out] mvec field vector in mesh representation
      */
     void Map_SolToMesh (const RVector &svec, RVector &mvec) const;
+    void Map_SolToMesh (const CVector &svec, CVector &mvec) const;
+
+    void Map_MeshToGrid (const RVector &mvec, RVector &gvec) const
+    { Map_MeshToBasis (mvec, gvec); }
+
+    void Map_MeshToGrid (const CVector &mvec, CVector &gvec) const
+    { Map_MeshToBasis (mvec, gvec); }
+
+    void Map_GridToMesh (const RVector &gvec, RVector &mvec) const
+    { Map_BasisToMesh (gvec, mvec); }
+
+    void Map_GridToMesh (const CVector &gvec, CVector &mvec) const
+    { Map_BasisToMesh (gvec, mvec); }
 
     /**
      * \brief Single-element system matrix assembly
@@ -136,6 +154,10 @@ public:
      */
     virtual void AddToElMatrix (int el, RGenericSparseMatrix &M,
         const RVector *pxcoeff, int mode) const = 0;
+
+    const RCompRowMatrix *GetBuu() const { return Buu; }
+    const RCompRowMatrix *GetBvv() const { return Bvv; }
+    const RCompRowMatrix *GetBuv() const { return Buv; }
 
 protected:
     /**
@@ -180,6 +202,11 @@ protected:
 
     RPrecon_IC *Buu_precon; ///< preconditioner for Buu
     RPrecon_IC *Bvv_precon; ///< preconditioner for Bvv
+
+    RCompRowMatrix *Buu_Cholesky_L;
+    RVector        *Buu_Cholesky_d;
+    RCompRowMatrix *Bvv_Cholesky_L;
+    RVector        *Bvv_Cholesky_d;
 
     RCompRowMatrix *D;      ///< map basis->solution (limited support)
 

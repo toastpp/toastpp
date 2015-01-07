@@ -344,6 +344,7 @@ void AddDataGradientCplx (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
         CVector cdfield (glen);
         CVector *cdfield_grad = new CVector[dim];
 	raster->Map_MeshToGrid (dphi[q], cdfield);
+
 	ImageGradient (gdim, gsize, cdfield, cdfield_grad, elref);
 
         n = mesh->nQMref[q];

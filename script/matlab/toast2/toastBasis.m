@@ -163,10 +163,67 @@ classdef toastBasis < handle
             end
         end
         
-	function v = Value(obj,pt,idx)
-	    v = toast(uint32(81),obj.handle,pt,idx);
-	end
+	function v = Value(obj,pt,idx,idxmode)
+        % Returns the value of a basis function at a given point
+        %
+        % Syntax: v = basis.Value(pt,idx)
+        %         v = basis.Value(pt,idx,'FULLIDX')
+        %         v = basis.Value(pt,coeff)
+        %         v = basis.Value(pt,coeff,'NOMASK')
+        %
+        % Parameters:
+        %         pt [real array dim]:
+        %             coordinates of evaluation position
+        %         idx [integer]:
+        %             basis function index
+        %         coeff [real array]
+        %             basis coefficient vector
+        %
+        % Return values:
+        %         v [real]:
+        %             basis function value
+        %
+        % Notes:  By default, index 'idx' is taken to be the 'solution'
+        %         basis index, i.e. excluding any basis functions with no
+        %         mesh support. If the 'FULLIDX' flag is added, the index
+        %         is taken to represent the 'basis' index, i.e. for the
+        %         full basis grid.
+        %
+        %         If a basis coefficient vector is passed as the second
+        %         argument, then the return value is the value of the
+        %         function expressed by the basis coefficients at pt:
+        %               v = sum_i b_i(pt) * coeff(i)
+        %         coeff can be of length blen or slen, i.e. expressed in
+        %         the B or S basis expansion.
+        %         By default, points outside the mesh domain return 0. If
+        %         the 'NOMASK' flag is set, the mesh mask is not applied.
+        if nargin < 4
+    	    v = toast(uint32(81),obj.handle,pt,idx);
+        else
+            v = toast(uint32(81),obj.handle,pt,idx,idxmode);
+        end
+    end
 
+    function buu = Buu(obj)
+        buu = toast(uint32(87),obj.handle);
+    end
+    
+    function bvv = Bvv(obj)
+        bvv = toast(uint32(88),obj.handle);
+    end
+    
+    function buv = Buv(obj)
+        buv = toast(uint32(89),obj.handle);
+    end
+    
+    function sa = SupportArea(obj,idx)
+        sa = toast(uint32(90),obj.handle,idx);
+    end
+    
+    function Refine(obj,idx)
+        toast(uint32(91),obj.handle,idx);
+    end
+    
         function tgt = Map(obj,mapstr,src)
             % Map a scalar function defined over the problem domain from
             % one basis representation to another.

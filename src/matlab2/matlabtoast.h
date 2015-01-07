@@ -73,7 +73,17 @@ public:
         const mxArray *prhs[]);
     void GetBasisSLen (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void GetBasisBuu (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisBvv (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisBuv (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void BasisValue (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void GetBasisSupportArea (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void BasisRefine (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
     void MapBasis (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MapMeshToBasis (int nlhs, mxArray *plhs[], int nrhs,

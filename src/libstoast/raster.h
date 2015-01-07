@@ -90,6 +90,21 @@ public:
     inline const Mesh &mesh() const { return *meshptr; }
 
     /**
+     * \brief Return the bounding box of the basis support
+     * \return 2 x dim dense matrix
+     */
+    RDenseMatrix BoundingBox () const;
+
+    virtual RDenseMatrix SupportArea (int idx)
+    { xERROR("Not implemented"); return RDenseMatrix(); }
+
+    virtual void Refine (int idx)
+    { xERROR("Not implemented"); }
+
+    virtual void Refine (int *idx, int nidx)
+    { xERROR("Not implemented"); }
+
+    /**
      * \brief Returns a pointer to the element reference array for all grid
      *   points.
      * \return Array of length \ref GLen() containing the element indices
@@ -129,7 +144,7 @@ public:
      * Identical to Value_nomask, but returns zero if p is outside the mesh
      * \sa Value_nomask
      */
-    virtual double Value (const Point &p, int i) const;
+    virtual double Value (const Point &p, int i, bool is_solidx=true) const;
 
     /**
      * \brief Value of basis function b_i at point p
@@ -138,6 +153,19 @@ public:
      */
     virtual double Value_nomask (const Point &p, int i, bool is_solidx=true)
 	const = 0;
+
+    /**
+     * \brief Value of a function, expressed by basis coefficients, at point p.
+     * \param p evaluation position
+     * \param coeff vector of basis coefficients
+     * \param mask mask out domain exterior?
+     * \return function value at p
+     * \note Computes return value as sum_i b_i(p) coeff(i)
+     * \note If coeff.Dim()==blen, the coefficients are taken to be in full
+     *   basis expansion. If coeff.Dim()==slen, they are assumed to be in
+     *   solution basis, i.e. exclude basis functions without domain overlap.
+     */
+    double Value (const Point &p, const RVector &coeff, bool mask=true) const;
 
     /**
      * \brief Map a real-valued field from mesh to grid representation.

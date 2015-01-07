@@ -3,8 +3,9 @@
 #include "raster_gb2.h"
 
 Raster_Blob2_GB::Raster_Blob2_GB (const IVector &_bdim, const IVector &_gdim,
-    Mesh *mesh, double _sup, double shapeprm, RDenseMatrix *bb, double _map_tol)
-: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, bb, _map_tol)
+    Mesh *mesh, double _sup, double shapeprm, double diagscale,
+    RDenseMatrix *bb, double _map_tol)
+: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb, _map_tol)
 {
     a2 = sup*sup;
     isigma2 = 1.0/(sprm*sprm);

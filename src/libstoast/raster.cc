@@ -122,6 +122,18 @@ Raster::~Raster()
 
 // ==========================================================================
 
+RDenseMatrix Raster::BoundingBox () const
+{
+    RDenseMatrix bb(2,dim);
+    for (int i = 0; i < dim; i++) {
+	bb(0,i) = bbmin[i];
+	bb(1,i) = bbmax[i];
+    }
+    return bb;
+}
+
+// ==========================================================================
+
 void Raster::BasisVoxelPositions (RDenseMatrix &pos) const
 {
     GenerateVoxelPositions (*meshptr, bdim, &bbmin, &bbmax, pos);
@@ -146,10 +158,29 @@ void Raster::SolutionVoxelPositions (RDenseMatrix &pos) const
 
 // ==========================================================================
 
-double Raster::Value (const Point &p, int i) const
+double Raster::Value (const Point &p, int i, bool is_solidx) const
 {
-    double v = Value_nomask (p, i);
+    double v = Value_nomask (p, i, is_solidx);
     return (v && meshptr->ElFind(p) >= 0 ? v : 0.0);
+}
+
+// ==========================================================================
+
+double Raster::Value (const Point &p, const RVector &coeff, bool mask) const
+{
+    bool is_solidx = true;
+    int len = coeff.Dim();
+    if (len == blen)
+	is_solidx = false;
+    else if (len != slen)
+	xERROR("Invalid length of coefficient vector.");
+
+    double sum = 0.0;
+    if (!mask || meshptr->ElFind(p) >= 0) {
+	for (int i = 0; i < len; i++)
+	    sum += Value_nomask(p, i, is_solidx) * coeff[i];
+    }
+    return sum;
 }
 
 // ==========================================================================
