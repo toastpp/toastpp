@@ -705,6 +705,18 @@ else
 fi
 
 # =========================================================================
+# Check if ARPACK should be built static
+
+AC_ARG_ENABLE(arpack_shared,
+    [  --disable-arpack-shared do not build shared ARPACK libraries],
+    [isok=yes], [isok=no])
+if test "$isok" = "no"; then
+   ARPACK_LIB_SUFFIX=${LIB_SUFFIX}
+else
+   ARPACK_LIB_SUFFIX=${STLIB_SUFFIX}
+fi
+
+# =========================================================================
 # Check whether we can strip the symbol tables
 
 if test "$TOAST_DEBUG" = "0" -a "$TOAST_PROFILE" = "0" ; then
@@ -825,6 +837,7 @@ AC_SUBST(SHLIB_SUFFIX)
 AC_SUBST(STLIB_SUFFIX)
 AC_SUBST(BLAS_LIB_SUFFIX)
 AC_SUBST(LAPACK_LIB_SUFFIX)
+AC_SUBST(ARPACK_LIB_SUFFIX)
 AC_SUBST(MATH_LIBS)
 AC_SUBST(DL_LIBS)
 AC_SUBST(BLASLIB)

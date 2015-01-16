@@ -660,6 +660,7 @@ DL_LIBS
 MATH_LIBS
 LAPACK_LIB_SUFFIX
 BLAS_LIB_SUFFIX
+ARPACK_LIB_SUFFIX
 STLIB_SUFFIX
 SHLIB_SUFFIX
 LIB_SUFFIX
@@ -795,6 +796,7 @@ enable_shared
 enable_vectorizer
 enable_blas_shared
 enable_lapack_shared
+enable_arpack_shared
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1447,6 +1449,7 @@ Optional Features:
   --enable-vectorizer     enable vectorizer flags
   --disable-blas-shared   do not build shared BLAS libraries
   --disable-lapack-shared do not build shared LAPACK libraries
+  --disable-arpack-shared do not build shared ARPACK libraries
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -10686,6 +10689,22 @@ else
 fi
 
 # =========================================================================
+# Check if ARPACK should be built static
+
+# Check whether --enable-arpack_shared was given.
+if test "${enable_arpack_shared+set}" = set; then
+  enableval=$enable_arpack_shared; isok=yes
+else
+  isok=no
+fi
+
+if test "$isok" = "no"; then
+   ARPACK_LIB_SUFFIX=${LIB_SUFFIX}
+else
+   ARPACK_LIB_SUFFIX=${STLIB_SUFFIX}
+fi
+
+# =========================================================================
 # Check whether we can strip the symbol tables
 
 if test "$TOAST_DEBUG" = "0" -a "$TOAST_PROFILE" = "0" ; then
@@ -11646,7 +11665,8 @@ $debug ||
 if test -n "$CONFIG_FILES"; then
 
 
-ac_cr=''
+ac_cr='
+'
 ac_cs_awk_cr=`$AWK 'BEGIN { print "a\rb" }' </dev/null 2>/dev/null`
 if test "$ac_cs_awk_cr" = "a${ac_cr}b"; then
   ac_cs_awk_cr='\\r'
@@ -12809,7 +12829,8 @@ $debug ||
 if test -n "$CONFIG_FILES"; then
 
 
-ac_cr=''
+ac_cr='
+'
 ac_cs_awk_cr=`$AWK 'BEGIN { print "a\rb" }' </dev/null 2>/dev/null`
 if test "$ac_cs_awk_cr" = "a${ac_cr}b"; then
   ac_cs_awk_cr='\\r'
