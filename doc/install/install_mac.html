@@ -15,10 +15,10 @@
 
 <h2>Preliminaries</h2>
 <p>At present only the new matlab2 interface to toast is supported on Mac OS X.</p>
-<p>The following build tools are required for compilation:</p>
+<p>The following build tools are required for compilation (tested under OS X 10.10 Yosemite):</p>
 <ul>
-<li>Xcode (tested version 5.1.1) from the Mac App Store,</li>
-<li>gfortran (tested gfortran-mp-4.4) from, e.g., MacPorts.</li>
+<li>Xcode (tested version 6.1.1) from the Mac App Store,</li>
+<li>gfortran (tested gfortran-mp-4.8) from MacPorts.</li>
 </ul>
 
 <h2>Building the numerics libraries</h2>
@@ -26,17 +26,16 @@
 toast sources. Then set the TOASTDIR environment variable:</p>
 <p class="code">export TOASTDIR=$PWD</p>
 <p>Configure the makefiles with</p>
-<p class="code">./configure F77=[path to gfortran] --disable-blas-shared --disable-lapack-shared</p>
-<p>to perform a static link against the fortran runtime. The suggested fortran
-compiler (see 2.3.1) has a default path /opt/local/bin/gfortran-mp-4.4.</p>
+<p class="code">./configure F77=gfortran-mp-4.8 --disable-arpack-shared --disable-blas-shared --disable-lapack-shared SUPERLU_LOCAL_STATIC=1</p>
+<p>to perform a static link against the fortran runtime.</p>
 <p>Once configuration completes create a dummy malloc header,</p>
 <p class="code">touch malloc.h</p>
 <p>and set the toast environment variables:</p>
 <p class="code">source toastenv.sh</p>
-<p>The numerics and toast libaries can now be built:</p>
-<p class="code">make numerics<br />make toast</p>
+<p>The numerics libaries can now be built:</p>
+<p class="code">make numerics</p>
 
-<h2>Building the matlab2 interface and requisite toast libraries</h2>
+<h2>Building the requisite toast libraries and matlab2 interface</h2>
 <p>Load the toastpp Xcode workspace located in the mac subdirectory of the
 source tree.</p>
 <p>Enter the Build Settings tab for the matlab2 target and change the MATLABAPP
@@ -45,6 +44,9 @@ which you wish to compile.</p>
 <p>Build with Command-B</p>
 <p>Finally, you need to add the search paths for the mex files and matlab scripts. Launch Matlab from the toast main directory, and type</p>
 <p class="code">mtoast2_install</p>
+
+<h2>Note</h2>
+<p>Since Mathworks presently supports only gfortran 4.3 under Mac OS X, and overrides the use of external libc and libgfortran runtimes, the current version of toast is statically linked against the runtimes provided by MacPorts. This is sub-optimal, but cannot be changed until Mathworks supports a more recent version of gfortran.</p>
 
 </body>
 </html>

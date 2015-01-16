@@ -75,7 +75,7 @@ arpack::
 	mkdir -p $(TOASTOBJ)/ARPACK; \
 	cd $(TOASTOBJ)/ARPACK; \
 	$(MAKE) -f $(NUMERICSDIR)/ARPACK/Makefile.src lib; \
-	cp libarpack$(LIB_SUFFIX) $(LIBDIR)
+	cp libarpack$(ARPACK_LIB_SUFFIX) $(LIBDIR)
 
 #	mkdir -p $(TOASTOBJ)/ARPACK/SRC; \
 #	mkdir -p $(TOASTOBJ)/ARPACK/UTIL; \

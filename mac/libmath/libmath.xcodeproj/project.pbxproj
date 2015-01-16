@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F229EA21195C7B15003F34BC /* libarpack.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F297DC94195C199F00A7501F /* libarpack.dylib */; };
-		F229EA22195C7B15003F34BC /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F297DC95195C199F00A7501F /* libsuperlu.dylib */; };
 		F297DCA9195C199F00A7501F /* arpack.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC96195C199F00A7501F /* arpack.cc */; };
 		F297DCAB195C199F00A7501F /* cr_cholesky.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC98195C199F00A7501F /* cr_cholesky.cc */; };
 		F297DCAC195C199F00A7501F /* crmatrix_cm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC99195C199F00A7501F /* crmatrix_cm.cc */; };
@@ -24,8 +22,13 @@
 		F297DCB7195C199F00A7501F /* timing.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA4195C199F00A7501F /* timing.cc */; };
 		F297DCB8195C199F00A7501F /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA5195C199F00A7501F /* util.cc */; };
 		F297DCB9195C199F00A7501F /* vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DCA6195C199F00A7501F /* vector.cc */; };
+		F29C553A1A69658A0089B927 /* libsuperlu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F29C55391A69658A0089B927 /* libsuperlu.a */; };
+		F29C55421A6966F60089B927 /* libgfortran.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F29C55411A6966F60089B927 /* libgfortran.a */; };
 		F2D67FC819B7022E009C8818 /* task.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2D67FC619B7022E009C8818 /* task.cc */; };
 		F2D67FC919B7022E009C8818 /* vector_MT.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2D67FC719B7022E009C8818 /* vector_MT.cc */; };
+		F2E212301A695C5B00DB1738 /* libarpack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2E2122F1A695C5B00DB1738 /* libarpack.a */; };
+		F2E212351A695FAF00DB1738 /* libtoastlapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2E212341A695FAF00DB1738 /* libtoastlapack.a */; };
+		F2E212371A695FC300DB1738 /* libtoastblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2E212361A695FC300DB1738 /* libtoastblas.a */; };
 		F2ED6501195CB13B006CD663 /* libmath.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F297DC8D195C199200A7501F /* libmath.dylib */; };
 /* End PBXBuildFile section */
 
@@ -44,8 +47,6 @@
 
 /* Begin PBXFileReference section */
 		F297DC8D195C199200A7501F /* libmath.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libmath.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		F297DC94195C199F00A7501F /* libarpack.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarpack.dylib; path = ../../gcc_shared/lib/libarpack.dylib; sourceTree = "<group>"; };
-		F297DC95195C199F00A7501F /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = ../../gcc_shared/lib/libsuperlu.dylib; sourceTree = "<group>"; };
 		F297DC96195C199F00A7501F /* arpack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arpack.cc; path = ../../src/libmath/arpack.cc; sourceTree = "<group>"; };
 		F297DC98195C199F00A7501F /* cr_cholesky.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cr_cholesky.cc; path = ../../src/libmath/cr_cholesky.cc; sourceTree = "<group>"; };
 		F297DC99195C199F00A7501F /* crmatrix_cm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crmatrix_cm.cc; path = ../../src/libmath/crmatrix_cm.cc; sourceTree = "<group>"; };
@@ -61,8 +62,13 @@
 		F297DCA4195C199F00A7501F /* timing.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timing.cc; path = ../../src/libmath/timing.cc; sourceTree = "<group>"; };
 		F297DCA5195C199F00A7501F /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/libmath/util.cc; sourceTree = "<group>"; };
 		F297DCA6195C199F00A7501F /* vector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vector.cc; path = ../../src/libmath/vector.cc; sourceTree = "<group>"; };
+		F29C55391A69658A0089B927 /* libsuperlu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperlu.a; path = ../../gcc_shared/lib/libsuperlu.a; sourceTree = "<group>"; };
+		F29C55411A6966F60089B927 /* libgfortran.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgfortran.a; path = ../../../../../../opt/local/lib/gcc48/libgfortran.a; sourceTree = "<group>"; };
 		F2D67FC619B7022E009C8818 /* task.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = task.cc; path = ../../src/libmath/task.cc; sourceTree = "<group>"; };
 		F2D67FC719B7022E009C8818 /* vector_MT.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vector_MT.cc; path = ../../src/libmath/vector_MT.cc; sourceTree = "<group>"; };
+		F2E2122F1A695C5B00DB1738 /* libarpack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libarpack.a; path = ../../gcc_shared/lib/libarpack.a; sourceTree = "<group>"; };
+		F2E212341A695FAF00DB1738 /* libtoastlapack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoastlapack.a; path = ../../gcc_shared/lib/libtoastlapack.a; sourceTree = "<group>"; };
+		F2E212361A695FC300DB1738 /* libtoastblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoastblas.a; path = ../../gcc_shared/lib/libtoastblas.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +76,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F229EA21195C7B15003F34BC /* libarpack.dylib in Frameworks */,
-				F229EA22195C7B15003F34BC /* libsuperlu.dylib in Frameworks */,
+				F29C553A1A69658A0089B927 /* libsuperlu.a in Frameworks */,
+				F2E212371A695FC300DB1738 /* libtoastblas.a in Frameworks */,
+				F2E212351A695FAF00DB1738 /* libtoastlapack.a in Frameworks */,
+				F2E212301A695C5B00DB1738 /* libarpack.a in Frameworks */,
+				F29C55421A6966F60089B927 /* libgfortran.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,8 +90,11 @@
 		F297DC84195C199200A7501F = {
 			isa = PBXGroup;
 			children = (
-				F297DC94195C199F00A7501F /* libarpack.dylib */,
-				F297DC95195C199F00A7501F /* libsuperlu.dylib */,
+				F29C55411A6966F60089B927 /* libgfortran.a */,
+				F29C55391A69658A0089B927 /* libsuperlu.a */,
+				F2E212361A695FC300DB1738 /* libtoastblas.a */,
+				F2E212341A695FAF00DB1738 /* libtoastlapack.a */,
+				F2E2122F1A695C5B00DB1738 /* libarpack.a */,
 				F297DC96195C199F00A7501F /* arpack.cc */,
 				F297DC98195C199F00A7501F /* cr_cholesky.cc */,
 				F297DC99195C199F00A7501F /* crmatrix_cm.cc */,
@@ -273,14 +285,20 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libstdc++";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				GCC_UNROLL_LOOPS = YES;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../lib/\"",
+					"$(SRCROOT)/../../lib",
+					/opt/local/lib/gcc48,
+					/opt/local/lib/libgcc,
+					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 				);
 				LLVM_LTO = YES;
+				MACH_O_TYPE = staticlib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
@@ -295,6 +313,8 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libstdc++";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
@@ -302,9 +322,13 @@
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../lib/\"",
+					"$(SRCROOT)/../../lib",
+					/opt/local/lib/gcc48,
+					/opt/local/lib/libgcc,
+					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 				);
 				LLVM_LTO = YES;
+				MACH_O_TYPE = staticlib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
