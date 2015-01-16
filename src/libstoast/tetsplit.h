@@ -12,6 +12,8 @@ class BufMesh: public Mesh
 public:
     BufMesh();
     void SubSetup();
+    void Shrink();
+    void Rotate (const RDenseMatrix &R);
     friend std::ostream& operator<< (std::ostream& o, BufMesh &mesh);
 
     int nlen_used, elen_used;

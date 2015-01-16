@@ -32,80 +32,60 @@ Raster2::~Raster2 ()
     if (Bvv) delete Bvv;
     if (Buv) delete Buv;
     if (Buu_precon) {
-	std::cerr << "have Buu_precon" << std::endl;
 	delete Buu_precon;
     }
     if (Bvv_precon) {
-	std::cerr << "have Bvv_precon" << std::endl;
 	delete Bvv_precon;
     }
     if (Buu_Cholesky_L) {
-	std::cerr << "have Buu_Cholesky_L" << std::endl;
 	delete Buu_Cholesky_L;
     }
     if (Buu_Cholesky_d) {
-	std::cerr << "have Buu_Cholesky_d" << std::endl;
 	delete Buu_Cholesky_d;
     }
     if (Bvv_Cholesky_L) {
-	std::cerr << "have Bvv_Cholesky_L" << std::endl;
 	delete Bvv_Cholesky_L;
     }
     if (Bvv_Cholesky_d) {
-	std::cerr << "have Bvv_Cholesky_d" << std::endl;
 	delete Bvv_Cholesky_d;
     }
     if (D) {
-	std::cerr << "have D" << std::endl;
 	delete D;
     }
-    std::cerr << "done" << std::endl;
 }
 
 // =========================================================================
 
 void Raster2::Init ()
 {
-    std::cerr << "raster2 init" << std::endl;
-
     if (Buu) {
-	std::cerr << "delete Buu" << std::endl;
 	delete Buu;
     }
     if (Bvv) {
-	std::cerr << "delete Bvv" << std::endl;
 	delete Bvv;
     }
     if (Buv) {
-	std::cerr << "delete Buv" << std::endl;
 	delete Buv;
     }
     if (Buu_precon) {
-	std::cerr << "delete Buu_precon" << std::endl;
 	delete Buu_precon;
     }
     if (Bvv_precon) {
-	std::cerr << "delete Bvv_precon" << std::endl;
 	delete Bvv_precon;
     }
     if (Buu_Cholesky_L) {
-	std::cerr << "delete Buu_Cholesky_L" << std::endl;
 	delete Buu_Cholesky_L;
     }
     if (Buu_Cholesky_d) {
-	std::cerr << "delete Buu_Cholesky_d" << std::endl;
 	delete Buu_Cholesky_d;
     }
     if (Bvv_Cholesky_L) {
-	std::cerr << "delete Bvv_Cholesky_L" << std::endl;
 	delete Bvv_Cholesky_L;
     }
     if (Bvv_Cholesky_d) {
-	std::cerr << "delete Bvv_Cholesky_d" << std::endl;
 	delete Bvv_Cholesky_d;
     }
     if (D) {
-	std::cerr << "delete D" << std::endl;
 	delete D;
     }
 
@@ -121,7 +101,6 @@ void Raster2::Init ()
 
     // preconditioners
     if (map_tol) {
-	std::cerr << "tick 1" << std::endl;
 	Buu_precon = new RPrecon_IC; Buu_precon->Reset (Buu);
 	Bvv_precon = new RPrecon_IC; Bvv_precon->Reset (Bvv);
 	Buu_Cholesky_L = 0;
@@ -183,12 +162,10 @@ void Raster2::Map_BasisToGrid (const CVector &bvec, CVector &gvec) const
 void Raster2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
 {
     if (map_tol) {
-	std::cerr << "mesh to basis pcg" << std::endl;
 	double tol = map_tol;
 	int nit = PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
     } else {
-	std::cerr << "mesh to basis cholesky" << std::endl;
-	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, mvec, bvec);
+	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, ATx(*Buv,mvec), bvec);
     }
 }
 
@@ -205,7 +182,7 @@ void Raster2::Map_MeshToBasis (const CVector &mvec, CVector &bvec) const
 	double tol = map_tol;
 	nit += PCG (*Bvv, ATx(*Buv,mvec_tmp), bvec_tmp, tol, Bvv_precon);
     } else {
-	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, mvec_tmp, bvec_tmp);
+	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, ATx(*Buv,mvec_tmp), bvec_tmp);
     }
     SetReal(bvec, bvec_tmp);
 
@@ -214,7 +191,7 @@ void Raster2::Map_MeshToBasis (const CVector &mvec, CVector &bvec) const
 	double tol = map_tol;
 	nit += PCG (*Bvv, ATx(*Buv,mvec_tmp), bvec_tmp, tol, Bvv_precon);
     } else {
-	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, mvec_tmp, bvec_tmp);
+	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, ATx(*Buv,mvec_tmp), bvec_tmp);
     }
     SetImag(bvec, bvec_tmp);
 }
@@ -227,7 +204,7 @@ void Raster2::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
 	double tol = map_tol;
 	int nit = PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
     } else {
-	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, bvec, mvec);
+	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, Ax(*Buv,bvec), mvec);
     }
 }
 
@@ -244,7 +221,7 @@ void Raster2::Map_BasisToMesh (const CVector &bvec, CVector &mvec) const
 	double tol = map_tol;
 	nit += PCG (*Buu, Ax(*Buv,bvec_tmp), mvec_tmp, tol, Buu_precon);
     } else {
-	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, bvec_tmp, mvec_tmp);
+	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, Ax(*Buv,bvec_tmp), mvec_tmp);
     }
     SetReal(mvec, mvec_tmp);
 
@@ -253,7 +230,7 @@ void Raster2::Map_BasisToMesh (const CVector &bvec, CVector &mvec) const
 	double tol = map_tol;
 	nit += PCG (*Buu, Ax(*Buv,bvec_tmp), mvec_tmp, tol, Buu_precon);
     } else {
-	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, bvec_tmp, mvec_tmp);
+	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, Ax(*Buv,bvec_tmp), mvec_tmp);
     }
     SetImag(mvec, mvec_tmp);
 }

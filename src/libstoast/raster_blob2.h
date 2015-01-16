@@ -75,12 +75,14 @@ protected:
 private:
     RCompRowMatrix *CreateBasisMassmat () const;
     RCompRowMatrix *CreateBasisMassmat_tri () const;
+    RCompRowMatrix *CreateBasisMassmat_tet4 () const;
 
     /**
      * \brief Returns pointer to mixed mapping matrix
      */
     RCompRowMatrix *CreateMixedMassmat () const;
     RCompRowMatrix *CreateMixedMassmat_tri () const;
+    RCompRowMatrix *CreateMixedMassmat_tet4 () const;
 
     double MC_integral_2D(double basis_dst) const;
 };

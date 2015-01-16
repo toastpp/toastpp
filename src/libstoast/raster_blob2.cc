@@ -53,7 +53,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat () const
     case ELID_TRI10:
 	return CreateMixedMassmat_tri();
     case ELID_TET4:
-	//return CreateMixedMassmat_tet4();
+	return CreateMixedMassmat_tet4();
     default:
 	xERROR("Raster_Blob2: Unsupported element type");
 	return 0;
@@ -68,7 +68,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat () const
     case ELID_TRI10:
 	return CreateBasisMassmat_tri();
     case ELID_TET4:
-	//return CreateBasisMassmat_tet4();
+	return CreateBasisMassmat_tet4();
     default:
 	xERROR("Raster_Blob2: Unsupported element type");
 	return 0;

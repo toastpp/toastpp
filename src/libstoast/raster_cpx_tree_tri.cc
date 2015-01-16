@@ -8,12 +8,23 @@
 
 double TriIntF (double *x, double *y, double *z);
 
-RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tri () const
+RCompRowMatrix *Raster_CPixel_Tree::CreateMixedMassmat_tri () const
 {
-    int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
+    int i, j, k, r, m, nd, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
     int imin, imax, jmin, jmax;
     double djac;
+    int nnode = 10;
+    TreeNode **node = new TreeNode*[nnode];
+
+    int **ndpx = new int*[n]; // list of overlapping pixels per node
+    int *nndpx = new int[n]; // number of overlapping pixels per node
+    int *ndpxbuf = new int[n]; // list length of each entry
+    for (i = 0; i < n; i++) {
+	ndpxbuf[i] = 10;
+	ndpx[i] = new int[ndpxbuf[i]];
+	nndpx[i] = 0;
+    }
 
     double xrange = bbsize[0];
     double yrange = bbsize[1];
@@ -26,15 +37,6 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tri () const
     int np = QRule_tri_4_6 (&wght, &absc);
 
     // pass 1: determine matrix fill structure
-    int *nimin = new int[n];
-    int *nimax = new int[n];
-    int *njmin = new int[n];
-    int *njmax = new int[n];
-    for (i = 0; i < n; i++) {
-	nimin[i] = bdim[0];
-	njmin[i] = bdim[1];
-	nimax[i] = njmax[i] = -1;
-    }
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
 	// element bounding box
@@ -49,42 +51,55 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tri () const
 	    eymax = max (eymax, meshptr->nlist[pel->Node[j]][1]);
 	}
 	// determine which pixels overlap the element
-	imin = max (0, (int)floor(bdim[0] * (exmin-bbmin[0])/xrange));
-	imax = min (bdim[0]-1, (int)floor(bdim[0]*(exmax-bbmin[0])/xrange));
-	jmin = max (0, (int)floor(bdim[1] * (eymin-bbmin[1])/yrange));
-	jmax = min (bdim[1]-1, (int)floor(bdim[1]*(eymax-bbmin[1])/yrange));
+	int nn = tree->EnumerateOverlappingEndNodes (node, nnode,
+            exmin, eymin, exmax, eymax);
+	if (nn > nnode) {
+	    delete []node;
+	    node = new TreeNode*[nnode=nn];
+	    nn = tree->EnumerateOverlappingEndNodes (node, nnode,
+                exmin, eymin, exmax, eymax);
+	}
 	for (i = 0; i < pel->nNode(); i++) {
-	    int nidx = pel->Node[i];
-	    if (imin < nimin[nidx]) nimin[nidx] = imin;
-	    if (imax > nimax[nidx]) nimax[nidx] = imax;
-	    if (jmin < njmin[nidx]) njmin[nidx] = jmin;
-	    if (jmax > njmax[nidx]) njmax[nidx] = jmax;
+	    nd = pel->Node[i];
+	    for (j = 0; j < nn; j++) {
+		for (k = 0; k < nndpx[nd]; k++)
+		    if (node[j]->linidx == ndpx[nd][k])
+			break; // pixel already registered
+		if (k == nndpx[nd]) {
+		    // store pixel index for node nd
+		    if (nndpx[nd] == ndpxbuf[nd]) {
+			// need to grow buffer
+			int *tmp = new int[ndpxbuf[nd]*=2];
+			for (k = 0; k < nndpx[nd]; k++)
+			    tmp[k] = ndpx[nd][k];
+			delete []ndpx[nd];
+			ndpx[nd] = tmp;
+		    }
+		    ndpx[nd][nndpx[nd]++] = node[j]->linidx;
+		}
+	    }
 	}
     }
 
     int *rowptr = new int [n+1];
     rowptr[0] = 0;
-    for (r = 0; r < n; r++) {
-	int nentry = (nimax[r]-nimin[r]+1)*(njmax[r]-njmin[r]+1);
-	rowptr[r+1] = rowptr[r]+nentry;
-    }
+    for (r = 0; r < n; r++)
+	rowptr[r+1] = rowptr[r] + nndpx[r];
     int nz = rowptr[n];
     int *colidx = new int[nz];
     for (r = k = 0; r < n; r++) {
-	for (j = njmin[r]; j <= njmax[r]; j++) {
-	    for (i = nimin[r]; i <= nimax[r]; i++) {
-		colidx[k++] = i + j*bdim[0];
-	    }
-	}
+	for (j = 0; j < nndpx[r]; j++)
+	    colidx[k++] = ndpx[r][j];
     }
     RCompRowMatrix *buv = new RCompRowMatrix (n, blen, rowptr, colidx);
 
     delete []rowptr;
     delete []colidx;
-    delete []nimin;
-    delete []nimax;
-    delete []njmin;
-    delete []njmax;
+    for (i = 0; i < n; i++)
+	delete []ndpx[i];
+    delete []ndpx;
+    delete []nndpx;
+    delete []ndpxbuf;
 
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
@@ -102,10 +117,8 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tri () const
 	    eymax = max (eymax, meshptr->nlist[pel->Node[j]][1]);
 	}
 	// determine which pixels overlap the element
-	imin = max (0, (int)floor(bdim[0] * (exmin-bbmin[0])/xrange));
-	imax = min (bdim[0]-1, (int)floor(bdim[0]*(exmax-bbmin[0])/xrange));
-	jmin = max (0, (int)floor(bdim[1] * (eymin-bbmin[1])/yrange));
-	jmax = min (bdim[1]-1, (int)floor(bdim[1]*(eymax-bbmin[1])/yrange));
+	int nn = tree->EnumerateOverlappingEndNodes (node, nnode,
+            exmin, eymin, exmax, eymax);
 
 	// perform subdivision for every intersecting pixel
 	const int npoly = 10;
@@ -119,81 +132,74 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tri () const
 	int nv;
 	RVector fun;
 	double v;
-	for (i = imin; i <= imax; i++)
-	    for (j = jmin; j <= jmax; j++) {
-		nv = SutherlandHodgman (el, i, j, poly, npoly);
-		idx_j = i + j*bdim[0];
+	for (i = 0; i < nn; i++) {
+	    nv = SutherlandHodgman (el, node[i], poly, npoly);
+	    idx_j = node[i]->linidx;
 
-		// split into nv-2 triangles
-		for (k = 0; k < nv-2; k++) {
-		    n3[0][0] = poly[0][0];
-		    n3[0][1] = poly[0][1];
-		    n3[1][0] = poly[k+1][0];
-		    n3[1][1] = poly[k+1][1];
-		    n3[2][0] = poly[k+2][0];
-		    n3[2][1] = poly[k+2][1];
-		    t3.Initialise(n3);
-		    
-		    if (t3.Size() <= 0.0) continue;
-
-		    if (numerical_quadrature) {
-			// map quadrature points into global frame
-			for (m = 0; m < np; m++) {
-			    djac = t3.DetJ(absc[m], &n3);
-			    Point glob = t3.Global(n3, absc[m]);
-			    Point loc = pel->Local(meshptr->nlist, glob);
-			    fun = pel->LocalShapeF (loc);
-			    v = wght[m] * djac;
-			    for (ii = 0; ii < fun.Dim(); ii++) {
-				idx_i = pel->Node[ii];
-				(*buv)(idx_i, idx_j) += v*fun[ii];
-			    }
-			}
-
-		    } else { // exact integral for linear shape funct
-
-			RVector nfun[3];
-			double x[3], y[3], z[3];
-			for (m = 0; m < 3; m++) {
-			    // loop over nodes of subdivided triangle
-			    Point loc = pel->Local(meshptr->nlist, n3[m]);
-			    nfun[m] = pel->LocalShapeF(loc);
-			    x[m] = n3[m][0];
-			    y[m] = n3[m][1];
-			}
-			for (ii = 0; ii < 3; ii++) {
-			    // loop over nodes of base triangle
+	    // split into nv-2 triangles
+	    for (k = 0; k < nv-2; k++) {
+		n3[0][0] = poly[0][0];
+		n3[0][1] = poly[0][1];
+		n3[1][0] = poly[k+1][0];
+		n3[1][1] = poly[k+1][1];
+		n3[2][0] = poly[k+2][0];
+		n3[2][1] = poly[k+2][1];
+		t3.Initialise(n3);
+		
+		if (numerical_quadrature) {
+		    // map quadrature points into global frame
+		    for (m = 0; m < np; m++) {
+			djac = t3.DetJ(absc[m], &n3);
+			Point glob = t3.Global(n3, absc[m]);
+			Point loc = pel->Local(meshptr->nlist, glob);
+			fun = pel->LocalShapeF (loc);
+			v = wght[m] * djac;
+			for (ii = 0; ii < fun.Dim(); ii++) {
 			    idx_i = pel->Node[ii];
-			    for (m = 0; m < 3; m++) {
-				z[m] = nfun[m][ii];
-			    }
-			    (*buv)(idx_i, idx_j) += TriIntF(x,y,z);
+			    (*buv)(idx_i, idx_j) += v*fun[ii];
 			}
+		    }
+
+		} else { // exact integral for linear shape funct
+		    
+		    RVector nfun[3];
+		    double x[3], y[3], z[3];
+		    for (m = 0; m < 3; m++) {
+			// loop over nodes of subdivided triangle
+			Point loc = pel->Local(meshptr->nlist, n3[m]);
+			nfun[m] = pel->LocalShapeF(loc);
+			x[m] = n3[m][0];
+			y[m] = n3[m][1];
+		    }
+		    for (ii = 0; ii < 3; ii++) {
+			// loop over nodes of base triangle
+			idx_i = pel->Node[ii];
+			for (m = 0; m < 3; m++) {
+			    z[m] = nfun[m][ii];
+			}
+			(*buv)(idx_i, idx_j) += TriIntF(x,y,z);
 		    }
 		}
 	    }
+	}
     }
-
+    
     buv->Shrink();
     return buv;
 }
 
 
-int Raster_CPixel::SutherlandHodgman (int el, int xgrid, int ygrid,
+int Raster_CPixel_Tree::SutherlandHodgman (int el, TreeNode *node,
     Point *clip_poly, int npoly) const
 {
     int i,j;
 
     Point *list = new Point[npoly];
 
-    double xmin = bbmin[0] +
-	bbsize[0]*(double)xgrid/(double)bdim[0];
-    double xmax = bbmin[0] +
-	bbsize[0]*(double)(xgrid+1)/(double)bdim[0];
-    double ymin = bbmin[1] +
-	bbsize[1]*(double)ygrid/(double)bdim[1];
-    double ymax = bbmin[1] +
-	bbsize[1]*(double)(ygrid+1)/(double)bdim[1];
+    double xmin = node->xmin;
+    double xmax = node->xmax;
+    double ymin = node->ymin;
+    double ymax = node->ymax;
 
     Element *pel = meshptr->elist[el];
     int ni, nv = pel->nNode();
@@ -229,6 +235,7 @@ int Raster_CPixel::SutherlandHodgman (int el, int xgrid, int ygrid,
     return len;
 }
 
+#ifdef UNDEF
 // ==========================================================================
 // Assemble single-element contribution for element "el" into global
 // system matrix M, where coefficients (where applicable) are given in pixel
@@ -370,3 +377,4 @@ double TriIntF (double *x, double *y, double *z)
     return (x[0]*(y[1]-y[2]) + x[1]*(y[2]-y[0]) + x[2]*(y[0]-y[1])) *
 	(z[0]+z[1]+z[2]) / 6.0;
 }
+#endif

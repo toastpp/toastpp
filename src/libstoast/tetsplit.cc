@@ -27,6 +27,25 @@ void BufMesh::SubSetup()
 	    elist[el]->PostInitialisation(nlist);
 }
 
+void BufMesh::Shrink()
+{
+    int el, i;
+    for (el = 0; el < elen_used; ) {
+	if (elist[el]->Region() < 0) {
+	    elist.Delete(el);
+	    elen_used--;
+	} else el++;
+    }
+    // also need to shrink the node list
+}
+
+void BufMesh::Rotate (const RDenseMatrix &R)
+{
+    for (int i = 0; i < nlist.Len(); i++) {
+	nlist[i] = R * nlist[i];
+    }
+}
+
 std::ostream& operator<< (std::ostream& o, BufMesh &mesh)
 {
     o << "MeshData 5.0\n\n";
