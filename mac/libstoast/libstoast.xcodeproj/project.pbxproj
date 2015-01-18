@@ -29,9 +29,9 @@
 		F229E9FE195C7749003F34BC /* regul.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E8195C7749003F34BC /* regul.cc */; };
 		F229E9FF195C7749003F34BC /* solution.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E9195C7749003F34BC /* solution.cc */; };
 		F229EA00195C7749003F34BC /* source.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9EA195C7749003F34BC /* source.cc */; };
-		F229EA08195C7857003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA07195C7857003F34BC /* libfe.dylib */; };
-		F229EA0A195C7865003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA09195C7865003F34BC /* libmath.dylib */; };
 		F25A48C719804D0500656531 /* raster_px2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F25A48C619804D0500656531 /* raster_px2.cc */; };
+		F2933E581A6C0F2C0061F80E /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2933E561A6C0F2C0061F80E /* libfe.dylib */; };
+		F2933E591A6C0F2C0061F80E /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2933E571A6C0F2C0061F80E /* libmath.dylib */; };
 		F29C55361A6965220089B927 /* libsuperlu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F29C55351A6965220089B927 /* libsuperlu.a */; };
 		F29C553C1A6965C00089B927 /* libtoastblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F29C553B1A6965C00089B927 /* libtoastblas.a */; };
 		F29C55401A6966150089B927 /* libtoastlapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F29C553F1A6966150089B927 /* libtoastlapack.a */; };
@@ -94,9 +94,9 @@
 		F229E9E8195C7749003F34BC /* regul.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = regul.cc; path = ../../src/libstoast/regul.cc; sourceTree = "<group>"; };
 		F229E9E9195C7749003F34BC /* solution.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = solution.cc; path = ../../src/libstoast/solution.cc; sourceTree = "<group>"; };
 		F229E9EA195C7749003F34BC /* source.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = source.cc; path = ../../src/libstoast/source.cc; sourceTree = "<group>"; };
-		F229EA07195C7857003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
-		F229EA09195C7865003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F25A48C619804D0500656531 /* raster_px2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_px2.cc; path = ../../src/libstoast/raster_px2.cc; sourceTree = "<group>"; };
+		F2933E561A6C0F2C0061F80E /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
+		F2933E571A6C0F2C0061F80E /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F29C55351A6965220089B927 /* libsuperlu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperlu.a; path = ../../gcc_shared/lib/libsuperlu.a; sourceTree = "<group>"; };
 		F29C553B1A6965C00089B927 /* libtoastblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoastblas.a; path = ../../gcc_shared/lib/libtoastblas.a; sourceTree = "<group>"; };
 		F29C553F1A6966150089B927 /* libtoastlapack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtoastlapack.a; path = ../../gcc_shared/lib/libtoastlapack.a; sourceTree = "<group>"; };
@@ -126,12 +126,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2933E581A6C0F2C0061F80E /* libfe.dylib in Frameworks */,
+				F2933E591A6C0F2C0061F80E /* libmath.dylib in Frameworks */,
 				F29C55441A69674A0089B927 /* libgfortran.a in Frameworks */,
 				F29C553C1A6965C00089B927 /* libtoastblas.a in Frameworks */,
 				F29C55361A6965220089B927 /* libsuperlu.a in Frameworks */,
 				F29C55401A6966150089B927 /* libtoastlapack.a in Frameworks */,
-				F229EA0A195C7865003F34BC /* libmath.dylib in Frameworks */,
-				F229EA08195C7857003F34BC /* libfe.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,12 +141,12 @@
 		F229E9C5195C7652003F34BC = {
 			isa = PBXGroup;
 			children = (
+				F2933E561A6C0F2C0061F80E /* libfe.dylib */,
+				F2933E571A6C0F2C0061F80E /* libmath.dylib */,
 				F29C55431A69674A0089B927 /* libgfortran.a */,
 				F29C553F1A6966150089B927 /* libtoastlapack.a */,
 				F29C553B1A6965C00089B927 /* libtoastblas.a */,
 				F29C55351A6965220089B927 /* libsuperlu.a */,
-				F229EA09195C7865003F34BC /* libmath.dylib */,
-				F229EA07195C7857003F34BC /* libfe.dylib */,
 				F229E9D5195C7749003F34BC /* fwdsolver_cslu.cc */,
 				F229E9D6195C7749003F34BC /* fwdsolver_mw.cc */,
 				F229E9D7195C7749003F34BC /* fwdsolver_zslu.cc */,
@@ -396,6 +396,7 @@
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 					/opt/local/lib/libgcc,
 					/opt/local/lib/gcc48,
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
 				);
 				MACH_O_TYPE = staticlib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -423,6 +424,7 @@
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 					/opt/local/lib/libgcc,
 					/opt/local/lib/gcc48,
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
 				);
 				MACH_O_TYPE = staticlib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
