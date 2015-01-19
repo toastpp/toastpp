@@ -5,6 +5,7 @@
 #include "stoastlib.h"
 #include <fstream>
 
+
 #include "../common/objmgr.h"
 
 // ===========================================================================
@@ -618,11 +619,11 @@ static PyObject *toast_map_basis (PyObject *self, PyObject *args)
 	return NULL;
     }
     if (!strncmp (mapstr+1, "->", 2)) {
-        srcid = toupper(mapstr[0]);
-	tgtid = toupper(mapstr[3]);
+        srcid = (mapstr[0]);
+	tgtid = (mapstr[3]);
     } else if (!strncmp (mapstr+1, "<-", 2)) {
-        srcid = toupper(mapstr[3]);
-	tgtid = toupper(mapstr[0]);
+        srcid = (mapstr[3]);
+	tgtid = (mapstr[0]);
     } else {
         std::cerr << "toast.MapBasis: mapping string not recognised"
 		  << std::endl;
@@ -656,11 +657,11 @@ static PyObject *toast_map_basis (PyObject *self, PyObject *args)
 	memcpy (tgt_data, tgt.data_buffer(), ntgt*sizeof(double));
         } break;
     case NPY_CDOUBLE: {
-	toast::complex *src_data = (toast::complex*)PyArray_DATA(py_srcvec);
+	std::complex<double> *src_data = (std::complex<double>*)PyArray_DATA(py_srcvec);
 	CVector tgt, src(nsrc, src_data);
 	MapBasis (raster, srcid, tgtid, src, tgt);
-	toast::complex *tgt_data = (toast::complex*)PyArray_DATA(py_tgtvec);
-	memcpy (tgt_data, tgt.data_buffer(), ntgt*sizeof(toast::complex));
+	std::complex<double> *tgt_data = (std::complex<double>*)PyArray_DATA(py_tgtvec);
+	memcpy (tgt_data, tgt.data_buffer(), ntgt*sizeof(std::complex<double>));
         } break;
 #ifdef UNDEF
     case NPY_FLOAT: {
@@ -884,7 +885,7 @@ static PyObject *toast_sysmat (PyObject *self, PyObject *args)
 
     const idxtype *rowptr, *colidx;
     npy_intp nnz = FWS.F->GetSparseStructure (&rowptr, &colidx);
-    const toast::complex *Fval = FWS.F->ValPtr();
+    const std::complex<double> *Fval = FWS.F->ValPtr();
     npy_intp nrp = nlen+1;
 
     // Allocate the numpy arrays for the CSR matrix
@@ -897,7 +898,7 @@ static PyObject *toast_sysmat (PyObject *self, PyObject *args)
     for (i = 0; i < nrp; i++) rp[i] = rowptr[i];
     int *ci = (int*)PyArray_DATA(py_ci);
     for (i = 0; i < nnz; i++) ci[i] = colidx[i];
-    toast::complex *val = (toast::complex*)PyArray_DATA(py_vl);
+    std::complex<double> *val = (std::complex<double>*)PyArray_DATA(py_vl);
     for (i = 0; i < nnz; i++) val[i] = Fval[i];
 
     return Py_BuildValue ("NNN", py_rp, py_ci, py_vl);
@@ -975,7 +976,7 @@ static PyObject *toast_qvec (PyObject *self, PyObject *args, PyObject *keywds)
 
     const idxtype *rowptr, *colidx;
     npy_intp nnz = qvec.GetSparseStructure (&rowptr, &colidx);
-    const toast::complex *qval = qvec.ValPtr();
+    const std::complex<double> *qval = qvec.ValPtr();
     npy_intp nrp = qvec.nRows()+1;
 
     // Allocate the numpy arrays for the CSR matrix
@@ -988,7 +989,7 @@ static PyObject *toast_qvec (PyObject *self, PyObject *args, PyObject *keywds)
     for (i = 0; i < nrp; i++) rp[i] = rowptr[i];
     int *ci = (int*)PyArray_DATA(py_ci);
     for (i = 0; i < nnz; i++) ci[i] = colidx[i];
-    toast::complex *val = (toast::complex*)PyArray_DATA(py_vl);
+    std::complex<double> *val = (std::complex<double>*)PyArray_DATA(py_vl);
     for (i = 0; i < nnz; i++) val[i] = qval[i];
 
     return Py_BuildValue ("NNN", py_rp, py_ci, py_vl);
@@ -1060,7 +1061,7 @@ static PyObject *toast_mvec (PyObject *self, PyObject *args, PyObject *keywds)
 
     const idxtype *rowptr, *colidx;
     npy_intp nnz = mvec.GetSparseStructure (&rowptr, &colidx);
-    const toast::complex *mval = mvec.ValPtr();
+    const std::complex<double> *mval = mvec.ValPtr();
     npy_intp nrp = mvec.nRows()+1;
 
     // Allocate the numpy arrays for the CSR matrix
@@ -1073,7 +1074,7 @@ static PyObject *toast_mvec (PyObject *self, PyObject *args, PyObject *keywds)
     for (i = 0; i < nrp; i++) rp[i] = rowptr[i];
     int *ci = (int*)PyArray_DATA(py_ci);
     for (i = 0; i < nnz; i++) ci[i] = colidx[i];
-    toast::complex *val = (toast::complex*)PyArray_DATA(py_vl);
+    std::complex<double> *val = (std::complex<double>*)PyArray_DATA(py_vl);
     for (i = 0; i < nnz; i++) val[i] = mval[i];
 
     return Py_BuildValue ("NNN", py_rp, py_ci, py_vl);
@@ -1129,9 +1130,9 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 
     npy_intp dmx_dims[2] = {slen,nQ};
     PyObject *dmx = PyArray_SimpleNew (2, dmx_dims, NPY_CDOUBLE);
-    toast::complex *dmx_ptr = (toast::complex*)PyArray_DATA (dmx);
+    std::complex<double> *dmx_ptr = (std::complex<double>*)PyArray_DATA (dmx);
     for (i = 0; i < nQ; i++) {
-        toast::complex *dp = dmx_ptr + i;
+        std::complex<double> *dp = dmx_ptr + i;
 	if (raster) raster->Map_MeshToSol (dphi[i], sphi);
 	else        sphi = dphi[i];
 	for (j = 0; j < slen; j++) {
@@ -1150,9 +1151,9 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 
 	npy_intp amx_dims[2] = {slen,nM};
 	PyObject *amx = PyArray_SimpleNew (2, amx_dims, NPY_CDOUBLE);
-	toast::complex *amx_ptr = (toast::complex*)PyArray_DATA (amx);
+	std::complex<double> *amx_ptr = (std::complex<double>*)PyArray_DATA (amx);
 	for (i = 0; i < nM; i++) {
-	    toast::complex *ap = amx_ptr + i;
+	    std::complex<double> *ap = amx_ptr + i;
 	    if (raster) raster->Map_MeshToSol (aphi[i], sphi);
 	    else        sphi = aphi[i];
 	    for (j = 0; j < slen; j++) {
@@ -1195,8 +1196,8 @@ static PyObject *toast_fields (PyObject *self, PyObject *args)
         return NULL;
 
     for (const char *c = modestr; *c; c++) {
-	if (toupper(*c) == 'D') do_direct = true;
-	if (toupper(*c) == 'A') do_adjoint = true;
+	if (!strcasecmp(c, "D")) do_direct = true;
+	if (!strcasecmp(c, "A")) do_adjoint = true;
     }
 
     int n = mesh->nlen();
@@ -1205,12 +1206,12 @@ static PyObject *toast_fields (PyObject *self, PyObject *args)
 
     int *qrowptr = (int*)PyArray_DATA(py_qvec_rp);
     int *qcolidx = (int*)PyArray_DATA(py_qvec_ci);
-    toast::complex *qval = (toast::complex*)PyArray_DATA(py_qvec_vl);
+    std::complex<double> *qval = (std::complex<double>*)PyArray_DATA(py_qvec_vl);
     CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval);
 
     int *mrowptr = (int*)PyArray_DATA(py_mvec_rp);
     int *mcolidx = (int*)PyArray_DATA(py_mvec_ci);
-    toast::complex *mval = (toast::complex*)PyArray_DATA(py_mvec_vl);
+    std::complex<double> *mval = (std::complex<double>*)PyArray_DATA(py_mvec_vl);
     CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval);
 
     double *mua_ptr = (double*)PyArray_DATA(py_mua);
@@ -1374,21 +1375,21 @@ static PyObject *toast_jacobian (PyObject *self, PyObject *args)
     int nqm = mesh->nQM;
 
     // set up direct fields
-    toast::complex *dphi_ptr = (toast::complex*)PyArray_DATA(py_dphi);
+    std::complex<double> *dphi_ptr = (std::complex<double>*)PyArray_DATA(py_dphi);
     CVector *dphi = new CVector[nq];
     for (i = 0; i < nq; i++) {
 	dphi[i].Relink (dphi_ptr + i*n, n);
     }
 
     // set up adjoint fields
-    toast::complex *aphi_ptr = (toast::complex*)PyArray_DATA(py_aphi);
+    std::complex<double> *aphi_ptr = (std::complex<double>*)PyArray_DATA(py_aphi);
     CVector *aphi = new CVector[nm];
     for (i = 0; i < nm; i++) {
 	aphi[i].Relink (aphi_ptr + i*n, n);
     }
 
     // copy projections
-    toast::complex *proj_ptr = (toast::complex*)PyArray_DATA(py_proj);
+    std::complex<double> *proj_ptr = (std::complex<double>*)PyArray_DATA(py_proj);
     CVector proj(nqm, proj_ptr, SHALLOW_COPY);
 
     PyObject *J;
@@ -1454,23 +1455,23 @@ void AddDataGradient (QMMesh *mesh, Raster *raster, const CFwdSolver &FWS,
 	CVector cproj(n);
 	//Project_cplx (*mesh, q, dphi[q], cproj);
 	cproj = ProjectSingle (mesh, q, mvec, dphi[q]);
-	wqa = toast::complex(0,0);
+	wqa = std::complex<double>(0,0);
 	wqb = 0.0;
 
 	for (m = idx = 0; m < mesh->nM; m++) {
 	    if (!mesh->Connected (q, m)) continue;
 	    const CVector qs = mvec.Row(m);
-	    double rp = cproj[idx].re;
-	    double ip = cproj[idx].im;
+	    double rp = cproj[idx].real();
+	    double ip = cproj[idx].imag();
 	    double dn = 1.0/(rp*rp + ip*ip);
 
 	    // amplitude term
 	    term = -2.0 * b_mod[idx] / (ype[idx]*s_mod[idx]);
-	    wqa += qs * toast::complex (term*rp*dn, -term*ip*dn);
+	    wqa += qs * std::complex<double> (term*rp*dn, -term*ip*dn);
 
 	    // phase term
 	    term = -2.0 * b_arg[idx] / (ype[idx]*s_arg[idx]);
-	    wqa += qs * toast::complex (-term*ip*dn, -term*rp*dn);
+	    wqa += qs * std::complex<double> (-term*ip*dn, -term*rp*dn);
 
 	    //wqb += Re(qs) * (term * ypm[idx]);
 	    idx++;
@@ -1581,12 +1582,12 @@ static PyObject *toast_gradient (PyObject *self, PyObject *args)
 
     int *qrowptr = (int*)PyArray_DATA(py_qvec_rp);
     int *qcolidx = (int*)PyArray_DATA(py_qvec_ci);
-    toast::complex *qval = (toast::complex*)PyArray_DATA(py_qvec_vl);
+    std::complex<double> *qval = (std::complex<double>*)PyArray_DATA(py_qvec_vl);
     CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval, SHALLOW_COPY);
 
     int *mrowptr = (int*)PyArray_DATA(py_mvec_rp);
     int *mcolidx = (int*)PyArray_DATA(py_mvec_ci);
-    toast::complex *mval = (toast::complex*)PyArray_DATA(py_mvec_vl);
+    std::complex<double> *mval = (std::complex<double>*)PyArray_DATA(py_mvec_vl);
     CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval, SHALLOW_COPY);
 
     double *mua_ptr = (double*)PyArray_DATA(py_mua);
