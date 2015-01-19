@@ -1196,8 +1196,16 @@ static PyObject *toast_fields (PyObject *self, PyObject *args)
         return NULL;
 
     for (const char *c = modestr; *c; c++) {
-	if (!strcasecmp(c, "D")) do_direct = true;
-	if (!strcasecmp(c, "A")) do_adjoint = true;
+        switch(*c) {
+     
+                case 'd': case 'D':
+                do_direct = true;
+                break;
+                
+                case 'a': case 'A':
+                do_adjoint = true;
+                break;
+        }
     }
 
     int n = mesh->nlen();
