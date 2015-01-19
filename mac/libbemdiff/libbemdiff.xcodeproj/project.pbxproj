@@ -212,7 +212,7 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
 				SYMROOT = build;
@@ -234,7 +234,7 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
 				SYMROOT = build;

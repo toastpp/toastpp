@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F2933E551A6C0EEE0061F80E /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2933E541A6C0EEE0061F80E /* libmath.dylib */; };
+		F23B40931A6D564100FCB964 /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F23B40921A6D564100FCB964 /* libmath.dylib */; };
 		F297DC5F195C197F00A7501F /* tri6_ip.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3A195C197F00A7501F /* tri6_ip.cc */; };
 		F297DC60195C197F00A7501F /* tri_qr.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3B195C197F00A7501F /* tri_qr.cc */; };
 		F297DC61195C197F00A7501F /* element.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC3C195C197F00A7501F /* element.cc */; };
@@ -62,7 +62,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F2933E541A6C0EEE0061F80E /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
+		F23B40921A6D564100FCB964 /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F297DC33195C194700A7501F /* libfe.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libfe.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		F297DC3A195C197F00A7501F /* tri6_ip.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri6_ip.cc; path = ../../src/libfe/tri6_ip.cc; sourceTree = "<group>"; };
 		F297DC3B195C197F00A7501F /* tri_qr.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tri_qr.cc; path = ../../src/libfe/tri_qr.cc; sourceTree = "<group>"; };
@@ -108,7 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F2933E551A6C0EEE0061F80E /* libmath.dylib in Frameworks */,
+				F23B40931A6D564100FCB964 /* libmath.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,7 +118,7 @@
 		F297DC2A195C194700A7501F = {
 			isa = PBXGroup;
 			children = (
-				F2933E541A6C0EEE0061F80E /* libmath.dylib */,
+				F23B40921A6D564100FCB964 /* libmath.dylib */,
 				F297DC3A195C197F00A7501F /* tri6_ip.cc */,
 				F297DC3B195C197F00A7501F /* tri_qr.cc */,
 				F297DC3C195C197F00A7501F /* element.cc */,
@@ -307,7 +307,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACH_O_TYPE = staticlib;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -343,7 +343,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACH_O_TYPE = staticlib;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
@@ -361,7 +361,7 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
@@ -383,7 +383,7 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;

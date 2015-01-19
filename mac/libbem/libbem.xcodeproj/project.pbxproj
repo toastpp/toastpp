@@ -10,7 +10,6 @@
 		F229EA1E195C79C4003F34BC /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA1B195C79C4003F34BC /* libfe.dylib */; };
 		F229EA1F195C79C4003F34BC /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA1C195C79C4003F34BC /* libmath.dylib */; };
 		F229EA20195C79C4003F34BC /* libstoast.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F229EA1D195C79C4003F34BC /* libstoast.dylib */; };
-		F29C55381A6965390089B927 /* libsuperlu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F29C55371A6965390089B927 /* libsuperlu.a */; };
 		F2C7AC4C19B99E850092FFB9 /* libbem.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2CAA192195C4A6E0002757F /* libbem.dylib */; };
 		F2CAA19F195C4EF50002757F /* bem_element.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA199195C4EF50002757F /* bem_element.cc */; };
 		F2CAA1A0195C4EF50002757F /* bem_kernel.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2CAA19A195C4EF50002757F /* bem_kernel.cc */; };
@@ -37,7 +36,6 @@
 		F229EA1B195C79C4003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
 		F229EA1C195C79C4003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F229EA1D195C79C4003F34BC /* libstoast.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstoast.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libstoast.dylib"; sourceTree = "<group>"; };
-		F29C55371A6965390089B927 /* libsuperlu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsuperlu.a; path = ../../gcc_shared/lib/libsuperlu.a; sourceTree = "<group>"; };
 		F2CAA192195C4A6E0002757F /* libbem.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libbem.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2CAA199195C4EF50002757F /* bem_element.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bem_element.cc; path = ../../src/libbem/bem_element.cc; sourceTree = "<group>"; };
 		F2CAA19A195C4EF50002757F /* bem_kernel.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bem_kernel.cc; path = ../../src/libbem/bem_kernel.cc; sourceTree = "<group>"; };
@@ -52,7 +50,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F29C55381A6965390089B927 /* libsuperlu.a in Frameworks */,
 				F229EA1E195C79C4003F34BC /* libfe.dylib in Frameworks */,
 				F229EA1F195C79C4003F34BC /* libmath.dylib in Frameworks */,
 				F229EA20195C79C4003F34BC /* libstoast.dylib in Frameworks */,
@@ -65,7 +62,6 @@
 		F2CAA189195C4A6E0002757F = {
 			isa = PBXGroup;
 			children = (
-				F29C55371A6965390089B927 /* libsuperlu.a */,
 				F229EA1B195C79C4003F34BC /* libfe.dylib */,
 				F229EA1C195C79C4003F34BC /* libmath.dylib */,
 				F229EA1D195C79C4003F34BC /* libstoast.dylib */,
@@ -245,7 +241,7 @@
 					"\"$(SRCROOT)/../../lib/\"",
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
 				SYMROOT = build;
@@ -268,7 +264,7 @@
 					"\"$(SRCROOT)/../../lib/\"",
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx10.9;
 				SYMROOT = build;
