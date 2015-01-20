@@ -6,7 +6,9 @@
 #include "raster_blob2.h"
 #include "tet_qr.h"
 #include "tetsplit.h"
+#include "timing.h"
 
+static double t_rot = 0.0, t_cut = 0.0;
 // ==========================================================================
 // Local prototypes
 
@@ -17,10 +19,10 @@ void IcosaCut (BufMesh &mesh, double scale, const Point &cnt);
 
 RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 {
-    int i, i0, j0, k0, i1, j1, k1, s, el, nd, idx_i, idx_j, tmp;
+    int i, i0, j0, k0, i1, j1, k1, s, m, el, nd, idx_i, idx_j, tmp;
     int nel = meshptr->elen();
-    bool intersect;
-    double px0, py0, pz0, px1, py1, pz1, rx, ry, rz, dstx, dsty, dstz;
+    bool intersect, intersect0, intersect1;
+    double px0, py0, pz0, px1, py1, pz1, rx, ry, rz, dstx, dsty, dstz, djac, v;
 
     double xrange = bbmax[0]-bbmin[0];
     double yrange = bbmax[1]-bbmin[1];
@@ -40,157 +42,219 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
     int *npx = new int[blen];
     for (i = 0; i < blen; i++) npx[i] = 0;
 
-    bool *have_diag = new bool[blen];
-    for (i = 0; i < blen; i++) have_diag[i] = false;
-
-    // pass 1: determine matrix fill structure
-    for (el = 0; el < nel; el++) {
-	Element *pel = meshptr->elist[el];
-	for (k0 = 0; k0 < bdim[2]; k0++) {
-	    pz0 = bbmin[2] + k0+dz;
-	    for (j0 = 0; j0 < bdim[1]; j0++) {
-		py0 = bbmin[1] + j0*dy;
-		for (i0 = 0; i0 < bdim[0]; i0++) {
-		    px0 = bbmin[0] + i0*dx;
-		    intersect = false;
-		    for (s = 0; s < pel->nNode(); s++) {
-			nd = pel->Node[s];
+    // pass 1: determine storage requirements
+    for (idx_i = 0; idx_i < blen; idx_i++) {
+	std::cerr << "pass 1, " << idx_i << "/" << blen << std::endl;
+	k0 = idx_i / stride2;
+	tmp = idx_i - k0*stride2;
+	j0 = tmp / stride1;
+	i0 = tmp % stride1;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	pz0 = bbmin[2] + k0*dz;
+	for (idx_j = 0; idx_j < blen; idx_j++) {
+	    k1 = idx_j / stride2;
+	    tmp = idx_j - k1*stride2;
+	    j1 = tmp / stride1;
+	    i1 = tmp % stride1;
+	    px1 = bbmin[0] + i1*dx;
+	    py1 = bbmin[1] + j1*dy;
+	    pz1 = bbmin[2] + k1*dz;
+	    if (idx_i == idx_j) {
+		npx[idx_i]++; // diagonal elements always exist
+		continue;
+	    }
+	    dstx = px1-px0;
+	    dsty = py1-py0;
+	    dstz = pz1-pz0;
+	    if (dstx*dstx + dsty*dsty + dstz*dstz >= radlimit2)
+		continue;  // no overlap between blobs
+	    intersect0 = intersect1 = false;
+	    for (el = 0; el < nel; el++) {
+		Element *pel = meshptr->elist[el];
+		for (s = 0; s < pel->nNode(); s++) {
+		    nd = pel->Node[s];
+		    if (!intersect0) {
 			rx = px0-meshptr->nlist[nd][0];
 			ry = py0-meshptr->nlist[nd][1];
 			rz = pz0-meshptr->nlist[nd][2];
-			if (rx*rx + ry*ry + rz*rz < radlimit2) {
-			    intersect = true;
-			    break;
-			}
+			if (rx*rx+ry*ry+rz*rz < radlimit2)
+			    intersect0 = true;
 		    }
-		    if (intersect) {
-			for (k1 = 0; k1 < bdim[2]; k1++) {
-			    pz1 = bbmin[2] + k1*dz;
-			    for (j1 = 0; j1 < bdim[1]; j1++) {
-				py1 = bbmin[1] + j1*dy;
-				for (i1 = 0; i1 < bdim[0]; i1++) {
-				    px1 = bbmin[0] + i1*dx;
-				    dstx = px1-px0;
-				    dsty = py1-py0;
-				    dstz = pz1-pz0;
-				    if (dstx*dstx + dsty*dsty + dstz*dstz
-					>= radlimit2) continue;
-				    intersect = false;
-				    for (s = 0; s < pel->nNode(); s++) {
-					nd = pel->Node[s];
-					rx = px1-meshptr->nlist[nd][0];
-					ry = py1-meshptr->nlist[nd][1];
-					rz = pz1-meshptr->nlist[nd][2];
-					if (rx*rx + ry*ry + rz*rz < radlimit2) {
-					    intersect = true;
-					    break;
-					}
-				    }
-				    if (!intersect) continue;
-				    if (i0 + j0*stride1 + k0*stride2 ==
-					i1 + j1*stride1 + k1*stride2)
-					have_diag[i0+j0*stride1+k0*stride2] =
-					    true;
-				    npx[i0 + j0*stride1 + k0*stride2]++;
-				}
-			    }
-			}
+		    if (!intersect1) {
+			rx = px1-meshptr->nlist[nd][0];
+			ry = py1-meshptr->nlist[nd][1];
+			rz = pz1-meshptr->nlist[nd][2];
+			if (rx*rx+ry*ry+rz*rz < radlimit2)
+			    intersect1 = true;
 		    }
 		}
+		if (intersect0 && intersect1)
+		    break;
 	    }
+	    if (intersect0 && intersect1)
+		npx[idx_i]++; // overlap with mesh domain
 	}
-    }
-
-    for (i = 0; i < blen; i++) {
-	if (!have_diag[i]) // reserve space for diag element
-	    npx[i]++;
-	have_diag[i] = false;
     }
 
     int *rowptr = new int[blen+1];
     rowptr[0] = 0;
-    for (i = 0; i < blen; i++)
+    for (i = 0; i < blen; i++) {
 	rowptr[i+1] = rowptr[i]+npx[i];
+	npx[i] = 0;
+    }
     int nz = rowptr[blen];
     int *colidx = new int[nz];
-    for (i = 0; i < blen; i++)
-	npx[i] = 0;
-    for (el = 0; el < nel; el++) {
-	Element *pel = meshptr->elist[el];
-	for (k0 = 0; k0 < bdim[2]; k0++) {
-	    pz0 = bbmin[2] + k0*dz;
-	    for (j0 = 0; j0 < bdim[1]; j0++) {
-		py0 = bbmin[1] + j0*dy;
-		for (i0 = 0; i0 < bdim[0]; i0++) {
-		    px0 = bbmin[0] + i0*dx;
-		    intersect = false;
-		    for (s = 0; s < pel->nNode(); s++) {
-			nd = pel->Node[s];
+
+    // pass 2: determine matrix sparsity pattern
+    for (idx_i = 0; idx_i < blen; idx_i++) {
+	std::cerr << "pass 2, " << idx_i << "/" << blen << std::endl;
+	k0 = idx_i / stride2;
+	tmp = idx_i - k0*stride2;
+	j0 = tmp / stride1;
+	i0 = tmp % stride1;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	pz0 = bbmin[2] + k0*dz;
+	for (idx_j = 0; idx_j < blen; idx_j++) {
+	    k1 = idx_j / stride2;
+	    tmp = idx_j - k1*stride2;
+	    j1 = tmp / stride1;
+	    i1 = tmp % stride1;
+	    px1 = bbmin[0] + i1*dx;
+	    py1 = bbmin[1] + j1*dy;
+	    pz1 = bbmin[2] + k1*dz;
+	    if (idx_i == idx_j) {
+		colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
+		continue;
+	    }
+	    dstx = px1-px0;
+	    dsty = py1-py0;
+	    dstz = pz1-pz0;
+	    if (dstx*dstx + dsty*dsty + dstz*dstz >= radlimit2)
+		continue;  // no overlap between blobs
+	    intersect0 = intersect1 = false;
+	    for (el = 0; el < nel; el++) {
+		Element *pel = meshptr->elist[el];
+		for (s = 0; s < pel->nNode(); s++) {
+		    nd = pel->Node[s];
+		    if (!intersect0) {
 			rx = px0-meshptr->nlist[nd][0];
 			ry = py0-meshptr->nlist[nd][1];
 			rz = pz0-meshptr->nlist[nd][2];
-			if (rx*rx + ry*ry + rz*rz < radlimit2) {
-			    intersect = true;
-			    break;
-			}
+			if (rx*rx+ry*ry+rz*rz < radlimit2)
+			    intersect0 = true;
 		    }
-		    idx_i = i0 + j0*stride1 + k0*stride2;
-		    if (intersect) {
-			for (k1 = 0; k1 < bdim[2]; k1++) {
-			    pz1 = bbmin[2] + k1*dz;
-			    for (j1 = 0; j1 < bdim[1]; j1++) {
-				py1 = bbmin[1] + j1*dy;
-				for (i1 = 0; i1 < bdim[0]; i1++) {
-				    px1 = bbmin[0] + i1*dx;
-				    dstx = px1-px0;
-				    dsty = py1-py0;
-				    dstz = pz1-pz0;
-				    if (dstx*dstx + dsty*dsty + dstz*dstz
-					>= radlimit2) continue;
-				    intersect = false;
-				    for (s = 0; s < pel->nNode(); s++) {
-					nd = pel->Node[s];
-					rx = px1-meshptr->nlist[nd][0];
-					ry = py1-meshptr->nlist[nd][1];
-					rz = pz1-meshptr->nlist[nd][2];
-					if (rx*rx + ry*ry + rz*rz < radlimit2) {
-					    intersect = true;
-					    break;
-					}
-				    }
-				    if (!intersect) continue;
-				    idx_j = i1 + j1*stride1 + k1*stride2;
-				    if (idx_i == idx_j)
-					have_diag[idx_i] = true;
-				    colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
-				}
-			    }
-			}
+		    if (!intersect1) {
+			rx = px1-meshptr->nlist[nd][0];
+			ry = py1-meshptr->nlist[nd][1];
+			rz = pz1-meshptr->nlist[nd][2];
+			if (rx*rx+ry*ry+rz*rz < radlimit2)
+			    intersect1 = true;
 		    }
 		}
+		if (intersect0 && intersect1)
+		    break;
 	    }
+	    if (intersect0 && intersect1)
+		colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
 	}
     }
-    for (i = 0; i < blen; i++) {
-	if (!have_diag[i])
-	    colidx[rowptr[i] + npx[i]++] = i;
-    }
-    delete []have_diag;
-
+    delete []npx;
     RCompRowMatrix *bvv = new RCompRowMatrix (blen, blen, rowptr, colidx);
 
-    BufMesh submesh0, submesh1;
-    submesh0.elist.Append(new Tetrahedron4);
-    submesh0.nlist.New(4);
-    submesh0.nlen_used = 0;
-    submesh0.elen_used = 0;
-    submesh1.elist.Append(new Tetrahedron4);
-    submesh1.nlist.New(4);
-    submesh1.nlen_used = 0;
-    submesh1.elen_used = 0;
+    BufMesh submesh1, submesh2, submesh(*meshptr);
+    double t_copy = 0.0, t_cut = 0.0, t_setup = 0.0, t_comp = 0.0;
+
+    // pass 3: fill the matrix
+    for (idx_i = 0; idx_i < blen; idx_i++) {
+	std::cerr << "pass 3, " << idx_i << "/" << blen
+		  << ", t_copy=" << t_copy << ", t_cut=" << t_cut
+		  << ", t_setup=" << t_setup << ", t_comp=" << t_comp
+		  << std::endl;
+	k0 = idx_i / stride2;
+	tmp = idx_i - k0*stride2;
+	j0 = tmp / stride1;
+	i0 = tmp % stride1;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	pz0 = bbmin[2] + k0*dz;
+
+	for (el = 0; el < nel; el++) {
+	    Element *pel = meshptr->elist[el];
+	    intersect0 = false;
+	    for (s = 0; s < pel->nNode(); s++) {
+		nd = pel->Node[s];
+		rx = px0-meshptr->nlist[nd][0];
+		ry = py0-meshptr->nlist[nd][1];
+		rz = pz0-meshptr->nlist[nd][2];
+		if (rx*rx + ry*ry + rz*rz < radlimit2) {
+		    intersect0 = true;
+		    break;
+		}
+	    }
+	    submesh.elist[el]->SetRegion (intersect0 ? 0 : -1);
+	}
+	Point cnt(3);
+	cnt[0] = px0, cnt[1] = py0, cnt[2] = pz0;
+	submesh1.Copy (submesh);
+	//submesh1.Shrink();
+	IcosaCut (submesh1, sup, cnt); // cut mesh with first blob
+	if (!submesh1.elen_used) continue; // blob has no mesh support
+
+	for (idx_j = 0; idx_j < blen; idx_j++) {
+	    k1 = idx_j / stride2;
+	    tmp = idx_j - k1*stride2;
+	    j1 = tmp / stride1;
+	    i1 = tmp % stride1;
+	    px1 = bbmin[0] + i1*dx;
+	    py1 = bbmin[1] + j1*dy;
+	    pz1 = bbmin[2] + k1*dz;
+	    dstx = px1-px0;
+	    dsty = py1-py0;
+	    dstz = pz1-pz0;
+	    if (dstx*dstx + dsty*dsty + dstz*dstz >= radlimit2)
+		continue;  // no overlap between blobs
+	    cnt[0] = px1, cnt[1] = py1, cnt[2] = pz1;
+	    tic();
+	    submesh2.Copy (submesh1);
+	    t_copy += toc();
+	    tic();
+	    IcosaCut (submesh2, sup, cnt);
+	    t_cut += toc();
+	    tic();
+	    submesh2.SubSetup();
+	    t_setup += toc();
+	    tic();
+	    for (s = 0; s < submesh2.elen_used; s++) {
+		Element *psel = submesh2.elist[s];
+		if (psel->Region()) continue;
+		for (m = 0; m < np; m++) {
+		    djac = psel->DetJ(absc[m], &submesh2.nlist);
+		    Point glob = psel->Global (submesh2.nlist, absc[m]);
+		    v = wght[m] * djac *
+			Value_nomask(glob,idx_i,false) *
+			Value_nomask(glob,idx_j,false);
+		    (*bvv)(idx_i,idx_j) += v;
+		    if (idx_i != idx_j)
+			(*bvv)(idx_j,idx_i) += v;
+		}
+	    }
+	    t_comp += toc();
+	}
+    }
+
+
+#ifdef UNDEF
+    BufMesh submesh, submesh2;
+    submesh.elist.Append(new Tetrahedron4);
+    submesh.nlist.New(4);
+    submesh.nlen_used = 0;
+    submesh.elen_used = 0;
 
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
+	std::cerr << "pass3, el=" << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 
 	for (idx_i = 0; idx_i < blen; idx_i++) {
@@ -215,15 +279,15 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 	    if (!intersect) continue;
 	    // create a mesh contining this single element
 	    for (s = 0; s < 4; s++) {
-		submesh0.elist[0]->Node[s] = s;
-		submesh0.nlist[s] = meshptr->nlist[pel->Node[s]];
+		submesh.elist[0]->Node[s] = s;
+		submesh.nlist[s] = meshptr->nlist[pel->Node[s]];
 	    }
-	    submesh0.elen_used = 1;
-	    submesh0.nlen_used = 4;
-	    submesh0.elist[0]->SetRegion(0);
+	    submesh.elen_used = 1;
+	    submesh.nlen_used = 4;
+	    submesh.elist[0]->SetRegion(0);
 	    Point cnt(3);
 	    cnt[0] = px0, cnt[1] = py0, cnt[2] = pz0;
-	    IcosaCut (submesh0, sup, cnt);
+	    IcosaCut (submesh, sup, cnt);
 	    for (idx_j = 0; idx_j <= idx_i; idx_j++) {
 		k1 = idx_j / stride2;
 		tmp = idx_j - k1*stride2;
@@ -249,26 +313,42 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 		    }
 		}
 		if (!intersect) continue;
-		for (s = 0; s < 4; s++) {
-		    submesh1.elist[0]->Node[s] = s;
-		    submesh1.nlist[s] = meshptr->nlist[pel->Node[s]];
-		}
-		submesh1.elen_used = 1;
-		submesh1.nlen_used = 4;
-		submesh1.elist[0]->SetRegion(0);
+
 		Point cnt(3);
 		cnt[0] = px1, cnt[1] = py1, cnt[2] = pz1;
-		IcosaCut (submesh1, sup, cnt);
-		// what now? need intersection of the two submeshes
+		submesh2.Copy (submesh);
+		IcosaCut (submesh2, sup, cnt);
+		submesh2.SubSetup();
+		for (s = 0; s < submesh2.elen_used; s++) {
+		    Element *psel = submesh2.elist[s];
+		    if (psel->Region()) continue;
+		    for (m = 0; m < np; m++) {
+			djac = psel->DetJ(absc[m], &submesh2.nlist);
+			Point glob = psel->Global (submesh2.nlist, absc[m]);
+			v = wght[m] * djac *
+			    Value_nomask(glob,idx_i,false) *
+			    Value_nomask(glob,idx_j,false);
+			(*bvv)(idx_i,idx_j) += v;
+			if (idx_i != idx_j)
+			    (*bvv)(idx_j,idx_i) += v;
+		    }
+		}
 	    }
 	}
     }
+#endif
 
     delete []rowptr;
     delete []colidx;
-    delete []npx;
+
+    // diagonal conditioning
+    RVector d = bvv->Diag();
+    double dmean = mean(d);
+    for (i = 0; i < blen; i++)
+	(*bvv)(i,i) += dmean * dgscale;
 
     bvv->Shrink();
+    std::cerr << "exit BasisMatrix" << std::endl;
     return bvv;
 }
 
@@ -276,6 +356,8 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 
 RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 {
+    std::cerr << "enter MixedMatrix" << std::endl;
+
     int i, j, k, r, s, m, nd, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
     int imin, imax, jmin, jmax, kmin, kmax;
@@ -292,7 +374,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
     double dz = zrange/(bdim[2]-1.0);
     double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v;
     double rx, ry, rz;
-    int stride_i = bdim[0], stride_j = stride_i*bdim[1];
+    int stride1 = bdim[0], stride2 = bdim[0]*bdim[1];
     double radlimit2 = sup*sup;
 
     // quadrature rule for local tetrahedron
@@ -303,9 +385,10 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
     // pass 1: determine matrix fill structure
     double px, py, pz;
     for (el = 0; el < nel; el++) {
+	std::cerr << "pass1, el=" << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	for (k = 0; k < bdim[2]; k++) {
-	    pz = bbmin[2] + k+dz;
+	    pz = bbmin[2] + k*dz;
 	    for (j = 0; j < bdim[1]; j++) {
 		py = bbmin[1] + j*dy;
 		for (i = 0; i < bdim[0]; i++) {
@@ -339,6 +422,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
     for (i = 0; i < n; i++)
 	npx[i] = 0;
     for (el = 0; el < nel; el++) {
+	std::cerr << "pass2, el=" << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	for (k = 0; k < bdim[2]; k++) {
 	    pz = bbmin[2] + k*dz;
@@ -351,6 +435,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 			nd = pel->Node[s];
 			rx = px-meshptr->nlist[nd][0];
 			ry = py-meshptr->nlist[nd][1];
+			rz = pz-meshptr->nlist[nd][2];
 			if (rx*rx + ry*ry + rz*rz < radlimit2) {
 			    intersect = true;
 			    break;
@@ -360,7 +445,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 			for (s = 0; s < pel->nNode(); s++) {
 			    nd = pel->Node[s];
 			    colidx[rowptr[nd]+npx[nd]++] =
-				i + j*bdim[0] + k*bdim[0]*bdim[1];
+				i + j*stride1 + k*stride2;
 			}
 		    }
 		}
@@ -378,6 +463,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
     submesh.elen_used = 0;
 
     for (el = 0; el < nel; el++) {
+	std::cerr << "pass3, el=" << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 
 	for (k = 0; k < bdim[2]; k++) {
@@ -411,9 +497,10 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 			cnt[0] = px, cnt[1] = py, cnt[2] = pz;
 			IcosaCut (submesh, sup, cnt);
 			submesh.SubSetup();
-			idx_j = i + (j + k*bdim[1])*bdim[0];
-			for (s = 0; s < submesh.elen_used; i++) {
-			    Element *psel = submesh.elist[i];
+			idx_j = i + j*stride1 + k*stride2;
+			for (s = 0; s < submesh.elen_used; s++) {
+			    Element *psel = submesh.elist[s];
+			    if (psel->Region()) continue;
 			    // map quadrature points into global frame
 			    for (m = 0; m < np; m++) {
 				djac = psel->DetJ(absc[m], &submesh.nlist);

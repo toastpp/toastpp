@@ -99,6 +99,15 @@ int NodeList::Exists (const Node &node, double rad) const
     return -1;
 }
 
+NodeList &NodeList::operator= (const NodeList &nl)
+{
+    New (nl.Len());
+    for (int i = 0; i < size; i++)
+	list[i].Copy (nl.list[i]);
+    dofnod = nl.dofnod;
+    return *this;
+}
+
 int NodeList::TotBnd (void) const
 {
     int n, bnd;

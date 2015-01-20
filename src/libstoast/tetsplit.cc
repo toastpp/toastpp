@@ -17,6 +17,14 @@ BufMesh::BufMesh(): Mesh()
     nlen_used = elen_used = 0;
 }
 
+BufMesh::BufMesh (const Mesh &mesh): Mesh(mesh)
+{
+    nlen_used = nlen();
+    elen_used = elen();
+    for (int i = 0; i < elen_used; i++)
+	elist[i]->SetRegion(0);  // mark all elements active
+}
+
 void BufMesh::SubSetup()
 {
     for (int el=0; el < elen_used; el++)
@@ -27,21 +35,44 @@ void BufMesh::SubSetup()
 	    elist[el]->PostInitialisation(nlist);
 }
 
+void BufMesh::Copy (const BufMesh &mesh)
+{
+    nlist = mesh.nlist;
+    elist = mesh.elist;
+    nlen_used = mesh.nlen_used;
+    elen_used = mesh.elen_used;
+    for (int i = 0; i < elen_used; i++)
+	elist[i]->SetRegion (mesh.elist[i]->Region());
+    SubSetup();
+}
+
 void BufMesh::Shrink()
 {
-    int el, i;
-    for (el = 0; el < elen_used; ) {
-	if (elist[el]->Region() < 0) {
-	    elist.Delete(el);
-	    elen_used--;
-	} else el++;
+    int el, i, j, elen_used_new;
+
+    for (el = 0; el < elen_used; el++) {
+	if (elist[el]->Region()) {
+	    for (i = el+1; i < elen_used; i++) {
+		if (elist[i]->Region() == 0) {
+		    for (j = 0; j < elist[el]->nNode(); j++)
+			elist[el]->Node[j] = elist[i]->Node[j];
+		    elist[el]->SetRegion(0);
+		    elist[i]->SetRegion(-1);
+		    elist[el]->Initialise (nlist);
+		    break;
+		}
+	    }
+	}
     }
+    for (elen_used_new = el = 0; el < elen_used; el++)
+	if (elist[el]->Region() == 0) elen_used_new++;
+    elen_used = elen_used_new;
     // also need to shrink the node list
 }
 
 void BufMesh::Rotate (const RDenseMatrix &R)
 {
-    for (int i = 0; i < nlist.Len(); i++) {
+    for (int i = 0; i < nlen_used; i++) {
 	nlist[i] = R * nlist[i];
     }
 }

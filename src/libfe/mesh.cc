@@ -143,7 +143,17 @@ void Mesh::Copy (const Mesh &mesh)
     nlist = mesh.nlist;
     elist = mesh.elist;
     plist = mesh.plist;
-    Setup ();
+    nbhrs = 0;
+    fullsize = 0.0;
+    lastel_found = 0;
+    priv_nbnd = 0;
+    trap_load_error = true;
+    IndexBnd2Node = 0;
+    IndexNode2Bnd = 0;
+    is_set_up = false;
+    boundary = 0;
+    bnd_param = 0;
+    Setup (false);
 }
 
 RDenseMatrix Mesh::ElGeom (int el) const

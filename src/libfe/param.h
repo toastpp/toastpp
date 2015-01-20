@@ -193,6 +193,9 @@ public:
     void Remove (const int rec);
     // remove entry `rec' from the list
 
+    ParameterList &operator= (const ParameterList &plist);
+    // make *this a copy of plist
+
     // list type 
     PlistType pltype() const { return plist_type;}
     void SetListType(PlistType p) { plist_type = p;}

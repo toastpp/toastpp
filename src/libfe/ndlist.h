@@ -48,6 +48,9 @@ public:
     // If more than one node lies within 'rad' of 'node' then the first in
     // the list is returned
 
+    NodeList &operator= (const NodeList &nl);
+    // make *this a copy of nl
+
     int TotBnd (void) const;
     // returns the number of boundary nodes in the list  OLD!
 

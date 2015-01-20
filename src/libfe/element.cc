@@ -23,6 +23,8 @@ Element::Element ()
     sdnbhridx = 0;
     region = -1;
     subdivdata = 0;
+    bndel = false;
+    interfaceel = false;
 }
 
 Element::Element (const Element& el)   // copy constructor
@@ -33,6 +35,8 @@ Element::Element (const Element& el)   // copy constructor
     sdnbhridx = 0;
     region = -1;
     subdivdata = 0;
+    bndel = false;
+    interfaceel = false;
 }
 
 Element::~Element ()
@@ -434,6 +438,10 @@ void Element_Unstructured::Initialise (const NodeList &nlist)
 {
     Element::Initialise (nlist);
     size = ComputeSize (nlist);
+#ifdef FEM_DEBUG
+    if (size <= 0)
+	LOGOUT("Warning: element size not positive");
+#endif
     intdd.Zero (nNode());
     intbff.Zero (nNode());
 
