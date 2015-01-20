@@ -254,6 +254,18 @@ void ParameterList::Remove (const int rec)
     size--;
 }
 
+ParameterList &ParameterList::operator= (const ParameterList &plist)
+{
+    New (plist.Len());
+    for (int i = 0; i < size; i++) {
+	list[i] = plist.list[i];
+    }
+    output_prmtp_p1 = plist.output_prmtp_p1;
+    output_prmtp_p2 = plist.output_prmtp_p2;
+    output_prmtp_p3 = plist.output_prmtp_p3;
+    plist_type = plist.plist_type;
+}
+
 RVector ParameterList::Param (ParameterType prmtp) const
 {
     RVector prmvec(size);

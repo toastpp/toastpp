@@ -90,9 +90,14 @@ void Raster2::Init ()
     }
 
     // mass matrix for mesh basis
+    std::cerr << "enter MassMatrix" << std::endl;
     Buu = meshptr->MassMatrix();
+    std::cerr << "back from MassMatrix" << std::endl;
+
     // mass matrix for intrinsic basis
     Bvv = CreateBasisMassmat();
+    std::cerr << "back from BasisMatrix" << std::endl;
+
     // mass matrix for the mixed bases
     Buv = CreateMixedMassmat();
 

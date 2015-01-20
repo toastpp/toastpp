@@ -2277,8 +2277,9 @@ void TCompRowMatrix<MT>::CholeskySubst (const TVector<MT> &d,
     idxtype *Lcolidx = colidx;
     for (i = 0; i < n; i++) {
 	k1 = rowptr[i+1];
-        for (sum = b[i]; k < k1; k++)
+        for (sum = b[i]; k < k1; k++) {
 	    sum -= *Lval++ * x[*Lcolidx++];
+	}
 	x[i] = sum / d[i];
     }
     k = colptr[n]-1;
@@ -2299,7 +2300,8 @@ void CholeskySolve (const TCompRowMatrix<MT> &L,
 {
     dASSERT(d.Dim() == L.nCols(), "Incompatible dimensions");
     dASSERT(d.Dim() == b.Dim(), "Incompatible dimensions");
-    dASSERT(d.Dim() == x.Dim(), "Incompatible dimensions");
+
+    if (x.Dim() != d.Dim()) x.New (d.Dim());
     L.CholeskySubst (d, b.data_buffer(), x.data_buffer());
 }
 

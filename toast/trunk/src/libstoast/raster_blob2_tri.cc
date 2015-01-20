@@ -273,8 +273,6 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tri () const
     // pass 1: determine matrix fill structure
     double px0, py0, px1, py1;
     for (el = 0; el < nel; el++) {
-	std::cerr << "pass 1a: " << el << "/" << nel << std::endl;
-
 	Element *pel = meshptr->elist[el];
 	for (j0 = 0; j0 < bdim[1]; j0++) {
 	    py0 = bbmin[1] + j0*dy;

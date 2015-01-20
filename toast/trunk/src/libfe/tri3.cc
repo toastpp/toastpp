@@ -90,7 +90,6 @@ void Triangle3::Initialise (const NodeList& nlist)
     a2 = x0*y1 - x1*y0;  b2 = y0-y1;  c2 = x1-x0;
 
     Element_Unstructured_2D::Initialise (nlist);
-    dASSERT(size > 0, "Element size not positive");
 
 #ifdef TRI3_STORE_INTFF
     intff.New(3);

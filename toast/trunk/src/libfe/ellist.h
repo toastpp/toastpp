@@ -24,6 +24,9 @@ public:
     PElement& operator[] (int rec) const;
     // returns reference to an element in the list
 
+    ElementList &operator= (const ElementList &elist);
+    // make *this a copy of elist
+
     void New (int length);
     // create new (empty) list of with 'length' entries
 

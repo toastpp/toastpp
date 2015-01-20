@@ -10,8 +10,10 @@
 class BufMesh: public Mesh
 {
 public:
-    BufMesh();
+    BufMesh ();
+    BufMesh (const Mesh &mesh);
     void SubSetup();
+    void Copy (const BufMesh &mesh);
     void Shrink();
     void Rotate (const RDenseMatrix &R);
     friend std::ostream& operator<< (std::ostream& o, BufMesh &mesh);

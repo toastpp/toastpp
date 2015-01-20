@@ -67,6 +67,14 @@ void ElementList::Delete (int rec)
     List = TmpList;
 }
 
+ElementList &ElementList::operator= (const ElementList &elist)
+{
+    New (elist.Len());
+    for (int i = 0; i < Length; i++)
+	List[i] = elist[i]->Copy();
+    isKappa = elist.isKappa;
+}
+
 void ElementList::SetList (int no, PElement *ppel)
 {
     Clear(); // clear previous list
