@@ -30,9 +30,9 @@
 		F229E9FF195C7749003F34BC /* solution.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9E9195C7749003F34BC /* solution.cc */; };
 		F229EA00195C7749003F34BC /* source.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229E9EA195C7749003F34BC /* source.cc */; };
 		F23B408F1A6D559500FCB964 /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F23B408E1A6D559500FCB964 /* libsuperlu.dylib */; };
-		F23B40951A6D566D00FCB964 /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F23B40941A6D566D00FCB964 /* libmath.dylib */; };
 		F25A48C719804D0500656531 /* raster_px2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F25A48C619804D0500656531 /* raster_px2.cc */; };
-		F2933E581A6C0F2C0061F80E /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2933E561A6C0F2C0061F80E /* libfe.dylib */; };
+		F272C2D81A6FA1C8004EBCFF /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F272C2D71A6FA1C8004EBCFF /* libmath.dylib */; };
+		F272C2DA1A6FA1CB004EBCFF /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F272C2D91A6FA1CB004EBCFF /* libfe.dylib */; };
 		F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229E9CE195C7652003F34BC /* libstoast.dylib */; };
 		F2FF2D4B1A694F340092CC78 /* raster_blob2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D4A1A694F340092CC78 /* raster_blob2.cc */; };
 		F2FF2D5D1A694F9E0092CC78 /* raster_bb2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D4C1A694F9E0092CC78 /* raster_bb2.cc */; };
@@ -92,9 +92,9 @@
 		F229E9E9195C7749003F34BC /* solution.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = solution.cc; path = ../../src/libstoast/solution.cc; sourceTree = "<group>"; };
 		F229E9EA195C7749003F34BC /* source.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = source.cc; path = ../../src/libstoast/source.cc; sourceTree = "<group>"; };
 		F23B408E1A6D559500FCB964 /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = ../../gcc_shared/lib/libsuperlu.dylib; sourceTree = "<group>"; };
-		F23B40941A6D566D00FCB964 /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F25A48C619804D0500656531 /* raster_px2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_px2.cc; path = ../../src/libstoast/raster_px2.cc; sourceTree = "<group>"; };
-		F2933E561A6C0F2C0061F80E /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
+		F272C2D71A6FA1C8004EBCFF /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = ../libmath/build/Debug/libmath.dylib; sourceTree = "<group>"; };
+		F272C2D91A6FA1CB004EBCFF /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = ../libfe/build/Debug/libfe.dylib; sourceTree = "<group>"; };
 		F2FF2D4A1A694F340092CC78 /* raster_blob2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_blob2.cc; path = ../../src/libstoast/raster_blob2.cc; sourceTree = "<group>"; };
 		F2FF2D4C1A694F9E0092CC78 /* raster_bb2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_bb2.cc; path = ../../src/libstoast/raster_bb2.cc; sourceTree = "<group>"; };
 		F2FF2D4D1A694F9E0092CC78 /* raster_blob2_tet.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_blob2_tet.cc; path = ../../src/libstoast/raster_blob2_tet.cc; sourceTree = "<group>"; };
@@ -120,9 +120,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F23B40951A6D566D00FCB964 /* libmath.dylib in Frameworks */,
+				F272C2DA1A6FA1CB004EBCFF /* libfe.dylib in Frameworks */,
+				F272C2D81A6FA1C8004EBCFF /* libmath.dylib in Frameworks */,
 				F23B408F1A6D559500FCB964 /* libsuperlu.dylib in Frameworks */,
-				F2933E581A6C0F2C0061F80E /* libfe.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,9 +132,9 @@
 		F229E9C5195C7652003F34BC = {
 			isa = PBXGroup;
 			children = (
-				F23B40941A6D566D00FCB964 /* libmath.dylib */,
+				F272C2D91A6FA1CB004EBCFF /* libfe.dylib */,
+				F272C2D71A6FA1C8004EBCFF /* libmath.dylib */,
 				F23B408E1A6D559500FCB964 /* libsuperlu.dylib */,
-				F2933E561A6C0F2C0061F80E /* libfe.dylib */,
 				F229E9D5195C7749003F34BC /* fwdsolver_cslu.cc */,
 				F229E9D6195C7749003F34BC /* fwdsolver_mw.cc */,
 				F229E9D7195C7749003F34BC /* fwdsolver_zslu.cc */,
@@ -385,6 +385,8 @@
 					/opt/local/lib/libgcc,
 					/opt/local/lib/gcc48,
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
+					/Users/samuelpowell/Documents/toast/mac/libmath/build/Debug,
+					/Users/samuelpowell/Documents/toast/mac/libfe/build/Debug,
 				);
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -413,6 +415,8 @@
 					/opt/local/lib/libgcc,
 					/opt/local/lib/gcc48,
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
+					/Users/samuelpowell/Documents/toast/mac/libmath/build/Debug,
+					/Users/samuelpowell/Documents/toast/mac/libfe/build/Debug,
 				);
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;

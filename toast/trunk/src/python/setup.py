@@ -23,7 +23,7 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libmath',
                                     toastdir+'/src/libfe',
                                     toastdir+'/src/libstoast'],
-                    libraries = ['libmath','libfe','libstoast'] if "win" in sys.platform else ['math','fe','stoast'],
+                    libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
                     library_dirs = [toastver+'/lib'],
                     sources = ['toastmodule.cc'])
 

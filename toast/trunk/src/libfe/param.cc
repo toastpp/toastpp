@@ -264,6 +264,7 @@ ParameterList &ParameterList::operator= (const ParameterList &plist)
     output_prmtp_p2 = plist.output_prmtp_p2;
     output_prmtp_p3 = plist.output_prmtp_p3;
     plist_type = plist.plist_type;
+    return *this;
 }
 
 RVector ParameterList::Param (ParameterType prmtp) const
