@@ -73,6 +73,7 @@ ElementList &ElementList::operator= (const ElementList &elist)
     for (int i = 0; i < Length; i++)
 	List[i] = elist[i]->Copy();
     isKappa = elist.isKappa;
+    return *this;
 }
 
 void ElementList::SetList (int no, PElement *ppel)
