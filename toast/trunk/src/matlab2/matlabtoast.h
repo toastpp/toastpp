@@ -180,6 +180,8 @@ public:
     void SurfData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void SysmatSparsityStructure (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void SysmatComponent (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void Massmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);

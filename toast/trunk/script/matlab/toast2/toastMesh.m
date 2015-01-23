@@ -600,6 +600,29 @@ classdef toastMesh < handle
             end
         end
 
+        function smat = SysmatSparsityStructure (obj)
+            % Generate FEM system sparsity structure.
+            %
+            % Syntax: S = mesh.SysmatSparsityStructure 
+            %
+            % Return values:
+            %         S [real sparse matrix, n x n]:
+            %             empty system matrix
+            %
+            % Notes:
+            %         Returns a sparse real n x n matrix (n: number of
+            %         nodes in the mesh) with entries at locations
+            %         corresponding to the non-zeros in a system matrix for
+            %         this mesh. 
+            %
+            % See also:
+            %         toastMesh, SYSMATCOMPONENT
+           
+            smat = toast(uint32(92),obj.handle);
+            
+        end
+        
+        
         function smat = SysmatComponent (obj,intstr,varargin)
             % Generate an FEM system matrix component.
             %
@@ -651,15 +674,48 @@ classdef toastMesh < handle
             %         S is a building block for creating the FEM system
             %         matrix.
             %
+            % Advanced usage:
+            %         If a sparse matrix is passed as the last argument,
+            %         this will be used as the sparsity structure for the
+            %         system matrix component to be calculated. The current
+            %         sparsity structure of the mesh can be extracted by
+            %         calling toastMesh.SysmatSparsityStructure. Employing
+            %         this technique can vastly improve performance,
+            %         however caution should be excercised as no attempt is
+            %         made to check the validity of the sparsity structure:
+            %         improper usage will lead to undefined behaviour.
+            %
             % See also:
             %         toastMesh, ELMAT, DOTSYSMAT
-            if length(varargin)==0
-                smat = toast(uint32(74),obj.handle,intstr);
-            elseif length(varargin)==1
-                smat = toast(uint32(74),obj.handle,intstr,varargin{1});
-            else
-                smat = toast(uint32(74),obj.handle,intstr,varargin{1},varargin{2});
+            switch length(varargin)
+                
+                case 0
+                    % Integral without parameter
+                    smat = toast(uint32(74),obj.handle,intstr);
+                
+                case 1
+                    % Integral with parameter
+                    smat = toast(uint32(74),obj.handle,intstr,varargin{1});
+
+                case 2
+                    % Either element flag or sparsity structure
+                    if(strcmp(varargin{2},'EL'))
+                        smat = toast(uint32(74),obj.handle,intstr,varargin{1},varargin{2});
+                    elseif(issparse(varargin{2}))
+                        smat = toast(uint32(74),obj.handle,intstr,varargin{1},[],varargin{2});
+                    else
+                        error('mesh.SysmatComponent: unexpected arguments');
+                    end
+                    
+                case 3
+                    % Element flag with sparsity structure
+                    smat = toast(uint32(74),obj.handle,intstr,varargin{1},varargin{2},varargin{3});
+                    
+                otherwise
+                    error('mesh.SysmatComponent: unexpected arguments');
+                   
             end
+            
         end
         
         function mmat = Massmat (obj)
@@ -1021,7 +1077,7 @@ classdef toastMesh < handle
             mvec = toast(uint32(19),obj.handle,varargin{:});
         end
         
-        function intvec = IntFG(obj, f, g);
+        function intvec = IntFG(obj, f, g)
             % Integrate product of two real or complex functions over mesh.
             %
             % Syntax: mesh.IntFG(f, g)
@@ -1038,7 +1094,7 @@ classdef toastMesh < handle
         end
 
        
-        function intvec = IntGradFGradG(obj, f, g);
+        function intvec = IntGradFGradG(obj, f, g)
             % Integrate product of the gradient of two real or complex
 	    % functions over mesh.
             %
