@@ -291,8 +291,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mtoast->SurfData (nlhs, plhs, nrhs, prhs);
 	break;
     case TOAST_SYSMATCOMPONENT:
-        mtoast->SysmatComponent (nlhs, plhs, nrhs, prhs);
+    mtoast->SysmatComponent (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_SPARSITYSTRUCTURE:
+    mtoast->SysmatSparsityStructure(nlhs, plhs, nrhs, prhs);
+    break;
     case TOAST_MASSMAT:
 	mtoast->Massmat (nlhs, plhs, nrhs, prhs);
 	break;

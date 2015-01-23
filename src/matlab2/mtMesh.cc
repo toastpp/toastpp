@@ -452,18 +452,56 @@ void MatlabToast::SurfData (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
-void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
-    bool elbasis, mxArray **res)
+void MatlabToast::SysmatSparsityStructure (int nlhs, mxArray *plhs[],
+    int nrhs, const mxArray *prhs[])
 {
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+
     int n = mesh->nlen();
     int *rowptr, *colidx, nzero;
-
+    double *ndata;
+    
     mesh->SparseRowStructure (rowptr, colidx, nzero);
-    RCompRowMatrix F(n, n, rowptr, colidx);
+    
+    ndata = new double[nzero];
+    for(int i=0; i<nzero; i++) ndata[i] = 1.0;
+    
+    RCompRowMatrix F(n, n, rowptr, colidx, ndata);
+    
     delete []rowptr;
     delete []colidx;
+    delete []ndata;
     
+    CopyMatrix ( &plhs[0], F);
+}
 
+
+// =========================================================================
+
+void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
+    bool elbasis, mxArray **res, RCompRowMatrix &F)
+{
+    int n = mesh->nlen();
+
+    // If the supplied matrix has the correct dimension, assume it is
+    // of the correct sparsity structure, else compute and reinitialise.
+    if((F.nRows() == n) && (F.nCols() == n)) {
+        
+        F.Zero();
+        
+    }
+    else {
+        
+        int *rowptr, *colidx, nzero;
+        
+        mesh->SparseRowStructure (rowptr, colidx, nzero);
+        F.New(n, n);
+        F.Initialise(rowptr, colidx);
+        delete []rowptr;
+        delete []colidx;
+        
+    }
+    
     if (!strcasecmp (integral_type, "FF")) {
 	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
     } else if (!strcasecmp (integral_type, "DD")) {
@@ -489,6 +527,7 @@ void MatlabToast::SysmatComponent (int nlhs, mxArray *plhs[],
   QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     RVector prm;
+    RCompRowMatrix F;
     bool elbasis = false;
     char integral_type[32] = "";
 
@@ -512,9 +551,13 @@ void MatlabToast::SysmatComponent (int nlhs, mxArray *plhs[],
 
     }
     
+    if (nrhs >= 5 && mxIsSparse(prhs[4])) CopyTMatrix(F, prhs[4]);
+        
+
+    
     
 
-    CalcSysmatComponent (mesh, prm, integral_type, elbasis, &plhs[0]);
+    CalcSysmatComponent (mesh, prm, integral_type, elbasis, &plhs[0], F);
 }
 
 // =========================================================================
