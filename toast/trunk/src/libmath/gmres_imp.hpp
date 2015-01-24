@@ -146,7 +146,13 @@ int gmres (int restart, const TMatrix<MT> &A, const TVector<MT> &b,
 	    for (k = 0; k <= j; k++) {
 	        TVector<MT> &vk = v[k];
                 sum = (MT)0;
-		for (n = 0; n < N; n++) sum += vj1[n] * conj(vk[n]);
+     
+// SP 24.01.15: See mathdef.h for details of the following OS X specifics
+#ifndef __APPLE__
+            for (n = 0; n < N; n++) sum += vj1[n] * conj(vk[n]);
+#else
+            for (n = 0; n < N; n++) sum += vj1[n] * osxfix::conj(vk[n]);
+#endif
 		H(j,k) = sum;  // H(j,k) = C-innerproduct(v[j+1],v[k]);
 		for (n = 0; n < N; n++) vj1[n] -= sum * vk[n];
 	    }
@@ -319,7 +325,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 	    /* GMRES iteration */
 	    j = -1;
 	    cycle++;
-	    while ((norm_x=norm(s[j+1])) > elim*norm_b
+        while ((norm_x=::norm(s[j+1])) > elim*norm_b
 		   && (j < (MAX_GMRES_STEPS-1))
 		   && (cycle < MAX_CYCLE)
 		   )
@@ -346,7 +352,7 @@ int gmres (int restart, TVector<MT> (*Av_clbk)(const TVector<MT> &v,
 		    for (k = 0; k <= j; k++) {
 			TVector<MT> &vk = v[k];
 			sum = (MT)0;
-			for (n = 0; n < N; n++) sum += vj1[n] * conj(vk[n]);
+                for (n = 0; n < N; n++) sum += vj1[n] * ::conj(vk[n]);
 			H(j,k) = sum;  // H(j,k) = C-innerproduct(v[j+1],v[k]);
 			for (n = 0; n < N; n++) vj1[n] -= sum * vk[n];
 		    }

@@ -81,11 +81,38 @@ inline int pow (int base, int e)
 // inline float pow (float base, float e)
 // { return (float)pow ((double)base, (double)e); }
 
+
+
+
 inline float conj(float a)
 { return a; }
 
 inline double conj(double a)
 { return a; }
+
+
+
+// SP 24.01.15: OS X LIBC++ provides definitions of conj
+// for real types which return a std::complex. This is incompatible
+// with the gmres defined in gmres_imp.hpp. The following function
+// replicate original TOAST (LIBSTDC++) behaviour.
+#ifdef __APPLE__
+
+namespace osxfix {
+    
+    inline float conj(float a)
+    { return a; }
+    
+    inline double conj(double a)
+    { return a; }
+    
+    template<typename T> inline std::complex<T> conj(std::complex<T> a)
+    { return std::conj(a);}
+    
+}
+
+#endif
+
 
 inline bool iszero (double d)
 { return d == 0.0; }

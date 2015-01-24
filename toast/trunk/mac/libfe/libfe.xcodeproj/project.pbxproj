@@ -119,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				F272C2DB1A6FA1F8004EBCFF /* libmath.dylib */,
+				F297DC48195C197F00A7501F /* point.cc */,
 				F297DC3A195C197F00A7501F /* tri6_ip.cc */,
 				F297DC3B195C197F00A7501F /* tri_qr.cc */,
 				F297DC3C195C197F00A7501F /* element.cc */,
@@ -133,7 +134,6 @@
 				F297DC45195C197F00A7501F /* ordmmd.cc */,
 				F297DC46195C197F00A7501F /* param.cc */,
 				F297DC47195C197F00A7501F /* pix4.cc */,
-				F297DC48195C197F00A7501F /* point.cc */,
 				F297DC49195C197F00A7501F /* ptsource.cc */,
 				F297DC4A195C197F00A7501F /* qmmesh.cc */,
 				F297DC4B195C197F00A7501F /* quad4.cc */,
@@ -354,7 +354,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_CXX_LIBRARY = "libc++";
 				EXECUTABLE_PREFIX = "";
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
@@ -376,7 +376,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
-				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_CXX_LIBRARY = "libc++";
 				EXECUTABLE_PREFIX = "";
 				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
