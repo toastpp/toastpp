@@ -22,7 +22,7 @@
 
 
 // Force use of TOAST version of BLAS libraries (32-bit integer)
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
 #define TOAST_BLAS_32INT
 #endif
 
