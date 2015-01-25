@@ -23,7 +23,7 @@
 		F229EA6E195C8175003F34BC /* matlabtoast.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA35195C7C98003F34BC /* matlabtoast.cc */; };
 		F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA39195C7C98003F34BC /* mtGradient.cc */; };
 		F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3A195C7C98003F34BC /* mtJacobian.cc */; };
-		F23B40971A6D568400FCB964 /* liblbfgs-1.10.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F23B40961A6D568400FCB964 /* liblbfgs-1.10.dylib */; };
+		F25071FA1A7567020053D654 /* liblbfgs.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F25071F91A7567020053D654 /* liblbfgs.dylib */; };
 		F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */; };
 		F2FF2D491A694EF80092CC78 /* mtSysmat_basis.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D481A694EF80092CC78 /* mtSysmat_basis.cc */; };
 /* End PBXBuildFile section */
@@ -59,7 +59,7 @@
 		F229EA5F195C7E1A003F34BC /* libstoast.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstoast.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libstoast.dylib"; sourceTree = "<group>"; };
 		F229EA67195C803A003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F229EA69195C8062003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
-		F23B40961A6D568400FCB964 /* liblbfgs-1.10.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "liblbfgs-1.10.dylib"; path = "../../gcc_shared/lib/liblbfgs-1.10.dylib"; sourceTree = "<group>"; };
+		F25071F91A7567020053D654 /* liblbfgs.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblbfgs.dylib; path = ../liblbfgs/build/Debug/liblbfgs.dylib; sourceTree = "<group>"; };
 		F2FF2D481A694EF80092CC78 /* mtSysmat_basis.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtSysmat_basis.cc; path = ../../src/matlab2/mtSysmat_basis.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F23B40971A6D568400FCB964 /* liblbfgs-1.10.dylib in Frameworks */,
+				F25071FA1A7567020053D654 /* liblbfgs.dylib in Frameworks */,
 				F229EA6B195C8069003F34BC /* libmath.dylib in Frameworks */,
 				F229EA6A195C8062003F34BC /* libfe.dylib in Frameworks */,
 				F229EA60195C7E1A003F34BC /* libstoast.dylib in Frameworks */,
@@ -81,7 +81,7 @@
 		F229EA25195C7B9D003F34BC = {
 			isa = PBXGroup;
 			children = (
-				F23B40961A6D568400FCB964 /* liblbfgs-1.10.dylib */,
+				F25071F91A7567020053D654 /* liblbfgs.dylib */,
 				F229EA69195C8062003F34BC /* libfe.dylib */,
 				F229EA67195C803A003F34BC /* libmath.dylib */,
 				F229EA5F195C7E1A003F34BC /* libstoast.dylib */,
@@ -285,6 +285,7 @@
 					"/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.3",
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 					/opt/local/lib/gcc48,
+					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -322,6 +323,7 @@
 					"/opt/local/lib/gcc48/gcc/x86_64-apple-darwin14/4.8.3",
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
 					/opt/local/lib/gcc48,
+					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;

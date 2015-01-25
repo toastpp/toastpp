@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F23B408B1A6D554B00FCB964 /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F23B408A1A6D554B00FCB964 /* libsuperlu.dylib */; };
-		F23B40911A6D560B00FCB964 /* libarpack.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F23B40901A6D560B00FCB964 /* libarpack.dylib */; };
-		F297DCA9195C199F00A7501F /* arpack.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC96195C199F00A7501F /* arpack.cc */; };
+		F25071E01A7563560053D654 /* libsuperlu.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F25071DF1A7563560053D654 /* libsuperlu.dylib */; };
 		F297DCAB195C199F00A7501F /* cr_cholesky.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC98195C199F00A7501F /* cr_cholesky.cc */; };
 		F297DCAC195C199F00A7501F /* crmatrix_cm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC99195C199F00A7501F /* crmatrix_cm.cc */; };
 		F297DCAD195C199F00A7501F /* crmatrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = F297DC9A195C199F00A7501F /* crmatrix.cc */; };
@@ -43,10 +41,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F23B408A1A6D554B00FCB964 /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = ../../gcc_shared/lib/libsuperlu.dylib; sourceTree = "<group>"; };
-		F23B40901A6D560B00FCB964 /* libarpack.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarpack.dylib; path = ../../gcc_shared/lib/libarpack.dylib; sourceTree = "<group>"; };
+		F25071DF1A7563560053D654 /* libsuperlu.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsuperlu.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug/libsuperlu.dylib"; sourceTree = "<group>"; };
 		F297DC8D195C199200A7501F /* libmath.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libmath.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		F297DC96195C199F00A7501F /* arpack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arpack.cc; path = ../../src/libmath/arpack.cc; sourceTree = "<group>"; };
 		F297DC98195C199F00A7501F /* cr_cholesky.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cr_cholesky.cc; path = ../../src/libmath/cr_cholesky.cc; sourceTree = "<group>"; };
 		F297DC99195C199F00A7501F /* crmatrix_cm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crmatrix_cm.cc; path = ../../src/libmath/crmatrix_cm.cc; sourceTree = "<group>"; };
 		F297DC9A195C199F00A7501F /* crmatrix.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crmatrix.cc; path = ../../src/libmath/crmatrix.cc; sourceTree = "<group>"; };
@@ -70,8 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F23B40911A6D560B00FCB964 /* libarpack.dylib in Frameworks */,
-				F23B408B1A6D554B00FCB964 /* libsuperlu.dylib in Frameworks */,
+				F25071E01A7563560053D654 /* libsuperlu.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,9 +76,7 @@
 		F297DC84195C199200A7501F = {
 			isa = PBXGroup;
 			children = (
-				F23B40901A6D560B00FCB964 /* libarpack.dylib */,
-				F23B408A1A6D554B00FCB964 /* libsuperlu.dylib */,
-				F297DC96195C199F00A7501F /* arpack.cc */,
+				F25071DF1A7563560053D654 /* libsuperlu.dylib */,
 				F297DC98195C199F00A7501F /* cr_cholesky.cc */,
 				F297DC99195C199F00A7501F /* crmatrix_cm.cc */,
 				F297DC9A195C199F00A7501F /* crmatrix.cc */,
@@ -181,7 +174,6 @@
 				F2D67FC919B7022E009C8818 /* vector_MT.cc in Sources */,
 				F297DCAB195C199F00A7501F /* cr_cholesky.cc in Sources */,
 				F297DCB2195C199F00A7501F /* mathdef.cc in Sources */,
-				F297DCA9195C199F00A7501F /* arpack.cc in Sources */,
 				F297DCB9195C199F00A7501F /* vector.cc in Sources */,
 				F297DCB8195C199F00A7501F /* util.cc in Sources */,
 				F297DCB4195C199F00A7501F /* precon.cc in Sources */,
@@ -284,6 +276,7 @@
 					/opt/local/lib/gcc48,
 					/opt/local/lib/libgcc,
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug",
 				);
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
@@ -314,6 +307,7 @@
 					/opt/local/lib/gcc48,
 					/opt/local/lib/libgcc,
 					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug",
 				);
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
