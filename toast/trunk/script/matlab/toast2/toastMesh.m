@@ -687,34 +687,65 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, ELMAT, DOTSYSMAT
+            
+            nnd = toast(uint32(6),obj.handle);
+            
+            prm = [];
+            sstruct = [];
+            
+            % This process is required in order not to break legacy
+            % interface without optional sparsity structure.
             switch length(varargin)
                 
                 case 0
-                    % Integral without parameter
-                    smat = toast(uint32(74),obj.handle,intstr);
-                
+                    % Integral no parameter              
                 case 1
-                    % Integral with parameter
-                    smat = toast(uint32(74),obj.handle,intstr,varargin{1});
-
+                    
+                    if(issparse(varargin{1}) && ismatrix(varargin{1}))
+                        % Integral no parameter, with sparsity structure
+                        sstruct = varargin{1};                       
+                    else
+                        % Integral with parameter, no sparsity strucure
+                        prm = varargin{1};
+                    end
+                    
                 case 2
-                    % Either element flag or sparsity structure
+                    
                     if(strcmp(varargin{2},'EL'))
-                        smat = toast(uint32(74),obj.handle,intstr,varargin{1},varargin{2});
-                    elseif(issparse(varargin{2}))
-                        smat = toast(uint32(74),obj.handle,intstr,varargin{1},[],varargin{2});
+                    
+                        % Integral with parameter, on element, no sparsity
+                        % structure
+                        prm = varargin{1};
+                        
+                    elseif(issparse(varargin{2}) && ismatrix(varargin{2}))
+                        
+                        % Integral with parameter, on nodes, sparisty
+                        % structure
+                        prm = varargin{1};
+                        sstruct = varargin{2};
+
+                    else
+                        error('mesh.SysmatComponent: unexpected arguments');
+                    end
+               
+                case 3
+
+                    if(issparse(varargin{3}) && ismatrix(varargin{3}))
+                        % Integral with parameter, on elements, with
+                        % sparsity structure
+                        prm = varargin{1};
+                        sstruct = varargin{3};
                     else
                         error('mesh.SysmatComponent: unexpected arguments');
                     end
                     
-                case 3
-                    % Element flag with sparsity structure
-                    smat = toast(uint32(74),obj.handle,intstr,varargin{1},varargin{2},varargin{3});
-                    
                 otherwise
+                    
                     error('mesh.SysmatComponent: unexpected arguments');
                    
             end
+            
+            smat = toast(uint32(74),obj.handle,intstr,prm,sstruct);
             
         end
         
