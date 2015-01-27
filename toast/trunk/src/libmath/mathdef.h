@@ -84,11 +84,11 @@ inline int pow (int base, int e)
 
 
 
-inline float conj(float a)
-{ return a; }
+//inline float conj(float a)
+//{ return a; }
 
-inline double conj(double a)
-{ return a; }
+//inline double conj(double a)
+//{ return a; }
 
 
 
@@ -96,9 +96,8 @@ inline double conj(double a)
 // for real types which return a std::complex. This is incompatible
 // with the gmres defined in gmres_imp.hpp. The following function
 // replicate original TOAST (LIBSTDC++) behaviour.
-#ifdef __APPLE__
 
-namespace osxfix {
+namespace toast {
     
     inline float conj(float a)
     { return a; }
@@ -111,7 +110,6 @@ namespace osxfix {
     
 }
 
-#endif
 
 
 inline bool iszero (double d)
