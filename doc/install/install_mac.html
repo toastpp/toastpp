@@ -18,15 +18,15 @@
 <p>The following build tools are required for compilation (tested under OS X 10.10 Yosemite):</p>
 <ul>
 <li>Xcode (tested version 6.1.1) from the Mac App Store,</li>
+<li>MATLAB (version 2014a onwards).
 </ul>
 <!-- 
 <h2>Build instructing the numerics libraries</h2>
 <p>Open a terminal window and chage to the directory where you have placed the
 toast sources. Then set the TOASTDIR environment variable:</p>
 <p class="code">export TOASTDIR=$PWD</p>
-<p>Configure the makefiles with</p>
-<p class="code">./configure F77=gfortran-mp-4.3 --disable-blas-shared --disable-lapack-shared</p>
-<p>to perform a static link against the fortran runtime.</p>
+<p>Configure the makefiles with:</p>
+<p class="code">./configure F77=gfortran-mp-4.3</p>
 <p>Once configuration completes create a dummy malloc header,</p>
 <p class="code">touch malloc.h</p>
 <p>and set the toast environment variables:</p>

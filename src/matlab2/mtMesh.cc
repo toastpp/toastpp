@@ -479,7 +479,7 @@ void MatlabToast::SysmatSparsityStructure (int nlhs, mxArray *plhs[],
 // =========================================================================
 
 void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
-    bool elbasis, mxArray **res, RCompRowMatrix &F)
+    bool elbasis, bool prmint, mxArray **res, RCompRowMatrix &F)
 {
     int n = mesh->nlen();
 
@@ -502,21 +502,33 @@ void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
         
     }
     
-    if (!strcasecmp (integral_type, "FF")) {
-	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
-    } else if (!strcasecmp (integral_type, "DD")) {
-	AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_DD);
-    } else if (!strcasecmp (integral_type, "PFF")) {
-        AddToSysMatrix (*mesh, F, &prm,
-            elbasis ? ASSEMBLE_PFF_EL : ASSEMBLE_PFF);
-    } else if (!strcasecmp (integral_type, "PDD")) {
-        AddToSysMatrix (*mesh, F, &prm,
-            elbasis ? ASSEMBLE_PDD_EL : ASSEMBLE_PDD);
-    } else if (!strcasecmp (integral_type, "BNDPFF")) {
-        AddToSysMatrix (*mesh, F, &prm,
-            elbasis ? ASSEMBLE_BNDPFF_EL : ASSEMBLE_BNDPFF);
+    if(!prmint) {
+        
+        if (!strcasecmp (integral_type, "FF")) {
+            AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_FF);
+        } else if (!strcasecmp (integral_type, "DD")) {
+            AddToSysMatrix (*mesh, F, &prm, ASSEMBLE_DD);
+        } else {
+            mexErrMsgTxt ("Unknown integral string for non-parameter integration");
+        }
+        
+    } else {
+        
+        if (!strcasecmp (integral_type, "PFF")) {
+            AddToSysMatrix (*mesh, F, &prm,
+                            elbasis ? ASSEMBLE_PFF_EL : ASSEMBLE_PFF);
+        } else if (!strcasecmp (integral_type, "PDD")) {
+            AddToSysMatrix (*mesh, F, &prm,
+                            elbasis ? ASSEMBLE_PDD_EL : ASSEMBLE_PDD);
+        } else if (!strcasecmp (integral_type, "BNDPFF")) {
+            AddToSysMatrix (*mesh, F, &prm,
+                            elbasis ? ASSEMBLE_BNDPFF_EL : ASSEMBLE_BNDPFF);
+        } else {
+            mexErrMsgTxt ("Unknown integral string for parameter integration");
+        }
+        
     }
-
+    
     // Return system matrix to MATLAB
     CopyMatrix (res, F);
 }
@@ -528,36 +540,33 @@ void MatlabToast::SysmatComponent (int nlhs, mxArray *plhs[],
 
     RVector prm;
     RCompRowMatrix F;
+    bool prmint = false;            // Is this a parameter integral
     bool elbasis = false;
     char integral_type[32] = "";
 
+    // First argument is the required integral type
     if (nrhs >= 2 && mxIsChar(prhs[1])) {
 	mxGetString (prhs[1], integral_type, 32);
     } else {
 	mexErrMsgTxt ("Parameter 2: string expected");
     }
-
-
-    if (nrhs >= 4 && mxIsChar(prhs[3])) {
-	char cbuf[32];
-	mxGetString (prhs[3], cbuf, 32);
-	elbasis = (strcasecmp (cbuf, "EL") == 0);
-    }
     
-    if (nrhs >= 3) {
-        CopyVector (prm, prhs[2]);
-        xAssert ( (elbasis ? mesh->elen() : mesh->nlen())
-                 == prm.Dim(), (char*)"Argument 3: wrong size");
-
-    }
-    
-    if (nrhs >= 5 && mxIsSparse(prhs[4])) CopyTMatrix(F, prhs[4]);
+    // Second argument is the integration parameter, or empty
+    if(nrhs >=3) {
         
+        prmint = true;
+        CopyVector (prm, prhs[2]);
 
+        if(prm.Dim() == mesh->nlen())  elbasis = false;
+        else if (prm.Dim() == mesh->elen()) elbasis = true;
+        else prmint = false;
+   
+    }
     
+    // Thurd argument is the system matrix sparsity pattern, or empty
+    if (nrhs == 4 && mxIsSparse(prhs[3])) CopyTMatrix(F, prhs[3]);
     
-
-    CalcSysmatComponent (mesh, prm, integral_type, elbasis, &plhs[0], F);
+    CalcSysmatComponent (mesh, prm, integral_type, elbasis, prmint, &plhs[0], F);
 }
 
 // =========================================================================
