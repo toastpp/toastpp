@@ -70,14 +70,14 @@ MATHLIB TVector<std::complex<double> > Conj (
     const TVector<std::complex<double> > &vec)
 {
     TVector<std::complex<double> > tmp(vec.Dim());
-    for (int i = 0; i < vec.Dim(); i++) tmp[i] = conj(vec[i]);
+    for (int i = 0; i < vec.Dim(); i++) tmp[i] = toast::conj(vec[i]);
     return tmp;
 }
 
 MATHLIB void SelfConj (const TVector<std::complex<double> > &vec)
 {
   /* version converts this vector to conjugate */
-    for (int i = 0; i < vec.Dim(); i++) vec[i] = conj(vec[i]);
+    for (int i = 0; i < vec.Dim(); i++) vec[i] = toast::conj(vec[i]);
 }
 
 MATHLIB TVector<std::complex<double> > Hadamard (

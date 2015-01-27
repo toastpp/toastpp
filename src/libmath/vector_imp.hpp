@@ -887,7 +887,7 @@ template<class VT>
 TVector<VT> conj (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = conj (v[i]);
+    for (int i = 0; i < v.size; i++) tmp[i] = toast::conj (v[i]);
     return tmp;
 }
 
@@ -1064,7 +1064,7 @@ inline std::complex<double> doth (const TVector<std::complex<double> > &v1, cons
     return std::complex<double>(z.r, z.i);
 #else
     std::complex<double> d = (std::complex<double>)0;
-    for (int i = 0; i < v1.size; i++) d += conj(v1[i]) * v2[i];
+    for (int i = 0; i < v1.size; i++) d += toast::conj(v1[i]) * v2[i];
     return d;
 #endif // USE_BLAS_LEVEL1
 }
