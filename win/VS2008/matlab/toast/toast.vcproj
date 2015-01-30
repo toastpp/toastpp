@@ -362,6 +362,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\matlab2\mtSysmat_basis.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\matlab2\toast.cc"
 				>
 			</File>
