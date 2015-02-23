@@ -43,6 +43,21 @@ Mesh::Mesh ()
     bnd_param = 0;
 }
 
+Mesh::Mesh (const Mesh &mesh)
+{
+    nbhrs = 0;  // i.e. undefined
+    fullsize = 0.0; // i.e. undefined
+    lastel_found = 0;
+    priv_nbnd = 0;
+    trap_load_error = true;
+    IndexBnd2Node = 0;
+    IndexNode2Bnd = 0;
+    is_set_up = false;
+    boundary = 0;
+    bnd_param = 0;
+    Copy (mesh);
+}
+
 Mesh::~Mesh ()
 {
     //if (elk) delete []elk;

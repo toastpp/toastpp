@@ -278,6 +278,26 @@ void MatlabToast::GetBasisBuv (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::GetBasisBvw (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    IVector wdim(raster->Dim());
+    for (int i = 0; i < raster->Dim(); i++)
+        wdim[i] = (int)mxGetPr (prhs[1])[i];
+
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetBvw(wdim));
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
 void MatlabToast::BasisValue (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {

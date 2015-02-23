@@ -43,6 +43,8 @@ public:
 	double _sup, double shapeprm, double diagscale, RDenseMatrix *bb=0,
         double _map_tol=1e-10);
 
+    virtual void Init();
+
     /**
      * \brief Value of basis function b_i at point p
      * This does not check for mesh support
@@ -71,7 +73,10 @@ protected:
     double sup;     ///< support radius
     double sprm;    ///< shape parameter for basis types that use it
     double dgscale; ///< diagonal scaling factor
+    double bscale;  ///< global basis scaling factor
+    RVector grid;   ///< grid spacing
     RVector igrid;  ///< inverse grid spacing
+
 private:
     RCompRowMatrix *CreateBasisMassmat () const;
     RCompRowMatrix *CreateBasisMassmat_tri () const;
@@ -83,6 +88,10 @@ private:
     RCompRowMatrix *CreateMixedMassmat () const;
     RCompRowMatrix *CreateMixedMassmat_tri () const;
     RCompRowMatrix *CreateMixedMassmat_tet4 () const;
+
+    RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const;
+    RCompRowMatrix *CreateBasisPixelMassmat_tri (const IVector &wdim) const;
+    RCompRowMatrix *CreateBasisPixelMassmat_tet4 (const IVector &wdim) const;
 
     double MC_integral_2D(double basis_dst) const;
 };

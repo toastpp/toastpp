@@ -164,6 +164,8 @@ public:
      */
     Mesh ();
 
+    Mesh (const Mesh &mesh);
+
     /**
      * \brief Destructor
      */

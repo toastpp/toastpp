@@ -1055,8 +1055,8 @@ public:
     // list of absolute node numbers for the element's vertices
 
     //int Region;
-    int Region() const {return region;} // region id for segmented meshes
-    void SetRegion(int nr) {region = nr;} // set region id 
+    inline int Region() const {return region;} // region id for segmented meshes
+    inline void SetRegion(int nr) {region = nr;} // set region id 
 
     virtual void SplitSide (Mesh *mesh, int side, int newnode,
         Element *nbr1, Element *nbr2, Element *el1, Element *el2)

@@ -41,6 +41,7 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tet4 () const
 	nimax[i] = njmax[i] = nkmax[i] = -1;
     }
     for (el = 0; el < nel; el++) {
+        std::cerr << "pass 1, " << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	// element bounding box
 	double exmin = meshptr->nlist[pel->Node[0]][0];
@@ -114,6 +115,7 @@ RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tet4 () const
 
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
+        std::cerr << "pass 2, " << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	xASSERT(pel->Type() == ELID_TET4,
 		"Currently only implemented for 4-noded tetrahedra");
