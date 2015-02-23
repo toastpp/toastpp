@@ -216,6 +216,10 @@ classdef toastBasis < handle
         buv = toast(uint32(89),obj.handle);
     end
     
+    function bvw = Bvw(obj,dim)
+        bvw = toast(uint32(92),obj.handle,dim);
+    end
+    
     function sa = SupportArea(obj,idx)
         sa = toast(uint32(90),obj.handle,idx);
     end

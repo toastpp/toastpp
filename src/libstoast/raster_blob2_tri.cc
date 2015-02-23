@@ -863,6 +863,132 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tri () const
     return buv;
 }
 
+// ==========================================================================
+// Map directly between basis and a regular voxel image with piecewise
+// constant basis functions
+
+RCompRowMatrix *Raster_Blob2::CreateBasisPixelMassmat_tri (const IVector &pxdim) const
+{
+    int idx_i, idx_j, i, j, i0, j0, i1, j1, jj;
+    int stride1 = bdim[0];
+    int pstride1 = pxdim[0];
+    int plen = pxdim[0]*pxdim[1];
+    int subdiv = 10;
+    double px0, py0, px1, py1, rx, ry, x, y, v;
+    double radlimit2 = sup*sup;
+    double dx = grid[0];
+    double dy = grid[1];
+    double pdx = bbsize[0]/pxdim[0];
+    double pdy = bbsize[1]/pxdim[1];
+    bool intersect;
+    int *npx = new int[blen];
+    for (i = 0; i < blen; i++) npx[i] = 0;
+    Point p(2);
+
+    // pass 1: determine storage requirements
+    for (idx_i = 0; idx_i < blen; idx_i++) {
+ 	std::cerr << "BasisPixelmat pass 1, " << idx_i << "/" << blen << std::endl;
+	j0 = idx_i / stride1;
+	i0 = idx_i % stride1;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	for (idx_j = 0; idx_j < plen; idx_j++) {
+	    j1 = idx_j / pstride1;
+	    i1 = idx_j % pstride1;
+	    px1 = bbmin[0] + i1*pdx;
+	    py1 = bbmin[1] + j1*pdy;
+	    intersect = false;
+	    for (j = 0; j < 2; j++) {
+	        for (i = 0; i < 2; i++) {
+		    rx = px0 - (px1+i*pdx);
+		    ry = py0 - (py1+j*pdy);
+		    if (rx*rx + ry*ry < radlimit2) {
+		        intersect = true;
+			i = j = 2; // break
+		    }
+		}
+	    }
+	    if (intersect)
+	        npx[idx_i]++;
+	}
+    }
+
+    int *rowptr = new int[blen+1];
+    rowptr[0] = 0;
+    for (i = 0; i < blen; i++) {
+        rowptr[i+1] = rowptr[i]+npx[i];
+	npx[i] = 0;
+    }
+    int nz = rowptr[blen];
+    int *colidx = new int[nz];
+
+    // pass 2: determine matrix sparsity pattern
+    for (idx_i = 0; idx_i < blen; idx_i++) {
+  	std::cerr << "BasisPixelmat pass 2, " << idx_i << "/" << blen << std::endl;
+	j0 = idx_i / stride1;
+	i0 = idx_i % stride1;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	for (idx_j = 0; idx_j < plen; idx_j++) {
+	    j1 = idx_j / pstride1;
+	    i1 = idx_j % pstride1;
+	    px1 = bbmin[0] + i1*pdx;
+	    py1 = bbmin[1] + j1*pdy;
+	    intersect = false;
+	    for (j = 0; j < 2; j++) {
+	        for (i = 0; i < 2; i++) {
+		    rx = px0 - (px1+i*pdx);
+		    ry = py0 - (py1+j*pdy);
+		    if (rx*rx + ry*ry < radlimit2) {
+		        intersect = true;
+			i = j = 2; // break
+		    }
+		}
+	    }
+	    if (intersect)
+		colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
+	}      
+    }
+
+    delete []npx;
+    RCompRowMatrix *bvw = new RCompRowMatrix (blen, plen, rowptr, colidx);
+
+    for (idx_i = 0; idx_i < blen; idx_i++) {
+ 	std::cerr << "BasisPixelmat pass 3, " << idx_i << "/" << blen << std::endl;
+	j0 = idx_i / stride1;
+	i0 = idx_i % stride1;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	for (jj = rowptr[idx_i]; jj < rowptr[idx_i+1]; jj++) {
+	    idx_j = colidx[jj];
+	    j1 = idx_j / pstride1;
+	    i1 = idx_j % pstride1;
+	    px1 = bbmin[0] + i1*pdx;
+	    py1 = bbmin[1] + j1*pdy;
+	    v = 0.0;
+	    for (j = 0; j < subdiv; j++) {
+	        y = py1 + (j+0.5)/subdiv*pdy;
+		for (i = 0; i < subdiv; i++) {
+		    x = px1 + (i+0.5)/subdiv*pdx; 
+		    rx = x-px0;
+		    ry = y-py0;
+		    if (rx*rx + ry*ry < radlimit2) {
+		        p[0] = x; p[1] = y;
+			v += Value_nomask(p,idx_i,false);
+		    }
+		}
+	    }
+	    (*bvw)(idx_i,idx_j) = v;
+	}
+    }
+
+    delete []rowptr;
+    delete []colidx;
+
+    bvw->Shrink();
+    return bvw;
+}
+
 int Raster_Blob2::SutherlandHodgman (const Point *p0, int np0,
 				     const Point *p1, int np1,
 				     Point *clip_poly, const int npoly) const

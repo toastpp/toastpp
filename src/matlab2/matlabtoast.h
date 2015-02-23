@@ -79,6 +79,8 @@ public:
         const mxArray *prhs[]);
     void GetBasisBuv (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void GetBasisBvw (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void BasisValue (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
     void GetBasisSupportArea (int nlhs, mxArray *plhs[], int nrhs,

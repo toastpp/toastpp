@@ -158,6 +158,7 @@ public:
     const RCompRowMatrix *GetBuu() const { return Buu; }
     const RCompRowMatrix *GetBvv() const { return Bvv; }
     const RCompRowMatrix *GetBuv() const { return Buv; }
+    const RCompRowMatrix *GetBvw (const IVector &wdim);
 
 protected:
     /**
@@ -188,6 +189,9 @@ protected:
      */
     virtual RCompRowMatrix *CreateMixedMassmat () const = 0;
 
+    virtual RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const
+    { xERROR("Not implemented"); }
+
     /**
      * \brief Creates the matrix for mapping from (rectangular) basis
      *   to (sparse) solution
@@ -199,6 +203,8 @@ protected:
     RCompRowMatrix *Buu;    ///< mesh mass matrix for mapping
     RCompRowMatrix *Bvv;    ///< pixel mass matrix for mapping
     RCompRowMatrix *Buv;    ///< mixed-basis mapping matrix
+    RCompRowMatrix *Bvw;    ///< basis-pixel mixed mapping matrix (on demand)
+    IVector Bvw_dim;        ///< dimension for Bvw pixel image
 
     RPrecon_IC *Buu_precon; ///< preconditioner for Buu
     RPrecon_IC *Bvv_precon; ///< preconditioner for Bvv

@@ -138,6 +138,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_BASIS_BUV:
 	mtoast->GetBasisBuv (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_BASIS_BVW:
+        mtoast->GetBasisBvw (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_BASIS_SUPPORTAREA:
 	mtoast->GetBasisSupportArea (nlhs, plhs, nrhs, prhs);
 	break;

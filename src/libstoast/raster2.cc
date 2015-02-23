@@ -15,6 +15,7 @@ Raster2::Raster2 (const IVector &_bdim, const IVector &_gdim,
     Buu = 0;
     Bvv = 0;
     Buv = 0;
+    Bvw = 0;
     Buu_precon = 0;
     Bvv_precon = 0;
     Buu_Cholesky_L = 0;
@@ -31,6 +32,10 @@ Raster2::~Raster2 ()
     if (Buu) delete Buu;
     if (Bvv) delete Bvv;
     if (Buv) delete Buv;
+    if (Bvw) {
+        delete Bvw;
+	Bvw = 0;
+    }
     if (Buu_precon) {
 	delete Buu_precon;
     }
@@ -132,6 +137,18 @@ void Raster2::Init ()
     }
 
     glen = slen = blen;
+}
+
+// =========================================================================
+
+const RCompRowMatrix *Raster2::GetBvw (const IVector &wdim)
+{
+    if (Bvw) {
+        if (Bvw_dim == wdim) return Bvw;
+	else delete Bvw;
+    }
+    Bvw = CreateBasisPixelMassmat (wdim);
+    return Bvw;
 }
 
 // =========================================================================
