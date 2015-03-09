@@ -190,7 +190,7 @@ protected:
     virtual RCompRowMatrix *CreateMixedMassmat () const = 0;
 
     virtual RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const
-    { xERROR("Not implemented"); }
+    { xERROR("Not implemented"); return 0; }
 
     /**
      * \brief Creates the matrix for mapping from (rectangular) basis

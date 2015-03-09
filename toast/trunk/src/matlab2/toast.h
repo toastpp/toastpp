@@ -62,7 +62,7 @@
 #define TOAST_BASIS_BUU         87
 #define TOAST_BASIS_BVV         88
 #define TOAST_BASIS_BUV         89
-#define TOAST_BASIS_BVW         92 // end
+#define TOAST_BASIS_BVW         92
 #define TOAST_BASIS_SUPPORTAREA 90
 #define TOAST_BASIS_REFINE      91
 #define TOAST_MAPBASIS          29
@@ -103,7 +103,7 @@
 #define TOAST_SPLITELEMENT      78
 #define TOAST_NODENEIGHBOUR     79
 #define TOAST_UNWRAPPHASE       80
-#define TOAST_SPARSITYSTRUCTURE 92 // end
+#define TOAST_SPARSITYSTRUCTURE 93 // end
 
 #define TOAST_SETVERBOSITY    1000
 #define TOAST_THREADCOUNT     1001
