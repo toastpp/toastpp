@@ -292,7 +292,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
     // pre-compute local shape functions at quadrature points
     // for faster access from the inner loops
     Tetrahedron4 tet;
-    RVector fun[np];
+    RVector *fun = new RVector[np];
     for (i = 0; i < np; i++)
         fun[i] = tet.LocalShapeF(absc[i]);
 
