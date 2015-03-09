@@ -299,6 +299,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
     int *npx = new int[blen];
     for (i = 0; i < blen; i++) npx[i] = 0;
 
+    
     // pass 1: determine storage requirements
     for (idx_i = 0; idx_i < blen; idx_i++) {
 	std::cerr << "Basismat pass 1, " << idx_i << "/" << blen << std::endl;
@@ -548,6 +549,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
     }
     std::cerr << "time: " << toc() << std::endl;
 
+    delete []fun;
     delete []rowptr;
     delete []colidx;
 
@@ -921,6 +923,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 	    }
 	}
     }
+
 
     delete []rowptr;
     delete []colidx;
