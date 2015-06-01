@@ -290,7 +290,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2014a.app;
+				MATLABVER = MATLAB_R2015a.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
@@ -299,7 +299,7 @@
 				);
 				PRODUCT_NAME = toast;
 				SDKROOT = macosx10.9;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\"";
 			};
 			name = Debug;
 		};
@@ -330,7 +330,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2014a.app;
+				MATLABVER = MATLAB_R2015a.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
@@ -339,7 +339,7 @@
 				);
 				PRODUCT_NAME = toast;
 				SDKROOT = macosx10.9;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\"";
 			};
 			name = Release;
 		};
