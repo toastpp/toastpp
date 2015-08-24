@@ -292,14 +292,13 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
     // pre-compute local shape functions at quadrature points
     // for faster access from the inner loops
     Tetrahedron4 tet;
-    RVector *fun = new RVector[np];
+    RVector fun[np];
     for (i = 0; i < np; i++)
         fun[i] = tet.LocalShapeF(absc[i]);
 
     int *npx = new int[blen];
     for (i = 0; i < blen; i++) npx[i] = 0;
 
-    
     // pass 1: determine storage requirements
     for (idx_i = 0; idx_i < blen; idx_i++) {
 	std::cerr << "Basismat pass 1, " << idx_i << "/" << blen << std::endl;
@@ -549,7 +548,6 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
     }
     std::cerr << "time: " << toc() << std::endl;
 
-    delete []fun;
     delete []rowptr;
     delete []colidx;
 
@@ -924,7 +922,6 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 	}
     }
 
-
     delete []rowptr;
     delete []colidx;
     delete []npx;
@@ -1081,7 +1078,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisPixelMassmat_tet4 (const IVector &pxdim
 		    }
 		}
 	    }
-	    (*bvw)(idx_i,idx_j) = v;
+	    (*bvw)(idx_i,idx_j) = v*subwght;
 	}
     }
 
