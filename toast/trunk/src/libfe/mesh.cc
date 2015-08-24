@@ -898,6 +898,130 @@ int Mesh::BoundaryList (int **bndellist, int **bndsdlist) const
 #endif
 }
 
+static int idx_comp_length = 0;
+int idx_comp (const void *arg1, const void*arg2)
+{
+    int *a = (int*)arg1;
+    int *b = (int*)arg2;
+    for (int i = 0; i < idx_comp_length; i++) {
+	if (a[i] < b[i]) return -1;
+	else if (a[i] > b[i]) return 1;
+    }
+    return 0;
+}
+
+inline bool same_surf (const int *s1, const int *s2, int nvtx)
+{
+    for (int i = 0; i < nvtx; i++)
+	if (s1[i] != s2[i]) return false;
+    return true;
+}
+
+int Mesh::RegionBoundaries (IDenseMatrix &idx)
+{
+    int el, i, j, k, m, ii;
+    int nmaxsurf = 0;
+    int nmaxsurfvtx = 0;
+    for (el = 0; el < elen(); el++) {
+	Element *pel = elist[i];
+	nmaxsurf += pel->nSide();
+	for (j = 0; j < pel->nSide(); j++)
+	    nmaxsurfvtx = max(nmaxsurfvtx, pel->nSideNode(j));
+    }
+    int ncol = nmaxsurfvtx+1;
+    IDenseMatrix idx_full(nmaxsurf, ncol);
+    for (el = i = 0; el < elen(); el++) {
+	Element *pel = elist[el];
+	for (j = 0; j < pel->nSide(); j++) {
+	    for (k = 0; k < pel->nSideNode(j); k++) {
+		ii = pel->Node[pel->SideNode(j,k)];
+		for (m = k-1; m >= 0; m--) { // sort indices on each row
+		    if (idx_full(i,m) > ii)
+			idx_full(i,m+1) = idx_full(i,m);
+		    else
+			break;
+		}
+		idx_full(i,m+1) = ii;
+	    }
+	    idx_full(i++,k) = el;
+	}
+    }
+
+    // now sort rows so that duplicate faces are next to each other
+    int *pidx_full = idx_full.ValPtr();
+    idx_comp_length = ncol; // THREADUNSAFE!!!
+    qsort (pidx_full, nmaxsurf, ncol*sizeof(int), idx_comp);
+
+    // count the number of surface faces (singlet faces + dublet faces with
+    // different element regions
+    int nsurf = nmaxsurf;
+    for (i = 0; i < nmaxsurf-1; i++) {
+	if (same_surf(pidx_full+ncol*i, pidx_full+ncol*(i+1), nmaxsurfvtx)) {
+	    int el1 = idx_full(i,nmaxsurfvtx);
+	    int el2 = idx_full(i+1,nmaxsurfvtx);
+	    int r1 = elist[el1]->Region();
+	    int r2 = elist[el2]->Region();
+	    if (r1 == r2) nsurf -= 2; // remove both surfaces
+	    else          nsurf--;    // remove one of the dublet
+	}
+    }
+
+    // construct the surface list
+    // (last 3 columns: contributing regions + surface id)
+    int ncol_surflist = nmaxsurfvtx+3;
+    IDenseMatrix surflist(nsurf, ncol_surflist);
+    int nmaxsurfid = 100;
+    int *surfidtable = new int[nmaxsurfid*2];
+    int nsurfid = 0;
+
+    for (i = j = 0; i < nmaxsurf; i++) {
+	int neighbour = 0;
+	int el1, el2, r1, r2;
+	if (i && same_surf(pidx_full+ncol*i, pidx_full+ncol*(i-1), nmaxsurfvtx))
+	    neighbour = -1;
+	else if (i < nmaxsurf &&
+		 same_surf(pidx_full+ncol*i, pidx_full+ncol*(i+1), nmaxsurfvtx))
+	    neighbour = 1;
+	el1 = idx_full(i,nmaxsurfvtx);
+	r1 = elist[el1]->Region();
+	if (neighbour==1) {
+	    el2 = idx_full(i+neighbour,nmaxsurfvtx);
+	    r2 = elist[el2]->Region();
+	} else if (neighbour==0) {
+	    r2 = NAN;
+	} else {
+	    r2 = r1;
+	}
+	if (r1 != r2) {
+	    if (r1 > r2) k = r1, r1 = r2, r2 = k;
+	    for (k = 0; k < nmaxsurfvtx; k++)
+		surflist(j,k) = idx_full(i,k);
+	    surflist(j,k++) = r1;
+	    surflist(j,k++) = r2;
+	    for (m = 0; m < nsurfid; m++) {
+		if (surfidtable[m*2+0] == r1 && surfidtable[m*2+1] == r2)
+		    break;
+	    }
+	    if (m == nsurfid) {
+		if (nsurfid == nmaxsurfid) { // grow table
+		    int *tmp = new int[(nmaxsurfid *= 2)*2];
+		    memcpy (tmp, surfidtable, nsurfid*2*sizeof(int));
+		    delete []surfidtable;
+		    surfidtable = tmp;
+		}
+		surfidtable[m*2+0] = r1;
+		surfidtable[m*2+1] = r2;
+		nsurfid++;
+	    }
+	    surflist(j,k++) = m; // surface id
+	    j++;
+	}
+    }
+
+    idx = surflist;
+    return nsurf;
+}
+
 void Mesh::InitSubdivisionSupport ()
 {
     int i;
@@ -1694,6 +1818,50 @@ void Mesh::WriteVtk (ostream &os, const RVector &nim)
     for (i = 0; i < nlist.Len(); i++) {
 	os << nim[i] << endl;
     }
+}
+
+void Mesh::WriteGmsh (ostream &os)
+{
+    int i, j;
+
+    int nvol = elen();
+    int voltp = 4; // only works for 4-noded tetrahedra
+
+    // retrieve surface information
+    IDenseMatrix surf;
+    int nsurf = RegionBoundaries (surf);
+    int nsurfvtx = surf.nCols()-3;
+    int surfidxcol = surf.nCols()-1;
+    int surftp = 2; // only works for triangular surface faces
+
+    os << "$MeshFormat\n2.2 0 8\n$EndMeshFormat\n";
+    os << "$Nodes\n" << nlen() << endl;
+    for (i = 0; i < nlen(); i++) {
+	os << (i+1);
+	for (j = 0; j < nlist[i].Dim(); j++)
+	    os << ' ' << nlist[i][j];
+	os << endl;
+    }
+    os << "$EndNodes\n";
+    os << "$Elements\n" << (nvol+nsurf) << endl;
+    int ofs = 1;
+    for (i = 0; i < nsurf; i++) {
+	os << (i+ofs) << ' ' << surftp << ' ' << 2;
+	os << ' ' << (surf(i, surfidxcol)+1) << ' ' << (surf(i, surfidxcol)+1);
+	for (j = 0; j < nsurfvtx; j++)
+	    os << ' ' << (surf(i,j)+1);
+	os << endl;
+    }
+    ofs += nsurf;
+    for (i = 0; i < nvol; i++) {
+	Element *pel = elist[i];
+	os << (i+ofs) << ' ' << voltp << ' ' << 2;
+	os << ' ' << (pel->Region()+1) << ' ' << (pel->Region()+1);
+	for (j = 0; j < pel->nNode(); j++)
+	    os << ' ' << (pel->Node[j]+1);
+	os << endl;
+    }
+    os << "$EndElements" << endl;
 }
 
 // =========================================================================

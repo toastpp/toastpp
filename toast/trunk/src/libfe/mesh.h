@@ -335,6 +335,15 @@ public:
     // element number *bndellist[i] and relative side number *bndsdlist[i].
     // return value is the number of boundary segments found.
 
+    /**
+     * \brief Returns a list of outer and internal surface faces, based
+     *   on element region information.
+     * \param [out] idx List of global vertex indices for each surface element
+     *   (dimension nsurf x nv, where nsurf is the number of found surface
+     *   faces, and nv is the max. number of vertices per surface element)
+     */
+    int RegionBoundaries (IDenseMatrix &idx);
+
     bool PullToBoundary (const Point &p, Point &pshift, int &element,
 	int &side, double sub = 0) const;
     // calculates the projection pshift of p onto the surface of the nearest
@@ -584,6 +593,12 @@ public:
     void put (std::ostream &os, ParameterType p1 = PRM_MUA,
 	      ParameterType p2 = PRM_KAPPA, ParameterType p3 = PRM_N);
     void WriteVtk (ostream &os, const RVector &nim);
+
+    /**
+     * \brief Write the mesh to file in Gmsh format.
+     * \param os output stream
+     */
+    void WriteGmsh (ostream &os);
 
     bool trap_load_error;
     // set this to false if mesh input errors should not cause an abort
