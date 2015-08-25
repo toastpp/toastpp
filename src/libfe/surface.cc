@@ -329,7 +329,7 @@ Surface_Cone::Surface_Cone (const Point &_tip, const RVector &_dir,
 {
     dASSERT(_tip.Dim() == 3, "Arg 1 invalid vector dimension");
     dASSERT(_dir.Dim() == 3, "Arg 2 invalid vector dimension");
-    dASSERT(_sap > 0.0 && _sap < 0.5*M_PI, "Arg 3 invalid value");
+    dASSERT(_sap > 0.0 && _sap < 0.5*Pi, "Arg 3 invalid value");
     dASSERT(_height > 0.0, "Arg 4 invalid value");
 
     tip.New (3); tip = _tip;

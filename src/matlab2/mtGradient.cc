@@ -210,7 +210,14 @@ void MatlabToast::GradientCplx (int nlhs, mxArray *plhs[], int nrhs,
 	}
     }
 
-    CFwdSolver FWS (mesh, solver, tol);
+	int nth;
+#ifdef TOAST_THREAD_MATLAB_GRADIENT
+	nth = Task::GetThreadCount();
+#else
+	nth = 1;
+#endif
+
+    CFwdSolver FWS (mesh, solver, tol, nth);
     FWS.SetDataScaling (DATA_LOG);
     FWS.SetPhaseUnwrap (unwrap);
 
@@ -679,7 +686,7 @@ void AddDataGradientCplx_engine (task_data *td)
 
 	// adjoint field and gradient
 	CVector wphia (mesh->nlen());
-	fws->CalcField (wqa, wphia);
+	fws->CalcField (wqa, wphia, 0, itask);
 
 	CVector cafield(glen);
 	CVector *cafield_grad = new CVector[dim];

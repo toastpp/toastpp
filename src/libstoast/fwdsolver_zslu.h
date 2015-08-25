@@ -12,17 +12,18 @@ class ZSuperLU_engine;
 
 class STOASTLIB ZSuperLU {
 public:
-    ZSuperLU ();
+    ZSuperLU (int n=1);
     ~ZSuperLU ();
     void Reset (const CCompRowMatrix *F);
     void CalcField (const CVector &qvec, CVector &phi,
-	IterativeSolverResult *res) const;
+	IterativeSolverResult *res, int en=0) const;
     void CalcFields (const CCompRowMatrix &qvec, CVector *phi,
-	IterativeSolverResult *res) const;
+	IterativeSolverResult *res, int en=0) const;
 
 private:
     const CCompRowMatrix *A;
-    ZSuperLU_engine *engine;
+    ZSuperLU_engine **engine;
+	int nengine;
 };
 
 #endif // !__FWDSOLVER_ZSLU_H

@@ -201,7 +201,7 @@ zgstrf (superlu_options_t *options, SuperMatrix *A,
     int       *xlsub, *xlusup, *xusub;
     int       nzlumax;
     double fill_ratio = sp_ienv(6);  /* estimated fill ratio */
-    static    GlobalLU_t Glu; /* persistent to facilitate multiple factors. */
+    /*static*/    GlobalLU_t Glu; /* persistent to facilitate multiple factors. */
 
     /* Local scalars */
     fact_t    fact = options->Fact;

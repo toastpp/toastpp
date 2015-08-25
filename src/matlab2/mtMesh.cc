@@ -1018,8 +1018,8 @@ void MatlabToast::UnwrapPhase (int nlhs, mxArray *plhs[], int nrhs,
 template<class T>
 TVector<T> IntFG (const Mesh &mesh, const TVector<T> &f, const TVector<T> &g)
 {
-    dASSERT(f.Dim() == mesh.nlen(), Wrong vector size);
-    dASSERT(g.Dim() == mesh.nlen(), Wrong vector size);
+    dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
+    dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
     int el, nnode, *node, i, j, k, nj, nk, bs;
     T sum;
@@ -1080,8 +1080,8 @@ template<class T>
 TVector<T> IntGradFGradG (const Mesh &mesh, const TVector<T> &f,
     const TVector<T> &g)
 {
-    dASSERT(f.Dim() == mesh.nlen(), Wrong vector size);
-    dASSERT(g.Dim() == mesh.nlen(), Wrong vector size);
+    dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
+    dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
     int el, nnode, *node, i, j, k, nj, nk, bs;
     T sum;

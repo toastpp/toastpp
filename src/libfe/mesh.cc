@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <string.h>
+#include <climits>
 #include "mathlib.h"
 #include "felib.h"
 
@@ -988,7 +989,7 @@ int Mesh::RegionBoundaries (IDenseMatrix &idx)
 	    el2 = idx_full(i+neighbour,nmaxsurfvtx);
 	    r2 = elist[el2]->Region();
 	} else if (neighbour==0) {
-	    r2 = NAN;
+	    r2 = INT_MAX;
 	} else {
 	    r2 = r1;
 	}

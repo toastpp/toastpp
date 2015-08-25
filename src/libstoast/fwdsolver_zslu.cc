@@ -124,7 +124,6 @@ void ZSuperLU_engine::Solve (SuperMatrix *B, SuperMatrix *X)
 	delete []berr;   berr = new double[nrhs_max];
     }
 
-
     SuperLUStat_t stat;
     StatInit (&stat);
     
@@ -139,17 +138,19 @@ void ZSuperLU_engine::Solve (SuperMatrix *B, SuperMatrix *X)
 // =========================================================================
 // =========================================================================
 
-ZSuperLU::ZSuperLU ()
+ZSuperLU::ZSuperLU (int n): nengine(n)
 {
     A = 0;
-    engine = new ZSuperLU_engine;
+	engine = new ZSuperLU_engine*[n];
+	for (int i = 0; i < n; i++)
+	    engine[i] = new ZSuperLU_engine;
 }
 
 // =========================================================================
 
 ZSuperLU::~ZSuperLU ()
 {
-    delete engine;
+    delete []engine;
 }
 
 // =========================================================================
@@ -157,13 +158,14 @@ ZSuperLU::~ZSuperLU ()
 void ZSuperLU::Reset (const CCompRowMatrix *F)
 {
     A = F;
-    engine->Reset (F);
+	for (int i = 0; i < nengine; i++)
+	    engine[i]->Reset (F);
 }
 
 // =========================================================================
 
 void ZSuperLU::CalcField (const CVector &qvec, CVector &phi,
-    IterativeSolverResult *res) const
+    IterativeSolverResult *res, int en) const
 {
     SuperMatrix B, X;
     int m = qvec.Dim();
@@ -177,7 +179,7 @@ void ZSuperLU::CalcField (const CVector &qvec, CVector &phi,
     zCreate_Dense_Matrix (&B, m, 1, rhsbuf, m, SLU_DN, SLU_Z,SLU_GE);
     zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
-    engine->Solve (&B, &X);
+    engine[en]->Solve (&B, &X);
     
     Destroy_SuperMatrix_Store (&B);
     Destroy_SuperMatrix_Store (&X);
@@ -186,7 +188,7 @@ void ZSuperLU::CalcField (const CVector &qvec, CVector &phi,
 // =========================================================================
 
 void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
-    IterativeSolverResult *res) const
+    IterativeSolverResult *res, int en) const
 {
     SuperMatrix B, X;
     int i, r;
@@ -210,7 +212,7 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     doublecomplex *xbuf = (doublecomplex*)x;
     zCreate_Dense_Matrix (&X, n, nrhs, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
-    engine->Solve (&B, &X);
+    engine[en]->Solve (&B, &X);
     
     for (i = 0; i < nrhs; i++)
         memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(std::complex<double>));

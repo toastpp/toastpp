@@ -87,7 +87,7 @@
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			InheritedPropertySheets="..\..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\..\resources\toastlib.vsprops;..\..\resources\toast_debug.vsprops"
 			CharacterSet="0"
 			>
 			<Tool
@@ -112,9 +112,6 @@
 				AdditionalIncludeDirectories="&quot;$(ToastRootDir)numerics\SuperLU_4.3\SRC&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SUPERLU_43_EXPORTS"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

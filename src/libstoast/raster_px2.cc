@@ -188,7 +188,7 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat (const IVector &wdim)
 {
     xASSERT(wdim.Dim() == dim, "Invalid length of pixel dimension vector");
 
-    int i, j, k, pi, pj, pk;
+    int i, j, k, ii, jj, kk, pi, pj, pk, idx_i;
     double x0, x1, y0, y1, z0, z1;
     double px0, px1, py0, py1, pz0, pz1;
     bool intersect;
@@ -246,6 +246,8 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat (const IVector &wdim)
     delete []npx;
     delete []rowptr;
     delete []colidx;
+
+	return 0;
 }
 
 
