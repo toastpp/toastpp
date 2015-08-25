@@ -51,13 +51,6 @@ ARPACK_LIB_SUFFIX = @ARPACK_LIB_SUFFIX@
 
 MAKE_LIB = @MAKE_LIB@
 
-ifndef MEXBIN
-MEXBIN = mex
-endif
-
-MEX      = $(MEXBIN) @MEXFLAGS@
-MEXEXT   = @MEXEXT@
-
 BUILD_FDOT = @TOAST_FDOT@
 OGLLIB = @OGLLIB@
 OGLINC = @OGLINC@
@@ -192,3 +185,16 @@ FEFLAGS   = $(CCFLAGS) $(ILUFLAGS) $(FEINC)
 STOASTFLAGS = $(CCFLAGS) $(ILUFLAGS) $(STOASTINC) $(RPATH)
 FLAGS = $(CCFLAGS) $(ILUFLAGS) $(INCLUDE)
 # =======================================================================
+
+# =======================================================================
+# MATLAB support
+# =======================================================================
+ifndef MEXBIN
+MEXBIN = mex
+endif
+
+MEX      = $(MEXBIN) @MEXFLAGS@
+MEXEXT   = @MEXEXT@
+
+MEXINC = $(INCLUDE)
+MEXLIB = $(STOASTLIB) -llbfgs

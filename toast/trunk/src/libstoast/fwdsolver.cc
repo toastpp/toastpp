@@ -26,9 +26,9 @@ TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, LSOLVER linsolver, double tol)
 // =========================================================================
 
 template<class T>
-TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, const char *solver, double tol)
+TFwdSolver<T>::TFwdSolver (const QMMesh *mesh, const char *solver, double tol, int nth)
 {
-    Setup ();
+    Setup (nth);
     meshptr = mesh;
     SetLinSolver (solver, tol);
 }
@@ -62,7 +62,7 @@ TFwdSolver<T>::~TFwdSolver ()
 // =========================================================================
 
 template<class T>
-void TFwdSolver<T>::Setup ()
+void TFwdSolver<T>::Setup (int nth)
 {
     // set initial and default parameters
     SuperLU = 0;
@@ -80,26 +80,26 @@ void TFwdSolver<T>::Setup ()
     meshptr = 0;
     pphi = 0;
 
-    SetupType ();
+    SetupType (nth);
     SETUP_MPI();
 }
 
 // =========================================================================
 
 template<>
-void TFwdSolver<std::complex<double> >::SetupType ()
+void TFwdSolver<std::complex<double> >::SetupType (int nth)
 {
-    SuperLU = new ZSuperLU ();
+    SuperLU = new ZSuperLU (nth);
 }
 
 template<>
-void TFwdSolver<std::complex<float> >::SetupType ()
+void TFwdSolver<std::complex<float> >::SetupType (int nth)
 {
     SuperLU = new CSuperLU ();
 }
 
 template<class T>
-void TFwdSolver<T>::SetupType ()
+void TFwdSolver<T>::SetupType (int nth)
 {
 }
 
@@ -506,7 +506,7 @@ void TFwdSolver<std::complex<double> >::Reset (const Solution &sol,
 
 template<>
 void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
-    TVector<float> &phi, IterativeSolverResult *res) const
+    TVector<float> &phi, IterativeSolverResult *res, int th) const
 {
     // calculate the (real) photon density field for a given (real)
     // source distribution. Use only if data type is INTENSITY
@@ -525,7 +525,7 @@ void TFwdSolver<float>::CalcField (const TVector<float> &qvec,
 
 template<>
 void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
-    TVector<double> &phi, IterativeSolverResult *res) const
+    TVector<double> &phi, IterativeSolverResult *res, int th) const
 {
     // calculate the (real) photon density field for a given (real)
     // source distribution. Use only if data type is INTENSITY
@@ -545,7 +545,7 @@ void TFwdSolver<double>::CalcField (const TVector<double> &qvec,
 template<>
 void TFwdSolver<std::complex<float> >::CalcField (
     const TVector<std::complex<float> > &qvec,
-    TVector<std::complex<float> > &cphi, IterativeSolverResult *res) const
+    TVector<std::complex<float> > &cphi, IterativeSolverResult *res, int th) const
 {
     if (solvertp == LSOLVER_DIRECT) {
         ((CSuperLU*)SuperLU)->CalcField (qvec, cphi, res);
@@ -562,7 +562,7 @@ void TFwdSolver<std::complex<float> >::CalcField (
 template<>
 void TFwdSolver<std::complex<double> >::CalcField (
     const TVector<std::complex<double> > &qvec,
-    TVector<std::complex<double> > &cphi, IterativeSolverResult *res) const
+    TVector<std::complex<double> > &cphi, IterativeSolverResult *res, int th) const
 {
     // calculate the complex field for a given source distribution
 
@@ -571,7 +571,7 @@ void TFwdSolver<std::complex<double> >::CalcField (
     clock_t time0 = tm.tms_utime;
 #endif
     if (solvertp == LSOLVER_DIRECT) {
-	((ZSuperLU*)SuperLU)->CalcField (qvec, cphi, res);
+	((ZSuperLU*)SuperLU)->CalcField (qvec, cphi, res, th);
         //SuperMatrix B, X;
 	//int n = meshptr->nlen();
 	//

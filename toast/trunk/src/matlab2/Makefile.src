@@ -16,10 +16,10 @@ AUXOBJ = ${AUXSRC:.cc=.o}
 all:: $(TGTOBJ)
 
 %.o : %.cc
-	$(MEX) -c $<
+	$(MEX) $(MEXINC) -c $<
 
 %.$(MEXEXT) : %.cc $(AUXOBJ)
-	$(MEX) $^
+	$(MEX) $(MEXINC) $(MEXLIB) $^
 
 clean::
 	rm -f *.$(MEXEXT)

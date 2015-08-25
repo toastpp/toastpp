@@ -60,8 +60,14 @@ public:
 
     static bool IsMultiprocessing() { return is_multiprocessing; }
 
-    inline static void UserMutex_lock() { pthread_mutex_lock (&user_mutex); }
-    inline static void UserMutex_unlock() {pthread_mutex_unlock (&user_mutex);}
+    inline static void UserMutex_lock() { 
+		int res = pthread_mutex_lock (&user_mutex);
+		dASSERT(!res, "Mutex could not be locked: %d", res);
+	}
+    inline static void UserMutex_unlock() {
+		int res = pthread_mutex_unlock (&user_mutex);
+		dASSERT(!res, "Mutex could not be unlocked: %d", res);
+	}
 
 private:
     static int nthread;

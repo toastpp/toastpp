@@ -92,7 +92,7 @@ public:
      * \note For valid strings to define the linear solver, see
      * \ref SetLinSolver.
      */
-    TFwdSolver (const QMMesh *mesh, const char *solver, double tol = 1e-10);
+    TFwdSolver (const QMMesh *mesh, const char *solver, double tol = 1e-10, int nth=1);
 
     /**
      * \brief Constructor. Creates a forward solver instance.
@@ -283,7 +283,7 @@ public:
      * \sa CalcFields
      */
     void CalcField (const TVector<T> &qvec, TVector<T> &phi,
-        IterativeSolverResult *res = 0) const;
+        IterativeSolverResult *res=0, int th=0) const;
 
     /**
      * \brief Calculate photon density fields for all sources.
@@ -409,8 +409,8 @@ public:
     PreconType precontp;    ///< preconditioner
 
 protected:
-    void Setup ();
-    void SetupType ();
+    void Setup (int nth=1);
+    void SetupType (int nth=1);
     void DeleteType ();
 
     /**
