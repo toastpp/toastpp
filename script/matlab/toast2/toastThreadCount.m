@@ -16,14 +16,14 @@ function [th,ncore] = toastThreadCount (th_set)
 %         If 0 < th_set < 1, it defines the number of workers as a fraction of
 %         the total number of cores available.
 
-[th0,ncore0] = toast(uint32(1001));
+[th0,ncore0] = toastmex(uint32(1001));
 if nargin > 0
     if th_set == 0
         th_set = ncore0;
     elseif th_set < 1
         th_set = max(1, round(th_set*ncore0));
     end
-    toast(uint32(1001),th_set);
+    toastmex(uint32(1001),th_set);
 else
     th = th0;
     if nargout > 1

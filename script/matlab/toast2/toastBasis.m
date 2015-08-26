@@ -78,13 +78,13 @@ classdef toastBasis < handle
             %         it has the same size as the bounding box of the mesh.
             %         You can provide a custom bounding box with the bb
             %         parameter, e.g. to map only a subregion of the mesh.
-            obj.handle = toast(uint32(26),mesh.handle,dims,varargin);
+            obj.handle = toastmex(uint32(26),mesh.handle,dims,varargin);
             obj.mesh = mesh;
         end
         
         function delete(obj)
             if obj.handle > 0
-                toast(uint32(27),obj.handle);
+                toastmex(uint32(27),obj.handle);
                 obj.handle = 0;
                 obj.mesh = toastMesh;
             end
@@ -101,7 +101,7 @@ classdef toastBasis < handle
             %
             % See also:
             %         toastMesh.NodeCount, BLEN, SLEN
-            n = toast(uint32(71),obj.handle);
+            n = toastmex(uint32(71),obj.handle);
         end
         
         function b = blen(obj)
@@ -115,7 +115,7 @@ classdef toastBasis < handle
             %
             % See also:
             %         NLEN, SLEN
-            b = toast(uint32(72),obj.handle);
+            b = toastmex(uint32(72),obj.handle);
         end
         
         function s = slen(obj)
@@ -135,7 +135,7 @@ classdef toastBasis < handle
             %
             % See also:
             %         NLEN, BLEN
-            s = toast(uint32(73),obj.handle);
+            s = toastmex(uint32(73),obj.handle);
         end
         
         function [bdim gdim] = Dims(obj)
@@ -157,9 +157,9 @@ classdef toastBasis < handle
             % See also:
             %         TOASTBASIS
             if nargout < 2
-                bdim = toast(uint32(28),obj.handle);
+                bdim = toastmex(uint32(28),obj.handle);
             else
-                [bdim gdim] = toast(uint32(28),obj.handle);
+                [bdim gdim] = toastmex(uint32(28),obj.handle);
             end
         end
         
@@ -198,34 +198,34 @@ classdef toastBasis < handle
         %         By default, points outside the mesh domain return 0. If
         %         the 'NOMASK' flag is set, the mesh mask is not applied.
         if nargin < 4
-    	    v = toast(uint32(81),obj.handle,pt,idx);
+    	    v = toastmex(uint32(81),obj.handle,pt,idx);
         else
-            v = toast(uint32(81),obj.handle,pt,idx,idxmode);
+            v = toastmex(uint32(81),obj.handle,pt,idx,idxmode);
         end
     end
 
     function buu = Buu(obj)
-        buu = toast(uint32(87),obj.handle);
+        buu = toastmex(uint32(87),obj.handle);
     end
     
     function bvv = Bvv(obj)
-        bvv = toast(uint32(88),obj.handle);
+        bvv = toastmex(uint32(88),obj.handle);
     end
     
     function buv = Buv(obj)
-        buv = toast(uint32(89),obj.handle);
+        buv = toastmex(uint32(89),obj.handle);
     end
     
     function bvw = Bvw(obj,dim)
-        bvw = toast(uint32(92),obj.handle,dim);
+        bvw = toastmex(uint32(92),obj.handle,dim);
     end
     
     function sa = SupportArea(obj,idx)
-        sa = toast(uint32(90),obj.handle,idx);
+        sa = toastmex(uint32(90),obj.handle,idx);
     end
     
     function Refine(obj,idx)
-        toast(uint32(91),obj.handle,idx);
+        toastmex(uint32(91),obj.handle,idx);
     end
     
         function tgt = Map(obj,mapstr,src)
@@ -262,7 +262,7 @@ classdef toastBasis < handle
             %         maps function 'mimg', represented by nodal values of
             %         the unstructured mesh, to regular grid basis 'simg'
             %         excluding grid points external to the mesh.
-            tgt = toast(uint32(29),obj.handle,mapstr,double(src));
+            tgt = toastmex(uint32(29),obj.handle,mapstr,double(src));
         end
         
         function img = Sample(obj,svec,grd)
@@ -282,7 +282,7 @@ classdef toastBasis < handle
             %
             % Notes:  To turn the returned vector into a d-dimensional
             %         image, use img = reshape(img,grd)
-            img = toast(uint32(83),obj.handle,svec,grd);
+            img = toastmex(uint32(83),obj.handle,svec,grd);
         end
         
         function elref = GridElref(obj)
@@ -297,11 +297,11 @@ classdef toastBasis < handle
             % Notes:  The returned list is of length glen and contains the
             %         1-based element indices for every grid point. Grid
             %         points outside the mesh are indicated by value 0.
-            elref = toast(uint32(63),obj.handle);
+            elref = toastmex(uint32(63),obj.handle);
         end
 
 	function g = ImageGradient(obj,img)
-	    g = toast(uint32(64),obj.handle,img);
+	    g = toastmex(uint32(64),obj.handle,img);
 	end
     end
     

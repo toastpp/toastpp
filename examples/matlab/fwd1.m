@@ -22,7 +22,7 @@ ref = ones(n,1)*1.4;
 freq = 100;
 
 % Solve FEM linear system
-smat = toastDotSysmat(hmesh,mua,mus,ref,freq);
+smat = dotSysmat(hmesh,mua,mus,ref,freq);
 phi = smat\qvec;
 meas = log(mvec.' * phi);
 

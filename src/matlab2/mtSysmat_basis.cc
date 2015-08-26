@@ -1,5 +1,5 @@
 #include "matlabtoast.h"
-#include "toastmex.h"
+#include "mexutil.h"
 #include "util.h"
 
 static void CalcSysmat (const Raster2 *raster, RVector &mua, RVector &mus,

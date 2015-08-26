@@ -7,7 +7,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
-#include "toastmex.h"
+#include "mexutil.h"
 
 using namespace std;
 

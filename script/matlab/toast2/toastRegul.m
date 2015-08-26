@@ -94,7 +94,7 @@ classdef toastRegul < handle
                 else
                     error('toastRegul: Required field not found: basis');
                 end
-                obj.handle = toast(uint32(44),prm,hbasis,x0,0);
+                obj.handle = toastmex(uint32(44),prm,hbasis,x0,0);
             else % uses parameters directly
                 typestr = varargin{1};
                 basis = varargin{2};
@@ -105,13 +105,13 @@ classdef toastRegul < handle
                 else
                     extras = [];
                 end
-    	        obj.handle = toast(uint32(44),typestr,basis.handle,x0,tau,extras);
+    	        obj.handle = toastmex(uint32(44),typestr,basis.handle,x0,tau,extras);
             end
         end
         
         function delete(obj)
             if obj.handle > 0
-                toast(uint32(45),obj.handle);
+                toastmex(uint32(45),obj.handle);
             obj.handle = 0;
             end
         end
@@ -134,7 +134,7 @@ classdef toastRegul < handle
             %
             % See also:
             %         toastRegul
-            val = toast(uint32(46),obj.handle,x);
+            val = toastmex(uint32(46),obj.handle,x);
         end
 
         function grad = Gradient (obj, x)
@@ -156,7 +156,7 @@ classdef toastRegul < handle
             %
             % See also:
             %         toastRegul
-            grad = toast(uint32(47),obj.handle,x);
+            grad = toastmex(uint32(47),obj.handle,x);
         end
 
         function hdiag = HDiag (obj, x)
@@ -179,7 +179,7 @@ classdef toastRegul < handle
             %
             % See also:
             %         toastRegul
-            hdiag = toast(uint32(48),obj.handle,x);
+            hdiag = toastmex(uint32(48),obj.handle,x);
         end
         
         function hess = Hess (obj, x)
@@ -198,11 +198,11 @@ classdef toastRegul < handle
             %
             % See also:
             %         toastRegul
-            hess = toast(uint32(49),obj.handle,x);
+            hess = toastmex(uint32(49),obj.handle,x);
         end
         
         function kappa = Kappa(obj, x)
-            kappa = toast(uint32(50),obj.handle,x);
+            kappa = toastmex(uint32(50),obj.handle,x);
         end
     end
 

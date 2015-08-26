@@ -72,16 +72,16 @@ classdef toastMesh < handle
             %         toastMesh, ELEMENTSIZE, MAKE, READ
             if nargin > 0
                 if nargin == 3
-                    obj.handle = toast(uint32(1),arg1,arg2,arg3);
+                    obj.handle = toastmex(uint32(1),arg1,arg2,arg3);
                 else
-                    obj.handle = toast(uint32(0),arg1);
+                    obj.handle = toastmex(uint32(0),arg1);
                 end
             end
         end
 
         function delete(obj)
             if obj.handle > 0
-                toast(uint32(3),obj.handle);
+                toastmex(uint32(3),obj.handle);
                 obj.handle = 0;
             end
         end
@@ -151,9 +151,9 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh, ELEMENTSIZE, READ
             if obj.handle > 0 % Delete existing mesh
-	            toast(uint32(3),obj.handle);
+	            toastmex(uint32(3),obj.handle);
             end
-	        obj.handle = toast(uint32(1),vtx,idx,eltp);
+	        obj.handle = toastmex(uint32(1),vtx,idx,eltp);
         end
 
 	    function Read(obj,fname)
@@ -181,9 +181,9 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0 % Delete existing mesh
-	            toast(uint32(3),obj.handle);
+	            toastmex(uint32(3),obj.handle);
             end
-            obj.handle = toast(uint32(0),fname);
+            obj.handle = toastmex(uint32(0),fname);
         end
 
 	    function Write(obj,fname)
@@ -198,13 +198,13 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0
-	            toast(uint32(2),obj.handle,fname);
+	            toastmex(uint32(2),obj.handle,fname);
             end
         end
 
         function WriteVtk(obj,fname,nim)
             if obj.handle > 0
-                toast(uint32(82),obj.handle,fname,nim);
+                toastmex(uint32(82),obj.handle,fname,nim);
             end
         end
         
@@ -222,7 +222,7 @@ classdef toastMesh < handle
             % Return values:
             %         perm [integer array]:
             if obj.handle > 0
-                perm = toast(uint32(70),obj.handle,modestr);
+                perm = toastmex(uint32(70),obj.handle,modestr);
             end
         end
         
@@ -248,7 +248,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh/Optimise
             if obj.handle > 0
-                toast(uint32(84),obj.handle,perm);
+                toastmex(uint32(84),obj.handle,perm);
             end
         end
         
@@ -289,7 +289,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0
-	            nnd = toast(uint32(6),obj.handle);
+	            nnd = toastmex(uint32(6),obj.handle);
             else
 	            nnd = 0;
             end
@@ -307,7 +307,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0
-	            nel = toast(uint32(7),obj.handle);
+	            nel = toastmex(uint32(7),obj.handle);
             else
 	            nel = 0;
             end
@@ -327,7 +327,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0
-	            dim = toast(uint32(9),obj.handle);
+	            dim = toastmex(uint32(9),obj.handle);
             else
 	            dim = 0;
             end
@@ -356,7 +356,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh
-	        bb = toast(uint32(8),obj.handle);
+	        bb = toastmex(uint32(8),obj.handle);
         end
 
         function size = Size(obj)
@@ -374,7 +374,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, ElementSize, toastElement.Size
-	        size = toast(uint32(59),obj.handle);
+	        size = toastmex(uint32(59),obj.handle);
         end
 
         function reg = Region(obj,newreg)
@@ -402,9 +402,9 @@ classdef toastMesh < handle
             % See also:
             %         toastElement/Region
             if nargin > 1
-                reg = toast(uint32(85),obj.handle,0,newreg);
+                reg = toastmex(uint32(85),obj.handle,0,newreg);
             else
-                reg = toast(uint32(85),obj.handle,0);
+                reg = toastmex(uint32(85),obj.handle,0);
             end
         end
         
@@ -440,7 +440,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, MAKE, SURFDATA
-	        [vtx,idx,eltp] = toast(uint32(4),obj.handle);
+	        [vtx,idx,eltp] = toastmex(uint32(4),obj.handle);
         end
 
 	    function [vtx,idx,perm] = SurfData(obj)
@@ -479,7 +479,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, DATA
-	        [vtx,idx,perm] = toast(uint32(5),obj.handle);
+	        [vtx,idx,perm] = toastmex(uint32(5),obj.handle);
         end
 
 	    function elsize = ElementSize(obj)
@@ -498,7 +498,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, Size, toastElement.Size
-	        elsize = toast(uint32(10),obj.handle);
+	        elsize = toastmex(uint32(10),obj.handle);
         end
 
 	    function elid = FindElement(obj,pts)
@@ -526,7 +526,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh
-	        elid = toast(uint32(12),obj.handle,pts);
+	        elid = toastmex(uint32(12),obj.handle,pts);
         end
 
 	    function elmat = Elmat(obj,idx,intstr,sideidx)
@@ -594,9 +594,9 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh, SYSMATCOMPONENT
             if nargin < 4
-	            elmat = toast(uint32(25),obj.handle,idx,intstr);
+	            elmat = toastmex(uint32(25),obj.handle,idx,intstr);
             else
-	            elmat = toast(uint32(25),obj.handle,idx,intstr,sideidx);
+	            elmat = toastmex(uint32(25),obj.handle,idx,intstr,sideidx);
             end
         end
 
@@ -618,7 +618,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh, SYSMATCOMPONENT
            
-            smat = toast(uint32(93),obj.handle);
+            smat = toastmex(uint32(93),obj.handle);
             
         end
         
@@ -688,7 +688,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh, ELMAT, DOTSYSMAT
             
-            nnd = toast(uint32(6),obj.handle);
+            nnd = toastmex(uint32(6),obj.handle);
             
             prm = [];
             sstruct = [];
@@ -745,7 +745,7 @@ classdef toastMesh < handle
                    
             end
             
-            smat = toast(uint32(74),obj.handle,intstr,prm,sstruct);
+            smat = toastmex(uint32(74),obj.handle,intstr,prm,sstruct);
             
         end
         
@@ -772,7 +772,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, ELMAT, SYSMATCOMPONENT, dotSysmat
-            mmat = toast(uint32(24),obj.handle);
+            mmat = toastmex(uint32(24),obj.handle);
         end
         
         function SetQM(obj,qpos,mpos)
@@ -793,7 +793,7 @@ classdef toastMesh < handle
             %
             %         The data link list is assumed to be dense, i.e. all
             %         sources are connected to all detectors.
-            toast(uint32(14),obj.handle,qpos,mpos);
+            toastmex(uint32(14),obj.handle,qpos,mpos);
         end
         
         function ReadQM(obj,qmname)
@@ -810,7 +810,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, WRITEQM, DATALINKLIST, QPOS, MPOS
-            toast(uint32(13),obj.handle,qmname);
+            toastmex(uint32(13),obj.handle,qmname);
         end
         
         function WriteQM(obj,qmname,qp,mp,dll)
@@ -843,7 +843,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, READQM, DATALINKLIST, QPOS, MPOS
-	        toast(uint32(16),obj.handle,qmname,qp,mp,dll);
+	        toastmex(uint32(16),obj.handle,qmname,qp,mp,dll);
         end
 
         function linklist = DataLinkList(obj,format)
@@ -936,9 +936,9 @@ classdef toastMesh < handle
             end
             
             if strcmpi(format,'list')
-    	        linklist = toast(uint32(17),obj.handle);
+    	        linklist = toastmex(uint32(17),obj.handle);
             elseif (strcmpi(format,'matrix'))
-                linklist = toast(uint32(15),obj.handle);
+                linklist = toastmex(uint32(15),obj.handle);
             else
                 error('mesh.DataLinkList: parameter 1: not recognised')
             end
@@ -972,7 +972,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, MPOS
-	        qpos = toast(uint32(20),obj.handle);
+	        qpos = toastmex(uint32(20),obj.handle);
         end
 
         function mpos = Mpos(obj)
@@ -1003,7 +1003,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, QPOS
-            mpos = toast(uint32(21),obj.handle);
+            mpos = toastmex(uint32(21),obj.handle);
         end
         
         function qvec = Qvec(obj,varargin)
@@ -1055,7 +1055,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, READQM, QPOS, MVEC
-            qvec = toast(uint32(18),obj.handle,varargin{:});
+            qvec = toastmex(uint32(18),obj.handle,varargin{:});
         end
         
         function mvec = Mvec(obj,varargin)
@@ -1105,7 +1105,7 @@ classdef toastMesh < handle
             %
             % See also:
             %         toastMesh, READQM, QVEC, MPOS
-            mvec = toast(uint32(19),obj.handle,varargin{:});
+            mvec = toastmex(uint32(19),obj.handle,varargin{:});
         end
         
         function intvec = IntFG(obj, f, g)
@@ -1121,7 +1121,7 @@ classdef toastMesh < handle
             %           Second nodal function, real or complex double;
             %
             % Samuel Powell, March 2014, UCL.
-            intvec = toast(uint32(4000),obj.handle,f,g);
+            intvec = toastmex(uint32(4000),obj.handle,f,g);
         end
 
        
@@ -1139,7 +1139,7 @@ classdef toastMesh < handle
             %           Second nodal function, real or complex double.
             %
             % Samuel Powell, March 2014, UCL.
-            intvec = toast(uint32(4001),obj.handle,f,g);
+            intvec = toastmex(uint32(4001),obj.handle,f,g);
         end
 
         function nn = NodeNeighbour (obj)
@@ -1152,7 +1152,7 @@ classdef toastMesh < handle
             %              Each row i of nn contains a list of indices
             %              >= 1 of neighbour nodes of i. Trailing entries
             %              of 0 are unused.
-            nn = toast(uint32(79),obj.handle);
+            nn = toastmex(uint32(79),obj.handle);
         end
         
         function Refine(obj,elrefine)
@@ -1170,9 +1170,9 @@ classdef toastMesh < handle
             %         The method also recursively refines neighbouring
             %         elements if required.
             if nargin > 1
-                toast(uint32(77),obj.handle,elrefine);
+                toastmex(uint32(77),obj.handle,elrefine);
             else
-                toast(uint32(77),obj.handle,elrefine);
+                toastmex(uint32(77),obj.handle,elrefine);
             end
         end
         
@@ -1186,7 +1186,7 @@ classdef toastMesh < handle
             %             element indx (>= 1)
             %
             % Notes:  currently works only with Triangle3 meshes.
-            toast(uint32(78),obj.handle,elidx);
+            toastmex(uint32(78),obj.handle,elidx);
         end
     
         function uphase = UnwrapPhase(obj,phase,seed)
@@ -1202,7 +1202,7 @@ classdef toastMesh < handle
             %
             % Notes:  This function will fail if the target phase
             %         difference between neighbouring nodes is > pi
-            uphase = toast(uint32(80),obj.handle,phase,seed);
+            uphase = toastmex(uint32(80),obj.handle,phase,seed);
         end
             
 	    function h = Display(obj,varargin)

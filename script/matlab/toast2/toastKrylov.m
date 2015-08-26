@@ -34,4 +34,4 @@ else
     hr = 0;
 end
 
-p = toast(uint32(55),x,J,g,M,lambda,hr,tol);
+p = toastmex(uint32(55),x,J,g,M,lambda,hr,tol);

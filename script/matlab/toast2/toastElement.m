@@ -41,7 +41,7 @@ classdef toastElement < handle
             %
             % See also:
             %         toastElement
-            dof = toast(uint32(75),obj.mesh.handle,obj.elid);
+            dof = toastmex(uint32(75),obj.mesh.handle,obj.elid);
         end
         
         function size = Size(obj)
@@ -58,7 +58,7 @@ classdef toastElement < handle
             %         indicates an incorrect node order.
             % See also:
             %         toastElement, toastMesh.ElementSize
-            size = toast(uint32(10),obj.mesh.handle,obj.elid);
+            size = toastmex(uint32(10),obj.mesh.handle,obj.elid);
         end
         
         function reg = Region(obj,newreg)
@@ -84,9 +84,9 @@ classdef toastElement < handle
             % See also:
             %         toastMesh/Region
             if nargin > 1
-                reg = toast(uint32(85),obj.mesh.handle,obj.elid,newreg);
+                reg = toastmex(uint32(85),obj.mesh.handle,obj.elid,newreg);
             else
-                reg = toast(uint32(85),obj.mesh.handle,obj.elid);
+                reg = toastmex(uint32(85),obj.mesh.handle,obj.elid);
             end
         end
         
@@ -111,7 +111,7 @@ classdef toastElement < handle
             %
             % See also:
             %         toastElement, toastMesh.Make
-	        [evtx,eidx,eltp] = toast(uint32(11),obj.mesh.handle,obj.elid);
+	        [evtx,eidx,eltp] = toastmex(uint32(11),obj.mesh.handle,obj.elid);
         end
 
         function elmat = Mat(obj,intstr,sideidx)
@@ -194,9 +194,9 @@ classdef toastElement < handle
             % See also:
             %         toastElement, toastMesh.SysmatComponent
             if nargin < 3
-                elmat = toast(uint32(25),obj.mesh.handle,obj.elid,intstr);
+                elmat = toastmex(uint32(25),obj.mesh.handle,obj.elid,intstr);
             else
-                elmat = toast(uint32(25),obj.mesh.handle,obj.elid,intstr,sideidx);
+                elmat = toastmex(uint32(25),obj.mesh.handle,obj.elid,intstr,sideidx);
             end
         end
     
@@ -240,9 +240,9 @@ classdef toastElement < handle
             % See also:
             %         toastElement, SHAPEDER
             if nargin < 3
-                fun = toast(uint32(57),obj.mesh.handle,obj.elid,pt);
+                fun = toastmex(uint32(57),obj.mesh.handle,obj.elid,pt);
             else
-                fun = toast(uint32(57),obj.mesh.handle,obj.elid,pt,frame);
+                fun = toastmex(uint32(57),obj.mesh.handle,obj.elid,pt,frame);
             end
         end
 
@@ -288,9 +288,9 @@ classdef toastElement < handle
             % See also:
             %         toastElement, SHAPEFUNC
             if nargin < 3
-                der = toast(uint32(58),obj.mesh.handle,obj.elid,pt);
+                der = toastmex(uint32(58),obj.mesh.handle,obj.elid,pt);
             else
-                der = toast(uint32(58),obj.mesh.handle,obj.elid,pt,frame);
+                der = toastmex(uint32(58),obj.mesh.handle,obj.elid,pt,frame);
             end
         end
     end

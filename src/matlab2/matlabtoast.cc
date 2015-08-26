@@ -1,5 +1,5 @@
 #include "matlabtoast.h"
-#include "toastmex.h"
+#include "mexutil.h"
 #include "util.h"
 #include "timing.h"
 
