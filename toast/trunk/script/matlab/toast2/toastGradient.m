@@ -56,4 +56,4 @@ function p = toastGradient(hmesh,hbasis,qvec,mvec,mua,mus,ref,freq,data,sd,varar
 %        Likewise, qvec, mvec and phi (if provided) can be real-valued, as
 %        the imaginary component is ignored.
 
-p = toast(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,varargin{:});
+p = toastmex(uint32(52),hmesh.handle,hbasis.handle,qvec,mvec,mua,mus,ref,freq,data,sd,varargin{:});

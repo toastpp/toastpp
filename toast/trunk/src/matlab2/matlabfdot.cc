@@ -1,7 +1,7 @@
 #include "mex.h"
 #include "stoastlib.h"
 #include "util.h"
-#include "toastmex.h"
+#include "mexutil.h"
 #include "matlabfdot.h"
 
 // =========================================================================

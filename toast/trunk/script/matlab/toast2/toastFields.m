@@ -49,5 +49,5 @@ else
     bhandle = basis.handle;
 end
 
-phi = toast(uint32(51),mesh.handle,bhandle,qvec,mua,mus,ref, ...
+phi = toastmex(uint32(51),mesh.handle,bhandle,qvec,mua,mus,ref, ...
             freq,method,tol);

@@ -49,7 +49,7 @@ if nargin==5
     dphi = varargin{1};
     aphi = varargin{2};
     proj = varargin{3};
-    J = toast(uint32(53),hmesh.handle,hb,dphi,aphi,proj);
+    J = toastmex(uint32(53),hmesh.handle,hb,dphi,aphi,proj);
 else
     qvec = varargin{1};
     mvec = varargin{2};
@@ -65,7 +65,7 @@ else
             tol = varargin{8};
         end
     end
-    J = toast(uint32(53),hmesh.handle,hb,qvec,mvec,mua,mus,ref,freq,solver,tol);
+    J = toastmex(uint32(53),hmesh.handle,hb,qvec,mvec,mua,mus,ref,freq,solver,tol);
 end
 
 end

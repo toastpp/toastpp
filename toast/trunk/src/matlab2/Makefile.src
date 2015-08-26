@@ -2,10 +2,10 @@ include $(TOASTDIR)/Makefile.incl
 SHELL = /bin/csh
 VPATH = $(TSRC)/matlab2
 
-TGTSRC = toast.cc
+TGTSRC = toastmex.cc
 TGTOBJ = ${TGTSRC:.cc=.$(MEXEXT)}
 
-AUXSRC = matlabtoast.cc toastmex.cc util.cc mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
+AUXSRC = matlabtoast.cc mexutil.cc util.cc mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
 
 ifeq ($(BUILD_FDOT),1)
   AUXSRC +=  matlabfdot.cc

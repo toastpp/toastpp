@@ -1,583 +1,402 @@
+// TOAST mex driver.
+// This is a single entry point for Matlab toast functions that are
+// implemented in C++.
+
 #include "mex.h"
-//#include "ilupack.h"
-#include "mathlib.h"
-#include "felib.h"
 #include "toastmex.h"
 
-using namespace std;
+MatlabToast *mtoast = 0;
 
-static bool is64bit = (sizeof(mwIndex) == 8);
+#ifdef FDOT
+MatlabFDOT *mfdot = 0;
+#endif
 
-// ============================================================================
-// ============================================================================
-// PART 1: TOAST -> MATLAB conversions
-// ============================================================================
-// ============================================================================
+void mexClear();
 
-
-// ============================================================================
-// Copy a dense RVector from TOAST to MATLAB format
-
-void CopyVector (mxArray **array, const RVector &vec, VectorOrientation vo)
+void ProvideToast ()
 {
-    int i, m = vec.Dim();
-    mxArray *tmp;
+    if (!mtoast) {
+	mtoast = new MatlabToast;
+	mexAtExit (mexClear);
 
-    // note: these seem transposed, but produce correct result
-    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (1, m, mxREAL);
-    else            tmp = mxCreateDoubleMatrix (m, 1, mxREAL);
-    double *pr = mxGetPr (tmp);
-
-    for (i = 0; i < m; i++)
-	pr[i] = vec[i];
-
-    *array = tmp;
+#ifdef TOAST_THREAD
+	Task_Init (0);
+#endif
+    }
 }
 
-// ============================================================================
-// Copy a dense CVector from TOAST to MATLAB format
-
-void CopyVector (mxArray **array, const CVector &vec, VectorOrientation vo)
+#ifdef FDOT
+void ProvideFDOT ()
 {
-    int i, m = vec.Dim();
-    mxArray *tmp;
+    ProvideToast();
+    if (!mfdot) mfdot = new MatlabFDOT;
+}
+#endif
 
-    // note: these seem transposed, but produce correct result
-    if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (1, m, mxCOMPLEX);
-    else            tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
-    double *pr = mxGetPr (tmp);
-    double *pi = mxGetPi (tmp);
+// =========================================================================
+// MEX entry point
 
-    for (i = 0; i < m; i++) {
-        pr[i] = vec[i].real();
-	pi[i] = vec[i].imag();
+void mexClear ()
+{
+  //    if (mtoast) {
+  //	delete mtoast;
+  //	mtoast = 0;
+  //    }
+}
+
+void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+    unsigned int funcid;
+
+    if (nrhs> 0 && mxIsUint32 (prhs[0])) {
+	funcid = *(unsigned int*)mxGetData (prhs[0]);
+	nrhs--;
+	prhs++;
+    }
+    else {
+        mexErrMsgTxt ("toast: Invalid toast driver call: integer function id expected in first argument.");
     }
 
-    *array = tmp;
-}
+    ProvideToast();
 
-// ============================================================================
-// Copy a dense IVector from TOAST to MATLAB format
-
-void CopyVector (mxArray **array, const IVector &vec, VectorOrientation vo)
-{
-    int i, m = vec.Dim();
-
-    const mwSize dim = (mwSize)vec.Dim();
-    mxArray *tmp;
-
-    if (vo==ROWVEC) tmp = mxCreateNumericMatrix (1,dim, mxINT32_CLASS, mxREAL);
-    else            tmp = mxCreateNumericMatrix (dim,1, mxINT32_CLASS, mxREAL);
-    int *pr = (int*)mxGetData (tmp);
-
-    for (i = 0; i < m; i++)
-	pr[i] = vec[i];
-
-    *array = tmp;
-}
-
-// ============================================================================
-// Copy a dense matrix from TOAST to MATLAB format
-
-void CopyMatrix (mxArray **array, const RDenseMatrix &mat)
-{
-    int m = mat.nRows();
-    int n = mat.nCols();
-    int i, j, idx;
-
-    mxArray *tmp = mxCreateDoubleMatrix (m, n, mxREAL);
-    double *pr = mxGetPr (tmp);
-
-    for (j = idx = 0; j < n; j++)
-	for (i = 0; i < m; i++)
-	    pr[idx++] = mat(i,j);
-
-    *array = tmp;
-}
-
-// ============================================================================
-// Copy a complex dense matrix from TOAST to MATLAB format
-
-void CopyMatrix (mxArray **array, const CDenseMatrix &mat)
-{
-    int m = mat.nRows();
-    int n = mat.nCols();
-    int i, j, idx;
-
-    mxArray *tmp = mxCreateDoubleMatrix (m, n, mxCOMPLEX);
-    double *pr = mxGetPr (tmp);
-    double *pi = mxGetPi (tmp);
-
-    for (j = idx = 0; j < n; j++)
-      for (i = 0; i < m; i++) {
-	pr[idx] = mat(i,j).real();
-	pi[idx] = mat(i,j).imag();
-	idx++;
-      }
-
-    *array = tmp;
-}
-
-// ============================================================================
-// Copy a sparse matrix from TOAST to MATLAB format
-
-void CopyMatrix (mxArray **array, const RCompRowMatrix &mat)
-{
-    int i, j, k;
-    int m = mat.nRows();
-    int n = mat.nCols();
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
-    const double *pval = mat.ValPtr();
-    int nz = rowptr[m];
-    mwIndex *rcount = new mwIndex[n];
-    mwIndex idx;
-
-    mxArray *tmp = mxCreateSparse (m, n, nz, mxREAL);
-
-    for (i = 0; i < n; i++) rcount[i] = 0;
-    for (i = 0; i < nz; i++) rcount[colidx[i]]++;
-
-    double  *pr = mxGetPr(tmp);
-    mwIndex *ir = mxGetIr(tmp);
-    mwIndex *jc = mxGetJc(tmp);
-
-    jc[0] = 0;
-    for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
-    for (i = 0; i < n; i++) rcount[i] = 0;
-    for (i = 0; i < m; i++)
-	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
-	    j = colidx[k];
-	    idx = jc[j]+rcount[j];
-	    ir[idx] = i;
-	    pr[idx] = pval[k];
-	    rcount[j]++;
-	}
-    delete []rcount;
-    *array = tmp;
-}
-
-// ============================================================================
-// Copy a sparse matrix from TOAST to MATLAB format
-
-void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
-{
-    int i, j, k;
-    int m = mat.nRows();
-    int n = mat.nCols();
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
-    const std::complex<double> *pval = mat.ValPtr();
-    int nz = rowptr[m];
-    mwIndex *rcount = new mwIndex[n];
-    mwIndex idx;
-
-    mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
-
-    for (i = 0; i < n; i++) rcount[i] = 0;
-    for (i = 0; i < nz; i++) rcount[colidx[i]]++;
-
-    double  *pr = mxGetPr(tmp);
-    double  *pi = mxGetPi(tmp);
-    mwIndex *ir = mxGetIr(tmp);
-    mwIndex *jc = mxGetJc(tmp);
-
-    jc[0] = 0;
-    for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
-    for (i = 0; i < n; i++) rcount[i] = 0;
-
-    for (i = 0; i < m; i++)
-	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
-	    j = colidx[k];
-	    idx = jc[j]+rcount[j];
-	    ir[idx] = i;
-	    pr[idx] = pval[k].real();
-	    pi[idx] = pval[k].imag();
-	    rcount[j]++;	
-	}
-    delete []rcount;
-
-    *array = tmp;
-}
-
-// ============================================================================
-// Copy a symmetric sparse matrix from TOAST to MATLAB format
-
-void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
-{
-    int i, j, k, nz;
-    int m = mat.nRows();
-    int n = mat.nCols();
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
-    const std::complex<double> *pval = mat.ValPtr();
-    mwIndex *rcount = new mwIndex[n];
-    mwIndex idx;
-
-    // calculate the number of nonzero entries in the equivalent
-    // non-symmetric sparse matrix
-
-    for (j = 0; j < n; j++) rcount[j] = 0;
-    for (i = nz = 0; i < m; i++) {
-	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
-	    j = colidx[k]; 
-	    nz++;
-	    rcount[j]++;
-	    if (j < i) { // off-diagonal element: transpose
-		nz++;
-		rcount[i]++;
-	    }
-	}
-    }
-
-    mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
-
-    double  *pr = mxGetPr(tmp);
-    double  *pi = mxGetPi(tmp);
-    mwIndex *ir = mxGetIr(tmp);
-    mwIndex *jc = mxGetJc(tmp);
-
-    jc[0] = 0;
-    for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
-    for (i = 0; i < n; i++) rcount[i] = 0;
-
-    for (i = 0; i < m; i++) {
-	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
-	    j = colidx[k];
-	    idx = jc[j]+rcount[j];
-	    ir[idx] = i;
-	    pr[idx] = pval[k].real();
-	    pi[idx] = pval[k].imag();
-	    rcount[j]++;
-
-	    if (j < i) { // off-diagonal element: transpose
-		idx = jc[i]+rcount[i];
-		ir[idx] = j;
-		pr[idx] = pval[k].real();
-		pi[idx] = pval[k].imag();
-		rcount[i]++;
-	    }
-	}
-    }
-    delete []rcount;
-    *array = tmp;
-}
-
-// ============================================================================
-// Transpose and copy a dense matrix from TOAST to MATLAB format
-
-void CopyTMatrix (mxArray **array, const RDenseMatrix &mat)
-{
-    int n = mat.nRows();
-    int m = mat.nCols();
-    int i, j, idx;
-
-    mxArray *tmp = mxCreateDoubleMatrix (m, n, mxREAL);
-    double *pr = mxGetPr (tmp);
-
-    for (j = idx = 0; j < n; j++)
-	for (i = 0; i < m; i++)
-	    pr[idx++] = mat(j,i);
-
-    *array = tmp;
-}
-
-// ============================================================================
-// Transpose and copy a sparse matrix from TOAST to MATLAB format
-
-void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat)
-{
-    int i;
-    int m = mat.nCols();
-    int n = mat.nRows();
-
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
-    const std::complex<double> *pval = mat.ValPtr();
-    int nz = rowptr[n];
-
-    mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
-    double  *pr = mxGetPr (tmp);
-    double  *pi = mxGetPi (tmp);
-    mwIndex *ir = mxGetIr (tmp);
-    mwIndex *jc = mxGetJc (tmp);
-
-    for (i = 0; i < nz; i++) {
-        pr[i] = pval[i].real();
-	pi[i] = pval[i].imag();
-	ir[i] = colidx[i];
-    }
-    for (i = 0; i <= n; i++)
-	jc[i] = rowptr[i];
-
-    *array = tmp;
-}
-
-
-// ============================================================================
-// ============================================================================
-// PART 2: MATLAB -> TOAST conversions
-// ============================================================================
-// ============================================================================
-
-// ============================================================================
-// Copy a RVector from MATLAB to TOAST format
-
-void CopyVector (RVector &vec, const mxArray *array)
-{
-    mwIndex m = mxGetM(array);
-    mwIndex n = mxGetN(array);
-    mwIndex d = m*n;
-
-    vec.New((int)d);
-    double *val = vec.data_buffer();
-
-    switch (mxGetClassID (array)) {
-    case mxDOUBLE_CLASS: {
-	double *pr = mxGetPr (array);
-	memcpy (val, pr, d*sizeof(double));
-        } break;
-    case mxUINT32_CLASS:
-    case mxINT32_CLASS: {
-	mwIndex i;
-	int *pr = (int*)mxGetData (array);
-	for (i = 0; i < d; i++) val[i] = pr[i];
-        } break;
-    case mxUINT8_CLASS:
-    case mxINT8_CLASS: {
-	mwIndex i;
-	char *pr = (char*)mxGetData (array);
-	for (i = 0; i < d; i++) val[i] = pr[i];
-        } break;
-    default:
-	cerr << mxGetClassName(array) << " not supported" << endl;
+    switch (funcid) {
+    case TOAST_CLEARMESH:
+	mtoast->ClearMesh (nlhs, plhs, nrhs, prhs);
 	break;
-    }
-}
+    case TOAST_MARKMESHBOUNDARY:
+	mtoast->MarkMeshBoundary (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHLIN2QUAD:
+	mtoast->MeshLin2Quad (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SETQM:
+	mtoast->SetQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_FINDELEMENT:
+	mtoast->FindElement (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_READNIM:
+	mtoast->ReadNIM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITENIM:
+	mtoast->WriteNIM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_QVEC:
+	mtoast->Qvec (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MVEC:
+	mtoast->Mvec (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_QPOS:
+	mtoast->QPos (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MPOS:
+	mtoast->MPos (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SYSMAT:
+	mtoast->Sysmat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SYSMATBASIS:
+	mtoast->Sysmat_basis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_VOLMAT:
+	mtoast->Volmat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BNDMAT:
+	mtoast->Bndmat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BNDREFLECTIONTERM:
+	mtoast->BndReflectionTerm (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SETBASIS:
+	mtoast->SetBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_CLEARBASIS:
+	mtoast->ClearBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_GETBASISSIZE:
+	mtoast->GetBasisSize (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_NLEN:
+        mtoast->GetBasisNLen (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_BLEN:
+        mtoast->GetBasisBLen (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_SLEN:
+        mtoast->GetBasisSLen (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_VALUE:
+	mtoast->BasisValue (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_BUU:
+	mtoast->GetBasisBuu (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_BVV:
+	mtoast->GetBasisBvv (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_BUV:
+	mtoast->GetBasisBuv (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_BVW:
+        mtoast->GetBasisBvw (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_SUPPORTAREA:
+	mtoast->GetBasisSupportArea (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASIS_REFINE:
+	mtoast->BasisRefine (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPBASIS:
+	mtoast->MapBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPMESHTOBASIS:
+	mtoast->MapMeshToBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPMESHTOGRID:
+	mtoast->MapMeshToGrid (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPMESHTOSOL:
+	mtoast->MapMeshToSol (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPBASISTOMESH:
+	mtoast->MapBasisToMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPSOLTOMESH:
+	mtoast->MapSolToMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPSOLTOBASIS:
+	mtoast->MapSolToBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPSOLTOGRID:
+	mtoast->MapSolToGrid (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPGRIDTOMESH:
+	mtoast->MapGridToMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPGRIDTOBASIS:
+	mtoast->MapGridToBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MAPGRIDTOSOL:
+	mtoast->MapGridToSol (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASISTOMESHMATRIX:
+	mtoast->BasisToMeshMatrix (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_BASISSAMPLE:
+	mtoast->SampleBasis (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_GRIDELREF:
+	mtoast->GridElref (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SAMPLEFIELD:
+	mtoast->SampleField (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_IMAGEGRADIENT:
+	mtoast->ImageGradient (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_READVECTOR:
+	mtoast->ReadVector (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITEVECTOR:
+	mtoast->WriteVector (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SOLUTIONMASK:
+	mtoast->SolutionMask (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SETVERBOSITY:
+	mtoast->SetVerbosity (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_THREADCOUNT:
+	mtoast->ThreadCount (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGUL:
+	mtoast->Regul (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_CLEARREGUL:
+	mtoast->ClearRegul (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGULVALUE:
+	mtoast->RegulValue (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGULGRADIENT:
+	mtoast->RegulGradient (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGULHDIAG:
+	mtoast->RegulHDiag (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGULHESS:
+	mtoast->RegulHess (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGULHESS1F:
+	mtoast->RegulHess1f (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_REGULKAPPA:
+	mtoast->RegulKappa (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_FIELDS:
+	mtoast->Fields (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_GRADIENT:
+	mtoast->Gradient (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_JACOBIAN:
+	mtoast->Jacobian (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_JACOBIANCW:
+	mtoast->JacobianCW (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_KRYLOV:
+	mtoast->Krylov (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_LBFGS:
+        mtoast->LBFGS (nlhs, plhs, nrhs, prhs);
+	break;
 
-// ============================================================================
-// Copy a CVector from MATLAB to TOAST format
+    // methods defined in mtMesh.cc
+    case TOAST_MAKEMESH:
+	mtoast->MakeMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_READMESH:
+	mtoast->ReadMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITEMESH:
+	mtoast->WriteMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITEMESHVTK:
+	mtoast->WriteMeshVtk (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHOPT:
+	mtoast->MeshOpt (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHREORDER:
+	mtoast->MeshReorder (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHNODECOUNT:
+	mtoast->MeshNodeCount (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHELEMENTCOUNT:
+	mtoast->MeshElementCount (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHDIMENSION:
+	mtoast->MeshDimension (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHBB:
+	mtoast->MeshBB (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHSIZE:
+	mtoast->MeshSize (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHDATA:
+	mtoast->MeshData (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SURFDATA:
+	mtoast->SurfData (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SYSMATCOMPONENT:
+    mtoast->SysmatComponent (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SPARSITYSTRUCTURE:
+    mtoast->SysmatSparsityStructure(nlhs, plhs, nrhs, prhs);
+    break;
+    case TOAST_MASSMAT:
+	mtoast->Massmat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_READQM:
+	mtoast->ReadQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_WRITEQM:
+	mtoast->WriteQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_GETQM:
+	mtoast->GetQM (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_DATALINKLIST:
+	mtoast->DataLinkList (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_MESHREFINE:
+        mtoast->MeshRefine (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SPLITELEMENT:
+	mtoast->SplitElement (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_NODENEIGHBOUR:
+	mtoast->NodeNeighbour (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_UNWRAPPHASE:
+	mtoast->UnwrapPhase (nlhs, plhs, nrhs, prhs);
+	break;
 
-void CopyVector (CVector &vec, const mxArray *array)
-{
-    mwIndex m = mxGetM(array);
-    mwIndex n = mxGetN(array);
-    mwIndex d = m*n;
-    double *pr = mxGetPr (array);
-    double *pi = mxGetPi (array);
- 
-    vec.New((int)d);
-    std::complex<double> *val = vec.data_buffer();
-   
-    for (mwIndex i = 0; i < d; i++)
-        val[i] = std::complex<double> (pr[i], pi[i]);
-}
+    // methods defined in mtElement.cc
+    case TOAST_ELDOF:
+        mtoast->ElDof (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELEMENTSIZE:
+	mtoast->ElSize (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELEMENTDATA:
+	mtoast->ElData (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELEMENTREGION:
+	mtoast->ElRegion (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_ELMAT:
+	mtoast->ElMat (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SHAPEFUNC:
+	mtoast->ShapeFunc (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_SHAPEGRAD:
+	mtoast->ShapeGrad (nlhs, plhs, nrhs, prhs);
+	break;
+// Integral methods added by SP
+    case TOAST_INTFG:
+	mtoast->IntFG (nlhs, plhs, nrhs, prhs);
+	break;
+    case TOAST_INTGRADFGRADG:
+	mtoast->IntGradFGradG (nlhs, plhs, nrhs, prhs);
+	break;
 
 
-
-
-
-// ============================================================================
-// Copy a dense matrix from MATLAB to TOAST format
-
-void CopyMatrix (RDenseMatrix &mat, const mxArray *array)
-{
-    mwIndex i, j;
-    mwIndex m = mxGetM(array);
-    mwIndex n = mxGetN(array);
-    double *pr = mxGetPr (array);
-
-    mat.New ((int)m,(int)n);
-    double *val = mat.ValPtr();
-    for (j = 0; j < n; j++)
-	for (i = 0; i < m; i++)
-	    val[i*n+j] = *pr++;
-}
-
-// ============================================================================
-// Copy a dense integer matrix from MATLAB to TOAST format
-
-void CopyMatrix (IDenseMatrix &mat, const mxArray *array)
-{
-    mwIndex i, j;
-    mwIndex m = mxGetM(array);
-    mwIndex n = mxGetN(array);
-    double *pr = mxGetPr (array);
-
-    mat.New ((int)m,(int)n);
-    int *val = mat.ValPtr();
-    for (j = 0; j < n; j++)
-	for (i = 0; i < m; i++)
-	    val[i*n+j] = (int)*pr++;
-}
-
-// ============================================================================
-// Copy a dense matrix from MATLAB to TOAST format
-
-void CopyTMatrix (RDenseMatrix &mat, const mxArray *array)
-{
-    mwIndex i, j;
-    mwIndex m = mxGetM(array);
-    mwIndex n = mxGetN(array);
-    double *pr = mxGetPr (array);
-
-    mat.New ((int)n,(int)m);
-    double *val = mat.ValPtr();
-    for (j = 0; j < n; j++)
-	for (i = 0; i < m; i++)
-	    val[j*m+i] = *pr++;
-}
-
-// ============================================================================
-// Transpose and copy a sparse matrix from MATLAB to TOAST format
-
-void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
-{
-    mwIndex dim = mxGetNumberOfDimensions (array);
-    if (dim > 2) mexErrMsgTxt ("CopyTMatrix: 2-D matrix expected");
-
-    mwIndex m   = mxGetDimensions (array)[0];
-    mwIndex n   = mxGetDimensions (array)[1];
-    mwIndex nz  = mxGetNzmax (array);
-    double *pr  = mxGetPr (array);
-    double *pi  = mxGetPi (array);
-    int *rowptr, *colidx;
-
-#ifdef INDEX64
-    mwIndex i;
-    mwIndex *ir = mxGetIr (array);
-    mwIndex *jc = mxGetJc (array);
-    rowptr = new int[n+1];
-    colidx = new int[nz];
-    for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
-    for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
-#else
-    rowptr = mxGetJc (array);
-    colidx = mxGetIr (array);
+#ifdef FDOT
+    // FDOT interface
+    case FDOT_MAKEFWD:
+	ProvideFDOT();
+	mfdot->MakeFwd (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_CLEARFWD:
+	ProvideFDOT();
+	mfdot->DelFwd (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_FWDOP:
+	ProvideFDOT();
+	mfdot->FwdOp (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_FWDOPRATIO:
+	ProvideFDOT();
+	mfdot->FwdOpRatio (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_ADJOP:
+	ProvideFDOT();
+	mfdot->AdjOp (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_ADJOPRATIO:
+	ProvideFDOT();
+	mfdot->AdjOpRatio (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_EXCIT:
+	ProvideFDOT();
+	mfdot->Excit (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_SYSMAT:
+	ProvideFDOT();
+	mfdot->Sysmat (nlhs, plhs, nrhs, prhs);
+	break;
 #endif
 
-    std::complex<double> *val = new std::complex<double>[nz];
-    for (mwIndex i = 0; i < nz; i++)
-        val[i] = std::complex<double> (pr[i], pi[i]);
-
-    mat.New ((int)n, (int)m);
-    mat.Initialise (rowptr, colidx, val);
-
-    delete []val;
-#ifdef INDEX64
-    delete []rowptr;
-    delete []colidx;
-#endif
-}
-
-// ============================================================================
-// Transpose and copy a sparse matrix from MATLAB to TOAST format
-
-void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
-{
-    mwIndex dim = mxGetNumberOfDimensions (array);
-    if (dim > 2) mexErrMsgTxt ("CopyTMatrix: 2-D matrix expected");
-
-    mwIndex m   = mxGetDimensions (array)[0];
-    mwIndex n   = mxGetDimensions (array)[1];
-    mwIndex nz  = mxGetNzmax (array);
-    double *pr  = mxGetPr (array);
-    int *rowptr, *colidx;
-
-#ifdef INDEX64
-    mwIndex i;
-    mwIndex *ir = mxGetIr (array);
-    mwIndex *jc = mxGetJc (array);
-    rowptr = new int[n+1];
-    colidx = new int[nz];
-    for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
-    for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
-#else
-    rowptr = mxGetJc (array);
-    colidx = mxGetIr (array);
-#endif
-
-    double *val = new double[nz];
-    for (mwIndex i = 0; i < nz; i++) {
-	val[i] = pr[i];
-    }
-
-    mat.New ((int)n, (int)m);
-    mat.Initialise (rowptr, colidx, val);
-
-    delete []val;
-#ifdef INDEX64
-    delete []rowptr;
-    delete []colidx;
-#endif
-}
-
-// ============================================================================
-// ============================================================================
-// Assertion functions
-
-void dAssert (bool cond, char *msg) {
-    mxAssert (cond, msg);
-}
-
-void xAssert (bool cond, char *msg) {
-    if (!cond) mexErrMsgTxt (msg);
-}
-
-
-// ============================================================================
-// ============================================================================
-// Misc. mex utility functions
-
-// ============================================================================
-// waitbar functions
-
-static struct {
-    mwSize ndim, dims[2];
-    int flag;
-    int range, d;
-    mxArray *pmx1[1];
-    mxArray *pmx2[2];
-    mxArray *pmx3[1];
-    mxArray *pmx4[1];
-    double *pmx2_0;
-    double *pmx3_0;
-} waitbar = {0, {0,0}, 0, 0, 0};
-
-void mxOpenWaitbar (char *s, int range)
-{
-    if (waitbar.flag < 1) {
-	waitbar.flag++;
-	waitbar.range = range;
-	waitbar.d = std::max(1,waitbar.range/50); // granularity
-	waitbar.ndim = 2; waitbar.dims[0] = 1; waitbar.dims[1] = 1;
-	waitbar.pmx2[0] = mxCreateNumericArray(waitbar.ndim,waitbar.dims,mxUINT16_CLASS,mxREAL);
-	waitbar.pmx2_0 = mxGetPr(waitbar.pmx2[0]);
-	*waitbar.pmx2_0 = 0;
-	waitbar.ndim = 2; waitbar.dims[0] = 1; waitbar.dims[1] = 1;
-	waitbar.pmx3[0] = mxCreateNumericArray(waitbar.ndim,waitbar.dims,mxDOUBLE_CLASS,mxREAL);
-	waitbar.pmx3_0 = mxGetPr(waitbar.pmx3[0]);
-	waitbar.pmx2[1] = mxCreateString(s);
-	mexCallMATLAB(1,waitbar.pmx1,2,waitbar.pmx2,"waitbar");
-    }
-}
-
-void mxUpdateWaitbar (int i)
-{
-    double x;
-    if (waitbar.flag > 0) {
-	if ((i%waitbar.d) == 0) {
-	    x = (double)(i+1)/waitbar.range;
-	    *waitbar.pmx3_0 = x;
-	    mexCallMATLAB(0,waitbar.pmx4,1,waitbar.pmx3,"waitbar");
-	}
-    }
-}
-
-void mxCloseWaitbar ()
-{
-    if (waitbar.flag > 0) {
-	mexCallMATLAB (0, waitbar.pmx4, 1, waitbar.pmx1, "close");
-	waitbar.flag = 0;
+    default:
+	mexPrintf ("toast: requested function id=%d\n", funcid);
+	mexErrMsgTxt ("toast: Invalid toast driver call: function id not recognised.");
+	break;
     }
 }

@@ -8,7 +8,7 @@ classdef toastNim < double
                 val = 0;
             else
                 if ischar(data)
-                    [val,mname] = toast(uint32(22),data);
+                    [val,mname] = toastmex(uint32(22),data);
                 else
                     val = double(data);
                 end
@@ -18,7 +18,7 @@ classdef toastNim < double
         end
 
         function Write(obj,fname,meshname)
-            toast(uint32(56),fname,meshname,double(obj));
+            toastmex(uint32(56),fname,meshname,double(obj));
         end
         
         function v = Values(obj)

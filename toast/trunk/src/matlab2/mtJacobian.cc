@@ -4,7 +4,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
-#include "toastmex.h"
+#include "mexutil.h"
 #include "fwdsolver.h"
 
 using namespace std;

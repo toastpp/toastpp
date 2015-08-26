@@ -6,5 +6,5 @@
 %          numbers provide more output.
 
 function toastSetVerbosity(level)
-toast(uint32(1000),uint32(level));
+toastmex(uint32(1000),uint32(level));
 end

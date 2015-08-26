@@ -4,7 +4,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
-#include "toastmex.h"
+#include "mexutil.h"
 
 #ifdef TOAST_THREAD_MATLAB_GRADIENT
 #include "task.h"
