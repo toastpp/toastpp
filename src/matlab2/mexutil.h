@@ -1,10 +1,9 @@
-#ifndef __TOASTMEX_H
-#define __TOASTMEX_H
+#ifndef __MEXUTIL_H
+#define __MEXUTIL_H
 
 #include "mex.h"
 #include "matrix.h"
 #include "mathlib.h"
-//#include "toasttype.h"
 
 #ifndef MX_API_VER
 #define MX_API_VER 0
@@ -64,4 +63,4 @@ void dAssert (bool cond, char *msg);
 void xAssert (bool cond, char *msg);
 // assertion checked always
 
-#endif // !__TOASTMEX_H
+#endif // !__MEXUTIL_H
