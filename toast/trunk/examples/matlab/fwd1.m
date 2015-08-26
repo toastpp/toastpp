@@ -10,16 +10,16 @@ meshdir = '../../test/2D/meshes/';
 hmesh=toastMesh([meshdir 'ellips_tri10.msh']);
 hmesh.ReadQM([meshdir 'circle25_32x32.qm']);
 
-% Construct source and measurement vectors
-qvec = hmesh.Qvec('Neumann','Gaussian',2);
-mvec = hmesh.Mvec('Gaussian',2);
-
 % Load parameter distributions
 n = hmesh.NodeCount;
 mua = toastNim([meshdir 'tgt_mua_ellips_tri10.nim']);
 mus = toastNim([meshdir 'tgt_mus_ellips_tri10.nim']);
 ref = ones(n,1)*1.4;
 freq = 100;
+
+% Construct source and measurement vectors
+qvec = hmesh.Qvec('Neumann','Gaussian',2);
+mvec = hmesh.Mvec('Gaussian',2,ref);
 
 % Solve FEM linear system
 smat = dotSysmat(hmesh,mua,mus,ref,freq);

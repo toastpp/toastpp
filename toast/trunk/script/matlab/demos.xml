@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<demos>
+<?xml version="1.0" encoding="utf-8"?><demos>
 
-<name>TOAST</name>
+<name>Toast++</name>
 <type>toolbox</type>
 <icon>html/toast_logo_100.jpg</icon>
 <description>

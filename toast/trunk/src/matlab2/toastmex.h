@@ -1,7 +1,7 @@
 // -*-C++-*-
 
-#ifndef __MATLAB_TOAST_H
-#define __MATLAB_TOAST_H
+#ifndef __MATLAB_TOASTMEX_H
+#define __MATLAB_TOASTMEX_H
 
 #include "mathlib.h"
 #include "matlabtoast.h"
@@ -124,4 +124,4 @@
 #define FDOT_SYSMAT           2006
 #endif
 
-#endif // !__MATLAB_TOAST_H
+#endif // !__MATLAB_TOASTMEX_H

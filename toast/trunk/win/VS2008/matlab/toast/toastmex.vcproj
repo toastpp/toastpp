@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="toast"
+	Name="toastmex"
 	ProjectGUID="{641E2478-8B0A-477F-942C-5BCE235D84DD}"
-	RootNamespace="toast"
+	RootNamespace="toastmex"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOAST_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTMEX_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -120,7 +120,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOAST_EXPORTS;FEM_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TOASTMEX_EXPORTS;FEM_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -195,7 +195,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOAST_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTMEX_EXPORTS"
 				RuntimeLibrary="2"
 			/>
 			<Tool
@@ -267,7 +267,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;TOAST_EXPORTS"
+				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;TOASTMEX_EXPORTS"
 				RuntimeLibrary="2"
 			/>
 			<Tool
@@ -331,6 +331,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\matlab2\mexutil.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\matlab2\mtBasis.cc"
 				>
 			</File>
@@ -367,10 +371,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\matlab2\toast.cc"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\matlab2\toastlbfgs.cc"
 				>
 			</File>
@@ -393,7 +393,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\matlab2\toast.h"
+				RelativePath="..\..\..\..\src\matlab2\mexutil.h"
 				>
 			</File>
 			<File
