@@ -11,6 +11,7 @@ classdef toastMesh < handle
             %
             % Syntax: mesh = toastMesh(vtx,idx,eltp)
             %         mesh = toastMesh(fname)
+            %         mesh = toastMesh(fname,'gmsh')
             %
             % Parameters:
             %         vtx [real array n x 2 or n x 3]:
@@ -21,6 +22,8 @@ classdef toastMesh < handle
             %             list of element type indices (see notes)
             %         fname [string]:
             %             file name for mesh file to load
+            %         'gmsh'
+            %             Read from file fname in gmsh format
             %
             % Return values:
             %         mesh [object]:
@@ -71,6 +74,10 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh, ELEMENTSIZE, MAKE, READ
             if nargin > 0
+                if nargin == 2 && strcmpi(arg2,'gmsh')
+                    obj = toastReadGmshMesh(arg1);
+                    return;
+                end
                 if nargin == 3
                     obj.handle = toastmex(uint32(1),arg1,arg2,arg3);
                 else
@@ -156,15 +163,18 @@ classdef toastMesh < handle
 	        obj.handle = toastmex(uint32(1),vtx,idx,eltp);
         end
 
-	    function Read(obj,fname)
+	    function Read(obj,fname,arg)
             % Replace the geometry of a mesh with a definition loaded from
             % a toast mesh file.
             %
             % Syntax: mesh.Read(fname)
+            %         mesh.Read(fname,'gmsh')
             %
             % Parameters:
             %         fname [string]:
             %             file name for mesh file to load
+            %         'gmsh'
+            %             read from file fname in gmsh format
             %
             % Notes:  The current mesh geometry of the mesh object is
             %         discarded and replaced by the new mesh definition.
@@ -183,22 +193,44 @@ classdef toastMesh < handle
             if obj.handle > 0 % Delete existing mesh
 	            toastmex(uint32(3),obj.handle);
             end
+            if nargin>2
+                if strcmpi(arg,'gmsh')
+                    obj.handle = toastReadGmshMesh(fname);
+                    return;
+                end
+	    end
             obj.handle = toastmex(uint32(0),fname);
         end
 
-	    function Write(obj,fname)
+	    function Write(obj,fname,fmt)
             % Write a toast mesh to a file.
             %
             % Syntax: mesh.Write(fname)
+            %         mesh.Write(fname,fmt)
             %
             % Parameters:
             %         fname [string]:
             %             file name for mesh file to write
+            %         fmt [string]:
+            %             output format. Currently supported:
+            %             - 'gmsh': Write mesh in Gmsh ASCII format
+            %
+            % Notes:  Without format string, the mesh is written in native
+            %         Toast format.
+            %
+            %         Gmsh output currently only supports 4-noded
+            %         tetrahedral meshes. Element region information is
+            %         preserved as element tags, and surface meshes are
+            %         also added, based on region interfaces.
             %
             % See also:
             %         toastMesh
             if obj.handle > 0
-	            toastmex(uint32(2),obj.handle,fname);
+                if nargin > 2 && strcmpi(fmt,'gmsh')
+                    toastmex(uint32(2),obj.handle,fname,'gmsh');
+                else
+    	            toastmex(uint32(2),obj.handle,fname);
+                end
             end
         end
 
@@ -529,6 +561,30 @@ classdef toastMesh < handle
 	        elid = toastmex(uint32(12),obj.handle,pts);
         end
 
+        % Return a list of outer and internal boundary faces, based on
+        % element region information.
+        %
+        % This function extracts the faces of the outer mesh surface, and
+        % any internal surfaces, and returns them as a vertex index list.
+        % Internal surfaces are region boundaries, i.e. any faces that are
+        % shared by elements with different region labels.
+        % Outer surfaces are all faces that are not shared by two elements.
+        %
+        % Syntax: rsurf = mesh.RegionSurfaces
+        %
+        % Return values:
+        %         rsurf [real nsurf x nv]:
+        %             List of global vertex indices for each found surface
+        %             face. Each row contains one face. nv is the max
+        %             number of vertices per surface face (e.g. 3 for
+        %             tetrahedral meshes).
+        %
+        % Notes:  This function is currently only implemented for
+        %         tetrahedral meshes.
+        function rsurf = RegionSurfaces(obj)
+            rsurf = toastmex(uint32(94),obj.handle);
+        end
+            
 	    function elmat = Elmat(obj,idx,intstr,sideidx)
             % Return an element matrix for a single element of a mesh.
             %
@@ -621,7 +677,6 @@ classdef toastMesh < handle
             smat = toastmex(uint32(93),obj.handle);
             
         end
-        
         
         function smat = SysmatComponent (obj,intstr,varargin)
             % Generate an FEM system matrix component.
