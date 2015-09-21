@@ -52,7 +52,7 @@
 		F2ED6502195CB145006CD663 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(SRCROOT)/../../lib";
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
 			dstSubfolderSpec = 0;
 			files = (
 				F2ED6503195CB14D006CD663 /* libfe.dylib in CopyFiles */,

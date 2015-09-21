@@ -15,7 +15,7 @@
 		F25071F31A7566040053D654 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(SRCROOT)/../../lib";
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
 			dstSubfolderSpec = 0;
 			files = (
 				F25071F41A75660E0053D654 /* liblbfgs.dylib in CopyFiles */,

@@ -209,7 +209,7 @@
 		F25071F51A7566180053D654 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(SRCROOT)/../../lib";
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
 			dstSubfolderSpec = 0;
 			files = (
 				F25071F61A75662D0053D654 /* libsuperlu.dylib in CopyFiles */,

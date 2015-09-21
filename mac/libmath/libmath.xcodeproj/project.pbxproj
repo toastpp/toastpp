@@ -31,7 +31,7 @@
 		F2ED6500195CB132006CD663 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(SRCROOT)/../../lib";
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
 			dstSubfolderSpec = 0;
 			files = (
 				F2ED6501195CB13B006CD663 /* libmath.dylib in CopyFiles */,
