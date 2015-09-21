@@ -13,7 +13,7 @@
 		F229EA48195C7C98003F34BC /* mtMesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3B195C7C98003F34BC /* mtMesh.cc */; };
 		F229EA49195C7C98003F34BC /* mtQMvec.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3C195C7C98003F34BC /* mtQMvec.cc */; };
 		F229EA4A195C7C98003F34BC /* mtRegul.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3D195C7C98003F34BC /* mtRegul.cc */; };
-		F229EA4B195C7C98003F34BC /* toast.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3E195C7C98003F34BC /* toast.cc */; };
+		F229EA4B195C7C98003F34BC /* mexutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3E195C7C98003F34BC /* mexutil.cc */; };
 		F229EA4C195C7C98003F34BC /* toastlbfgs.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3F195C7C98003F34BC /* toastlbfgs.cc */; };
 		F229EA4D195C7C98003F34BC /* toastmex.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA40195C7C98003F34BC /* toastmex.cc */; };
 		F229EA4E195C7C98003F34BC /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA41195C7C98003F34BC /* util.cc */; };
@@ -24,7 +24,7 @@
 		F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA39195C7C98003F34BC /* mtGradient.cc */; };
 		F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3A195C7C98003F34BC /* mtJacobian.cc */; };
 		F25071FA1A7567020053D654 /* liblbfgs.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F25071F91A7567020053D654 /* liblbfgs.dylib */; };
-		F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */; };
+		F2ED64F6195CAFEB006CD663 /* toastmex.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toastmex.mexmaci64 */; };
 		F2FF2D491A694EF80092CC78 /* mtSysmat_basis.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D481A694EF80092CC78 /* mtSysmat_basis.cc */; };
 /* End PBXBuildFile section */
 
@@ -35,14 +35,14 @@
 			dstPath = "$(SRCROOT)/../../darwin64/mex2";
 			dstSubfolderSpec = 0;
 			files = (
-				F2ED64F6195CAFEB006CD663 /* toast.mexmaci64 in CopyFiles */,
+				F2ED64F6195CAFEB006CD663 /* toastmex.mexmaci64 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = toast.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
+		F229EA2E195C7B9D003F34BC /* toastmex.mexmaci64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = toastmex.mexmaci64; sourceTree = BUILT_PRODUCTS_DIR; };
 		F229EA35195C7C98003F34BC /* matlabtoast.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = matlabtoast.cc; path = ../../src/matlab2/matlabtoast.cc; sourceTree = "<group>"; };
 		F229EA36195C7C98003F34BC /* mtBasis.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtBasis.cc; path = ../../src/matlab2/mtBasis.cc; sourceTree = "<group>"; };
 		F229EA37195C7C98003F34BC /* mtElement.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtElement.cc; path = ../../src/matlab2/mtElement.cc; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 		F229EA3B195C7C98003F34BC /* mtMesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtMesh.cc; path = ../../src/matlab2/mtMesh.cc; sourceTree = "<group>"; };
 		F229EA3C195C7C98003F34BC /* mtQMvec.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtQMvec.cc; path = ../../src/matlab2/mtQMvec.cc; sourceTree = "<group>"; };
 		F229EA3D195C7C98003F34BC /* mtRegul.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtRegul.cc; path = ../../src/matlab2/mtRegul.cc; sourceTree = "<group>"; };
-		F229EA3E195C7C98003F34BC /* toast.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toast.cc; path = ../../src/matlab2/toast.cc; sourceTree = "<group>"; };
+		F229EA3E195C7C98003F34BC /* mexutil.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mexutil.cc; path = ../../src/matlab2/mexutil.cc; sourceTree = "<group>"; };
 		F229EA3F195C7C98003F34BC /* toastlbfgs.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toastlbfgs.cc; path = ../../src/matlab2/toastlbfgs.cc; sourceTree = "<group>"; };
 		F229EA40195C7C98003F34BC /* toastmex.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toastmex.cc; path = ../../src/matlab2/toastmex.cc; sourceTree = "<group>"; };
 		F229EA41195C7C98003F34BC /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/matlab2/util.cc; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 				F229EA3B195C7C98003F34BC /* mtMesh.cc */,
 				F229EA3C195C7C98003F34BC /* mtQMvec.cc */,
 				F229EA3D195C7C98003F34BC /* mtRegul.cc */,
-				F229EA3E195C7C98003F34BC /* toast.cc */,
+				F229EA3E195C7C98003F34BC /* mexutil.cc */,
 				F229EA3F195C7C98003F34BC /* toastlbfgs.cc */,
 				F229EA40195C7C98003F34BC /* toastmex.cc */,
 				F229EA41195C7C98003F34BC /* util.cc */,
@@ -106,7 +106,7 @@
 		F229EA2F195C7B9D003F34BC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */,
+				F229EA2E195C7B9D003F34BC /* toastmex.mexmaci64 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -139,7 +139,7 @@
 			);
 			name = matlab2;
 			productName = matlab2;
-			productReference = F229EA2E195C7B9D003F34BC /* toast.mexmaci64 */;
+			productReference = F229EA2E195C7B9D003F34BC /* toastmex.mexmaci64 */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -173,7 +173,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F229EA4B195C7C98003F34BC /* toast.cc in Sources */,
+				F229EA4B195C7C98003F34BC /* mexutil.cc in Sources */,
 				F229EA6E195C8175003F34BC /* matlabtoast.cc in Sources */,
 				F229EA48195C7C98003F34BC /* mtMesh.cc in Sources */,
 				F229EA4D195C7C98003F34BC /* toastmex.cc in Sources */,
@@ -289,16 +289,16 @@
 					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2015a.app;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MATLABVER = MATLAB_R2013b.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
 					"-lmx",
 				);
-				PRODUCT_NAME = toast;
-				SDKROOT = macosx10.9;
+				PRODUCT_NAME = toastmex;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\"";
 			};
 			name = Debug;
@@ -329,16 +329,16 @@
 					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2015a.app;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MATLABVER = MATLAB_R2013b.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
 					"-lmex",
 					"-lmx",
 				);
-				PRODUCT_NAME = toast;
-				SDKROOT = macosx10.9;
+				PRODUCT_NAME = toastmex;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\"";
 			};
 			name = Release;
