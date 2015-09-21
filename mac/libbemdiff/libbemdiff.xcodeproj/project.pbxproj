@@ -213,10 +213,10 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\"";
 			};
@@ -237,10 +237,10 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\"";
 			};

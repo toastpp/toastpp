@@ -282,10 +282,10 @@
 				);
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
@@ -316,10 +316,10 @@
 				);
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				SYMROOT = build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
 			};
