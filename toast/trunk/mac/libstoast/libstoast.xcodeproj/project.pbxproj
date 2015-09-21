@@ -58,7 +58,7 @@
 		F2ED64F7195CB08F006CD663 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(SRCROOT)/../../lib";
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
 			dstSubfolderSpec = 0;
 			files = (
 				F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */,

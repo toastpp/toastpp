@@ -16,7 +16,7 @@
 		F2ED64FC195CB103006CD663 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(SRCROOT)/../../lib";
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
 			dstSubfolderSpec = 0;
 			files = (
 				F2C7AC4D19B99F230092FFB9 /* libbemdiff.dylib in CopyFiles */,
