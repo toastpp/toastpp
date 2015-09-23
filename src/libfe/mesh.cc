@@ -331,6 +331,26 @@ void Mesh::Reorder (const IVector &perm)
     }
 }
 
+bool Mesh::Shrink ()
+{
+    int i, j, shift, nds = nlen(), els = elen();
+    bool shrink = false;
+    bool *usend = new bool[nds];
+    for (i = 0; i < nds; i++) usend[i] = false;
+    for (i = 0; i < els; i++) {
+	Element *pel = elist[i];
+	for (j = 0; j < pel->nNode(); j++)
+	    usend[pel->Node[j]] = true;
+    }
+    for (i = nds-1; i >= 0; i--)
+	if (!usend[i]) {
+	    nlist.Remove(i);
+	    elist.RemoveNodeRef(i);
+	    shrink = true;
+	}
+    return shrink;
+}
+
 void Mesh::ScaleMesh (double scale)
 {
     for (int i = 0; i < nlen(); i++) nlist[i] *= scale;

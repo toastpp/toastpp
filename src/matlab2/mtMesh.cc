@@ -106,6 +106,11 @@ void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
 	}
     }
 
+    // check mesh consistency
+    if (mesh->Shrink()) {
+	mexWarnMsgTxt ("toastMesh: removed unused nodes");
+	nvtx = mesh->nlen();
+    }
     
     // create dummy parameter list
     mesh->plist.New (nvtx);
