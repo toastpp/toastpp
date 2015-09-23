@@ -74,7 +74,8 @@ protected:
 
     RCompRowMatrix *CreateBasisMassmat () const;
 
-	RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const;
+    RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const;
+    RCompRowMatrix *CreateBasisPixelMassmat_tri (const IVector &wdim) const;
 
 private:
     bool grid_is_basis;       ///< grid and basis dimensions identical?

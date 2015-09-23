@@ -358,6 +358,138 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tri () const
 }
 
 // ==========================================================================
+// Creates the basis-pixel mass matrix (Bvw) for mapping from a raster image
+// with piecewise constant pixel values to the basis
+
+RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
+    const
+{
+    const int sublen = 1000;
+    int i, j, k, ii, jj, si, sj, pi, pj, idx_i, idx_j;
+    double x0, x1, y0, y1;
+    double px0, px1, py0, py1, v;
+    bool intersect;
+    int *npx = new int[blen];
+    for (i = 0; i < blen; i++) npx[i] = 0;
+    int plen = wdim[0]*wdim[1];
+    RVector psize(2), bsize(2);
+    Point p(2);
+    for (i = 0; i < 2; i++) {
+	psize[i] = bbsize[i]/wdim[i];
+	bsize[i] = bbsize[i]/(bdim[i]-1.0);
+    }
+    double dx = bsize[0]/sublen;
+    double dy = bsize[1]/sublen;
+
+    // pass 1: evaluate sparse matrix structure
+    for (j = 0; j < bdim[1]-1; j++) {
+	y0 = bsize[1]*j;
+	y1 = y0 + bsize[1];
+	for (i = 0; i < bdim[0]-1; i++) {
+	    x0 = bsize[0]*i;
+	    x1 = x0 + bsize[0];
+	    
+	    for (pj = 0; pj < wdim[1]; pj++) {
+		py0 = psize[1]*pj;
+		py1 = py0 + psize[1];
+		for (pi = 0; pi < wdim[0]; pi++) {
+		    px0 = psize[0]*pi;
+		    px1 = px0 + psize[0];
+		    
+		    if (px0 > x1 || px1 < x0 || py0 > y1 || py1 < y0)
+			intersect = false;
+		    else {
+			for (jj = 0; jj < 2; jj++) {
+			    for (ii = 0; ii < 2; ii++) {
+				idx_i = (i+ii) + (j+jj)*bdim[0];
+				npx[idx_i]++;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+    int *rowptr = new int[blen+1];
+    rowptr[0] = 0;
+    for (i = 0; i < blen; i++) {
+	rowptr[i+1] = rowptr[i]+npx[i];
+	npx[i] = 0;
+    }
+    int nz = rowptr[blen];
+    int *colidx = new int[nz];
+
+    // pass 2: sparsity pattern
+    for (j = 0; j < bdim[1]-1; j++) {
+	y0 = bsize[1]*j;
+	y1 = y0 + bsize[1];
+	for (i = 0; i < bdim[0]-1; i++) {
+	    x0 = bsize[0]*i;
+	    x1 = x0 + bsize[0];
+	    
+	    for (pj = 0; pj < wdim[1]; pj++) {
+		py0 = psize[1]*pj;
+		py1 = py0 + psize[1];
+		for (pi = 0; pi < wdim[0]; pi++) {
+		    px0 = psize[0]*pi;
+		    px1 = px0 + psize[0];
+		    idx_j = pi + pj*wdim[0];
+		    
+		    if (px0 > x1 || px1 < x0 || py0 > y1 || py1 < y0)
+			intersect = false;
+		    else {
+			for (jj = 0; jj < 2; jj++) {
+			    for (ii = 0; ii < 2; ii++) {
+				idx_i = (i+ii) + (j+jj)*bdim[0];
+				colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+    RCompRowMatrix *bvw = new RCompRowMatrix (blen, plen, rowptr, colidx);
+    delete []npx;
+    delete []rowptr;
+    delete []colidx;
+
+    // pass 3: fill the matrix
+    for (j = 0; j < bdim[1]-1; j++) {
+	y0 = bsize[1]*j;
+	y1 = y0 + bsize[1];
+	for (i = 0; i < bdim[0]-1; i++) {
+	    x0 = bsize[0]*i;
+	    x1 = x0 + bsize[0];
+		
+	    for (sj = 0; sj < sublen; sj++) {
+		p[1] = y0 + (sj+0.5)*dy;
+		pj = (int)(p[1]/psize[1]);
+		p[1] += bbmin[1];
+		for (si = 0; si < sublen; si++) {
+		    p[0] = x0 + (si+0.5)*dx;
+		    pi = (int)(p[0]/psize[0]);
+		    p[0] += bbmin[0];
+		    idx_j = pi + pj*wdim[0];
+		    for (jj = 0; jj < 2; jj++) {
+			for (ii = 0; ii < 2; ii++) {
+			    idx_i = (i+ii) + (j+jj)*bdim[0];
+			    v = Value_nomask(p, idx_i, false);
+			    (*bvw)(idx_i, idx_j) += v;
+			}
+		    }
+		}
+	    }
+	}
+    }
+    (*bvw) *= dx*dy;
+    
+    return bvw;
+}
+
+// ==========================================================================
 // Assemble single-element contribution for element "el" into global
 // system matrix M, where coefficients (where applicable) are given in pixel
 // basis. "mode" is the integration type.
