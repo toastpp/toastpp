@@ -276,6 +276,20 @@ public:
      */
     void Reorder (const IVector &perm);
 
+    /**
+     * \brief Remove unused nodes and update the index list
+     *
+     * If the mesh contains any nodes not referenced by any entry in
+     * the index list, those nodes are removed and the index list is
+     * updated accordingly.
+     * \return true if the mesh was modified, false if no unused nodes
+     *   were found.
+     * \note Any external object that referenced the original mesh
+     *   (nodal arrays, basis mapping matrices, etc.) will be invalid
+     *   after this operation.
+     */
+    bool Shrink ();
+    
     double ElDist (int el1, int el2) const;
     // returns the distance between the centres of elements el1 and el2
 

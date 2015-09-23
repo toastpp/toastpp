@@ -37,7 +37,7 @@ public:
     // be decremented by 1.
     // WARNING: the element list will be invalid after the node is removed!
     // remove all references to the deleted node from the element list and run
-    // ElementList::RemoveNode (nd) to update the element list.
+    // ElementList::RemoveNodeRef(nd) to update the element list.
 
     int Len (void) const { return size; };
     // returns number of nodes in the list

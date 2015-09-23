@@ -178,7 +178,6 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisMassmat () const
     return M;
 }
 
-
 // ==========================================================================
 // Creates the basis-pixel mass matrix (Bvw) for mapping from a raster image
 // with piecewise constant pixel values to the basis
@@ -188,68 +187,14 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat (const IVector &wdim)
 {
     xASSERT(wdim.Dim() == dim, "Invalid length of pixel dimension vector");
 
-    int i, j, k, ii, jj, kk, pi, pj, pk, idx_i;
-    double x0, x1, y0, y1, z0, z1;
-    double px0, px1, py0, py1, pz0, pz1;
-    bool intersect;
-    int *npx = new int[blen];
-    for (i = 0; i < blen; i++) npx[i] = 0;
-    RVector psize(dim), bsize(dim);
-    for (i = 0; i < dim; i++) {
-	psize[i] = bbsize[i]/wdim[i];
-	bsize[i] = bbsize[i]/(bdim[i]-1.0);
-    }
-
-    // pass 1: evaluate sparse matrix structure
-    if (dim == 2) {
-	for (j = 0; j < bdim[1]-1; j++) {
-	    y0 = bsize[1]*j;
-	    y1 = y0 + bsize[1];
-	    for (i = 0; i < bdim[0]-1; i++) {
-		x0 = bsize[0]*i;
-		x1 = x0 + bsize[0];
-		idx_i = i + j*bdim[0];
-		
-		for (pj = 0; pj < wdim[1]; pj++) {
-		    py0 = psize[1]*pj;
-		    py1 = py0 + psize[1];
-		    for (pi = 0; pi < wdim[0]; pi++) {
-			px0 = psize[0]*pj;
-			px1 = px0 + psize[0];
-
-			if (px0 >= x1 || px1 <= x0 || py0 >= y1 || py1 <= y0)
-			    intersect = false;
-			else {
-			    for (jj = 0; jj < 2; jj++) {
-				for (ii = 0; ii < 2; ii++) {
-				    idx_i = (i+ii) + (j+jj)*bdim[0];
-				    npx[idx_i]++;
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	}
-    }
-    int *rowptr = new int[blen+1];
-    rowptr[0] = 0;
-    for (i = 0; i < blen; i++) {
-	rowptr[i+1] = rowptr[i]+npx[i];
-	npx[i] = 0;
-    }
-    int nz = rowptr[blen];
-    int *colidx = new int[nz];
-
-
-    
-    delete []npx;
-    delete []rowptr;
-    delete []colidx;
-
+    switch (meshptr->elist[0]->Type()) {
+    case ELID_TRI3:
+	return CreateBasisPixelMassmat_tri (wdim);
+    default:
+	xERROR("Raster_Pixel2: unsupported element type");
 	return 0;
+    }
 }
-
 
 // ==========================================================================
 // Creates the mixed-basis mass matrix (Buv)
