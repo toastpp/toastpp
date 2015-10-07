@@ -202,7 +202,7 @@ classdef toastMesh < handle
             obj.handle = toastmex(uint32(0),fname);
         end
 
-	    function Write(obj,fname,fmt)
+	    function Write(obj,fname,fmt,prm)
             % Write a toast mesh to a file.
             %
             % Syntax: mesh.Write(fname)
@@ -226,8 +226,12 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh
             if obj.handle > 0
-                if nargin > 2 && strcmpi(fmt,'gmsh')
-                    toastmex(uint32(2),obj.handle,fname,'gmsh');
+                if nargin > 2 
+                    if strcmpi(fmt,'gmsh')
+                        toastmex(uint32(2),obj.handle,fname,'gmsh');
+                    elseif strcmpi(fmt,'gmsh-pos') && nargin > 3
+                        toastWriteMeshGmshPos(obj,fname,prm);
+                    end
                 else
     	            toastmex(uint32(2),obj.handle,fname);
                 end

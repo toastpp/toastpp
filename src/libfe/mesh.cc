@@ -2466,61 +2466,7 @@ RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     local_elref = (elref == 0);
     if (local_elref)
         elref = GenerateElementPixelRef (mesh, gdim, bbmin, bbmax);
-#ifdef UNDEF
-    int *node, nnode, el;
-    int rlen = nx*ny*nz;
-    int *elref = new int[rlen];
-    for (i = 0; i < rlen; i++) elref[i] = -1;
 
-    // associate elements with grid points
-    Point elbbmin(dim), elbbmax(dim);
-    for (el = 0; el < mesh.elen(); el++) {
-        nnode = mesh.elist[el]->nNode();
-	node  = mesh.elist[el]->Node;
-
-        // compute element bounding box
-        for (d = 0; d < dim; d++) elbbmin[d] = 1e10, elbbmax[d] = -1e10;
-	for (i = 0; i < nnode; i++) {
-	    Point &nd = mesh.nlist[node[i]];
-	    for (d = 0; d < dim; d++) {
-	        if (nd[d] < elbbmin[d]) elbbmin[d] = nd[d];
-		if (nd[d] > elbbmax[d]) elbbmax[d] = nd[d];
-	    }
-	}
-	for (d = 0; d < dim; d++) { // inflate a bit to avoid edge problems
-	    elbbmin[d] -= EPS;
-	    elbbmax[d] += EPS;
-	}
-
-	// search all grid points inside the element bounding box
-	int rmin[3], rmax[3];
-	for (d = 0; d < dim; d++) {
-	    if (elbbmin[d] > (*bbmax)[d]) goto no_overlap;
-	    if (elbbmax[d] < (*bbmin)[d]) goto no_overlap;
-	    if (elbbmin[d] <= (*bbmin)[d] || dW[d] == 0) rmin[d] = 0;
-	    else rmin[d] = (int)((elbbmin[d]-(*bbmin)[d])/dW[d]);
-	    if (elbbmax[d] >= (*bbmax)[d] || dW[d] == 0) rmax[d] = gdim[d];
-	    else rmax[d] = (int)((elbbmax[d]-(*bbmin)[d])/dW[d] + 1.0);
-	}
-	if (dim < 3) rmin[2] = 0, rmax[2] = 1;
-	for (iz = rmin[2]; iz < rmax[2]; iz++) {
-	    if (dim > 2) p[2] = iz*dW[2] + (*bbmin)[2];
-	    for (iy = rmin[1]; iy < rmax[1]; iy++) {
-	        p[1] = iy*dW[1] + (*bbmin)[1];
-		for (ix = rmin[0]; ix < rmax[0]; ix++) {
-		    idx = ix + nx*(iy + ny*iz);
-		    if (elref[idx] < 0) {
-		        p[0] = ix*dW[0] + (*bbmin)[0];
-			if (mesh.elist[el]->GContains (p, mesh.nlist))
-			    elref[idx] = el;
-		    }
-		}
-	    }
-	}
-    no_overlap:;
-    }
-
-#endif
     // get map matrix structure
     int nzero = 0;
     for (i = 0; i < rlen; i++)
@@ -2734,58 +2680,7 @@ RGenericSparseMatrix *NodeMapMatrix (const Mesh &mesh, const IVector &gdim,
     local_elref = (elref == 0);
     if (local_elref)
         elref = GenerateElementPixelRef (mesh, gdim, bbmin, bbmax);
-#ifdef UNDEF
-    int *node, nnode, ix, iy, iz, el;
-    // create mask for pixel outside mesh support
-    Point elbbmin(dim), elbbmax(dim);
-    int *elref = new int[rlen];
-    for (i = 0; i < rlen; i++) elref[i] = -1;
-    for (el = 0; el < mesh.elen(); el++) {
-        nnode = mesh.elist[el]->nNode();
-	node  = mesh.elist[el]->Node;
 
-        // compute element bounding box
-        for (d = 0; d < dim; d++) elbbmin[d] = 1e10, elbbmax[d] = -1e10;
-	for (i = 0; i < nnode; i++) {
-	    Point &nd = mesh.nlist[node[i]];
-	    for (d = 0; d < dim; d++) {
-	        if (nd[d] < elbbmin[d]) elbbmin[d] = nd[d];
-		if (nd[d] > elbbmax[d]) elbbmax[d] = nd[d];
-	    }
-	}
-	for (d = 0; d < dim; d++) { // inflate a bit to avoid edge problems
-	    elbbmin[d] -= EPS;
-	    elbbmax[d] += EPS;
-	}
-
-	// search all grid points inside the element bounding box
-	int rmin[3], rmax[3];
-	for (d = 0; d < dim; d++) {
-	    if (elbbmin[d] > (*bbmax)[d]) goto no_overlap;
-	    if (elbbmax[d] < (*bbmin)[d]) goto no_overlap;
-	    if (elbbmin[d] <= (*bbmin)[d] || dW[d] == 0) rmin[d] = 0;
-	    else rmin[d] = (int)((elbbmin[d]-(*bbmin)[d])/dW[d]);
-	    if (elbbmax[d] >= (*bbmax)[d] || dW[d] == 0) rmax[d] = gdim[d];
-	    else rmax[d] = (int)((elbbmax[d]-(*bbmin)[d])/dW[d] + 1.0);
-	}
-	if (dim < 3) rmin[2] = 0, rmax[2] = 1;
-	for (iz = rmin[2]; iz < rmax[2]; iz++) {
-	    if (dim > 2) p[2] = iz*dW[2] + (*bbmin)[2];
-	    for (iy = rmin[1]; iy < rmax[1]; iy++) {
-	        p[1] = iy*dW[1] + (*bbmin)[1];
-		for (ix = rmin[0]; ix < rmax[0]; ix++) {
-		    idx = ix + nx*(iy + ny*iz);
-		    if (elref[idx] < 0) {
-		        p[0] = ix*dW[0] + (*bbmin)[0];
-			if (mesh.elist[el]->GContains (p, mesh.nlist))
-			    elref[idx] = el;
-		    }
-		}
-	    }
-	}
-    no_overlap:;
-    }
-#endif
     for (nzero = mesh.nlen(), d = 0; d < dim; d++) nzero *= 2;
     // assuming linear interpolation between nearest pixels
 
