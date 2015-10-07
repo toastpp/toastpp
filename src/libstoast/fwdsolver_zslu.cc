@@ -9,37 +9,18 @@
 #include "fwdsolver_zslu.h"
 
 // =========================================================================
-
-class ZSuperLU_engine {
-public:
-    ZSuperLU_engine();
-    ~ZSuperLU_engine();
-    void Reset (const CCompRowMatrix *F);
-    void Solve (SuperMatrix *B, SuperMatrix *X);
-    SuperMatrix A, L, U;
-    int *perm_c;
-    int *perm_r;
-    int *etree;
-    double *R, *C;
-    superlu_options_t options;
-    
-private:
-    void AllocMatrix (const CCompRowMatrix *F);
-    void Deallocate ();
-    bool allocated;
-};
-
 // =========================================================================
 
-ZSuperLU_engine::ZSuperLU_engine ()
+ZSuperLU::ZSuperLU (int n)
 {
-    perm_c = 0;
-    perm_r = 0;
-    etree  = 0;
-    R      = 0;
-    C      = 0;
+    A         = 0;
+    perm_c    = 0;
+    perm_r    = 0;
+    etree     = 0;
+    R         = 0;
+    C         = 0;
     allocated = false;
-    
+
     set_default_options(&options);
     options.Fact = DOFACT;
     options.Equil = NO;
@@ -50,14 +31,26 @@ ZSuperLU_engine::ZSuperLU_engine ()
 
 // =========================================================================
 
-ZSuperLU_engine::~ZSuperLU_engine ()
+ZSuperLU::~ZSuperLU ()
 {
     Deallocate();
 }
 
 // =========================================================================
 
-void ZSuperLU_engine::Deallocate ()
+void ZSuperLU::AllocMatrix (const CCompRowMatrix *F)
+{
+    int m = F->nRows();
+    int n = F->nCols();
+    int nz = F->nVal();
+    doublecomplex *cdat = (doublecomplex*)F->ValPtr();
+    zCreate_CompCol_Matrix (&sA, m, n, nz, cdat, 
+        F->colidx, F->rowptr, SLU_NR, SLU_Z, SLU_GE);    
+}
+
+// =========================================================================
+
+void ZSuperLU::Deallocate()
 {
     if (allocated) {
 	delete []perm_c;
@@ -65,19 +58,20 @@ void ZSuperLU_engine::Deallocate ()
 	delete []etree;
 	delete []R;
 	delete []C;
-	Destroy_SuperMatrix_Store (&A);
+	Destroy_SuperMatrix_Store (&sA);
 	allocated = false;
 	if (options.Fact != DOFACT) {
-	    Destroy_SuperNode_Matrix (&L);
-	    Destroy_CompCol_Matrix (&U);
+	    Destroy_SuperNode_Matrix (&sL);
+	    Destroy_CompCol_Matrix (&sU);
 	}
     }
 }
 
 // =========================================================================
 
-void ZSuperLU_engine::Reset (const CCompRowMatrix *F)
+void ZSuperLU::Reset (const CCompRowMatrix *F)
 {
+    A = F;
     Deallocate();
     AllocMatrix (F);
     int m = F->nRows();
@@ -87,37 +81,26 @@ void ZSuperLU_engine::Reset (const CCompRowMatrix *F)
     etree  = new int[n];
     R      = new double[m];
     C      = new double[n];
-    get_perm_c (0, &A, perm_c);
+    get_perm_c (0, &sA, perm_c);
     options.Fact = DOFACT;
     allocated = true;
 }
 
 // =========================================================================
 
-void ZSuperLU_engine::AllocMatrix (const CCompRowMatrix *F)
-{
-    int m = F->nRows();
-    int n = F->nCols();
-    int nz = F->nVal();
-    doublecomplex *cdat = (doublecomplex*)F->ValPtr();
-    zCreate_CompCol_Matrix (&A, m, n, nz, cdat, 
-        F->colidx, F->rowptr, SLU_NR, SLU_Z, SLU_GE);
-}
-
-// =========================================================================
-
-void ZSuperLU_engine::Solve (SuperMatrix *B, SuperMatrix *X)
+void ZSuperLU::Solve (SuperMatrix *sB, SuperMatrix *sX) const
 {
     int info;
     mem_usage_t mem_usage;
     char equed = 'N';
     double R = 0.0;
     double C = 0.0;
+    GlobalLU_t Glu;
     static int nrhs_max = 1;
     static double *ferr = new double[nrhs_max];
     static double *berr = new double[nrhs_max];
     double recip_pivot_growth, rcond;
-    int nrhs = B->ncol;
+    int nrhs = sB->ncol;
     if (nrhs > nrhs_max) {
         nrhs_max = nrhs;
 	delete []ferr;   ferr = new double[nrhs_max];
@@ -127,39 +110,12 @@ void ZSuperLU_engine::Solve (SuperMatrix *B, SuperMatrix *X)
     SuperLUStat_t stat;
     StatInit (&stat);
     
-    zgssvx (&options, &A, perm_c, perm_r, etree, &equed, &R, &C,
-    		  &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
-    		  ferr, berr, &mem_usage, &stat, &info);
+    zgssvx (&options, &sA, perm_c, perm_r, etree, &equed, &R, &C,
+	    &sL, &sU, 0, 0, sB, sX, &recip_pivot_growth, &rcond,
+	    ferr, berr, &Glu, &mem_usage, &stat, &info);
 
     options.Fact = FACTORED;
     StatFree (&stat);
-}
-
-// =========================================================================
-// =========================================================================
-
-ZSuperLU::ZSuperLU (int n): nengine(n)
-{
-    A = 0;
-	engine = new ZSuperLU_engine*[n];
-	for (int i = 0; i < n; i++)
-	    engine[i] = new ZSuperLU_engine;
-}
-
-// =========================================================================
-
-ZSuperLU::~ZSuperLU ()
-{
-    delete []engine;
-}
-
-// =========================================================================
-
-void ZSuperLU::Reset (const CCompRowMatrix *F)
-{
-    A = F;
-	for (int i = 0; i < nengine; i++)
-	    engine[i]->Reset (F);
 }
 
 // =========================================================================
@@ -167,7 +123,7 @@ void ZSuperLU::Reset (const CCompRowMatrix *F)
 void ZSuperLU::CalcField (const CVector &qvec, CVector &phi,
     IterativeSolverResult *res, int en) const
 {
-    SuperMatrix B, X;
+    SuperMatrix sB, sX;
     int m = qvec.Dim();
     int n = phi.Dim();
 
@@ -176,13 +132,13 @@ void ZSuperLU::CalcField (const CVector &qvec, CVector &phi,
 
     doublecomplex *rhsbuf = (doublecomplex*)qvec.data_buffer();
     doublecomplex *xbuf   = (doublecomplex*)phi.data_buffer();
-    zCreate_Dense_Matrix (&B, m, 1, rhsbuf, m, SLU_DN, SLU_Z,SLU_GE);
-    zCreate_Dense_Matrix (&X, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
+    zCreate_Dense_Matrix (&sB, m, 1, rhsbuf, m, SLU_DN, SLU_Z,SLU_GE);
+    zCreate_Dense_Matrix (&sX, n, 1, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
-    engine[en]->Solve (&B, &X);
+    Solve (&sB, &sX);
     
-    Destroy_SuperMatrix_Store (&B);
-    Destroy_SuperMatrix_Store (&X);
+    Destroy_SuperMatrix_Store (&sB);
+    Destroy_SuperMatrix_Store (&sX);
 }
 
 // =========================================================================
@@ -190,7 +146,7 @@ void ZSuperLU::CalcField (const CVector &qvec, CVector &phi,
 void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     IterativeSolverResult *res, int en) const
 {
-    SuperMatrix B, X;
+    SuperMatrix sB, sX;
     int i, r;
     const idxtype *rptr, *cidx;
 
@@ -204,21 +160,21 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     // write sparse source vector array into dense matrix
     CDenseMatrix qd(qvec);
     doublecomplex *qbuf = (doublecomplex*)qd.ValPtr();
-    zCreate_Dense_Matrix (&B, m, nrhs, qbuf, m, SLU_DN, SLU_Z, SLU_GE);
+    zCreate_Dense_Matrix (&sB, m, nrhs, qbuf, m, SLU_DN, SLU_Z, SLU_GE);
 
     std::complex<double> *x = new std::complex<double>[n*nrhs];
     for (i = 0; i < nrhs; i++)
         memcpy (x+(i*n), phi[i].data_buffer(), n*sizeof(std::complex<double>));
     doublecomplex *xbuf = (doublecomplex*)x;
-    zCreate_Dense_Matrix (&X, n, nrhs, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
+    zCreate_Dense_Matrix (&sX, n, nrhs, xbuf, n, SLU_DN, SLU_Z, SLU_GE);
 
-    engine[en]->Solve (&B, &X);
+    Solve (&sB, &sX);
     
     for (i = 0; i < nrhs; i++)
         memcpy (phi[i].data_buffer(), x+(i*n), n*sizeof(std::complex<double>));
 
-    Destroy_SuperMatrix_Store (&B);
-    Destroy_SuperMatrix_Store (&X);
+    Destroy_SuperMatrix_Store (&sB);
+    Destroy_SuperMatrix_Store (&sX);
     
     delete []x;
 }

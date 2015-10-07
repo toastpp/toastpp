@@ -136,8 +136,8 @@ x = [scmua;sckap];                                  % linea solution vector
 logx = log(x);                                      % transform to log
 
 % Initialise regularisation
-%hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
-hreg = toastRegul('MRF',hbasis,logx,tau);
+hreg = toastRegul ('TV', hbasis, logx, tau, 'Beta', beta);
+%hreg = toastRegul('MRF',hbasis,logx,tau);
 
 % initial data error (=2 due to data scaling)
 err0 = toastObjective (proj, data, sd, hreg, logx); %initial error

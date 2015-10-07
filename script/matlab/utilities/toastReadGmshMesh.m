@@ -16,6 +16,7 @@ els = gmsh.TETS(1:gmsh.nbTets,:);
 if (~isempty(els))
     idx = els(:,1:4);
     eltp = 3;
+    gmshtp = 4;
 end
 
 % Look for triangular elements
@@ -24,6 +25,7 @@ if eltp == 0
     if (~isempty(els))
         idx = els(:,1:3);
         eltp = 15;
+        gmshtp = 2;
     end
 end
 
@@ -31,9 +33,12 @@ if eltp == 0
     error('Gmsh element type not supported by toast importer');
 end
 
-% Save region labels
-elreg = els(:,end);
-
+% Extract volume labels
+perm = find(gmsh.ELE_INFOS(:,2)==gmshtp);
+if length(perm) ~= size(idx,1)
+    error('Inconsistent volume label list');
+end
+elreg = gmsh.ELE_TAGS(perm,2);
 
 % Convert to toast mesh
 nel = size(idx,1);

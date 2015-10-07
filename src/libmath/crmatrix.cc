@@ -46,7 +46,7 @@ void LU (TCompRowMatrix<std::complex<double> > &A,
     SuperMatrix smA, L, U, B, X;
     superlu_options_t options;
     SuperLUStat_t stat;
-
+    GlobalLU_t Glu;
     doublecomplex *cdat = (doublecomplex*)A.ValPtr();
     zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
 			    cdat, A.colidx, A.rowptr, SLU_NR, SLU_Z, SLU_GE);
@@ -68,8 +68,8 @@ void LU (TCompRowMatrix<std::complex<double> > &A,
     StatInit (&stat);
 
     zgssvx (&options, &smA, perm_c, perm_r, etree, &equed, &R, &C,
-		  &L, &U, 0, 0, &B, &X, &recip_pivot_growth, &rcond,
-		  &ferr, &berr, &mem_usage, &stat, &info);
+	    &L, &U, 0, 0, &B, &X, &recip_pivot_growth, &rcond,
+	    &ferr, &berr, &Glu, &mem_usage, &stat, &info);
 
     StatFree (&stat);
 

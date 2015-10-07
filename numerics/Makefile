@@ -4,7 +4,7 @@ include ../Makefile.incl
 NUMERICSDIR = $(TOASTDIR)/numerics
 LIBDIR = $(TLIB)
 INCDIR = $(TOASTDIR)/include
-SUPERLUDIR = SuperLU_4.1
+SUPERLUDIR = SuperLU_5.0
 
 COMPONENT = blas fspblas lapack arpack liblbfgs
 
