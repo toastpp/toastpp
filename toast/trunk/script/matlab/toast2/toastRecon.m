@@ -44,11 +44,10 @@ dmask = LPRM.hMesh.DataLinkList ();
 
 % ----------------------------------------------------------------------
 % Set up the mapper between FEM and solution bases
-if isfield(prm.solver,'basis') && isfield(prm.solver.basis,'hbasis')
-    LPRM.hBasis = prm.solver.basis.hbasis;
-else
-    LPRM.hBasis = toastBasis (LPRM.hMesh, prm.solver.basis.bdim, 'Linear');
+if ~isfield(prm.solver.basis,'hbasis')
+    prm.solver.basis.hbasis = toastBasis(LPRM.hMesh,prm.solver.basis.bdim,'Linear');
 end
+LPRM.hBasis = prm.solver.basis.hbasis;
 RES.bdim = LPRM.hBasis.Dims();
 blen = prod(RES.bdim);
 
@@ -192,6 +191,11 @@ function [prm,localprm] = checkprm(prm)
 
 if ~isa(prm,'toastParam')
     error('Expected a toastParam argument.');
+end
+
+% check for mandatory fields
+if isfield(prm.solver,'basis') == false
+    error('Required parameter field "solver.basis" is missing.');
 end
 
 % fill missing parameter entries

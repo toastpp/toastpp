@@ -113,14 +113,15 @@ void CSuperLU_engine::Solve (SuperMatrix *B, SuperMatrix *X)
     char equed = 'N';
     float R = 0.0;
     float C = 0.0;
+    GlobalLU_t Glu;
     float ferr, berr;
     float recip_pivot_growth, rcond;
     SuperLUStat_t stat;
     StatInit (&stat);
 
     cgssvx (&options, &A, perm_c, perm_r, etree, &equed, &R, &C,
-		  &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
-		  &ferr, &berr, &mem_usage, &stat, &info);
+	    &L, &U, 0, 0, B, X, &recip_pivot_growth, &rcond,
+	    &ferr, &berr, &Glu, &mem_usage, &stat, &info);
     options.Fact = FACTORED;
     StatFree (&stat);
 }

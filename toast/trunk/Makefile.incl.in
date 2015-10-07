@@ -95,7 +95,7 @@ NVCC = $(CUDA_INSTALL_PATH)/bin/nvcc -arch=sm_20
 # =======================================================================
 # SuperLU support
 
-SUPERLUDIR = $(TOASTDIR)/numerics/SuperLU_4.3/SRC
+SUPERLUDIR = $(TOASTDIR)/numerics/SuperLU_5.0/SRC
 SUPERLUINC = -I$(SUPERLUDIR)
 SUPERLULIB = @SUPERLULIB@
 BUILD_SUPERLU = @BUILD_SUPERLU@
