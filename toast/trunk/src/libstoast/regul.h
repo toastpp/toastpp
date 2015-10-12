@@ -96,6 +96,12 @@ public:
     virtual RVector GetHessianDiag (const RVector &x) const = 0;
     // returns the diagonal of the 2nd derivative matrix
 
+    virtual bool SetLocalScaling (const RVector &scale_all)
+    { return false; }
+    // set local regularisation scaling factor. scale_all is a concatenation
+    // of local scaling factors for all parameters in 'G' basis
+    // returns true if regularisation supports local scaling, false otherwise
+
     virtual PRIOR Type() const = 0; 
 
 protected:
@@ -153,6 +159,11 @@ public:
     void ReadParams (ParamParser *pp);
     void WriteParams (ParamParser *pp);
 
+    RVector *SetKref (const RVector &gkref_all);
+    // Set the regularisation scaling for all parameters directly
+    // gkref_all: concatenated scaling images for all parameters in
+    // 'G' basis
+
     RVector *MakeKref (const RVector &gimgref, double sdr, double fT);
     // Return scalar field for isotropic diffusivity distribution given
     // image gimgref. sdr: value for reference sigma; fT: fraction of max to
@@ -192,6 +203,8 @@ public:
     RVector GetHessianDiag (const RVector &x) const ;
 
     inline RDenseMatrix tinterp (const RDenseMatrix *mat, int i, int j) const;
+
+    bool SetLocalScaling (const RVector &scale_all);
 
 protected:
     double sdr, fT;

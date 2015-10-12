@@ -554,6 +554,21 @@ void MatlabToast::RegulKappa (int nlhs, mxArray *plhs[], int nrhs,
 }
 
 // =========================================================================
+
+void MatlabToast::RegulSetLocalScaling (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    // regularisation
+    Regularisation *reg = GetRegul(prhs[0]);
+
+    // scaling image stack (concatenated for all parameters)
+    RVector scale_all;
+    CopyVector (scale_all, prhs[1]);
+
+    reg->SetLocalScaling (scale_all);
+}
+
+// =========================================================================
 // Local functions
 // =========================================================================
 

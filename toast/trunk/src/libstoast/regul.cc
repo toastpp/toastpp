@@ -360,6 +360,30 @@ void GenericSigma::WriteParams (ParamParser *pp)
     }
 }
 
+bool GenericSigma::SetLocalScaling (const RVector &scale_all)
+{
+    kref = SetKref (scale_all);
+    KRefIsLocal = true;
+    krefimg_name = NULL;
+    return true;
+}
+
+RVector *GenericSigma::SetKref (const RVector &gkref_all)
+{
+    int j, sofs, gofs;
+    int slen = raster->SLen();
+    int glen = raster->GLen();
+    int nprm = gkref_all.Dim() / glen;
+
+    RVector *kref_all = new RVector(slen*nprm);
+    for (j = sofs = gofs = 0; j < nprm; j++, sofs += slen, gofs += glen) {
+        RVector gkref (gkref_all, gofs, glen);
+	RVector kref (*kref_all, sofs, slen); // single parameter solution
+	raster->Map_GridToSol (gkref, kref);
+    }
+    return kref_all;
+}
+
 RVector *GenericSigma::MakeKref (const RVector &gimgref_all, double sdr,
     double fT)
 {

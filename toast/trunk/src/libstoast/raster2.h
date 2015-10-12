@@ -160,6 +160,9 @@ public:
     const RCompRowMatrix *GetBuv() const { return Buv; }
     const RCompRowMatrix *GetBvw (const IVector &wdim);
 
+    virtual const RCompRowMatrix *GetGuv() const { return 0; }
+    virtual const RCompRowMatrix *GetGvv() const { return 0; }
+
 protected:
     /**
      * \brief Basis constructor.
