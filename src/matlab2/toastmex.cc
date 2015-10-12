@@ -234,6 +234,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_REGULKAPPA:
 	mtoast->RegulKappa (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_REGULSETLOCALSCALING:
+        mtoast->RegulSetLocalScaling (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_FIELDS:
 	mtoast->Fields (nlhs, plhs, nrhs, prhs);
 	break;

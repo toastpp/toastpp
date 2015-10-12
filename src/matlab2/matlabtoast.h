@@ -81,6 +81,10 @@ public:
         const mxArray *prhs[]);
     void GetBasisBvw (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void GetBasisGuv (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisGvv (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void BasisValue (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
     void GetBasisSupportArea (int nlhs, mxArray *plhs[], int nrhs,
@@ -140,6 +144,8 @@ public:
     void RegulHess1f (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void RegulKappa (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void RegulSetLocalScaling (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void Fields (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Gradient (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
