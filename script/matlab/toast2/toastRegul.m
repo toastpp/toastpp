@@ -204,6 +204,10 @@ classdef toastRegul < handle
         function kappa = Kappa(obj, x)
             kappa = toastmex(uint32(50),obj.handle,x);
         end
+
+        function SetLocalScaling(obj, scale)
+            toastmex(uint32(96),obj.handle,scale);
+        end
     end
 
     properties
