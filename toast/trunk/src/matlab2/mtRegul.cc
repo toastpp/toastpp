@@ -92,7 +92,10 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
 
 	// generic parameters from key/value list
 	if (nrhs > 3 && mxIsCell(prhs[4])) {
-	    for (prm = 0; field = mxGetCell (prhs[4], prm); prm+=2) {
+		int nprm = mxGetM(prhs[4])*mxGetN(prhs[4]);
+
+	    for (prm = 0; prm < nprm; prm+=2) {
+			field = mxGetCell (prhs[4], prm);
 	        AssertArg_Char (field, __func__, 5);
 		mxGetString (field, cbuf, 256);
 		if (!strcasecmp (cbuf, "KapRefImage")) {

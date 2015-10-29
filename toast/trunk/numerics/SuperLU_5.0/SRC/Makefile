@@ -9,7 +9,7 @@ else
 	LIB = $(LIBNAME)$(LIB_SUFFIX)
 endif
 
-VPATH = $(TOASTDIR)/numerics/SuperLU_5.0/SRC
+VPATH = $(TOASTDIR)/numerics/SuperLU_5.0/SRC:$(TOASTDIR)/numerics/SuperLU_5.0/CBLAS
 # End Toast costomisation ############################################
 
 #######################################################################
@@ -56,6 +56,23 @@ CLASRC	= clacon2.o scsum1.o icmax1.o
 ZLASRC	= zlacon2.o dzsum1.o izmax1.o
 SCLAUX 	= smach.o    # slamch.o
 DZLAUX 	= dmach.o    # dlamch.o
+
+### BLAS
+SBLAS1 = isamax.o sasum.o saxpy.o scopy.o sdot.o snrm2.o \
+	 srot.o sscal.o sswap.o
+SBLAS2 = sgemv.o ssymv.o strsv.o sger.o ssyr2.o
+
+DBLAS1 = idamax.o dasum.o daxpy.o dcopy.o ddot.o dnrm2.o \
+	 drot.o dscal.o dswap.o
+DBLAS2 = dgemv.o dsymv.o dtrsv.o dger.o dsyr2.o
+
+CBLAS1 = icamax.o scasum.o caxpy.o ccopy.o scnrm2.o \
+	 cscal.o cswap.o
+CBLAS2 = cgemv.o chemv.o ctrsv.o cgerc.o cher2.o
+
+ZBLAS1 = izamax.o dzasum.o zaxpy.o zcopy.o dznrm2.o \
+	 zscal.o dcabs1.o zswap.o
+ZBLAS2 = zgemv.o zhemv.o ztrsv.o zgerc.o zher2.o
 
 ### SuperLU 
 ALLAUX 	= superlu_timer.o util.o memory.o get_perm_c.o mmd.o \
@@ -122,7 +139,7 @@ ZLUSRC = \
 	ilu_zcolumn_dfs.o ilu_zpanel_dfs.o ilu_zcopy_to_ucol.o \
 	ilu_zpivotL.o zdiagonal.o
 
-OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(SLASRC) $(DLASRC) $(CLASRC) $(ZLASRC) $(ALLAUX) $(LAAUX)
+OBJS = $(SLUSRC) $(DLUSRC) $(CLUSRC) $(ZLUSRC) $(SLASRC) $(DLASRC) $(CLASRC) $(ZLASRC) $(ALLAUX) $(LAAUX) $(SBLAS1) $(SBLAS2) $(DBLAS1) $(DBLAS2) $(CBLAS1) $(CBLAS2) $(ZBLAS1) $(ZBLAS2)
 
 ifndef HAVE_LAPACK
 OBJS += $(SCLAUX) $(DZLAUX)

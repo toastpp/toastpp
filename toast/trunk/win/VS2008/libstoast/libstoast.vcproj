@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libfe.lib libmath.lib"
+				AdditionalDependencies="libfe.lib libmath.lib SuperLU_50.lib"
 				AdditionalLibraryDirectories=""
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -292,6 +292,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="SuperLU_50.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""

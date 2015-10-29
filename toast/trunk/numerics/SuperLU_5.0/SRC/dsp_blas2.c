@@ -253,7 +253,7 @@ sp_dtrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 		    STRSV(ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
 			&x[fsupc], &incx);
 #else
-		    dtrsv_("L", "T", "U", &nsupc, &Lval[luptr], &nsupr,
+		    sluc_dtrsv_("L", "T", "U", &nsupc, &Lval[luptr], &nsupr,
 			&x[fsupc], &incx);
 #endif
 		}
@@ -288,7 +288,7 @@ sp_dtrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 		    STRSV( ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
 			    &x[fsupc], &incx);
 #else
-		    dtrsv_("U", "T", "N", &nsupc, &Lval[luptr], &nsupr,
+		    sluc_dtrsv_("U", "T", "N", &nsupc, &Lval[luptr], &nsupr,
 			    &x[fsupc], &incx);
 #endif
 		}

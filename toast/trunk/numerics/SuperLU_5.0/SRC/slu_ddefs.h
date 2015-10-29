@@ -81,7 +81,11 @@ typedef int int_t; /* default */
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "vs_stdint.h"
+#else
 #include <stdint.h>
+#endif
 #include "slu_Cnames.h"
 #include "supermatrix.h"
 #include "slu_util.h"
@@ -282,7 +286,7 @@ extern void    check_tempv(int, double *);
 extern int dgemm_(const char*, const char*, const int*, const int*, const int*,
                   const double*, const double*, const int*, const double*,
 		  const int*, const double*, double*, const int*);
-extern int dtrsv_(char*, char*, char*, int*, double*, int*,
+extern int slu_dtrsv_(char*, char*, char*, int*, double*, int*,
                   double*, int*);
 extern int dtrsm_(char*, char*, char*, char*, int*, int*,
                   double*, double*, int*, double*, int*);

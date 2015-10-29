@@ -19,13 +19,13 @@
     void c_div(complex *, complex *, complex *), r_cnjg(complex *, complex *);
 
     /* Local variables */
-    static integer info;
-    static complex temp;
-    static integer i, j;
+    integer info;
+    complex temp;
+    integer i, j;
     extern logical lsame_(char *, char *);
-    static integer ix, jx, kx;
+    integer ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static logical noconj, nounit;
+    logical noconj, nounit;
 
 
 /*  Purpose   
