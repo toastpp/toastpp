@@ -21,13 +21,13 @@
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex temp;
-    static integer lenx, leny, i, j;
+    integer info;
+    doublecomplex temp;
+    integer lenx, leny, i, j;
     extern logical lsame_(char *, char *);
-    static integer ix, iy, jx, jy, kx, ky;
+    integer ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static logical noconj;
+    logical noconj;
 
 
 /*  Purpose   

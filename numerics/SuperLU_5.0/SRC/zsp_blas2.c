@@ -16,6 +16,7 @@
 
 #include "slu_zdefs.h"
 
+
 /* 
  * Function prototypes 
  */
@@ -261,7 +262,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 		    CTRSV(ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
 			&x[fsupc], &incx);
 #else
-		    toast_ztrsv_("L", "T", "U", &nsupc, &Lval[luptr], &nsupr,
+		    sluc_ztrsv_("L", "T", "U", &nsupc, &Lval[luptr], &nsupr,
 			&x[fsupc], &incx);
 #endif
 		}
@@ -298,7 +299,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 		    CTRSV( ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
 			    &x[fsupc], &incx);
 #else
-		    toast_ztrsv_("U", "T", "N", &nsupc, &Lval[luptr], &nsupr,
+		    sluc_ztrsv_("U", "T", "N", &nsupc, &Lval[luptr], &nsupr,
 			    &x[fsupc], &incx);
 #endif
 		}
@@ -340,7 +341,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 		    ZTRSV(ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
 			&x[fsupc], &incx);
 #else
-                    toast_ztrsv_("L", trans, "U", &nsupc, &Lval[luptr], &nsupr,
+                    sluc_ztrsv_("L", trans, "U", &nsupc, &Lval[luptr], &nsupr,
                            &x[fsupc], &incx);
 #endif
 		}
@@ -379,7 +380,7 @@ sp_ztrsv(char *uplo, char *trans, char *diag, SuperMatrix *L,
 		    ZTRSV( ftcs1, ftcs2, ftcs3, &nsupc, &Lval[luptr], &nsupr,
 			    &x[fsupc], &incx);
 #else
-                    toast_ztrsv_("U", trans, "N", &nsupc, &Lval[luptr], &nsupr,
+                    sluc_ztrsv_("U", trans, "N", &nsupc, &Lval[luptr], &nsupr,
                                &x[fsupc], &incx);
 #endif
   		}
