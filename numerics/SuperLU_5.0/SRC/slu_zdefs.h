@@ -81,7 +81,11 @@ typedef int int_t; /* default */
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#include "vs_stdint.h"
+#else
 #include <stdint.h>
+#endif
 #include "slu_Cnames.h"
 #include "supermatrix.h"
 #include "slu_util.h"
@@ -281,13 +285,13 @@ extern int     print_double_vec(char *, int, double *);
 extern void    check_tempv(int, doublecomplex *);
 
 /*! \brief BLAS */
+extern int sluc_ztrsv_(char*, char*, char*, int*, doublecomplex*, int*,
+                  doublecomplex*, int*);
 
 #ifdef UNDEF
 extern int zgemm_(const char*, const char*, const int*, const int*, const int*,
                   const doublecomplex*, const doublecomplex*, const int*, const doublecomplex*,
 		  const int*, const doublecomplex*, doublecomplex*, const int*);
-extern int ztrsv_(char*, char*, char*, int*, doublecomplex*, int*,
-                  doublecomplex*, int*);
 extern int ztrsm_(char*, char*, char*, char*, int*, int*,
                   doublecomplex*, doublecomplex*, int*, doublecomplex*, int*);
 extern int zgemv_(char *, int *, int *, doublecomplex *, doublecomplex *a, int *,

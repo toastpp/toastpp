@@ -1,7 +1,7 @@
 #ifndef __BLASNAMES_H
 #define __BLASNAMES_H
 
-#if (!defined(WIN32))&&(!defined(WIN64))
+#if (!defined(_WIN32))&&(!defined(_WIN64))
 #define TOASTLOCAL_BLAS_NAMES
 #endif
 

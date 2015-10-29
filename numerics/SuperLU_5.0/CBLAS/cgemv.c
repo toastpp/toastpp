@@ -20,13 +20,13 @@
     void r_cnjg(complex *, complex *);
 
     /* Local variables */
-    static integer info;
-    static complex temp;
-    static integer lenx, leny, i, j;
+    integer info;
+    complex temp;
+    integer lenx, leny, i, j;
     extern logical lsame_(char *, char *);
-    static integer ix, iy, jx, jy, kx, ky;
+    integer ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static logical noconj;
+    logical noconj;
 
 
 /*  Purpose   

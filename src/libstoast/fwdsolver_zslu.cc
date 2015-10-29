@@ -96,16 +96,10 @@ void ZSuperLU::Solve (SuperMatrix *sB, SuperMatrix *sX) const
     double R = 0.0;
     double C = 0.0;
     GlobalLU_t Glu;
-    static int nrhs_max = 1;
-    static double *ferr = new double[nrhs_max];
-    static double *berr = new double[nrhs_max];
-    double recip_pivot_growth, rcond;
     int nrhs = sB->ncol;
-    if (nrhs > nrhs_max) {
-        nrhs_max = nrhs;
-	delete []ferr;   ferr = new double[nrhs_max];
-	delete []berr;   berr = new double[nrhs_max];
-    }
+	double *ferr = new double[nrhs];
+	double *berr = new double[nrhs];
+    double recip_pivot_growth, rcond;
 
     SuperLUStat_t stat;
     StatInit (&stat);
@@ -116,6 +110,8 @@ void ZSuperLU::Solve (SuperMatrix *sB, SuperMatrix *sX) const
 
     options.Fact = FACTORED;
     StatFree (&stat);
+	delete []ferr;
+	delete []berr;
 }
 
 // =========================================================================

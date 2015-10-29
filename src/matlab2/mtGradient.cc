@@ -944,22 +944,22 @@ void GetGradientCplx (QMMesh *mesh, Raster *raster, CFwdSolver &FWS,
 
     if (!phi || !proj) {
         if (!phi) {
-	    phi_local = new CVector[nQ];
-	    for (i = 0; i < nQ; i++)
-	        phi_local[i].New (n);
-	    FWS.CalcFields (qvec, phi_local);
-	    phi = phi_local;
-	}
-	if (!proj) {
-	    proj_local = FWS.ProjectAll_real (mvec, phi);
-	    proj = &proj_local;
-	}
+			phi_local = new CVector[nQ];
+			for (i = 0; i < nQ; i++)
+				phi_local[i].New (n);
+			FWS.CalcFields (qvec, phi_local);
+			phi = phi_local;
+		}
+		if (!proj) {
+		    proj_local = FWS.ProjectAll_real (mvec, phi);
+			proj = &proj_local;
+		}
     } else if (phi && FWS.LinSolver() == LSOLVER_DIRECT) {
-	// HACK: SuperLU appears to fail occasionally unless it starts with
-	// solving for a 'regular' source. Maybe a problem with condition
-	// of linear system when RHS is an adjoint source?
-	CVector tmp(n);
-	FWS.CalcField(qvec.Row(0), tmp);
+		// HACK: SuperLU appears to fail occasionally unless it starts with
+		// solving for a 'regular' source. Maybe a problem with condition
+		// of linear system when RHS is an adjoint source?
+		CVector tmp(n);
+		FWS.CalcField(qvec.Row(0), tmp);
     }
 
     AddDataGradientCplx (mesh, raster, FWS, *proj, data, sd, phi, mvec, grad);

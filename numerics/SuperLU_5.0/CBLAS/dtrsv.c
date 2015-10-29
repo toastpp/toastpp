@@ -6,7 +6,7 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int dtrsv_(char *uplo, char *trans, char *diag, integer *n, 
+/* Subroutine */ int sluc_dtrsv_(char *uplo, char *trans, char *diag, integer *n, 
 	doublereal *a, integer *lda, doublereal *x, integer *incx)
 {
 
@@ -15,13 +15,13 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer info;
-    static doublereal temp;
-    static integer i, j;
+    integer info;
+    doublereal temp;
+    integer i, j;
     extern logical lsame_(char *, char *);
-    static integer ix, jx, kx;
+    integer ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static logical nounit;
+    logical nounit;
 
 
 /*  Purpose   

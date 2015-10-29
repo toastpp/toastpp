@@ -6,7 +6,7 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int ztrsv_(char *uplo, char *trans, char *diag, integer *n, 
+/* Subroutine */ int sluc_ztrsv_(char *uplo, char *trans, char *diag, integer *n, 
 	doublecomplex *a, integer *lda, doublecomplex *x, integer *incx)
 {
 
@@ -20,13 +20,13 @@
 	    doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex temp;
-    static integer i, j;
+    integer info;
+    doublecomplex temp;
+    integer i, j;
     extern logical lsame_(char *, char *);
-    static integer ix, jx, kx;
+    integer ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static logical noconj, nounit;
+    logical noconj, nounit;
 
 
 /*  Purpose   

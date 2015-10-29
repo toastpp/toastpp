@@ -76,7 +76,7 @@ ilu_zcolumn_dfs(
     int     mem_error;
     int     *xsup, *supno, *lsub, *xlsub;
     int     nzlmax;
-    static  int  first = 1, maxsuper;
+    /*static*/  int  first = 1, maxsuper; // MS151029: removed static for thread safety
 
     xsup    = Glu->xsup;
     supno   = Glu->supno;

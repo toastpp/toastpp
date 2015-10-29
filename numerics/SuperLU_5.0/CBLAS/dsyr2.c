@@ -16,11 +16,11 @@
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer info;
-    static doublereal temp1, temp2;
-    static integer i, j;
+    integer info;
+    doublereal temp1, temp2;
+    integer i, j;
     extern logical lsame_(char *, char *);
-    static integer ix, iy, jx, jy, kx, ky;
+    integer ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
