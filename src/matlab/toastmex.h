@@ -2,8 +2,8 @@
 #define __TOASTMEX_H
 
 #include "mex.h"
-#include "matrix.h"
 #include "mathlib.h"
+#include "matrix.h"
 #include "toasttype.h"
 
 #ifndef MX_API_VER
