@@ -2,6 +2,9 @@ include $(TOASTDIR)/Makefile.incl
 SHELL = /bin/csh
 VPATH = $(TSRC)/matlab
 
+MEXINC2 = $(MEXINC) -I$(TSRC)/libbemdiff -I$(TSRC)/libbem -I$(TSRC)/libdgfe
+MEXLIB2 = $(MEXLIB) -lbemdiff -lbem -ldgfe
+
 SRCS =  toastBasisToMeshMatrix.cc \
 	toastBndmat.cc \
 	toastBndReflectionTerm.cc \
@@ -125,10 +128,10 @@ OBJS = ${SRCS:.cc=.$(MEXEXT)}
 all:: $(OBJS)
 
 %.o : %.cc
-	$(MEX) -c $<
+	$(MEX) $(MEXINC2) -c $<
 
 %.$(MEXEXT) : %.cc toastmex.o util.o
-	$(MEX) $^
+	$(MEX) $(MEXINC2) $(MEXLIB2) $^
 
 clean::
 	rm -f *.$(MEXEXT)
