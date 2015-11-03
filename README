@@ -54,8 +54,8 @@ Installation of a precompiled Toast++ package
       - One platform-dependent binary package (e.g. toast_v1.0.0_win64.zip),
         containing the binary libraries, executables and mex files.
 
-    Currently Linux-64 and Windows-x64 platforms are supported. OS X 10.9
-    has support only for the matlab2 interface.
+    Currently Linux-64 and Windows-x64 platforms are supported. OS X 
+    (10.7-10.10) supports only for the matlab2 interface.
 
     Unzip and/or untar the two files into the same directory, and make sure
     to retain the directory structure of the archives.

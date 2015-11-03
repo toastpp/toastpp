@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F24F6BC01BE8D0B20086A329 /* clacon2.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BBD1BE8D0B20086A329 /* clacon2.c */; };
+		F24F6BC11BE8D0B20086A329 /* dlacon2.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BBE1BE8D0B20086A329 /* dlacon2.c */; };
+		F24F6BC21BE8D0B20086A329 /* zlacon2.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BBF1BE8D0B20086A329 /* zlacon2.c */; };
+		F24F6BC51BE8D0E00086A329 /* input_error.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BC31BE8D0E00086A329 /* input_error.c */; };
+		F24F6BC61BE8D0E00086A329 /* slacon2.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BC41BE8D0E00086A329 /* slacon2.c */; };
+		F24F6BC81BE8D2E90086A329 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F24F6BC71BE8D2E90086A329 /* Accelerate.framework */; };
+		F24F6BCA1BE8D4590086A329 /* dmach.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BC91BE8D4590086A329 /* dmach.c */; };
+		F24F6BCC1BE8D47D0086A329 /* smach.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BCB1BE8D47C0086A329 /* smach.c */; };
+		F24F6BCE1BE8D5620086A329 /* dtrsv.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BCD1BE8D5620086A329 /* dtrsv.c */; };
+		F24F6BD01BE8D5940086A329 /* ztrsv.c in Sources */ = {isa = PBXBuildFile; fileRef = F24F6BCF1BE8D5940086A329 /* ztrsv.c */; };
 		F250711B1A7561FD0053D654 /* ccolumn_bmod.c in Sources */ = {isa = PBXBuildFile; fileRef = F250704A1A7561FD0053D654 /* ccolumn_bmod.c */; };
 		F250711C1A7561FD0053D654 /* ccolumn_dfs.c in Sources */ = {isa = PBXBuildFile; fileRef = F250704B1A7561FD0053D654 /* ccolumn_dfs.c */; };
 		F250711D1A7561FD0053D654 /* ccopy_to_ucol.c in Sources */ = {isa = PBXBuildFile; fileRef = F250704C1A7561FD0053D654 /* ccopy_to_ucol.c */; };
@@ -76,7 +86,6 @@
 		F250715D1A7561FD0053D654 /* dsp_blas3.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070911A7561FD0053D654 /* dsp_blas3.c */; };
 		F250715E1A7561FD0053D654 /* dutil.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070921A7561FD0053D654 /* dutil.c */; };
 		F250715F1A7561FD0053D654 /* dzsum1.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070931A7561FD0053D654 /* dzsum1.c */; };
-		F25071601A7561FD0053D654 /* f2c.h in Headers */ = {isa = PBXBuildFile; fileRef = F25070941A7561FD0053D654 /* f2c.h */; };
 		F25071611A7561FD0053D654 /* get_perm_c.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070951A7561FD0053D654 /* get_perm_c.c */; };
 		F25071621A7561FD0053D654 /* heap_relax_snode.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070961A7561FD0053D654 /* heap_relax_snode.c */; };
 		F25071631A7561FD0053D654 /* html_mainpage.h in Headers */ = {isa = PBXBuildFile; fileRef = F25070971A7561FD0053D654 /* html_mainpage.h */; };
@@ -111,8 +120,6 @@
 		F25071801A7561FD0053D654 /* lsame.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070B91A7561FD0053D654 /* lsame.c */; };
 		F25071811A7561FD0053D654 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = F25070BA1A7561FD0053D654 /* Makefile */; };
 		F25071821A7561FD0053D654 /* mark_relax.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070BB1A7561FD0053D654 /* mark_relax.c */; };
-		F25071831A7561FD0053D654 /* mc21_f2c.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070BC1A7561FD0053D654 /* mc21_f2c.c */; };
-		F25071841A7561FD0053D654 /* mc21.f in Sources */ = {isa = PBXBuildFile; fileRef = F25070BD1A7561FD0053D654 /* mc21.f */; };
 		F25071851A7561FD0053D654 /* mc64ad.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070BE1A7561FD0053D654 /* mc64ad.c */; };
 		F25071861A7561FD0053D654 /* memory.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070C01A7561FD0053D654 /* memory.c */; };
 		F25071871A7561FD0053D654 /* mmd.c in Sources */ = {isa = PBXBuildFile; fileRef = F25070C11A7561FD0053D654 /* mmd.c */; };
@@ -201,7 +208,6 @@
 		F25071DA1A7561FD0053D654 /* zsp_blas2.c in Sources */ = {isa = PBXBuildFile; fileRef = F25071181A7561FD0053D654 /* zsp_blas2.c */; };
 		F25071DB1A7561FD0053D654 /* zsp_blas3.c in Sources */ = {isa = PBXBuildFile; fileRef = F25071191A7561FD0053D654 /* zsp_blas3.c */; };
 		F25071DC1A7561FD0053D654 /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = F250711A1A7561FD0053D654 /* zutil.c */; };
-		F25071DE1A75632A0053D654 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F25071DD1A75632A0053D654 /* Accelerate.framework */; };
 		F25071F61A75662D0053D654 /* libsuperlu.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F25070431A75618A0053D654 /* libsuperlu.dylib */; };
 /* End PBXBuildFile section */
 
@@ -219,217 +225,209 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F24F6BBD1BE8D0B20086A329 /* clacon2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = clacon2.c; path = ../../numerics/SuperLU_5.0/SRC/clacon2.c; sourceTree = "<group>"; };
+		F24F6BBE1BE8D0B20086A329 /* dlacon2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlacon2.c; path = ../../numerics/SuperLU_5.0/SRC/dlacon2.c; sourceTree = "<group>"; };
+		F24F6BBF1BE8D0B20086A329 /* zlacon2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlacon2.c; path = ../../numerics/SuperLU_5.0/SRC/zlacon2.c; sourceTree = "<group>"; };
+		F24F6BC31BE8D0E00086A329 /* input_error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = input_error.c; path = ../../numerics/SuperLU_5.0/SRC/input_error.c; sourceTree = "<group>"; };
+		F24F6BC41BE8D0E00086A329 /* slacon2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slacon2.c; path = ../../numerics/SuperLU_5.0/SRC/slacon2.c; sourceTree = "<group>"; };
+		F24F6BC71BE8D2E90086A329 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		F24F6BC91BE8D4590086A329 /* dmach.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dmach.c; path = ../../numerics/SuperLU_5.0/INSTALL/dmach.c; sourceTree = "<group>"; };
+		F24F6BCB1BE8D47C0086A329 /* smach.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smach.c; path = ../../numerics/SuperLU_5.0/INSTALL/smach.c; sourceTree = "<group>"; };
+		F24F6BCD1BE8D5620086A329 /* dtrsv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dtrsv.c; path = ../../numerics/SuperLU_5.0/CBLAS/dtrsv.c; sourceTree = "<group>"; };
+		F24F6BCF1BE8D5940086A329 /* ztrsv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ztrsv.c; path = ../../numerics/SuperLU_5.0/CBLAS/ztrsv.c; sourceTree = "<group>"; };
 		F25070431A75618A0053D654 /* libsuperlu.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libsuperlu.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		F250704A1A7561FD0053D654 /* ccolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ccolumn_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/ccolumn_bmod.c; sourceTree = "<group>"; };
-		F250704B1A7561FD0053D654 /* ccolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ccolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ccolumn_dfs.c; sourceTree = "<group>"; };
-		F250704C1A7561FD0053D654 /* ccopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ccopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/ccopy_to_ucol.c; sourceTree = "<group>"; };
-		F250704D1A7561FD0053D654 /* cdiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cdiagonal.c; path = ../../numerics/SuperLU_4.1/SRC/cdiagonal.c; sourceTree = "<group>"; };
-		F250704E1A7561FD0053D654 /* cgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgscon.c; path = ../../numerics/SuperLU_4.1/SRC/cgscon.c; sourceTree = "<group>"; };
-		F250704F1A7561FD0053D654 /* cgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsequ.c; path = ../../numerics/SuperLU_4.1/SRC/cgsequ.c; sourceTree = "<group>"; };
-		F25070501A7561FD0053D654 /* cgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsisx.c; path = ../../numerics/SuperLU_4.1/SRC/cgsisx.c; sourceTree = "<group>"; };
-		F25070511A7561FD0053D654 /* cgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsitrf.c; path = ../../numerics/SuperLU_4.1/SRC/cgsitrf.c; sourceTree = "<group>"; };
-		F25070521A7561FD0053D654 /* cgsitrf.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = cgsitrf.c.bak; path = ../../numerics/SuperLU_4.1/SRC/cgsitrf.c.bak; sourceTree = "<group>"; };
-		F25070531A7561FD0053D654 /* cgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsrfs.c; path = ../../numerics/SuperLU_4.1/SRC/cgsrfs.c; sourceTree = "<group>"; };
-		F25070541A7561FD0053D654 /* cgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgssv.c; path = ../../numerics/SuperLU_4.1/SRC/cgssv.c; sourceTree = "<group>"; };
-		F25070551A7561FD0053D654 /* cgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgssvx.c; path = ../../numerics/SuperLU_4.1/SRC/cgssvx.c; sourceTree = "<group>"; };
-		F25070561A7561FD0053D654 /* cgssvx.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = cgssvx.c.bak; path = ../../numerics/SuperLU_4.1/SRC/cgssvx.c.bak; sourceTree = "<group>"; };
-		F25070571A7561FD0053D654 /* cgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgstrf.c; path = ../../numerics/SuperLU_4.1/SRC/cgstrf.c; sourceTree = "<group>"; };
-		F25070581A7561FD0053D654 /* cgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgstrs.c; path = ../../numerics/SuperLU_4.1/SRC/cgstrs.c; sourceTree = "<group>"; };
-		F25070591A7561FD0053D654 /* clacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = clacon.c; path = ../../numerics/SuperLU_4.1/SRC/clacon.c; sourceTree = "<group>"; };
-		F250705A1A7561FD0053D654 /* clacon.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = clacon.c.bak; path = ../../numerics/SuperLU_4.1/SRC/clacon.c.bak; sourceTree = "<group>"; };
-		F250705B1A7561FD0053D654 /* clangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = clangs.c; path = ../../numerics/SuperLU_4.1/SRC/clangs.c; sourceTree = "<group>"; };
-		F250705C1A7561FD0053D654 /* claqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = claqgs.c; path = ../../numerics/SuperLU_4.1/SRC/claqgs.c; sourceTree = "<group>"; };
-		F250705D1A7561FD0053D654 /* cldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cldperm.c; path = ../../numerics/SuperLU_4.1/SRC/cldperm.c; sourceTree = "<group>"; };
-		F250705E1A7561FD0053D654 /* cmemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cmemory.c; path = ../../numerics/SuperLU_4.1/SRC/cmemory.c; sourceTree = "<group>"; };
-		F250705F1A7561FD0053D654 /* cmyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cmyblas2.c; path = ../../numerics/SuperLU_4.1/SRC/cmyblas2.c; sourceTree = "<group>"; };
-		F25070601A7561FD0053D654 /* colamd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = colamd.c; path = ../../numerics/SuperLU_4.1/SRC/colamd.c; sourceTree = "<group>"; };
-		F25070611A7561FD0053D654 /* colamd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = colamd.h; path = ../../numerics/SuperLU_4.1/SRC/colamd.h; sourceTree = "<group>"; };
-		F25070621A7561FD0053D654 /* cpanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpanel_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/cpanel_bmod.c; sourceTree = "<group>"; };
-		F25070631A7561FD0053D654 /* cpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/cpanel_dfs.c; sourceTree = "<group>"; };
-		F25070641A7561FD0053D654 /* cpivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpivotgrowth.c; path = ../../numerics/SuperLU_4.1/SRC/cpivotgrowth.c; sourceTree = "<group>"; };
-		F25070651A7561FD0053D654 /* cpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpivotL.c; path = ../../numerics/SuperLU_4.1/SRC/cpivotL.c; sourceTree = "<group>"; };
-		F25070661A7561FD0053D654 /* cpruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpruneL.c; path = ../../numerics/SuperLU_4.1/SRC/cpruneL.c; sourceTree = "<group>"; };
-		F25070671A7561FD0053D654 /* creadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = creadhb.c; path = ../../numerics/SuperLU_4.1/SRC/creadhb.c; sourceTree = "<group>"; };
-		F25070681A7561FD0053D654 /* creadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = creadrb.c; path = ../../numerics/SuperLU_4.1/SRC/creadrb.c; sourceTree = "<group>"; };
-		F25070691A7561FD0053D654 /* creadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = creadtriple.c; path = ../../numerics/SuperLU_4.1/SRC/creadtriple.c; sourceTree = "<group>"; };
-		F250706A1A7561FD0053D654 /* csnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csnode_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/csnode_bmod.c; sourceTree = "<group>"; };
-		F250706B1A7561FD0053D654 /* csnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/csnode_dfs.c; sourceTree = "<group>"; };
-		F250706C1A7561FD0053D654 /* csp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csp_blas2.c; path = ../../numerics/SuperLU_4.1/SRC/csp_blas2.c; sourceTree = "<group>"; };
-		F250706D1A7561FD0053D654 /* csp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csp_blas3.c; path = ../../numerics/SuperLU_4.1/SRC/csp_blas3.c; sourceTree = "<group>"; };
-		F250706E1A7561FD0053D654 /* cutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cutil.c; path = ../../numerics/SuperLU_4.1/SRC/cutil.c; sourceTree = "<group>"; };
-		F250706F1A7561FD0053D654 /* dcolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcolumn_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/dcolumn_bmod.c; sourceTree = "<group>"; };
-		F25070701A7561FD0053D654 /* dcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/dcolumn_dfs.c; sourceTree = "<group>"; };
-		F25070711A7561FD0053D654 /* dcomplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcomplex.c; path = ../../numerics/SuperLU_4.1/SRC/dcomplex.c; sourceTree = "<group>"; };
-		F25070721A7561FD0053D654 /* dcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/dcopy_to_ucol.c; sourceTree = "<group>"; };
-		F25070731A7561FD0053D654 /* ddiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ddiagonal.c; path = ../../numerics/SuperLU_4.1/SRC/ddiagonal.c; sourceTree = "<group>"; };
-		F25070741A7561FD0053D654 /* dgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgscon.c; path = ../../numerics/SuperLU_4.1/SRC/dgscon.c; sourceTree = "<group>"; };
-		F25070751A7561FD0053D654 /* dgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsequ.c; path = ../../numerics/SuperLU_4.1/SRC/dgsequ.c; sourceTree = "<group>"; };
-		F25070761A7561FD0053D654 /* dgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsisx.c; path = ../../numerics/SuperLU_4.1/SRC/dgsisx.c; sourceTree = "<group>"; };
-		F25070771A7561FD0053D654 /* dgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsitrf.c; path = ../../numerics/SuperLU_4.1/SRC/dgsitrf.c; sourceTree = "<group>"; };
-		F25070781A7561FD0053D654 /* dgsitrf.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dgsitrf.c.bak; path = ../../numerics/SuperLU_4.1/SRC/dgsitrf.c.bak; sourceTree = "<group>"; };
-		F25070791A7561FD0053D654 /* dgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsrfs.c; path = ../../numerics/SuperLU_4.1/SRC/dgsrfs.c; sourceTree = "<group>"; };
-		F250707A1A7561FD0053D654 /* dgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgssv.c; path = ../../numerics/SuperLU_4.1/SRC/dgssv.c; sourceTree = "<group>"; };
-		F250707B1A7561FD0053D654 /* dgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgssvx.c; path = ../../numerics/SuperLU_4.1/SRC/dgssvx.c; sourceTree = "<group>"; };
-		F250707C1A7561FD0053D654 /* dgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgstrf.c; path = ../../numerics/SuperLU_4.1/SRC/dgstrf.c; sourceTree = "<group>"; };
-		F250707D1A7561FD0053D654 /* dgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgstrs.c; path = ../../numerics/SuperLU_4.1/SRC/dgstrs.c; sourceTree = "<group>"; };
-		F250707E1A7561FD0053D654 /* dlacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlacon.c; path = ../../numerics/SuperLU_4.1/SRC/dlacon.c; sourceTree = "<group>"; };
-		F250707F1A7561FD0053D654 /* dlacon.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dlacon.c.bak; path = ../../numerics/SuperLU_4.1/SRC/dlacon.c.bak; sourceTree = "<group>"; };
-		F25070801A7561FD0053D654 /* dlamch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlamch.c; path = ../../numerics/SuperLU_4.1/SRC/dlamch.c; sourceTree = "<group>"; };
-		F25070811A7561FD0053D654 /* dlangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlangs.c; path = ../../numerics/SuperLU_4.1/SRC/dlangs.c; sourceTree = "<group>"; };
-		F25070821A7561FD0053D654 /* dlaqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlaqgs.c; path = ../../numerics/SuperLU_4.1/SRC/dlaqgs.c; sourceTree = "<group>"; };
-		F25070831A7561FD0053D654 /* dldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dldperm.c; path = ../../numerics/SuperLU_4.1/SRC/dldperm.c; sourceTree = "<group>"; };
-		F25070841A7561FD0053D654 /* dmemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dmemory.c; path = ../../numerics/SuperLU_4.1/SRC/dmemory.c; sourceTree = "<group>"; };
-		F25070851A7561FD0053D654 /* dmyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dmyblas2.c; path = ../../numerics/SuperLU_4.1/SRC/dmyblas2.c; sourceTree = "<group>"; };
-		F25070861A7561FD0053D654 /* dpanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpanel_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/dpanel_bmod.c; sourceTree = "<group>"; };
-		F25070871A7561FD0053D654 /* dpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/dpanel_dfs.c; sourceTree = "<group>"; };
-		F25070881A7561FD0053D654 /* dpivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpivotgrowth.c; path = ../../numerics/SuperLU_4.1/SRC/dpivotgrowth.c; sourceTree = "<group>"; };
-		F25070891A7561FD0053D654 /* dpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpivotL.c; path = ../../numerics/SuperLU_4.1/SRC/dpivotL.c; sourceTree = "<group>"; };
-		F250708A1A7561FD0053D654 /* dpruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpruneL.c; path = ../../numerics/SuperLU_4.1/SRC/dpruneL.c; sourceTree = "<group>"; };
-		F250708B1A7561FD0053D654 /* dreadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dreadhb.c; path = ../../numerics/SuperLU_4.1/SRC/dreadhb.c; sourceTree = "<group>"; };
-		F250708C1A7561FD0053D654 /* dreadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dreadrb.c; path = ../../numerics/SuperLU_4.1/SRC/dreadrb.c; sourceTree = "<group>"; };
-		F250708D1A7561FD0053D654 /* dreadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dreadtriple.c; path = ../../numerics/SuperLU_4.1/SRC/dreadtriple.c; sourceTree = "<group>"; };
-		F250708E1A7561FD0053D654 /* dsnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsnode_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/dsnode_bmod.c; sourceTree = "<group>"; };
-		F250708F1A7561FD0053D654 /* dsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/dsnode_dfs.c; sourceTree = "<group>"; };
-		F25070901A7561FD0053D654 /* dsp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsp_blas2.c; path = ../../numerics/SuperLU_4.1/SRC/dsp_blas2.c; sourceTree = "<group>"; };
-		F25070911A7561FD0053D654 /* dsp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsp_blas3.c; path = ../../numerics/SuperLU_4.1/SRC/dsp_blas3.c; sourceTree = "<group>"; };
-		F25070921A7561FD0053D654 /* dutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dutil.c; path = ../../numerics/SuperLU_4.1/SRC/dutil.c; sourceTree = "<group>"; };
-		F25070931A7561FD0053D654 /* dzsum1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dzsum1.c; path = ../../numerics/SuperLU_4.1/SRC/dzsum1.c; sourceTree = "<group>"; };
-		F25070941A7561FD0053D654 /* f2c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = f2c.h; path = ../../numerics/SuperLU_4.1/SRC/f2c.h; sourceTree = "<group>"; };
-		F25070951A7561FD0053D654 /* get_perm_c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = get_perm_c.c; path = ../../numerics/SuperLU_4.1/SRC/get_perm_c.c; sourceTree = "<group>"; };
-		F25070961A7561FD0053D654 /* heap_relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = heap_relax_snode.c; path = ../../numerics/SuperLU_4.1/SRC/heap_relax_snode.c; sourceTree = "<group>"; };
-		F25070971A7561FD0053D654 /* html_mainpage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = html_mainpage.h; path = ../../numerics/SuperLU_4.1/SRC/html_mainpage.h; sourceTree = "<group>"; };
-		F25070981A7561FD0053D654 /* icmax1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = icmax1.c; path = ../../numerics/SuperLU_4.1/SRC/icmax1.c; sourceTree = "<group>"; };
-		F25070991A7561FD0053D654 /* ilu_ccolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ccolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_ccolumn_dfs.c; sourceTree = "<group>"; };
-		F250709A1A7561FD0053D654 /* ilu_ccopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ccopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_ccopy_to_ucol.c; sourceTree = "<group>"; };
-		F250709B1A7561FD0053D654 /* ilu_ccopy_to_ucol.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ilu_ccopy_to_ucol.c.bak; path = ../../numerics/SuperLU_4.1/SRC/ilu_ccopy_to_ucol.c.bak; sourceTree = "<group>"; };
-		F250709C1A7561FD0053D654 /* ilu_cdrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_cdrop_row.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_cdrop_row.c; sourceTree = "<group>"; };
-		F250709D1A7561FD0053D654 /* ilu_cpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_cpanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_cpanel_dfs.c; sourceTree = "<group>"; };
-		F250709E1A7561FD0053D654 /* ilu_cpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_cpivotL.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_cpivotL.c; sourceTree = "<group>"; };
-		F250709F1A7561FD0053D654 /* ilu_csnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_csnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_csnode_dfs.c; sourceTree = "<group>"; };
-		F25070A01A7561FD0053D654 /* ilu_dcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dcolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_dcolumn_dfs.c; sourceTree = "<group>"; };
-		F25070A11A7561FD0053D654 /* ilu_dcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dcopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_dcopy_to_ucol.c; sourceTree = "<group>"; };
-		F25070A21A7561FD0053D654 /* ilu_dcopy_to_ucol.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ilu_dcopy_to_ucol.c.bak; path = ../../numerics/SuperLU_4.1/SRC/ilu_dcopy_to_ucol.c.bak; sourceTree = "<group>"; };
-		F25070A31A7561FD0053D654 /* ilu_ddrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ddrop_row.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_ddrop_row.c; sourceTree = "<group>"; };
-		F25070A41A7561FD0053D654 /* ilu_ddrop_row.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ilu_ddrop_row.c.bak; path = ../../numerics/SuperLU_4.1/SRC/ilu_ddrop_row.c.bak; sourceTree = "<group>"; };
-		F25070A51A7561FD0053D654 /* ilu_dpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dpanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_dpanel_dfs.c; sourceTree = "<group>"; };
-		F25070A61A7561FD0053D654 /* ilu_dpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dpivotL.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_dpivotL.c; sourceTree = "<group>"; };
-		F25070A71A7561FD0053D654 /* ilu_dsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dsnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_dsnode_dfs.c; sourceTree = "<group>"; };
-		F25070A81A7561FD0053D654 /* ilu_heap_relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_heap_relax_snode.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_heap_relax_snode.c; sourceTree = "<group>"; };
-		F25070A91A7561FD0053D654 /* ilu_relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_relax_snode.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_relax_snode.c; sourceTree = "<group>"; };
-		F25070AA1A7561FD0053D654 /* ilu_scolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_scolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_scolumn_dfs.c; sourceTree = "<group>"; };
-		F25070AB1A7561FD0053D654 /* ilu_scopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_scopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_scopy_to_ucol.c; sourceTree = "<group>"; };
-		F25070AC1A7561FD0053D654 /* ilu_scopy_to_ucol.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ilu_scopy_to_ucol.c.bak; path = ../../numerics/SuperLU_4.1/SRC/ilu_scopy_to_ucol.c.bak; sourceTree = "<group>"; };
-		F25070AD1A7561FD0053D654 /* ilu_sdrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_sdrop_row.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_sdrop_row.c; sourceTree = "<group>"; };
-		F25070AE1A7561FD0053D654 /* ilu_spanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_spanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_spanel_dfs.c; sourceTree = "<group>"; };
-		F25070AF1A7561FD0053D654 /* ilu_spivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_spivotL.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_spivotL.c; sourceTree = "<group>"; };
-		F25070B01A7561FD0053D654 /* ilu_ssnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ssnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_ssnode_dfs.c; sourceTree = "<group>"; };
-		F25070B11A7561FD0053D654 /* ilu_zcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zcolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_zcolumn_dfs.c; sourceTree = "<group>"; };
-		F25070B21A7561FD0053D654 /* ilu_zcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zcopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_zcopy_to_ucol.c; sourceTree = "<group>"; };
-		F25070B31A7561FD0053D654 /* ilu_zcopy_to_ucol.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ilu_zcopy_to_ucol.c.bak; path = ../../numerics/SuperLU_4.1/SRC/ilu_zcopy_to_ucol.c.bak; sourceTree = "<group>"; };
-		F25070B41A7561FD0053D654 /* ilu_zdrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zdrop_row.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_zdrop_row.c; sourceTree = "<group>"; };
-		F25070B51A7561FD0053D654 /* ilu_zpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zpanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_zpanel_dfs.c; sourceTree = "<group>"; };
-		F25070B61A7561FD0053D654 /* ilu_zpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zpivotL.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_zpivotL.c; sourceTree = "<group>"; };
-		F25070B71A7561FD0053D654 /* ilu_zsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zsnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ilu_zsnode_dfs.c; sourceTree = "<group>"; };
-		F25070B81A7561FD0053D654 /* izmax1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = izmax1.c; path = ../../numerics/SuperLU_4.1/SRC/izmax1.c; sourceTree = "<group>"; };
-		F25070B91A7561FD0053D654 /* lsame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lsame.c; path = ../../numerics/SuperLU_4.1/SRC/lsame.c; sourceTree = "<group>"; };
-		F25070BA1A7561FD0053D654 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../numerics/SuperLU_4.1/SRC/Makefile; sourceTree = "<group>"; };
-		F25070BB1A7561FD0053D654 /* mark_relax.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mark_relax.c; path = ../../numerics/SuperLU_4.1/SRC/mark_relax.c; sourceTree = "<group>"; };
-		F25070BC1A7561FD0053D654 /* mc21_f2c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mc21_f2c.c; path = ../../numerics/SuperLU_4.1/SRC/mc21_f2c.c; sourceTree = "<group>"; };
-		F25070BD1A7561FD0053D654 /* mc21.f */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.fortran; name = mc21.f; path = ../../numerics/SuperLU_4.1/SRC/mc21.f; sourceTree = "<group>"; };
-		F25070BE1A7561FD0053D654 /* mc64ad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mc64ad.c; path = ../../numerics/SuperLU_4.1/SRC/mc64ad.c; sourceTree = "<group>"; };
-		F25070BF1A7561FD0053D654 /* mc64ad.f.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = mc64ad.f.bak; path = ../../numerics/SuperLU_4.1/SRC/mc64ad.f.bak; sourceTree = "<group>"; };
-		F25070C01A7561FD0053D654 /* memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = memory.c; path = ../../numerics/SuperLU_4.1/SRC/memory.c; sourceTree = "<group>"; };
-		F25070C11A7561FD0053D654 /* mmd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mmd.c; path = ../../numerics/SuperLU_4.1/SRC/mmd.c; sourceTree = "<group>"; };
-		F25070C21A7561FD0053D654 /* qselect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = qselect.c; path = ../../numerics/SuperLU_4.1/SRC/qselect.c; sourceTree = "<group>"; };
-		F25070C31A7561FD0053D654 /* relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = relax_snode.c; path = ../../numerics/SuperLU_4.1/SRC/relax_snode.c; sourceTree = "<group>"; };
-		F25070C41A7561FD0053D654 /* scolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scolumn_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/scolumn_bmod.c; sourceTree = "<group>"; };
-		F25070C51A7561FD0053D654 /* scolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/scolumn_dfs.c; sourceTree = "<group>"; };
-		F25070C61A7561FD0053D654 /* scomplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scomplex.c; path = ../../numerics/SuperLU_4.1/SRC/scomplex.c; sourceTree = "<group>"; };
-		F25070C71A7561FD0053D654 /* scopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/scopy_to_ucol.c; sourceTree = "<group>"; };
-		F25070C81A7561FD0053D654 /* scsum1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scsum1.c; path = ../../numerics/SuperLU_4.1/SRC/scsum1.c; sourceTree = "<group>"; };
-		F25070C91A7561FD0053D654 /* sdiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sdiagonal.c; path = ../../numerics/SuperLU_4.1/SRC/sdiagonal.c; sourceTree = "<group>"; };
-		F25070CA1A7561FD0053D654 /* sgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgscon.c; path = ../../numerics/SuperLU_4.1/SRC/sgscon.c; sourceTree = "<group>"; };
-		F25070CB1A7561FD0053D654 /* sgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsequ.c; path = ../../numerics/SuperLU_4.1/SRC/sgsequ.c; sourceTree = "<group>"; };
-		F25070CC1A7561FD0053D654 /* sgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsisx.c; path = ../../numerics/SuperLU_4.1/SRC/sgsisx.c; sourceTree = "<group>"; };
-		F25070CD1A7561FD0053D654 /* sgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsitrf.c; path = ../../numerics/SuperLU_4.1/SRC/sgsitrf.c; sourceTree = "<group>"; };
-		F25070CE1A7561FD0053D654 /* sgsitrf.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sgsitrf.c.bak; path = ../../numerics/SuperLU_4.1/SRC/sgsitrf.c.bak; sourceTree = "<group>"; };
-		F25070CF1A7561FD0053D654 /* sgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsrfs.c; path = ../../numerics/SuperLU_4.1/SRC/sgsrfs.c; sourceTree = "<group>"; };
-		F25070D01A7561FD0053D654 /* sgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgssv.c; path = ../../numerics/SuperLU_4.1/SRC/sgssv.c; sourceTree = "<group>"; };
-		F25070D11A7561FD0053D654 /* sgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgssvx.c; path = ../../numerics/SuperLU_4.1/SRC/sgssvx.c; sourceTree = "<group>"; };
-		F25070D21A7561FD0053D654 /* sgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgstrf.c; path = ../../numerics/SuperLU_4.1/SRC/sgstrf.c; sourceTree = "<group>"; };
-		F25070D31A7561FD0053D654 /* sgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgstrs.c; path = ../../numerics/SuperLU_4.1/SRC/sgstrs.c; sourceTree = "<group>"; };
-		F25070D41A7561FD0053D654 /* slacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slacon.c; path = ../../numerics/SuperLU_4.1/SRC/slacon.c; sourceTree = "<group>"; };
-		F25070D51A7561FD0053D654 /* slamch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slamch.c; path = ../../numerics/SuperLU_4.1/SRC/slamch.c; sourceTree = "<group>"; };
-		F25070D61A7561FD0053D654 /* slangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slangs.c; path = ../../numerics/SuperLU_4.1/SRC/slangs.c; sourceTree = "<group>"; };
-		F25070D71A7561FD0053D654 /* slaqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slaqgs.c; path = ../../numerics/SuperLU_4.1/SRC/slaqgs.c; sourceTree = "<group>"; };
-		F25070D81A7561FD0053D654 /* sldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sldperm.c; path = ../../numerics/SuperLU_4.1/SRC/sldperm.c; sourceTree = "<group>"; };
-		F25070D91A7561FD0053D654 /* slu_cdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_cdefs.h; path = ../../numerics/SuperLU_4.1/SRC/slu_cdefs.h; sourceTree = "<group>"; };
-		F25070DA1A7561FD0053D654 /* slu_Cnames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_Cnames.h; path = ../../numerics/SuperLU_4.1/SRC/slu_Cnames.h; sourceTree = "<group>"; };
-		F25070DB1A7561FD0053D654 /* slu_dcomplex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_dcomplex.h; path = ../../numerics/SuperLU_4.1/SRC/slu_dcomplex.h; sourceTree = "<group>"; };
-		F25070DC1A7561FD0053D654 /* slu_ddefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_ddefs.h; path = ../../numerics/SuperLU_4.1/SRC/slu_ddefs.h; sourceTree = "<group>"; };
-		F25070DD1A7561FD0053D654 /* slu_scomplex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_scomplex.h; path = ../../numerics/SuperLU_4.1/SRC/slu_scomplex.h; sourceTree = "<group>"; };
-		F25070DE1A7561FD0053D654 /* slu_sdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_sdefs.h; path = ../../numerics/SuperLU_4.1/SRC/slu_sdefs.h; sourceTree = "<group>"; };
-		F25070DF1A7561FD0053D654 /* slu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_util.h; path = ../../numerics/SuperLU_4.1/SRC/slu_util.h; sourceTree = "<group>"; };
-		F25070E01A7561FD0053D654 /* slu_zdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_zdefs.h; path = ../../numerics/SuperLU_4.1/SRC/slu_zdefs.h; sourceTree = "<group>"; };
-		F25070E11A7561FD0053D654 /* smemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smemory.c; path = ../../numerics/SuperLU_4.1/SRC/smemory.c; sourceTree = "<group>"; };
-		F25070E21A7561FD0053D654 /* smyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smyblas2.c; path = ../../numerics/SuperLU_4.1/SRC/smyblas2.c; sourceTree = "<group>"; };
-		F25070E31A7561FD0053D654 /* sp_coletree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp_coletree.c; path = ../../numerics/SuperLU_4.1/SRC/sp_coletree.c; sourceTree = "<group>"; };
-		F25070E41A7561FD0053D654 /* sp_ienv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp_ienv.c; path = ../../numerics/SuperLU_4.1/SRC/sp_ienv.c; sourceTree = "<group>"; };
-		F25070E51A7561FD0053D654 /* sp_preorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp_preorder.c; path = ../../numerics/SuperLU_4.1/SRC/sp_preorder.c; sourceTree = "<group>"; };
-		F25070E61A7561FD0053D654 /* spanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spanel_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/spanel_bmod.c; sourceTree = "<group>"; };
-		F25070E71A7561FD0053D654 /* spanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/spanel_dfs.c; sourceTree = "<group>"; };
-		F25070E81A7561FD0053D654 /* spivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spivotgrowth.c; path = ../../numerics/SuperLU_4.1/SRC/spivotgrowth.c; sourceTree = "<group>"; };
-		F25070E91A7561FD0053D654 /* spivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spivotL.c; path = ../../numerics/SuperLU_4.1/SRC/spivotL.c; sourceTree = "<group>"; };
-		F25070EA1A7561FD0053D654 /* spruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spruneL.c; path = ../../numerics/SuperLU_4.1/SRC/spruneL.c; sourceTree = "<group>"; };
-		F25070EB1A7561FD0053D654 /* sreadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sreadhb.c; path = ../../numerics/SuperLU_4.1/SRC/sreadhb.c; sourceTree = "<group>"; };
-		F25070EC1A7561FD0053D654 /* sreadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sreadrb.c; path = ../../numerics/SuperLU_4.1/SRC/sreadrb.c; sourceTree = "<group>"; };
-		F25070ED1A7561FD0053D654 /* sreadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sreadtriple.c; path = ../../numerics/SuperLU_4.1/SRC/sreadtriple.c; sourceTree = "<group>"; };
-		F25070EE1A7561FD0053D654 /* ssnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssnode_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/ssnode_bmod.c; sourceTree = "<group>"; };
-		F25070EF1A7561FD0053D654 /* ssnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/ssnode_dfs.c; sourceTree = "<group>"; };
-		F25070F01A7561FD0053D654 /* ssp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssp_blas2.c; path = ../../numerics/SuperLU_4.1/SRC/ssp_blas2.c; sourceTree = "<group>"; };
-		F25070F11A7561FD0053D654 /* ssp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssp_blas3.c; path = ../../numerics/SuperLU_4.1/SRC/ssp_blas3.c; sourceTree = "<group>"; };
-		F25070F21A7561FD0053D654 /* superlu_enum_consts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = superlu_enum_consts.h; path = ../../numerics/SuperLU_4.1/SRC/superlu_enum_consts.h; sourceTree = "<group>"; };
-		F25070F31A7561FD0053D654 /* superlu_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = superlu_timer.c; path = ../../numerics/SuperLU_4.1/SRC/superlu_timer.c; sourceTree = "<group>"; };
-		F25070F41A7561FD0053D654 /* supermatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = supermatrix.h; path = ../../numerics/SuperLU_4.1/SRC/supermatrix.h; sourceTree = "<group>"; };
-		F25070F51A7561FD0053D654 /* sutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sutil.c; path = ../../numerics/SuperLU_4.1/SRC/sutil.c; sourceTree = "<group>"; };
-		F25070F61A7561FD0053D654 /* temp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = temp; path = ../../numerics/SuperLU_4.1/SRC/temp; sourceTree = "<group>"; };
-		F25070F71A7561FD0053D654 /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../../numerics/SuperLU_4.1/SRC/util.c; sourceTree = "<group>"; };
-		F25070F81A7561FD0053D654 /* xerbla.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xerbla.c; path = ../../numerics/SuperLU_4.1/SRC/xerbla.c; sourceTree = "<group>"; };
-		F25070F91A7561FD0053D654 /* zcolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zcolumn_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/zcolumn_bmod.c; sourceTree = "<group>"; };
-		F25070FA1A7561FD0053D654 /* zcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zcolumn_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/zcolumn_dfs.c; sourceTree = "<group>"; };
-		F25070FB1A7561FD0053D654 /* zcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zcopy_to_ucol.c; path = ../../numerics/SuperLU_4.1/SRC/zcopy_to_ucol.c; sourceTree = "<group>"; };
-		F25070FC1A7561FD0053D654 /* zdiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zdiagonal.c; path = ../../numerics/SuperLU_4.1/SRC/zdiagonal.c; sourceTree = "<group>"; };
-		F25070FD1A7561FD0053D654 /* zgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgscon.c; path = ../../numerics/SuperLU_4.1/SRC/zgscon.c; sourceTree = "<group>"; };
-		F25070FE1A7561FD0053D654 /* zgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsequ.c; path = ../../numerics/SuperLU_4.1/SRC/zgsequ.c; sourceTree = "<group>"; };
-		F25070FF1A7561FD0053D654 /* zgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsisx.c; path = ../../numerics/SuperLU_4.1/SRC/zgsisx.c; sourceTree = "<group>"; };
-		F25071001A7561FD0053D654 /* zgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsitrf.c; path = ../../numerics/SuperLU_4.1/SRC/zgsitrf.c; sourceTree = "<group>"; };
-		F25071011A7561FD0053D654 /* zgsitrf.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = zgsitrf.c.bak; path = ../../numerics/SuperLU_4.1/SRC/zgsitrf.c.bak; sourceTree = "<group>"; };
-		F25071021A7561FD0053D654 /* zgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsrfs.c; path = ../../numerics/SuperLU_4.1/SRC/zgsrfs.c; sourceTree = "<group>"; };
-		F25071031A7561FD0053D654 /* zgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgssv.c; path = ../../numerics/SuperLU_4.1/SRC/zgssv.c; sourceTree = "<group>"; };
-		F25071041A7561FD0053D654 /* zgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgssvx.c; path = ../../numerics/SuperLU_4.1/SRC/zgssvx.c; sourceTree = "<group>"; };
-		F25071051A7561FD0053D654 /* zgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgstrf.c; path = ../../numerics/SuperLU_4.1/SRC/zgstrf.c; sourceTree = "<group>"; };
-		F25071061A7561FD0053D654 /* zgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgstrs.c; path = ../../numerics/SuperLU_4.1/SRC/zgstrs.c; sourceTree = "<group>"; };
-		F25071071A7561FD0053D654 /* zlacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlacon.c; path = ../../numerics/SuperLU_4.1/SRC/zlacon.c; sourceTree = "<group>"; };
-		F25071081A7561FD0053D654 /* zlacon.c.bak */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = zlacon.c.bak; path = ../../numerics/SuperLU_4.1/SRC/zlacon.c.bak; sourceTree = "<group>"; };
-		F25071091A7561FD0053D654 /* zlangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlangs.c; path = ../../numerics/SuperLU_4.1/SRC/zlangs.c; sourceTree = "<group>"; };
-		F250710A1A7561FD0053D654 /* zlaqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlaqgs.c; path = ../../numerics/SuperLU_4.1/SRC/zlaqgs.c; sourceTree = "<group>"; };
-		F250710B1A7561FD0053D654 /* zldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zldperm.c; path = ../../numerics/SuperLU_4.1/SRC/zldperm.c; sourceTree = "<group>"; };
-		F250710C1A7561FD0053D654 /* zmemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zmemory.c; path = ../../numerics/SuperLU_4.1/SRC/zmemory.c; sourceTree = "<group>"; };
-		F250710D1A7561FD0053D654 /* zmyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zmyblas2.c; path = ../../numerics/SuperLU_4.1/SRC/zmyblas2.c; sourceTree = "<group>"; };
-		F250710E1A7561FD0053D654 /* zpanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpanel_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/zpanel_bmod.c; sourceTree = "<group>"; };
-		F250710F1A7561FD0053D654 /* zpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpanel_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/zpanel_dfs.c; sourceTree = "<group>"; };
-		F25071101A7561FD0053D654 /* zpivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpivotgrowth.c; path = ../../numerics/SuperLU_4.1/SRC/zpivotgrowth.c; sourceTree = "<group>"; };
-		F25071111A7561FD0053D654 /* zpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpivotL.c; path = ../../numerics/SuperLU_4.1/SRC/zpivotL.c; sourceTree = "<group>"; };
-		F25071121A7561FD0053D654 /* zpruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpruneL.c; path = ../../numerics/SuperLU_4.1/SRC/zpruneL.c; sourceTree = "<group>"; };
-		F25071131A7561FD0053D654 /* zreadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zreadhb.c; path = ../../numerics/SuperLU_4.1/SRC/zreadhb.c; sourceTree = "<group>"; };
-		F25071141A7561FD0053D654 /* zreadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zreadrb.c; path = ../../numerics/SuperLU_4.1/SRC/zreadrb.c; sourceTree = "<group>"; };
-		F25071151A7561FD0053D654 /* zreadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zreadtriple.c; path = ../../numerics/SuperLU_4.1/SRC/zreadtriple.c; sourceTree = "<group>"; };
-		F25071161A7561FD0053D654 /* zsnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsnode_bmod.c; path = ../../numerics/SuperLU_4.1/SRC/zsnode_bmod.c; sourceTree = "<group>"; };
-		F25071171A7561FD0053D654 /* zsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsnode_dfs.c; path = ../../numerics/SuperLU_4.1/SRC/zsnode_dfs.c; sourceTree = "<group>"; };
-		F25071181A7561FD0053D654 /* zsp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsp_blas2.c; path = ../../numerics/SuperLU_4.1/SRC/zsp_blas2.c; sourceTree = "<group>"; };
-		F25071191A7561FD0053D654 /* zsp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsp_blas3.c; path = ../../numerics/SuperLU_4.1/SRC/zsp_blas3.c; sourceTree = "<group>"; };
-		F250711A1A7561FD0053D654 /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zutil.c; path = ../../numerics/SuperLU_4.1/SRC/zutil.c; sourceTree = "<group>"; };
-		F25071DD1A75632A0053D654 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
+		F250704A1A7561FD0053D654 /* ccolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ccolumn_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/ccolumn_bmod.c; sourceTree = "<group>"; };
+		F250704B1A7561FD0053D654 /* ccolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ccolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ccolumn_dfs.c; sourceTree = "<group>"; };
+		F250704C1A7561FD0053D654 /* ccopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ccopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/ccopy_to_ucol.c; sourceTree = "<group>"; };
+		F250704D1A7561FD0053D654 /* cdiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cdiagonal.c; path = ../../numerics/SuperLU_5.0/SRC/cdiagonal.c; sourceTree = "<group>"; };
+		F250704E1A7561FD0053D654 /* cgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgscon.c; path = ../../numerics/SuperLU_5.0/SRC/cgscon.c; sourceTree = "<group>"; };
+		F250704F1A7561FD0053D654 /* cgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsequ.c; path = ../../numerics/SuperLU_5.0/SRC/cgsequ.c; sourceTree = "<group>"; };
+		F25070501A7561FD0053D654 /* cgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsisx.c; path = ../../numerics/SuperLU_5.0/SRC/cgsisx.c; sourceTree = "<group>"; };
+		F25070511A7561FD0053D654 /* cgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsitrf.c; path = ../../numerics/SuperLU_5.0/SRC/cgsitrf.c; sourceTree = "<group>"; };
+		F25070531A7561FD0053D654 /* cgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgsrfs.c; path = ../../numerics/SuperLU_5.0/SRC/cgsrfs.c; sourceTree = "<group>"; };
+		F25070541A7561FD0053D654 /* cgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgssv.c; path = ../../numerics/SuperLU_5.0/SRC/cgssv.c; sourceTree = "<group>"; };
+		F25070551A7561FD0053D654 /* cgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgssvx.c; path = ../../numerics/SuperLU_5.0/SRC/cgssvx.c; sourceTree = "<group>"; };
+		F25070571A7561FD0053D654 /* cgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgstrf.c; path = ../../numerics/SuperLU_5.0/SRC/cgstrf.c; sourceTree = "<group>"; };
+		F25070581A7561FD0053D654 /* cgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cgstrs.c; path = ../../numerics/SuperLU_5.0/SRC/cgstrs.c; sourceTree = "<group>"; };
+		F25070591A7561FD0053D654 /* clacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = clacon.c; path = ../../numerics/SuperLU_5.0/SRC/clacon.c; sourceTree = "<group>"; };
+		F250705B1A7561FD0053D654 /* clangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = clangs.c; path = ../../numerics/SuperLU_5.0/SRC/clangs.c; sourceTree = "<group>"; };
+		F250705C1A7561FD0053D654 /* claqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = claqgs.c; path = ../../numerics/SuperLU_5.0/SRC/claqgs.c; sourceTree = "<group>"; };
+		F250705D1A7561FD0053D654 /* cldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cldperm.c; path = ../../numerics/SuperLU_5.0/SRC/cldperm.c; sourceTree = "<group>"; };
+		F250705E1A7561FD0053D654 /* cmemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cmemory.c; path = ../../numerics/SuperLU_5.0/SRC/cmemory.c; sourceTree = "<group>"; };
+		F250705F1A7561FD0053D654 /* cmyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cmyblas2.c; path = ../../numerics/SuperLU_5.0/SRC/cmyblas2.c; sourceTree = "<group>"; };
+		F25070601A7561FD0053D654 /* colamd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = colamd.c; path = ../../numerics/SuperLU_5.0/SRC/colamd.c; sourceTree = "<group>"; };
+		F25070611A7561FD0053D654 /* colamd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = colamd.h; path = ../../numerics/SuperLU_5.0/SRC/colamd.h; sourceTree = "<group>"; };
+		F25070621A7561FD0053D654 /* cpanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpanel_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/cpanel_bmod.c; sourceTree = "<group>"; };
+		F25070631A7561FD0053D654 /* cpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/cpanel_dfs.c; sourceTree = "<group>"; };
+		F25070641A7561FD0053D654 /* cpivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpivotgrowth.c; path = ../../numerics/SuperLU_5.0/SRC/cpivotgrowth.c; sourceTree = "<group>"; };
+		F25070651A7561FD0053D654 /* cpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpivotL.c; path = ../../numerics/SuperLU_5.0/SRC/cpivotL.c; sourceTree = "<group>"; };
+		F25070661A7561FD0053D654 /* cpruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpruneL.c; path = ../../numerics/SuperLU_5.0/SRC/cpruneL.c; sourceTree = "<group>"; };
+		F25070671A7561FD0053D654 /* creadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = creadhb.c; path = ../../numerics/SuperLU_5.0/SRC/creadhb.c; sourceTree = "<group>"; };
+		F25070681A7561FD0053D654 /* creadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = creadrb.c; path = ../../numerics/SuperLU_5.0/SRC/creadrb.c; sourceTree = "<group>"; };
+		F25070691A7561FD0053D654 /* creadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = creadtriple.c; path = ../../numerics/SuperLU_5.0/SRC/creadtriple.c; sourceTree = "<group>"; };
+		F250706A1A7561FD0053D654 /* csnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csnode_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/csnode_bmod.c; sourceTree = "<group>"; };
+		F250706B1A7561FD0053D654 /* csnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/csnode_dfs.c; sourceTree = "<group>"; };
+		F250706C1A7561FD0053D654 /* csp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csp_blas2.c; path = ../../numerics/SuperLU_5.0/SRC/csp_blas2.c; sourceTree = "<group>"; };
+		F250706D1A7561FD0053D654 /* csp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csp_blas3.c; path = ../../numerics/SuperLU_5.0/SRC/csp_blas3.c; sourceTree = "<group>"; };
+		F250706E1A7561FD0053D654 /* cutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cutil.c; path = ../../numerics/SuperLU_5.0/SRC/cutil.c; sourceTree = "<group>"; };
+		F250706F1A7561FD0053D654 /* dcolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcolumn_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/dcolumn_bmod.c; sourceTree = "<group>"; };
+		F25070701A7561FD0053D654 /* dcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/dcolumn_dfs.c; sourceTree = "<group>"; };
+		F25070711A7561FD0053D654 /* dcomplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcomplex.c; path = ../../numerics/SuperLU_5.0/SRC/dcomplex.c; sourceTree = "<group>"; };
+		F25070721A7561FD0053D654 /* dcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dcopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/dcopy_to_ucol.c; sourceTree = "<group>"; };
+		F25070731A7561FD0053D654 /* ddiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ddiagonal.c; path = ../../numerics/SuperLU_5.0/SRC/ddiagonal.c; sourceTree = "<group>"; };
+		F25070741A7561FD0053D654 /* dgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgscon.c; path = ../../numerics/SuperLU_5.0/SRC/dgscon.c; sourceTree = "<group>"; };
+		F25070751A7561FD0053D654 /* dgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsequ.c; path = ../../numerics/SuperLU_5.0/SRC/dgsequ.c; sourceTree = "<group>"; };
+		F25070761A7561FD0053D654 /* dgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsisx.c; path = ../../numerics/SuperLU_5.0/SRC/dgsisx.c; sourceTree = "<group>"; };
+		F25070771A7561FD0053D654 /* dgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsitrf.c; path = ../../numerics/SuperLU_5.0/SRC/dgsitrf.c; sourceTree = "<group>"; };
+		F25070791A7561FD0053D654 /* dgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgsrfs.c; path = ../../numerics/SuperLU_5.0/SRC/dgsrfs.c; sourceTree = "<group>"; };
+		F250707A1A7561FD0053D654 /* dgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgssv.c; path = ../../numerics/SuperLU_5.0/SRC/dgssv.c; sourceTree = "<group>"; };
+		F250707B1A7561FD0053D654 /* dgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgssvx.c; path = ../../numerics/SuperLU_5.0/SRC/dgssvx.c; sourceTree = "<group>"; };
+		F250707C1A7561FD0053D654 /* dgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgstrf.c; path = ../../numerics/SuperLU_5.0/SRC/dgstrf.c; sourceTree = "<group>"; };
+		F250707D1A7561FD0053D654 /* dgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dgstrs.c; path = ../../numerics/SuperLU_5.0/SRC/dgstrs.c; sourceTree = "<group>"; };
+		F250707E1A7561FD0053D654 /* dlacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlacon.c; path = ../../numerics/SuperLU_5.0/SRC/dlacon.c; sourceTree = "<group>"; };
+		F25070801A7561FD0053D654 /* dlamch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlamch.c; path = ../../numerics/SuperLU_5.0/SRC/dlamch.c; sourceTree = "<group>"; };
+		F25070811A7561FD0053D654 /* dlangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlangs.c; path = ../../numerics/SuperLU_5.0/SRC/dlangs.c; sourceTree = "<group>"; };
+		F25070821A7561FD0053D654 /* dlaqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlaqgs.c; path = ../../numerics/SuperLU_5.0/SRC/dlaqgs.c; sourceTree = "<group>"; };
+		F25070831A7561FD0053D654 /* dldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dldperm.c; path = ../../numerics/SuperLU_5.0/SRC/dldperm.c; sourceTree = "<group>"; };
+		F25070841A7561FD0053D654 /* dmemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dmemory.c; path = ../../numerics/SuperLU_5.0/SRC/dmemory.c; sourceTree = "<group>"; };
+		F25070851A7561FD0053D654 /* dmyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dmyblas2.c; path = ../../numerics/SuperLU_5.0/SRC/dmyblas2.c; sourceTree = "<group>"; };
+		F25070861A7561FD0053D654 /* dpanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpanel_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/dpanel_bmod.c; sourceTree = "<group>"; };
+		F25070871A7561FD0053D654 /* dpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/dpanel_dfs.c; sourceTree = "<group>"; };
+		F25070881A7561FD0053D654 /* dpivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpivotgrowth.c; path = ../../numerics/SuperLU_5.0/SRC/dpivotgrowth.c; sourceTree = "<group>"; };
+		F25070891A7561FD0053D654 /* dpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpivotL.c; path = ../../numerics/SuperLU_5.0/SRC/dpivotL.c; sourceTree = "<group>"; };
+		F250708A1A7561FD0053D654 /* dpruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dpruneL.c; path = ../../numerics/SuperLU_5.0/SRC/dpruneL.c; sourceTree = "<group>"; };
+		F250708B1A7561FD0053D654 /* dreadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dreadhb.c; path = ../../numerics/SuperLU_5.0/SRC/dreadhb.c; sourceTree = "<group>"; };
+		F250708C1A7561FD0053D654 /* dreadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dreadrb.c; path = ../../numerics/SuperLU_5.0/SRC/dreadrb.c; sourceTree = "<group>"; };
+		F250708D1A7561FD0053D654 /* dreadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dreadtriple.c; path = ../../numerics/SuperLU_5.0/SRC/dreadtriple.c; sourceTree = "<group>"; };
+		F250708E1A7561FD0053D654 /* dsnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsnode_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/dsnode_bmod.c; sourceTree = "<group>"; };
+		F250708F1A7561FD0053D654 /* dsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/dsnode_dfs.c; sourceTree = "<group>"; };
+		F25070901A7561FD0053D654 /* dsp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsp_blas2.c; path = ../../numerics/SuperLU_5.0/SRC/dsp_blas2.c; sourceTree = "<group>"; };
+		F25070911A7561FD0053D654 /* dsp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dsp_blas3.c; path = ../../numerics/SuperLU_5.0/SRC/dsp_blas3.c; sourceTree = "<group>"; };
+		F25070921A7561FD0053D654 /* dutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dutil.c; path = ../../numerics/SuperLU_5.0/SRC/dutil.c; sourceTree = "<group>"; };
+		F25070931A7561FD0053D654 /* dzsum1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dzsum1.c; path = ../../numerics/SuperLU_5.0/SRC/dzsum1.c; sourceTree = "<group>"; };
+		F25070951A7561FD0053D654 /* get_perm_c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = get_perm_c.c; path = ../../numerics/SuperLU_5.0/SRC/get_perm_c.c; sourceTree = "<group>"; };
+		F25070961A7561FD0053D654 /* heap_relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = heap_relax_snode.c; path = ../../numerics/SuperLU_5.0/SRC/heap_relax_snode.c; sourceTree = "<group>"; };
+		F25070971A7561FD0053D654 /* html_mainpage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = html_mainpage.h; path = ../../numerics/SuperLU_5.0/SRC/html_mainpage.h; sourceTree = "<group>"; };
+		F25070981A7561FD0053D654 /* icmax1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = icmax1.c; path = ../../numerics/SuperLU_5.0/SRC/icmax1.c; sourceTree = "<group>"; };
+		F25070991A7561FD0053D654 /* ilu_ccolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ccolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_ccolumn_dfs.c; sourceTree = "<group>"; };
+		F250709A1A7561FD0053D654 /* ilu_ccopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ccopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_ccopy_to_ucol.c; sourceTree = "<group>"; };
+		F250709C1A7561FD0053D654 /* ilu_cdrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_cdrop_row.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_cdrop_row.c; sourceTree = "<group>"; };
+		F250709D1A7561FD0053D654 /* ilu_cpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_cpanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_cpanel_dfs.c; sourceTree = "<group>"; };
+		F250709E1A7561FD0053D654 /* ilu_cpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_cpivotL.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_cpivotL.c; sourceTree = "<group>"; };
+		F250709F1A7561FD0053D654 /* ilu_csnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_csnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_csnode_dfs.c; sourceTree = "<group>"; };
+		F25070A01A7561FD0053D654 /* ilu_dcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dcolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_dcolumn_dfs.c; sourceTree = "<group>"; };
+		F25070A11A7561FD0053D654 /* ilu_dcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dcopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_dcopy_to_ucol.c; sourceTree = "<group>"; };
+		F25070A31A7561FD0053D654 /* ilu_ddrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ddrop_row.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_ddrop_row.c; sourceTree = "<group>"; };
+		F25070A51A7561FD0053D654 /* ilu_dpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dpanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_dpanel_dfs.c; sourceTree = "<group>"; };
+		F25070A61A7561FD0053D654 /* ilu_dpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dpivotL.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_dpivotL.c; sourceTree = "<group>"; };
+		F25070A71A7561FD0053D654 /* ilu_dsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_dsnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_dsnode_dfs.c; sourceTree = "<group>"; };
+		F25070A81A7561FD0053D654 /* ilu_heap_relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_heap_relax_snode.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_heap_relax_snode.c; sourceTree = "<group>"; };
+		F25070A91A7561FD0053D654 /* ilu_relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_relax_snode.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_relax_snode.c; sourceTree = "<group>"; };
+		F25070AA1A7561FD0053D654 /* ilu_scolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_scolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_scolumn_dfs.c; sourceTree = "<group>"; };
+		F25070AB1A7561FD0053D654 /* ilu_scopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_scopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_scopy_to_ucol.c; sourceTree = "<group>"; };
+		F25070AD1A7561FD0053D654 /* ilu_sdrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_sdrop_row.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_sdrop_row.c; sourceTree = "<group>"; };
+		F25070AE1A7561FD0053D654 /* ilu_spanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_spanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_spanel_dfs.c; sourceTree = "<group>"; };
+		F25070AF1A7561FD0053D654 /* ilu_spivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_spivotL.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_spivotL.c; sourceTree = "<group>"; };
+		F25070B01A7561FD0053D654 /* ilu_ssnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_ssnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_ssnode_dfs.c; sourceTree = "<group>"; };
+		F25070B11A7561FD0053D654 /* ilu_zcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zcolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_zcolumn_dfs.c; sourceTree = "<group>"; };
+		F25070B21A7561FD0053D654 /* ilu_zcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zcopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_zcopy_to_ucol.c; sourceTree = "<group>"; };
+		F25070B41A7561FD0053D654 /* ilu_zdrop_row.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zdrop_row.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_zdrop_row.c; sourceTree = "<group>"; };
+		F25070B51A7561FD0053D654 /* ilu_zpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zpanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_zpanel_dfs.c; sourceTree = "<group>"; };
+		F25070B61A7561FD0053D654 /* ilu_zpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zpivotL.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_zpivotL.c; sourceTree = "<group>"; };
+		F25070B71A7561FD0053D654 /* ilu_zsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ilu_zsnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ilu_zsnode_dfs.c; sourceTree = "<group>"; };
+		F25070B81A7561FD0053D654 /* izmax1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = izmax1.c; path = ../../numerics/SuperLU_5.0/SRC/izmax1.c; sourceTree = "<group>"; };
+		F25070B91A7561FD0053D654 /* lsame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lsame.c; path = ../../numerics/SuperLU_5.0/SRC/lsame.c; sourceTree = "<group>"; };
+		F25070BA1A7561FD0053D654 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../numerics/SuperLU_5.0/SRC/Makefile; sourceTree = "<group>"; };
+		F25070BB1A7561FD0053D654 /* mark_relax.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mark_relax.c; path = ../../numerics/SuperLU_5.0/SRC/mark_relax.c; sourceTree = "<group>"; };
+		F25070BE1A7561FD0053D654 /* mc64ad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mc64ad.c; path = ../../numerics/SuperLU_5.0/SRC/mc64ad.c; sourceTree = "<group>"; };
+		F25070C01A7561FD0053D654 /* memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = memory.c; path = ../../numerics/SuperLU_5.0/SRC/memory.c; sourceTree = "<group>"; };
+		F25070C11A7561FD0053D654 /* mmd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mmd.c; path = ../../numerics/SuperLU_5.0/SRC/mmd.c; sourceTree = "<group>"; };
+		F25070C21A7561FD0053D654 /* qselect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = qselect.c; path = ../../numerics/SuperLU_5.0/SRC/qselect.c; sourceTree = "<group>"; };
+		F25070C31A7561FD0053D654 /* relax_snode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = relax_snode.c; path = ../../numerics/SuperLU_5.0/SRC/relax_snode.c; sourceTree = "<group>"; };
+		F25070C41A7561FD0053D654 /* scolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scolumn_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/scolumn_bmod.c; sourceTree = "<group>"; };
+		F25070C51A7561FD0053D654 /* scolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/scolumn_dfs.c; sourceTree = "<group>"; };
+		F25070C61A7561FD0053D654 /* scomplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scomplex.c; path = ../../numerics/SuperLU_5.0/SRC/scomplex.c; sourceTree = "<group>"; };
+		F25070C71A7561FD0053D654 /* scopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/scopy_to_ucol.c; sourceTree = "<group>"; };
+		F25070C81A7561FD0053D654 /* scsum1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scsum1.c; path = ../../numerics/SuperLU_5.0/SRC/scsum1.c; sourceTree = "<group>"; };
+		F25070C91A7561FD0053D654 /* sdiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sdiagonal.c; path = ../../numerics/SuperLU_5.0/SRC/sdiagonal.c; sourceTree = "<group>"; };
+		F25070CA1A7561FD0053D654 /* sgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgscon.c; path = ../../numerics/SuperLU_5.0/SRC/sgscon.c; sourceTree = "<group>"; };
+		F25070CB1A7561FD0053D654 /* sgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsequ.c; path = ../../numerics/SuperLU_5.0/SRC/sgsequ.c; sourceTree = "<group>"; };
+		F25070CC1A7561FD0053D654 /* sgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsisx.c; path = ../../numerics/SuperLU_5.0/SRC/sgsisx.c; sourceTree = "<group>"; };
+		F25070CD1A7561FD0053D654 /* sgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsitrf.c; path = ../../numerics/SuperLU_5.0/SRC/sgsitrf.c; sourceTree = "<group>"; };
+		F25070CF1A7561FD0053D654 /* sgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgsrfs.c; path = ../../numerics/SuperLU_5.0/SRC/sgsrfs.c; sourceTree = "<group>"; };
+		F25070D01A7561FD0053D654 /* sgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgssv.c; path = ../../numerics/SuperLU_5.0/SRC/sgssv.c; sourceTree = "<group>"; };
+		F25070D11A7561FD0053D654 /* sgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgssvx.c; path = ../../numerics/SuperLU_5.0/SRC/sgssvx.c; sourceTree = "<group>"; };
+		F25070D21A7561FD0053D654 /* sgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgstrf.c; path = ../../numerics/SuperLU_5.0/SRC/sgstrf.c; sourceTree = "<group>"; };
+		F25070D31A7561FD0053D654 /* sgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sgstrs.c; path = ../../numerics/SuperLU_5.0/SRC/sgstrs.c; sourceTree = "<group>"; };
+		F25070D41A7561FD0053D654 /* slacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slacon.c; path = ../../numerics/SuperLU_5.0/SRC/slacon.c; sourceTree = "<group>"; };
+		F25070D51A7561FD0053D654 /* slamch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slamch.c; path = ../../numerics/SuperLU_5.0/SRC/slamch.c; sourceTree = "<group>"; };
+		F25070D61A7561FD0053D654 /* slangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slangs.c; path = ../../numerics/SuperLU_5.0/SRC/slangs.c; sourceTree = "<group>"; };
+		F25070D71A7561FD0053D654 /* slaqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = slaqgs.c; path = ../../numerics/SuperLU_5.0/SRC/slaqgs.c; sourceTree = "<group>"; };
+		F25070D81A7561FD0053D654 /* sldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sldperm.c; path = ../../numerics/SuperLU_5.0/SRC/sldperm.c; sourceTree = "<group>"; };
+		F25070D91A7561FD0053D654 /* slu_cdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_cdefs.h; path = ../../numerics/SuperLU_5.0/SRC/slu_cdefs.h; sourceTree = "<group>"; };
+		F25070DA1A7561FD0053D654 /* slu_Cnames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_Cnames.h; path = ../../numerics/SuperLU_5.0/SRC/slu_Cnames.h; sourceTree = "<group>"; };
+		F25070DB1A7561FD0053D654 /* slu_dcomplex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_dcomplex.h; path = ../../numerics/SuperLU_5.0/SRC/slu_dcomplex.h; sourceTree = "<group>"; };
+		F25070DC1A7561FD0053D654 /* slu_ddefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_ddefs.h; path = ../../numerics/SuperLU_5.0/SRC/slu_ddefs.h; sourceTree = "<group>"; };
+		F25070DD1A7561FD0053D654 /* slu_scomplex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_scomplex.h; path = ../../numerics/SuperLU_5.0/SRC/slu_scomplex.h; sourceTree = "<group>"; };
+		F25070DE1A7561FD0053D654 /* slu_sdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_sdefs.h; path = ../../numerics/SuperLU_5.0/SRC/slu_sdefs.h; sourceTree = "<group>"; };
+		F25070DF1A7561FD0053D654 /* slu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_util.h; path = ../../numerics/SuperLU_5.0/SRC/slu_util.h; sourceTree = "<group>"; };
+		F25070E01A7561FD0053D654 /* slu_zdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slu_zdefs.h; path = ../../numerics/SuperLU_5.0/SRC/slu_zdefs.h; sourceTree = "<group>"; };
+		F25070E11A7561FD0053D654 /* smemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smemory.c; path = ../../numerics/SuperLU_5.0/SRC/smemory.c; sourceTree = "<group>"; };
+		F25070E21A7561FD0053D654 /* smyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smyblas2.c; path = ../../numerics/SuperLU_5.0/SRC/smyblas2.c; sourceTree = "<group>"; };
+		F25070E31A7561FD0053D654 /* sp_coletree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp_coletree.c; path = ../../numerics/SuperLU_5.0/SRC/sp_coletree.c; sourceTree = "<group>"; };
+		F25070E41A7561FD0053D654 /* sp_ienv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp_ienv.c; path = ../../numerics/SuperLU_5.0/SRC/sp_ienv.c; sourceTree = "<group>"; };
+		F25070E51A7561FD0053D654 /* sp_preorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sp_preorder.c; path = ../../numerics/SuperLU_5.0/SRC/sp_preorder.c; sourceTree = "<group>"; };
+		F25070E61A7561FD0053D654 /* spanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spanel_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/spanel_bmod.c; sourceTree = "<group>"; };
+		F25070E71A7561FD0053D654 /* spanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/spanel_dfs.c; sourceTree = "<group>"; };
+		F25070E81A7561FD0053D654 /* spivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spivotgrowth.c; path = ../../numerics/SuperLU_5.0/SRC/spivotgrowth.c; sourceTree = "<group>"; };
+		F25070E91A7561FD0053D654 /* spivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spivotL.c; path = ../../numerics/SuperLU_5.0/SRC/spivotL.c; sourceTree = "<group>"; };
+		F25070EA1A7561FD0053D654 /* spruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spruneL.c; path = ../../numerics/SuperLU_5.0/SRC/spruneL.c; sourceTree = "<group>"; };
+		F25070EB1A7561FD0053D654 /* sreadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sreadhb.c; path = ../../numerics/SuperLU_5.0/SRC/sreadhb.c; sourceTree = "<group>"; };
+		F25070EC1A7561FD0053D654 /* sreadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sreadrb.c; path = ../../numerics/SuperLU_5.0/SRC/sreadrb.c; sourceTree = "<group>"; };
+		F25070ED1A7561FD0053D654 /* sreadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sreadtriple.c; path = ../../numerics/SuperLU_5.0/SRC/sreadtriple.c; sourceTree = "<group>"; };
+		F25070EE1A7561FD0053D654 /* ssnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssnode_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/ssnode_bmod.c; sourceTree = "<group>"; };
+		F25070EF1A7561FD0053D654 /* ssnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/ssnode_dfs.c; sourceTree = "<group>"; };
+		F25070F01A7561FD0053D654 /* ssp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssp_blas2.c; path = ../../numerics/SuperLU_5.0/SRC/ssp_blas2.c; sourceTree = "<group>"; };
+		F25070F11A7561FD0053D654 /* ssp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ssp_blas3.c; path = ../../numerics/SuperLU_5.0/SRC/ssp_blas3.c; sourceTree = "<group>"; };
+		F25070F21A7561FD0053D654 /* superlu_enum_consts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = superlu_enum_consts.h; path = ../../numerics/SuperLU_5.0/SRC/superlu_enum_consts.h; sourceTree = "<group>"; };
+		F25070F31A7561FD0053D654 /* superlu_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = superlu_timer.c; path = ../../numerics/SuperLU_5.0/SRC/superlu_timer.c; sourceTree = "<group>"; };
+		F25070F41A7561FD0053D654 /* supermatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = supermatrix.h; path = ../../numerics/SuperLU_5.0/SRC/supermatrix.h; sourceTree = "<group>"; };
+		F25070F51A7561FD0053D654 /* sutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sutil.c; path = ../../numerics/SuperLU_5.0/SRC/sutil.c; sourceTree = "<group>"; };
+		F25070F61A7561FD0053D654 /* temp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = temp; path = ../../numerics/SuperLU_5.0/SRC/temp; sourceTree = "<group>"; };
+		F25070F71A7561FD0053D654 /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../../numerics/SuperLU_5.0/SRC/util.c; sourceTree = "<group>"; };
+		F25070F81A7561FD0053D654 /* xerbla.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xerbla.c; path = ../../numerics/SuperLU_5.0/SRC/xerbla.c; sourceTree = "<group>"; };
+		F25070F91A7561FD0053D654 /* zcolumn_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zcolumn_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/zcolumn_bmod.c; sourceTree = "<group>"; };
+		F25070FA1A7561FD0053D654 /* zcolumn_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zcolumn_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/zcolumn_dfs.c; sourceTree = "<group>"; };
+		F25070FB1A7561FD0053D654 /* zcopy_to_ucol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zcopy_to_ucol.c; path = ../../numerics/SuperLU_5.0/SRC/zcopy_to_ucol.c; sourceTree = "<group>"; };
+		F25070FC1A7561FD0053D654 /* zdiagonal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zdiagonal.c; path = ../../numerics/SuperLU_5.0/SRC/zdiagonal.c; sourceTree = "<group>"; };
+		F25070FD1A7561FD0053D654 /* zgscon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgscon.c; path = ../../numerics/SuperLU_5.0/SRC/zgscon.c; sourceTree = "<group>"; };
+		F25070FE1A7561FD0053D654 /* zgsequ.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsequ.c; path = ../../numerics/SuperLU_5.0/SRC/zgsequ.c; sourceTree = "<group>"; };
+		F25070FF1A7561FD0053D654 /* zgsisx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsisx.c; path = ../../numerics/SuperLU_5.0/SRC/zgsisx.c; sourceTree = "<group>"; };
+		F25071001A7561FD0053D654 /* zgsitrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsitrf.c; path = ../../numerics/SuperLU_5.0/SRC/zgsitrf.c; sourceTree = "<group>"; };
+		F25071021A7561FD0053D654 /* zgsrfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgsrfs.c; path = ../../numerics/SuperLU_5.0/SRC/zgsrfs.c; sourceTree = "<group>"; };
+		F25071031A7561FD0053D654 /* zgssv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgssv.c; path = ../../numerics/SuperLU_5.0/SRC/zgssv.c; sourceTree = "<group>"; };
+		F25071041A7561FD0053D654 /* zgssvx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgssvx.c; path = ../../numerics/SuperLU_5.0/SRC/zgssvx.c; sourceTree = "<group>"; };
+		F25071051A7561FD0053D654 /* zgstrf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgstrf.c; path = ../../numerics/SuperLU_5.0/SRC/zgstrf.c; sourceTree = "<group>"; };
+		F25071061A7561FD0053D654 /* zgstrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zgstrs.c; path = ../../numerics/SuperLU_5.0/SRC/zgstrs.c; sourceTree = "<group>"; };
+		F25071071A7561FD0053D654 /* zlacon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlacon.c; path = ../../numerics/SuperLU_5.0/SRC/zlacon.c; sourceTree = "<group>"; };
+		F25071091A7561FD0053D654 /* zlangs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlangs.c; path = ../../numerics/SuperLU_5.0/SRC/zlangs.c; sourceTree = "<group>"; };
+		F250710A1A7561FD0053D654 /* zlaqgs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlaqgs.c; path = ../../numerics/SuperLU_5.0/SRC/zlaqgs.c; sourceTree = "<group>"; };
+		F250710B1A7561FD0053D654 /* zldperm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zldperm.c; path = ../../numerics/SuperLU_5.0/SRC/zldperm.c; sourceTree = "<group>"; };
+		F250710C1A7561FD0053D654 /* zmemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zmemory.c; path = ../../numerics/SuperLU_5.0/SRC/zmemory.c; sourceTree = "<group>"; };
+		F250710D1A7561FD0053D654 /* zmyblas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zmyblas2.c; path = ../../numerics/SuperLU_5.0/SRC/zmyblas2.c; sourceTree = "<group>"; };
+		F250710E1A7561FD0053D654 /* zpanel_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpanel_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/zpanel_bmod.c; sourceTree = "<group>"; };
+		F250710F1A7561FD0053D654 /* zpanel_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpanel_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/zpanel_dfs.c; sourceTree = "<group>"; };
+		F25071101A7561FD0053D654 /* zpivotgrowth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpivotgrowth.c; path = ../../numerics/SuperLU_5.0/SRC/zpivotgrowth.c; sourceTree = "<group>"; };
+		F25071111A7561FD0053D654 /* zpivotL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpivotL.c; path = ../../numerics/SuperLU_5.0/SRC/zpivotL.c; sourceTree = "<group>"; };
+		F25071121A7561FD0053D654 /* zpruneL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zpruneL.c; path = ../../numerics/SuperLU_5.0/SRC/zpruneL.c; sourceTree = "<group>"; };
+		F25071131A7561FD0053D654 /* zreadhb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zreadhb.c; path = ../../numerics/SuperLU_5.0/SRC/zreadhb.c; sourceTree = "<group>"; };
+		F25071141A7561FD0053D654 /* zreadrb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zreadrb.c; path = ../../numerics/SuperLU_5.0/SRC/zreadrb.c; sourceTree = "<group>"; };
+		F25071151A7561FD0053D654 /* zreadtriple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zreadtriple.c; path = ../../numerics/SuperLU_5.0/SRC/zreadtriple.c; sourceTree = "<group>"; };
+		F25071161A7561FD0053D654 /* zsnode_bmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsnode_bmod.c; path = ../../numerics/SuperLU_5.0/SRC/zsnode_bmod.c; sourceTree = "<group>"; };
+		F25071171A7561FD0053D654 /* zsnode_dfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsnode_dfs.c; path = ../../numerics/SuperLU_5.0/SRC/zsnode_dfs.c; sourceTree = "<group>"; };
+		F25071181A7561FD0053D654 /* zsp_blas2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsp_blas2.c; path = ../../numerics/SuperLU_5.0/SRC/zsp_blas2.c; sourceTree = "<group>"; };
+		F25071191A7561FD0053D654 /* zsp_blas3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zsp_blas3.c; path = ../../numerics/SuperLU_5.0/SRC/zsp_blas3.c; sourceTree = "<group>"; };
+		F250711A1A7561FD0053D654 /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zutil.c; path = ../../numerics/SuperLU_5.0/SRC/zutil.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -437,7 +435,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F25071DE1A75632A0053D654 /* Accelerate.framework in Frameworks */,
+				F24F6BC81BE8D2E90086A329 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,7 +445,16 @@
 		F250703A1A75618A0053D654 = {
 			isa = PBXGroup;
 			children = (
-				F25071DD1A75632A0053D654 /* Accelerate.framework */,
+				F24F6BCF1BE8D5940086A329 /* ztrsv.c */,
+				F24F6BCD1BE8D5620086A329 /* dtrsv.c */,
+				F24F6BCB1BE8D47C0086A329 /* smach.c */,
+				F24F6BC91BE8D4590086A329 /* dmach.c */,
+				F24F6BC71BE8D2E90086A329 /* Accelerate.framework */,
+				F24F6BC31BE8D0E00086A329 /* input_error.c */,
+				F24F6BC41BE8D0E00086A329 /* slacon2.c */,
+				F24F6BBD1BE8D0B20086A329 /* clacon2.c */,
+				F24F6BBE1BE8D0B20086A329 /* dlacon2.c */,
+				F24F6BBF1BE8D0B20086A329 /* zlacon2.c */,
 				F250704A1A7561FD0053D654 /* ccolumn_bmod.c */,
 				F250704B1A7561FD0053D654 /* ccolumn_dfs.c */,
 				F250704C1A7561FD0053D654 /* ccopy_to_ucol.c */,
@@ -456,15 +463,12 @@
 				F250704F1A7561FD0053D654 /* cgsequ.c */,
 				F25070501A7561FD0053D654 /* cgsisx.c */,
 				F25070511A7561FD0053D654 /* cgsitrf.c */,
-				F25070521A7561FD0053D654 /* cgsitrf.c.bak */,
 				F25070531A7561FD0053D654 /* cgsrfs.c */,
 				F25070541A7561FD0053D654 /* cgssv.c */,
 				F25070551A7561FD0053D654 /* cgssvx.c */,
-				F25070561A7561FD0053D654 /* cgssvx.c.bak */,
 				F25070571A7561FD0053D654 /* cgstrf.c */,
 				F25070581A7561FD0053D654 /* cgstrs.c */,
 				F25070591A7561FD0053D654 /* clacon.c */,
-				F250705A1A7561FD0053D654 /* clacon.c.bak */,
 				F250705B1A7561FD0053D654 /* clangs.c */,
 				F250705C1A7561FD0053D654 /* claqgs.c */,
 				F250705D1A7561FD0053D654 /* cldperm.c */,
@@ -494,14 +498,12 @@
 				F25070751A7561FD0053D654 /* dgsequ.c */,
 				F25070761A7561FD0053D654 /* dgsisx.c */,
 				F25070771A7561FD0053D654 /* dgsitrf.c */,
-				F25070781A7561FD0053D654 /* dgsitrf.c.bak */,
 				F25070791A7561FD0053D654 /* dgsrfs.c */,
 				F250707A1A7561FD0053D654 /* dgssv.c */,
 				F250707B1A7561FD0053D654 /* dgssvx.c */,
 				F250707C1A7561FD0053D654 /* dgstrf.c */,
 				F250707D1A7561FD0053D654 /* dgstrs.c */,
 				F250707E1A7561FD0053D654 /* dlacon.c */,
-				F250707F1A7561FD0053D654 /* dlacon.c.bak */,
 				F25070801A7561FD0053D654 /* dlamch.c */,
 				F25070811A7561FD0053D654 /* dlangs.c */,
 				F25070821A7561FD0053D654 /* dlaqgs.c */,
@@ -522,23 +524,19 @@
 				F25070911A7561FD0053D654 /* dsp_blas3.c */,
 				F25070921A7561FD0053D654 /* dutil.c */,
 				F25070931A7561FD0053D654 /* dzsum1.c */,
-				F25070941A7561FD0053D654 /* f2c.h */,
 				F25070951A7561FD0053D654 /* get_perm_c.c */,
 				F25070961A7561FD0053D654 /* heap_relax_snode.c */,
 				F25070971A7561FD0053D654 /* html_mainpage.h */,
 				F25070981A7561FD0053D654 /* icmax1.c */,
 				F25070991A7561FD0053D654 /* ilu_ccolumn_dfs.c */,
 				F250709A1A7561FD0053D654 /* ilu_ccopy_to_ucol.c */,
-				F250709B1A7561FD0053D654 /* ilu_ccopy_to_ucol.c.bak */,
 				F250709C1A7561FD0053D654 /* ilu_cdrop_row.c */,
 				F250709D1A7561FD0053D654 /* ilu_cpanel_dfs.c */,
 				F250709E1A7561FD0053D654 /* ilu_cpivotL.c */,
 				F250709F1A7561FD0053D654 /* ilu_csnode_dfs.c */,
 				F25070A01A7561FD0053D654 /* ilu_dcolumn_dfs.c */,
 				F25070A11A7561FD0053D654 /* ilu_dcopy_to_ucol.c */,
-				F25070A21A7561FD0053D654 /* ilu_dcopy_to_ucol.c.bak */,
 				F25070A31A7561FD0053D654 /* ilu_ddrop_row.c */,
-				F25070A41A7561FD0053D654 /* ilu_ddrop_row.c.bak */,
 				F25070A51A7561FD0053D654 /* ilu_dpanel_dfs.c */,
 				F25070A61A7561FD0053D654 /* ilu_dpivotL.c */,
 				F25070A71A7561FD0053D654 /* ilu_dsnode_dfs.c */,
@@ -546,14 +544,12 @@
 				F25070A91A7561FD0053D654 /* ilu_relax_snode.c */,
 				F25070AA1A7561FD0053D654 /* ilu_scolumn_dfs.c */,
 				F25070AB1A7561FD0053D654 /* ilu_scopy_to_ucol.c */,
-				F25070AC1A7561FD0053D654 /* ilu_scopy_to_ucol.c.bak */,
 				F25070AD1A7561FD0053D654 /* ilu_sdrop_row.c */,
 				F25070AE1A7561FD0053D654 /* ilu_spanel_dfs.c */,
 				F25070AF1A7561FD0053D654 /* ilu_spivotL.c */,
 				F25070B01A7561FD0053D654 /* ilu_ssnode_dfs.c */,
 				F25070B11A7561FD0053D654 /* ilu_zcolumn_dfs.c */,
 				F25070B21A7561FD0053D654 /* ilu_zcopy_to_ucol.c */,
-				F25070B31A7561FD0053D654 /* ilu_zcopy_to_ucol.c.bak */,
 				F25070B41A7561FD0053D654 /* ilu_zdrop_row.c */,
 				F25070B51A7561FD0053D654 /* ilu_zpanel_dfs.c */,
 				F25070B61A7561FD0053D654 /* ilu_zpivotL.c */,
@@ -562,10 +558,7 @@
 				F25070B91A7561FD0053D654 /* lsame.c */,
 				F25070BA1A7561FD0053D654 /* Makefile */,
 				F25070BB1A7561FD0053D654 /* mark_relax.c */,
-				F25070BC1A7561FD0053D654 /* mc21_f2c.c */,
-				F25070BD1A7561FD0053D654 /* mc21.f */,
 				F25070BE1A7561FD0053D654 /* mc64ad.c */,
-				F25070BF1A7561FD0053D654 /* mc64ad.f.bak */,
 				F25070C01A7561FD0053D654 /* memory.c */,
 				F25070C11A7561FD0053D654 /* mmd.c */,
 				F25070C21A7561FD0053D654 /* qselect.c */,
@@ -580,7 +573,6 @@
 				F25070CB1A7561FD0053D654 /* sgsequ.c */,
 				F25070CC1A7561FD0053D654 /* sgsisx.c */,
 				F25070CD1A7561FD0053D654 /* sgsitrf.c */,
-				F25070CE1A7561FD0053D654 /* sgsitrf.c.bak */,
 				F25070CF1A7561FD0053D654 /* sgsrfs.c */,
 				F25070D01A7561FD0053D654 /* sgssv.c */,
 				F25070D11A7561FD0053D654 /* sgssvx.c */,
@@ -631,14 +623,12 @@
 				F25070FE1A7561FD0053D654 /* zgsequ.c */,
 				F25070FF1A7561FD0053D654 /* zgsisx.c */,
 				F25071001A7561FD0053D654 /* zgsitrf.c */,
-				F25071011A7561FD0053D654 /* zgsitrf.c.bak */,
 				F25071021A7561FD0053D654 /* zgsrfs.c */,
 				F25071031A7561FD0053D654 /* zgssv.c */,
 				F25071041A7561FD0053D654 /* zgssvx.c */,
 				F25071051A7561FD0053D654 /* zgstrf.c */,
 				F25071061A7561FD0053D654 /* zgstrs.c */,
 				F25071071A7561FD0053D654 /* zlacon.c */,
-				F25071081A7561FD0053D654 /* zlacon.c.bak */,
 				F25071091A7561FD0053D654 /* zlangs.c */,
 				F250710A1A7561FD0053D654 /* zlaqgs.c */,
 				F250710B1A7561FD0053D654 /* zldperm.c */,
@@ -678,7 +668,6 @@
 			files = (
 				F25071A11A7561FD0053D654 /* slu_ddefs.h in Headers */,
 				F25071A31A7561FD0053D654 /* slu_sdefs.h in Headers */,
-				F25071601A7561FD0053D654 /* f2c.h in Headers */,
 				F25071A21A7561FD0053D654 /* slu_scomplex.h in Headers */,
 				F250719F1A7561FD0053D654 /* slu_Cnames.h in Headers */,
 				F25071B91A7561FD0053D654 /* supermatrix.h in Headers */,
@@ -757,6 +746,7 @@
 				F25071981A7561FD0053D654 /* sgstrs.c in Sources */,
 				F25071CB1A7561FD0053D654 /* zlangs.c in Sources */,
 				F25071B21A7561FD0053D654 /* sreadtriple.c in Sources */,
+				F24F6BC11BE8D0B20086A329 /* dlacon2.c in Sources */,
 				F25071D41A7561FD0053D654 /* zpruneL.c in Sources */,
 				F25071691A7561FD0053D654 /* ilu_cpivotL.c in Sources */,
 				F25071651A7561FD0053D654 /* ilu_ccolumn_dfs.c in Sources */,
@@ -772,21 +762,25 @@
 				F250714A1A7561FD0053D654 /* dgstrs.c in Sources */,
 				F25071861A7561FD0053D654 /* memory.c in Sources */,
 				F25071241A7561FD0053D654 /* cgssv.c in Sources */,
+				F24F6BCC1BE8D47D0086A329 /* smach.c in Sources */,
 				F25071C11A7561FD0053D654 /* zgscon.c in Sources */,
 				F25071D51A7561FD0053D654 /* zreadhb.c in Sources */,
 				F25071AE1A7561FD0053D654 /* spivotL.c in Sources */,
 				F25071551A7561FD0053D654 /* dpivotL.c in Sources */,
 				F25071481A7561FD0053D654 /* dgssvx.c in Sources */,
+				F24F6BC51BE8D0E00086A329 /* input_error.c in Sources */,
 				F25071C21A7561FD0053D654 /* zgsequ.c in Sources */,
 				F250716D1A7561FD0053D654 /* ilu_ddrop_row.c in Sources */,
 				F250711B1A7561FD0053D654 /* ccolumn_bmod.c in Sources */,
 				F250714C1A7561FD0053D654 /* dlamch.c in Sources */,
 				F250715A1A7561FD0053D654 /* dsnode_bmod.c in Sources */,
 				F250719D1A7561FD0053D654 /* sldperm.c in Sources */,
+				F24F6BCA1BE8D4590086A329 /* dmach.c in Sources */,
 				F25071561A7561FD0053D654 /* dpruneL.c in Sources */,
 				F25071331A7561FD0053D654 /* cpivotL.c in Sources */,
 				F25071851A7561FD0053D654 /* mc64ad.c in Sources */,
 				F25071921A7561FD0053D654 /* sgsisx.c in Sources */,
+				F24F6BCE1BE8D5620086A329 /* dtrsv.c in Sources */,
 				F25071A91A7561FD0053D654 /* sp_ienv.c in Sources */,
 				F25071751A7561FD0053D654 /* ilu_sdrop_row.c in Sources */,
 				F25071B41A7561FD0053D654 /* ssnode_dfs.c in Sources */,
@@ -795,7 +789,6 @@
 				F25071671A7561FD0053D654 /* ilu_cdrop_row.c in Sources */,
 				F25071321A7561FD0053D654 /* cpivotgrowth.c in Sources */,
 				F25071B81A7561FD0053D654 /* superlu_timer.c in Sources */,
-				F25071841A7561FD0053D654 /* mc21.f in Sources */,
 				F250712B1A7561FD0053D654 /* cldperm.c in Sources */,
 				F25071B61A7561FD0053D654 /* ssp_blas3.c in Sources */,
 				F25071261A7561FD0053D654 /* cgstrf.c in Sources */,
@@ -831,7 +824,6 @@
 				F25071D31A7561FD0053D654 /* zpivotL.c in Sources */,
 				F25071D91A7561FD0053D654 /* zsnode_dfs.c in Sources */,
 				F250719C1A7561FD0053D654 /* slaqgs.c in Sources */,
-				F25071831A7561FD0053D654 /* mc21_f2c.c in Sources */,
 				F25071311A7561FD0053D654 /* cpanel_dfs.c in Sources */,
 				F25071721A7561FD0053D654 /* ilu_relax_snode.c in Sources */,
 				F25071211A7561FD0053D654 /* cgsisx.c in Sources */,
@@ -873,6 +865,7 @@
 				F250714E1A7561FD0053D654 /* dlaqgs.c in Sources */,
 				F25071511A7561FD0053D654 /* dmyblas2.c in Sources */,
 				F25071611A7561FD0053D654 /* get_perm_c.c in Sources */,
+				F24F6BC61BE8D0E00086A329 /* slacon2.c in Sources */,
 				F25071CC1A7561FD0053D654 /* zlaqgs.c in Sources */,
 				F25071C81A7561FD0053D654 /* zgstrf.c in Sources */,
 				F250717A1A7561FD0053D654 /* ilu_zcopy_to_ucol.c in Sources */,
@@ -895,6 +888,7 @@
 				F25071A81A7561FD0053D654 /* sp_coletree.c in Sources */,
 				F250717F1A7561FD0053D654 /* izmax1.c in Sources */,
 				F250718B1A7561FD0053D654 /* scolumn_dfs.c in Sources */,
+				F24F6BC01BE8D0B20086A329 /* clacon2.c in Sources */,
 				F250719B1A7561FD0053D654 /* slangs.c in Sources */,
 				F25071391A7561FD0053D654 /* csnode_dfs.c in Sources */,
 				F25071C01A7561FD0053D654 /* zdiagonal.c in Sources */,
@@ -926,8 +920,10 @@
 				F25071251A7561FD0053D654 /* cgssvx.c in Sources */,
 				F25071271A7561FD0053D654 /* cgstrs.c in Sources */,
 				F25071381A7561FD0053D654 /* csnode_bmod.c in Sources */,
+				F24F6BC21BE8D0B20086A329 /* zlacon2.c in Sources */,
 				F25071AA1A7561FD0053D654 /* sp_preorder.c in Sources */,
 				F250716B1A7561FD0053D654 /* ilu_dcolumn_dfs.c in Sources */,
+				F24F6BD01BE8D5940086A329 /* ztrsv.c in Sources */,
 				F250714D1A7561FD0053D654 /* dlangs.c in Sources */,
 				F250713F1A7561FD0053D654 /* dcomplex.c in Sources */,
 			);
@@ -1016,6 +1012,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+					Add_,
+				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -1030,6 +1031,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = Add_;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;

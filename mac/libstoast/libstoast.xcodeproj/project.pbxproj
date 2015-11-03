@@ -395,7 +395,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SYMROOT = build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_5.0/SRC\"";
 			};
 			name = Debug;
 		};
@@ -426,7 +426,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SYMROOT = build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_4.3/SRC\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_5.0/SRC\"";
 			};
 			name = Release;
 		};
