@@ -6,7 +6,7 @@ function flag = gmshMeshWriter(mesh, gmshFile, values)
 %Predefined fprint formats
 MESH_FORMAT = '2.1 0 8';
 NODE_FORMAT = '%u %g %g %g';
-ELEM_FORMAT = '%u %u %u';
+ELEM_FORMAT = '%u %u %u %u %u';
 NODE_DATA_FORMAT1 = '%u %g';
 NODE_DATA_FORMAT3 = '%u %g %g %g';
 NODE_DATA_FORMAT9 = '%u %g %g %g %g %g %g %g %g %g';
@@ -66,7 +66,7 @@ if ~flag
   fprintf(fid, '$Elements\n');
   fprintf(fid, '%u\n', mesh.nElems);
   for ie = 1:mesh.nElems
-    element = [gmshElType, 0, mesh.elems(ie, :)];
+    element = [gmshElType, 2, 0, 14, mesh.elems(ie, :)];
     fprintf(fid, ELEM_FORMAT, ie, element);
   end
   fprintf(fid, '$EndElements\n');

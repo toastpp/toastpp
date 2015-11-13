@@ -395,6 +395,16 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	ProvideFDOT();
 	mfdot->Sysmat (nlhs, plhs, nrhs, prhs);
 	break;
+    case FDOT_MAKEPROJECTORLIST:
+	ProvideFDOT();
+	mfdot->MakeProjectorList (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_PROJECTTOIMAGE:
+	mfdot->ProjectToImage (nlhs, plhs, nrhs, prhs);
+	break;
+    case FDOT_PROJECTTOFIELD:
+	mfdot->ProjectToField (nlhs, plhs, nrhs, prhs);
+	break;
 #endif
 
     default:

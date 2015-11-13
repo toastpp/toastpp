@@ -228,7 +228,10 @@ classdef toastMesh < handle
             if obj.handle > 0
                 if nargin > 2 
                     if strcmpi(fmt,'gmsh')
-                        toastmex(uint32(2),obj.handle,fname,'gmsh');
+                        %toastmex(uint32(2),obj.handle,fname,'gmsh');
+                        toastWriteGmshMesh(obj,fname);
+                    elseif strcmpi(fmt,'gmsh-surf')
+                        toastWriteGmshMesh(obj,fname,'surf');
                     elseif strcmpi(fmt,'gmsh-pos') && nargin > 3
                         toastWriteMeshGmshPos(obj,fname,prm);
                     end

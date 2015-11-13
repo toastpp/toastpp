@@ -29,6 +29,13 @@ public:
     void Excit (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void Sysmat (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 
+    void MakeProjectorList (int nlhs, mxArray *plhs[],
+	int nrhs, const mxArray *prhs[]);
+    void ProjectToImage (int nlhs, mxArray *plhs[],
+	int nrhs, const mxArray *prhs[]);
+    void ProjectToField (int nlhs, mxArray *plhs[],
+	int nrhs, const mxArray *prhs[]);
+    
 private:
     FDOTFwd *GetFDOTFwd (const mxArray *idx);
 
