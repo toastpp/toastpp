@@ -125,6 +125,9 @@
 #define FDOT_ADJOPRATIO       2001
 #define FDOT_EXCIT            2005
 #define FDOT_SYSMAT           2006
+#define FDOT_MAKEPROJECTORLIST 2008
+#define FDOT_PROJECTTOIMAGE   2009
+#define FDOT_PROJECTTOFIELD   2010
 #endif
 
 #endif // !__MATLAB_TOASTMEX_H

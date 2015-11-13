@@ -176,8 +176,11 @@ FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask $(SUPERLUINC) \
             $(ILUPACKINC) $(OGLINC) $(CUDAINC)
 TOASTINC  = $(FEINC) -I$(TSRC)/libstoast
 STOASTINC = $(FEINC) -I$(TSRC)/libstoast
-FDOTINC   = $(STOASTINC) -I$(TSRC)/libfdot
 INCLUDE   = $(TOASTINC)
+ifdef BUILD_FDOT
+      INCLUDE += -DFDOT -I$(TSRC)/libfdot
+      STOASTLIB += -lfdot
+endif
 # =======================================================================
 
 # =======================================================================
