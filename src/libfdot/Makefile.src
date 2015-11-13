@@ -18,7 +18,7 @@ OBJS = ${SRCS:.cc=.o}
 HDRS = ${SRCS:.cc=.h}
 
 %.o : %.cc $(HDRS)
-	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(FDOTINC) $(SHLIB_CFLAGS) -c $<
+	$(CXX) $(CCFLAGS) $(ILUFLAGS) $(INCLUDE) $(SHLIB_CFLAGS) -c $<
 
 # make static version of library
 $(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
