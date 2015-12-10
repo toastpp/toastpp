@@ -4,8 +4,9 @@
 
 Raster_Blob2_HB::Raster_Blob2_HB (const IVector &_bdim, const IVector &_gdim,
     Mesh *mesh, double _sup, double shapeprm, double diagscale,
-    RDenseMatrix *bb, double _map_tol)
-: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb, _map_tol)
+    RDenseMatrix *bb, double _map_tol, int _npad)
+: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb, _map_tol,
+		_npad)
 {
     fac = Pi/sup;
 }

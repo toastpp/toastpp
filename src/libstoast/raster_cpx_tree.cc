@@ -50,7 +50,7 @@ void Raster_CPixel_Tree::FinaliseTree ()
     if (Bvv) delete Bvv;
     Bvv = CreateBasisMassmat();
     if (Buv) delete Buv;
-    Buv = CreateMixedMassmat();
+    Buv = CreateBuv();
     if (map_tol) {
 	std::cerr << "reset precon" << std::endl;
 	if (Bvv_precon) delete Bvv_precon;
@@ -151,16 +151,16 @@ RCompRowMatrix *Raster_CPixel_Tree::CreateBasisMassmat () const
 
 // =========================================================================
 
-RCompRowMatrix *Raster_CPixel_Tree::CreateMixedMassmat () const
+RCompRowMatrix *Raster_CPixel_Tree::CreateBuv () const
 {
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return CreateMixedMassmat_tri();
+	return CreateBuv_tri();
 	return 0;
     case ELID_TET4:
-	//return CreateMixedMassmat_tet4();
+	//return CreateBuv_tet4();
 	return 0;
     default:
 	xERROR("Raster_CPixel: Unsupported element type");

@@ -86,7 +86,7 @@ struct CREATEMIXEDMASSMAT_TRI_PASS2_THREADDATA {
     const Point *bbmax;
 };
 
-void CreateMixedMassmat_tri_pass2_engine (task_data *td)
+void CreateBuv_tri_pass2_engine (task_data *td)
 {
     int itask = td->proc;
     int ntask = td->np;
@@ -195,7 +195,7 @@ void CreateMixedMassmat_tri_pass2_engine (task_data *td)
 }
 #endif // THREAD_LEVEL
 
-RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tri () const
+RCompRowMatrix *Raster_Pixel2::CreateBuv_tri () const
 {
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
@@ -282,7 +282,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tri () const
     thdata.bdim = &bdim;
     thdata.bbmin = &bbmin;
     thdata.bbmax = &bbmax;
-    Task::Multiprocess (CreateMixedMassmat_tri_pass2_engine, &thdata);
+    Task::Multiprocess (CreateBuv_tri_pass2_engine, &thdata);
 #else // !THREAD_LEVEL: serial computation
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
@@ -361,13 +361,14 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tri () const
 // Creates the basis-pixel mass matrix (Bvw) for mapping from a raster image
 // with piecewise constant pixel values to the basis
 
-RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
+RCompRowMatrix *Raster_Pixel2::CreateBvw_tri (const IVector &wdim)
     const
 {
     const int sublen = 1000;
-    int i, j, k, ii, jj, si, sj, pi, pj, idx_i, idx_j;
-    double x0, x1, y0, y1;
+    int i, j, k, ii, jj, si, sj, pi, pj, idx_i, idx_j, idx;
+    double x0, x1, y0, y1, xcnt, ycnt;
     double px0, px1, py0, py1, v;
+    double xmin, xmax, ymin, ymax;
     bool intersect;
     int *npx = new int[blen];
     for (i = 0; i < blen; i++) npx[i] = 0;
@@ -382,30 +383,23 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
     double dy = bsize[1]/sublen;
 
     // pass 1: evaluate sparse matrix structure
-    for (j = 0; j < bdim[1]-1; j++) {
-	y0 = bsize[1]*j;
-	y1 = y0 + bsize[1];
-	for (i = 0; i < bdim[0]-1; i++) {
-	    x0 = bsize[0]*i;
-	    x1 = x0 + bsize[0];
-	    
+    for (j = 0; j < bdim[1]; j++) {
+	ycnt = bsize[1]*j;
+	y0 = max(0.0, ycnt-bsize[1]);
+	y1 = min(bbsize[1], ycnt+bsize[1]);
+	for (i = 0; i < bdim[0]; i++) {
+	    idx_i = i + j*bdim[0];
+	    xcnt = bsize[0]*i;
+	    x0 = max(0.0, xcnt-bsize[0]);
+	    x1 = min(bbsize[0], xcnt+bsize[0]);
 	    for (pj = 0; pj < wdim[1]; pj++) {
 		py0 = psize[1]*pj;
 		py1 = py0 + psize[1];
 		for (pi = 0; pi < wdim[0]; pi++) {
 		    px0 = psize[0]*pi;
 		    px1 = px0 + psize[0];
-		    
-		    if (px0 > x1 || px1 < x0 || py0 > y1 || py1 < y0)
-			intersect = false;
-		    else {
-			for (jj = 0; jj < 2; jj++) {
-			    for (ii = 0; ii < 2; ii++) {
-				idx_i = (i+ii) + (j+jj)*bdim[0];
-				npx[idx_i]++;
-			    }
-			}
-		    }
+		    if (px0 <= x1 && px1 >= x0 && py0 <= y1 && py1 >= y0)
+			npx[idx_i]++;
 		}
 	    }
 	}
@@ -419,15 +413,18 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
     }
     int nz = rowptr[blen];
     int *colidx = new int[nz];
-
+    double *scale = new double[nz];
+    
     // pass 2: sparsity pattern
-    for (j = 0; j < bdim[1]-1; j++) {
-	y0 = bsize[1]*j;
-	y1 = y0 + bsize[1];
-	for (i = 0; i < bdim[0]-1; i++) {
-	    x0 = bsize[0]*i;
-	    x1 = x0 + bsize[0];
-	    
+    for (j = 0; j < bdim[1]; j++) {
+	ycnt = bsize[1]*j;
+	y0 = max(0.0, ycnt-bsize[1]);
+	y1 = min(bbsize[1], ycnt+bsize[1]);
+	for (i = 0; i < bdim[0]; i++) {
+	    idx_i = i + j*bdim[0];
+	    xcnt = bsize[0]*i;
+	    x0 = max(0.0, xcnt-bsize[0]);
+	    x1 = min(bbsize[0], xcnt+bsize[0]);	    
 	    for (pj = 0; pj < wdim[1]; pj++) {
 		py0 = psize[1]*pj;
 		py1 = py0 + psize[1];
@@ -435,16 +432,14 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
 		    px0 = psize[0]*pi;
 		    px1 = px0 + psize[0];
 		    idx_j = pi + pj*wdim[0];
-		    
-		    if (px0 > x1 || px1 < x0 || py0 > y1 || py1 < y0)
-			intersect = false;
-		    else {
-			for (jj = 0; jj < 2; jj++) {
-			    for (ii = 0; ii < 2; ii++) {
-				idx_i = (i+ii) + (j+jj)*bdim[0];
-				colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
-			    }
-			}
+		    if (px0 <= x1 && px1 >= x0 && py0 <= y1 && py1 >= y0) {
+			xmin = max(x0,px0);
+			xmax = min(x1,px1);
+			ymin = max(y0,py0);
+			ymax = min(y1,py1);
+			idx = rowptr[idx_i]+npx[idx_i]++;
+			colidx[idx] = idx_j;
+			scale[idx] = (xmax-xmin)*(ymax-ymin);
 		    }
 		}
 	    }
@@ -452,6 +447,8 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
     }
 
     RCompRowMatrix *bvw = new RCompRowMatrix (blen, plen, rowptr, colidx);
+    ICompRowMatrix *count = new ICompRowMatrix (blen, plen, rowptr, colidx);
+    
     delete []npx;
     delete []rowptr;
     delete []colidx;
@@ -478,13 +475,23 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat_tri (const IVector &wdim)
 			    idx_i = (i+ii) + (j+jj)*bdim[0];
 			    v = Value_nomask(p, idx_i, false);
 			    (*bvw)(idx_i, idx_j) += v;
+			    (*count)(idx_i, idx_j) += 1;
 			}
 		    }
 		}
 	    }
 	}
     }
-    (*bvw) *= dx*dy;
+
+    double *pbvw = bvw->ValPtr();
+    int *pcount = count->ValPtr();
+
+    for (i = 0; i < nz; i++) {
+	if (pcount[i]) {
+	    pbvw[i] *= scale[i]/pcount[i];
+	}
+    }
+    delete []scale;
     
     return bvw;
 }

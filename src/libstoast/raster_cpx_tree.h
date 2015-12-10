@@ -140,9 +140,9 @@ protected:
         RDenseMatrix *bb=0, double _map_tol=1e-10);
 
     RCompRowMatrix *CreateBasisMassmat () const;
-    RCompRowMatrix *CreateMixedMassmat () const;
-    RCompRowMatrix *CreateMixedMassmat_tri () const;
-    RCompRowMatrix *CreateMixedMassmat_tet4 () const;
+    RCompRowMatrix *CreateBuv () const;
+    RCompRowMatrix *CreateBuv_tri () const;
+    RCompRowMatrix *CreateBuv_tet4 () const;
 
     void AddToElMatrix_tri (int el, RGenericSparseMatrix &M,
         const RVector *pxcoeff, int mode) const;

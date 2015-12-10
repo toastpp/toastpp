@@ -405,9 +405,10 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops;..\resources\packages.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
+			EnableManagedIncrementalBuild="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"

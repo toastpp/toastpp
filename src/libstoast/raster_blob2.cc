@@ -8,10 +8,13 @@
 
 Raster_Blob2::Raster_Blob2 (const IVector &_bdim, const IVector &_gdim,
     Mesh *mesh, double _sup, double shapeprm, double diagscale,
-    RDenseMatrix *bb, double _map_tol)
-: Raster2 (_bdim, _gdim, mesh, bb, _map_tol), sup(_sup), sprm(shapeprm),
-  dgscale(diagscale)
+    RDenseMatrix *bb, double _map_tol, int _npad)
+    : Raster2 (_bdim, _gdim, mesh, bb, _map_tol), sup(_sup), sprm(shapeprm),
+	       dgscale(diagscale), npad(_npad)
 {
+    bdim_pad = bdim + 2*npad;
+    blen_pad = prod(bdim_pad);
+    
     grid.New(dim);
     igrid.New(dim);
     for (int i = 0; i < dim; i++) {
@@ -51,10 +54,13 @@ void Raster_Blob2::Init ()
 double Raster_Blob2::Value_nomask (const Point &p, int i, bool is_solidx) const
 {
     int bi = (is_solidx ? sol2basis[i] : i);
-    int iz = (dim < 3 ? 0 : bi / (bdim[0]*bdim[1]));
-    bi -= iz*bdim[0]*bdim[1];
-    int iy = bi/bdim[0];
-    int ix = bi - iy*bdim[0];
+    int iz = (dim < 3 ? 0 : bi / (bdim_pad[0]*bdim_pad[1]));
+    bi -= iz*bdim_pad[0]*bdim_pad[1];
+    int iy = bi/bdim_pad[0];
+    int ix = bi - iy*bdim_pad[0];
+
+    ix -= npad;
+    iy -= npad;
 
     double dx = bbmin[0] + ix*grid[0] - p[0];
     double dy = bbmin[1] + iy*grid[1] - p[1];
@@ -62,6 +68,7 @@ double Raster_Blob2::Value_nomask (const Point &p, int i, bool is_solidx) const
     double dst2 = dx*dx + dy*dy;;
 
     if (dim > 2) {
+	iz -= npad;
 	double dz = bbmin[2] + iz*grid[2] - p[2];
 	dst2 += dz*dz;
     }
@@ -70,17 +77,60 @@ double Raster_Blob2::Value_nomask (const Point &p, int i, bool is_solidx) const
 }
 
 // ==========================================================================
+
+RVector Raster_Blob2::Gradient_nomask (const Point &p, int i, bool is_solidx)
+    const
+{
+    int bi = (is_solidx ? sol2basis[i] : i);
+    int iz = (dim < 3 ? 0 : bi / (bdim_pad[0]*bdim_pad[1]));
+    bi -= iz*bdim_pad[0]*bdim_pad[1];
+    int iy = bi/bdim_pad[0];
+    int ix = bi - iy*bdim_pad[0];
+
+    ix -= npad;
+    iy -= npad;
+
+    double dx = p[0] - (bbmin[0] + ix*grid[0]);
+    double dy = p[1] - (bbmin[1] + iy*grid[1]);
+    double dz = 0.0;
+    double dst2 = dx*dx + dy*dy;
+    double phi = atan2(dy,dx);
+    double theta = 0.0;
+
+    if (dim > 2) {
+	iz -= npad;
+	dz = p[2] - (bbmin[2] + iz*grid[2]);
+	dst2 += dz*dz;
+    }
+    double r = sqrt(dst2);
+    if (dim > 2 && r)
+	theta = acos(dz/r);
+    
+    double rg = bscale * RadGradient (r);
+    RVector g(dim);
+    g[0] = cos(phi)*rg;
+    g[1] = sin(phi)*rg;
+    if (dim > 2) {
+	double sint = sin(theta);
+	g[0] *= sint;
+	g[1] *= sint;
+	g[2] = cos(theta)*rg;
+    }
+    return g;
+}
+
+// ==========================================================================
 // Creates the mixed-basis mass matrix (Buv)
 
-RCompRowMatrix *Raster_Blob2::CreateMixedMassmat () const
+RCompRowMatrix *Raster_Blob2::CreateBuv () const
 {
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return CreateMixedMassmat_tri();
+	return CreateBuv_tri();
     case ELID_TET4:
-	return CreateMixedMassmat_tet4();
+	return CreateBuv_tet4();
     default:
 	xERROR("Raster_Blob2: Unsupported element type");
 	return 0;
@@ -93,7 +143,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat () const
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return CreateBasisMassmat_tri();
+	return Bvv_tri();
     case ELID_TET4:
 	return CreateBasisMassmat_tet4();
     default:
@@ -102,15 +152,15 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat () const
     }
 }
 
-RCompRowMatrix *Raster_Blob2::CreateBasisPixelMassmat (const IVector &pxdim) const
+RCompRowMatrix *Raster_Blob2::CreateBvw (const IVector &pxdim) const
 {
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return CreateBasisPixelMassmat_tri (pxdim);
+	return CreateBvw_tri (pxdim);
     case ELID_TET4:
-	return CreateBasisPixelMassmat_tet4 (pxdim);
+	return CreateBvw_tet4 (pxdim);
     default:
 	xERROR("Raster_Blob2: Unsupported element type");
 	return 0;

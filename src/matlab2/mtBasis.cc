@@ -22,7 +22,8 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     double blobarg = 1.0;
     double maptol = 1e-10;
     double dgscale = 0.1;
-
+    int npad = 0;
+    
     // mesh
     ASSERTARG(nrhs > 0, 0, "Too few parameters provided");
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
@@ -84,6 +85,8 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 		    maptol = mxGetScalar(mxGetCell(prhs[2], ++i));
 		} else if (!strcasecmp (optionstr, "DIAGSCALE")) {
 		    dgscale = mxGetScalar(mxGetCell(prhs[2], ++i));
+		} else if (!strcasecmp (optionstr, "PADDING")) {
+		    npad = (int)(mxGetScalar (mxGetCell(prhs[2], ++i))+0.5);
 		} else {
 		    ASSERTARG(false, 1, "unexpected value");
 		}
@@ -133,23 +136,23 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 	break;
     case 9:
 	raster = Raster_Blob2::Create<Raster_Blob2_RB> (bdim, bdim, mesh,
-            blobrad, blobarg, dgscale, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol, npad);
 	break;
     case 10:
 	raster = Raster_Blob2::Create<Raster_Blob2_BB> (bdim, bdim, mesh,
-	    blobrad, blobarg, dgscale, bb, maptol);
+            blobrad, blobarg, dgscale, bb, maptol, npad);
 	break;
     case 11:
 	raster = Raster_Blob2::Create<Raster_Blob2_SB> (bdim, bdim, mesh,
-	    blobrad, blobarg, dgscale, bb, maptol);
+            blobrad, blobarg, dgscale, bb, maptol, npad);
 	break;
     case 12:
 	raster = Raster_Blob2::Create<Raster_Blob2_HB> (bdim, bdim, mesh,
-	    blobrad, blobarg, dgscale, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol, npad);
 	break;
     case 13:
 	raster = Raster_Blob2::Create<Raster_Blob2_GB> (bdim, bdim, mesh,
-	    blobrad, blobarg, dgscale, bb, maptol);
+	    blobrad, blobarg, dgscale, bb, maptol, npad);
 	break;
     case 14:
 	raster = Raster2::Create<Raster_CPixel_Tree> (bdim, bdim, mesh, bb,

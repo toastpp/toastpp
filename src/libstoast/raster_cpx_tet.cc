@@ -6,7 +6,7 @@
 #include "tet_qr.h"
 #include "tetsplit.h"
 
-RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tet4 () const
+RCompRowMatrix *Raster_CPixel::CreateBuv_tet4 () const
 {
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
