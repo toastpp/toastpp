@@ -55,7 +55,7 @@ private:
     bool apply_prior;
     double gmrf_exp;
     double tv_beta2;
-    double hyper[2];
+    double hyperp[2];
     const int *nbg_rowptr, *nbg_colidx;
     const Raster *raster;
 };
@@ -74,8 +74,8 @@ inline void ObjectiveFunction::SetGMRFParam (double _gmrf_exp,
     const int *_nbg_rowptr, const int *_nbg_colidx)
 {
     gmrf_exp = _gmrf_exp;
-    hyper[0] = _hypermua;
-    hyper[1] = _hyperkappa;
+    hyperp[0] = _hypermua;
+    hyperp[1] = _hyperkappa;
     nbg_rowptr = _nbg_rowptr;
     nbg_colidx = _nbg_colidx;
     apply_prior = true;

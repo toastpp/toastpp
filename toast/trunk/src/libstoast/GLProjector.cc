@@ -1,7 +1,8 @@
 #define STOASTLIB_IMPLEMENTATION
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32)
 #include <windows.h>
+#include <WinGDI.h>
 #endif
 #include "stoastlib.h"
 #include "GLProjector.h"

@@ -24,6 +24,7 @@ if eltp == 0
     els = gmsh.TRIANGLES(1:gmsh.nbTriangles,:);
     if (~isempty(els))
         idx = els(:,1:3);
+        vtx = vtx(:,1:2);
         eltp = 15;
         gmshtp = 2;
     end
@@ -44,6 +45,17 @@ elreg = gmsh.ELE_TAGS(perm,2);
 nel = size(idx,1);
 eltp = ones(nel,1)*eltp;
 mesh = toastMesh(vtx, idx, eltp);
+
+es = mesh.ElementSize;
+if min(es) < 0
+    warning('Negative element sizes detected. Flipping indices.');
+    for i=1:length(es)
+        if es(i) < 0
+            idx(i,1:2) = [idx(i,2),idx(i,1)];
+        end
+    end
+    mesh = toastMesh(vtx, idx, eltp);
+end
 
 % Set region labels
 mesh.Region(elreg);

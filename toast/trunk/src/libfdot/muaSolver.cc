@@ -55,7 +55,7 @@ RVector mua_adjFwdCaller(const RVector& x, void * context)
     return result;
 }
 
-RVector mua_logAdjFwdCaller(const RVector& logx, void * context)
+TVector<double> mua_logAdjFwdCaller(const TVector<double>& logx, void * context)
 {
     MuaSolver * solver = (MuaSolver*) context;
     RVector result = logx;
@@ -65,10 +65,10 @@ RVector mua_logAdjFwdCaller(const RVector& logx, void * context)
 }
 
 int MuaSolver::Solve(const RVector & data, 
-		    RVector & result, const RPreconditioner * precon, 
+		    RVector & result, RPreconditioner * precon, 
 		    int maxLinIters, int nonLinIters, double tol, bool logSolve)
 {
-    RVector y(nNodes), Fx(data.Dim()), delta(result.Dim());
+	TVector<double> y(nNodes), Fx(data.Dim()), delta(result.Dim());
 
     // initial guess is supplied in result vector 
     sol.SetParam(OT_CMUA, result);
@@ -90,7 +90,7 @@ int MuaSolver::Solve(const RVector & data,
 	    cout<<"Calculate adjoint field"<<endl;
 	    logAdjOperator(data-Fx, linx, y); //difference data
 	    cout<<"Run BiCGSTAB"<<endl;
-	    BiCGSTAB (mua_logAdjFwdCaller, this, y, delta, tol, precon, maxLinIters);
+	    BiCGSTAB<double> (mua_logAdjFwdCaller, (void*)this, y, delta, tol, precon, maxLinIters);
 	    result *= exp(delta);    // log(result)+=delta ==> result*=exp(delta)
 	}
 	else

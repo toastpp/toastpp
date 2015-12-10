@@ -217,7 +217,7 @@ classdef toastBasis < handle
     end
     
     function bvw = Bvw(obj,dim)
-        bvw = toastmex(uint32(92),obj.handle,dim);
+        bvw = toastmex(uint32(93),obj.handle,dim);
     end
     
     function sa = SupportArea(obj,idx)

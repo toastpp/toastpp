@@ -74,8 +74,9 @@ protected:
 
     RCompRowMatrix *CreateBasisMassmat () const;
 
-    RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const;
-    RCompRowMatrix *CreateBasisPixelMassmat_tri (const IVector &wdim) const;
+    RCompRowMatrix *CreateBvw (const IVector &wdim) const;
+    RCompRowMatrix *CreateBvw_tri (const IVector &wdim) const;
+    RCompRowMatrix *CreateBvw_tet4 (const IVector &wdim) const;
 
 private:
     bool grid_is_basis;       ///< grid and basis dimensions identical?
@@ -83,9 +84,9 @@ private:
     /**
      * \brief Returns pointer to mixed mapping matrix
      */
-    RCompRowMatrix *CreateMixedMassmat () const;
-    RCompRowMatrix *CreateMixedMassmat_tri () const;
-    RCompRowMatrix *CreateMixedMassmat_tet4 () const;
+    RCompRowMatrix *CreateBuv () const;
+    RCompRowMatrix *CreateBuv_tri () const;
+    RCompRowMatrix *CreateBuv_tet4 () const;
 
     void AddToElMatrix_tri (int el, RGenericSparseMatrix &M,
         const RVector *pxcoeff, int mode) const;
@@ -97,7 +98,7 @@ private:
         int npoly) const;
 
 #if THREAD_LEVEL==2
-    friend void CreateMixedMassmat_tri_pass2_engine (task_data *td);
+    friend void CreateBuv_tri_pass2_engine (task_data *td);
 #endif
 };
     

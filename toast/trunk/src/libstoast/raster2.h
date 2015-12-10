@@ -36,6 +36,10 @@ public:
      */
     virtual ~Raster2 ();
 
+    virtual RVector Gradient_nomask (const Point &p, int i, bool is_solidx=true)
+	const
+    { xERROR("Not implemented"); return RVector(); }
+    
     /**
      * \brief Map a real-valued coefficient vector from intermediate grid to
      *   intrinsic basis.
@@ -190,9 +194,12 @@ protected:
     /**
      * \brief Creates the mass matrix for the mixed bases (Buv)
      */
-    virtual RCompRowMatrix *CreateMixedMassmat () const = 0;
+    virtual RCompRowMatrix *CreateBuv () const = 0;
 
-    virtual RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const
+    /**
+     * \brief Creates mass matrix for mixed grid bases (Bvw)
+     */
+    virtual RCompRowMatrix *CreateBvw (const IVector &wdim) const
     { xERROR("Not implemented"); return 0; }
 
     /**

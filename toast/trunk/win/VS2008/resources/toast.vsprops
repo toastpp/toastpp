@@ -14,10 +14,16 @@
 	<Tool
 		Name="VCLinkerTool"
 		AdditionalLibraryDirectories="&quot;$(ToastLibDir)&quot;;&quot;$(ToastAuxLibDir)&quot;"
+		IgnoreDefaultLibraryNames=""
 	/>
 	<Tool
 		Name="VCPostBuildEventTool"
 		CommandLine=""
+	/>
+	<UserMacro
+		Name="BuildType"
+		Value="Release"
+		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
 		Name="ToastRootDir"
@@ -46,7 +52,7 @@
 	/>
 	<UserMacro
 		Name="ToastBuildDir"
-		Value="$(ToastWinDir)$(PlatformName)\$(ConfigurationName)\"
+		Value="$(ToastWinDir)$(PlatformName)\$(BuildType)\"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro

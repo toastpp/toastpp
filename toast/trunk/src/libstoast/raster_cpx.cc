@@ -59,15 +59,15 @@ RCompRowMatrix *Raster_CPixel::CreateBasisMassmat () const
 
 // =========================================================================
 
-RCompRowMatrix *Raster_CPixel::CreateMixedMassmat () const
+RCompRowMatrix *Raster_CPixel::CreateBuv () const
 {
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return CreateMixedMassmat_tri();
+	return CreateBuv_tri();
     case ELID_TET4:
-	return CreateMixedMassmat_tet4();
+	return CreateBuv_tet4();
     default:
 	xERROR("Raster_CPixel: Unsupported element type");
 	return 0;

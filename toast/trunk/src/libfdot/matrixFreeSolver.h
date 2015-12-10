@@ -20,10 +20,10 @@ class FDOTLIB MatrixFreeSolver : public FluoSolver
 			    Projector ** projList, IVector & dataWin);
 	~MatrixFreeSolver(); 
 	int Solve(const RVector & data, 
-		    RVector & result, const RPreconditioner * precon, 
+		    RVector & result, RPreconditioner * precon, 
 		    int maxIters, double tol=1e-7);
 	int SolveNonLin(const RVector & data, 
-		    RVector & result, const RPreconditioner * precon, 
+		    RVector & result, RPreconditioner * precon, 
 		    int maxIters, double tol);
 	void fwdOperator(RVector & x);
 	void adjOperator(RVector & x);

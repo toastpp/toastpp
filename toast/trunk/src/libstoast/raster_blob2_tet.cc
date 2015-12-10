@@ -756,10 +756,8 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 
 // ==========================================================================
 
-RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
+RCompRowMatrix *Raster_Blob2::CreateBuv_tet4 () const
 {
-    std::cerr << "enter MixedMatrix" << std::endl;
-
     int i, j, k, r, s, m, nd, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
     int imin, imax, jmin, jmax, kmin, kmax;
@@ -935,7 +933,7 @@ RCompRowMatrix *Raster_Blob2::CreateMixedMassmat_tet4 () const
 // Map directly between basis and a regular voxel image with piecewise
 // constant basis functions
 
-RCompRowMatrix *Raster_Blob2::CreateBasisPixelMassmat_tet4 (const IVector &pxdim) const
+RCompRowMatrix *Raster_Blob2::CreateBvw_tet4 (const IVector &pxdim) const
 {
     int i, j, k, idx_i, idx_j, i0, j0, k0, i1, j1, k1, jj, tmp;
     double px0, py0, pz0, px1, py1, pz1, x, y, z, rx, ry, rz, v;

@@ -95,16 +95,13 @@ void Raster2::Init ()
     }
 
     // mass matrix for mesh basis
-    std::cerr << "enter MassMatrix" << std::endl;
     Buu = meshptr->MassMatrix();
-    std::cerr << "back from MassMatrix" << std::endl;
 
     // mass matrix for intrinsic basis
     Bvv = CreateBasisMassmat();
-    std::cerr << "back from BasisMatrix" << std::endl;
 
     // mass matrix for the mixed bases
-    Buv = CreateMixedMassmat();
+    Buv = CreateBuv();
 
     // basis->solution mapper
     D = CreateSolMapper();
@@ -147,7 +144,7 @@ const RCompRowMatrix *Raster2::GetBvw (const IVector &wdim)
         if (Bvw_dim == wdim) return Bvw;
 	else delete Bvw;
     }
-    Bvw = CreateBasisPixelMassmat (wdim);
+    Bvw = CreateBvw (wdim);
     return Bvw;
 }
 

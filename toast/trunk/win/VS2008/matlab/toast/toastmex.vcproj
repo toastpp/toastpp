@@ -314,6 +314,152 @@
 				CommandLine="copy &quot;$(ToastWinDir)dll\*.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libmath.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfe.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libstoast.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Release_fdot|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(SolutionDir)resources\toastmex_win64.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine=""
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TOASTMEX_EXPORTS"
+				RuntimeLibrary="2"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(ToastMex2Dir)$(ProjectName).mexw32"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(ToastWinDir)dll\*.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libmath.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfe.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libstoast.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_fdot|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(SolutionDir)resources\toastmex_win64.vsprops;..\..\resources\packages.vsprops"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine=""
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(ToastSrcDir)libfdot&quot;"
+				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;TOASTMEX_EXPORTS;FDOT"
+				RuntimeLibrary="2"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="lbfgs.lib libfdot.lib"
+				OutputFile="$(ToastMex2Dir)$(ProjectName).mexw64"
+				AdditionalLibraryDirectories=""
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(ToastWinDir)dll\*.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libmath.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfe.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libstoast.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfdot.dll&quot; &quot;$(ToastMex2Dir)&quot;"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -323,6 +469,26 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\..\..\..\src\matlab2\matlabfdot.cc"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
 			<File
 				RelativePath="..\..\..\..\src\matlab2\matlabtoast.cc"
 				>
@@ -360,6 +526,26 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\matlab2\mtProjector.cc"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\matlab2\mtQMvec.cc"
 				>
 			</File>
@@ -389,6 +575,26 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\..\src\matlab2\matlabfdot.h"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
 			<File
 				RelativePath="..\..\..\..\src\matlab2\matlabtoast.h"
 				>
