@@ -244,7 +244,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\packages.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -392,9 +392,10 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops"
-			CharacterSet="1"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\packages.vsprops"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
+			EnableManagedIncrementalBuild="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -414,10 +415,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
+				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBFDOT_EXPORTS"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

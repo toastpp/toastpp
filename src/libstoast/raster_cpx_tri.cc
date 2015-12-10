@@ -8,7 +8,7 @@
 
 double TriIntF (double *x, double *y, double *z);
 
-RCompRowMatrix *Raster_CPixel::CreateMixedMassmat_tri () const
+RCompRowMatrix *Raster_CPixel::CreateBuv_tri () const
 {
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="mesa"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(MesaIncludeDir)&quot;"
+		PreprocessorDefinitions="NOMINMAX"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="OPENGL32.lib OSMESA32.lib GLU32.lib mesa.lib"
+		AdditionalLibraryDirectories="&quot;$(MesaLibDir)&quot;"
+	/>
+	<UserMacro
+		Name="MesaRootDir"
+		Value="D:\packages\Mesa-7.5.1"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="MesaIncludeDir"
+		Value="$(MesaRootDir)\Include"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="MesaLibDir"
+		Value="$(MesaRootDir)\windows\VC8\mesa\x64\Release"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

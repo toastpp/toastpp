@@ -29,7 +29,7 @@ ObjectiveFunction::ObjectiveFunction (const Raster *_raster)
     sd = 0;
     scale = 0;
     apply_prior = false;
-    hyper[0] = hyper[1] = 1.0;
+    hyperp[0] = hyperp[1] = 1.0;
     nbg_rowptr = 0;
     nbg_colidx = 0;
     raster = _raster;
@@ -39,8 +39,8 @@ void ObjectiveFunction::SetTVParam (double _tv_beta2,
     double _hypermua, double _hyperkappa)
 {
     tv_beta2 = _tv_beta2;
-    hyper[0] = _hypermua;
-    hyper[1] = _hyperkappa;
+    hyperp[0] = _hypermua;
+    hyperp[1] = _hyperkappa;
     apply_prior = true;
 }
 
@@ -351,7 +351,7 @@ void ObjectiveFunction::add_gradient_prior (const Solution &sol,
 #if REGULARISATION == REGULARISATION_GMRF
     int prm, j, k, c, r1, r2, dim, ofs = 0;
     double h, v1, v2, edge, tmp;
-    const double *hp = hyper;
+    const double *hp = hyperp;
 
     for (prm = 0; prm < sol.nParam(); prm++) {
         if (sol.IsActive(prm)) {

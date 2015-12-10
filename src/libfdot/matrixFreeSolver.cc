@@ -103,7 +103,7 @@ RVector mf_adjFwdCaller(const RVector& x, void * context)
 
 
 int MatrixFreeSolver::Solve(const RVector & data, 
-		    RVector & result, const RPreconditioner * precon, 
+		    RVector & result, RPreconditioner * precon, 
 		    int maxIters, double tol)
 {
     calcExcitationData();
@@ -132,7 +132,7 @@ int MatrixFreeSolver::Solve(const RVector & data,
 
     cout<<"Run PCG"<<endl;
     int iters;
-    iters = BiCGSTAB (&mf_adjFwdCaller, this, y, result, tol, precon, maxIters);
+    iters = BiCGSTAB<double> (&mf_adjFwdCaller, this, y, result, tol, precon, maxIters);
     //GMRES (&mf_adjFwdCaller, this, y, result, tol, precon, 10, &iters, &tol);
     cout << "MatrixFreeSolver::Solve: PCG error = " << tol << " in " << iters << " iterations" << endl;
 
@@ -158,7 +158,7 @@ int MatrixFreeSolver::Solve(const RVector & data,
 }
 
 int MatrixFreeSolver::SolveNonLin(const RVector & data, 
-		    RVector & result, const RPreconditioner * precon, 
+		    RVector & result, RPreconditioner * precon, 
 		    int maxIters, double tol)
 {
     //FEMSolver->CalcFields(/*FEMMesh, nQ,*/ qVecs, phi_e);
@@ -201,7 +201,7 @@ int MatrixFreeSolver::SolveNonLin(const RVector & data,
 	double ttol=1e-2;
 	int iiters;
 	delta = 0.0;
-	iiters = BiCGSTAB (&mf_adjFwdCaller, this, y, delta, ttol, precon, maxIters);
+	iiters = BiCGSTAB<double> (&mf_adjFwdCaller, this, y, delta, ttol, precon, maxIters);
 	//GMRES (&mf_adjFwdCaller, this, y, delta, ttol, precon, 2, &iiters, &ttol);
 /*MATHLIB int GMRES (TVector<MT> (*Av_clbk)(const TVector<MT> &v, void *context),
     void *context, const TVector<MT> &b, TVector<MT> &x, double tol,

@@ -6,11 +6,13 @@
 #include "tet_qr.h"
 #include "tetsplit.h"
 
+const int nprog = 50;
+
 // ==========================================================================
 // Create the mixed-basis mass matrix Buv by subdividing tetrahedral elements
 // at voxel boundaries
 
-RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
+RCompRowMatrix *Raster_Pixel2::CreateBuv_tet4 () const
 {
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
     int ii, jj, idx_i, idx_j;
@@ -23,7 +25,7 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
     double dx = xrange/(bdim[0]-1.0);
     double dy = yrange/(bdim[1]-1.0);
     double dz = zrange/(bdim[2]-1.0);
-    double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v;
+    double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v, prog;
     int stride_i = bdim[0], stride_j = stride_i*bdim[1];
 
     // quadrature rule for local tetrahedron
@@ -44,6 +46,8 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	nkmin[i] = bdim[2];
 	nimax[i] = njmax[i] = nkmax[i] = -1;
     }
+    
+    std::cout << "Buv: pass 1 [" << std::flush; prog = 0;
     for (el = 0; el < nel; el++) {
 	Element *pel = meshptr->elist[el];
 	// element bounding box
@@ -77,7 +81,12 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    if (kmin < nkmin[nidx]) nkmin[nidx] = kmin;
 	    if (kmax > nkmax[nidx]) nkmax[nidx] = kmax;
 	}
+	while (((el+1)*nprog)/nel > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
     }
+    std::cout << "]" << std::endl;
 
     int *rowptr = new int[n+1];
     rowptr[0] = 0;
@@ -113,11 +122,9 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
     submesh.nlen_used = 0;
     submesh.elen_used = 0;
 
-    double t_split = 0.0, t_integrate = 0.0;
-
     // pass 2: fill the matrix
+    std::cout << "Buv: pass 2 [" << std::flush; prog = 0;
     for (el = 0; el < nel; el++) {
-	std::cout << "Buv: processing el " << el << " of " << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	xASSERT(pel->Type() == ELID_TET4, "Currently only implemented for 4-noded tetrahedra");
 
@@ -147,8 +154,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	kmin = max (0, (int)floor((bdim[2]-1) * (ezmin-bbmin[2])/zrange));
 	kmax = min (bdim[2]-2, (int)floor((bdim[2]-1) * (ezmax-bbmin[2])/zrange));
 
-	tic();
-
 	// Create a mesh containing this single element
 	for (i = 0; i < 4; i++) {
 	    submesh.elist[0]->Node[i] = i;
@@ -157,13 +162,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	submesh.elist[0]->SetRegion(0);
 	submesh.elen_used = 1;
 	submesh.nlen_used = 4;
-
-	// DEBUG
-	//submesh.SubSetup();
-	//ofstream ofs1("dbg1.msh");
-	//ofs1 << submesh << std::endl;
-	//double orig_size = submesh.CalcFullSize();
-	//std::cout << "Initial element size: " << orig_size << std::endl;
 
 	// perform subdivisions along x-cutting planes
 	for (i = imin; i < imax; i++) {
@@ -176,51 +174,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	}
 	    
-#ifdef UNDEF
-	// DEBUG: compare integral over original element with sum
-	// over sub elements
-	submesh.SubSetup();
-	double sum = 0.0, sum_orig = 0.0;
-	for (m = 0; m < np; m++) {
-	    djac = pel->DetJ(absc[m], &meshptr->nlist);
-	    fun = pel->LocalShapeF (absc[m]);
-	    v = wght[m] * djac;
-	    for (ii = 0; ii < fun.Dim(); ii++) {
-		sum_orig += v*fun[ii];
-	    }
-	}
-
-	for (i = 0; i < submesh.elen_used; i++) {
-	    Element *psel = submesh.elist[i];
-	    for (m = 0; m < np; m++) {
-		djac = psel->DetJ(absc[m], &submesh.nlist);
-		Point glob = psel->Global (submesh.nlist, absc[m]);
-		Point loc = pel->Local(meshptr->nlist, glob);
-		fun = pel->LocalShapeF (loc);
-		v = wght[m] * djac;
-		for (ii = 0; ii < fun.Dim(); ii++) {
-		    sum += v*fun[ii];
-		}
-	    }
-	}
-#endif
-
-	// DEBUG
-	//submesh.SubSetup();
-	//ofstream ofs2("dbg2.msh");
-	//ofs2 << submesh << std::endl;
-	//double sz = 0.0;
-	//std::cout << "Subdiv element sizes: " << std::endl;
-	//for (i = 0; i < submesh.elen_used; i++) {
-	//    double s = submesh.elist[i]->Size();
-	//    std::cout << s << std::endl;
-	//    sz += s;
-	//    if (s <= 0)
-	//	std::cerr << "**** x-split: El size(" << el << ',' << i
-	//		  << ")=" << s << std::endl;
-	//}
-	//std::cout << "Total: " << sz << std::endl;
-
 	// perform subdivisions along y-cutting planes
 	for (j = jmin; j < jmax; j++) {
 	    int elen = submesh.elen_used;
@@ -232,22 +185,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	}
 	    
-	// DEBUG
-	//submesh.SubSetup();
-	//ofstream ofs3("dbg3.msh");
-	//ofs3 << submesh << std::endl;
-	//sz = 0.0;
-	//std::cout << "Subdiv element sizes: " << std::endl;
-	//for (i = 0; i < submesh.elen_used; i++) {
-	//    double s = submesh.elist[i]->Size();
-	//    std::cout << s << std::endl;
-	//    sz += s;
-	//    if (s <= 0)
-	//	std::cerr << "**** y-split: El size(" << el << ',' << i
-	//		  << ")=" << s << std::endl;
-	//}
-	//std::cout << "Total: " << sz << std::endl;
-
 	// perform subdivisions along z-cutting planes
 	for (k = kmin; k < kmax; k++) {
 	    int elen = submesh.elen_used;
@@ -258,25 +195,6 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 		    Tetsplit (&submesh, m, 2, cut_pos);
 	    }
 	}
-
-	// DEBUG
-	//submesh.SubSetup();
-	//ofstream ofs4("dbg4.msh");
-	//ofs4 << submesh << std::endl;
-	//sz = 0.0;
-	//std::cout << "Subdiv element sizes: " << std::endl;
-	//for (i = 0; i < submesh.elen_used; i++) {
-	//    double s = submesh.elist[i]->Size();
-	//    std::cout << s << std::endl;
-	//    sz += s;
-	//    if (s <= 0)
-	//	std::cerr << "**** z-split: El size(" << el << ',' << i
-	//		  << ")=" << s << std::endl;
-	//}
-	//std::cout << "Total: " << sz << std::endl;
-
-	t_split += toc();
-	tic();
 
 	// for any voxel cells completely inside the element,
 	// replace the subdivided elements by a simple 6-tetra
@@ -343,15 +261,210 @@ RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat_tet4 () const
 	    }
 	    //sz += psel->Size();
 	}
-	t_integrate += toc();
+	while (((el+1)*nprog)/nel > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
     }
-
-    std::cout << "#### t_split = " << t_split << std::endl;
-    std::cout << "#### t_integrate = " << t_integrate << std::endl;
+    std::cout << "]" << std::endl;
 
     Buv->Shrink();
     return Buv;
 }
+
+// ==========================================================================
+// Creates the basis-pixel mass matrix (Bvw) for mapping from a raster image
+// with piecewise constant pixel values to the basis
+
+RCompRowMatrix *Raster_Pixel2::CreateBvw_tet4 (const IVector &wdim)
+    const
+{
+    const int sublen = 100;
+    int i, j, k, ii, jj, kk, si, sj, sk, pi, pj, pk, idx_i, idx_j, idx;
+    double x0, x1, y0, y1, z0, z1, xcnt, ycnt, zcnt;
+    double px0, px1, py0, py1, pz0, pz1, v, prog;
+    double xmin, xmax, ymin, ymax, zmin, zmax;
+    bool intersect;
+    int *npx = new int[blen];
+    for (i = 0; i < blen; i++) npx[i] = 0;
+    int plen = wdim[0]*wdim[1]*wdim[2];
+    RVector psize(3), bsize(3);
+    Point p(3);
+    for (i = 0; i < 3; i++) {
+	psize[i] = bbsize[i]/wdim[i];
+	bsize[i] = bbsize[i]/(bdim[i]-1.0);
+    }
+    double dx = bsize[0]/sublen;
+    double dy = bsize[1]/sublen;
+    double dz = bsize[2]/sublen;
+    
+    // pass 1: evaluate sparse matrix structure
+    std::cout << "Bvw: pass 1 [" << std::flush; prog = 0;
+    for (k = 0; k < bdim[2]; k++) {
+	zcnt = bsize[2]*k;
+	z0 = max(0.0, zcnt-bsize[2]);
+	z1 = min(bbsize[2], zcnt+bsize[2]);
+	for (j = 0; j < bdim[1]; j++) {
+	    ycnt = bsize[1]*j;
+	    y0 = max(0.0, ycnt-bsize[1]);
+	    y1 = min(bbsize[1], ycnt+bsize[1]);
+	    for (i = 0; i < bdim[0]; i++) {
+		xcnt = bsize[0]*i;
+		x0 = max(0.0, xcnt-bsize[0]);
+		x1 = min(bbsize[0], xcnt+bsize[0]);
+		idx_i = i + j*bdim[0] + k*bdim[0]*bdim[1];
+		for (pk = 0; pk < wdim[2]; pk++) {
+		    pz0 = psize[2]*pk;
+		    pz1 = pz0 + psize[2];
+		    for (pj = 0; pj < wdim[1]; pj++) {
+			py0 = psize[1]*pj;
+			py1 = py0 + psize[1];
+			for (pi = 0; pi < wdim[0]; pi++) {
+			    px0 = psize[0]*pi;
+			    px1 = px0 + psize[0];
+			    if (px0 <= x1 && px1 >= x0 && py0 <= y1 &&
+				py1 >= y0 && pz0 <= z1 && pz1 >= z0)
+				npx[idx_i]++;
+			}
+		    }
+		}
+	    }
+	}
+	while (((k+1)*nprog)/bdim[2] > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    int *rowptr = new int[blen+1];
+    rowptr[0] = 0;
+    for (i = 0; i < blen; i++) {
+	rowptr[i+1] = rowptr[i]+npx[i];
+	npx[i] = 0;
+    }
+    int nz = rowptr[blen];
+    int *colidx = new int[nz];
+    double *scale = new double[nz];
+    
+    // pass 2: sparsity pattern
+    std::cout << "Bvw: pass 2 [" << std::flush; prog = 0;
+    for (k = 0; k < bdim[2]; k++) {
+	zcnt = bsize[2]*k;
+	z0 = max(0.0, zcnt-bsize[2]);
+	z1 = min(bbsize[2], zcnt+bsize[2]);
+	for (j = 0; j < bdim[1]; j++) {
+	    ycnt = bsize[1]*j;
+	    y0 = max(0.0, ycnt-bsize[1]);
+	    y1 = min(bbsize[1], ycnt+bsize[1]);
+	    for (i = 0; i < bdim[0]; i++) {
+		xcnt = bsize[0]*i;
+		x0 = max(0.0, xcnt-bsize[0]);
+		x1 = min(bbsize[0], xcnt+bsize[0]);
+		idx_i = i + j*bdim[0] + k*bdim[0]*bdim[1];
+		for (pk = 0; pk < wdim[2]; pk++) {
+		    pz0 = psize[2]*pk;
+		    pz1 = pz0 + psize[2];
+		    for (pj = 0; pj < wdim[1]; pj++) {
+			py0 = psize[1]*pj;
+			py1 = py0 + psize[1];
+			for (pi = 0; pi < wdim[0]; pi++) {
+			    px0 = psize[0]*pi;
+			    px1 = px0 + psize[0];
+			    idx_j = pi + pj*wdim[0] + pk*wdim[0]*wdim[1];
+			    if (px0 <= x1 && px1 >= x0 && py0 <= y1 &&
+				py1 >= y0 && pz0 <= z1 && pz1 >= z0) {
+				xmin = max(x0,px0);
+				xmax = min(x1,px1);
+				ymin = max(y0,py0);
+				ymax = min(y1,py1);
+				zmin = max(z0,pz0);
+				zmax = min(z1,pz1);
+				idx = rowptr[idx_i]+npx[idx_i]++;
+				colidx[idx] = idx_j;
+				scale[idx] = (xmax-xmin)*(ymax-ymin)*
+				    (zmax-zmin);
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	while (((k+1)*nprog)/bdim[2] > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    RCompRowMatrix *bvw = new RCompRowMatrix (blen, plen, rowptr, colidx);
+    ICompRowMatrix *count = new ICompRowMatrix (blen, plen, rowptr, colidx);
+    
+    delete []npx;
+    delete []rowptr;
+    delete []colidx;
+
+    // pass 3: fill the matrix
+    std::cout << "Bvw: pass 3 [" << std::flush; prog = 0;
+    for (k = 0; k < bdim[2]-1; k++) {
+	z0 = bsize[2]*k;
+	z1 = z0 + bsize[2];
+	for (j = 0; j < bdim[1]-1; j++) {
+	    y0 = bsize[1]*j;
+	    y1 = y0 + bsize[1];
+	    for (i = 0; i < bdim[0]-1; i++) {
+		x0 = bsize[0]*i;
+		x1 = x0 + bsize[0];
+
+		for (sk = 0; sk < sublen; sk++) {
+		    p[2] = z0 + (sk+0.5)*dz;
+		    pk = (int)(p[2]/psize[2]);
+		    p[2] += bbmin[2];
+		    for (sj = 0; sj < sublen; sj++) {
+			p[1] = y0 + (sj+0.5)*dy;
+			pj = (int)(p[1]/psize[1]);
+			p[1] += bbmin[1];
+			for (si = 0; si < sublen; si++) {
+			    p[0] = x0 + (si+0.5)*dx;
+			    pi = (int)(p[0]/psize[0]);
+			    p[0] += bbmin[0];
+			    idx_j = pi + pj*wdim[0] + pk*wdim[0]*wdim[1];
+			    for (kk = 0; kk < 2; kk++) {
+				for (jj = 0; jj < 2; jj++) {
+				    for (ii = 0; ii < 2; ii++) {
+					idx_i = (i+ii) + (j+jj)*bdim[0] +
+					    (k+kk)*bdim[0]*bdim[1];
+					v = Value_nomask(p, idx_i, false);
+					(*bvw)(idx_i, idx_j) += v;
+					(*count)(idx_i, idx_j) += 1;
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	while (((k+1)*nprog)/(bdim[2]-1) > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    double *pbvw = bvw->ValPtr();
+    int *pcount = count->ValPtr();
+
+    for (i = 0; i < nz; i++) {
+	if (pcount[i]) {
+	    pbvw[i] *= scale[i]/pcount[i];
+	}
+    }
+    delete []scale;
+    
+    return bvw;
+}
+
 // ==========================================================================
 // Assemble single-element contribution for element "el" into global
 // system matrix M, where coefficients (where applicable) are given in pixel

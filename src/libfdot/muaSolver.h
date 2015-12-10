@@ -19,7 +19,7 @@ class FDOTLIB MuaSolver
 			    Projector ** projList, Solution & initSol);
 	~MuaSolver(); 
 	int Solve(const RVector & data, 
-		    RVector & result, const RPreconditioner * precon, 
+		    RVector & result, RPreconditioner * precon, 
 		    int maxLinIters, int nonLinIters, double tol=1e-7, bool logSolve=false);
 
 	void fwdOperator(RVector & x);
@@ -55,6 +55,6 @@ class FDOTLIB MuaSolver
 
 // A helper function to pass into BiCGSTAB, since it cannot take member funcs
 RVector mua_adjFwdCaller(const RVector& x, void * context);
-RVector mua_logAdjFwdCaller(const RVector& logx, void * context);
+TVector<double> mua_logAdjFwdCaller(const TVector<double>& logx, void * context);
 
 #endif

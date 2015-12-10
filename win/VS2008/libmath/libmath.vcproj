@@ -411,7 +411,7 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops;..\resources\packages.vsprops"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
@@ -452,7 +452,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libblas64.lib SuperLU_50.lib"
+				AdditionalDependencies="libblas64.lib "
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""

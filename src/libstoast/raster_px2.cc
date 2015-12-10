@@ -182,14 +182,16 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisMassmat () const
 // Creates the basis-pixel mass matrix (Bvw) for mapping from a raster image
 // with piecewise constant pixel values to the basis
 
-RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat (const IVector &wdim)
+RCompRowMatrix *Raster_Pixel2::CreateBvw (const IVector &wdim)
     const
 {
     xASSERT(wdim.Dim() == dim, "Invalid length of pixel dimension vector");
 
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
-	return CreateBasisPixelMassmat_tri (wdim);
+	return CreateBvw_tri (wdim);
+    case ELID_TET4:
+	return CreateBvw_tet4 (wdim);
     default:
 	xERROR("Raster_Pixel2: unsupported element type");
 	return 0;
@@ -199,15 +201,15 @@ RCompRowMatrix *Raster_Pixel2::CreateBasisPixelMassmat (const IVector &wdim)
 // ==========================================================================
 // Creates the mixed-basis mass matrix (Buv)
 
-RCompRowMatrix *Raster_Pixel2::CreateMixedMassmat () const
+RCompRowMatrix *Raster_Pixel2::CreateBuv () const
 {
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return CreateMixedMassmat_tri();
+	return CreateBuv_tri();
     case ELID_TET4:
-	return CreateMixedMassmat_tet4();
+	return CreateBuv_tet4();
     default:
 	xERROR("Raster_Pixel2: Unsupported element type");
 	return 0;

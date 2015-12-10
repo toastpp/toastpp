@@ -20,10 +20,10 @@ public:
     template<class T>
     static Raster2 *Create (const IVector &_bdim, const IVector &_gdim,
         Mesh *mesh, double _sup, double shapeprm, double diagscale,
-        RDenseMatrix *bb=0, double _map_tol=1e-10)
+	RDenseMatrix *bb=0, double _map_tol=1e-10, int _npad=0)
     {
         T *raster = new T(_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb,
-	    _map_tol);
+	    _map_tol, _npad);
 	raster->Init();
 	return raster;
     }
@@ -41,7 +41,7 @@ public:
      */
     Raster_Blob2 (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
 	double _sup, double shapeprm, double diagscale, RDenseMatrix *bb=0,
-        double _map_tol=1e-10);
+	double _map_tol=1e-10, int _npad=0);
 
     virtual void Init();
 
@@ -51,6 +51,8 @@ public:
      * \sa Value
      */
     double Value_nomask (const Point &p, int i, bool is_solidx=true) const;
+
+    RVector Gradient_nomask (const Point &p, int i, bool is_solidx=true) const;
 
     void AddToElMatrix (int el, RGenericSparseMatrix &M,
         const RVector *pxcoeff, int mode) const;
@@ -63,6 +65,9 @@ protected:
      */
     virtual double RadValue (double r) const = 0;
 
+    virtual double RadGradient (double r) const
+    { xERROR("Not implemented"); return 0.0; }
+    
     int SutherlandHodgman (int el, double px, double py, Point *clip_poly,
         int npoly) const;
 
@@ -76,23 +81,28 @@ protected:
     double bscale;  ///< global basis scaling factor
     RVector grid;   ///< grid spacing
     RVector igrid;  ///< inverse grid spacing
-
+    int npad;       ///< padding width [number of grid rows/cols] for blob basis
+    IVector bdim_pad; ///< basis dimensions including padding
+    int blen_pad;   ///< size of padded basis
+    
 private:
     RCompRowMatrix *CreateBasisMassmat () const;
-    RCompRowMatrix *CreateBasisMassmat_tri () const;
+    RCompRowMatrix *Bvv_tri () const;
     RCompRowMatrix *CreateBasisMassmat_tet4 () const;
 
     /**
      * \brief Returns pointer to mixed mapping matrix
      */
-    RCompRowMatrix *CreateMixedMassmat () const;
-    RCompRowMatrix *CreateMixedMassmat_tri () const;
-    RCompRowMatrix *CreateMixedMassmat_tet4 () const;
+    RCompRowMatrix *CreateBuv () const;
+    RCompRowMatrix *CreateBuv_tri () const;
+    RCompRowMatrix *CreateBuv_tet4 () const;
 
-    RCompRowMatrix *CreateBasisPixelMassmat (const IVector &wdim) const;
-    RCompRowMatrix *CreateBasisPixelMassmat_tri (const IVector &wdim) const;
-    RCompRowMatrix *CreateBasisPixelMassmat_tet4 (const IVector &wdim) const;
+    RCompRowMatrix *CreateBvw (const IVector &wdim) const;
+    RCompRowMatrix *CreateBvw_tri (const IVector &wdim) const;
+    RCompRowMatrix *CreateBvw_tet4 (const IVector &wdim) const;
 
+    RCompRowMatrix *CreateBvw_linw_tri (const IVector &wdim) const;
+    
     double MC_integral_2D(double basis_dst) const;
 };
 

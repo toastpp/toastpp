@@ -4,8 +4,9 @@
 
 Raster_Blob2_SB::Raster_Blob2_SB (const IVector &_bdim, const IVector &_gdim,
     Mesh *mesh, double _sup, double shapeprm, double diagscale,
-    RDenseMatrix *bb, double _map_tol)
-: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb, _map_tol)
+    RDenseMatrix *bb, double _map_tol, int _npad)
+: Raster_Blob2 (_bdim, _gdim, mesh, _sup, shapeprm, diagscale, bb, _map_tol,
+		_npad)
 {
     int i, j;
     for (i = 0; i <= 4; i++)
@@ -33,4 +34,9 @@ double Raster_Blob2_SB::RadValue (double r) const
     }
     sum *= 4.0;
     return sum;
+}
+
+double Raster_Blob2_SB::RadGradient (double r) const
+{
+    return 0.0;
 }

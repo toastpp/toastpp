@@ -292,7 +292,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SuperLU_50.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""
@@ -408,8 +407,8 @@
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops"
-			CharacterSet="1"
+			InheritedPropertySheets="..\resources\toastlib.vsprops;..\resources\toast_x64.vsprops;..\resources\packages.vsprops"
+			CharacterSet="0"
 			WholeProgramOptimization="0"
 			>
 			<Tool
@@ -449,7 +448,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libfe.lib libmath.lib OPENGL32.lib OSMESA32.lib GLU32.lib"
+				AdditionalDependencies="libfe.lib libmath.lib "
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""

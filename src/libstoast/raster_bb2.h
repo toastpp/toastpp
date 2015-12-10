@@ -11,7 +11,7 @@ class STOASTLIB Raster_Blob2_BB: public Raster_Blob2 {
 public:
     Raster_Blob2_BB (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
         double _sup, double _alpha, double diagscale,
-        RDenseMatrix *bb=0, double _map_tol=1e-10);
+        RDenseMatrix *bb=0, double _map_tol=1e-10, int _npad=0);
 
 protected:
     double RadValue (double r) const;
