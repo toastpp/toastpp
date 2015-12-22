@@ -33,10 +33,22 @@ double Raster_Blob2_SB::RadValue (double r) const
 	sum += d3*iomega[1];
     }
     sum *= 4.0;
-    return sum;
+    return sum*bscale;
 }
 
 double Raster_Blob2_SB::RadGradient (double r) const
 {
-    return 0.0;
+    if (r >= sup) return 0.0;
+
+    double x = -r;
+    double dx = x-xi[0];
+    double d2 = dx*dx;
+    double sum = -3.0*iomega[0]*d2;
+    if (x > xi[1]) {
+	dx = x-xi[1];
+	d2 = dx*dx;
+	sum += -3.0*iomega[1]*d2;
+    }
+    sum *= 4.0;
+    return sum*bscale;
 }

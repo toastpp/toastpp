@@ -26,9 +26,11 @@ Raster_Blob2::Raster_Blob2 (const IVector &_bdim, const IVector &_gdim,
 void Raster_Blob2::Init ()
 {
     int i, j, k;
-
+    double brescale;
+    
     // determine scaling factor so that sum of basis coefficients approx 1
-    bscale = 0.0;
+    bscale = 1.0;
+    brescale = 0.0;
     IVector nnbr(dim);
     for (i = 0; i < dim; i++)
         nnbr[i] = (int)ceil(sup*igrid[i]);
@@ -40,11 +42,11 @@ void Raster_Blob2::Init ()
 	    for (i = -nnbr[0]; i <= nnbr[0]; i++) {
 	        double dx = i/igrid[0];
 		double dst = sqrt(dx*dx + dy*dy + dz*dz);
-		bscale += RadValue(dst);
+		brescale += RadValue(dst);
 	    }
 	}
     }
-    bscale = 1.0/bscale;
+    bscale = 1.0/brescale;
     // Note: we need to compute bscale before calling Raster2::Init, so that
     // the correct bscale is used for calculating the mapping matrices
 
@@ -73,7 +75,7 @@ double Raster_Blob2::Value_nomask (const Point &p, int i, bool is_solidx) const
 	dst2 += dz*dz;
     }
     
-    return bscale * RadValue (sqrt(dst2));
+    return RadValue (sqrt(dst2));
 }
 
 // ==========================================================================
@@ -137,15 +139,50 @@ RCompRowMatrix *Raster_Blob2::CreateBuv () const
     }
 }
 
-RCompRowMatrix *Raster_Blob2::CreateBasisMassmat () const
+// ==========================================================================
+// Creates the mixed-basis stiffness matrix (Duv)
+
+RCompRowMatrix *Raster_Blob2::CreateBvv () const
 {
     switch (meshptr->elist[0]->Type()) {
     case ELID_TRI3:
     case ELID_TRI6:
     case ELID_TRI10:
-	return Bvv_tri();
+	return CreateBvv_tri();
     case ELID_TET4:
-	return CreateBasisMassmat_tet4();
+	return CreateBvv_tet4();
+    default:
+	xERROR("Raster_Blob2: Unsupported element type");
+	return 0;
+    }
+}
+
+RCompRowMatrix *Raster_Blob2::CreateDvv () const
+{
+    switch (meshptr->elist[0]->Type()) {
+    case ELID_TRI3:
+    case ELID_TRI6:
+    case ELID_TRI10:
+	return CreateDvv_tri();
+    case ELID_TET4:
+	//return CreateDvv_tet4();
+	return 0;
+    default:
+	xERROR("Raster_Blob2: Unsupported element type");
+	return 0;
+    }
+}
+
+RCompRowMatrix *Raster_Blob2::CreateDuv () const
+{
+    switch (meshptr->elist[0]->Type()) {
+    case ELID_TRI3:
+    case ELID_TRI6:
+    case ELID_TRI10:
+	return CreateDuv_tri();
+    case ELID_TET4:
+	//return CreateBuv_tet4();
+	return 0;
     default:
 	xERROR("Raster_Blob2: Unsupported element type");
 	return 0;

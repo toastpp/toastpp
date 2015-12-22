@@ -216,6 +216,18 @@ classdef toastBasis < handle
         buv = toastmex(uint32(89),obj.handle);
     end
     
+    function duu = Duu(obj)
+        duu = toastmex(uint32(98),obj.handle);
+    end
+    
+    function dvv = Dvv(obj)
+        dvv = toastmex(uint32(99),obj.handle);
+    end
+    
+    function duv = Duv(obj)
+        duv = toastmex(uint32(97),obj.handle);
+    end
+    
     function bvw = Bvw(obj,dim)
         bvw = toastmex(uint32(93),obj.handle,dim);
     end

@@ -18,7 +18,7 @@ void IcosaCut (BufMesh &mesh, double scale, const Point &cnt);
 // ==========================================================================
 
 #ifdef UNDEF
-RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
+RCompRowMatrix *Raster_Blob2::CreateBvv_tet4 () const
 {
     int i, i0, j0, k0, i1, j1, k1, tmp, nd, s, m, idx_i, idx_j;
     int el, nel = meshptr->elen();
@@ -269,7 +269,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 // ==========================================================================
 
 // currently active
-RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
+RCompRowMatrix *Raster_Blob2::CreateBvv_tet4 () const
 {
     int i, j, i0, j0, k0, i1, j1, k1, s, m, el, nd, idx_i, idx_j, tmp;
     int nel = meshptr->elen();
@@ -570,7 +570,7 @@ RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
 
 #ifdef UNDEF
 // SIMPLE DIAGONAL VERSION
-RCompRowMatrix *Raster_Blob2::CreateBasisMassmat_tet4 () const
+RCompRowMatrix *Raster_Blob2::CreateBvv_tet4 () const
 {
     int i, i0, j0, k0, i1, j1, k1, s, m, el, nd, idx_i, idx_j, tmp;
     int nel = meshptr->elen();

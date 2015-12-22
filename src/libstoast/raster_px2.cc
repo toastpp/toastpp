@@ -55,7 +55,7 @@ double Raster_Pixel2::Value_nomask (const Point &p, int i, bool is_solidx) const
 // =========================================================================
 // Creates the pixel-pixel mass matrix (Bvv)
 
-RCompRowMatrix *Raster_Pixel2::CreateBasisMassmat () const
+RCompRowMatrix *Raster_Pixel2::CreateBvv () const
 {
     // neighbour stencils
     static const int nstencil2 = 9;

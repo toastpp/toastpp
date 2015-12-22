@@ -22,6 +22,9 @@ Raster2::Raster2 (const IVector &_bdim, const IVector &_gdim,
     Buu_Cholesky_d = 0;
     Bvv_Cholesky_L = 0;
     Bvv_Cholesky_d = 0;
+    Duu = 0;
+    Dvv = 0;
+    Duv = 0;
     D = 0;
 }
 
@@ -32,10 +35,10 @@ Raster2::~Raster2 ()
     if (Buu) delete Buu;
     if (Bvv) delete Bvv;
     if (Buv) delete Buv;
-    if (Bvw) {
-        delete Bvw;
-	Bvw = 0;
-    }
+    if (Bvw) delete Bvw;
+    if (Duu) delete Duu;
+    if (Dvv) delete Dvv;
+    if (Duv) delete Duv;
     if (Buu_precon) {
 	delete Buu_precon;
     }
@@ -90,6 +93,18 @@ void Raster2::Init ()
     if (Bvv_Cholesky_d) {
 	delete Bvv_Cholesky_d;
     }
+    if (Duu) {
+	delete Duu;
+	Duu = 0;
+    }
+    if (Dvv) {
+	delete Dvv;
+	Dvv = 0;
+    }
+    if (Duv) {
+	delete Duv;
+	Duv = 0;
+    }
     if (D) {
 	delete D;
     }
@@ -98,7 +113,7 @@ void Raster2::Init ()
     Buu = meshptr->MassMatrix();
 
     // mass matrix for intrinsic basis
-    Bvv = CreateBasisMassmat();
+    Bvv = CreateBvv();
 
     // mass matrix for the mixed bases
     Buv = CreateBuv();
@@ -138,6 +153,30 @@ void Raster2::Init ()
 
 // =========================================================================
 
+const RCompRowMatrix *Raster2::GetDuu () const
+{
+    if (!Duu) Duu = CreateDuu();
+    return Duu;
+}
+
+// =========================================================================
+
+const RCompRowMatrix *Raster2::GetDvv () const
+{
+    if (!Dvv) Dvv = CreateDvv();
+    return Dvv;
+}
+
+// =========================================================================
+
+const RCompRowMatrix *Raster2::GetDuv () const
+{
+    if (!Duv) Duv = CreateDuv();
+    return Duv;
+}
+
+// =========================================================================
+
 const RCompRowMatrix *Raster2::GetBvw (const IVector &wdim)
 {
     if (Bvw) {
@@ -146,6 +185,20 @@ const RCompRowMatrix *Raster2::GetBvw (const IVector &wdim)
     }
     Bvw = CreateBvw (wdim);
     return Bvw;
+}
+
+// =========================================================================
+
+RCompRowMatrix *Raster2::CreateDuu () const
+{
+    idxtype *rowptr, *colidx;
+    int nzero, n = meshptr->nlen();
+    meshptr->SparseRowStructure (rowptr, colidx, nzero);
+    RCompRowMatrix *M = new RCompRowMatrix (n,n,rowptr,colidx);
+    delete []rowptr;
+    delete []colidx;
+    AddToSysMatrix (*meshptr, *M, (RVector*)0, ASSEMBLE_DD);
+    return M;
 }
 
 // =========================================================================
