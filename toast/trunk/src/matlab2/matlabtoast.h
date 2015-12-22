@@ -81,6 +81,12 @@ public:
         const mxArray *prhs[]);
     void GetBasisBvw (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
+    void GetBasisDuu (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisDvv (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
+    void GetBasisDuv (int nlhs, mxArray *plhs[], int nrhs,
+        const mxArray *prhs[]);
     void GetBasisGuv (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void GetBasisGvv (int nlhs, mxArray *plhs[], int nrhs,

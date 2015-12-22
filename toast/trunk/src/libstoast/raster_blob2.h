@@ -86,9 +86,9 @@ protected:
     int blen_pad;   ///< size of padded basis
     
 private:
-    RCompRowMatrix *CreateBasisMassmat () const;
-    RCompRowMatrix *Bvv_tri () const;
-    RCompRowMatrix *CreateBasisMassmat_tet4 () const;
+    RCompRowMatrix *CreateBvv () const;
+    RCompRowMatrix *CreateBvv_tri () const;
+    RCompRowMatrix *CreateBvv_tet4 () const;
 
     /**
      * \brief Returns pointer to mixed mapping matrix
@@ -97,6 +97,12 @@ private:
     RCompRowMatrix *CreateBuv_tri () const;
     RCompRowMatrix *CreateBuv_tet4 () const;
 
+    RCompRowMatrix *CreateDvv () const;
+    RCompRowMatrix *CreateDvv_tri () const;
+
+    RCompRowMatrix *CreateDuv () const;
+    RCompRowMatrix *CreateDuv_tri () const;
+    
     RCompRowMatrix *CreateBvw (const IVector &wdim) const;
     RCompRowMatrix *CreateBvw_tri (const IVector &wdim) const;
     RCompRowMatrix *CreateBvw_tet4 (const IVector &wdim) const;

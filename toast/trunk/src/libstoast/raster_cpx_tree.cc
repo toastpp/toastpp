@@ -48,7 +48,7 @@ void Raster_CPixel_Tree::FinaliseTree ()
 
     //Init();
     if (Bvv) delete Bvv;
-    Bvv = CreateBasisMassmat();
+    Bvv = CreateBvv();
     if (Buv) delete Buv;
     Buv = CreateBuv();
     if (map_tol) {
@@ -129,7 +129,7 @@ void Raster_CPixel_Tree::Refine (int *idx, int nidx)
 
 // =========================================================================
 
-RCompRowMatrix *Raster_CPixel_Tree::CreateBasisMassmat () const
+RCompRowMatrix *Raster_CPixel_Tree::CreateBvv () const
 {
     // construct a sparse diagonal matrix
     idxtype *rowptr = new idxtype[blen+1];

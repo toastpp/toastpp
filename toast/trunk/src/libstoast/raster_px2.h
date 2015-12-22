@@ -72,7 +72,7 @@ protected:
     Raster_Pixel2 (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
         RDenseMatrix *bb = 0, double _map_tol=1e-10);
 
-    RCompRowMatrix *CreateBasisMassmat () const;
+    RCompRowMatrix *CreateBvv () const;
 
     RCompRowMatrix *CreateBvw (const IVector &wdim) const;
     RCompRowMatrix *CreateBvw_tri (const IVector &wdim) const;
