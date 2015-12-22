@@ -63,6 +63,9 @@
 #define TOAST_BASIS_BVV         88
 #define TOAST_BASIS_BUV         89
 #define TOAST_BASIS_BVW         93
+#define TOAST_BASIS_DUU         98
+#define TOAST_BASIS_DVV         99 // end
+#define TOAST_BASIS_DUV         97
 #define TOAST_BASIS_GUV         94
 #define TOAST_BASIS_GVV         95
 #define TOAST_BASIS_SUPPORTAREA 90
@@ -95,7 +98,7 @@
 #define TOAST_REGULHESS         49
 #define TOAST_REGULHESS1F       67
 #define TOAST_REGULKAPPA        50
-#define TOAST_REGULSETLOCALSCALING 96 // end
+#define TOAST_REGULSETLOCALSCALING 96
 #define TOAST_FIELDS            51
 #define TOAST_GRADIENT          52
 #define TOAST_JACOBIAN          53

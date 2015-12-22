@@ -153,14 +153,15 @@ int QRule_tri_dummy (const double **wght, const Point **absc)
 }
 
 // ===========================================================================
-#ifdef UNDEF
-RCompRowMatrix *Raster_Blob2::Bvv_tri () const
+
+RCompRowMatrix *Raster_Blob2::CreateBvv_tri () const
 {
     const double eps = 1e-10;
-    const int subgrd = 100;
-    int i, i0, j0, i1, j1, bidx0, bidx1, prog;
+    const int subgrd = 200;
+    int i, i0, j0, i1, j1, bidx0, bidx1, prog, count;
     double xcnt0, ycnt0, xcnt1, ycnt1, dstx, dsty;
     double xmin, ymin, xmax, ymax, x, y, r, r0, r1, v0, v1, bvvi;
+    double dx0_2, dy0_2, dx1_2, dy1_2, area;
     double xstep = 1.0/((bdim[0]-1.0)*subgrd);
     double ystep = 1.0/((bdim[1]-1.0)*subgrd);
     double dx = grid[0];
@@ -191,7 +192,7 @@ RCompRowMatrix *Raster_Blob2::Bvv_tri () const
 		}
 	    }
 	}
-	if (((j0+1)*nprog)/bdim_pad[1] > prog) {
+	while (((j0+1)*nprog)/bdim_pad[1] > prog) {
 	    std::cout << "=" << std::flush;
 	    prog++;
 	}
@@ -224,7 +225,7 @@ RCompRowMatrix *Raster_Blob2::Bvv_tri () const
 		}
 	    }
 	}
-	if (((j0+1)*nprog)/bdim_pad[1] > prog) {
+	while (((j0+1)*nprog)/bdim_pad[1] > prog) {
 	    std::cout << "=" << std::flush;
 	    prog++;
 	}
@@ -259,22 +260,41 @@ RCompRowMatrix *Raster_Blob2::Bvv_tri () const
 			    }
 			}
 			if (i == noverlap) { // not present - calculate
-			    xmin = min(xcnt0,xcnt1)-sup;
-			    xmax = max(xcnt0,xcnt1)+sup;
-			    ymin = min(ycnt0,ycnt1)-sup;
-			    ymax = max(ycnt0,ycnt1)+sup;
+			    xmin = max(xcnt0,xcnt1)-sup;
+			    xmax = min(xcnt0,xcnt1)+sup;
+			    ymin = max(ycnt0,ycnt1)-sup;
+			    ymax = min(ycnt0,ycnt1)+sup;
 			    bvvi = 0.0;
+			    count = 0;
 			    for (x = xmin; x <= xmax; x += xstep) {
+				dstx = x-xcnt0;
+				dx0_2 = dstx*dstx;
+				dstx = x-xcnt1;
+				dx1_2 = dstx*dstx;
 				for (y = ymin; y <= ymax; y += ystep) {
-				    r0 = hypot(x-xcnt0, y-ycnt0);
-				    if (r0 >= sup) continue;
-				    r1 = hypot(x-xcnt1, y-ycnt1);
-				    if (r1 >= sup) continue;
+				    dsty = y-ycnt0;
+				    dy0_2 = dsty*dsty;
+				    if (dx0_2 + dy0_2 >= radlimit2) continue;
+				    dsty = y-ycnt1;
+				    dy1_2 = dsty*dsty;
+				    if (dx1_2 + dy1_2 >= radlimit2) continue;
+				    r0 = sqrt(dx0_2+dy0_2);
+				    r1 = sqrt(dx1_2+dy1_2);
 				    v0 = RadValue(r0);
 				    v1 = RadValue(r1);
 				    bvvi += v0*v1;
+				    count++;
 				}
 			    }
+			    // area of overlap
+			    if (r < eps) {
+				area = sup*sup*Pi;
+			    } else {
+				double theta = 2.0*acos(r/(2.0*sup));
+				area = sup*sup*0.5*(theta - sin(theta));
+			    }
+			    if (count)
+				bvvi *= area/(double)count;
 			    OVERLAP *tmp = new OVERLAP[noverlap+1];
 			    if (noverlap) {
 				memcpy(tmp,overlap,noverlap*sizeof(OVERLAP));
@@ -290,13 +310,13 @@ RCompRowMatrix *Raster_Blob2::Bvv_tri () const
 		}
 	    }
 	}
-	if (((j0+1)*nprog)/bdim_pad[1] > prog) {
+	while (((j0+1)*nprog)/bdim_pad[1] > prog) {
 	    std::cout << "=" << std::flush;
 	    prog++;
 	}
     }
     std::cout << "]" << std::endl;
-    (*bvv) *= xstep*ystep;
+    //(*bvv) *= xstep*ystep;
     
     // diagonal conditioning
     RVector d = bvv->Diag();
@@ -307,9 +327,9 @@ RCompRowMatrix *Raster_Blob2::Bvv_tri () const
     bvv->Shrink();
     return bvv;
 }
-#endif
 
-RCompRowMatrix *Raster_Blob2::Bvv_tri () const
+#ifdef UNDEF
+RCompRowMatrix *Raster_Blob2::CreateBvv_tri () const
 {
     int i, j, i0, j0, i1, j1, k, ii, jj, nv, nv0, nv1, m, el, nd, idx_i, idx_j;
     int prog, nel = meshptr->elen(), n = meshptr->nlen();
@@ -571,6 +591,7 @@ RCompRowMatrix *Raster_Blob2::Bvv_tri () const
     bvv->Shrink();
     return bvv;
 }
+#endif
 
 // ===========================================================================
 
@@ -746,10 +767,354 @@ RCompRowMatrix *Raster_Blob2::CreateBuv_tri () const
     return buv;
 }
 
+// ===========================================================================
+
+RCompRowMatrix *Raster_Blob2::CreateDvv_tri () const
+{
+    const double eps = 1e-10;
+    const int subgrd = 200;
+    int i, i0, j0, i1, j1, bidx0, bidx1, prog;
+    double xcnt0, ycnt0, xcnt1, ycnt1, dstx, dsty;
+    double xmin, ymin, xmax, ymax, x, y, r, r0, r1, dvvi;
+    double dx0_2, dy0_2, dx1_2, dy1_2;
+    RVector g0(2), g1(2);
+    double xstep = 1.0/((bdim[0]-1.0)*subgrd);
+    double ystep = 1.0/((bdim[1]-1.0)*subgrd);
+    double dx = grid[0];
+    double dy = grid[1];
+    double radlimit2 = sup*sup;
+    double radlimit22 = radlimit2*4.0;
+    IVector npx(blen_pad);
+    struct OVERLAP {
+	double dst;
+	double v;
+    } *overlap;
+    int noverlap = 0;
+    
+    std::cout << "Dvv: pass 1 [" << std::flush; prog = 0;
+    for (j0 = -npad; j0 < bdim[1]+npad; j0++) {
+	ycnt0 = bbmin[1]+j0*dy;
+	for (i0 = -npad; i0 < bdim[0]+npad; i0++) {
+	    xcnt0 = bbmin[0]+i0*dx;
+	    bidx0 = (i0+npad) + (j0+npad)*bdim_pad[0];
+	    for (j1 = -npad; j1 < bdim[1]+npad; j1++) {
+		ycnt1 = bbmin[1]+j1*dy;
+		for (i1 = -npad; i1 < bdim[0]+npad; i1++) {
+		    xcnt1 = bbmin[0]+i1*dx;
+		    dstx = xcnt0-xcnt1;
+		    dsty = ycnt0-ycnt1;
+		    if (dstx*dstx + dsty*dsty < radlimit22)
+			npx[bidx0]++;
+		}
+	    }
+	}
+	while (((j0+1)*nprog)/bdim_pad[1] > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    int *rowptr = new int[blen_pad+1];
+    rowptr[0] = 0;
+    for (i = 0; i < blen_pad; i++)
+	rowptr[i+1] = rowptr[i] + npx[i];
+    int nz = rowptr[blen_pad];
+    int *colidx = new int[nz];
+    npx.Clear();
+
+    std::cout << "Dvv: pass 2 [" << std::flush; prog = 0;
+    for (j0 = -npad; j0 < bdim[1]+npad; j0++) {
+	ycnt0 = bbmin[1]+j0*dy;
+	for (i0 = -npad; i0 < bdim[0]+npad; i0++) {
+	    xcnt0 = bbmin[0]+i0*dx;
+	    bidx0 = (i0+npad) + (j0+npad)*bdim_pad[0];
+	    for (j1 = -npad; j1 < bdim[1]+npad; j1++) {
+		ycnt1 = bbmin[1]+j1*dy;
+		for (i1 = -npad; i1 < bdim[0]+npad; i1++) {
+		    xcnt1 = bbmin[0]+i1*dx;
+		    bidx1 = (i1+npad) + (j1+npad)*bdim_pad[0];
+		    dstx = xcnt0-xcnt1;
+		    dsty = ycnt0-ycnt1;
+		    if (dstx*dstx + dsty*dsty < radlimit22)
+			colidx[rowptr[bidx0]+npx[bidx0]++] = bidx1;
+		}
+	    }
+	}
+	while (((j0+1)*nprog)/bdim_pad[1] > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    RCompRowMatrix *dvv = new RCompRowMatrix (blen_pad, blen_pad,
+					      rowptr, colidx);
+    delete []rowptr;
+    delete []colidx;
+
+    std::cout << "Dvv: pass 3 [" << std::flush; prog = 0;
+    for (j0 = -npad; j0 < bdim[1]+npad; j0++) {
+	ycnt0 = bbmin[1]+j0*dy;
+	for (i0 = -npad; i0 < bdim[0]+npad; i0++) {
+	    xcnt0 = bbmin[0]+i0*dx;
+	    bidx0 = (i0+npad) + (j0+npad)*bdim_pad[0];
+	    for (j1 = -npad; j1 < bdim[1]+npad; j1++) {
+		ycnt1 = bbmin[1]+j1*dy;
+		for (i1 = -npad; i1 < bdim[0]+npad; i1++) {
+		    xcnt1 = bbmin[0]+i1*dx;
+		    bidx1 = (i1+npad) + (j1+npad)*bdim_pad[0];
+		    dstx = xcnt0-xcnt1;
+		    dsty = ycnt0-ycnt1;
+		    if (dstx*dstx + dsty*dsty < radlimit22) {
+			r = hypot(dstx,dsty);
+			// check if we already have an entry
+			for (i = 0; i < noverlap; i++) {
+			    if (fabs(overlap[i].dst-r) < eps) {
+				dvvi = overlap[i].v;
+				break;
+			    }
+			}
+			if (i == noverlap) { // not present - calculate
+			    xmin = max(xcnt0,xcnt1)-sup;
+			    xmax = min(xcnt0,xcnt1)+sup;
+			    ymin = max(ycnt0,ycnt1)-sup;
+			    ymax = min(ycnt0,ycnt1)+sup;
+			    dvvi = 0.0;
+			    for (x = xmin; x <= xmax; x += xstep) {
+				dstx = x-xcnt0;
+				dx0_2 = dstx*dstx;
+				dstx = x-xcnt1;
+				dx1_2 = dstx*dstx;
+				for (y = ymin; y <= ymax; y += ystep) {
+				    dsty = y-ycnt0;
+				    dy0_2 = dsty*dsty;
+				    if (dx0_2 + dy0_2 >= radlimit2) continue;
+				    dsty = y-ycnt1;
+				    dy1_2 = dsty*dsty;
+				    if (dx1_2 + dy1_2 >= radlimit2) continue;
+				    r0 = sqrt(dx0_2+dy0_2);
+				    r1 = sqrt(dx1_2+dy1_2);
+				    g0 = RadGradient(r0);
+				    g1 = RadGradient(r1);
+				    dvvi += g0[0]*g1[0] + g0[1]*g1[1];
+				}
+			    }			    
+			    OVERLAP *tmp = new OVERLAP[noverlap+1];
+			    if (noverlap) {
+				memcpy(tmp,overlap,noverlap*sizeof(OVERLAP));
+				delete []overlap;
+			    }
+			    overlap = tmp;
+			    overlap[noverlap].dst = r;
+			    overlap[noverlap].v = dvvi;
+			    noverlap++;
+			}
+			(*dvv)(bidx0,bidx1) = dvvi;
+		    }
+		}
+	    }
+	}
+	while (((j0+1)*nprog)/bdim_pad[1] > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+    (*dvv) *= xstep*ystep;
+    
+    // diagonal conditioning
+    RVector d = dvv->Diag();
+    double dmean = mean(d);
+    for (i = 0; i < blen; i++)
+	(*dvv)(i,i) += dmean*dgscale;
+
+    dvv->Shrink();
+    return dvv;
+}
+
+// ===========================================================================
+
+RCompRowMatrix *Raster_Blob2::CreateDuv_tri () const
+{
+    int i, j, k, ii, jj, nv, m, el, nd, idx_i, idx_j, prog;
+    int nel = meshptr->elen(), n = meshptr->nlen();
+    bool intersect;
+    double rx, ry, djac, v;
+    RDenseMatrix der, IJ(2,2);
+    RVector g;
+    
+    // grid range and spacing (assumes regular arrangement of blob
+    // basis functions)
+    double xrange = bbmax[0]-bbmin[0];
+    double yrange = bbmax[1]-bbmin[1];
+    double dx = xrange/(bdim[0]-1.0);
+    double dy = yrange/(bdim[1]-1.0);
+    double radlimit2 = sup*sup;
+    
+    // quadrature rule for local triangle
+    const double *wght;
+    const Point *absc;
+    int np = QRule_tri_4_6 (&wght, &absc);
+
+    int *npx = new int[n];
+    for (i = 0; i < n; i++) npx[i] = 0;
+
+    // pass 1: determine matrix fill structure
+    double px, py;
+    std::cout << "Duv: pass 1 [" << std::flush; prog = 0;
+    for (el = 0; el < nel; el++) {
+	Element *pel = meshptr->elist[el];
+	for (j = -npad; j < bdim[1]+npad; j++) {
+	    py = bbmin[1] + j*dy;
+	    for (i = -npad; i < bdim[0]+npad; i++) {
+		px = bbmin[0] + i*dx;
+		intersect = false;
+		for (k = 0; k < pel->nNode(); k++) {
+		    nd = pel->Node[k];
+		    rx = px-meshptr->nlist[nd][0];
+		    ry = py-meshptr->nlist[nd][1];
+		    if (rx*rx + ry*ry < radlimit2) {
+			intersect = true;
+			break;
+		    }
+		}
+		if (intersect) {
+		    for (k = 0; k < pel->nNode(); k++)
+			npx[pel->Node[k]]++;
+		}
+	    }
+	}
+	if (((el+1)*nprog)/nel > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    int *rowptr = new int[n+1];
+    rowptr[0] = 0;
+    for (i = 0; i < n; i++)
+	rowptr[i+1] = rowptr[i]+npx[i];
+    int nz = rowptr[n];
+    int *colidx = new int[nz];
+    for (i = 0; i < n; i++)
+	npx[i] = 0;
+
+    // pass 2
+    std::cout << "Duv: pass 2 [" << std::flush; prog = 0;
+    for (el = 0; el < nel; el++) {
+	Element *pel = meshptr->elist[el];
+	for (j = -npad; j < bdim[1]+npad; j++) {
+	    py = bbmin[1] + j*dy;
+	    for (i = -npad; i < bdim[0]+npad; i++) {
+		px = bbmin[0] + i*dx;
+		intersect = false;
+		for (k = 0; k < pel->nNode(); k++) {
+		    nd = pel->Node[k];
+		    rx = px-meshptr->nlist[nd][0];
+		    ry = py-meshptr->nlist[nd][1];
+		    if (rx*rx + ry*ry < radlimit2) {
+			intersect = true;
+			break;
+		    }
+		}
+		if (intersect) {
+		    for (k = 0; k < pel->nNode(); k++) {
+			nd = pel->Node[k];
+			colidx[rowptr[nd]+npx[nd]++] =
+			    (i+npad) + (j+npad)*bdim_pad[0];
+		    }
+		}
+	    }
+	}
+	if (((el+1)*nprog)/nel > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    RCompRowMatrix *duv = new RCompRowMatrix (n, blen_pad, rowptr, colidx);
+
+    // pass 3: fill the matrix
+    std::cout << "Duv: pass 3 [" << std::flush; prog = 0;
+    for (el = 0; el < nel; el++) {
+	Element *pel = meshptr->elist[el];
+	const int npoly = 10;
+	Point poly[npoly];
+	Triangle3 t3;
+	NodeList n3(3);
+	for (i = 0; i < 3; i++) {
+	    t3.Node[i] = i;
+	    n3[i].New(2);
+	}
+
+	for (j = -npad; j < bdim[1]+npad; j++) {
+	    py = bbmin[1] + j*dy;
+	    for (i = -npad; i < bdim[0]+npad; i++) {
+		px = bbmin[0] + i*dx;
+		intersect = false;
+		for (k = 0; k < pel->nNode(); k++) {
+		    nd = pel->Node[k];
+		    rx = px-meshptr->nlist[nd][0];
+		    ry = py-meshptr->nlist[nd][1];
+		    if (rx*rx + ry*ry < radlimit2) {
+			intersect = true;
+			break;
+		    }
+		}
+		if (intersect) {
+		    nv = SutherlandHodgman (el, px, py, poly, npoly);
+		    idx_j = (i+npad) + (j+npad)*bdim_pad[0];
+
+		    // split into nv-2 triangles
+		    for (k = 0; k < nv-2; k++) {
+			n3[0][0] = poly[0][0];
+			n3[0][1] = poly[0][1];
+			n3[1][0] = poly[k+1][0];
+			n3[1][1] = poly[k+1][1];
+			n3[2][0] = poly[k+2][0];
+			n3[2][1] = poly[k+2][1];
+			t3.Initialise(n3);
+
+			for (m = 0; m < np; m++) {
+			    djac = t3.IJacobian(absc[m], &n3, IJ);
+			    Point glob = t3.Global(n3, absc[m]);
+			    Point loc = pel->Local(meshptr->nlist, glob);
+			    der = IJ*pel->LocalShapeD (loc);
+			    g = Gradient_nomask(glob,idx_j,false);
+			    g *= wght[m] * djac;
+			    for (ii = 0; ii < 3; ii++) {
+				idx_i = pel->Node[ii];
+				v = g[0]*der(ii,0) + g[1]*der(ii,1);
+				(*duv)(idx_i, idx_j) += v;
+			    }
+			}
+		    }
+		}    
+	    }
+	}
+	if (((el+1)*nprog)/nel > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    delete []rowptr;
+    delete []colidx;
+    delete []npx;
+
+    duv->Shrink();
+    return duv;
+}
+
 // ==========================================================================
 // Map directly between basis and a regular voxel image with piecewise
 // constant basis functions
 
+#ifdef UNDEF
 RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
     const IVector &pxdim) const
 {
@@ -758,8 +1123,8 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
     int stride1 = bdim[0];
     int pstride1 = pxdim[0];
     int plen = pxdim[0]*pxdim[1];
-    int *npx = new int[blen];
-    for (i = 0; i < blen; i++) npx[i] = 0;
+    int *npx = new int[blen_pad];
+    for (i = 0; i < blen_pad; i++) npx[i] = 0;
     double px0, py0, px1, py1, rx, ry, djac;
     double dx = grid[0];
     double dy = grid[1];
@@ -775,9 +1140,9 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
 
     // pass 1: determine storage requirements
     std::cout << "Bvw: pass 1 [" << std::flush; prog = 0;
-    for (idx_i = 0; idx_i < blen; idx_i++) {
-	j0 = idx_i / stride1;
-	i0 = idx_i % stride1;
+    for (idx_i = 0; idx_i < blen_pad; idx_i++) {
+	j0 = idx_i / bdim_pad[0] - npad;
+	i0 = idx_i % bdim_pad[0] - npad;
 	px0 = bbmin[0] + i0*dx;
 	py0 = bbmin[1] + j0*dy;
 	intersect = false;
@@ -820,27 +1185,27 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
 		}
 	    }
 	}
-	if (((idx_i+1)*nprog)/blen > prog) {
+	if (((idx_i+1)*nprog)/blen_pad > prog) {
 	    std::cout << "=" << std::flush;
 	    prog++;
 	}
     }
     std::cout << "]" << std::endl;
 
-    int *rowptr = new int[blen+1];
+    int *rowptr = new int[blen_pad+1];
     rowptr[0] = 0;
-    for (i = 0; i < blen; i++) {
+    for (i = 0; i < blen_pad; i++) {
         rowptr[i+1] = rowptr[i]+npx[i];
 	npx[i] = 0;
     }
-    int nz = rowptr[blen];
+    int nz = rowptr[blen_pad];
     int *colidx = new int[nz];
 
     // pass 2: sparsity pattern
     std::cout << "Bvw: pass 2 [" << std::flush; prog = 0;
-    for (idx_i = 0; idx_i < blen; idx_i++) {
-	j0 = idx_i / stride1;
-	i0 = idx_i % stride1;
+    for (idx_i = 0; idx_i < blen_pad; idx_i++) {
+	j0 = idx_i / bdim_pad[0] - npad;
+	i0 = idx_i % bdim_pad[0] - npad;
 	px0 = bbmin[0] + i0*dx;
 	py0 = bbmin[1] + j0*dy;
 	intersect = false;
@@ -879,7 +1244,7 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
 		    colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
 	    }
 	}
-	if (((idx_i+1)*nprog)/blen > prog) {
+	if (((idx_i+1)*nprog)/blen_pad > prog) {
 	    std::cout << "=" << std::flush;
 	    prog++;
 	}
@@ -887,7 +1252,7 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
     std::cout << "]" << std::endl;
 
     delete []npx;
-    RCompRowMatrix *bvw = new RCompRowMatrix (blen, plen, rowptr, colidx);
+    RCompRowMatrix *bvw = new RCompRowMatrix (blen_pad, plen, rowptr, colidx);
 
     const int npoly = 10;
     Point poly[npoly];
@@ -900,9 +1265,9 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
 
     // pass 3: fill the matrix
     std::cout << "Bvw: pass 3 [" << std::flush; prog = 0;
-    for (idx_i = 0; idx_i < blen; idx_i++) {
-	j0 = idx_i / stride1;
-	i0 = idx_i % stride1;
+    for (idx_i = 0; idx_i < blen_pad; idx_i++) {
+	j0 = idx_i / bdim_pad[0] - npad;
+	i0 = idx_i % bdim_pad[0] - npad;
 	px0 = bbmin[0] + i0*dx;
 	py0 = bbmin[1] + j0*dy;
 
@@ -938,11 +1303,12 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
 		    i1 = max(0, min(pxdim[0]-1, (int)((px1-bbmin[0])/pdx)));
 		    j1 = max(0, min(pxdim[1]-1, (int)((py1-bbmin[1])/pdy)));
 		    idx_j = i1 + j1*pstride1;
-		    (*bvw)(idx_i,idx_j) += Value_nomask(glob,idx_i,false)*djac;
+		    (*bvw)(idx_i,idx_j) += Value_nomask(glob,idx_i,false)
+			* djac * wght[m];
 		}
 	    }
 	}
-	if (((idx_i+1)*nprog)/blen > prog) {
+	if (((idx_i+1)*nprog)/blen_pad > prog) {
 	    std::cout << "=" << std::flush;
 	    prog++;
 	}
@@ -954,7 +1320,148 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (
     bvw->Shrink();
     return bvw;
 }
+#endif
 
+//#ifdef UNDEF
+RCompRowMatrix *Raster_Blob2::CreateBvw_tri (const IVector &pxdim) const
+{
+    int idx_i, idx_j, i, j, i0, j0, i1, j1, jj, prog;
+    //int stride1 = bdim[0];
+    int pstride1 = pxdim[0];
+    int plen = pxdim[0]*pxdim[1];
+    int subdiv = 10;
+    double px0, py0, px1, py1, rx, ry, x, y, v;
+    double radlimit2 = sup*sup;
+    double dx = grid[0];
+    double dy = grid[1];
+    double pdx = bbsize[0]/pxdim[0];
+    double pdy = bbsize[1]/pxdim[1];
+    double subwght = (pdx*pdy)/(subdiv*subdiv);
+    bool intersect;
+    int *npx = new int[blen_pad];
+    for (i = 0; i < blen_pad; i++) npx[i] = 0;
+    Point p(2);
+
+    // pass 1: determine storage requirements
+    std::cout << "Bvw: pass 1 [" << std::flush; prog = 0;
+    for (idx_i = 0; idx_i < blen_pad; idx_i++) {
+	j0 = idx_i / bdim_pad[0] - npad;
+	i0 = idx_i % bdim_pad[0] - npad;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	for (idx_j = 0; idx_j < plen; idx_j++) {
+	    j1 = idx_j / pstride1;
+	    i1 = idx_j % pstride1;
+	    px1 = bbmin[0] + i1*pdx;
+	    py1 = bbmin[1] + j1*pdy;
+	    intersect = false;
+	    for (j = 0; j < 2; j++) {
+	        for (i = 0; i < 2; i++) {
+		    rx = px0 - (px1+i*pdx);
+		    ry = py0 - (py1+j*pdy);
+		    if (rx*rx + ry*ry < radlimit2) {
+		        intersect = true;
+			i = j = 2; // break
+		    }
+		}
+	    }
+	    if (intersect)
+	        npx[idx_i]++;
+	}
+	if (((idx_i+1)*nprog)/blen_pad > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    int *rowptr = new int[blen_pad+1];
+    rowptr[0] = 0;
+    for (i = 0; i < blen_pad; i++) {
+        rowptr[i+1] = rowptr[i]+npx[i];
+	npx[i] = 0;
+    }
+    int nz = rowptr[blen_pad];
+    int *colidx = new int[nz];
+
+    // pass 2: determine matrix sparsity pattern
+    std::cout << "Bvw: pass 2 [" << std::flush; prog = 0;
+    for (idx_i = 0; idx_i < blen_pad; idx_i++) {
+	j0 = idx_i / bdim_pad[0] - npad;
+	i0 = idx_i % bdim_pad[0] - npad;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	for (idx_j = 0; idx_j < plen; idx_j++) {
+	    j1 = idx_j / pstride1;
+	    i1 = idx_j % pstride1;
+	    px1 = bbmin[0] + i1*pdx;
+	    py1 = bbmin[1] + j1*pdy;
+	    intersect = false;
+	    for (j = 0; j < 2; j++) {
+	        for (i = 0; i < 2; i++) {
+		    rx = px0 - (px1+i*pdx);
+		    ry = py0 - (py1+j*pdy);
+		    if (rx*rx + ry*ry < radlimit2) {
+		        intersect = true;
+			i = j = 2; // break
+		    }
+		}
+	    }
+	    if (intersect)
+		colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
+	}      
+	if (((idx_i+1)*nprog)/blen_pad > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    delete []npx;
+    RCompRowMatrix *bvw = new RCompRowMatrix (blen_pad, plen, rowptr, colidx);
+
+    std::cout << "Bvw: pass 3 [" << std::flush; prog = 0;
+    for (idx_i = 0; idx_i < blen_pad; idx_i++) {
+	j0 = idx_i / bdim_pad[0] - npad;
+	i0 = idx_i % bdim_pad[0] - npad;
+	px0 = bbmin[0] + i0*dx;
+	py0 = bbmin[1] + j0*dy;
+	for (jj = rowptr[idx_i]; jj < rowptr[idx_i+1]; jj++) {
+	    idx_j = colidx[jj];
+	    j1 = idx_j / pstride1;
+	    i1 = idx_j % pstride1;
+	    px1 = bbmin[0] + i1*pdx;
+	    py1 = bbmin[1] + j1*pdy;
+	    v = 0.0;
+	    for (j = 0; j < subdiv; j++) {
+	        y = py1 + (j+0.5)/subdiv*pdy;
+		for (i = 0; i < subdiv; i++) {
+		    x = px1 + (i+0.5)/subdiv*pdx;
+
+		    rx = x-px0;
+		    ry = y-py0;
+		    if (rx*rx + ry*ry < radlimit2) {
+		        p[0] = x; p[1] = y;
+			v += Value_nomask(p,idx_i,false);
+		    }
+		}
+	    }
+	    (*bvw)(idx_i,idx_j) = v*subwght;
+	}
+	if (((idx_i+1)*nprog)/blen_pad > prog) {
+	    std::cout << "=" << std::flush;
+	    prog++;
+	}
+    }
+    std::cout << "]" << std::endl;
+
+    delete []rowptr;
+    delete []colidx;
+
+    bvw->Shrink();
+    return bvw;
+}
+//#endif
 
 // ==========================================================================
 // Mapping W->V for blob basis V and bilinear pixel basis W
@@ -1161,135 +1668,6 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_linw_tri (const IVector &pxdim) const
     return bvw;
 }
 
-
-#ifdef UNDEF
-RCompRowMatrix *Raster_Blob2::CreateBvw_tri (const IVector &pxdim) const
-{
-    int idx_i, idx_j, i, j, i0, j0, i1, j1, jj;
-    int stride1 = bdim[0];
-    int pstride1 = pxdim[0];
-    int plen = pxdim[0]*pxdim[1];
-    int subdiv = 10;
-    double px0, py0, px1, py1, rx, ry, x, y, v;
-    double radlimit2 = sup*sup;
-    double dx = grid[0];
-    double dy = grid[1];
-    double pdx = bbsize[0]/pxdim[0];
-    double pdy = bbsize[1]/pxdim[1];
-    double subwght = (pdx*pdy)/(subdiv*subdiv);
-    bool intersect;
-    int *npx = new int[blen];
-    for (i = 0; i < blen; i++) npx[i] = 0;
-    Point p(2);
-
-    // pass 1: determine storage requirements
-    for (idx_i = 0; idx_i < blen; idx_i++) {
- 	std::cerr << "BasisPixelmat pass 1, " << idx_i << "/" << blen << std::endl;
-	j0 = idx_i / stride1;
-	i0 = idx_i % stride1;
-	px0 = bbmin[0] + i0*dx;
-	py0 = bbmin[1] + j0*dy;
-	for (idx_j = 0; idx_j < plen; idx_j++) {
-	    j1 = idx_j / pstride1;
-	    i1 = idx_j % pstride1;
-	    px1 = bbmin[0] + i1*pdx;
-	    py1 = bbmin[1] + j1*pdy;
-	    intersect = false;
-	    for (j = 0; j < 2; j++) {
-	        for (i = 0; i < 2; i++) {
-		    rx = px0 - (px1+i*pdx);
-		    ry = py0 - (py1+j*pdy);
-		    if (rx*rx + ry*ry < radlimit2) {
-		        intersect = true;
-			i = j = 2; // break
-		    }
-		}
-	    }
-	    if (intersect)
-	        npx[idx_i]++;
-	}
-    }
-
-    int *rowptr = new int[blen+1];
-    rowptr[0] = 0;
-    for (i = 0; i < blen; i++) {
-        rowptr[i+1] = rowptr[i]+npx[i];
-	npx[i] = 0;
-    }
-    int nz = rowptr[blen];
-    int *colidx = new int[nz];
-
-    // pass 2: determine matrix sparsity pattern
-    for (idx_i = 0; idx_i < blen; idx_i++) {
-  	std::cerr << "BasisPixelmat pass 2, " << idx_i << "/" << blen << std::endl;
-	j0 = idx_i / stride1;
-	i0 = idx_i % stride1;
-	px0 = bbmin[0] + i0*dx;
-	py0 = bbmin[1] + j0*dy;
-	for (idx_j = 0; idx_j < plen; idx_j++) {
-	    j1 = idx_j / pstride1;
-	    i1 = idx_j % pstride1;
-	    px1 = bbmin[0] + i1*pdx;
-	    py1 = bbmin[1] + j1*pdy;
-	    intersect = false;
-	    for (j = 0; j < 2; j++) {
-	        for (i = 0; i < 2; i++) {
-		    rx = px0 - (px1+i*pdx);
-		    ry = py0 - (py1+j*pdy);
-		    if (rx*rx + ry*ry < radlimit2) {
-		        intersect = true;
-			i = j = 2; // break
-		    }
-		}
-	    }
-	    if (intersect)
-		colidx[rowptr[idx_i]+npx[idx_i]++] = idx_j;
-	}      
-    }
-
-    delete []npx;
-    RCompRowMatrix *bvw = new RCompRowMatrix (blen, plen, rowptr, colidx);
-
-    for (idx_i = 0; idx_i < blen; idx_i++) {
- 	std::cerr << "BasisPixelmat pass 3, " << idx_i << "/" << blen << std::endl;
-	j0 = idx_i / stride1;
-	i0 = idx_i % stride1;
-	px0 = bbmin[0] + i0*dx;
-	py0 = bbmin[1] + j0*dy;
-	for (jj = rowptr[idx_i]; jj < rowptr[idx_i+1]; jj++) {
-	    idx_j = colidx[jj];
-	    j1 = idx_j / pstride1;
-	    i1 = idx_j % pstride1;
-	    px1 = bbmin[0] + i1*pdx;
-	    py1 = bbmin[1] + j1*pdy;
-	    v = 0.0;
-	    for (j = 0; j < subdiv; j++) {
-	        y = py1 + (j+0.5)/subdiv*pdy;
-		for (i = 0; i < subdiv; i++) {
-		    x = px1 + (i+0.5)/subdiv*pdx;
-
-		    // debug
-		    if (x*x + y*y > 25*25) continue;
-
-		    rx = x-px0;
-		    ry = y-py0;
-		    if (rx*rx + ry*ry < radlimit2) {
-		        p[0] = x; p[1] = y;
-			v += Value_nomask(p,idx_i,false);
-		    }
-		}
-	    }
-	    (*bvw)(idx_i,idx_j) = v*subwght;
-	}
-    }
-
-    delete []rowptr;
-    delete []colidx;
-
-    bvw->Shrink();
-    return bvw;
-}
-#endif
 
 int Raster_Blob2::SutherlandHodgman (const Point *p0, int np0,
 				     const Point *p1, int np1,

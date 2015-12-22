@@ -164,6 +164,10 @@ public:
     const RCompRowMatrix *GetBuv() const { return Buv; }
     const RCompRowMatrix *GetBvw (const IVector &wdim);
 
+    const RCompRowMatrix *GetDuu () const;
+    const RCompRowMatrix *GetDvv () const;
+    const RCompRowMatrix *GetDuv () const;
+    
     virtual const RCompRowMatrix *GetGuv() const { return 0; }
     virtual const RCompRowMatrix *GetGvv() const { return 0; }
 
@@ -189,7 +193,7 @@ protected:
      * \brief Creates the mass matrix for the class's own basis
      *   representation (Bvv)
      */
-    virtual RCompRowMatrix *CreateBasisMassmat () const = 0;
+    virtual RCompRowMatrix *CreateBvv () const = 0;
 
     /**
      * \brief Creates the mass matrix for the mixed bases (Buv)
@@ -200,6 +204,14 @@ protected:
      * \brief Creates mass matrix for mixed grid bases (Bvw)
      */
     virtual RCompRowMatrix *CreateBvw (const IVector &wdim) const
+    { xERROR("Not implemented"); return 0; }
+
+    RCompRowMatrix *CreateDuu () const;
+
+    virtual RCompRowMatrix *CreateDvv () const
+    { xERROR("Not implemented"); return 0; }
+    
+    virtual RCompRowMatrix *CreateDuv () const
     { xERROR("Not implemented"); return 0; }
 
     /**
@@ -224,6 +236,10 @@ protected:
     RCompRowMatrix *Bvv_Cholesky_L;
     RVector        *Bvv_Cholesky_d;
 
+    mutable RCompRowMatrix *Duu; ///< mesh stiffness matrix
+    mutable RCompRowMatrix *Dvv; ///< basis stiffness matrix
+    mutable RCompRowMatrix *Duv; ///< mixed-basis stiffness matrix
+    
     RCompRowMatrix *D;      ///< map basis->solution (limited support)
 
 public:

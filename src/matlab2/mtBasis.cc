@@ -301,6 +301,54 @@ void MatlabToast::GetBasisBvw (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::GetBasisDuu (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetDuu());
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisDvv (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetDvv());
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
+void MatlabToast::GetBasisDuv (int nlhs, mxArray *plhs[], int nrhs,
+    const mxArray *prhs[])
+{
+    Raster *raster = GETBASIS_SAFE(0);
+    if (nlhs > 0) {
+	Raster2 *raster2 = dynamic_cast<Raster2*>(raster);
+	if (raster2) {
+	    CopyMatrix (&plhs[0], *raster2->GetDuv());
+	} else {
+	    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+	}
+    }
+}
+
+// =========================================================================
+
 void MatlabToast::BasisValue (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {

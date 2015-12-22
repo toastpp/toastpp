@@ -139,7 +139,7 @@ protected:
     Raster_CPixel_Tree (const IVector &_bdim, const IVector &_gdim, Mesh *mesh,
         RDenseMatrix *bb=0, double _map_tol=1e-10);
 
-    RCompRowMatrix *CreateBasisMassmat () const;
+    RCompRowMatrix *CreateBvv () const;
     RCompRowMatrix *CreateBuv () const;
     RCompRowMatrix *CreateBuv_tri () const;
     RCompRowMatrix *CreateBuv_tet4 () const;

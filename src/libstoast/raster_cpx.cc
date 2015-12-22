@@ -37,7 +37,7 @@ double Raster_CPixel::Value_nomask (const Point &p, int i, bool is_solidx)
 
 // =========================================================================
 
-RCompRowMatrix *Raster_CPixel::CreateBasisMassmat () const
+RCompRowMatrix *Raster_CPixel::CreateBvv () const
 {
     // construct a sparse diagonal matrix
     idxtype *rowptr = new idxtype[blen+1];
