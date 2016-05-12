@@ -307,6 +307,16 @@ int Element::SubdivisionLevel () const
     return (subdivdata ? subdivdata->level : 0);
 }
 
+RDenseMatrix Element::GlobalShapeD (const NodeList &nlist, const Point &glob)
+    const
+{
+    int d = Dimension();
+    Point loc (Local(nlist, glob));
+    RDenseMatrix IJ(d,d);
+    IJacobian(loc, &nlist, IJ);
+    return IJ * LocalShapeD (loc);
+}
+
 double Element::Jacobian (const Point &loc, const NodeList *nlist,
     RDenseMatrix &J) const
 {
