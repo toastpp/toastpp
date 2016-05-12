@@ -132,8 +132,7 @@ if dim==3
 
 else
 
-    if showsurfdata
-    %if size(surfdata,1) == size(vtx,1)
+    if showsurfdata && size(surfdata,1) == size(vtx,1)
         h = patch('Vertices', vtx, 'Faces', idx, 'CData',surfdata, 'FaceColor','interp');
     else
         h = patch('Vertices', vtx, 'Faces', idx, 'FaceVertexCData', surfdata, 'FaceColor', 'flat');
