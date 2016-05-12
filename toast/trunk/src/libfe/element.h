@@ -517,8 +517,7 @@ public:
      * \sa LocalShapeF, GlobalShapeF, GlobalShapeD
      */
     virtual RDenseMatrix GlobalShapeD (const NodeList &nlist,
-        const Point &glob) const
-    { return LocalShapeD (Local (nlist, glob)); }
+        const Point &glob) const;
 
     /**
      * \brief Returns the weights and abscissae of quadrature rules over the
