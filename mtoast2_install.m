@@ -10,13 +10,13 @@ nargin = length(varargin);
 nogui = nargin > 0 && varargin{1} == true;
 
 if ~nogui
-    fprintf(1,'\nAdding search paths for TOAST Matlab scripts and MEX files.\n\n')
+    fprintf(1,'\nAdding search paths for the Toast++ toolbox.\n\n')
 end
 
 % figure out path structure
 toastdir = getenv('TOASTDIR');
 if length(toastdir) == 0
-    toastdir = pwd;
+    [toastdir,name,ext] = fileparts(which('mtoast2_install.m'));
 end
 toastver = getenv('TOASTVER');
 if length(toastver) == 0
@@ -35,6 +35,7 @@ if length(toastver) == 0
 end
 
 % Remove current toast references from path
+fprintf('Searching for existing toast path entries ...\n');
 p = path;
 p(find(p==' ')) = '^';
 p(find(p==pathsep)) = ' ';
@@ -44,44 +45,34 @@ for i = 1:size(p,1)        % restore spaces
     p{i}(find(p{i}=='^')) = ' ';
 end
 
-found_toast = false;
 k = strfind(p,'toast');
+nfound = 0;
 for i=1:length(k)
     if length(k{i}) > 0
-        if ~found_toast
-            if ~nogui
-                fprintf(1,'Found existing toast directories in path:\n\n');
-            end
-            found_toast = true;
-        end
-        if ~nogui
-            disp(p{i});
-        end
+        fprintf('Removing search path %s\n', p{i});
+        rmpath(p{i});
+        nfound = nfound+1;
     end
 end
-if found_toast
-    if nogui
-        inp = 'Y';
-    else
-        inp = input('\nDelete existing toast directories? Y/N [Y]: ','s');
-        if isempty(inp)
-            inp = 'Y';
-        end
-    end
-    if strcmpi(inp,'Y')
-        for i=1:length(k)
-            if length(k{i}) > 0
-                rmpath(p{i});
-            end
-        end
-    end
-    fprintf('\n');
+if nfound > 0
+    fprintf('Removed %d existing toast path entries\n', nfound);
+else
+    fprintf('No existing toast paths found.\n');
 end
 
 if ~nogui
-    fprintf ('TOAST root directory: %s\n', toastdir);
+    fprintf ('\nTOAST root directory: %s\n', toastdir);
     fprintf ('TOAST arch directory: %s\n\n', toastver);
 end
+
+% Sanity checks: assert valid file structure
+assertfile([toastdir '/mtoast2_install.m']);
+assertdir([toastdir '/script']);
+assertdir([toastdir '/script/matlab']);
+assertdir([toastdir '/script/matlab/toast2']);
+assertdir([toastdir '/script/matlab/utilities']);
+assertdir([toastver '/mex2']);
+assertfile([toastver '/mex2/toastmex.' mexext]);
 
 % Add all directories under the script/matlab node
 p = genpath([toastdir '/script/matlab/']);
@@ -125,4 +116,19 @@ if nargin == 0 || nogui==false
     fprintf(1,'\nPlease check that the toast paths are set correctly,\n')
     fprintf(1,'then save to store the paths permanently.\n')
     pathtool
+end
+
+
+function assertfile(pathstr)
+if exist(pathstr,'file') ~= 2
+    error('\nToast toolbox file structure mismatch. Expected file not found:\n%s\n\nDetected toast root folder:   %s\nDetected toast binary folder: %s\n\nPlease check your toast installation.', pathstr, toastdir, toastver);
+end
+end
+
+function assertdir(pathstr)
+if exist(pathstr,'dir') ~= 7
+    error('\nToast toolbox file structure mismatch. Expected directory not found:\n%s\n\nDetected toast root folder:   %s\nDetected toast binary folder: %s\n\nPlease check your toast installation.', pathstr, toastdir, toastver);
+end
+end
+
 end
