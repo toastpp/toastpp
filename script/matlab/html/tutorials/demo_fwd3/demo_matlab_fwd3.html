@@ -1,0 +1,81 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Toast toolbox tutorial: Generating frequency domain data</h1>
+<p>This example extends the previous tutorial to simulate modulated source distributions, and return amplitude and phase data for all measurements. To run this tutorial yourself, you need Matlab, and you have to install the Toast toolbox on your computer.</p>
+<p>To save you typing, the full Matlab script for this example can be downloaded <a href="demo_matlab_fwd3.m">here</a>.
+
+<h2>Step 1: Setting up the frequency domain system matrix</h2>
+<p>The frequency-domain version of the diffusion equation is given by</p>
+<img src="demo_matlab_fwd3_eq1.png" />
+<p>where &Phi; is now a complex photon density depending on modulation frequency &omega;.</p>
+<p>Most of the problem setup (creating the mesh, defining the parameter distributions and setting up the source and detector vectors) is identical to the previous tutorial.</p>
+<p>The only difference is the inclusion of a frequency-dependent term in the system matrix K. This term is imaginary, making the linear system complex-valued.</p>
+<p>Toast adds the frequency term automatically in the call to toastSysmat if a nonzero modulation frequency is provided. The frequency is given in MHz.</p>
+<div class="example">
+freq = 100;&nbsp;&nbsp;<span class="comment">% modulation frequency [MHz]</span><br />
+K = dotSysmat(mesh,mua,mus,ref,freq);
+</div>
+<p>where hmesh is the mesh handle, and mua, mus, ref are the optical parameter vectors as created in the previous tutorial.</p>
+
+<h2>Step 2: Solving the complex linear system</h2>
+<p>Given source and detector vectors qvec and mvec, the linear system can now be solved as before:</p>
+<div class="example">
+Y = mvec.' * (K\qvec);
+</div>
+<p>Y is now a complex-valued measurement vector. Usually, the data are represented as logarithmic amplitude and phase:</p>
+<div class="example">
+logY = log(Y);<br />
+lnamp = real(logY);<br />
+phase = imag(logY);
+</div>
+<p>As before, the data can be displayed as sinograms.</p>
+<img src="demo_matlab_fwd3_1.png" />
+<p>Subtraction of the homogeneous solution shows the effect of the parameter inclusions on the measurement data:</p>
+<img src="demo_matlab_fwd3_2.png" />
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

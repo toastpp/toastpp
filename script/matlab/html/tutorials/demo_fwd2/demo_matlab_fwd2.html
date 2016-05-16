@@ -1,0 +1,142 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Toast toolbox tutorial: Forward solver for inhomogeneous parameters</h1>
+<p>This example builds on the homogeneous parameter example described in the <a href="demo_matlab_fwd1.html">previous example</a>, by setting up an inhomogeneous distribution for the absorption and scattering parameters.</p>
+<p>The Matlab script for this example can be downloaded <a href="demo_matlab_fwd2.m">here</a>.</p>
+
+<h2>Step 1: Creating parameter maps</h2>
+<p>The simplest way to define an inhomogeneous parameter distribution for a 2D problem is by creating an image and mapping it onto the mesh basis. Below are two 128x128 bitmaps to be used as the absorption and scattering parameter distributions.</p>
+<img src="demo_matlab_fwd2_mua.png" />
+<img src="demo_matlab_fwd2_mus.png" />
+<p>The images are stored in a common bitmap format (in this case, greyscale .png), and loaded into Matlab with the standard imread command:</p>
+<div class="example">
+bmua = imread('demo_matlab_fwd2_mua.png');<br />
+bmus = imread('demo_matlab_fwd2_mus.png');
+</div>
+<p>The images are scaled to the desired parameter values:</p>
+<div class="example">
+bmua = double(bmua)./255.*0.02 + 0.01;<br />
+bmus = double(bmus)./255.*1.0 + 1.0;
+</div>
+<p>and displayed:</p>
+<div class="example">
+figure;<br />
+subplot(1,2,1);<br />
+imagesc(bmua);<br />
+axis equal tight; colorbar<br />
+title('\mu_a');<br />
+subplot(1,2,2);<br />
+imagesc(bmus);<br />
+axis equal tight; colorbar<br />
+title('\mu_s');
+</div>
+<img src="demo_matlab_fwd2_3.png" />
+
+<h2>Step 2: Mapping the images in the mesh basis</h2>
+<p>The images now have to be mapped into the mesh basis. To do this, we first have to create a mapping object:</p>
+<div class="example">
+grd = size(bmua);<br />
+basis = toastBasis(mesh,grd);
+</div>
+<p>where 'mesh' is the mesh object for a circular mesh created as in the previous example, and grd are the dimensions of a regular grid basis (set here to coincide with the target image sizes).</p>
+<p>toastBasis creates the mapper object for mapping between unstructured mesh and regular pixel basis.</p> 
+<p>We can now use the Map method of the basis object to map the parameter images into the mesh basis, and display them with mesh.Display:</p>
+<div class="example">
+
+mua = basis.Map('B->M',bmua);<br />
+mus = basis.Map('B->M',bmus);<br />
+figure; mesh.Display(mua);<br />
+figure; mesh.Display(mus);
+</div>
+<img src="demo_matlab_fwd2_4.png" />
+<img src="demo_matlab_fwd2_5.png" />
+<p>Note that the edges of the inclusions are slightly jagged and washed out, because the outlines cannot be mapped exactly into the piecewise linear mesh basis. If required, a higher precision can be obtained with a more refined mesh or adaptive refinement along the edges.</p>
+<p>The third parameter distribution, for refractive index n, is kept constant. So as in the previous example, we can write
+<div class="example">
+nnd = mesh.NodeCount;<br />
+ref_bkg = 1.4;<br />
+ref = ones(nnd,1) * ref_bkg;
+</div>
+
+<h2>Step 3: Invoking the forward solver</h2>
+<p>The rest of the code for this example is identical to the previous one: create the source and measurement vectors, build the system matrix, and solve the linear system.</p>
+<p>The sinogram and measurement profiles of the resulting boundary measurements look like this:</p>
+<img src="demo_matlab_fwd2_6.png" />
+<img src="demo_matlab_fwd2_7.png" />
+<p>It can be seen now that there are (small) variations between the measurement profiles of individual source distributions, caused by the parameter inhomogeneities.</p>
+
+<h2>Step 4: Differences to homogeneous results</h2>
+<p>To see the effect more clearly, we can display the differences to the homogeneous results (this assumes that you have already run Demo 1):</p>
+<div class="example">
+data_homog = toastReadVector('demo_matlab_fwd1.dat');<br />
+logYhomog = reshape(data_homog,nq,nq)';<br />
+dlogY = log(Y)-logYhomog;<br />
+<br />
+figure<br />
+imagesc(dlogY);<br />
+xlabel('source index q');<br />
+ylabel('detector index m');<br />
+axis equal tight;<br />
+colorbar<br />
+<br />
+figure<br />
+hold on<br />
+for i=1:size(Y,2)<br />
+    ywrap = [dlogY(i:end,i); dlogY(1:i-1,i)];<br />
+    plot(angle,ywrap,'o-');<br />
+end<br />
+axis([0 360 -1 0.1]);<br />
+xlabel('angular source-detector separation');<br />
+ylabel('log intensity perturbation');
+</div>
+<img src="demo_matlab_fwd2_8.png" />
+<img src="demo_matlab_fwd2_9.png" />
+<p>It can be seen that the perturbation consist mainly of a reduction in the measured intensity, caused by the increased absorption inclusions. Only for a few measurements in the vicinity of the scattering object close to the boundary, a small increase in intensity due to backscattering is observed.</p>
+<p>The task of the inverse solver discussed in the next tutorial will be to reconstruct the internal parameter distributions from these measurement perturbations.</p>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

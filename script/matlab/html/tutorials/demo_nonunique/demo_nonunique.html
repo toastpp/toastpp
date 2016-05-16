@@ -1,0 +1,245 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Toast toolbox tutorial: Demonstrating non-uniqueness</h1>
+<p>This example demonstrates a non-uniqueness condition in DOT. Transillumination amplitude data from a steady-state measurement at a single wavelength are not sufficient for reconstructing both absorption and scattering parameter distributions.</p>
+<p>In this example, this is demonstrated by generating data from a model with homogeneous absorption, while scattering consists of a homogeneous background with a circular inclusion of increased scattering.</p>
+<p>Using these data, an absorption-only reconstruction is performed under the assumption that scattering is constant.</p>
+<p>The reconstruction succeeds in finding an absorption distribution that generates data matching the scatter-perturbed target data.</p>
+<p>The Matlab script for this example can be downloaded <a href="nonuniqueness.m">here</a>.</p>
+
+<h2>Step 1: Create the target mesh</h2>
+<p>For this example, we create a 2D circular mesh with a circular inclusion. You can create this mesh yourself with gmsh (see <a href="../demo_meshgen1/demo_meshgen1.html">Meshing tutorial 1</a> and <a href="../demo_meshgen2/demo_meshgen2.html">Meshing tutorial 2</a> for details). The mesh should be circular with radius 25 and centre in the origin. It should contain a small off-centre inclusion, and separate surface definitions for the background and inclusion. Call the mesh <i>circle_blob.msh</i> so that the script will recognise it.</p>
+<p>Alternatively, you can download a ready-made mesh <a href="circle_blob.msh">here</a>.</p>
+<div style="width:100%;max-width:1000px">
+<img src="fig1a.jpg" style="width:50%;max-width:556px"><img src="fig1b.jpg" style="width:50%;max-width:556px">
+</div>
+
+<h2>Step 2: Load the mesh</h2>
+<p>We start the script by loading the mesh and identifying the elements forming the inclusion:</p>
+<div class="example">
+mesh = toastMesh('circle_blob.msh','gmsh');<br />
+ne = mesh.ElementCount;<br />
+nv = mesh.NodeCount;<br />
+regidx = mesh.Region;<br />
+regno = unique(regidx);<br />
+blobel = find(regidx == regno(2));&nbsp;<span class="comment">% assuming that the second surface marks the inclusion</span>
+</div>
+
+<h2>Step 3: Define source and measurement geometry</h2>
+<p>We define 32 source and detector locations along the mesh circumference, and use toastMesh methods Qvec and Mvec to extract the corresponding operators.</p>
+<div class="example">
+rad = 25; <span class="comment">% mesh radius [mm]</span><br />
+nopt = 32;<br />
+for i=1:nopt<br />
+&nbsp;&nbsp;phiq = (i-1)/32*2*pi;<br />
+&nbsp;&nbsp;qpos(i,:) = rad*[cos(phiq), sin(phiq)];<br />
+&nbsp;&nbsp;phim = (i-0.5)/32*2*pi;<br />
+&nbsp;&nbsp;mpos(i,:) = rad*[cos(phim), sin(phim)];<br />
+end<br />
+mesh.SetQM(qpos,mpos);<br />
+qvec = real(mesh.Qvec('Neumann','Gaussian',2));<br />
+mvec = real(mesh.Mvec('Gaussian',2,refind));
+</div>
+
+<h2>Step 4: Define the target parameter distribution</h2>
+<p>We want a piecewise constant target parameter distribution, so the target parameters are assigned in an element basis:</p>
+<div class="example">
+refind = 1.4;<span class="comment">   % refractive index</span><br />
+c0 = 0.3;<span class="comment">       % speed of light in vacuum [mm/ps]</span><br />
+cm = c0/refind;<span class="comment"> % speed of light in the medium [mm/ps]</span><br />
+mua_bkg = 0.01;<span class="comment"> % background absorption [1/mm]</span><br />
+mus_bkg = 1;<span class="comment">    % background scattering [1/mm];</span><br />
+ref = ones(ne,1)*refind;<br />
+mua = ones(ne,1)*mua_bkg;<br />
+mus = ones(ne,1)*mus_bkg;<br />
+mus(blobel) = mus_bkg*2;<br />
+<br />
+<span class="comment">% Display the target distributions</span><br />
+figure('position',[0,0,640,420]);<br />
+subplot(2,3,1); mesh.Display(mua, 'range',[0.005,0.025]);<br />
+axis off; title('\mu_a target');<br />
+subplot(2,3,2); mesh.Display(mus, 'range',[0.8,2.2]);<br />
+axis off; title('\mu_s target');
+</div>
+
+<h2>Step 5: Generate target data</h2>
+<p>Use the FEM solver to generate surface CW amplitude data for the model defined above. Also solve the homogeneous problem to allow display of perturbation data:</p>
+<div class="example">
+<span class="comment">% compute perturbed target model</span><br />
+smat = dotSysmat(mesh, mua, mus, ref, 'EL');<br />
+data = log(mvec' * (smat\qvec));<br />
+<br />
+<span class="comment">% for reference, also solve the homogeneous problem</span><br />
+mus = ones(ne,1)*mus_bkg;<br />
+smat = dotSysmat(mesh, mua, mus, ref, 'EL');<br />
+data_homog = log(mvec' * (smat\qvec));<br />
+<br />
+<span class="comment">% display sinogram of target data perturbations due to inclusion</span><br />
+subplot(2,3,3);<br />
+imagesc(data-data_homog, [-0.26,0.015]); axis equal tight; colorbar<br />
+title('target data');<br />
+</div>
+<p>Note the <i>'EL'</i> flag in the system matrix computation. This signals to Toast that the parameter vectors are supplied on an element-wise basis (default is node basis).</p>
+<img src="fig2.jpg" style="width:100%;max-width:656px" />
+
+<h2>Step 6: Setting up the inverse solver</h2>
+<p>For the reconstruction, we start from the correct background parameters. However, the reconstruction will (wrongly) assume that the scattering distribution is homogeneous, and only update the absorption distribution.</p>
+<p>To initialise the inverse solver, we reset the parameters to their background values, and compute the corresponding FEM solution. Note that for the inverse problem, we assume piecewise linear parameter distributions, and therefore define the parameters on a nodal basis.</p>
+<div class="example">
+mua = ones(nv,1)*mua_bkg;<br />
+mus = ones(nv,1)*mus_bkg;<br />
+ref = ones(nv,1)*refind;<br />
+smat = dotSysmat(mesh, mua, mus, ref);<br />
+proj = reshape(log(mvec' * (smat\qvec)), [], 1);<br />
+sd = ones(size(proj));<br />
+data = reshape(data, [], 1);<br />
+subplot(2,3,4); mesh.Display(mua, 'range',[0.005,0.025]); axis off; title('\mu_a recon');<br />
+subplot(2,3,5); mesh.Display(mus, 'range',[0.8,2.2]); axis off; title('\mu_s recon');<br />
+subplot(2,3,6); imagesc(reshape(proj,nopt,nopt)-data_homog, [-0.26,0.015]); axis equal tight; colorbar<br />
+title('recon data');
+</div>
+<p>Next, we set up an inverse solver basis as a regular 32x32 grid, and map the intial estimate of the solution vector (the log of the absorption distribution) into that basis.</p>
+<div class="example">
+grd = [32,32];<br />
+basis = toastBasis(mesh, grd);<br />
+<br />
+bmua = basis.Map('M->B', mua);<br />
+bcmua = bmua*cm;<br />
+scmua = basis.Map('B->S', bcmua);<br />
+x = scmua;<br />
+logx = log(x);<br />
+slen = length(x);<br />
+</div>
+<p>We set up a regularizer instance and compute the initial value of the objective function:</p>
+<div class="example">
+regul = toastRegul('TV', basis, logx, 1e-4, 'Beta', 0.01);<br />
+<br />
+err0 = toastObjective(proj, data, sd, regul, logx);<br />
+err = err0;<br />
+errp = inf;<br />
+itr = 1;<br />
+step = 1.0;<br />
+fprintf('Iteration %d, objective %f\n', 0, err);<br />
+</div>
+
+<h2>Step 7: The inverse solver loop</h2>
+<p>Finally, we add the loop for the iterative minimisation of the objective function. Note that this uses a local callback function for the evaluation of the line search. Therefore, Matlab requires that the main body of the code is wrapped into a function as well:</p>
+<div class="example">
+function nonuniqueness<br />
+<br />
+<span class="comment">% -------------------------</span><br />
+<span class="comment">% code so far</span><br />
+<span class="comment">% -------------------------</span><br />
+<br />
+<span class="comment">% inverse solver loop</span><br />
+itrmax = 100;<span class="comment">   % CG iteration limit</span><br />
+tolCG = 1e-6;<span class="comment">   % convergence criterion</span><br />
+while (itr &lt;= itrmax) &amp;&amp; (err &gt; tolCG*err0) &amp;&amp; (errp-err &gt; tolCG)<br />
+<br />
+&nbsp;&nbsp;errp = err;<br />
+&nbsp;&nbsp;r = -toastGradient(mesh, basis, qvec, mvec, mua, mus, ref, 0, ...<br />
+&nbsp;&nbsp;&nbsp;&nbsp;data, sd, 'method', 'cg', 'tolerance', 1e-12);<br />
+&nbsp;&nbsp;r = r(1:slen);<span class="comment"> % drop mus gradient</span><br />
+&nbsp;&nbsp;r = r .* x;<span class="comment"> % parameter scaling</span><br />
+&nbsp;&nbsp;r = r - regul.Gradient(logx);<br />
+&nbsp;&nbsp;<br />
+&nbsp;&nbsp;<span class="comment">% CG search direction update</span><br />
+&nbsp;&nbsp;if itr &gt; 1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;delta_old = delta_new;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;delta_mid = r' * s;<br />
+&nbsp;&nbsp;end<br />
+&nbsp;&nbsp;s = r;<br />
+&nbsp;&nbsp;if itr == 1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;d = s;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;delta_new = r' * d;<br />
+&nbsp;&nbsp;else<br />
+&nbsp;&nbsp;&nbsp;&nbsp;delta_new = r' * s;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;beta = (delta_new - delta_mid) / delta_old;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;if mod(itr, 20) == 0 || beta &lt;= 0<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d = s;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;else<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d = s + d*beta;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;end<br />
+&nbsp;&nbsp;end<br />
+&nbsp;&nbsp;<span class="comment">% Line search along update direction</span><br />
+&nbsp;&nbsp;step = toastLineSearch(logx, d, step, err, @objective);<br />
+&nbsp;&nbsp;logx = logx + d*step;<span class="comment"> % update solution estimate</span><br />
+&nbsp;&nbsp;mua = basis.Map('S->M',exp(logx)/cm);<br />
+&nbsp;&nbsp;subplot(2,3,4); mesh.Display(mua, 'range',[0.005,0.025]);<br />
+&nbsp;&nbsp;axis off; title('\mu_a recon');<br />
+&nbsp;&nbsp;<br />
+&nbsp;&nbsp;proj = reshape(log(mvec' * (dotSysmat(mesh, mua, mus, ref)\qvec)), [], 1);<br />
+&nbsp;&nbsp;subplot(2,3,6); imagesc(reshape(proj,nopt,nopt)-data_homog, [-0.26,0.015]);<br />
+&nbsp;&nbsp;axis equal tight; colorbar<br />
+&nbsp;&nbsp;title('recon data');<br />
+&nbsp;&nbsp;err = toastObjective(proj, data, sd, regul, logx);<br />
+&nbsp;&nbsp;fprintf('Iteration %d, objective %f\n', itr, err);<br />
+&nbsp;&nbsp;itr = itr+1;<br />
+&nbsp;&nbsp;drawnow<br />
+end<br />
+<br />
+&nbsp;&nbsp;function p = objective(logx)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;mua_ = basis.Map('S->M',exp(logx))/cm;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;proj_ = reshape(log(mvec' * (dotSysmat(mesh, mua_, mus, ref)\qvec)), [], 1);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;p = toastObjective(proj_, data, sd, regul, logx);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;end<br />
+<br />
+end
+</div>
+<img src="fig3.jpg" style="width:100%;max-width:656px" />
+<p>The image above shows the result of the absorption reconstruction after 100 CG steps. It produces an absorption feature in approximately the position of the actual scattering object, and oscillatory rings around it. The boundary data generated by this absorption distribution match those of the target scattering distribution (right column), with an objective function of 0.0067 from the initial value of 8.26 of the homogeneous starting distribution.</p>
+
+<h2>Further experiments</h2>
+<ul>
+<li>As a further exercise, modify the reconstruction script so that it uses frequency domain data (log amplitude and phase) for the absorption reconstruction. Does the inverse solver still find a solution that agrees with the target data?</li>
+<li>Try to reconstruct both absorption and scattering from amplitude-only data. What happens?</li>
+</ul>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

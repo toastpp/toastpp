@@ -1,0 +1,77 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Toast toolbox tutorial: Constructing the Jacobian</h1>
+<p>The computation of the Jacobian matrix <b>J</b> is required by most gradient-based image reconstruction approaches. The Jacobian contains the derivatives of the measurements with respect to the model parameters. It is a matrix of size M x P, where M is the number of measurement data, and P is the number of model parameters to reconstruct (e.g. the coefficients of a finite-dimensional basis expansion of the absorption and scattering parameters).</p>
+
+<p><b>J</b> = {&part; y<sub>i</sub>/&part; x<sub>j</sub>}</p>
+
+<p> When multiple parameter and data types are present, <b>J</b> has a block structure. For example, if absorption coefficient &mu;<sub>a</sub> and diffusion coefficient &kappa; are the model parameters, and the data consist of log amplitude lnA and phase &phi;, </p>
+<p><table>
+<tr><td rowspan="2" style="vertical-align:middle"><b>J</b> =</td>
+<td style="border:1px solid black">&part; lnA<sub>i</sub>/&part; &mu;<sub>j</sub></td>
+<td style="border:1px solid black">&part; lnA<sub>i</sub>/&part; &kappa;<sub>j</sub></td></tr>
+<tr><td style="border:1px solid black">&part; &phi;<sub>i</sub>/&part; &mu;<sub>j</sub></td>
+<td style="border:1px solid black">&part; &phi;<sub>i</sub>/&part; &kappa;<sub>j</sub></td></tr>
+</table></p>
+<p>Within each block, each line of the matrix describes the effect of perturbing a parameter has on one specific measurement. This is called the <i>Photon Measurement Density Function</i> (PMDF). A PMDF can be displayed as an image.</p>
+
+<p>Toast has a function <i>toastJacobian</i> which returns <b>J</b> for a given set of absorption and scattering parameters and a given set of source and detector definitions. The syntax is</p>
+<div class="example">
+J = toastJacobian(mesh,basis,qvec,mvec,mua,mus,ref,freq);
+</div>
+where <i>mesh</i> is the mesh object, <i>basis</i> is the solution basis mapper, <i>qvec</i> and <i>mvec</i> are the sparse matrices containing the source and detector column vectors, mua, mus, are the absorption and diffusion coefficient vectors in the mesh basis, ref is the refractive index vector in the mesh basis, and freq is the modulation frequency.</i></p>
+
+<p>The returned matrix is expressed in the solution basis defined by the basis mapper <i>basis</i>. If the results should be expressed in the mesh basis instead, replace the basis object with "0" in the argument list.</p>
+
+<p>To obtain the Jacobian for a steady-state problem, set <i>freq</i>=0. In that case, the bottom half of the returned matrix (containing the phase PMDFs) will be zero. Often in steady-state problems, only the absorption parameter is reconstructed, due to the nonuniqueness of the dual-parameter reconstruction problem. In that case, a simplified real-valued version <i>toastJacobianCW</i> can be used which only returns &part; lnA/&part; &mu; (the top left block). The syntax is</p>
+<div class="example">
+J = toastJacobianCW(mesh,basis,qvec,mvec,mua,mus,ref);
+</div>
+<p>This function is more efficient than calling toastJacobian and discarding the unused blocks of the returned matrix.</p>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>
