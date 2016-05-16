@@ -1,0 +1,233 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Toast toolbox tutorial: Building a spherical mesh with Gmsh</h1>
+<p>Toast++ doesn't include its own mesh generator except for trivial meshes like circles, spheres and slabs without internal boundaries. Toast can however import meshes built with <a href="http://geuz.org/gmsh/">Gmsh</a>, an open-source mesh generator. To run the following examples, you need to have Gmsh installed on your system. You can download Gmsh from its home page. On many Linux systems (such as Ubuntu), you should be able to install gmsh with
+<div class="example">
+sudo apt-get install gmsh
+</div>
+
+<p>Launch Gmsh in interactive mode by typing</p>
+<div class="example">
+gmsh
+</div>
+<p>(On Windows systems, you will probably have an icon or Start menu item that allows you to launch Gmsh). You should see the Gmsh application window, containing the menu window (left) and the graphic window (right)</p>
+<p><img src="gmsh1.png" style="width:100%;max-width:585px" /></p>
+<p><i>The Gmsh main window.</i></p>
+<p>We will now use Gmsh to construct a mesh for a simple spherical domain.</p>
+
+<p>Note: If you want to skip the manual definition of the sphere geometry described in Step 1 of this tutorial, a ready-made geometry file can be found in $TOASTDIR/examples/matlab/gmsh/sphere.geo. You can load it into gmsh with <i>File | Open | sphere.geo</i> after navigating to the correct subdirectory in the file-open dialog. Then continue with <a href="#step2">Step 2</a>.</p>
+
+<h2>Step 1: Define the geometry</h2>
+<p>The Geometry module allows to define the domain to be meshed. We need to add some geometry elements to the current (empty) project. These contain points, circle arcs, surface patches, and finally the sphere volume.</p>
+<h3>Adding parameters</h3>
+<p>First, let's add a few parameters to be used for these geometry definitions.</p>
+<ul>
+<li>Click <i>Geometry | Elementary entities | Add | Parameter</i></li>
+<li>First, the mesh radius. Name: <i>rad</i>, Value: <i>10</i>. Click <i>Add</i></li>
+<li>Next, the node density. Name: <i>ndens</i>, Value: <i>1</i>. Click <i>Add</i>
+</ul>
+
+<h3>Adding points</h3>
+<p>Next, we need to define the points we will use to construct the circle arcs for the sphere.</p>
+<ul>
+<li>Click <i>Geometry | Elementary entities | Add | Point</i></li>
+<li>Add the following 6 points:<br />
+<div class="example">
+x=0,&nbsp;&nbsp;&nbsp; y=0,&nbsp;&nbsp;&nbsp; z=0,&nbsp;&nbsp;&nbsp; element size=ndens<br />
+x=&nbsp;rad, y=0,&nbsp;&nbsp;&nbsp; z=0,&nbsp;&nbsp;&nbsp; element size=ndens<br />
+x=-rad, y=0,&nbsp;&nbsp;&nbsp; z=0,&nbsp;&nbsp;&nbsp; element size=ndens<br />
+x=0,&nbsp;&nbsp;&nbsp; y=&nbsp;rad, z=0,&nbsp;&nbsp;&nbsp; element size=ndens<br />
+x=0,&nbsp;&nbsp;&nbsp; y=-rad, z=0,&nbsp;&nbsp;&nbsp; element size=ndens<br />
+x=0,&nbsp;&nbsp;&nbsp; y=0,&nbsp;&nbsp;&nbsp; z=&nbsp;rad, element size=ndens<br />
+x=0,&nbsp;&nbsp;&nbsp; y=0,&nbsp;&nbsp;&nbsp; z=-rad, element size=ndens
+</div>
+</li>
+<li>Close the dialog, and press 'q' to finish the point input</li>
+<li>You can rotate the view in the graphic window by left-clicking and dragging the mouse.</li>
+<li>For the next step, you should display the point labels: Click <i> Tools | Options | Geometry</i>. Tick <i>Point labels</i>.</li>
+</ul>
+<p><img src="gmsh2.png" style="width:100%;max-width:585px" /></p>
+<p><i>The points we will use to attach the circle arcs.</i></p>
+
+<h3>Adding circle arcs</h3>
+<p>We can now attach circle arcs to the points to define the sphere patches.</p>
+<ul>
+<li>Click <i>Geometry | Elementary entities | Add | Circle arc</i></li>
+<li>To define a circle arc, you need to click on three points in the graphic window:
+  <ul>
+  <li>The first end point of the arc</li>
+  <li>The circle centre point</li>
+  <li>The second end point of the arc</li>
+  </ul>
+</li>
+<li>Add the following 12 arcs by clicking the corresponding points:
+<div class="example">
+2 - 1 - 4<br />
+4 - 1 - 3<br />
+3 - 1 - 5<br />
+5 - 1 - 2<br />
+2 - 1 - 6<br />
+6 - 1 - 3<br />
+3 - 1 - 7<br />
+7 - 1 - 2<br />
+4 - 1 - 6<br />
+6 - 1 - 5<br />
+5 - 1 - 7<br />
+7 - 1 - 4
+</div>
+</li>
+<li>Press 'q' to finish the arc input.</li>
+</ul>
+<p><img src="gmsh3.png" style="width:100%;max-width:585px" /></p>
+<p><i>Sphere geometry after defining the surface patches.</i></p>
+<p><i>The circle arcs defining the sphere.</i></p>
+
+<h3>Adding surface patches</h3>
+<p>We are now ready to add the patches that define the sphere surface. Each surface patch is bounded by three circle arcs. You define a surface patch by clicking the bounding arcs.</p>
+<ul>
+<li>Open <i>Tools | Options | Geometry</i>, un-select <i>Point labels</i>, and select <i>Line labels</i>.</li>
+<li>Click <i>Geometry | Elementary entities | Add | Ruled surface</i></li>
+<li>Add 8 surface patches by clicking the following sequence of 3 arcs (each arc defined by its label:
+<div class="example">
+2 - 7 - 12, press 'e'<br />
+2 - 9 - 6, press 'e'<br />
+3 - 6 - 10, press 'e'<br />
+3 - 7 - 11, press 'e'<br />
+4 - 11 - 8, press 'e'<br />
+4 - 5 - 10, press 'e'<br />
+1 - 5 - 9, press 'e'<br />
+1 - 8 - 12, press 'e'
+</div>
+</li>
+<li>Each surface is represented by dashed lines.</li>
+<li>Press 'q' to finish the surface input.</li>
+</ul>
+<p><img src="gmsh4.png" style="width:100%;max-width:585px" /></p>
+<p><i>Sphere geometry after defining the surface patches.</i></p>
+
+<h3>Adding the volume definition</h3>
+<p>The volume is determined by the bounding surface defined in the previous step.</p>
+<ul>
+<li>Open <i>Tools | Options | Geometry</i>, un-select <i>Line labels</i>, and select <i>Surface labels</i>.</li>
+<li>Click <i>Geometry | Elementary entities | Add | Volume</i></li>
+<li>Click on a surface line.</li>
+<li>Press 'e' followed by 'q' to finish the surface input.</li>
+</ul>
+<p><img src="gmsh5.png" style="width:100%;max-width:585px" /></p>
+<p><i>Sphere geometry after defining the volume.</i></p>
+
+<h3>Writing the geometry to file</h3>
+<p>You can now save the sphere geometry to a file for later use and manual editing.</p>
+<ul>
+<li>Click <i>File | Save As ...</i></li>
+<li>Save as <i>sphere_test.geo</i></li>
+</ul>
+
+<a name="step2"></a><h2>Step 2: Meshing the sphere</h2>
+<h3>Creating the volume mesh</h3>
+<p>Given the logical geometry of the domain defined in the previous step, we can now mesh the volume.</p>
+<ul>
+<li>From the menu window, pick <i> Modules | Mesh | 3D</i></li>
+</ul>
+<p><img src="gmsh6.png" style="width:100%;max-width:585px" /></p>
+<p><i>The meshed sphere volume.</i></p>
+<p>You can change the displayed elements:</p>
+<ul>
+<li>Click <i>Tools | Options | Mesh</i></li>
+<li>Tick <i>Surface faces</i></li>
+<li>Untick <i>Volume edges</i></li>
+</ul>
+<p><img src="gmsh7.png" style="width:100%;max-width:585px" /></p>
+<p><i>Displaying the surface mesh.</i></p>
+<p>You can also define clipping planes to display the internal structure of the mesh:</p>
+<ul>
+<li>Click <i>Tools | Clipping | Mesh</i></li>
+<li>Click and drag the mouse left or right in any of the four input boxes defining the plane parameters.</li>
+</ul>
+<p><img src="gmsh8.png" style="width:100%;max-width:585px" /></p>
+<p><i>The clipped mesh surface.</i></p>
+
+<h3>Writing the mesh to file</h3>
+<p>Now save the mesh to a file in Gmsh ASCII format.</p>
+<ul>
+<li>Click <i>File | Save Mesh</i></li>
+<li>The mesh will have the same file name as the geometry file written earlier, but with file extension .msh.</li>
+</ul>
+
+<h2>Step 3: Loading the mesh into Toast++</h2>
+<p>The Matlab interface of Toast++ has an option to read meshes in gmsh format. Currently this is limited to linear triangles in 2D and linear tetrahedra in 3D, but additional element types will be added in the future.</p>
+<ul>
+<li>Launch Matlab, and make sure that the Toast environment is loaded (run $TOASTDIR/mtoast2_install.m if required).</li>
+<li><p>Type</p>
+<div class="example">
+mesh = toastMesh('sphere_test.msh','gmsh');
+</div>
+<p>The 'gmsh' option instructs Toast to read the mesh in Gmsh format. Please note that by default, Gmsh and Toast use the same file ending (.msh) for mesh files, but the formats are not compatible. Trying to load the Gmsh-generated mesh without the 'gmsh' flag into Toast will fail.</p>
+<p>The toastMesh command may give out a warning</p>
+<div class="example" style="color:red;">
+Warning: toastMesh: removed unused nodes
+</div>
+<p>This is due to the fact that gmsh mesh files sometimes contain geometry-related vertices which are not connected to any elements. These are stripped by the toastMesh reader. You can ignore this warning.</p>
+</li>
+<li><p>To display the imported mesh in Matlab, type</p>
+<div class="example">
+mesh.Display
+</div>
+</li>
+<li><p>You can write out the mesh file again in Toast format:</p>
+<div class="example">
+mesh.Write('sphere_test_toast.msh');
+</div>
+</li>
+</ul>
+<p><img src="toast_mesh.png" style="width:100%;max-width:585px" /></p>
+<p><i>The imported sphere mesh.</i></p>
+
+<h3>Next: <a href="../demo_meshgen2/demo_meshgen2.html">Mesh generation tutorial 2: Add internal structure</a></h3>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h3>Continued from: <a href="../demo_meshgen1/demo_meshgen1.html">Mesh generation tutorial 1: Create a spherical mesh</a></h3>
+
+<h1>Extending the sphere mesh with internal structure</h1>
+<p>To add structure to the mesh geometry, we now want to add internal surfaces that define region boundaries. These can be useful for example to assign different optical properties for the forward solver.</p>
+
+<p>In general, internal surfaces are defined in the same way as the domain surface definition described in <a href="../demo_meshgen1/demo_meshgen1.html">Tutorial 1</a>. You can add as many surfaces as you like, but the interactive input quickly becomes tedious and error-prone. A faster way is by manually editing the geometry file.</p>
+
+<p>Make a copy of the .geo file created in Tutorial 1:</p>
+<div class="example">
+cp sphere_test.geo segmented_sphere_test.geo
+</div>
+<p>If you didn't work through Tutorial 1, you can make a copy of $TOASTDIR/examples/matlab/gmsh/sphere.geo instead. Open the copy in a text editor. You should see the definitions of the points, circle arcs, surfaces and volumes that we have entered interactively in the Gmsh window.</p>
+
+<h2>Add a concentric layer</h2>
+<p>First, we want to create a concentric layer below the sphere surface. This may for example represent the inner surface of a superficial skin layer.</p>
+<p>The easiest way to do this is by creating a scaled copy of the outer mesh surface. The Gmsh geometry script commands required for this are <i>Duplicata</i> (for duplicating an element), and <i>Dilate</i> (for scaling an element).</p>
+
+<p>Locate the definitions for the <i>Surface loop</i> in the geometry file. This should look something like this:</p>
+<div class="example">
+Surface Loop(30) = {14, 16, 18, 20, 22, 24, 26, 28};
+</div>
+<p>The surface loop defines the sphere surface via the 8 sphere patches that make up the surface. The list of surface patch identifiers is given in curly brackets. The values of identifiers are automatically assigned and may be different in your file.</p>
+<p>We now want to create a scaled copy of these patches. Add the following to the file:</p>
+<div class="example">
+Dilate {{0,0,0}, 0.8} {<br />
+&nbsp;&nbsp;Duplicata { Surface{14, 16, 18, 20, 22, 24, 26, 28}; }<br />
+}
+</div>
+<p>replacing the identifiers with your own values. The <i>Dilate</i> command has two parameters, the reference point of the scaling transform (in this case, the origin, coinciding with the sphere centre), and the scaling factor, 0.8.</p>
+<p>You should also delete the <i>Volume</i> definition in the geo file, because the volumes will have to be re-defined.</p>
+<p>Save the modified .geo file, and load it into gmsh.</p>
+<p><img src="gmsh1.png" style="width:100%;max-width:615px" /></p>
+<p><i>The layered mesh geometry.</i></p>
+
+<h2>Adding an off-centre blob</h2>
+<p>Let's add another, off-centre internal target sphere to the geometry, representing e.g. a tumour.</p>
+<p>In the .geo file, make another replica of the sphere surface, with a smaller scale and shifted centre:</p>
+<div class="example">
+Dilate {{3,0,5}, 0.2} {<br />
+&nbsp;&nbsp;Duplicata { Surface{14, 16, 18, 20, 22, 24, 26, 28}; }<br />
+}
+</div>
+<p><img src="gmsh2.png" style="width:100%;max-width:615px" /></p>
+<p><i>Adding an off-centre internal sphere surface</i></p>
+
+<h2>Defining the sub-volumes</h2>
+<p>The domain is now segmented into three regions by three surfaces. Two of the regions are bounded by two surfaces each, and one (the small inner sphere) by a single surface. We now need to define the surfaces that bound the three sub-volumes:</p>
+<ul>
+<li><i>Tools | Options | Geometry | Tick 'surfaces' and 'surface labels'</i></li>
+<li><i>Modules | Geometry | Elementary entities | Add | Volume</i></li>
+<li>Click on one of the surface lines for the outer surface, followed by a line for the subsurface concenctric layer. Press 'e'.</li>
+<li>Click on the subsurface concentric layer, followed by the small inclusion. Press 'e'.</li>
+<li>Click on the surface of the small inclusion. Press 'e'.</li>
+<li>Press 'q'.</li>
+</ul>
+
+<h2>Creating the segmented mesh</h2>
+<p>We can now create a mesh from this geometry that conforms with the internal structure we defined.</p>
+<p><i>Modules | Mesh | 3D</i></p>
+<p>After setting the display parameters as in Tutorial 1, and activating a clipping plane, the internal surfaces of the segmented mesh can be viewed in gmsh.</p>
+<p><img src="gmsh3.png" style="width:100%;max-width:615px" /></p>
+<p><i>Surfaces of the segmented sphere mesh</i></p>
+<p>Write out the mesh into a file:</p>
+<p><i>File | Save mesh</i></p>
+
+<h2>Adding layer information to the mesh in Toast</h2>
+<p>As before, you can load the gmsh mesh file into Toast. From Matlab, type</p>
+<div class="example">
+mesh=toastMesh('segmented_sphere_test.msh','gmsh');<br />
+mesh.Display
+</div>
+<p>The internal structure is not obvious from the surface display of the mesh, but each element contains information about the sub-volume it belongs to via its <i>region index</i>.</p>
+<div class="example">
+reg = mesh.Region;<br />
+unique(reg)
+</div>
+<p>should display three labels corresponding to the <i>Volume</i> labels in the .geo file.</p>
+<p>You can visualise the regions in a cross section:</p>
+<div class="example">
+grd = [128 128 128];<br />
+basis = toastBasis(mesh,grd);<br />
+elref = basis.GridElref;<br />
+regim = zeros(size(elref));<br />
+for i=1:length(elref)<br />
+&nbsp;&nbsp;el = elref(i);<br />
+&nbsp;&nbsp;if el>0<br />
+&nbsp;&nbsp;&nbsp;&nbsp;regim(i) = reg(el);<br />
+&nbsp;&nbsp;end<br />
+end<br />
+regim = reshape(regim,grd);<br />
+imagesc(squeeze(regim(:,64,:)),[min(reg)-1,max(reg)]);<br />
+axis equal tight; colorbar
+</div>
+<p><img src="toast_region.png" style="width:100%;max-width:615px" /></p>
+<p><i>Cross section through segmented sphere loaded into a Toast mesh</i></p>
+<p>The region labels can for example be used to define piecewise constant parameters for an FEM forward solution.</p>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

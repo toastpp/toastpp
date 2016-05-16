@@ -1,0 +1,169 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Toast toolbox tutorial: Building a DOT forward solver</h1>
+<p>This example shows how to write a simple DOT steady-state forward solver in Matlab using the Toast toolbox. To run this code yourself, you need Matlab, and you have to install the Toast toolbox on your computer.</p>
+<p>To save you typing, the full Matlab script for this example can be downloaded <a href="demo_matlab_fwd1.m">here</a>.
+<h2>Step 1: Create a mesh</h2>
+<p>The forward solver uses the finite element method to solve the diffusion equation in a domain. An unstructured mesh is required to define the domain and distribution of parameters. The Toast toolbox contains a few helper functions to create simple meshes. More complex meshes can be generated with external mesh generators and loaded into Toast.</p>
+<p>For this example, we create a simple two-dimensional circular mesh of radius 25 mm, using the following commands:</p>
+<div class="example">
+rad = 25;&nbsp;&nbsp;&nbsp;<span class="comment">% mesh radius [mm]</span><br />
+nsect = 6;&nbsp;&nbsp;<span class="comment">% number of sectors</span><br />
+nring = 32;&nbsp;<span class="comment">% number of rings</span><br />
+nbnd = 2;&nbsp;&nbsp;&nbsp;<span class="comment">% number of boundary rings</span><br /><br />
+[vtx,idx,eltp] = mkcircle(rad,nsect,nring,nbnd);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">% create the mesh geometry</span><br />
+mesh = toastMesh (vtx,idx,eltp);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">% create the mesh object</span>
+</div>
+<p>where <i>nsect</i>, <i>nring</i>, and <i>nbnd</i> define the element structure of the mesh.</p>
+<p>You can retrieve the geometry parameters from an existing mesh:</p>
+<div class="example">
+[vtx,idx,eltp] = mesh.Data;<br />
+nnode = mesh.NodeCount;<br />
+nel = mesh.ElementCount;
+</div>
+<p>where 'vtx' is the list of node coordinates, 'idx' is the list of node indices for each element, 'eltp' is the list of element type identifiers for each element, 'nnode' is the number of nodes, and 'nel' is the number of elements in the mesh.</p>
+
+<p>To visualise the new mesh, use the 'Display' method of the toastMesh class:</p>
+<div class="example">
+mesh.Display
+</div>
+<p> which will open the following figure:</p>
+<img src="demo_matlab_fwd1_1.png" />
+<p>You can change the mesh resolution by varying the parameters used for mkcircle. Here is a mesh created with nsect=8, nring=16 and nbnd=4:</p>
+<img src="demo_matlab_fwd1_2.png" />
+
+<h2>Step 2: The optical coefficients</h2>
+<p>The forward solver requires the distribution of absorption and scattering coefficient, as well as the refractive index.</p>
+<p>The mesh defines a <i>basis</i> u(r) with which functions f(r) defined in the domain can be approximated with a finite dimensional array of coefficients:</p>
+<img src="demo_matlab_fwd1_eq1.png" />
+<p>In this example, we assume a <i>piecewise linear</i> basis, where coefficients f<sub>i</sub> are defined on the vertices of each mesh element. (Toast also allows to define a piecewise constant basis, as well has higher-order polynomial bases. We'll come to those later.)</p>
+<p>Toast constructs the basis u<sub>i</sub>(r) automatically. All we have to provide are the index arrays for absorption &mu;<sub>a</sub>, scattering &mu;<sub>s</sub> and refractive index n:</p>
+<div class="example">
+mua_bkg = 0.01;<br />
+mus_bkg = 1.0;<br />
+ref_bkg = 1.4;<br />
+nnd = mesh.NodeCount;<br />
+mua = ones(nnd,1) * mua_bkg;<br />
+mus = ones(nnd,1) * mus_bkg;<br />
+ref = ones(nnd,1) * ref_bkg;
+</div>
+<p>mua, mus and ref now homogeneous parameter distributions. We will look at creating inhomogeneous distributions later.</p>
+
+<h2>Source and detector locations</h2>
+<p>We need to define at least one source distribution and one detector profile for the forward solver. For practical applications, multiple source and detector locations are usually employed.</p>
+<p>For this example, we assumed that sources and detectors are arranged with equidistant spacing around the circumference of the mesh:</p>
+<div class="example">
+nq = 16;<br />
+for i=1:nq<br />
+&nbsp;&nbsp;phi_q = 2*pi*(i-1)/nq;<br />
+&nbsp;&nbsp;Q(i,:) = rad * [cos(phi_q) sin(phi_q)];<br />
+&nbsp;&nbsp;phi_m = 2*pi*(i-0.5)/nq;<br />
+&nbsp;&nbsp;M(i,:) = rad * [cos(phi_m) sin(phi_m)];<br />
+end<br />
+mesh.SetQM(Q,M);
+</div>
+<p>The SetQM method attaches the source and detector locations to the mesh. You can display the source and detector location superimposed on the mesh display from step 1:</p>
+<div class="example">
+hold on<br />
+plot(Q(:,1),Q(:,2),'ro','MarkerFaceColor','r');<br />
+plot(M(:,1),M(:,2),'bx','MarkerFaceColor','b');
+</div>
+<p>which will show the source locations as red circles, and the detector locations as blue squares:</p>
+<img src="demo_matlab_fwd1_3.png" />
+<p>From the source and detector locations, you create the source and boundary projection vectors using the Qvec and Mvec functions:
+<div class="example">
+qvec = mesh.Qvec('Neumann','Gaussian',2);<br />
+mvec = mesh.Mvec('Gaussian',2);
+</div>
+<p>where <i>Neumann</i> defines the source as an incoming flux (you could instead using <i>Isotropic</i> for internal source distributions). <i>Gaussian</i> defines the boundary profiles for the source and detector response functions, and '2' is their width.</p>
+
+<h2>Running the forward solver</h2>
+<p>We now have everything in place to set up and run the forward solver to simulate the measuremenets for our problem. The FEM formulation leads to a linear system of the form</p>
+<img src="demo_matlab_fwd1_eq2.png" />
+<p>where K is a <i>system matrix</i> depending on the parameters x (absorption, scattering, refractive index), Q is a matrix of column vectors, where each column consists of one source distribution, M is a matrix of column vectors for the detector response distributions, &Phi; is the matrix of photon density distributions for each source, and Y contains the measurements for each source and detector combination.</p>
+<p>With the Toast toolbox, this system is represented by the following code</p>
+<div class="example">
+K = dotSysmat(mesh,mua,mus,ref,0);<br />
+Phi = K\qvec;<br />
+Y = mvec.' * Phi;
+</div>
+<p>where dotSysmat builds DOT system matrix K from the mesh geometry and parameter coefficients (the '0' at the end refers to the modulation frequency, which is zero for a steady-state problem). The linear system is solved for &Phi; with the backslash operator. For larger problems, you may have to switch to an iterative scheme such as <i>bicgstab</i> or <i>gmres</i>. The measurements are obtained from the photon density distributions by projecting onto the measurement profiles M.</p>
+<p>You can display the measurements as a sinogram:</p>
+<div class="example">
+figure<br />
+imagesc(log(Y));<br />
+xlabel('source index q');<br />
+ylabel('detector index m');<br />
+axis equal tight;<br />
+colorbar
+</div>
+<img src="demo_matlab_fwd1_4.png" />
+<p>or as a boundary profile as a function of source detector separation:</p>
+<div class="example">
+figure<br />
+hold on<br />
+angle = [360/32:360/16:360];<br />
+for i=1:size(Y,2)<br />
+&nbsp;&nbsp;ywrap = [Y(i:end,i); Y(1:i-1,i)];<br />
+&nbsp;&nbsp;plot(angle,log(ywrap),'o-');<br />
+end<br />
+axis([0 360 -13 -2]);<br />
+xlabel('angular source-detector separation');<br />
+ylabel('log intensity');
+</div>
+<img src="demo_matlab_fwd1_5.png" />
+<p>Note that all 16 measurement profiles coincide, because of the symmetry of the problem. For inhomogeneous problems or more complex shapes, this will no longer be the case.</p>
+<p>We can now write out the generated data as a linear vector with source-major ordering for later re-use:</p>
+<div class="example">
+data = reshape(log(Y'),[],1);<br />
+toastWriteVector('demo_matlab_fwd1.dat',data);
+</div>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

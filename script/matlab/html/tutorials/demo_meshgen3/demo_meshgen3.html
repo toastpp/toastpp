@@ -1,0 +1,118 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Adaptive meshing</h1>
+<p>Gmsh allows to define the local mesh density based on the nodal coefficients of a background mesh. In this tutorial we will demonstrate how to use this feature to produce an adaptive mesh in Toast.</p>
+
+<p>For simplicity, this example is performed in 2D, but it can be applied equally to 3D problems.</p>
+
+<h2>Step 1: Initial mesh with uniform node density</h2>
+<p>We start from a simple geometry, defining a circle with radius 25. You can either use the circle.geo file found in examples/matlab/gmsh/circle.geo, or just copy the definition below into a new file circle.geo:</p>
+<div class="example">
+Point(1) = {0,0,0,1};<br />
+Point(2) = {25,0,0,1};<br />
+Point(3) = {-25,0,0,1};<br />
+Point(4) = {0,25,0,1};<br />
+Point(5) = {0,-25,0,1};<br />
+Circle(1) = {3,1,5};<br />
+Circle(2) = {5,1,2};<br />
+Circle(3) = {2,1,4};<br />
+Circle(4) = {4,1,3};<br />
+Line Loop(5) = {1,2,3,4};<br />
+Plane Surface(6) = {5};
+</div>
+<p>Now generate a mesh from this geometry. We do this from Matlab, so that the entire process can be packaged into a script:</p>
+<div class="example">
+system ('gmsh -2 circle.geo -o tmp.msh');
+</div>
+<p>which runs a non-interactive gmsh session. "-2" runs the 2D mesh generator, and "-o" specifies the output file name. Load the new mesh into Toast:</p>
+<div class="example">
+mesh = toastMesh('tmp.msh','gmsh');
+mesh.Display;
+</div>
+<p>where flag 'gmsh' tells Toast to read a mesh in gmsh format. The Display command shows the mesh structure. Gmsh has produced an unstructured mesh with homogeneous node density.</p>
+<p><img src="mesh1.png" style="width:100%;max-width:615px" /></p>
+<p><i>Unstructured mesh with uniform mesh density</i></p>
+
+<h2>Step 2: Run a forward problem</h2>
+<p>To generate a simple density function for the adaptive process, we now run a forward problem on this mesh, and use the resulting field to determine the target node density. You can apply other criteria for the adaptive remeshing, but the mechanism remains the same.</p>
+<div class="example">
+% system matrix<br />
+n = mesh.NodeCount;<br />
+mua = ones(n,1)*0.01; % absorption coefficient<br />
+mus = ones(n,1)*1;    % scattering coefficient<br />
+ref = ones(n,1)*1.4;  % refractive index<br />
+<br />
+% rhs (single source)<br />
+mesh.SetQM([-25,0],[25,0]);<br />
+qvec = mesh.Qvec('Neumann','Gaussian',2);<br />
+<br />
+% solve<br />
+phi = sysmat\qvec;<br />
+figure; mesh.Display(log(phi));
+</div>
+<p><img src="mesh2.png" style="width:100%;max-width:615px" /></p>
+<p><i>The field computed on the uniform mesh</i></p>
+
+<h2>Step 3: Construct the density function and remesh</h2>
+<p>We now rescale the field for a suitable density range, and write a it out as a gmsh background mesh (.pos).</p>
+<div class="example">
+dns = -log(phi);<br />
+dns = (dns-min(dns))/(max(dns)-min(dns))*1.8+0.2;<br />
+mesh.Write('tmp.pos','gmsh-pos',dns);
+</div>
+<p>where flag 'gmsh-pos' directs Toast to write the mesh in gmsh .pos format, using the third argument (dns) as a nodal coefficient vector.</p>
+<p>Now we call gmsh again, loading both the background mesh and the circle geometry, and remesh based on the background mesh coefficients:</p>
+<div class="example">
+system('gmsh -bgm tmp.pos -merge circle.geo -2 -o adaptive.msh');<br />
+mesh2 = toastMesh('adaptive.msh','gmsh');<br />
+mesh2.Display;
+</div>
+<p><img src="mesh3.png" style="width:100%;max-width:615px" /></p>
+<p><i>The remeshed circle, using the forward field as density function.</i></p>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

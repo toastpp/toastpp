@@ -1,0 +1,111 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../images/toast_logo_small.jpg"></td>
+<td><img src="../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../toast.html">Toast++</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Matlab toolbox demos</h1>
+<p>The Toast-Matlab toolbox contains a series of interactive demos that allow to explore specific topics of the forward and inverse problems in diffuse optical tomography. Once the toolbox is installed, open the Matlab main help page by typing
+<div class="example">
+doc
+</div>
+<p>on the Matlab command prompt. Navigate to the <i>Supplemental software</i> section at the bottom of the list, and open the <i>Toast++ Toolbox</i> link. This opens the Toast++ main help page. Follow the link to <i>Examples</i> in the Contents list to open the demo page. From there, open a demo to run it or to inspect its source code.</p>
+<p>More info about the demos is available <a href="demos.html">here</a>.</p>
+
+<h1>Matlab online tutorials</h1>
+<p>Below is a list of online tutorials shows typical use examples for the Matlab-Toast toolbox. Each tutorial contains a link to the Matlab script to recreate the example.</p>
+<p>The tutorials introduce the concept of the forward and inverse problems in optical tomography step by step. It is recommended to work through them in sequence, since later tutorials build upon the previous ones.</p>
+
+<h2>Mesh generation for Toast problems with Gmsh</h2>
+<h3><a href="demo_meshgen1/demo_meshgen1.html">Build a spherical mesh</a></h3>
+<p>Create a spherical mesh with the Gmsh user interface, and import it into Toast.</p>
+<h3><a href="demo_meshgen2/demo_meshgen2.html">Addint internal structure to the sphere</a></h3>
+<p>Create a sphere with multiple regions by adding internal surfaces.</p>
+<h3><a href="demo_meshgen3/demo_meshgen3.html">Creating an adaptive mesh</a></h3>
+<p>Create an adaptive mesh based on a nodal density function</p>
+
+<h2>Solving DOT forward problems</h2>
+<img src="demo_matlab_fwd1_4.png" height="100" style="float: right;" />
+<h3><a href="demo_fwd1/demo_matlab_fwd1.html">Building a DOT forward solver</a></h3>
+<p style="min-height: 70px;">This example shows a basic forward solver for a simple 2-D homogeneous problem, generating steady-state boundary data. It explains how to create a mesh, set up homogeneous parameter vectors, define the source and detector profiles, and solve the linear FEM problem.</p>
+ 
+<img src="demo_matlab_fwd2_4.png" height="100" style="float: right;" />
+<h3><a href="demo_fwd2/demo_matlab_fwd2.html">Extending to inhomogeneous parameters</a></h3>
+<p style="min-height: 70px;">This example shows how to define inhomogeneous parameter distributions by mapping bitmap images into the mesh basis, and evaluates the data differences to the homogeneous solution.</p>
+
+<h3><a href="demo_fwd3/demo_matlab_fwd3.html">Generating frequency-domain data</a></h3>
+<p style="min-height: 70px;">This example applies modifications to the script to allow for the calculation of complex-valued measurement data from modulated light sources.</p>
+
+<h3><a href="demo_fwd4/demo_matlab_fwd4.html">Generating time-domain data</a></h3>
+<p style="min-height: 70px;">This example shows how to solve the time-dependent diffusion equation by applying a finite-difference scheme to represent the time derivative. It shows the setup of the system matrices and the solver loop for the time steps.</p>
+
+<h2>Solving DOT inverse problems</h2>
+<h3><a href="demo_pmdf1/demo_matlab_pmdf1.html">Constructing the Jacobian matrix</a></h3>
+<p style="min-height: 70px;">The Jacobian defines the derivative of the forward operator with respect to given parameter distributions. It is an important element of many reconstruction algorithms. This example shows how to calculate the Jacobian, and the interpretation of individual rows as photon measurement density functions.</p>
+ 
+<h3><a href="demo_rec1/demo_matlab_rec1.html">A simple reconstruction problem</a></h3>
+<p style="min-height: 70px;">Reconstructing absorption and scattering parameters from frequency domain boundary data in a 2D problem.</p>
+ 
+<h3><a href="demo_nonunique/demo_nonunique.html">Non-uniqueness</a></h3>
+<p style="min-height: 70px;">Simultaneous reconstruction of the absorption and scattering parameters requires sufficient information in the measurement data to distinguish between the effects of the parameters. This example shows that steady-state intensity data do not allow to reconstruct for both parameter distributions.</p>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 2 April 2014 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td>
+<td class="counter">
+<div id="eXTReMe"><a href="http://extremetracking.com/open?login=ucacmas">
+<img src="http://t1.extreme-dm.com/i.gif" style="border: 0;"
+height="38" width="41" id="EXim" alt="eXTReMe Tracker" /></a>
+<script type="text/javascript"><!--
+var EXlogin='ucacmas' // Login
+var EXvsrv='s11' // VServer
+EXs=screen;EXw=EXs.width;navigator.appName!="Netscape"?
+EXb=EXs.colorDepth:EXb=EXs.pixelDepth;
+navigator.javaEnabled()==1?EXjv="y":EXjv="n";
+EXd=document;EXw?"":EXw="na";EXb?"":EXb="na";
+EXd.write("<img src=http://e2.extreme-dm.com",
+"/"+EXvsrv+".g?login="+EXlogin+"&amp;",
+"jv="+EXjv+"&amp;j=y&amp;srw="+EXw+"&amp;srb="+EXb+"&amp;",
+"l="+escape(EXd.referrer)+" height=1 width=1>");//-->
+</script><noscript><div id="neXTReMe"><img height="1" width="1" alt=""
+src="http://e2.extreme-dm.com/s11.g?login=ucacmas&amp;j=n&amp;jv=n" />
+</div></noscript></div>
+</td></tr>
+</table>
+</div>
+
+</div> 
+</body>
+</html>

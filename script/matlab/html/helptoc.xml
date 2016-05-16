@@ -11,6 +11,7 @@
     <tocitem target="examples.html" image="$toolbox/matlab/icons/demoicon.gif">Examples
         <tocitem target="quickstart.html">A 2D reconstruction</tocitem>
         <tocitem target="../demos.xml">Toast++ demos</tocitem>
+	<tocitem target="tutorials/demos_matlab.html">Toast++ tutorials</tocitem>
     </tocitem>
     <tocitem>Reference
         <tocitem target="functions_alpha.html" image="$toolbox/matlab/icons/reficon.gif">Functions - Alphabetical List</tocitem>
