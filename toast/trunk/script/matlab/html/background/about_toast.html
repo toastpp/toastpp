@@ -1,0 +1,90 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../images/toast_logo_small.jpg"></td>
+<td><img src="../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../toast.html">Toast++</a></dt>
+  </dl>
+  <dl>
+    <dt><a href="background.html">Background</a></dt>
+    <dd>
+      <a href="dot.html">Diffuse optical tomography</a>
+      <span>About Toast++</span>
+      <a href="about_toolbox.html">About the Toast++ toolbox</a>
+    </dd>
+  </dl>
+  <dl>
+    <dt><a href="../examples.html">Examples</a></td>
+    <dd>
+      <a href="../quickstart.html">A quick 2D reconstruction</a>
+      <a href="../tutorials/demos_matlab.html">Tutorials</a>
+      <a href="../../demos.xml">Demos</a>
+    </dd>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>What is Toast++?</h1>
+<p>Toast++ is an open-source software suite for image reconstruction in diffuse optical tomography (DOT). DOT seeks to recover the spatial distribution of the optical parameters of a scattering object from boundary measurements of light transmission between a set of infrared light sources and a set of detectors.</p>
+<p>The main application of DOT is in medical imaging, where the optical parameters are related to important physiological tissue parameters such as the oxygenation level of blood and tissue.</p>
+<p>Parameter reconstruction in DOT is a nonlinear ill-posed inverse problem. Infrared light is highly scattered in biological tissues, and propagates as a diffuse photon density wave rather than in a straight path. The spatital sensitivity distribution of a measurement (photon measurement density function, PMDF) depends itself on the unknown optical parameters.</p>
+<p>Toast++ uses a model-based iterative approach to the DOT reconstruction problem. A numerical model of diffuse light transport is applied to the current parameter estimate at each step, and an objective function is defined as a norm of the difference between measurement and model data. The reconstruction problem is then formulated in terms of minimisation of the objective function. The problem is linearised around the current estimate at each step to find an update direction and update step.</p>
+
+<h2>Toast++ Features</h2>
+<ul>
+<li>Available for Windows, Linux and Mac platforms.</li>
+<li>Diffusion light transport model using a finite element (FEM) forward solver.</li>
+<li>Can be applied to 2D and 3D problems.</li>
+<li>Multiple element types (triangles, tetrahedra, pixels, voxels) and multiple orders of polynomial shape functions (linear, quadratic cubic) to accommodate different problem geometries.</li>
+<li>Selection of inverse solvers (gradient-type, Newton-type)</li>
+<li>Selection of regularisation methods</li>
+</ul>
+
+<h2>Where to get Toast++</h2>
+<p>Toast++ is being developed by Martin Schweiger and Simon Arridge at University College London, UK. The <a href="toastplusplus.org">Toast++ web site</a> contains download links for the sources and binary packages, as well as tutorials, a user forum, and a list of references.</p>
+
+<table bgcolor="#FFFFB0" border="2px">
+<tr><td>
+Why 'Toast'?<br>
+Toast stands for 'Time-resolved Optical Absorption and Scattering Tomography'. Although the current version of Toast++ also supports frequency domain and steady-state measurement systems, the original name was retained.
+</td></tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../images/toast_logo_small.jpg"></td>
+<td><img src="../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../toast.html">Toast++</a></dt>
+  </dl>
+  <dl>
+    <dt><a href="background.html">Background</a></dt>
+    <dd>
+      <span>Diffuse optical tomography</span>
+      <a href="about_toast.html">About Toast++</a>
+      <a href="about_toolbox.html">About the Toast++ toolbox</a>
+    </dd>
+  </dl>
+  <dl>
+    <dt><a href="../examples.html">Examples</a></td>
+    <dd>
+      <a href="../quickstart.html">A quick 2D reconstruction</a>
+      <a href="../tutorials/demos_matlab.html">Tutorials</a>
+      <a href="../demos.xml">Demos</a>
+    </dd>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="imagecol">
+  <div style="margin-left:auto;margin-right:auto;width:300px;">
+  <img src="ctproj.gif" width="300" alt="CT imaging">
+  <img src="efield.gif" width="300" alt="diffuse imaging">
+  </div>
+  <p class="caption">Figure 1: A schematic view of projections along straight lines, as encountered  in CT imaging, where included objects cast "shadows" on the
+opposite detector  array (top), and a photon density wave from a single
+source propagating through a diffuse medium with an embedded object (bottom).</p>
+  <div style="margin-left:auto;margin-right:auto;width:240px;">
+  <img src="pmdf_homog.gif" width="240" alt="PMDF in homogeneous medium">
+  <img src="pmdf_blob.gif" width="240" alt="Perturbed PMDF">
+  </div>
+  <p class="caption">Figure 2: Sensitivity distribution for two boundary measurements of modulation amplitude. Left: homogeneous case, right: perturbation of the sensitivity maps by an included absorbing object.</p>
+</td>
+
+<td class="maintext">
+<h1>What is diffuse optical tomography?</h1>
+<p>In clinical applications of diffuse optical tomography (DOT), infrared light is used to probe the body, with the aim to recover the spatial distribution of the optical parameters, such as absorption and scattering, and to present them as 3-D images to the clinician. The optical parameters are related to physiologically relevant properties of blood and tissue oxygenation levels. DOT can therefore be regarded as a <i>functional imaging modality</i>, in contrast to methods that primarily image body <i>structure</i>, such as X-ray computed tomography (X-ray CT) or magnetic resonance imaging (MRI).</p>
+           
+<p> The use of infrared light for imaging presents a big challenge: Unlike the radiation in CT, which generally travels in straight lines through the body, infrared light is strongly scattered by tissue. For most tissue types, a photon's mean free path of travel between two scattering events is only a fraction of a millimetre. Therefore, any photons that penetrate the tissue will have undergone multiple scattering events. Instead of a pencil beam of radiation travelling through the tissue, we face a diffuse photon density wave. The Figure 1 shows a schematic view of the straight-line projections encountered in CT imaging, and the photon density field calculated for a  scattering medium with an embedded rectangular object of increased absorption.</p>
+            
+<p> Diffuse light propagation complicates image reconstruction. Light travelling 
+ between two points on the surface spreads out over a significant volume inside
+the tissue and therefore carries very little spatial information. to maximise
+the information contained in the measurements, we use multiple detectors
+to sample the light emerging over a large surface area from the body for
+each source. The problem now is to reconstruct images of the internal distribution
+of the tissue's optical properties from these boundary measurements. Unlike
+CT, this problem is highly nonlinear, and analytical solutions exist only
+for a limited number of simple geometries. In general, we must resort to
+an iterative approach.
+  </p>
+   
+<h1>Measurement sensitivity regions</h1>
+ <p>To appreciate the difficulty faced when reconstructing images in optical
+ tomography, it is useful to visualise the volume of tissue probed by a single
+ source-detector pair, and the perturbation of this volume in the presence
+ of an embedded inhomogeneity. Such a volume is called a <i>photon measurement
+ density function</i> (PMDF), or sensitivity region, because it shows how
+a measurement will be affected by a parameter perturbation of a point inside
+ the medium. The calculation of PMDF is essential when constructing the Jacobian
+ of the forward solver, required by many inversion algorithms.</p>
+
+<p>We can see that the sensitivity regions spread out widely inside the tissue,
+which means that each measurement contains little spatial information. Furthermore, the regions are distorted by the included object, so the region probed by
+a measurement itself depends on the distribution of optical parameters! This
+has a profound effect on the solution of the imaging problem, because if
+we want to backproject boundary measurements into the tissue, we need to
+know the shape of the PMDFs and hence the solution of the problem we want
+to solve. This demonstrates the nonlinearity of the imaging problem in ODT.
+In general, it can only be solved by an iterative approach, where the estimates
+of the PMDFs are updated along with the estimates of the optical parameters.</p>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

@@ -1,8 +1,8 @@
-/*html{
-  min-height: 100%;
-  margin-bottom: 1px;
-  overflow-y: scroll;
-}*/
+html{
+/*  min-height: 100%;
+  margin-bottom: 1px;*/
+  overflow: visible;
+}
 body {
   font-family: Arial, Helvetica, Sans-Serif;
   font-size:15px;
@@ -12,7 +12,7 @@ body {
 .all {
   position:relative;
   top:0px;
-  width:840px;
+  max-width:840px;
   margin-left:auto;
   margin-right:auto;
 }
@@ -82,11 +82,13 @@ p {
   margin-bottom:1ex;
 }
 
+/*
 .main-height {
   height: -moz-calc(100% - 185px);
   height: -webkit-calc(100% - 185px);
   height: calc(100% - 185px);
 }
+*/
 
 a:link	{background: transparent; color: #0000FF;} 
 a:visited {color: #800080;}
