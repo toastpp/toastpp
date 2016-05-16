@@ -1,0 +1,108 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../../toast.html">Toast++</a></dt>
+  </dl>
+  <dl>
+    <dt><a href="../../background/background.html">Background</a></dt>
+    <dd>
+      <a href="../../background/dot.html">Diffuse optical tomography</a>
+      <a href="../../background/about_toast.html">About Toast++</a>
+      <a href="../../background/about_toolbox.html">About the Toast++ toolbox</a>
+    </dd>
+  </dl>
+  <dl>
+    <dt><a href="../examples.html">Examples</a></td>
+    <dd>
+      <a href="../quickstart.html">A quick 2D reconstruction</a>
+      <a href="../tutorials/demos_matlab.html">Tutorials</a>
+      <a href="../demos.xml">Demos</a>
+    </dd>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="imagecol">
+  <div style="margin-left:auto;margin-right:auto;width:300px;">
+  <img src="quickstart1.jpg" style="width:300px" alt="Inverse solver GUI">
+  </div>
+  <p class="caption">The graphical interface for the reconstruction wizard.</p>
+</td>
+
+<td class="maintext">
+<h1>A Quick Example</h1>
+<p>This example demonstrates how to use the GUI interface for setting up
+reconstruction parameters. It performs a 2D reconstruction from simulated
+measurements.
+<p>In the following checklist, $TOASTDIR refers to the TOAST root directory.
+
+<ul>
+<li class="checklist">If you haven't done so yet, make sure that the MATLAB path definition includes the Toast mex and script directories. The easiest way to do this is to run the
+<i>mtoast2_install</i> script in the Toast root directory. This script adds the necessary paths for the running MATLAB session and opens the pathtool dialog box to allow storing the paths permanently.
+<div class="example">
+cd $TOASTDIR<br>
+mtoast2_install
+</div>
+
+<li class="checklist">Change the working directory to $TOASTDIR/test/2D/matlab.
+<div class="example">
+cd $TOASTDIR/test/2D/matlab
+</div>
+
+<li class="checklist">
+Launch the GUI reconstruction interface.
+<div class="example">
+recon_gui
+</div>
+This brings up a dialog box which allows access to all reconstruction
+parameters.
+
+<li class="checklist">Load a parameter file into the GUI. Click 'Load' to open
+the file dialog. Load the 'recon1.prm' parameter file in the current directory.
+This loads the data files and reconstruction parameters for the example.
+
+<li class="checklist">Launch the reconstruction. Click 'Run' to start the
+reconstruction of the absorption and scattering distributions with the
+selected parameters.
+
+</ul>
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>
