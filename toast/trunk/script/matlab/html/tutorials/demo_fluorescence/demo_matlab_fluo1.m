@@ -2,25 +2,16 @@
 % Reconstruction of fluorochrome concentration from fluorescence
 % measurements
 
-clear all
-close all
-
-% A few general parameters
-refind = 1.4;   % homogeneous refractive index of the medium
-c0 = 0.3;       % speed of light in vacuum [mm/ps]
-cm = c0/refind; % speed of light in the medium
+%% Optical background parameters
+refind = 1.4;     % homogeneous refractive index of the medium
+mua_homog = 0.05; % background absorption [1/mm]
+mus_homog = 1;    % background scattering [1/mm]
 
 %% Create the mesh
 rad = 25;
 [vtx,idx,eltp] = mkcircle(rad,6,32,2);
 mesh = toastMesh(vtx,idx,eltp);
 n = mesh.NodeCount;
-
-%% solution basis
-grd = [64 64];
-blen = prod(grd);
-basis = toastBasis (mesh, grd);
-nsol = basis.slen;
 
 %% Source and measurement projection vectors
 np = 32;
@@ -39,6 +30,12 @@ nQ = size(qvec,2);
 mvec = mesh.Mvec ('Gaussian', 0.5, refind);
 nM = size(mvec,2);
 
+%% solution basis
+grd = [64 64];
+blen = prod(grd);
+basis = toastBasis (mesh, grd);
+nsol = basis.slen;
+
 %% The flu target in grid dimensions: 3 different blobs 
 fltgt_g = zeros(grd);
 nblobs = 3;
@@ -56,8 +53,8 @@ for i = 1:grd(1)
       end
   end
 end
-muatgt_g=0.05*ones(grd);
-mustgt_g=1*ones(grd);
+muatgt_g = mua_homog*ones(grd);
+mustgt_g = mus_homog*ones(grd);
 
 % map to solution basis
 fltgt_h   = basis.Map ('B->M', reshape(fltgt_g,[],1));
@@ -106,8 +103,7 @@ lgamma_fl = reshape ((mvec.' * sol_fl), (size(mvec,2))*size(sol1,2), 1);
 lgamma_fl = lgamma_fl(dmask);
 fdata = [real(lgamma_fl)];
 
-R = sparse(diag(1./(xdata))); % scaling matrix
-toastWriteVector('./data/fl_sim_mod_mat.fem',fdata)
+R = sparse(diag(1./(xdata))); % scaling matrix: inverse of excitation data
 figure;
 subplot(2,2,1);imagesc(reshape(xdata,nM,nQ));colormap(gray);colorbar;axis square;title('Excitation Data RtN map');
 subplot(2,2,2);imagesc(reshape(fdata,nM,nQ));colormap(gray);colorbar;axis square;title('Fluoresence Data RtN map');
@@ -130,34 +126,15 @@ for i = 1:nQ
 end
 Jr = R*Jr; % rescale Jacobian
 
-% column scaling if required
-c = ones(nsol,1);
-for k = 1:nsol
-    c(k) = norm(Jr(:,k));
-end
-S = sparse(diag(1./c));
-S = 0.001*speye(nsol); % reset to identity (i.e. no image scaling)
-Jr = Jr * S;
-
-Algorithm=2;
 lambda = 1e-4*(trace(Jr' * Jr)); % regularisation proportional to trace
-if Algorithm == 1
-    disp('solving using Backslash');
-    tr = [r; ones(nsol,1)];
-    tJ = [Jr ; lambda*eye(nsol)];
-    x = tJ\tr;
-else
-    disp('solving using Conjugate Gradients');
-    s_tol=1e-6;
-    s_iter=200;
-    [x,CGflag,relres,niter] = cgs(Jr'*Jr + lambda*speye(nsol), Jr'*r,s_tol,s_iter);
-    disp(['CG iterations: ',num2str(niter)]);
-end
-x = S*x; %unscale
+disp('solving using Conjugate Gradients');
+s_tol=1e-6;
+s_iter=200;
+[x,CGflag,relres,niter] = cgs(Jr'*Jr + lambda*speye(nsol), Jr'*r,s_tol,s_iter);
+disp(['CG iterations: ',num2str(niter)]);
+
 xim = basis.Map('S->B', x);
-sim = basis.Map('S->B', diag(S));
  
 figure;
-subplot(2,2,1);imagesc(fltgt_g);colorbar;axis square;title('target fluoresence');
-subplot(2,2,2);imagesc(reshape(sim,grd));colormap(gray);colorbar;axis square;title('Image recscaling');
-subplot(2,2,3);imagesc(reshape(xim,grd));colormap(gray);colorbar;axis square;title('reconstructed fluoresence');
+subplot(1,2,1);imagesc(fltgt_g);colorbar;axis square;title('target fluoresence');
+subplot(1,2,2);imagesc(reshape(xim,grd));colormap(gray);colorbar;axis square;title('reconstructed fluoresence');

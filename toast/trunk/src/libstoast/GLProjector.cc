@@ -1,5 +1,7 @@
 #define STOASTLIB_IMPLEMENTATION
 
+#ifdef MESA_SUPPORT
+
 #if defined(_WIN32)
 #include <windows.h>
 #include <WinGDI.h>
@@ -362,3 +364,4 @@ void GLProjector::constructMatrix_SF()
     toField.RowScale(scale);
 }
 
+#endif // MESA_SUPPORT

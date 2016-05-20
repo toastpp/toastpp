@@ -1,4 +1,4 @@
-/* 
+/*
 ---
 Some utility functions for reading/writing data and parameters
 from file or console input
@@ -9,9 +9,11 @@ from file or console input
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include "projector.h"
-#include "GLProjector.h"
 #include "camera.h"
+#include "projector.h"
+#ifdef MESA_SUPPORT
+#include "GLProjector.h"
+#endif
 
 using namespace std;
 
@@ -220,11 +222,15 @@ void SelectProjectors (ParamParser &pp, QMMesh & mesh, Projector ** projPtrs, Ca
 		camPtrs[m] = new OrthoCamera(w, h, pixSize, cpos, x, y, z);
 	    }
 	}
+#ifdef MESA_SUPPORT
+	// note: currently only GLProjector is implemented, so MESA_SUPPORT is required
 	if (projtp==PROJTYPE_MESAGL)
 	{
 	    projPtrs[m] = new GLProjector(camPtrs[m], &mesh, nBndElems, bndellist, bndsdlist);
 	}
-
+#else
+	xERROR("Mesa-3D support required but not provided.");
+#endif
     }
 }
 

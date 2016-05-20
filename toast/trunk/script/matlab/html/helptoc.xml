@@ -10,8 +10,8 @@
       <tocitem target="background/about_toolbox.html">About the Toast++ toolbox</tocitem>
     </tocitem>
     <tocitem target="examples.html" image="$toolbox/matlab/icons/demoicon.gif">Examples
-        <tocitem target="quickstart.html">A 2D reconstruction</tocitem>
-        <tocitem target="../demos.xml">Toast++ demos</tocitem>
+      <tocitem target="quickstart.html">A 2D reconstruction</tocitem>
+      <tocitem target="../demos.xml">Toast++ demos</tocitem>
 	<tocitem target="tutorials/demos_matlab.html">Toast++ tutorials
 	<tocitem target="tutorials/demo_meshgen1/demo_meshgen1.html">Mesh generation: spherical mesh</tocitem>
 	<tocitem target="tutorials/demo_meshgen2/demo_meshgen2.html">Internal boundaries</tocitem>
@@ -23,15 +23,14 @@
 	<tocitem target="tutorials/demo_pmdf1/demo_matlab_pmdf1.html">Jacobian generation</tocitem>
 	<tocitem target="tutorials/demo_rec1/demo_matlab_rec1.html">Simple inverse solver</tocitem>
 	<tocitem target="tutorials/demo_nonunique/demo_nonunique.html">Non-uniqueness example</tocitem>
-	</tocitem>
+      </tocitem>
     </tocitem>
     <tocitem>Reference
-        <tocitem target="functions_alpha.html" image="$toolbox/matlab/icons/reficon.gif">Functions - Alphabetical List</tocitem>
-        <tocitem target="functions_cat.html" image="$toolbox/matlab/icons/reficon.gif">Functions - By Category</tocitem>
-        <tocitem target="toast_gui.html" image="$toolbox/matlab/icons/pagesicon.gif">Toast++ GUI</tocitem>
+      <tocitem target="matlab: doc toast2">Class and function list</tocitem>
     </tocitem>
-    <tocitem target="http://web4.cs.ucl.ac.uk/research/vis/toast/index.html" image="$toolbox/matlab/icons/webicon.gif">TOAST Web Site
+    <tocitem>Toast++ on the web
+      <tocitem target="http://web4.cs.ucl.ac.uk/research/vis/toast/index.html" image="$toolbox/matlab/icons/webicon.gif">Toast++ Web Site</tocitem>
     </tocitem>
-</tocitem>
+  </tocitem>
 
 </toc>

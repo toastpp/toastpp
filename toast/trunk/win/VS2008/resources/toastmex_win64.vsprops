@@ -10,10 +10,11 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		AdditionalIncludeDirectories="$(MatlabIncludeDir)"
+		PreprocessorDefinitions="FDOT"
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="libmath.lib libfe.lib libstoast.lib libmx.lib libmex.lib libmat.lib"
+		AdditionalDependencies="libmath.lib libfe.lib libstoast.lib libfdot.lib libmx.lib libmex.lib libmat.lib"
 		OutputFile="$(ToastMexDir)$(ProjectName).mexw64"
 		AdditionalLibraryDirectories="$(MatlabLibDir)"
 		ModuleDefinitionFile="$(SolutionDir)matlab\resources\mexfunc.def"
