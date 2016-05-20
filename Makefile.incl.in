@@ -54,6 +54,9 @@ MAKE_LIB = @MAKE_LIB@
 BUILD_FDOT = @TOAST_FDOT@
 OGLLIB = @OGLLIB@
 OGLINC = @OGLINC@
+ifeq ($(BUILD_FDOT),1)
+      CCFLAGS += -DMESA_SUPPORT
+endif
 
 # =======================================================================
 # BLAS and LAPACK libraries (determined by configure)
@@ -157,7 +160,7 @@ MATHLIB   = -L$(TLIB) -larpack @SUPERLULIB@ $(SPBLASLIB) $(LAPACKLIB) $(BLASLIB)
 FELIB     = -L$(TLIB) $(TLIBS)
 TOASTLIB  = -L$(TLIB) -ltoast $(TLIBS)
 TOASTCLIB = -L$(TLIB) -lctoast -ltoast $(TLIBS)
-STOASTLIB = -L$(TLIB) -lstoast $(TLIBS)
+STOASTLIB = -L$(TLIB) -lstoast -lfdot $(TLIBS)
 
 GUIFLAGS  = -I$(TSRC)/libtcl @GUIFLAGS@
 GUILIBS   = -ltoasttcl @GUILIBS@
@@ -173,14 +176,11 @@ endif
 # =======================================================================
 FEINC     = -I$(TOASTDIR) -I$(TINC) -I$(TSRC)/libtask $(SUPERLUINC) \
             -I$(TSRC)/libmath -I$(TSRC)/libfe -I$(TSRC)/libdiffreg \
+	    -I$(TSRC)/libfdot \
             $(ILUPACKINC) $(OGLINC) $(CUDAINC)
 TOASTINC  = $(FEINC) -I$(TSRC)/libstoast
 STOASTINC = $(FEINC) -I$(TSRC)/libstoast
-INCLUDE   = $(TOASTINC)
-ifeq ($(ENABLE_CUDA),1)
-      INCLUDE += -DFDOT -I$(TSRC)/libfdot
-      STOASTLIB += -lfdot
-endif
+INCLUDE   = $(TOASTINC) -DFDOT
 # =======================================================================
 
 # =======================================================================

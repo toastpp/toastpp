@@ -18,10 +18,6 @@ else
 	SUPERLU_NAME = libsuperlu$(LIB_SUFFIX)
 endif
 
-#ifeq ($(BUILD_FDOT),1)
-#	COMPONENT += mesa
-#endif
-
 all:: $(COMPONENT)
 
 blas::
@@ -125,14 +121,6 @@ liblbfgs::
 		install_name_tool -id @rpath/liblbfgs-1.10$(LIB_SUFFIX) $(LIBDIR)/liblbfgs-1.10$(LIB_SUFFIX); \
 		install_name_tool -id @rpath/liblbfgs$(LIB_SUFFIX) $(LIBDIR)/liblbfgs$(LIB_SUFFIX); \
 	fi
-
-mesa::
-	cd $(NUMERICSDIR)/Mesa-7.3 ; \
-	./configure --prefix=$(TOASTOBJ) ; \
-	make ; \
-	ln -s -f $(NUMERICSDIR)/Mesa-7.3/include/GL $(TOASTDIR)/include/GL ; \
-	cd lib ; tar czvf mesa_lib.tar.gz * ; \
-	cd $(TOASTDIR)/lib; tar xzvf $(NUMERICSDIR)/Mesa-7.3/lib/mesa_lib.tar.gz
 
 clean:: blas_clean fspblas_clean lapack_clean superlu_clean blzpack_clean \
 	arpack_clean liblbfgs_clean

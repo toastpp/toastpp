@@ -16,8 +16,10 @@
 //#include "felib.h"
 //#include "stoastlib.h"
 //#include "camera.h"
+#include "projector.h"
+#ifdef MESA_SUPPORT
 #include "GLProjector.h"
-
+#endif
 
 using namespace std;
 
@@ -171,11 +173,14 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 		camPList[m] = new OrthoCamera(w, h, pixSize, cpos, x, y, z);
 	    }
 	}
-
+#ifdef MESA_SUPPORT
 	if (projtp==PROJTYPE_MESAGL)
 	{
 	    projPList[m] = new GLProjector(camPList[m], mesh, nBndElems, bndellist, bndsdlist);
 	}
+#else
+	xERROR("Mesa-3D support required but not provided.");
+#endif
 
 	dpr[m] = Ptr2Handle (projPList[m]);
 

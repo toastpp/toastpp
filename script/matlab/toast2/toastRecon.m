@@ -4,12 +4,13 @@ function toastRecon(prm)
 % Synopsis: toastRecon(prm)
 %    prm: reconstruction parameter structure
 %
-% Runs a toast reconstruction with the parameters defined in prm.
-% prm contains information about measurements, meshes and grids,
-% tolerance limits for the forward and inverse solvers, regularisation
-% parameters, etc.
+% A high-level convenience function which runs a toast reconstruction with
+% the parameters defined in prm.
+% prm is a toastParam instance containing information about measurements,
+% meshes and grids, tolerance limits for the forward and inverse solvers,
+% regularisation parameters, etc.
 %
-% See also: toastReadParam
+% See also: toastParam
   
 disp('---------------------------------------')
 disp('Starting reconstruction')

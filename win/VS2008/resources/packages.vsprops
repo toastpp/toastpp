@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="packages"
-	InheritedPropertySheets=".\pthreads.vsprops;.\mesa.vsprops;.\superlu.vsprops"
+	InheritedPropertySheets=".\pthreads.vsprops;.\superlu.vsprops"
 	>
 	<Tool
 		Name="VCLinkerTool"

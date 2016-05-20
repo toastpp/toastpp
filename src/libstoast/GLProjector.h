@@ -1,7 +1,10 @@
 #ifndef GLPROJECTOR_H
 #define GLPROJECTOR_H
 
+#ifdef MESA_SUPPORT
+
 #include "projector.h"
+#include "GL/osmesa.h"
 
 class STOASTLIB GLProjector : public Projector
 {
@@ -24,4 +27,5 @@ class STOASTLIB GLProjector : public Projector
 	int nBndElems;
 };
 
-#endif
+#endif // MESA_SUPPORT
+#endif //!GLPROJECTOR_H

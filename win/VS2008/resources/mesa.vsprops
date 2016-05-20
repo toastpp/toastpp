@@ -6,13 +6,13 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="&quot;$(MesaIncludeDir)&quot;"
-		PreprocessorDefinitions="NOMINMAX"
+		AdditionalIncludeDirectories="&quot;$(WinSDKIncludeDir)&quot;;&quot;$(MesaIncludeDir)&quot;"
+		PreprocessorDefinitions="NOMINMAX;MESA_SUPPORT"
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="OPENGL32.lib OSMESA32.lib GLU32.lib mesa.lib"
-		AdditionalLibraryDirectories="&quot;$(MesaLibDir)&quot;"
+		AdditionalDependencies="OPENGL32.lib GLU32.lib OSMESA32.lib"
+		AdditionalLibraryDirectories="&quot;$(WinSDKLibDir)&quot;;&quot;$(MesaLibDir)&quot;"
 	/>
 	<UserMacro
 		Name="MesaRootDir"
@@ -27,6 +27,21 @@
 	<UserMacro
 		Name="MesaLibDir"
 		Value="$(MesaRootDir)\windows\VC8\mesa\x64\Release"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="WinSDKDir"
+		Value="C:\Program Files\Microsoft SDKs\Windows\v6.0A"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="WinSDKLibDir"
+		Value="$(WinSDKDir)\Lib\x64"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="WinSDKIncludeDir"
+		Value="$(WinSDKDir)\Include"
 		PerformEnvironmentSet="true"
 	/>
 </VisualStudioPropertySheet>

@@ -1,3 +1,23 @@
+% Return the data for constructing a circular mesh
+%
+% [vtx,idx,eltp] = mkcircle(rad,nsect,nring,nbnd)
+%
+% rad [real]:        radius [mm]
+% nsect [integer]:   number of element sectors (tangential element
+%                    resolution; suggestion: 6)
+% nring [integer]:   number of element rings (radial resolution, e.g. 32)
+% nbnd [integer]:    number of high-resolution boundary rings (e.g. 2)
+% vtx [real nx3]:    vertex list
+% idx [integer ex3]: element index list
+% eltp [integer e]:  element type list
+%
+% The returned parameters can be used directly in the toastMesh
+% constructor to create a mesh instance.
+%
+% Example:
+%   [vtx,idx,eltp] = mkcircle(25,6,32,2);
+%   mesh = toastMesh(vtx,idx,eltp);
+
 function [vtx, idx, eltp] = mkcircle (rad, nsect, nring, nbnd)
   
   eps = 1e-8;
