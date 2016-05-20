@@ -25,16 +25,6 @@ all::
 	fi; \
 	done
 
-matlab::
-	if test -d matlab ;\
-	then \
-		(mkdir -p $(TOASTVER)/mex; \
-			cd $(TOASTVER)/mex; \
-			cp $(TOASTDIR)/src/matlab/Makefile.src ./Makefile; \
-			echo "making" all "in matlab..."; \
-			$(MAKE) $(MFLAGS) all); \
-	fi
-
 matlab2::
 	if test -d matlab2 ;\
 	then \

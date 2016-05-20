@@ -108,7 +108,7 @@ function [S,B,alpha] = dotSysmat (hmesh,mua,mus,ref,varargin)
 %         would just make the example a bit cumbersome to read).
 %
 % See also:
-%         toastMesh.SysmatComponent, toastMesh.Massmat, toastMesh.Elmat
+%         toastMesh, toastMesh.SysmatComponent, toastMesh.Massmat, toastMesh.Elmat
 
 freq = 0;
 elbasis = false;

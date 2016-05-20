@@ -7,7 +7,7 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		PreprocessorDefinitions="_WIN32"
+		PreprocessorDefinitions="_WIN32;FDOT"
 	/>
 	<Tool
 		Name="VCLinkerTool"

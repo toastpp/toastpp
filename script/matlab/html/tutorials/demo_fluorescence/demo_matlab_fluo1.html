@@ -1,0 +1,188 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+                            
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+                            
+  <meta name="GENERATOR"
+ content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20smp i686) [Netscape]">
+                            
+  <meta name="Author" content="Martin Schweiger">
+  <title>TOAST Optical Tomography Home Page</title>
+  <link rel="stylesheet" href="../../toast.css" type="TEXT/CSS">  
+</head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#990066"
+ alink="#ff0000">
+<div class="all">
+<table class="header">
+<tr><td class="logo" rowspan="2"><img src="../../images/toast_logo_small.jpg"></td>
+<td><img src="../../images/toastpp_label.png" width="300" height="46"></td></tr>
+<tr><td>Image Reconstruction in Diffuse Optical Tomography</td></tr>
+</table>
+
+<div class="menu">
+  <dl>
+    <dt><a href="../demos_matlab.html">Tutorials</a></dt>
+  </dl>
+</div>
+
+<table class="main">
+<tr>
+<td class="maintext">
+<h1>Fluorescence imaging example</h1>
+<p>In this example, we reconstruct the concentration of a fluorescent substance from boundary measurements of steady-state light transmission at the excitation and fluorescence wavelengths.</p>
+<p>The complete script can be downloaded <a href="demo_matlab_fluo1.m">here</a>.
+
+<h2>Step 1: Generating the forward data</h2>
+<p>We set up a model consisting of a circular mesh with multiple fluorochrome targets, and simulate the boundary measurements.</p>
+<p>First, define the homogeneous background values of the optical parameters:</p>
+<div class="example">
+refind = 1.4;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">% homogeneous refractive index of the medium</span><br />
+mua_homog = 0.05;&nbsp;<span class="comment">% background absorption [1/mm]</span><br />
+mus_homog = 1;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">% background scattering [1/mm]</span>
+</div>
+<p>Next, create the mesh:</p>
+<div class="example">
+rad = 25;&nbsp;<span class="comment">% mesh radius [mm]</span><br />
+[vtx,idx,eltp] = mkcircle(rad,6,32,2);<br />
+mesh = toastMesh(vtx,idx,eltp);<br />
+n = mesh.NodeCount;
+</div>
+<p>Define the source and detector locations, and construct the right-hand-side source vectors and measurement projection vectors:</p>
+<div class="example">
+np = 32;&nbsp;<span class="comment">% number of sources and detectors</span><br />
+for i=1:np<br />
+&nbsp;&nbsp;qphi = (i-1)/np * 2*pi;<br />
+&nbsp;&nbsp;qpos(i,:) = rad * [cos(qphi) sin(qphi)];<br />
+&nbsp;&nbsp;mphi = (i-0.5)/np *2*pi;<br />
+&nbsp;&nbsp;mpos(i,:) = rad * [cos(mphi) sin(mphi)];<br />
+end<br />
+mesh.SetQM(qpos,mpos);<br />
+dmask = mesh.DataLinkList;<br />
+<br />
+qvec = mesh.Qvec ('Neumann', 'Gaussian', 0.5);<br />
+nQ = size(qvec,2);<br />
+<br />
+mvec = mesh.Mvec ('Gaussian', 0.5, refind);<br />
+nM = size(mvec,2);
+</div>
+<p>Set up a regular grid basis expansion for expressing the chromophore concentration (rather than using the FEM mesh basis):</p>
+<div class="example">
+grd = [64 64];&nbsp;<span class="comment">% grid dimensions</span><br />
+blen = prod(grd);<br />
+basis = toastBasis (mesh, grd);&nbsp;<span class="comment">% construct basis mapper</span><br />
+nsol = basis.slen;&nbsp;<span class="comment">% solution dimension (excluding pixels outside mesh support)</span>
+</div>
+<p>and construct a target distribution of fluorochrome concentration:</p>
+<div class="example">
+<span class="comment">% homogeneous absorption and scattering</span><br />
+muatgt_g = mua_homog*ones(grd);<br />
+mustgt_g = mus_homog*ones(grd);<br />
+<br />
+<span class="comment">Set up fluorochrome target</span><br />
+fltgt_g = zeros(grd);<br />
+nblobs = 3;<br />
+fcontrast = [0.1 0.06 0.1];<br />
+blbcx = grd(1)*[0.7 0.75 0.3];&nbsp;<span class="comment">% xcentre of blobs</span><br />
+blbcy = grd(2)*[0.3 0.75 0.7];&nbsp;<span class="comment">% ycentre of blobs</span><br />
+blbrad = grd(1)*[0.1 0.1 0.1];&nbsp;<span class="comment">% radius of blobs</span><br />
+<br />
+for i = 1:grd(1)<br />
+&nbsp;&nbsp;for j = 1:grd(2)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;for k = 1:nblobs<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if( (i-blbcx(k))^2 + (j-blbcy(k))^2 < blbrad(k)^2)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fltgt_g(i,j) = fltgt_g(i,j)+fcontrast(k);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end<br />
+&nbsp;&nbsp;&nbsp;&nbsp;end<br />
+&nbsp;&nbsp;end<br />
+end
+</div>
+<img src="img3.png" style="width:100%;max-width:560px" />
+<p>Now map the parameters to the mesh basis and run the forward solver at the exitation and fluorescence wavelengths:</p>
+<div class="example">
+fltgt_h   = basis.Map ('B->M', reshape(fltgt_g,[],1));<br />
+muatgt_h  = basis.Map ('B->M', reshape(muatgt_g,[],1));<br />
+mustgt_h  = basis.Map ('B->M', reshape(mustgt_g,[],1));<br />
+ref = ones(n,1) * refind;<br />
+<br /> 
+figure;<br />
+subplot(2,2,1);imagesc(fltgt_g); colormap(gray);colorbar;axis square;title('target fluoresence');<br />
+subplot(2,2,2);imagesc(muatgt_g);colormap(gray);colorbar;axis square;title('Background \mu_a');<br />
+subplot(2,2,3);imagesc(mustgt_g);colormap(gray);colorbar;axis square;title('background \mu_s');<br />
+<br />
+<span class="comment">% FEM system matrix</span><br />
+smat = dotSysmat (mesh, muatgt_h, mustgt_h, ref, 0);<br />
+<br />
+<span class="comment">% excitation photon density</span><br />
+sol1=smat\qvec;<br />
+sol1=full(sol1); % mappings dont work with sparse matrices<br />
+<br />
+<span class="comment">% fluoresence photon density</span><br />
+sol_fl=smat\(sol1.*(fltgt_h*ones(1,nQ)));<br />
+<br />
+<span class="comment">% excitation boundary data</span><br />
+lgamma = reshape ((mvec.' * sol1), (size(mvec,2))*size(sol1,2), 1);<br />
+lgamma = lgamma(dmask);<br />
+xdata = [real(lgamma)];<br />
+<br />
+<span class="comment">% fluorescence boundary data</span><br />
+lgamma_fl = reshape ((mvec.' * sol_fl), (size(mvec,2))*size(sol1,2), 1);<br />
+lgamma_fl = lgamma_fl(dmask);<br />
+fdata = [real(lgamma_fl)];
+</div>
+<img src="img2.png" style="width:100%;max-width:560px" />
+
+<h2>Step 2: Perform the reconstruction of fluorochrome concentration</h2>
+<p>Use the excitation data for rescaling the data vector for the reconstruction:</p>
+<div class="example">
+R = sparse(diag(1./(xdata)));&nbsp;<span class="comment">% scaling matrix: inverse of excitation data</span><br />
+r = R*fdata;&nbsp;<span class="comment">% rescale fluorescence data by excitation.</span>
+</div>
+<p>Build the Jacobian matrix, using the adjoint measurement vector:</p>
+<div class="example">
+asol1 = smat\mvec;&nbsp;<span class="comment">% adjoint</span><br />
+Jr = zeros(nM*nQ,nsol);<br />
+for i = 1:nQ<br />
+&nbsp;&nbsp;for j = 1:nM<br />
+&nbsp;&nbsp;&nbsp;&nbsp;tmp_h = full(sol1(:,i).*asol1(:,j));<br />
+&nbsp;&nbsp;&nbsp;&nbsp;tmp_s = basis.Map ('M->S',tmp_h);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Jr(( i-1)*nM +j,:) = tmp_s;<br />
+&nbsp;&nbsp;end<br />
+end<br />
+Jr = R*Jr;&nbsp;<span class="comment">% rescale Jacobian</span>
+</div>
+<p>and solve, using conjugate gradients:</p>
+<div class="example">
+lambda = 1e-4*(trace(Jr' * Jr));&nbsp;<span class="comment">% regularisation proportional to trace</span><br />
+s_tol=1e-6;<br />
+s_iter=200;<br />
+[x,CGflag,relres,niter] = cgs(Jr'*Jr + lambda*speye(nsol), Jr'*r,s_tol,s_iter);<br />
+disp(['CG iterations: ',num2str(niter)]);
+</div>
+<p>Finally, display the results:</p>
+<div class="example">
+xim = basis.Map('S->B', x);<br />
+<br />
+figure;<br />
+subplot(1,2,1);imagesc(fltgt_g);colorbar;axis square;title('target fluoresence');<br />
+subplot(1,2,2);imagesc(reshape(xim,grd));colormap(gray);colorbar;axis square;title('reconstructed fluoresence');<br />
+</div>
+<img src="img1.png" style="width:100%;max-width:560px" />
+
+</td>
+</tr>
+</table>
+
+<div class="footer"><hr />
+<table>
+<tr><td>
+Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+</table>
+</div>
+
+</div> 
+
+</body>
+</html>

@@ -17,12 +17,7 @@ SRCS = 	solution.cc mwsolution.cc source.cc fwdsolver.cc fwdsolver_zslu.cc \
 	raster_blob2.cc raster_blob2_tri.cc raster_blob2_tet.cc raster_rb2.cc \
 	raster_bb2.cc raster_sb2.cc raster_hb2.cc raster_gb2.cc \
 	raster_cpx_tree.cc raster_cpx_tree_tri.cc \
-	sh.cc tetsplit.cc
-
-# Only build projector classes if FDOT support is required
-ifeq ($(BUILD_FDOT),1)
-SRCS += projector.cc GLProjector.cc camera.cc
-endif
+	sh.cc tetsplit.cc projector.cc camera.cc GLProjector.cc
 
 ifdef MAKE_MPI
 SRCS += jacobian_mpi.cc

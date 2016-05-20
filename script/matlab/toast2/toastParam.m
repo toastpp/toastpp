@@ -1,15 +1,119 @@
 classdef toastParam
-    % A hierarchical container for the parameters defining a Toast forward
-    % or inverse problem.
+    % A hierarchical container structure for the parameters defining a Toast
+    % forward or inverse problem. This structure is used by some of the
+    % high-level scripts like toastRecon, and is a convenient way of storing
+    % and passing parameters by custom scripts.
+    %
+    % See also: toastRecon
     
     properties
+        % Source/detector specification
+        %
+        % Can contain the following fields:
+        % meas.qmfile [string]:   name of source-detector (QM) definition file
+        % meas.src.type [string]: source type ['Neumann','Dirichlet']
+        % meas.src.prof [string]: source profile ['Gaussian','Cosine','Point']
+        % meas.src.width [real]:  source width [mm]. E.g. sigma for Gaussian profile
+        % meas.det.prof [string]: detector profile ['Gaussian','Cosine','Point']
+        % meas.det.width [real]:  detector width [mm]. E.g. sigma for Gaussian profile
         meas = [];
+        
+        % Measurement data subsection
+        %
+        % Can contain the following fields:
+        % data.freq [real]:             modulation frequency [MHz]. 0 for steady-state
+        % data.lnamp [real vector]:     log amplitude target data for each source-detector pair
+        % data.lnampfile [string]:      file name containing log amplitude target data
+        % data.phase [real vector]:     phase target data for each source-detector pair
+        % data.phasefile [string]:      file name containing phase target data
+        % data.useref [bool]:           true if reference data are defined
+        % data.ref.lnamp [real vector]: log amplitude reference data for each source-detector pair
+        % data.ref.lnampfile [string]:  file name containing log amplitude reference data
+        % data.ref.phase [real vector]: phase reference data for each source-detector pair
+        % data.ref.phasefile [string]:  file name containing phase reference data
+        %
+        % Note: The standard behaviour of a script interpreting a toastParam
+        % instance should be as follows: If the data.lnamp field is defined,
+        % a script should ignore the data.lnampfile entry. If only the data.lnampfile
+        % entry is defined, a script should read the data from that file and store
+        % them in data.lnamp. Similar for all other data entries.
         data = [];
+
+        % FEM forward solver parameters
+        %
+        % Can contain the following fields:
+        % fwdsolver.hmesh [object]:    toastMesh instance
+        % fwdsolver.meshfile [string]: Mesh file name (in Toast format)
+        % fwdsolver.method [string]:   linear solver method ['direct','cg','bicg','bicgstab','gmres']
+        % fwdsolver.tol [real]:        solver tolerance (ignored for 'direct')
+        %
+        % Note: The standard behaviour of a script interpreting a toastParam
+        % instance should be as follows: If the fwdsolver.hmesh field is
+        % defined, fwdsolver.meshfile is ignored. If ony fwdsolver.meshfile
+        % is defined, the script should read the mesh from file and store
+        % it in fwdsolver.hmesh.
         fwdsolver = [];
+        
+        % Inverse solver parameters
+        %
+        % Can contain the following fields:
+        % solver.method [string]:                 inverse solver method ['pcg','lbfgs','lm']
+        % solver.tol [real]:                      convergence criterion
+        % solver.itmax [integer]:                 iteration limit
+        % solver.lsearch [bool]:                  invoke line search along search direction
+        % solver.basis.bdim [dx1 integer vector]: inverse solver basis dimensions
+        % solver.basis.gdim [dx1 integer vector]: intermediate high-res basis dimensions
+        %
+        % Note: This section is only interpreted by the inverse solver, and
+        % can be left empty if the toastParam instance is passed to a
+        % forward solver.
         solver = [];
+        
+        % (Initial) optical parameter distribution
+        %
+        % Can contain the following fields:
+        % initprm.mua absorption parameter specs
+        % initprm.mus scattering parameter specs
+        % initprm.ref refractive index specs
+        %
+        % Note: Each of the three parameter specs can contain any of the
+        % following sub-fields:
+        % .nprm [real vector]: nodal parameter values
+        % .bprm [real vector]: parameter values in inverse basis
+        % .sprm [real vector]: parameter values in reduced solution basis
+        % .reset [string]: reset method ['homog','nim']
+        % .val [real]: homogeneous reset value (only used if .reset=='homog')
+        % .nim [string]: name of nodal image file (only used if .reset=='nim')
+        %
+        % Note: The standard behaviour of a script interpreting a toastParam
+        % instance should be as follows: If any of the .nprm, .bprm or
+        % .sprm fields are defined, the .reset, .val. and .nim fields are
+        % ignored. Otherwise, the .nprm, .bprm and .sprm fields are
+        % constructed by interpreting the .reset, .val and .nim fields.
+        % Mapping between .nprm, .bprm and .sprm is performed via the Map
+        % method of the basis mapper instance. Not all applications may
+        % require all three basis expansions. For example, a forward solver
+        % application may only require the .nprm expansion.
         initprm = [];
+        
+        % Regularisation specification
+        %
+        % Can contain the following fields:
+        % regul.method [string]: regularisation method ['TV','TK0','TK1','Huber','PM','QPM',Tukey']
+        % regul.tau [real]: regularisation hyperparameter
+        % regul.x0 [real vector]: initial solution vector
+        %
+        % Note: depending on the regularisation method, additional fields
+        % may be required. See toastRegul for a full description.
+        % See also: toastRegul
         regul = [];
+        
+        % Script-specific parameters
+        %
+        % This section can contain arbitrary user-defined fields. The
+        % interpretation is up to the called script.
         user = [];
+        
         transient = [];
     end
     

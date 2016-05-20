@@ -18,10 +18,6 @@ toast::
 			$(MAKE) $(MFLAGS) all); \
 	done
 
-matlab::
-	cd src; \
-	$(MAKE) matlab;
-
 matlab2::
 	cd src; \
 	$(MAKE) matlab2;

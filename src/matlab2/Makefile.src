@@ -5,11 +5,7 @@ VPATH = $(TSRC)/matlab2
 TGTSRC = toastmex.cc
 TGTOBJ = ${TGTSRC:.cc=.$(MEXEXT)}
 
-AUXSRC = matlabtoast.cc mexutil.cc util.cc mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc
-
-ifeq ($(BUILD_FDOT),1)
-  AUXSRC +=  matlabfdot.cc mtProjector.cc
-endif
+AUXSRC = matlabtoast.cc mexutil.cc util.cc mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc matlabfdot.cc mtProjector.cc
 
 AUXOBJ = ${AUXSRC:.cc=.o}
 

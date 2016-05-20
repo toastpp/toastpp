@@ -7,11 +7,11 @@
 //#include "supermatrix.h"
 #include "camera.h"
 
-#if defined(_WIN32)
-#include <windows.h>
-#endif
-#include "GL/gl.h"
-#include "GL/osmesa.h"
+//#if defined(_WIN32)
+//#include <windows.h>
+//#endif
+//#include "GL/gl.h"
+//#include "GL/osmesa.h"
 
 class STOASTLIB Projector  
 {
