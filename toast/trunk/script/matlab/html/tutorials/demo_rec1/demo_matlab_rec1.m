@@ -1,14 +1,23 @@
 function demo_matlab_rec1
 
+%% Some general parameters
+refind = 1.4;   % refractive index of medium;
+c0 = 0.3;       % speed of light in vacuum
+cm = c0/refind; % speed of light in the medium
+
 %% Step 1: Compute target data
 
 % read the target image and convert to absorption coefficients [1/mm]
 bmua = imread('demo_matlab_fwd2_mua.png');
 bmua = double(bmua)./255.*0.02 + 0.01;
+figure;
+subplot(1,2,1); imagesc(bmua); axis equal tight; colorbar;
+title('absorption target');
+drawnow
 
 % construct the circular mesh
 rad = 25;
-[vtx,idx,eltp] = mkcircle(rad,6,32,2);
+[vtx,idx,eltp] = mkcircle(rad,6,64,2);
 fwdmesh = toastMesh(vtx,idx,eltp);
 
 % map parameter distribution to nodal coefficients
@@ -41,17 +50,17 @@ data = reshape(log(Y), [], 1);
 %% Step 2: inverse solver
 
 % construct a coarser mesh for the inverse problem
-[vtx,idx,eltp] = mkcircle(rad,6,16,2);
+[vtx,idx,eltp] = mkcircle(rad,6,32,2);
 mesh = toastMesh(vtx,idx,eltp);
 n = mesh.NodeCount;
 
-grd = [32,32];
+grd = [64 64];
 basis = toastBasis(mesh,grd);
 
 % set up initial parameter estimates
 mua = ones(n,1)*0.01;
 mus = ones(n,1)*1;
-ref = ones(n,1)*1.4;
+ref = ones(n,1)*refind;
 
 % set up source and measurement vectors for inverse mesh
 mesh.SetQM(Q,M);
@@ -66,14 +75,14 @@ proj = reshape(log(mvec.' * (K\qvec)), [], 1);
 sd = ones(size(proj));
 
 % set up solution vector
-c = 0.3./ref; % speed of light in the medium [mm/ps]
-x = basis.Map('M->S',mua.*c);
+x = basis.Map('M->S',mua.*cm);
 logx = log(x);
 
 % initial objective function
-err0 = objective(data,proj);
+err0 = full(objective(data,proj));
 err = err0;
 errp = inf;
+fprintf ('initial cost function: %f\n', err);
 
 % nonlinear conjugate gradient solver loop
 tolcg = 1e-6;
@@ -108,8 +117,30 @@ while (itr <= itrmax) && (err > tolcg*err0) && (errp-err > tolcg)
         end
     end
     
+    % Line search
     step = toastLineSearch (logx, d, step, err, @ls_objective);
     
+    % Add update to solution
+    logx = logx + d*step;
+    x = exp(logx);
+    
+    % Map parameters back to mesh
+    mua = basis.Map('S->M', x)./cm;
+    
+    % And display new update
+    mua_img = reshape(basis.Map('S->B', x)./cm, grd);
+    subplot(1,2,2);
+    imagesc(mua_img); axis equal tight; colorbar
+    title ('absorption recon');
+    drawnow
+    
+    % Update measurements and objective function
+    K = dotSysmat(mesh,mua,mus,ref,0);
+    proj = reshape(log(mvec.' * (K\qvec)), [], 1);
+    err = full(objective(data,proj));
+    fprintf ('cost function: %f\n', err);
+    
+    itr = itr+1;
 end
 
     function of = objective(data,proj)
@@ -118,7 +149,7 @@ end
 
     function of = ls_objective(logx)
         x_ = exp(logx);
-        mua_ = basis.Map('S->M', x_) ./ c;
+        mua_ = basis.Map('S->M', x_) ./ cm;
         K_ = dotSysmat(mesh,mua_,mus,ref,0);
         proj_ = reshape(log(mvec.' * (K_\qvec)), [], 1);
         of = objective(data,proj_);
