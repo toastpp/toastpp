@@ -173,13 +173,15 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 		camPList[m] = new OrthoCamera(w, h, pixSize, cpos, x, y, z);
 	    }
 	}
-#ifdef MESA_SUPPORT
+#if defined(MESA_SUPPORT)
 	if (projtp==PROJTYPE_MESAGL)
 	{
 	    projPList[m] = new GLProjector(camPList[m], mesh, nBndElems, bndellist, bndsdlist);
 	}
+#elif defined(_WIN32)
+	mexErrMsgTxt("This function requires Mesa-3D, but Toast has been compiled without Mesa support.\n(The Windows version currently does not support Mesa).");
 #else
-	xERROR("Mesa-3D support required but not provided.");
+	mexErrMsgTxt("This function requires Mesa-3D, but Toast has been compiled without Mesa support.");
 #endif
 
 	dpr[m] = Ptr2Handle (projPList[m]);
