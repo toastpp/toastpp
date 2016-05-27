@@ -12,6 +12,10 @@ ifeq ($(BUILD_SUPERLU),1)
 	COMPONENT += superlu
 endif
 
+ifeq ($(BUILD_FDOT),1)
+	COMPONENT += mesa
+endif
+
 ifeq ($(SUPERLU_LOCAL_STATIC),1)
 	SUPERLU_NAME = libsuperlu.a
 else
@@ -121,6 +125,16 @@ liblbfgs::
 		install_name_tool -id @rpath/liblbfgs-1.10$(LIB_SUFFIX) $(LIBDIR)/liblbfgs-1.10$(LIB_SUFFIX); \
 		install_name_tool -id @rpath/liblbfgs$(LIB_SUFFIX) $(LIBDIR)/liblbfgs$(LIB_SUFFIX); \
 	fi
+
+mesa:
+	cd $(TOASTOBJ); \
+	cp -r $(NUMERICSDIR)/Mesa-7.5.1 . ; \
+	cd Mesa-7.5.1; \
+	./configure --prefix=$(TOASTDIR) --enable-static --disable-shared --with-driver=osmesa --disable-egl; \
+	make; \
+	make install; \
+	cd ..; \
+#	rm -rf Mesa-7.5.1
 
 clean:: blas_clean fspblas_clean lapack_clean superlu_clean blzpack_clean \
 	arpack_clean liblbfgs_clean

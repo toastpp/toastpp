@@ -12,7 +12,7 @@ AUXOBJ = ${AUXSRC:.cc=.o}
 all:: $(TGTOBJ)
 
 %.o : %.cc
-	$(MEX) $(MEXINC) -c $<
+	$(MEX) $(MEXFLAGS) $(MEXINC) -c $<
 
 %.$(MEXEXT) : %.cc $(AUXOBJ)
 	$(MEX) $(MEXINC) $(MEXLIB) $^
