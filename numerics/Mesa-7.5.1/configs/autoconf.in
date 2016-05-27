@@ -12,7 +12,11 @@ CXX = @CXX@
 OPT_FLAGS = @OPT_FLAGS@
 ARCH_FLAGS = @ARCH_FLAGS@
 ASM_FLAGS = @ASM_FLAGS@
-PIC_FLAGS = @PIC_FLAGS@
+
+#PIC_FLAGS = @PIC_FLAGS@
+PIC_FLAGS = -fPIC
+#MS: force relocatable code even when building static libraries
+
 DEFINES = @DEFINES@
 CFLAGS = @CPPFLAGS@ @CFLAGS@ \
 	$(OPT_FLAGS) $(PIC_FLAGS) $(ARCH_FLAGS) $(ASM_FLAGS) $(DEFINES)
