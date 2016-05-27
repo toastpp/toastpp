@@ -73,7 +73,11 @@ _x86_64_get_dispatch:
 
 	.p2align	4,,15
 _x86_64_get_dispatch:
-	movq	_gl_DispatchTSD(%rip), %rdi
+/*	movq	_gl_DispatchTSD(%rip), %rdi
+	jmp	pthread_getspecific@PLT */
+/* MS 160527: bug fix as per https://bugs.freedesktop.org/show_bug.cgi?id=33440 */
+	movq	_gl_DispatchTSD@GOTPCREL(%rip), %rax
+	movl	(%rax), %edi
 	jmp	pthread_getspecific@PLT
 
 #elif defined(THREADS)

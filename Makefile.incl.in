@@ -52,10 +52,13 @@ ARPACK_LIB_SUFFIX = @ARPACK_LIB_SUFFIX@
 MAKE_LIB = @MAKE_LIB@
 
 BUILD_FDOT = @TOAST_FDOT@
-OGLLIB = @OGLLIB@
+#OGLLIB = @OGLLIB@
+OGLLIB =
 OGLINC = @OGLINC@
 ifeq ($(BUILD_FDOT),1)
-      CCFLAGS += -DMESA_SUPPORT
+     OGLLIB = $(TOASTDIR)/lib/libOSMesa.a $(TOASTDIR)/lib/libGLU.a
+     CCFLAGS += -DMESA_SUPPORT
+     CCLIBS = $(CCLIBS) -ldl
 endif
 
 # =======================================================================
@@ -199,5 +202,9 @@ endif
 MEX      = $(MEXBIN) @MEXFLAGS@
 MEXEXT   = @MEXEXT@
 
+MEXFLAGS =
+ifeq ($(BUILD_FDOT),1)
+      MEXFLAGS += -DMESA_SUPPORT
+endif
 MEXINC = $(INCLUDE)
 MEXLIB = $(STOASTLIB) -llbfgs
