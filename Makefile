@@ -160,27 +160,21 @@ distro_common::
 	zip -9    toast_common.zip $(TOASTRELDIR)/INSTALL ; \
 	mv toast_common.zip $(TOASTRELDIR)
 
-distro_bin_win32::
-	ln -T -s $(PWD) ../$(TOASTRELDIR); \
-	cd ..; \
-	zip -9 -r toast_bin_win32.zip $(TOASTRELDIR)/win32/Release/bin $(TOASTRELDIR)/win32/Release/mex -x@$(TOASTRELDIR)/exclude.lst ; \
-	mv toast_bin_win32.zip $(TOASTRELDIR)
-
 distro_bin_win64::
 	ln -T -s $(PWD) ../$(TOASTRELDIR); \
 	cd ..; \
-	zip -9 -r toast_bin_win64.zip $(TOASTRELDIR)/win/x64/Release/bin $(TOASTRELDIR)/win/x64/Release/mex $(TOASTRELDIR)/win/x64/Release/mex2 -x@$(TOASTRELDIR)/exclude.lst ; \
+	zip -9 -r toast_bin_win64.zip $(TOASTRELDIR)/win/x64/Release/bin $(TOASTRELDIR)/win/x64/Release/mex2 -x@$(TOASTRELDIR)/exclude.lst ; \
 	mv toast_bin_win64.zip $(TOASTRELDIR)
 
 distro_bin_linux::
 	cd ..; \
 	ln -T -s trunk $(TOASTRELDIR); \
-	tar czvf toast_bin_linux.tar.gz $(TOASTRELDIR)/$(ARCHDIR)/bin \
-	$(TOASTRELDIR)/$(ARCHDIR)/lib $(TOASTRELDIR)/$(ARCHDIR)/mex \
+	zip -9 -r toast_bin_linux.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
+	$(TOASTRELDIR)/$(ARCHDIR)/lib \
 	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
 	$(TOASTRELDIR)/toastenv.csh $(TOASTRELDIR)/toastenv.sh; \
-	mv toast_bin_linux.tar.gz $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz
-	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).tar.gz"
+	mv toast_bin_linux.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip
+	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"
 
 distro_bin_darwin::
 	ln  -s $(PWD) ../$(TOASTRELDIR); \
