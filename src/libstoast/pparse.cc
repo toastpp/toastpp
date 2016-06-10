@@ -64,7 +64,7 @@ bool ParamParser::GetString (const char *cat, char *str)
     if (!bfile) return false;
     prmf.clear();
     prmf.seekg (0, ios::beg);
-    while ((ok = (prmf.getline (cbuf, 256) != 0))) {
+    while ((ok = (prmf.getline (cbuf, 256).rdstate() == ios::goodbit))) {
 	if (!strncasecmp (cbuf, cat, lcat) && 
 	    (cbuf[lcat] == ' ' || cbuf[lcat] == '=')) break;
     }

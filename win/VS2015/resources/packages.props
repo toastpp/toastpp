@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="pthreads.props" />
+    <Import Project="superlu.props" />
+    <Import Project="..\numerics\liblbfgs\lib\liblbfgs.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <ExtPackageDir>D:\src\packages\</ExtPackageDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="ExtPackageDir">
+      <Value>$(ExtPackageDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

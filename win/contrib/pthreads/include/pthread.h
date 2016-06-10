@@ -313,6 +313,11 @@ enum {
 #endif
 #endif
 
+// MS: avoid redefinition in VS2015
+#if _MSC_VER >= 1900
+#define HAVE_STRUCT_TIMESPEC
+#endif
+
 #if !defined(HAVE_STRUCT_TIMESPEC)
 #define HAVE_STRUCT_TIMESPEC
 #if !defined(_TIMESPEC_DEFINED)
