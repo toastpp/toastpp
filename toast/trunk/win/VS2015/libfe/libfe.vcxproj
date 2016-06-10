@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B034B0E2-9237-4305-8C24-50CB99E9DAC3}</ProjectGuid>
+    <RootNamespace>libfe</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\resources\toastlib.props" />
+    <Import Project="..\resources\toast_x64.props" />
+    <Import Project="..\resources\packages.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\resources\toastlib.props" />
+    <Import Project="..\resources\toast_x64.props" />
+    <Import Project="..\resources\toast_debug.props" />
+    <Import Project="..\resources\packages.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBFE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libmath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBFE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level2</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\libfe\element.cc" />
+    <ClCompile Include="..\..\..\src\libfe\ellist.cc" />
+    <ClCompile Include="..\..\..\src\libfe\line2d2.cc" />
+    <ClCompile Include="..\..\..\src\libfe\lin_qr.cc" />
+    <ClCompile Include="..\..\..\src\libfe\mesh.cc" />
+    <ClCompile Include="..\..\..\src\libfe\meshopt.cc" />
+    <ClCompile Include="..\..\..\src\libfe\ndlist.cc" />
+    <ClCompile Include="..\..\..\src\libfe\nim.cc" />
+    <ClCompile Include="..\..\..\src\libfe\node.cc" />
+    <ClCompile Include="..\..\..\src\libfe\ordmmd.cc" />
+    <ClCompile Include="..\..\..\src\libfe\param.cc" />
+    <ClCompile Include="..\..\..\src\libfe\pix4.cc" />
+    <ClCompile Include="..\..\..\src\libfe\point.cc" />
+    <ClCompile Include="..\..\..\src\libfe\ptsource.cc" />
+    <ClCompile Include="..\..\..\src\libfe\qmmesh.cc" />
+    <ClCompile Include="..\..\..\src\libfe\quad4.cc" />
+    <ClCompile Include="..\..\..\src\libfe\rcm.cc" />
+    <ClCompile Include="..\..\..\src\libfe\refine_mesh.cc" />
+    <ClCompile Include="..\..\..\src\libfe\surface.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tet10.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tet10_ip.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tet4.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tet_qr.cc" />
+    <ClCompile Include="..\..\..\src\libfe\timespec.cc">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\libfe\tri10.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri10_ip.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri3.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri3D3.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri3D6.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri3old.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri6.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri6_ip.cc" />
+    <ClCompile Include="..\..\..\src\libfe\tri_qr.cc" />
+    <ClCompile Include="..\..\..\src\libfe\vox27.cc" />
+    <ClCompile Include="..\..\..\src\libfe\vox8.cc" />
+    <ClCompile Include="..\..\..\src\libfe\wdg18inf.cc" />
+    <ClCompile Include="..\..\..\src\libfe\wdg6.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\arch.h" />
+    <ClInclude Include="..\..\..\src\libfe\element.h" />
+    <ClInclude Include="..\..\..\src\libfe\ellist.h" />
+    <ClInclude Include="..\..\..\src\libfe\felib.h" />
+    <ClInclude Include="..\..\..\src\libfe\line2d2.h" />
+    <ClInclude Include="..\..\..\src\libfe\lin_qr.h" />
+    <ClInclude Include="..\..\..\src\libfe\mesh.h" />
+    <ClInclude Include="..\..\..\src\libfe\meshopt.h" />
+    <ClInclude Include="..\..\..\src\libfe\ndlist.h" />
+    <ClInclude Include="..\..\..\src\libfe\nim.h" />
+    <ClInclude Include="..\..\..\src\libfe\node.h" />
+    <ClInclude Include="..\..\..\src\libfe\ordmmd.h" />
+    <ClInclude Include="..\..\..\src\libfe\param.h" />
+    <ClInclude Include="..\..\..\src\libfe\pix4.h" />
+    <ClInclude Include="..\..\..\src\libfe\point.h" />
+    <ClInclude Include="..\..\..\src\libfe\ptsource.h" />
+    <ClInclude Include="..\..\..\src\libfe\qmmesh.h" />
+    <ClInclude Include="..\..\..\src\libfe\quad4.h" />
+    <ClInclude Include="..\..\..\src\libfe\rcm.h" />
+    <ClInclude Include="..\..\..\src\libfe\refine_mesh.h" />
+    <ClInclude Include="..\..\..\src\libfe\surface.h" />
+    <ClInclude Include="..\..\..\src\libfe\tet10.h" />
+    <ClInclude Include="..\..\..\src\libfe\tet10_ip.h" />
+    <ClInclude Include="..\..\..\src\libfe\tet4.h" />
+    <ClInclude Include="..\..\..\src\libfe\tet_qr.h" />
+    <ClInclude Include="..\..\..\src\libfe\timespec.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri10.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri10_ip.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri3.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri3D3.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri3D6.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri3old.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri6.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri6_ip.h" />
+    <ClInclude Include="..\..\..\src\libfe\tri_qr.h" />
+    <ClInclude Include="..\..\..\src\libfe\vox27.h" />
+    <ClInclude Include="..\..\..\src\libfe\vox8.h" />
+    <ClInclude Include="..\..\..\src\libfe\wdg18inf.h" />
+    <ClInclude Include="..\..\..\src\libfe\wdg6.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libmath\libmath.vcxproj">
+      <Project>{2f7bee71-0116-4104-ae66-a434447f7178}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

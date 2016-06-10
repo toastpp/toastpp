@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="toast.props" />
+    <Import Project="packages.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <LibCopyDir>$(ToastBinDir)</LibCopyDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>libstoast.lib;libfe.lib;libmath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ToastBinDir)$(ProjectName).exe</OutputFile>
+      <ImportLibrary>$(ToastLibDir)$(ProjectName).lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ToastLibDir)*.dll" "$(ToastBinDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="LibCopyDir">
+      <Value>$(LibCopyDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
