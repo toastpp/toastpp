@@ -20,7 +20,7 @@
 	/>
 	<UserMacro
 		Name="PthreadsDir"
-		Value="$(ExtPackageDir)pthreads\Pre-built.2\"
+		Value="$(SolutionDir)..\contrib\pthreads\"
 		PerformEnvironmentSet="true"
 	/>
 	<UserMacro
