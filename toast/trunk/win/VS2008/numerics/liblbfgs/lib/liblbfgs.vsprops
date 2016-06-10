@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="liblbfgs"
+	>
+	<UserMacro
+		Name="LbfgsDir"
+		Value="$(SolutionDir)..\..\numerics\liblbfgs-1.10\"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="LbfgsLibDir"
+		Value="$(LbfgsDir)lib"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="LbfgsIncludeDir"
+		Value="$(LbfgsDir)include"
+	/>
+</VisualStudioPropertySheet>

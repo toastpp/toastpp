@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="shift_jis"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
-	Name="liblbfgs"
+	Version="9.00"
+	Name="lbfgs"
 	ProjectGUID="{C4405B73-A899-44BF-8681-04CE040B6705}"
 	RootNamespace="lib"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
-			Name="Win32"
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			InheritedPropertySheets="$(SolutionDir)resources\toast.vsprops"
+			CharacterSet="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -36,18 +38,19 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\..\..\numerics\liblbfgs\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -60,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\lbfgs_debug.lib"
+				OutputFile="$(ToastLibDir)$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -76,14 +79,16 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(ProjectDir)..\include\*.h $(ToastRootDir)include"
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			InheritedPropertySheets="$(SolutionDir)resources\toast.vsprops;.\liblbfgs.vsprops"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -100,12 +105,13 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\..\..\numerics\liblbfgs\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(LbfgsIncludeDir)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -124,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(SolutionDir)..\..\lib\lbfgs.lib"
+				OutputFile="$(ToastLibDir)$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -140,6 +146,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(LbfgsIncludeDir)\*.h&quot; &quot;$(ToastRootDir)include&quot;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -147,34 +154,34 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source files"
+			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\numerics\liblbfgs\lib\lbfgs.c"
+				RelativePath="..\..\..\..\..\numerics\liblbfgs-1.10\lib\lbfgs.c"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header files"
+			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\numerics\liblbfgs\lib\arithmetic_ansi.h"
+				RelativePath="..\..\..\..\..\numerics\liblbfgs-1.10\lib\arithmetic_ansi.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\numerics\liblbfgs\lib\arithmetic_sse_double.h"
+				RelativePath="..\..\..\..\..\numerics\liblbfgs-1.10\lib\arithmetic_sse_double.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\numerics\liblbfgs\lib\arithmetic_sse_float.h"
+				RelativePath="..\..\..\..\..\numerics\liblbfgs-1.10\lib\arithmetic_sse_float.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\numerics\liblbfgs\include\lbfgs.h"
+				RelativePath="..\..\..\..\..\numerics\liblbfgs-1.10\include\lbfgs.h"
 				>
 			</File>
 		</Filter>
