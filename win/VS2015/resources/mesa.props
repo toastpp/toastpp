@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <MesaRootDir>$(ToastRootDir)numerics\Mesa-7.5.1</MesaRootDir>
+    <MesaIncludeDir>$(MesaRootDir)\include</MesaIncludeDir>
+    <MesaLibDir>$(SolutionDir)$(Platform)\$(Configuration)</MesaLibDir>
+    <WinSDKDir>C:\Program Files\Microsoft SDKs\Windows\v6.0A</WinSDKDir>
+    <WinSDKLibDir>$(WinSDKDir)\Lib\x64</WinSDKLibDir>
+    <WinSDKIncludeDir>$(WinSDKDir)\Include</WinSDKIncludeDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MesaIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;MESA_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>mesa.lib;gdi.lib;glu.lib;osmesa.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MesaLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>opengl32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="MesaRootDir">
+      <Value>$(MesaRootDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="MesaIncludeDir">
+      <Value>$(MesaIncludeDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="MesaLibDir">
+      <Value>$(MesaLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="WinSDKDir">
+      <Value>$(WinSDKDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="WinSDKLibDir">
+      <Value>$(WinSDKLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="WinSDKIncludeDir">
+      <Value>$(WinSDKIncludeDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

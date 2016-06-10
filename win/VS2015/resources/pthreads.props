@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <PthreadsDir>$(SolutionDir)..\contrib\pthreads\</PthreadsDir>
+    <PthreadsLibDir>$(PthreadsDir)lib\x64\</PthreadsLibDir>
+    <PthreadsIncludeDir>$(PthreadsDir)include\</PthreadsIncludeDir>
+    <PthreadsDllDir>$(PthreadsDir)dll\x64\</PthreadsDllDir>
+    <PthreadsLibName>pthreadVC2.lib</PthreadsLibName>
+    <PthreadsDllName>pthreadVC2.dll</PthreadsDllName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PthreadsIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TOAST_THREAD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(PthreadsLibName);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(PthreadsLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(ToastBinDir)" mkdir "$(ToastBinDir)"
+copy "$(PthreadsDllDir)$(PthreadsDllName)" "$(ToastBinDir)"
+if not exist "$(ToastMexDir)" mkdir "$(ToastMexDir)"
+copy "$(PthreadsDllDir)$(PthreadsDllName)" "$(ToastMexDir)"
+if not exist "$(ToastMex2Dir)" mkdir "$(ToastMex2Dir)"
+copy "$(PthreadsDllDir)$(PthreadsDllName)" "$(ToastMex2Dir)"
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PthreadsDir">
+      <Value>$(PthreadsDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PthreadsLibDir">
+      <Value>$(PthreadsLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PthreadsIncludeDir">
+      <Value>$(PthreadsIncludeDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PthreadsDllDir">
+      <Value>$(PthreadsDllDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PthreadsLibName">
+      <Value>$(PthreadsLibName)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PthreadsDllName">
+      <Value>$(PthreadsDllName)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <BuildType>Release</BuildType>
+    <ToastRootDir>$(SolutionDir)..\..\</ToastRootDir>
+    <ToastSrcDir>$(ToastRootDir)src\</ToastSrcDir>
+    <ToastIncDir>$(ToastRootDir)include\</ToastIncDir>
+    <ToastWinDir>$(ToastRootDir)win\</ToastWinDir>
+    <ToastContribDir>$(ToastWinDir)contrib\</ToastContribDir>
+    <ToastBuildDir>$(ToastWinDir)$(Platform)\$(BuildType)\</ToastBuildDir>
+    <ToastLibDir>$(ToastBuildDir)lib\</ToastLibDir>
+    <ToastBinDir>$(ToastBuildDir)bin\</ToastBinDir>
+    <ToastMexDir>$(ToastBuildDir)mex\</ToastMexDir>
+    <ToastMex2Dir>$(ToastBuildDir)mex2\</ToastMex2Dir>
+    <ToastObjDir>$(ToastBuildDir)obj\$(ProjectName)\</ToastObjDir>
+    <ToastAuxLibDir>$(ToastContribDir)lib\</ToastAuxLibDir>
+    <BlasLib>blas_win32.lib</BlasLib>
+    <LapackLib>lapack_win32.lib</LapackLib>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+    <OutDir>$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ToastRootDir);$(ToastRootDir)include;$(ToastSrcDir)libmath;$(ToastSrcDir)libfe;$(ToastSrcDir)libstoast;$(ToastSrcDir)libfdot;$(ToastSrcDir)libbemdiff;$(ToastSrcDir)libbem;$(ToastRootDir)numerics\SuperLU_5.0\SRC;$(ToastRootDir)numerics\ILUPACK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(ToastLibDir);$(ToastAuxLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="BuildType">
+      <Value>$(BuildType)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastRootDir">
+      <Value>$(ToastRootDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastSrcDir">
+      <Value>$(ToastSrcDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastIncDir">
+      <Value>$(ToastIncDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastWinDir">
+      <Value>$(ToastWinDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastContribDir">
+      <Value>$(ToastContribDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastBuildDir">
+      <Value>$(ToastBuildDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastLibDir">
+      <Value>$(ToastLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastBinDir">
+      <Value>$(ToastBinDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastMexDir">
+      <Value>$(ToastMexDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastMex2Dir">
+      <Value>$(ToastMex2Dir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastObjDir">
+      <Value>$(ToastObjDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ToastAuxLibDir">
+      <Value>$(ToastAuxLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="BlasLib">
+      <Value>$(BlasLib)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="LapackLib">
+      <Value>$(LapackLib)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
