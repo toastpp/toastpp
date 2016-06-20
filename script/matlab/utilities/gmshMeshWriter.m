@@ -39,11 +39,15 @@ if ~flag
     case 2
       gmshElType = 2;
     case 3
-      gmshElType = 4;
+      if size(mesh.elems,2) == 3
+          gmshElType = 2;
+      else
+          gmshElType = 4;
+      end
   end
   
   
-  for id = 1:mesh.d+1
+  for id = 1:size(mesh.elems,2) %  1:mesh.d+1
     ELEM_FORMAT = [ELEM_FORMAT, ' %u'];
   end
   ELEM_FORMAT =  [ELEM_FORMAT, '\n'];

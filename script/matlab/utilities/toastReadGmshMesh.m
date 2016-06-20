@@ -24,9 +24,13 @@ if eltp == 0
     els = gmsh.TRIANGLES(1:gmsh.nbTriangles,:);
     if (~isempty(els))
         idx = els(:,1:3);
-        vtx = vtx(:,1:2);
-        eltp = 15;
         gmshtp = 2;
+        if min(vtx(:,3)) > -eps && max(vtx(:,3)) < eps % 2D mesh
+            vtx = vtx(:,1:2);
+            eltp = 15;
+        else
+            eltp = 16;  % surface triangle
+        end
     end
 end
 
