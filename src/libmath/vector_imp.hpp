@@ -1253,7 +1253,7 @@ template<class VT>
 double l1norm (const TVector<VT> &v)
 {
     double sum = 0.0;
-    for (int i = 0; i < v.size; i++) sum += norm (v[i]);
+    for (int i = 0; i < v.size; i++) sum += std::abs(v[i]);
     return sum;
 }
 #ifdef USE_CBLAS
