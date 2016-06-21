@@ -457,6 +457,32 @@ void MatlabToast::SurfData (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 
+void MatlabToast::ElementNeighbours (int nlhs, mxArray *plhs[],
+    int nrhs, const mxArray *prhs[])
+{
+    QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
+
+    int ne = mesh->elen();
+    mesh->PopulateNeighbourLists();
+    int i, j;
+    int nnbmax = 0;
+    for (i = 0; i < ne; i++) {
+	if (mesh->elist[i]->nSide() > nnbmax)
+	    nnbmax = mesh->elist[i]->nSide();
+    }
+    RDenseMatrix nb(ne, nnbmax);
+    for (i = 0; i < ne; i++) {
+	Element *pel = mesh->elist[i];
+	int ns = pel->nSide();
+	for (j = 0; j < ns; j++) {
+	    nb(i, j) = pel->sdnbhridx[j]+1; // one-based
+	}
+    }
+    CopyMatrix(&plhs[0], nb);
+}
+
+// =========================================================================
+
 void MatlabToast::SysmatSparsityStructure (int nlhs, mxArray *plhs[],
     int nrhs, const mxArray *prhs[])
 {

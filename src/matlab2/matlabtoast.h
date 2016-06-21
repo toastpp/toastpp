@@ -10,10 +10,7 @@
 #include "mex.h"
 #include "stoastlib.h"
 #include "../common/objmgr.h"
-
-#ifdef FDOT
 #include "FDOTFwd.h"
-#endif
 
 #define ASSERTARG(cond,argno,errmsg) AssertArg(cond,__func__,argno,errmsg)
 #define ASSERTARG_CHAR(argno) AssertArg_Char(prhs[argno],__func__,(argno+1))
@@ -182,7 +179,7 @@ public:
     void MeshReorder (int nlhs, mxArray *plhs[], int nrhs,
 	const mxArray *prhs[]);
     void MeshNodeCount (int nlhs, mxArray *plhs[], int nrhs,
-		const mxArray *prhs[]);
+	const mxArray *prhs[]);
     void MeshElementCount (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void MeshDimension (int nlhs, mxArray *plhs[], int nrhs,
@@ -192,6 +189,8 @@ public:
     void ClearMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void MeshData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void SurfData (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+    void ElementNeighbours (int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
     void MarkMeshBoundary (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
     void SysmatSparsityStructure (int nlhs, mxArray *plhs[], int nrhs,
