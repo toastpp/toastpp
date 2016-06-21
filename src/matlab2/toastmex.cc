@@ -6,10 +6,7 @@
 #include "toastmex.h"
 
 MatlabToast *mtoast = 0;
-
-#ifdef FDOT
 MatlabFDOT *mfdot = 0;
-#endif
 
 void mexClear();
 
@@ -25,13 +22,11 @@ void ProvideToast ()
     }
 }
 
-#ifdef FDOT
 void ProvideFDOT ()
 {
     ProvideToast();
     if (!mfdot) mfdot = new MatlabFDOT;
 }
-#endif
 
 // =========================================================================
 // MEX entry point
@@ -305,6 +300,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case TOAST_SURFDATA:
 	mtoast->SurfData (nlhs, plhs, nrhs, prhs);
 	break;
+    case TOAST_ELEMENTNEIGHBOURS:
+	mtoast->ElementNeighbours (nlhs, plhs, nrhs, prhs);
+	break;
     case TOAST_SYSMATCOMPONENT:
     mtoast->SysmatComponent (nlhs, plhs, nrhs, prhs);
 	break;
@@ -369,8 +367,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mtoast->IntGradFGradG (nlhs, plhs, nrhs, prhs);
 	break;
 
-
-#ifdef FDOT
     // FDOT interface
     case FDOT_MAKEFWD:
 	ProvideFDOT();
@@ -414,7 +410,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case FDOT_PROJECTTOFIELD:
 	mfdot->ProjectToField (nlhs, plhs, nrhs, prhs);
 	break;
-#endif
 
     default:
 	mexPrintf ("toast: requested function id=%d\n", funcid);

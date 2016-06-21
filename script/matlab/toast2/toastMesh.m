@@ -521,6 +521,26 @@ classdef toastMesh < handle
 	        [vtx,idx,perm] = toastmex(uint32(5),obj.handle);
         end
 
+        function nblist = ElementNeighbours(obj)
+            % Return a list of element neighbours for each element
+            %
+            % Syntax: nblist = mesh.ElementNeighbours()
+            %
+            % Return values:
+            %        nblist [integer array m x nbmax]:
+            %             matrix of neighbour indices
+            %
+            % Note: Each row i of the returned matrix contains a list of
+            %       neighbour element indices for element i.
+            %
+            %       An index of 0 indicates no neighbour (boundary face).
+            %
+            %       nbmax is the max. number of sides for any single
+            %       element in the mesh. If the mesh contains mixed
+            %       elements, any unused trailing entries are set to 0. 
+            nblist = toastmex(uint32(100),obj.handle);
+        end
+        
 	    function elsize = ElementSize(obj)
             % Return an array with mesh element sizes.
             %
