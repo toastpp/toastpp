@@ -222,15 +222,18 @@ void SelectProjectors (ParamParser &pp, QMMesh & mesh, Projector ** projPtrs, Ca
 		camPtrs[m] = new OrthoCamera(w, h, pixSize, cpos, x, y, z);
 	    }
 	}
+	if (projtp==PROJTYPE_MESAGL) {
 #ifdef MESA_SUPPORT
-	// note: currently only GLProjector is implemented, so MESA_SUPPORT is required
-	if (projtp==PROJTYPE_MESAGL)
-	{
-	    projPtrs[m] = new GLProjector(camPtrs[m], &mesh, nBndElems, bndellist, bndsdlist);
-	}
+	    // note: currently only GLProjector is implemented, so MESA_SUPPORT
+	    // is required
+	    projPtrs[m] = new GLProjector(camPtrs[m], &mesh, nBndElems,
+					  bndellist, bndsdlist);
 #else
-	xERROR("Mesa-3D support required but not provided.");
+	    xERROR("Mesa-3D support required but not provided.");
 #endif
+	} else {
+	    xERROR("Unsupported projector type requested.");
+	}
     }
 }
 
