@@ -5,9 +5,7 @@
 
 #include "mathlib.h"
 #include "matlabtoast.h"
-#ifdef FDOT
 #include "matlabfdot.h"
-#endif
 
 // Matlab function indices
 #define TOAST_READMESH           0
@@ -17,6 +15,7 @@
 #define TOAST_CLEARMESH          3
 #define TOAST_MESHDATA           4
 #define TOAST_SURFDATA           5
+#define TOAST_ELEMENTNEIGHBOURS 100 // end
 #define TOAST_MARKMESHBOUNDARY  60
 #define TOAST_MESHNODECOUNT      6
 #define TOAST_MESHELEMENTCOUNT   7
@@ -64,7 +63,7 @@
 #define TOAST_BASIS_BUV         89
 #define TOAST_BASIS_BVW         93
 #define TOAST_BASIS_DUU         98
-#define TOAST_BASIS_DVV         99 // end
+#define TOAST_BASIS_DVV         99
 #define TOAST_BASIS_DUV         97
 #define TOAST_BASIS_GUV         94
 #define TOAST_BASIS_GVV         95
@@ -118,7 +117,6 @@
 #define TOAST_INTFG           4000
 #define TOAST_INTGRADFGRADG   4001
 
-#ifdef FDOT
 // Fluorescence solver interface
 #define FDOT_MAKEFWD          2007
 #define FDOT_CLEARFWD         2002
@@ -131,6 +129,5 @@
 #define FDOT_MAKEPROJECTORLIST 2008
 #define FDOT_PROJECTTOIMAGE   2009
 #define FDOT_PROJECTTOFIELD   2010
-#endif
 
 #endif // !__MATLAB_TOASTMEX_H
