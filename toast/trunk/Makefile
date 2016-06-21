@@ -181,6 +181,6 @@ distro_bin_darwin::
 	cd ..; \
 	zip -9 -r toast_bin_darwin64.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
 		$(TOASTRELDIR)/$(ARCHDIR)/lib \
-		$(TOASTRELDIR)/$(ARCHDIR)/mex2 ; \
+		$(TOASTRELDIR)/$(ARCHDIR)/mex2 -x "*.DS_Store" ; \
 	mv toast_bin_darwin64.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip 
 	@echo "Darwin distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"
