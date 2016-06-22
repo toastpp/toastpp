@@ -8,8 +8,16 @@
 #endif
 #include "stoastlib.h"
 #include "GLProjector.h"
+#ifdef __APPLE__
+#include <OpenGl/OpenGl.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <OpenGL/CGLTypes.h>
+#include <OpenGL/CGLCurrent.h>
+#else
 #include "GL/gl.h"
 #include "GL/glu.h"
+#endif
 #include <iostream>
 #include "qmmesh.h"
 
@@ -45,6 +53,9 @@ void GLProjector::init(Camera * cam, QMMesh * mesh)
 
 void GLProjector::setupMesaGL()
 {
+#ifdef __APPLE__
+    // TODO
+#else
     // Set up MesaGL context here
 #if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
     /* specify Z, stencil, accum sizes */
@@ -61,7 +72,9 @@ void GLProjector::setupMesaGL()
     /* Bind the buffer to the context and make it current */
     if (!OSMesaMakeCurrent( mesaGLContext, imageBuffer, GL_UNSIGNED_BYTE, w, h )) {
 	cout<<"OSMesaMakeCurrent failed!\n"<<endl;
-    }   
+    }
+    
+#endif
 
 }
 
@@ -70,7 +83,11 @@ GLProjector::~GLProjector()
     delete[] imageBuffer;
     delete[] bndellist;
     delete[] bndsdlist;
+#ifdef __APPLE__
+    // TODO
+#else
     OSMesaDestroyContext(mesaGLContext);
+#endif
 }
 
 RVector GLProjector::getImageBuffer()
