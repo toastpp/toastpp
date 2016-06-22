@@ -5,6 +5,9 @@
       location = "group:matlab2/matlab2.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:libfdot/libfdot.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:liblbfgs/liblbfgs.xcodeproj">
    </FileRef>
    <FileRef
@@ -14,10 +17,10 @@
       location = "group:libstoast/libstoast.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:libbem/libbem.xcodeproj">
+      location = "group:libbemdiff/libbemdiff.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:libbemdiff/libbemdiff.xcodeproj">
+      location = "group:libbem/libbem.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:libdgfe/libdgfe.xcodeproj">

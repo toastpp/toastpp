@@ -24,6 +24,9 @@
 		F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA39195C7C98003F34BC /* mtGradient.cc */; };
 		F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F229EA3A195C7C98003F34BC /* mtJacobian.cc */; };
 		F25071FA1A7567020053D654 /* liblbfgs.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F25071F91A7567020053D654 /* liblbfgs.dylib */; };
+		F2B1C2091D17F059003CB98E /* matlabfdot.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C2071D17F059003CB98E /* matlabfdot.cc */; };
+		F2B1C20A1D17F059003CB98E /* mtProjector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C2081D17F059003CB98E /* mtProjector.cc */; };
+		F2B1C20C1D17FB1D003CB98E /* libfdot.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2B1C20B1D17FB1D003CB98E /* libfdot.dylib */; };
 		F2ED64F6195CAFEB006CD663 /* toastmex.mexmaci64 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229EA2E195C7B9D003F34BC /* toastmex.mexmaci64 */; };
 		F2FF2D491A694EF80092CC78 /* mtSysmat_basis.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D481A694EF80092CC78 /* mtSysmat_basis.cc */; };
 /* End PBXBuildFile section */
@@ -60,6 +63,9 @@
 		F229EA67195C803A003F34BC /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
 		F229EA69195C8062003F34BC /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
 		F25071F91A7567020053D654 /* liblbfgs.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblbfgs.dylib; path = ../liblbfgs/build/Debug/liblbfgs.dylib; sourceTree = "<group>"; };
+		F2B1C2071D17F059003CB98E /* matlabfdot.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = matlabfdot.cc; path = ../../src/matlab2/matlabfdot.cc; sourceTree = "<group>"; };
+		F2B1C2081D17F059003CB98E /* mtProjector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtProjector.cc; path = ../../src/matlab2/mtProjector.cc; sourceTree = "<group>"; };
+		F2B1C20B1D17FB1D003CB98E /* libfdot.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfdot.dylib; path = ../libfdot/build/Debug/libfdot.dylib; sourceTree = "<group>"; };
 		F2FF2D481A694EF80092CC78 /* mtSysmat_basis.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mtSysmat_basis.cc; path = ../../src/matlab2/mtSysmat_basis.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2B1C20C1D17FB1D003CB98E /* libfdot.dylib in Frameworks */,
 				F25071FA1A7567020053D654 /* liblbfgs.dylib in Frameworks */,
 				F229EA6B195C8069003F34BC /* libmath.dylib in Frameworks */,
 				F229EA6A195C8062003F34BC /* libfe.dylib in Frameworks */,
@@ -81,10 +88,13 @@
 		F229EA25195C7B9D003F34BC = {
 			isa = PBXGroup;
 			children = (
+				F2B1C20B1D17FB1D003CB98E /* libfdot.dylib */,
 				F25071F91A7567020053D654 /* liblbfgs.dylib */,
 				F229EA69195C8062003F34BC /* libfe.dylib */,
 				F229EA67195C803A003F34BC /* libmath.dylib */,
 				F229EA5F195C7E1A003F34BC /* libstoast.dylib */,
+				F2B1C2071D17F059003CB98E /* matlabfdot.cc */,
+				F2B1C2081D17F059003CB98E /* mtProjector.cc */,
 				F229EA35195C7C98003F34BC /* matlabtoast.cc */,
 				F229EA36195C7C98003F34BC /* mtBasis.cc */,
 				F229EA37195C7C98003F34BC /* mtElement.cc */,
@@ -148,7 +158,7 @@
 		F229EA26195C7B9D003F34BC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = UCL;
 			};
 			buildConfigurationList = F229EA29195C7B9D003F34BC /* Build configuration list for PBXProject "matlab2" */;
@@ -182,7 +192,9 @@
 				F229EA70195C817A003F34BC /* mtJacobian.cc in Sources */,
 				F229EA4E195C7C98003F34BC /* util.cc in Sources */,
 				F2FF2D491A694EF80092CC78 /* mtSysmat_basis.cc in Sources */,
+				F2B1C2091D17F059003CB98E /* matlabfdot.cc in Sources */,
 				F229EA4A195C7C98003F34BC /* mtRegul.cc in Sources */,
+				F2B1C20A1D17F059003CB98E /* mtProjector.cc in Sources */,
 				F229EA6F195C817A003F34BC /* mtGradient.cc in Sources */,
 				F229EA43195C7C98003F34BC /* mtBasis.cc in Sources */,
 				F229EA45195C7C98003F34BC /* mtField.cc in Sources */,
@@ -210,6 +222,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -225,9 +238,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -258,8 +271,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				SDKROOT = macosx10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -267,14 +280,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
-				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					MESA_SUPPORT,
+					FDOT,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -287,7 +304,7 @@
 					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MATLABVER = MATLAB_R2013b.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
@@ -297,7 +314,7 @@
 				);
 				PRODUCT_NAME = toastmex;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../src/libfdot\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\" \"$(SRCROOT)/../../numerics/SuperLU_5.0/SRC\"";
 			};
 			name = Debug;
 		};
@@ -305,14 +322,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
 				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
-				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					TOAST_THREAD,
+					MESA_SUPPORT,
+					FDOT,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -325,7 +346,7 @@
 					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MATLABVER = MATLAB_R2013b.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
@@ -335,7 +356,7 @@
 				);
 				PRODUCT_NAME = toastmex;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\"";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../src/matlab2\" \"$(SYSTEM_APPS_DIR)/$(MATLABVER)/extern/include\" \"$(SRCROOT)/../../src/libstoast\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../src/libfdot\" \"$(SRCROOT)/../../numerics/liblbfgs-1.10/include\" \"$(SRCROOT)/../../numerics/SuperLU_5.0/SRC\"";
 			};
 			name = Release;
 		};

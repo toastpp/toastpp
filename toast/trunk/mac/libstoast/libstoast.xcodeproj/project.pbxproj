@@ -33,6 +33,10 @@
 		F25A48C719804D0500656531 /* raster_px2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F25A48C619804D0500656531 /* raster_px2.cc */; };
 		F272C2D81A6FA1C8004EBCFF /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F272C2D71A6FA1C8004EBCFF /* libmath.dylib */; };
 		F272C2DA1A6FA1CB004EBCFF /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F272C2D91A6FA1CB004EBCFF /* libfe.dylib */; };
+		F2B1C1FF1D17E98F003CB98E /* camera.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1FD1D17E98F003CB98E /* camera.cc */; };
+		F2B1C2001D17E98F003CB98E /* GLProjector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1FE1D17E98F003CB98E /* GLProjector.cc */; };
+		F2B1C2021D17E9E8003CB98E /* projector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C2011D17E9E8003CB98E /* projector.cc */; };
+		F2B1C2041D17EDC4003CB98E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2B1C2031D17EDC4003CB98E /* OpenGL.framework */; };
 		F2ED64F8195CB097006CD663 /* libstoast.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F229E9CE195C7652003F34BC /* libstoast.dylib */; };
 		F2FF2D4B1A694F340092CC78 /* raster_blob2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D4A1A694F340092CC78 /* raster_blob2.cc */; };
 		F2FF2D5D1A694F9E0092CC78 /* raster_bb2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2FF2D4C1A694F9E0092CC78 /* raster_bb2.cc */; };
@@ -95,6 +99,10 @@
 		F25A48C619804D0500656531 /* raster_px2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_px2.cc; path = ../../src/libstoast/raster_px2.cc; sourceTree = "<group>"; };
 		F272C2D71A6FA1C8004EBCFF /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = ../libmath/build/Debug/libmath.dylib; sourceTree = "<group>"; };
 		F272C2D91A6FA1CB004EBCFF /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = ../libfe/build/Debug/libfe.dylib; sourceTree = "<group>"; };
+		F2B1C1FD1D17E98F003CB98E /* camera.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cc; path = ../../src/libstoast/camera.cc; sourceTree = "<group>"; };
+		F2B1C1FE1D17E98F003CB98E /* GLProjector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GLProjector.cc; path = ../../src/libstoast/GLProjector.cc; sourceTree = "<group>"; };
+		F2B1C2011D17E9E8003CB98E /* projector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = projector.cc; path = ../../src/libstoast/projector.cc; sourceTree = "<group>"; };
+		F2B1C2031D17EDC4003CB98E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		F2FF2D4A1A694F340092CC78 /* raster_blob2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_blob2.cc; path = ../../src/libstoast/raster_blob2.cc; sourceTree = "<group>"; };
 		F2FF2D4C1A694F9E0092CC78 /* raster_bb2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_bb2.cc; path = ../../src/libstoast/raster_bb2.cc; sourceTree = "<group>"; };
 		F2FF2D4D1A694F9E0092CC78 /* raster_blob2_tet.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raster_blob2_tet.cc; path = ../../src/libstoast/raster_blob2_tet.cc; sourceTree = "<group>"; };
@@ -120,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2B1C2041D17EDC4003CB98E /* OpenGL.framework in Frameworks */,
 				F272C2DA1A6FA1CB004EBCFF /* libfe.dylib in Frameworks */,
 				F272C2D81A6FA1C8004EBCFF /* libmath.dylib in Frameworks */,
 				F23B408F1A6D559500FCB964 /* libsuperlu.dylib in Frameworks */,
@@ -132,6 +141,10 @@
 		F229E9C5195C7652003F34BC = {
 			isa = PBXGroup;
 			children = (
+				F2B1C2031D17EDC4003CB98E /* OpenGL.framework */,
+				F2B1C2011D17E9E8003CB98E /* projector.cc */,
+				F2B1C1FD1D17E98F003CB98E /* camera.cc */,
+				F2B1C1FE1D17E98F003CB98E /* GLProjector.cc */,
 				F272C2D91A6FA1CB004EBCFF /* libfe.dylib */,
 				F272C2D71A6FA1C8004EBCFF /* libmath.dylib */,
 				F23B408E1A6D559500FCB964 /* libsuperlu.dylib */,
@@ -250,12 +263,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2B1C2021D17E9E8003CB98E /* projector.cc in Sources */,
 				F2FF2D5E1A694F9E0092CC78 /* raster_blob2_tet.cc in Sources */,
 				F2FF2D681A694F9E0092CC78 /* raster_px2_tri.cc in Sources */,
 				F229E9F1195C7749003F34BC /* mwsolution.cc in Sources */,
 				F2FF2D621A694F9E0092CC78 /* raster_cpx_tree.cc in Sources */,
 				F2FF2D6C1A694F9E0092CC78 /* sh.cc in Sources */,
 				F229E9FC195C7749003F34BC /* raster_sb.cc in Sources */,
+				F2B1C2001D17E98F003CB98E /* GLProjector.cc in Sources */,
 				F229E9EF195C7749003F34BC /* jacobian.cc in Sources */,
 				F229E9FE195C7749003F34BC /* regul.cc in Sources */,
 				F229E9F6195C7749003F34BC /* raster_bl.cc in Sources */,
@@ -290,6 +305,7 @@
 				F2FF2D6B1A694F9E0092CC78 /* raster2.cc in Sources */,
 				F229E9ED195C7749003F34BC /* fwdsolver_zslu.cc in Sources */,
 				F2FF2D6A1A694F9E0092CC78 /* raster_sb2.cc in Sources */,
+				F2B1C1FF1D17E98F003CB98E /* camera.cc in Sources */,
 				F229E9F5195C7749003F34BC /* raster_bb.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -329,7 +345,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -362,7 +378,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -377,20 +393,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					NEED_EXPLICIT_INSTANTIATION,
+					MESA_SUPPORT,
 				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../lib/\"",
-					"$(inherited)",
-					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
-					/opt/local/lib/libgcc,
-					/opt/local/lib/gcc48,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
-					/Users/samuelpowell/Documents/toast/mac/libmath/build/Debug,
-					/Users/samuelpowell/Documents/toast/mac/libfe/build/Debug,
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -409,20 +417,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NEED_EXPLICIT_INSTANTIATION,
 					TOAST_THREAD,
+					MESA_SUPPORT,
 				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../lib/\"",
-					"$(inherited)",
-					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
-					/opt/local/lib/libgcc,
-					/opt/local/lib/gcc48,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-ekkndshdgwexwdhfufsleqipvycb/Build/Products/Debug",
-					/Users/samuelpowell/Documents/toast/mac/libmath/build/Debug,
-					/Users/samuelpowell/Documents/toast/mac/libfe/build/Debug,
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SYMROOT = build;
