@@ -1,0 +1,314 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F2B1C1F01D17E6B7003CB98E /* FDOTFwd.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1EB1D17E6B7003CB98E /* FDOTFwd.cc */; };
+		F2B1C1F11D17E6B7003CB98E /* matrixFreeSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1EC1D17E6B7003CB98E /* matrixFreeSolver.cc */; };
+		F2B1C1F21D17E6B7003CB98E /* MLEMSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1ED1D17E6B7003CB98E /* MLEMSolver.cc */; };
+		F2B1C1F31D17E6B7003CB98E /* muaSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1EE1D17E6B7003CB98E /* muaSolver.cc */; };
+		F2B1C1F41D17E6B7003CB98E /* util.cc in Sources */ = {isa = PBXBuildFile; fileRef = F2B1C1EF1D17E6B7003CB98E /* util.cc */; };
+		F2B1C1F61D17E782003CB98E /* libstoast.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2B1C1F51D17E782003CB98E /* libstoast.dylib */; };
+		F2B1C1F81D17E7A6003CB98E /* libfe.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2B1C1F71D17E7A6003CB98E /* libfe.dylib */; };
+		F2B1C1FA1D17E83F003CB98E /* libmath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2B1C1F91D17E83F003CB98E /* libmath.dylib */; };
+		F2B1C20E1D17FDEE003CB98E /* libfdot.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = F2B1C1E41D17E51F003CB98E /* libfdot.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2B1C20D1D17FDE5003CB98E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(SRCROOT)/../../darwin64/lib";
+			dstSubfolderSpec = 0;
+			files = (
+				F2B1C20E1D17FDEE003CB98E /* libfdot.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F2B1C1E41D17E51F003CB98E /* libfdot.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libfdot.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2B1C1EB1D17E6B7003CB98E /* FDOTFwd.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FDOTFwd.cc; path = ../../src/libfdot/FDOTFwd.cc; sourceTree = "<group>"; };
+		F2B1C1EC1D17E6B7003CB98E /* matrixFreeSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = matrixFreeSolver.cc; path = ../../src/libfdot/matrixFreeSolver.cc; sourceTree = "<group>"; };
+		F2B1C1ED1D17E6B7003CB98E /* MLEMSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MLEMSolver.cc; path = ../../src/libfdot/MLEMSolver.cc; sourceTree = "<group>"; };
+		F2B1C1EE1D17E6B7003CB98E /* muaSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = muaSolver.cc; path = ../../src/libfdot/muaSolver.cc; sourceTree = "<group>"; };
+		F2B1C1EF1D17E6B7003CB98E /* util.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cc; path = ../../src/libfdot/util.cc; sourceTree = "<group>"; };
+		F2B1C1F51D17E782003CB98E /* libstoast.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstoast.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug/libstoast.dylib"; sourceTree = "<group>"; };
+		F2B1C1F71D17E7A6003CB98E /* libfe.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfe.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug/libfe.dylib"; sourceTree = "<group>"; };
+		F2B1C1F91D17E83F003CB98E /* libmath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmath.dylib; path = "../../../../Library/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug/libmath.dylib"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F2B1C1E11D17E51F003CB98E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2B1C1FA1D17E83F003CB98E /* libmath.dylib in Frameworks */,
+				F2B1C1F81D17E7A6003CB98E /* libfe.dylib in Frameworks */,
+				F2B1C1F61D17E782003CB98E /* libstoast.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F2B1C1DB1D17E51F003CB98E = {
+			isa = PBXGroup;
+			children = (
+				F2B1C1F91D17E83F003CB98E /* libmath.dylib */,
+				F2B1C1F71D17E7A6003CB98E /* libfe.dylib */,
+				F2B1C1F51D17E782003CB98E /* libstoast.dylib */,
+				F2B1C1EB1D17E6B7003CB98E /* FDOTFwd.cc */,
+				F2B1C1EC1D17E6B7003CB98E /* matrixFreeSolver.cc */,
+				F2B1C1ED1D17E6B7003CB98E /* MLEMSolver.cc */,
+				F2B1C1EE1D17E6B7003CB98E /* muaSolver.cc */,
+				F2B1C1EF1D17E6B7003CB98E /* util.cc */,
+				F2B1C1E51D17E51F003CB98E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F2B1C1E51D17E51F003CB98E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F2B1C1E41D17E51F003CB98E /* libfdot.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F2B1C1E21D17E51F003CB98E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F2B1C1E31D17E51F003CB98E /* libfdot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2B1C1E81D17E51F003CB98E /* Build configuration list for PBXNativeTarget "libfdot" */;
+			buildPhases = (
+				F2B1C1E01D17E51F003CB98E /* Sources */,
+				F2B1C1E11D17E51F003CB98E /* Frameworks */,
+				F2B1C1E21D17E51F003CB98E /* Headers */,
+				F2B1C20D1D17FDE5003CB98E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libfdot;
+			productName = libfdot;
+			productReference = F2B1C1E41D17E51F003CB98E /* libfdot.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F2B1C1DC1D17E51F003CB98E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Samuel Powell";
+				TargetAttributes = {
+					F2B1C1E31D17E51F003CB98E = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+				};
+			};
+			buildConfigurationList = F2B1C1DF1D17E51F003CB98E /* Build configuration list for PBXProject "libfdot" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F2B1C1DB1D17E51F003CB98E;
+			productRefGroup = F2B1C1E51D17E51F003CB98E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F2B1C1E31D17E51F003CB98E /* libfdot */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F2B1C1E01D17E51F003CB98E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2B1C1F41D17E6B7003CB98E /* util.cc in Sources */,
+				F2B1C1F01D17E6B7003CB98E /* FDOTFwd.cc in Sources */,
+				F2B1C1F21D17E6B7003CB98E /* MLEMSolver.cc in Sources */,
+				F2B1C1F31D17E6B7003CB98E /* muaSolver.cc in Sources */,
+				F2B1C1F11D17E6B7003CB98E /* matrixFreeSolver.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F2B1C1E61D17E51F003CB98E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F2B1C1E71D17E51F003CB98E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F2B1C1E91D17E51F003CB98E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					DEBUG,
+					TOAST_THREAD,
+					NEED_EXPLICIT_INSTANTIATION,
+					"$(inherited)",
+					MESA_SUPPORT,
+				);
+				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../lib/\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfdot\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_5.0/SRC\" \"$(SRCROOT)/../../src/libstoast\"";
+			};
+			name = Debug;
+		};
+		F2B1C1EA1D17E51F003CB98E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++98";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NEED_EXPLICIT_INSTANTIATION,
+					TOAST_THREAD,
+					MESA_SUPPORT,
+				);
+				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../lib/\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../..\" \"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../src/libfdot\" \"$(SRCROOT)/../../src/libfe\" \"$(SRCROOT)/../../src/libmath\" \"$(SRCROOT)/../../numerics/SuperLU_5.0/SRC\" \"$(SRCROOT)/../../src/libstoast\"";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F2B1C1DF1D17E51F003CB98E /* Build configuration list for PBXProject "libfdot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2B1C1E61D17E51F003CB98E /* Debug */,
+				F2B1C1E71D17E51F003CB98E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2B1C1E81D17E51F003CB98E /* Build configuration list for PBXNativeTarget "libfdot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2B1C1E91D17E51F003CB98E /* Debug */,
+				F2B1C1EA1D17E51F003CB98E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F2B1C1DC1D17E51F003CB98E /* Project object */;
+}
