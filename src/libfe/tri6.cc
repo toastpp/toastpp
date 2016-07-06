@@ -294,33 +294,6 @@ bool Triangle6::LContains (const Point& loc, bool pad) const
     }
 }
 
-bool Triangle6::GContains (const Point& glob, const NodeList& nlist) const
-{
-    double xx = glob[0], yy = glob[1];
-
-    // check bounding box
-    if (xx < bbmin[0] || xx > bbmax[0] || yy < bbmin[1] || yy > bbmax[1])
-        return false;
-
-    double x0, x1, x2, y0, y1, y2, y0r, yyr, fac;
-    const double EPS = 1e-10;
-
-    for (int i = 0; i < 3; i++) {
-        x0 = nlist[Node[i]][0],       y0 = nlist[Node[i]][1];
-	x1 = nlist[Node[(i+1)%3]][0], y1 = nlist[Node[(i+1)%3]][1];
-	x2 = nlist[Node[(i+2)%3]][0], y2 = nlist[Node[(i+2)%3]][1];
-	if (fabs (x1-x2) < EPS) {
-	    if ((x0 < x1 && xx > x1) || (x0 > x1 && xx < x1)) return false;
-	} else {
-	    fac = (y2-y1)/(x2-x1);
-	    y0r = (x0-x1)*fac + y1;
-	    yyr = (xx-x1)*fac + y1;
-	    if ((y0 < y0r && yy > yyr) || (y0 > y0r && yy < yyr)) return false;
-	}
-    }
-    return true;
-}
-
 RVector Triangle6::LocalShapeF (const Point &loc) const
 {
     dASSERT(loc.Dim() == 2, "Invalid point dimension");
