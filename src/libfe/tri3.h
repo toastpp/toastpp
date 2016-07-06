@@ -124,10 +124,6 @@ public:
     // returns TRUE if point 'loc' (in local coordinates of the element) is
     // within the standard triangle
 
-    bool GContains (const Point& glob, const NodeList& nlist) const;
-    // returns TRUE if point 'glob' (in global coordinates) is within the
-    // element. nlist is the mesh node coordinate list
-
     /**
      * \brief Return the values of all shape functions for a point inside
      *   the element, given in local coordinates.
