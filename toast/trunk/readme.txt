@@ -1,65 +1,83 @@
-TOAST- Image Reconstruction in Optical Tomography
-2008-2009 (c) Martin Schweiger and Simon Arridge, University College London
+Toast++- Image Reconstruction in Optical Tomography
+2008-2016 (c) Martin Schweiger and Simon Arridge, University College London
 
 ========================================================================
 
-TOAST is a software suite for image reconstruction in optical tomography.
+Toast++ is an open-source software suite for image reconstruction in optical
+tomography.
 It is being developed by Martin Schweiger and Simon Arridge at University
 College London.
 
 The TOAST suite is available for download online at
 
-    http://web4.cs.ucl.ac.uk/research/vis/toast/
+    http://toastplusplus.org
 
 Please check the TOAST web site regularly for updates.
 
-The TOAST License is described in the license.html document.
+Toast++ is distributed with a GPL v3 license. Please see file COPYING for
+details.
 
 
-Downloading TOAST:
-------------------
-TOAST is available for different computer platforms:
+Downloading Toast++:
+--------------------
 
-- Windows
-- Linux (32-bit)
-- Linux (64-bit)
+Source distribution: The Toast++ sources are available via an SVN repository
+on sourceforge (https://sourceforge.net/projects/toastpp)
 
-You need to download two archive files from the TOAST download page:
-
-- The "Common" package containing platform-independent scripts and text
-  files
-- The platform-specific package for your computer, containing libraries
-  and mex files.
+To check out the current version:
+svn checkout http://svn.code.sf.net/p/toastpp/code/toast/trunk toastpp
 
 
-Installing TOAST:
------------------
-Unzip or untar the two files into a common directory. This will create
-a sub-directory "toast2009" containing the complete TOAST suite.
+Pre-compiled binaries: Binary packages for several computer platforms are
+hosted on sourceforge:
+https://sourceforge.net/projects/toastpp/files
 
-For Linux systems, a TOASTDIR environment variable must be defined pointing
-to the TOAST root directory. The additional TOAST environment settings can
-then be defined by executing the toastenv scripts.
+You will need to download two zip files:
+- The "Common" package containing device-independent scripts and examples
+- One of the platform-dependent packages for Windows, Linux or Mac-OS.
 
-Example (csh):
 
-  setenv TOASTDIR $HOME/toast2009
-  source $TOASTDIR/toastenv.csh
+Installing precompiled Toast++ packages:
+----------------------------------------
 
-Example (bash):
+If you are using the pre-compiled packages, just unzip both packages into THE
+SAME directory. You should end up with a single "toast" root directory.
 
-  export TOASTDIR=$HOME/toast2009
-  source $TOASTDIR/toastenv.sh
+Note that some unzip utilities, in particular on Windows, store the zip contents
+under a directory named after the zip file, e.g.
 
-For all computer systems, the Matlab environment is set by running the
-mtoast_install script:
+toast_v2.0.0_common.zip  -->  toast_v2.0.0_common/
 
-- Start Matlab
-- Change the working directory to your toast2009 root directory.
-- Run mtoast_install.
+In that case, you will end up with two separate directories, and must merge the
+two "toast" subdirectories from both manually.
 
-This will add the TOAST mex and script directories to your Matlab search
-path. You should save the new path definition to make it permanent.
+
+Compiling from sources:
+-----------------------
+
+Please follow the instructions under doc/install.
+
+
+Preparing the Toast++ environment:
+----------------------------------
+
+(Required for both precompiled and compiled installations)
+
+On Linux, type
+
+cd <toast root dir>
+export TOASTDIR=$PWD
+source toastenv.sh
+
+This step can be skipped for Windows installations.
+
+For setting the Toast++ paths for the Matlab toolbox:
+From the Matlab prompt:
+
+cd <toast root dir>
+mtoast2_install
+
+Save the paths to make them permanent.
 
 
 Getting started:
@@ -67,7 +85,9 @@ Getting started:
 After setting up the TOAST toolbox, you can start by running the included
 demos. In Matlab, type
 
-  demo toolbox toast
+  doc
+
+Follow the link to 
 
 This will bring up a list of available TOAST demos, showing some of the
 capabilities of the TOAST suite.

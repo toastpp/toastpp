@@ -484,9 +484,11 @@ void Element_Unstructured::operator= (const Element_Unstructured &el)
 bool Element_Unstructured::GContains (const Point& glob, const NodeList& nlist)
     const
 {
+    const double EPS = 1e-8;
+    
     // check bounding box
     for (int i = 0; i < Dimension(); i++)
-        if (glob[i] < bbmin[i] || glob[i] > bbmax[i]) return false;
+        if (glob[i] < bbmin[i]-EPS || glob[i] > bbmax[i]+EPS) return false;
 
     return Element::GContains (glob, nlist);
 }

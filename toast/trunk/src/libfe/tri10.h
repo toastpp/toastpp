@@ -82,7 +82,6 @@ public:
     RVector DirectionCosine (int side, RDenseMatrix& jacin);
     const RVector &LNormal (int side) const;
     bool LContains (const Point& loc, bool pad = true) const;
-    bool GContains (const Point& glob, const NodeList& nlist) const;
 
     /**
      * \brief Return the values of all shape functions for a point inside
