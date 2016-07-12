@@ -1,4 +1,12 @@
 language: cpp
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - gfortran
+
 script:
     - export TOASTDIR=$PWD
     - ./configure
