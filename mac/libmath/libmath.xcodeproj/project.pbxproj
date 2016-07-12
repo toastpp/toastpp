@@ -271,15 +271,7 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_UNROLL_LOOPS = YES;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../../lib",
-					/opt/local/lib/gcc48,
-					/opt/local/lib/libgcc,
-					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug",
-					/Users/samuelpowell/Documents/toast/mac/libsuperlu/build/Debug,
-				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -305,15 +297,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
 				GCC_UNROLL_LOOPS = YES;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../../lib",
-					/opt/local/lib/gcc48,
-					/opt/local/lib/libgcc,
-					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-dcvgzejpmjtxdkhiausliwwpdmzq/Build/Products/Debug",
-					/Users/samuelpowell/Documents/toast/mac/libsuperlu/build/Debug,
-				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
