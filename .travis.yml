@@ -1,0 +1,7 @@
+language: cpp
+script:
+    - export TOASTDIR=$PWD
+    - ./configure
+    - source toastenv.sh
+    - make numerics
+    - make toast
