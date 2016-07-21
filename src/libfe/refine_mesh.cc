@@ -659,7 +659,6 @@ FELIB void RefineTriangle3Mesh (Mesh *mesh, bool *elrefine)
 	    
     // create the new nodes
     mesh->nlist.Append (nrefine);
-    mesh->plist.Append (nrefine);
     for (i = 0; i < nedge; i++) {
 	if (edge[i].refine) {
 	    mesh->nlist[nnd].New(2);

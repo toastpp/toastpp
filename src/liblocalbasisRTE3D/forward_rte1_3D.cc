@@ -1024,8 +1024,11 @@ int main (int argc, char *argv[])
 				     SRCMODE_NEUMANN));
 	    break;
 	}
-	for (int j = 0; j < qmmesh.nlen(); j++) 
-	  m[j] *= qmmesh.plist[j].C2A();
+
+	// **** WARNING: This doesn't work anymore!
+	// **** Need alternative way to retrieve C2A
+	//for (int j = 0; j < qmmesh.nlen(); j++) 
+	//  m[j] *= qmmesh.plist[j].C2A();
 	mvec.SetRow (i, m);
     }
     }

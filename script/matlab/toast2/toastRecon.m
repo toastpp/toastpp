@@ -88,7 +88,7 @@ fprintf ('Source vector set up: %d sources\n', size(LPRM.qvec,2));
 
 % ----------------------------------------------------------------------
 % Generate measurement vectors
-LPRM.mvec = LPRM.hMesh.Mvec (prm.meas.det.prof, prm.meas.det.width);
+LPRM.mvec = LPRM.hMesh.Mvec (prm.meas.det.prof, prm.meas.det.width, ref);
 fprintf ('Detector vector setup: %d detectors\n', size(LPRM.mvec,2));
 
 % ----------------------------------------------------------------------

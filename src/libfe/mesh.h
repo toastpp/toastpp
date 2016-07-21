@@ -147,7 +147,6 @@ public:
 
     NodeList nlist;      // list of mesh nodes
     ElementList elist;   // list of mesh elements
-    ParameterList plist; // list of mesh parameters (per node)
 
     mutable int **nbhrs;
     // list of edge-adjacent neighbours for each element
@@ -299,9 +298,6 @@ public:
     virtual void ScaleMesh (const RVector &scale);
     // Anisotropic scaling. 'scale' must have the same dimension as the mesh
 
-    double ParamAverage (const ParameterType prmtp) const;
-    // returns the average of parameter `prmtp' over the entire mesh
-
     int MaxNodeDiff (int mode=BW_AUTO) const;
     // calculates the maximum node number difference within a single element
     // of the mesh, either using all nodes (mode=BW_TOTAL) or only internal
@@ -411,20 +407,6 @@ public:
     Point BndIntersect (const Point &pt1, const Point &pt2);
     // this calculates the point of intersection of the mesh boundary and the
     // straight line from pt1 to pt2
-
-    void ResetCoeff_homog (ParameterType prmtp, double val)
-    	{ plist.SetParam (prmtp, val); }
-    // resets the coefficient `prmtp' (as defined in param.h) throughout the
-    // mesh to homogeneous value `val'
-
-    void ResetCoeff_region (ParameterType prmtp, double val, int region);
-    // Resets parameter type `prmtp' to `val' for all nodes belonging to
-    // region `region'
-
-    void ResetCoeff_sqrt (ParameterType prmtp, double cnt, double bnd);
-    // resets the coefficient 'prmtp' (as defined in param.h) throughout the
-    // mesh, as a function of square root of distance from centre, from value
-    // 'cnt' at the centre to value 'bnd' at the boundary
 
     int CheckConsistency () const;
     // performs some tests to check the consistency of the mesh
