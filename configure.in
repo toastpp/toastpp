@@ -10,7 +10,8 @@ if test "x$TOASTDIR" = x ; then
     exit
 fi
 
-dnl LDFLAGS=-L/usr/X11R6/lib
+dnl Location of auxiliary configure scripts
+AC_CONFIG_AUX_DIR(config)
 
 dnl Checks for programs.
 AC_PROG_CXX
