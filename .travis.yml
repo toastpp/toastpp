@@ -1,0 +1,41 @@
+language: cpp
+
+sudo: false
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          packages:
+            - gfortran
+    - os: osx
+      osx_image: xcode7.3
+
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    export TOASTDIR=$PWD;
+    ./configure;
+    source toastenv.sh;
+    make numerics;
+    make toast;
+    fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    cd mac;
+    cd libsuperlu;
+    xcodebuild -configuration release;
+    cd ../liblbfgs;
+    xcodebuild -configuration release;
+    cd ../libmath;
+    xcodebuild -configuration release;
+    cd ../libfe;
+    xcodebuild -configuration release;
+    cd ../libstoast;
+    xcodebuild -configuration release;
+    cd ../libfdot;
+    xcodebuild -configuration release;
+    cd ../libbemdiff;
+    xcodebuild -configuration release;
+    cd ../libdgfe;
+    xcodebuild -configuration release;
+    fi;

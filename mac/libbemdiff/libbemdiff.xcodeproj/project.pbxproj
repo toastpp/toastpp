@@ -208,11 +208,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				EXECUTABLE_PREFIX = "";
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
-				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -232,11 +228,7 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-affsqodjwejitoendgnuykmtiaki/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/toastpp-bqsgnuzpifdbbzeoqrrkklsqbbyp/Build/Products/Debug",
-				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
