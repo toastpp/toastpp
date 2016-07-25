@@ -298,10 +298,8 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../lib/\"",
 					"$(SYSTEM_APPS_DIR)/$(MATLABVER)/bin/maci64",
-					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
-					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
+					"$(SRCROOT)/../../darwin64/lib/",
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -340,10 +338,8 @@
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
 				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../lib/\"",
 					"$(SYSTEM_APPS_DIR)/$(MATLABVER)/bin/maci64",
-					/Users/samuelpowell/Documents/toast/gcc_shared/lib,
-					/Users/samuelpowell/Documents/toastpp/mac/liblbfgs/build/Debug,
+					"$(SRCROOT)/../../darwin64/lib/",
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
