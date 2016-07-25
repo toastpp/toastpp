@@ -320,7 +320,6 @@ void MatlabToast::ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
     int i, j;
 
     Mesh *mesh = GETMESH_SAFE(0);
-    int nlen = mesh->nlen();
     int elen = mesh->elen();
     int dim  = mesh->Dimension();
     bool isglobal = false;
@@ -373,7 +372,6 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
   int i, j, k;
 
     Mesh *mesh = GETMESH_SAFE(0);
-    int nlen = mesh->nlen();
     int elen = mesh->elen();
     int dim  = mesh->Dimension();
     bool isglobal = false;

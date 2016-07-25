@@ -52,11 +52,10 @@ RVector QVec_Cosine (const Mesh &mesh, const Point &cnt, double w,
     Element *pel;
     int i, j, is, js, el, nnode, *node;
     double scale = 0.5*Pi/w;
-    double d, q, w2 = w*w;
+    double d, q;
     double fac1 = 1.0 / (sqrt (2.0*Pi) * w);
     if (mesh.Dimension() == 3) fac1 /= (sqrt (2.0*Pi) * w);
     if (mode != SRCMODE_NEUMANN) fac1 /= (sqrt (2.0*Pi) * w);
-    double fac2 = -0.5/w2;
 
     // assemble source vector
     for (el = 0; el < mesh.elen(); el++) {

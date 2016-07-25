@@ -3,11 +3,6 @@
 #include "sh.h"
 #include <stdlib.h>
 
-static inline double dot(vec a, vec b)
-{
-    return a->x * b->x + a->y * b->y;
-}
-
 static inline double cross(vec a, vec b)
 {
     return a->x * b->y - a->y * b->x;
@@ -75,10 +70,6 @@ static void poly_append(poly p, vec v)
     p->v[p->len++] = *v;
 }
 
-static void poly_reset(poly p)
-{
-    p->len = 0;
-}
  
 /* this works only if all of the following are true:
  *   1. poly has no colinear edges;

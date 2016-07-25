@@ -33,7 +33,6 @@ double TriangleArea (const Point &p1, const Point &p2, const Point &p3)
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
 static const int nsample_tot = (((nsample_lin+3)*nsample_lin+2)*nsample_lin)/6;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_sample[nsample_tot];
 
 static const RSymMatrix sym_intff = RSymMatrix (4,
@@ -1132,11 +1131,11 @@ RVector Tetrahedron4::BndIntFX (int side, double (*func)(const Point&),
 double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
 {
     // computes \int_s du_i/dx_j u_k ds over side sd
-    int nd;
     dASSERT (sd >= 0 && sd < 4, "Argument 1: index out of range");
     dASSERT (j >= 0 && j < 3, "Argument 3: index out of range");
-    int nsdnd = nSideNode(sd);
 #ifdef FEM_DEBUG
+    int nd;
+    int nsdnd = nSideNode(sd);
     for (nd = 0; nd < nsdnd; nd++)
 	if (i == SideNode (sd,nd)) break;
     dASSERT (nd < nsdnd, "Argument 2: node index not found in side");
@@ -1173,12 +1172,6 @@ double Tetrahedron4::BndIntFD (Mesh &mesh, int el2, int i, int j, int k)
 RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     const NodeList &nlist) const
 {
-    static int npp = 0;
-    static double *pwght;
-    static Point  *pabsc;
-    static RVector *F;
-    static RDenseMatrix *D;
-
     int j, p;
     double d, f;
     RVector sum(4);
@@ -1215,7 +1208,7 @@ RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     
 int Tetrahedron4::Intersection (const Point &p1, const Point &p2, Point **pi)
 {
-    int i, j, n = 0;
+    int i, n = 0;
     double a, rx, ry, rz;
     double sx = p1[0], sy = p1[1], sz = p1[2];
     double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];

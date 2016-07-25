@@ -224,7 +224,6 @@ void Triangle3_MakeEdgeList (Mesh *mesh, EDGE **triedge, int *ntriedge)
     // Create global edge list
     int i, j, k, l, idx, tmp;
     int nel = mesh->elen();
-    int nnd = mesh->nlen();
     int nedge_full = nel*3;
     EDGE *edge_full = new EDGE[nedge_full];
 

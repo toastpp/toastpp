@@ -597,7 +597,7 @@ RCompRowMatrix *Raster_Blob2::CreateBvv_tri () const
 
 RCompRowMatrix *Raster_Blob2::CreateBuv_tri () const
 {
-    int i, j, k, ii, jj, nv, m, el, nd, idx_i, idx_j, prog;
+    int i, j, k, ii, nv, m, el, nd, idx_i, idx_j, prog;
     int nel = meshptr->elen(), n = meshptr->nlen();
     bool intersect;
     double rx, ry, djac, v;
@@ -937,7 +937,7 @@ RCompRowMatrix *Raster_Blob2::CreateDvv_tri () const
 
 RCompRowMatrix *Raster_Blob2::CreateDuv_tri () const
 {
-    int i, j, k, ii, jj, nv, m, el, nd, idx_i, idx_j, prog;
+    int i, j, k, ii, nv, m, el, nd, idx_i, idx_j, prog;
     int nel = meshptr->elen(), n = meshptr->nlen();
     bool intersect;
     double rx, ry, djac, v;
@@ -1472,7 +1472,7 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_linw_tri (const IVector &pxdim) const
     
     int i, j, k, m, ip, jp, ib, jb, ii, jj, bidx, pidx;
     double x, y, x0, x1, y0, y1, xcnt, ycnt, dx, dy, r, phi;
-    double v, dv, dvx, dvy, w0, w1, w2, w3;
+    double v, w0, w1, w2, w3;
     bool overlap;
     int plen = prod(pxdim);
     RVector ssize(dim);

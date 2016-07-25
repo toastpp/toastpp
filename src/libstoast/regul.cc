@@ -426,7 +426,6 @@ RDenseMatrix *GenericSigma::MakeKrefTens (const RVector &gimgref, double sdr,
 {
     int i;
     int slen = raster->SLen();
-    int glen = raster->GLen();
     int dim = raster->Dim();
     RDenseMatrix *kreftens = new RDenseMatrix [2*slen];
 
@@ -1444,7 +1443,7 @@ RVector GenericScaleSpace::GetKappa    (const RVector &x) const
     RVector dx (x - *x0);
     RVector pgrad(dimflag);  // pixel gradient
 
-    double result=0.0, val;
+    double val;
 
     int i;
     for (int p = 0; p < nset; p++) { // loop over parameter sets
@@ -1679,7 +1678,7 @@ RVector GenericScaleSpace::GetHess1f_KappaNotSet(const RVector &x,const RVector 
     PsiD.Identity();
     int  local_nset = f.Dim() / pdim; // may not be whole image
 
-    double result=0.0, valx;
+    double valx;
 
     int i,k;
     for (int p = 0; p < local_nset; p++) { // loop over parameter sets
@@ -2300,7 +2299,6 @@ void Tikhonov1::CreateHessian (const Raster *raster,
     // For Laplacian, kappa=-1 (constant) 
 
     int slen = raster->SLen();
-    int dim  = raster->Dim();
     idxtype *rowptr, *colidx;
 	int nzero;
     int row, col, i, i0, i1, cnt_idx, cntj, j;

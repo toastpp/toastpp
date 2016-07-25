@@ -627,8 +627,6 @@ void CalcFields_engine (task_data *td)
     int q, it, itsum = 0;
     double tol, err_max = 0.0;
 
-    IterativeSolverResult single_res, local_res = {0, 0.0};
-    IterativeSolverResult *sres = (thdata->res ? &single_res : NULL);
     for (q = q0; q < q1; q++) {
         tol = thdata->tol;
 	it = IterativeSolve (*thdata->F, thdata->qvec->Row(q), thdata->phi[q],
@@ -665,11 +663,9 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
 	res->rel_err = 0.0;
     }
 
-    int i, nq = qvec.nRows();
-
     if (solvertp == LSOLVER_DIRECT) {
 	((ZSuperLU*)SuperLU)->CalcFields (qvec, phi, res);
-        //for (i = 0; i < nq; i++) {
+    //for (int i = 0; i < nq; i++) {
 	//    CalcField (qvec.Row(i), phi[i], res);
 	//}
     } else {
@@ -685,13 +681,15 @@ void TFwdSolver<std::complex<double> >::CalcFields (const CCompRowMatrix &qvec,
 	thdata.maxit  = iterative_maxit;
 	thdata.res    = res;
 #ifdef UNDEF
+    int nq = qvec.nRows();
 	g_tpool->ProcessSequence (CalcFields_engine<std::complex<double> >, &thdata,
 				  0, nq, 1);
 #endif
 	Task::Multiprocess (CalcFields_engine<std::complex<double> >, &thdata);
 #else
+        int nq = qvec.nRows();
         CVector *qv = new CVector[nq];
-	for (i = 0; i < nq; i++) qv[i] = qvec.Row(i);
+	for (int i = 0; i < nq; i++) qv[i] = qvec.Row(i);
         IterativeSolve (*F, qv, phi, nq, iterative_tol, iterative_maxit,
             precon, res);
 	delete []qv;

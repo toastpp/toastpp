@@ -34,8 +34,6 @@ static const double sqrt3_05 = 0.5 *sqrt3;
 
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
-static const int nsample_tot = (nsample_lin*(nsample_lin + 1)) / 2;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_bndsample[3][nsample_lin];
 static const RSymMatrix sym_intff = RSymMatrix (3,
    "2 \
@@ -845,7 +843,7 @@ void Triangle3::SplitSide (Mesh *mesh, int side, int newnode,
     Element *nbr1, Element *nbr2, Element *el1, Element *el2)
 {
     dASSERT(subdivdata, "Subdivision data not available");
-    int level = subdivdata->level;
+    // int level = subdivdata->level;
 
     if (0/*level % 2*/) {
 	// we are currently at an odd subdivision level, so call for a
@@ -865,7 +863,7 @@ void Triangle3::Bisect (Mesh *mesh, int side, int newnode,
     int i;
 
     dASSERT(subdivdata, "Subdivision data not available");
-    int level = subdivdata->level;
+    // int level = subdivdata->level;
     //dASSERT((level % 2) == 0, "Subdivision level must be even");
 
     // If the side is not specified (side < 0), pick the longest side

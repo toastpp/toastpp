@@ -255,7 +255,6 @@ void QMMesh::SetupQM (const Point *q, int nq, const Point *m, int nm,
     } else {
         xASSERT(linklist->nRows() == nq && linklist->nCols() == nm,
 		"Linklist invalid dimensions");
-	int nqm = linklist->nVal();
 	idxtype *rp = linklist->rowptr;
 	idxtype *ci = linklist->colidx;
 	for (i = 0; i < nQ; i++) {
@@ -321,7 +320,7 @@ void QMMesh::LoadQM (istream &is)
 {
     char cbuf[256], flagstr[100], normflagstr[100], c;
     int i, j, dim, nitem;
-    double param1, param2, crd[3], nrm[3];
+    double crd[3], nrm[3];
     bool ok;
 
     // read header

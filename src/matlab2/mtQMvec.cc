@@ -34,7 +34,7 @@ CVector CompleteTrigSourceVector (const Mesh &mesh, int order)
     // currently only works with 2D circular mesh centered at origin
     int el, sd, nnode, *node;
     int n = mesh.nlen();
-    double phi0, phi1, rad, a, f0, f1;
+    double phi0, phi1, a, f0, f1;
     Element *pel;
     CVector qvec (n);
 
@@ -82,7 +82,7 @@ struct Qvec_Threaddata {
 
 void Qvec_engine (task_data *td)
 {
-    int i, j, ii;
+    int i;
     int itask = td->proc;
     int ntask = td->np;
     Qvec_Threaddata *thdata = (Qvec_Threaddata*)td->data;
@@ -133,7 +133,7 @@ void MatlabToast::Qvec (int nlhs, mxArray *plhs[], int nrhs,
 
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
-    int i, j, idx, n = mesh->nlen(), nQ = mesh->nQ;
+    int idx, n = mesh->nlen(), nQ = mesh->nQ;
 
     // read source parameters from function parameters
     if (mxIsChar(prhs[1])) mxGetString (prhs[1], typestr, 256);
@@ -171,7 +171,7 @@ void MatlabToast::Qvec (int nlhs, mxArray *plhs[], int nrhs,
     qvec.New (nQ, n);
 
 #ifndef TOAST_THREAD_MATLAB_QMVEC
-    for (i = 0; i < nQ; i++) {
+    for (int i = 0; i < nQ; i++) {
 	CVector q(n);
 	switch (qprof) {
 	case PROF_POINT:
@@ -218,7 +218,7 @@ struct Mvec_Threaddata {
 void Mvec_engine (task_data *td)
 {
     const double c0 = 0.3;
-    int i, j, ii;
+    int i, j;
     int itask = td->proc;
     int ntask = td->np;
     Mvec_Threaddata *thdata = (Mvec_Threaddata*)td->data;
@@ -266,7 +266,6 @@ void Mvec_engine (task_data *td)
 void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    const double c0 = 0.3;
     char cbuf[256];
 
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
@@ -281,7 +280,6 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
     double mwidth = mxGetScalar (prhs[2]);
 
     int n, nM;
-    int i, j, k, idx, ofs, resettp, cmd;
 
     n = mesh->nlen();
     nM = mesh->nM;
@@ -310,7 +308,8 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
     // build the measurement vectors
     mvec.New (nM, n);
 #ifndef TOAST_THREAD_MATLAB_QMVEC
-    for (i = 0; i < nM; i++) {
+    const double c0 = 0.3;
+    for (int i = 0; i < nM; i++) {
 	CVector m(n);
 	switch (mprof) {
 	case PROF_GAUSSIAN:
@@ -326,7 +325,7 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
 	    break;
 	}
 	if (apply_c2a)
-	    for (j = 0; j < n; j++) m[j] *= c0/(2.0*ref[j]*A_Keijzer(ref[j]));
+	    for (int j = 0; j < n; j++) m[j] *= c0/(2.0*ref[j]*A_Keijzer(ref[j]));
 	mvec.SetRow (i, m);
     }
 #else

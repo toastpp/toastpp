@@ -333,7 +333,7 @@ void Mesh::Reorder (const IVector &perm)
 
 bool Mesh::Shrink ()
 {
-    int i, j, shift, nds = nlen(), els = elen();
+    int i, j, nds = nlen(), els = elen();
     bool shrink = false;
     bool *usend = new bool[nds];
     for (i = 0; i < nds; i++) usend[i] = false;
@@ -2308,7 +2308,6 @@ void AddToRHS_thermal_expansion (const Mesh &mesh, RVector &rhs,
 	pel = mesh.elist[el];
 	nnode = pel->nNode();
 	node = pel->Node;
-	double size = pel->Size();
 	RVector fe = pel->ThermalExpansionVector (modulus[el], pratio[el], thermal_expansion[el], deltaT);
 
 	//for (d = 0; d < dim; d++) eps0[d] = thermal_expansion[el]*deltaT;
@@ -2438,7 +2437,6 @@ void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
 RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax, const int *elref)
 {
-    const double EPS = 1e-8;
     int i, j, ix, iy, iz, idx, d, dim = mesh.Dimension();
     int nx = gdim[0], ny = gdim[1], nz = (dim > 2 ? gdim[2]:1);
     int rlen = nx*ny*nz;
@@ -2898,7 +2896,7 @@ int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax)
 {
     const double EPS = 1e-6;
-    int i, n, ix, iy, iz, idx, el, nnode, *node;
+    int i, ix, iy, iz, idx, el, nnode, *node;
     int d, dim = mesh.Dimension();
     Point p(dim);
 
@@ -2980,7 +2978,7 @@ void GenerateVoxelPositions (const Mesh &mesh, const IVector &gdim,
     double dx = ((*bbmax)[0]-(*bbmin)[0])/(nx-1);
     double dy = ((*bbmax)[1]-(*bbmin)[1])/(ny-1);
     double dz = (dim > 2 ? ((*bbmax)[2]-(*bbmin)[2])/(nz-1) : 0);
-    double x, y, z;
+    double y, z;
 
     pos.New (nvox,dim);
     for (idx = k = 0; k < nz; k++) {

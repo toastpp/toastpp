@@ -173,8 +173,6 @@ Mesh *MatlabToast::GetMesh_Safe (const mxArray *arr, const char *func, int argno
 
 Raster *MatlabToast::GetBasis (const mxArray *idx, int *errid, bool allownull)
 {
-    unsigned int basisid;
-
     if (errid) *errid = 0;
 
     if (allownull) {
@@ -255,13 +253,12 @@ void MatlabToast::ThreadCount (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     int nthread_get = 1;
-    int nthread_set = 1;
     int ncore = 1;
 #ifdef TOAST_THREAD
     nthread_get = Task::GetThreadCount();
     ncore = Task::nProcessor();
     if (nrhs > 0) {
-	nthread_set = (int)(mxGetScalar(prhs[0])+0.5);
+	int nthread_set = (int)(mxGetScalar(prhs[0])+0.5);
 	Task::SetThreadCount (nthread_set);
     }
 #endif
@@ -628,8 +625,7 @@ void MatlabToast::Bndmat (int nlhs, mxArray *plhs[], int nrhs,
 
     char intstr[256];
     RVector prm;
-    int n, i;
-    bool elbasis = false;
+    int i;
     int rel = -1;
     int dim = -1;
     double val;
@@ -741,8 +737,6 @@ void MatlabToast::BndReflectionTerm (int nlhs, mxArray *plhs[], int nrhs,
 
 bool ReadRVector (char *name, RVector &data, int idx)
 {
-    char c;
-
     ifstream ifs(name);
 
     if (!idx) { // read last vector
@@ -766,8 +760,6 @@ bool ReadRVector (char *name, RVector &data, int idx)
 
 bool ReadCVector (char *name, CVector &data, int idx)
 {
-    char c;
-
     ifstream ifs(name);
 
     if (!idx) { // read last vector
@@ -887,7 +879,7 @@ static RVector JTJx_clbk (const RVector &x, void *context)
     const RCompRowMatrix *RHess =  data->RHess;
     const RVector &M            = *data->M;
     const double lambda         = *data->lambda;
-    int m = J->nRows(), n = J->nCols();
+    int n = J->nCols();
 
     RVector Px(n);
 

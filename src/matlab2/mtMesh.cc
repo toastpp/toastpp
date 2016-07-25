@@ -394,7 +394,6 @@ void MatlabToast::SurfData (int nlhs, mxArray *plhs[], int nrhs,
     double *pr;
 
     int nlen = mesh->nlen();
-    int elen = mesh->elen();
     int dim  = mesh->Dimension();
     int nbnd = mesh->nlist.NumberOf (BND_ANY);
 
@@ -1083,7 +1082,6 @@ void MatlabToast::IntFG (int nlhs, mxArray *plhs[], int nrhs,
                         const mxArray *prhs[])
 {
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
-    int n = mesh->nlen();
 
     bool isCplx = mxIsComplex (prhs[1]);
     if (isCplx != mxIsComplex (prhs[2]))
@@ -1148,7 +1146,6 @@ void MatlabToast::IntGradFGradG (int nlhs, mxArray *plhs[], int nrhs,
                         const mxArray *prhs[])
 {
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
-    int n = mesh->nlen();
 
     bool isCplx = mxIsComplex (prhs[1]);
     if (isCplx != mxIsComplex (prhs[2]))
