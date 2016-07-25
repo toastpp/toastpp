@@ -1019,6 +1019,7 @@
 				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1034,6 +1035,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = Add_;
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../lib";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
