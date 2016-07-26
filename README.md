@@ -9,7 +9,7 @@ College London.
 
 The TOAST suite is available for download online at
 
-    http://toastplusplus.org
+http://toastplusplus.org
 
 Please check the TOAST web site regularly for updates.
 
