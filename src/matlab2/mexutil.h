@@ -1,7 +1,7 @@
 #ifndef __MEXUTIL_H
 #define __MEXUTIL_H
 
-#ifdef __APPLE__
+#ifdef UNDEF
 #define INDEX64
 #else
 #define MX_COMPAT_32

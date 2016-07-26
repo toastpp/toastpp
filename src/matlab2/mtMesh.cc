@@ -7,6 +7,7 @@
 // ========================================================================
 
 #include "mexutil.h"
+#include "mex.h"
 #include "matlabtoast.h"
 
 
@@ -835,7 +836,7 @@ void MatlabToast::SetQM (int nlhs, mxArray *plhs[], int nrhs,
     // Copy source positions
     mwSize nq = mxGetM(prhs[1]);
     mwSize dimq = mxGetN(prhs[1]);
-    d = std::min(dim,dimq);
+    d = dimq < dim ? dimq : dim;
     if (dim != dimq) {
 	cerr << "Warning: toastSetQM: param 2:" << endl;
 	cerr << "source array size(" << nq << "," << dimq
