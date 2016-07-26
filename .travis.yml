@@ -25,11 +25,7 @@ script:
     export TOASTDIR=$PWD;
     echo $CONFIGOPTS;
     ./configure $CONFIGOPTS;
-    source toastenv.sh;
-    make numerics;
-    make toast;
-    fi;
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    ./configure;
     success=true;
     cd mac;
     cd libsuperlu;
