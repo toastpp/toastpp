@@ -6,8 +6,9 @@
 // the Mesh class.
 // ========================================================================
 
-#include "matlabtoast.h"
 #include "mexutil.h"
+#include "matlabtoast.h"
+
 
 using namespace std;
 
@@ -122,7 +123,7 @@ void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
     if (nrhs >= 4) {
 	RVector prm(nvtx);
 	double *pprm = mxGetPr (prhs[3]);
-	int nprm = mxGetN (prhs[3]);
+	mwSize nprm = mxGetN (prhs[3]);
 	if (nprm >= 1) {
 	    for (i = 0; i < nvtx; i++) prm[i] = *pprm++;
 	    mesh->plist.SetMua (prm);
@@ -832,8 +833,8 @@ void MatlabToast::SetQM (int nlhs, mxArray *plhs[], int nrhs,
     size_t dim = (size_t)mesh->Dimension();
 
     // Copy source positions
-    size_t nq = mxGetM(prhs[1]);
-    size_t dimq = mxGetN(prhs[1]);
+    mwSize nq = mxGetM(prhs[1]);
+    mwSize dimq = mxGetN(prhs[1]);
     d = std::min(dim,dimq);
     if (dim != dimq) {
 	cerr << "Warning: toastSetQM: param 2:" << endl;

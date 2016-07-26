@@ -1,5 +1,5 @@
-#include "matlabtoast.h"
 #include "mexutil.h"
+#include "matlabtoast.h"
 #include "util.h"
 #include "timing.h"
 
@@ -940,8 +940,8 @@ RCompRowMatrix BuildRHessian (Regularisation *reg, const RVector &x,
 void MatlabToast::Krylov (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    int m = mxGetM (prhs[1]);
-    int n = mxGetN (prhs[1]);
+    mwSize m = mxGetM (prhs[1]);
+    mwSize n = mxGetN (prhs[1]);
 
     // copy current solution
     RVector x(n);

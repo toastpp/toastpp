@@ -3,8 +3,8 @@
 // field-related methods
 // ========================================================================
 
-#include "matlabtoast.h"
 #include "mexutil.h"
+#include "matlabtoast.h"
 
 using namespace std;
 

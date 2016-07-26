@@ -3,8 +3,8 @@
 // Basis-related methods
 // ========================================================================
 
-#include "matlabtoast.h"
 #include "mexutil.h"
+#include "matlabtoast.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 
     // solution basis dimensions
     ASSERTARG(nrhs > 1, 1, "Too few parameters provided");
-    int dim = mxGetNumberOfElements (prhs[1]);
+    mwSize dim = mxGetNumberOfElements (prhs[1]);
     ASSERTARG(dim == mesh->Dimension(), 3, "Invalid basis dimensions");
     IVector bdim(dim);
     for (i = 0; i < dim; i++)
@@ -39,7 +39,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
 
     // optional parameters
     if (nrhs > 2 && mxIsCell (prhs[2])) {
-        int narg = mxGetNumberOfElements (prhs[2]);
+        mwSize narg = mxGetNumberOfElements (prhs[2]);
 	for (i = 0; i < narg; i++) {
 	    mxArray *cell = mxGetCell(prhs[2], i);
 	    if (mxIsChar (cell)) { 
@@ -356,7 +356,7 @@ void MatlabToast::BasisValue (int nlhs, mxArray *plhs[], int nrhs,
     RVector pt;
     CopyVector (pt, prhs[1]);
 
-    int m = mxGetM(prhs[2]), n = mxGetN(prhs[2]);
+    mwSize m = mxGetM(prhs[2]), n = mxGetN(prhs[2]);
     if (m*n == 1) { // scalar: assume this is basis index
 	bool is_solidx = true;
 	int idx = (int)mxGetScalar(prhs[2]) - 1;

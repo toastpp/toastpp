@@ -1,20 +1,15 @@
 #ifndef __MEXUTIL_H
 #define __MEXUTIL_H
 
+#ifdef __APPLE__
+#define INDEX64
+#else
+#define MX_COMPAT_32
+#endif
+
 #include "mex.h"
 #include "matrix.h"
 #include "mathlib.h"
-
-#ifndef MX_API_VER
-#define MX_API_VER 0
-#endif
-
-#if MX_API_VER < 0x07030000
-typedef int mwIndex;
-typedef int mwSize;
-#else
-#define INDEX64
-#endif
 
 typedef enum {
     ROWVEC,

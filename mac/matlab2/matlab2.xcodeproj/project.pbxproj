@@ -303,7 +303,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2013b.app;
+				MATLABVER = MATLAB_R2016a.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
@@ -343,7 +343,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2013b.app;
+				MATLABVER = MATLAB_R2016a.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
