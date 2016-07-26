@@ -116,7 +116,7 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 	alpha = dnew / (d & q);
 	
 	// check failure
-	if (!alpha || isnan(alpha)) {
+	if (!alpha || std::isnan(alpha)) {
 	    cerr << "*** PCG fails to converge" << endl;
 	    break;
 	}
@@ -138,7 +138,7 @@ MATHLIB int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 	}
 
 	// check failure
-	if (!beta || isnan(beta)) {
+	if (!beta || std::isnan(beta)) {
 	    cerr << "*** PCG fails to converge" << endl;
 	    break;
 	}
