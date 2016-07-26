@@ -58,7 +58,7 @@ OGLINC = @OGLINC@
 ifeq ($(BUILD_FDOT),1)
      OGLLIB = $(TOASTDIR)/lib/libOSMesa.a $(TOASTDIR)/lib/libGLU.a
      CCFLAGS += -DMESA_SUPPORT
-     CCLIBS = $(CCLIBS) -ldl
+     CCLIBS += -ldl
 endif
 
 # =======================================================================
