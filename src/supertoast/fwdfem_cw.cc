@@ -159,7 +159,6 @@ int main (int argc, char *argv[]) {
 	    m = QVec_Cosine (mesh, mesh.M[i], mwidth, SRCMODE_NEUMANN);
 	    break;
 	}
-	//for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
 	mvec.SetRow (i, m*c2a);
 	LOGOUT1_PROGRESS(i);
     }
@@ -644,7 +643,7 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
 	if (pp.GetString (resetstr[p], cbuf)) {
 	    pp.PutString (resetstr[p], cbuf);
 	    if (!strcasecmp (cbuf, "MESH")) {
-		param[p] = mesh.plist.Param(prmtp[p]);
+		xERROR("This option is no longer supported");
 	    } else if (!strncasecmp (cbuf, "HOMOG", 5)) {
 		sscanf (cbuf+5, "%lf", &prm);
 		param[p] = prm;
@@ -669,24 +668,19 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
 	} else {
 	    cout << "\nSelect initial distribution for " << resetstr[p]
 		 << endl;
-	    cout << "(1) Use values stored in mesh\n";
-	    cout << "(2) Global homogeneous\n";
-	    cout << "(3) Homogeneous in regions\n";
-	    cout << "(4) Nodal image file (NIM)\n";
-	    cout << "[1|2|3|4] >> ";
+	    cout << "(1) Global homogeneous\n";
+	    cout << "(2) Homogeneous in regions\n";
+	    cout << "(3) Nodal image file (NIM)\n";
+	    cout << "[1|2|3] >> ";
 	    cin >> resettp;
 	    switch (resettp) {
 	    case 1:
-		param[p] = mesh.plist.Param(prmtp[p]);
-		strcpy (cbuf, "MESH");
-		break;
-	    case 2:
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
 		param[p] = prm;
 		sprintf (cbuf, "HOMOG %f", prm);
 		break;
-	    case 3:
+	    case 2:
 		nreg = ScanRegions (mesh, nregnode);
 		strcpy (cbuf, "REGION_HOMOG");
 		cout << "\nFound " << nreg << " regions\n";
@@ -702,7 +696,7 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol)
 		    }
 		}
 		break;
-	    case 4:
+	    case 3:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
 		cin >> (cbuf+4);
