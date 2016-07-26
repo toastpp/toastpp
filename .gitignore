@@ -11,6 +11,8 @@
 
 *.xcbkptlist
 
+bin
+
 config.log
 
 config.status
@@ -26,6 +28,8 @@ lib
 linux
 
 bin
+
+*.xcbkptlist
 
 Makefile.incl
 

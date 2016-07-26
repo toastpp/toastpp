@@ -9,33 +9,48 @@ matrix:
         apt:
           packages:
             - gfortran
+      env:
+        - CONFIGOPTS=
+    - os: linux
+      addons:
+        apt:
+          packages:
+            - gfortran
+      env: CONFIGOPTS=--enable-threads --enable-fdot
     - os: osx
       osx_image: xcode7.3
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     export TOASTDIR=$PWD;
+    echo $CONFIGOPTS;
+    ./configure $CONFIGOPTS;
     ./configure;
-    source toastenv.sh;
-    make numerics;
-    make toast;
-    fi;
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    success=true;
     cd mac;
     cd libsuperlu;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../liblbfgs;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libmath;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libfe;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libstoast;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libfdot;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libbemdiff;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libdgfe;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
+    $success;
     fi;
