@@ -16,7 +16,7 @@ matrix:
         apt:
           packages:
             - gfortran
-      env: CONFIGOPTS=--enable-threads --enable-fdot
+      env: CONFIGOPTS="--enable-threads --enable-fdot"
     - os: osx
       osx_image: xcode7.3
 
