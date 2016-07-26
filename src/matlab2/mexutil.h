@@ -1,10 +1,10 @@
 #ifndef __MEXUTIL_H
 #define __MEXUTIL_H
 
-#ifdef UNDEF
-#define INDEX64
-#else
+#if defined(_WIN32)
 #define MX_COMPAT_32
+#else
+#define INDEX64
 #endif
 
 #include "mex.h"
