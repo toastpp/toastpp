@@ -7,9 +7,7 @@ Toast++ is an open-source software suite for image reconstruction in optical
 tomography. It is developed by Martin Schweiger and Simon Arridge at University
 College London.
 
-The TOAST suite is available for download online at
-
-http://toastplusplus.org
+The TOAST suite is available for download online at http://toastplusplus.org.
 
 Please check the TOAST web site regularly for updates.
 
@@ -29,16 +27,15 @@ You will need to download two zip files:
 Installing precompiled Toast++ packages
 ---------------------------------------
 
-If you are using the pre-compiled packages, just unzip both packages into THE
-SAME directory. You should end up with a single "toast" root directory.
+If you are using the pre-compiled packages, just unzip both packages into *the
+same* directory. You should end up with a single "toast" root directory.
 
 Note that some unzip utilities, in particular on Windows, store the zip contents
-under a directory named after the zip file, e.g.
-
-toast_v2.0.0_common.zip  -->  toast_v2.0.0_common/
+under a directory named after the zip file, e.g. `toast_v2.0.0_common.zip`  -> 
+`toast_v2.0.0_common/`
 
 In that case, you will end up with two separate directories, and must merge the
-two "toast" subdirectories from both manually.
+two toast subdirectories from both manually.
 
 Preparing the Toast++ environment
 ---------------------------------
