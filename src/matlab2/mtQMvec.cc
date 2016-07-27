@@ -3,8 +3,8 @@
 // Qvec/Mvec related methods
 // ========================================================================
 
-#include "mexutil.h"
 #include "matlabtoast.h"
+#include "mexutil.h"
 
 #ifdef TOAST_THREAD_MATLAB_QMVEC
 #include "task.h"

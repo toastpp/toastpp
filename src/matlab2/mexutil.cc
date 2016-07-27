@@ -1,8 +1,8 @@
-#include "mexutil.h"
 #include "mex.h"
 //#include "ilupack.h"
 #include "mathlib.h"
 #include "felib.h"
+#include "mexutil.h"
 
 using namespace std;
 

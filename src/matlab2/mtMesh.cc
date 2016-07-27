@@ -6,10 +6,9 @@
 // the Mesh class.
 // ========================================================================
 
-#include "mexutil.h"
-#include "mex.h"
 #include "matlabtoast.h"
-
+#include "mex.h"
+#include "mexutil.h"
 
 using namespace std;
 

@@ -3,8 +3,8 @@
 // Gradient-related methods
 // ========================================================================
 
-#include "mexutil.h"
 #include "matlabtoast.h"
+#include "mexutil.h"
 
 #ifdef TOAST_THREAD_MATLAB_GRADIENT
 #include "task.h"

@@ -7,10 +7,10 @@
 //				'flen' = focal length of pinhole 
 //				'pixelsize' = scale of ortho projection in mm
 
-#include "mexutil.h"
 #include "mex.h"
 #include "util.h"
 #include "toastmex.h"
+#include "mexutil.h"
 #include "fdotlib.h"
 #include "matlabfdot.h"
 //#include "felib.h"

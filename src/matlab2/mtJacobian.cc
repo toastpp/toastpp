@@ -3,8 +3,8 @@
 // Jacobian-related methods
 // ========================================================================
 
-#include "mexutil.h"
 #include "matlabtoast.h"
+#include "mexutil.h"
 #include "fwdsolver.h"
 
 using namespace std;

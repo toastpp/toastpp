@@ -2,7 +2,6 @@
 // This is a single entry point for Matlab toast functions that are
 // implemented in C++.
 
-#include "mexutil.h"
 #include "mex.h"
 #include "toastmex.h"
 

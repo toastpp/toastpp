@@ -1,11 +1,7 @@
 #ifndef __MEXUTIL_H
 #define __MEXUTIL_H
 
-#if defined(_WIN32)
-#define MX_COMPAT_32
-#else
 #define INDEX64
-#endif
 
 #include "mex.h"
 #include "matrix.h"
