@@ -89,7 +89,7 @@ prm.basis.hMesh = toastMesh('circle25_32.msh');
 prm.basis.hMesh.ReadQM('circle25_1x32.qm');
 prm.basis.hBasis = toastBasis(prm.basis.hMesh,[prm.bx prm.by],'Linear');
 prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
-prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2,1.4);
 n = prm.basis.hMesh.NodeCount();
 prm.mua = ones(n,1)*0.025;
 prm.mus = ones(n,1)*2;
@@ -189,7 +189,7 @@ rad = 24.5;
 Q = [rad*cos(phi) rad*sin(phi)];
 prm.basis.hMesh.SetQM(Q,M);
 prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
-prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2,1.4);
 
 axes(handles.axes7);
 n = prm.basis.hMesh.NodeCount();

@@ -508,10 +508,6 @@ protected:
 };
 
 
-// OBSOLETE
-STOASTLIB void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
-    CVector &proj);
-
 // ==========================================================================
 // Some macros
 

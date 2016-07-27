@@ -1448,33 +1448,6 @@ TVector<T> ProjectAll (const QMMesh *mesh, const TCompRowMatrix<T> &mvec,
     return proj;
 }
 
-// ========================================================================
-// OBSOLETE
-
-void Project_cplx (const QMMesh &mesh, int q, const CVector &phi,
-    CVector &proj)
-{
-    int i, m, el, nv, dim, nd, in;
-    std::complex<double> dphi;
-    double c2a;
-
-    for (i = 0; i < mesh.nQMref[q]; i++) {
-	m = mesh.QMref[q][i];
-	el = mesh.Mel[m];
-	nv = mesh.elist[el]->nNode();
-	dim = mesh.elist[el]->Dimension();
-	dphi = 0.0;
-	
-	RVector fun = mesh.elist[el]->GlobalShapeF (mesh.nlist, mesh.M[m]);
-	for (in = 0; in < nv; in++) {
-	    nd = mesh.elist[el]->Node[in];
-	    c2a = mesh.plist[nd].C2A();   // reflection parameter
-	    dphi += phi[nd]*fun[in]*c2a;
-	}
-	proj[i] = dphi;
-    }
-}
-
 // ==========================================================================
 // class and friend instantiations
 
