@@ -11,6 +11,8 @@
 
 *.xcuserstate
 
+*.xcbkptlist
+
 bin
 
 config.log
@@ -44,3 +46,5 @@ toastenv.csh
 toastenv.sh
 
 toastpp
+
+toast_bin_darwin64.zip
