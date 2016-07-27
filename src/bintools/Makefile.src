@@ -8,7 +8,6 @@ BINS =  getnim \
 	lin2quadmesh \
 	makeqm \
 	makeqm3d \
-	mesh2nim \
 	meshinfo \
 	mkmesh_brick \
 	mkmesh_cyl \

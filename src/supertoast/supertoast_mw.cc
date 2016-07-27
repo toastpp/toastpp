@@ -269,7 +269,6 @@ int main (int argc, char *argv[])
 	}
 	CVector cm(n);
 	SetReal (cm,m*c2a);
-	//for (j = 0; j < n; j++) m[j] *= mesh.plist[j].C2A();
 	mvec.SetRow (i, cm);
     }
 
@@ -798,9 +797,6 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
       param[p].New(mesh.nlen());
 	if (pp.GetString (resetstr, cbuf)) {
 	    pp.PutString (resetstr, cbuf);
-	    //    if (!strcasecmp (cbuf, "MESH")) {
-	    //	param[p] = mesh.plist.Param(prmtp[p]);
-	    //} else
 	    if (!strncasecmp (cbuf, "HOMOG", 5)) {
 	        if (sscanf (cbuf+5, "%lf", &prm) != 1)
 		    xERROR("Parse error on initial parameters!");
@@ -827,17 +823,12 @@ void SelectInitialParams (const Mesh &mesh, MWsolution &msol,
 	} else {
 	    cout << "\nSelect initial distribution for " << resetstr
 		 << endl;
-	    // cout << "(1) Use values stored in mesh\n";
 	    cout << "(1) Global homogeneous\n";
 	    cout << "(2) Homogeneous in regions\n";
 	    cout << "(3) Nodal image file (NIM)\n";
 	    cout << "[1|2|3] >> ";
 	    cin >> resettp;
 	    switch (resettp) {
-	      //case 1:
-	      //	param[p] = mesh.plist.Param(prmtp[p]);
-	      //	strcpy (cbuf, "MESH");
-	      //	break;
 	    case 1:
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
@@ -917,7 +908,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 	if (pp.GetString (resetstr, cbuf)) {
 	    pp.PutString (resetstr, cbuf);
 	    if (!strcasecmp (cbuf, "MESH")) {
-		param[p] = mesh.plist.Param(prmtp[p]);
+		xERROR("This option is no longer supported");
 	    } else if (!strncasecmp (cbuf, "HOMOG", 5)) {
 	        if (sscanf (cbuf+5, "%lf", &prm) != 1)
 		    xERROR("Parse error on reference parameters!");
@@ -944,24 +935,19 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 	} else {
 	    cout << "\nSelect initial distribution for " << resetstr
 		 << endl;
-	    cout << "(1) Use values stored in mesh\n";
-	    cout << "(2) Global homogeneous\n";
-	    cout << "(3) Homogeneous in regions\n";
-	    cout << "(4) Nodal image file (NIM)\n";
-	    cout << "[1|2|3|4] >> ";
+	    cout << "(1) Global homogeneous\n";
+	    cout << "(2) Homogeneous in regions\n";
+	    cout << "(3) Nodal image file (NIM)\n";
+	    cout << "[1|2|3] >> ";
 	    cin >> resettp;
 	    switch (resettp) {
 	    case 1:
-		param[p] = mesh.plist.Param(prmtp[p]);
-		strcpy (cbuf, "MESH");
-		break;
-	    case 2:
 		cout << "\nGlobal value:\n>> ";
 		cin >> prm;
 		param[p] = prm;
 		sprintf (cbuf, "HOMOG %f", prm);
 		break;
-	    case 3:
+	    case 2:
 		nreg = ScanRegions (mesh, nregnode);
 		strcpy (cbuf, "REGION_HOMOG");
 		cout << "\nFound " << nreg << " regions\n";
@@ -977,7 +963,7 @@ void SelectInitialReferenceParams (const Mesh &mesh, Solution &msol,
 		    }
 		}
 		break;
-	    case 4:
+	    case 3:
 		cout << "\nNIM file name:\n>> ";
 		strcpy (cbuf, "NIM ");
 		cin >> (cbuf+4);

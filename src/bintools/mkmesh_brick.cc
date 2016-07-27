@@ -121,21 +121,14 @@ int main (void)
     }
     cout << "Generated element list (" << nels << " elements)" << endl;
 
-    // create parameter list
-    mesh.plist.New (nnode);
-    mesh.plist.SetMua (hmua);
-    mesh.plist.SetMus (hmus);
-    mesh.plist.SetN (href);
     for (i = 0; i < mesh.nlist.Len(); i++)
         mesh.nlist[i].SetRegion (hreg);
-    cout << "Generated parameter list" << endl;
 
     for (;;) {
         int nd, cmd;
 	int xmin, xmax, ymin, ymax, zmin, zmax;
-	double mua, mus, refind;
 
-        cout << "Add parameter perturbation (1/0) ? ";
+        cout << "Set region index on node subset (1/0) ? ";
         cin  >> cmd;
 	if (cmd == 0) break;
 	cout << "x-extension of perturbation:" << endl;
@@ -147,8 +140,8 @@ int main (void)
 	cout << "z-extension of perturbation:" << endl;
 	cout << "zmin[0-" << dimz << "] zmax[0-" << dimz << "]: ";
 	cin  >> zmin >> zmax;
-	cout << "mua mus refind region: ";
-	cin  >> mua >> mus >> refind >> reg;
+	cout << "region index: ";
+	cin  >> reg;
 
 	for (k = zmin; k <= zmax; k++) {
 	    if (k < 0 || k > dimz) continue;
@@ -157,9 +150,6 @@ int main (void)
 		for (i = xmin; i <= xmax; i++) {
 		    if (i < 0 || i > dimx) continue;
 		    nd = k * (nnode_slice) + j * (dimy+1) + i;
-		    mesh.plist[nd].SetMua (mua);
-		    mesh.plist[nd].SetMus (mus);
-		    mesh.plist[nd].SetN (refind);
 		    mesh.nlist[nd].SetRegion (reg);
 		}
 	    }

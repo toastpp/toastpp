@@ -93,7 +93,7 @@ M = [radm*cos(prm.phim) radm*sin(prm.phim)];
 prm.basis.hMesh.SetQM(Q,M);
 
 prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
-prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2,1.4);
 prm.basis.hBasis = toastBasis(prm.basis.hMesh,[prm.bx prm.by],'Linear');
 n = prm.basis.hMesh.NodeCount();
 prm.mua = ones(n,1)*0.025;
@@ -176,7 +176,7 @@ Q = [radq*cos(phiq) radq*sin(phiq)];
 M = [radm*cos(phim) radm*sin(phim)];
 prm.basis.hMesh.SetQM(Q,M);
 prm.qvec = prm.basis.hMesh.Qvec('Neumann','Gaussian',2);
-prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2);
+prm.mvec = prm.basis.hMesh.Mvec('Gaussian',2,1.4);
 prm.phiq = phiq;
 prm.phim = phim;
 

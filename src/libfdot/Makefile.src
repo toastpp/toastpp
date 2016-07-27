@@ -7,8 +7,7 @@ VPATH = $(TSRC)/libfdot
 
 all:: $(LIB)
 
-SRCS = FDOTFwd.cc	
-
+SRCS = FDOTFwd.cc MLEMSolver.cc	matrixFreeSolver.cc muaSolver.cc util.cc
 
 OBJS = ${SRCS:.cc=.o} 
 HDRS = ${SRCS:.cc=.h}

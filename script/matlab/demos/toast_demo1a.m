@@ -84,7 +84,7 @@ prm.basis.hMesh = toastMesh('circle25_32.msh');
 prm.basis.hMesh.ReadQM('circle25_1x32.qm');
 prm.basis.hBasis = toastBasis(prm.basis.hMesh,prm.basis.bdim,'Linear');
 prm.qvec = real(prm.basis.hMesh.Qvec('Isotropic','Gaussian',2));
-prm.mvec = real(prm.basis.hMesh.Mvec('Gaussian',2));
+prm.mvec = real(prm.basis.hMesh.Mvec('Gaussian',2,1.4));
 prm.mvec = prm.mvec(:,[4,8,12,16]);   % only run with 4 detectors
 %prm.smask = toastSolutionMask(prm.basis.hBasis);
 n = prm.basis.hMesh.NodeCount();
