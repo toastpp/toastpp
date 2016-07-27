@@ -61,7 +61,6 @@ void Lin2Quad (Mesh &mesh)
 
     // allocate lists for new nodes
     NodeList nnlist (maxnew);
-    ParameterList nplist (maxnew);
 
     // find neighbour nodes for each node in the mesh
     cerr << "Setting up node neighbour list\n";
@@ -130,22 +129,15 @@ void Lin2Quad (Mesh &mesh)
         nn = nd_nnbhr[i];
 	nb = nd_nbhr[i];
 	Node &ni = mesh.nlist[i];
-	Parameter &pi = mesh.plist[i];
 	for (j = 0; j < nn; j++) {
 	    if ((nbj = nb[j]) <= i) continue; // to avoid counting twice
 	    Node &nj = mesh.nlist[nbj];
-	    Parameter &pj = mesh.plist[nbj];
 	    // create a new node between i and its jth neighbour
 	    nnlist[nnlen].New(dim);
 	    for (k = 0; k < dim; k++)
 	        nnlist[nnlen][k] = 0.5*(ni[k]+nj[k]);
 	    if (ni.BndTp() == nj.BndTp()) nnlist[nnlen].SetBndTp (ni.BndTp());
 	    else                          nnlist[nnlen].SetBndTp (BND_NONE);
-
-	    nplist[nnlen].SetMua ((pi.Mua()+pj.Mua())*0.5);
-	    nplist[nnlen].SetKappa ((pi.Kappa()+pj.Kappa())*0.5);
-	    nplist[nnlen].SetN ((pi.N()+pj.N())*0.5);
-	    nplist[nnlen].SetA ((pi.A()+pj.A())*0.5);
 
 	    // now find all elements sharing the new node
 	    for (k = 0; k < nelref[i]; k++) {
@@ -207,10 +199,8 @@ void Lin2Quad (Mesh &mesh)
     cerr << "Finalising mesh\n";
     if (nnlen) {
         mesh.nlist.Append (nnlen);
-	mesh.plist.Append (nnlen);
 	for (i = 0; i < nnlen; i++) {
 	    mesh.nlist[nlen+i].Copy (nnlist[i]);
-	    mesh.plist[nlen+i] = nplist[i];
 	}
     }
 

@@ -275,7 +275,7 @@ classdef toastSolver < handle
             fprintf ('Source vector set up: %d sources\n', size(localprm.qvec,2));
 
             % Generate measurement vectors
-            localprm.mvec = localprm.hMesh.Mvec (prm.meas.det.prof, prm.meas.det.width);
+            localprm.mvec = localprm.hMesh.Mvec (prm.meas.det.prof, prm.meas.det.width, localprm.ref);
             fprintf ('Detector vector setup: %d detectors\n', size(localprm.mvec,2));
             
             % Initial data set f[x0]

@@ -1,4 +1,6 @@
 
+*~
+
 *.dylib
 
 *.mexmaci64
@@ -25,11 +27,15 @@ lib
 
 linux
 
+linux64
+
 *.xcbkptlist
 
 Makefile.incl
 
 numerics/cuda/cusp
+
+script/matlab/demos/*.mat
 
 toast.env
 
