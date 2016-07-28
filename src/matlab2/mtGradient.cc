@@ -104,8 +104,8 @@ void MatlabToast::GradientReal (int nlhs, mxArray *plhs[], int nrhs,
 	} else if (!strcasecmp(label, "Fields")) { // fields for all sources
 	    i++;
 	    int q, nq = mesh->nQ, nlen = mesh->nlen();
-	    int m = mxGetM(prhs[i]);
-	    int n = mxGetN(prhs[i]);
+	    mwSize m = mxGetM(prhs[i]);
+	    mwSize n = mxGetN(prhs[i]);
 	    double *pr = mxGetPr(prhs[i]);
 	    xASSERT(m == nlen && n == nq, "Parameter phi wrong dimension");
 	    phi = new RVector[nq];
@@ -190,8 +190,8 @@ void MatlabToast::GradientCplx (int nlhs, mxArray *plhs[], int nrhs,
 	} else if (!strcasecmp(label, "Fields")) { // fields for all sources
 	    i++;
 	    int q, nq = mesh->nQ, nlen = mesh->nlen();
-	    int m = mxGetM(prhs[i]);
-	    int n = mxGetN(prhs[i]);
+	    mwSize m = mxGetM(prhs[i]);
+	    mwSize n = mxGetN(prhs[i]);
 	    double *pr = mxGetPr(prhs[i]);
 	    double *pi = mxGetPi(prhs[i]);
 	    xASSERT(m == nlen && n == nq, "Parameter phi wrong dimension");

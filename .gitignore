@@ -11,6 +11,8 @@
 
 *.xcuserstate
 
+*.xcbkptlist
+
 autom4te.cache
 
 bin
@@ -31,8 +33,6 @@ linux
 
 linux64
 
-*.xcbkptlist
-
 Makefile.incl
 
 numerics/cuda/cusp
@@ -48,6 +48,8 @@ toastenv.csh
 toastenv.sh
 
 toastpp
+
+toast_bin_darwin64.zip
 
 # Windows-specific patterns
 win/**/x64/
