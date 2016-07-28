@@ -11,7 +11,7 @@ cm = c0/refind; % speed of light in the medium
 bmua = imread('demo_matlab_fwd2_mua.png');
 bmua = double(bmua)./255.*0.02 + 0.01;
 figure;
-subplot(1,2,1); imagesc(bmua); axis equal tight; colorbar;
+subplot(1,2,1); imagesc(bmua,[0.005,0.03]); axis equal tight; colorbar;
 title('absorption target');
 drawnow
 
@@ -130,7 +130,7 @@ while (itr <= itrmax) && (err > tolcg*err0) && (errp-err > tolcg)
     % And display new update
     mua_img = reshape(basis.Map('S->B', x)./cm, grd);
     subplot(1,2,2);
-    imagesc(mua_img); axis equal tight; colorbar
+    imagesc(mua_img,[0.005,0.03]); axis equal tight; colorbar
     title ('absorption recon');
     drawnow
     
