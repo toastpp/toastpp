@@ -11,6 +11,8 @@
 
 *.xcuserstate
 
+autom4te.cache
+
 bin
 
 config.log
@@ -35,6 +37,8 @@ Makefile.incl
 
 numerics/cuda/cusp
 
+pathdef.m
+
 script/matlab/demos/*.mat
 
 toast.env
@@ -44,3 +48,9 @@ toastenv.csh
 toastenv.sh
 
 toastpp
+
+# Windows-specific patterns
+win/**/x64/
+*.ncb
+*.suo
+*.user
