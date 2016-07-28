@@ -73,7 +73,8 @@ doc
 Follow the link to the Toast++ Toolbox documentation under "Supplemental
 Software". This will bring up the main help page of the Toast++ toolbox.
 Here you find links to the Toast demos (under "Live examples") and tutorial
-scripts (under "Script tutorials").
+scripts (under "Script tutorials"). It also contains a brief introduction to
+DOT and links to the Toast++ homepage.
 
 To view a list of the available commands in the Toolbox, type
 
@@ -82,9 +83,6 @@ doc toast2 (lists the core classes and functions)
 doc utilities (lists auxiliary functions)
 doc gui (lists a few sample applications with user interface)
 ```
-
-This contains a brief introduction, a list of available functions, and links
-to the TOAST web page.
 
 For troubleshooting, please refer to the TOAST Frequently Asked Question
 page and the message board, accessible from the TOAST home page. If you
