@@ -154,9 +154,8 @@ distro_common::
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/doc -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast2_install.m ; \
-	zip -9    toast_common.zip $(TOASTRELDIR)/README ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/README.md ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/COPYING ; \
-	zip -9    toast_common.zip $(TOASTRELDIR)/COPYRIGHT ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/INSTALL ; \
 	mv toast_common.zip $(TOASTRELDIR)
 
@@ -182,5 +181,5 @@ distro_bin_darwin::
 	zip -9 -r toast_bin_darwin64.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
 		$(TOASTRELDIR)/$(ARCHDIR)/lib \
 		$(TOASTRELDIR)/$(ARCHDIR)/mex2 -x "*.DS_Store" ; \
-	mv toast_bin_darwin64.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip 
+	mv toast_bin_darwin64.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip
 	@echo "Darwin distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"
