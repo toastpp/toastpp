@@ -175,9 +175,12 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 	}
 	if (projtp == PROJTYPE_MESAGL) {
 #if defined(MESA_SUPPORT)
-	    projPList[m] = new GLProjector(camPList[m], mesh, nBndElems, bndellist, bndsdlist);
+#if defined(__APPLE__)
+        mexErrMsgTxt("Matab toast interface on OS X does not support OpenGL based cameras.");
+#endif
+        projPList[m] = new GLProjector(camPList[m], mesh, nBndElems, bndellist, bndsdlist);
 #else
-	    mexErrMsgTxt("This function requires Mesa-3D, but Toast has been compiled without Mesa support.");
+        mexErrMsgTxt("This function requires Mesa-3D, but Toast has been compiled without Mesa support.");
 #endif
 	} else {
 	    mexErrMsgTxt("Unsupported projector type requested.");
