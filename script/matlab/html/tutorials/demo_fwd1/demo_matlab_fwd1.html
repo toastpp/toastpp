@@ -106,9 +106,9 @@ plot(M(:,1),M(:,2),'bx','MarkerFaceColor','b');
 <p>From the source and detector locations, you create the source and boundary projection vectors using the Qvec and Mvec functions:
 <div class="example">
 qvec = mesh.Qvec('Neumann','Gaussian',2);<br />
-mvec = mesh.Mvec('Gaussian',2);
+mvec = mesh.Mvec('Gaussian',2,ref);
 </div>
-<p>where <i>Neumann</i> defines the source as an incoming flux (you could instead using <i>Isotropic</i> for internal source distributions). <i>Gaussian</i> defines the boundary profiles for the source and detector response functions, and '2' is their width.</p>
+<p>where <i>Neumann</i> defines the source as an incoming flux (you could instead using <i>Isotropic</i> for internal source distributions). <i>Gaussian</i> defines the boundary profiles for the source and detector response functions, and '2' is their width. The call to Mvec additionally requires the refractive index to construct the boundary operators.</p>
 
 <h2>Running the forward solver</h2>
 <p>We now have everything in place to set up and run the forward solver to simulate the measuremenets for our problem. The FEM formulation leads to a linear system of the form</p>
@@ -140,7 +140,7 @@ for i=1:size(Y,2)<br />
 &nbsp;&nbsp;ywrap = [Y(i:end,i); Y(1:i-1,i)];<br />
 &nbsp;&nbsp;plot(angle,log(ywrap),'o-');<br />
 end<br />
-axis([0 360 -13 -2]);<br />
+axis([0 360 -14 -3]);<br />
 xlabel('angular source-detector separation');<br />
 ylabel('log intensity');
 </div>
@@ -159,7 +159,7 @@ toastWriteVector('demo_matlab_fwd1.dat',data);
 <div class="footer"><hr />
 <table>
 <tr><td>
-Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+Page last updated: 28 July 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
 </table>
 </div>
 

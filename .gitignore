@@ -13,6 +13,8 @@
 
 *.xcbkptlist
 
+autom4te.cache
+
 bin
 
 config.log
@@ -31,11 +33,11 @@ linux
 
 linux64
 
-*.xcbkptlist
-
 Makefile.incl
 
 numerics/cuda/cusp
+
+pathdef.m
 
 script/matlab/demos/*.mat
 
@@ -48,3 +50,9 @@ toastenv.sh
 toastpp
 
 toast_bin_darwin64.zip
+
+# Windows-specific patterns
+win/**/x64/
+*.ncb
+*.suo
+*.user
