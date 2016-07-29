@@ -97,11 +97,18 @@ ref = ones(nnd,1) * ref_bkg;
 <p>It can be seen now that there are (small) variations between the measurement profiles of individual source distributions, caused by the parameter inhomogeneities.</p>
 
 <h2>Step 4: Differences to homogeneous results</h2>
-<p>To see the effect more clearly, we can display the differences to the homogeneous results (this assumes that you have already run Demo 1):</p>
+<p>To see the effect more clearly, we can display the differences to the homogeneous results.</p>
+<p>Reset the parameters to homogeneous background and re-run the forward solver:</p>
 <div class="example">
-data_homog = toastReadVector('demo_matlab_fwd1.dat');<br />
-logYhomog = reshape(data_homog,nq,nq)';<br />
-dlogY = log(Y)-logYhomog;<br />
+mua = ones(nnd,1)*0.01;<br />
+mus = ones(nnd,1)*1;<br />
+K = dotSysmat (mesh,mua,mus,ref,0);<br />
+Phi = K\qvec;<br />
+Yhomog = mvec.' * Phi;
+</div>
+<p>Display the difference images:</p>
+<div class="example">
+dlogY = log(Y)-log(Yhomog);
 <br />
 figure<br />
 imagesc(dlogY);<br />
@@ -132,7 +139,7 @@ ylabel('log intensity perturbation');
 <div class="footer"><hr />
 <table>
 <tr><td>
-Page last updated: 13 May 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
+Page last updated: 28 July 2016 by <a href="http://www.medphys.ucl.ac.uk/%7Emartins">Martin Schweiger</a></td></tr>
 </table>
 </div>
 

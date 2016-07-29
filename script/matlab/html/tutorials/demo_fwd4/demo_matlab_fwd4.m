@@ -62,7 +62,7 @@ plot(M(:,1),M(:,2),'bs','MarkerFaceColor','b');
 
 % Create the source and boundary projection vectors
 qvec = mesh.Qvec ('Neumann', 'Gaussian', 2);
-mvec = mesh.Mvec ('Gaussian', 2);
+mvec = mesh.Mvec ('Gaussian', 2, ref);
 
 theta = 0.5; % time coupling (0=explicit, 1/2=Crank-Nicholson, 1=implicit)
 dt = 2;      % time step interval [ps]
