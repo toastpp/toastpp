@@ -166,14 +166,12 @@ distro_bin_win64::
 	mv toast_bin_win64.zip $(TOASTRELDIR)
 
 distro_bin_linux::
-	cd ..; \
-	ln -T -s trunk $(TOASTRELDIR); \
-	zip -9 -r toast_bin_linux.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
-	$(TOASTRELDIR)/$(ARCHDIR)/lib \
-	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
-	$(TOASTRELDIR)/toastenv.csh $(TOASTRELDIR)/toastenv.sh; \
-	mv toast_bin_linux.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip
-	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"
+	zip -9 -r toast_bin_$(ARCHDIR).zip \
+	$(ARCHDIR)/bin \
+	$(ARCHDIR)/lib \
+	$(ARCHDIR)/mex2 \
+	toastenv.csh toastenv.sh
+	@echo "Linux bin tarball created in toast_bin_$(ARCHDIR).zip"
 
 distro_bin_darwin::
 	ln  -s $(PWD) ../$(TOASTRELDIR); \
