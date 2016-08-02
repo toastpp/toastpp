@@ -7,6 +7,7 @@
 // ========================================================================
 
 #include "matlabtoast.h"
+#include "mex.h"
 #include "mexutil.h"
 
 using namespace std;
@@ -110,31 +111,6 @@ void MatlabToast::MakeMesh (int nlhs, mxArray *plhs[], int nrhs,
     if (mesh->Shrink()) {
 	mexWarnMsgTxt ("toastMesh: removed unused nodes");
 	nvtx = mesh->nlen();
-    }
-    
-    // create dummy parameter list
-    mesh->plist.New (nvtx);
-    mesh->plist.SetMua (0.01);
-    mesh->plist.SetMus (1);
-    mesh->plist.SetN (1);
-
-    // copy user-provided list if available
-    if (nrhs >= 4) {
-	RVector prm(nvtx);
-	double *pprm = mxGetPr (prhs[3]);
-	int nprm = mxGetN (prhs[3]);
-	if (nprm >= 1) {
-	    for (i = 0; i < nvtx; i++) prm[i] = *pprm++;
-	    mesh->plist.SetMua (prm);
-	}
-	if (nprm >= 2) {
-	    for (i = 0; i < nvtx; i++) prm[i] = *pprm++;
-	    mesh->plist.SetMus (prm);
-	}
-	if (nprm >= 3) {
-	    for (i = 0; i < nvtx; i++) prm[i] = *pprm++;
-	    mesh->plist.SetN (prm);
-	}
     }
     
     // set up mesh
@@ -832,9 +808,9 @@ void MatlabToast::SetQM (int nlhs, mxArray *plhs[], int nrhs,
     size_t dim = (size_t)mesh->Dimension();
 
     // Copy source positions
-    size_t nq = mxGetM(prhs[1]);
-    size_t dimq = mxGetN(prhs[1]);
-    d = std::min(dim,dimq);
+    mwSize nq = mxGetM(prhs[1]);
+    mwSize dimq = mxGetN(prhs[1]);
+    d = std::min(dim, dimq);
     if (dim != dimq) {
 	cerr << "Warning: toastSetQM: param 2:" << endl;
 	cerr << "source array size(" << nq << "," << dimq

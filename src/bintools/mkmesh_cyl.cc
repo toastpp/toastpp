@@ -261,21 +261,14 @@ int main (void)
     } // end loop over element slices
     cout << "Generated element list (" << el << " elements)" << endl;
 
-    // create parameter list
-    mesh.plist.New (nnode);
-    mesh.plist.SetMua (hmua);
-    mesh.plist.SetMus (hmus);
-    mesh.plist.SetN (href);
     for (i = 0; i < mesh.nlist.Len(); i++)
         mesh.nlist[i].SetRegion (hreg);
-    cout << "Generated parameter list" << endl;
 
     for (;;) {
         int n, cmd, reg;
-	double mua, mus, refind;
 	double dx, dy, dz, dist, rad, xcnt, ycnt, zcnt, x1, y1, z1, x2, y2, z2;
 
-	cout << endl << "Add parameter perturbation" << endl;
+	cout << endl << "Set region index on internal area?" << endl;
 	cout << "(1) Rod" << endl;
 	cout << "(2) Sphere" << endl;
 	cout << "(3) Brick" << endl;
@@ -288,16 +281,13 @@ int main (void)
 	    cin  >> xcnt >> ycnt;
 	    cout << "Radius: ";
 	    cin  >> rad;
-	    cout << "mua mus refind region: ";
-	    cin  >> mua >> mus >> refind >> reg;
+	    cout << "region index: ";
+	    cin  >> reg;
 	    for (n = 0; n < mesh.nlen(); n++) {
 	        dx = mesh.nlist[n][0] - xcnt;
 		dy = mesh.nlist[n][1] - ycnt;
 		dist = hypot (dx, dy);
 		if (dist <= rad) {
-		    mesh.plist[n].SetMua (mua);
-		    mesh.plist[n].SetMus (mus);
-		    mesh.plist[n].SetN (refind);
 		    mesh.nlist[n].SetRegion (reg);
 		}
 	    }
@@ -307,17 +297,14 @@ int main (void)
 	    cin  >> xcnt >> ycnt >> zcnt;
 	    cout << "Radius: ";
 	    cin  >> rad;
-	    cout << "mua mus refind region: ";
-	    cin  >> mua >> mus >> refind >> reg;
+	    cout << "region index: ";
+	    cin  >> reg;
 	    for (n = 0; n < mesh.nlen(); n++) {
 	        dx = mesh.nlist[n][0] - xcnt;
 		dy = mesh.nlist[n][1] - ycnt;
 		dz = mesh.nlist[n][2] - zcnt;
 		dist = sqrt (dx*dx + dy*dy + dz*dz);
 		if (dist <= rad) {
-		    mesh.plist[n].SetMua (mua);
-		    mesh.plist[n].SetMus (mus);
-		    mesh.plist[n].SetN (refind);
 		    mesh.nlist[n].SetRegion (reg);
 		}
 	    }
@@ -327,15 +314,12 @@ int main (void)
 	    cin  >> x1 >> y1 >> z1;
 	    cout << "Brick BB (xmax ymax zmax): ";
 	    cin  >> x2 >> y2 >> z2;
-	    cout << "mua mus refind region: ";
-	    cin  >> mua >> mus >> refind >> reg;
+	    cout << "region index: ";
+	    cin  >> reg;
 	    for (n = 0; n < mesh.nlen(); n++) {
 	        if (x >= x1 && x <= x2 &&
 		    y >= y1 && y <= y2 &&
 		    z >= z1 && z <= z2) {
-		  mesh.plist[n].SetMua (mua);
-		  mesh.plist[n].SetMus (mus);
-		  mesh.plist[n].SetN (refind);
 		  mesh.nlist[n].SetRegion (reg);
 		}
 	    }

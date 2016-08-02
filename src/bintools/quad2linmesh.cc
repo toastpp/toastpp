@@ -108,14 +108,12 @@ void Quad2Lin (Mesh &mesh)
 
     // construct new node and element lists
     Node *nlist2 = new Node[nn2];
-    Parameter *plist2 = new Parameter[nn2];
     Element **elist2 = new Element*[ne];
 
     for (i = j = 0; i < nn; i++) {
         if (nused[i]) {
 	    nlist2[j].New(mesh.nlist[i].Dim());
 	    nlist2[j] = mesh.nlist[i];
-	    plist2[j] = mesh.plist[i];
 	    nmap[i] = j++;
 	} else nmap[i] = -1;
     }
@@ -147,7 +145,6 @@ void Quad2Lin (Mesh &mesh)
     }
     mesh.elist.SetList (ne, elist2);
     mesh.nlist.SetList (nn2, nlist2);
-    mesh.plist.SetList (nn2, plist2);
     delete []nused;
     delete []nmap;
 }

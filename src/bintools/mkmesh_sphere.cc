@@ -235,11 +235,6 @@ int main (void)
     }
     cout << "Finished refinement" << endl;
 
-    mesh.plist.New (mesh.nlen());
-    mesh.plist.SetMua (hmua);
-    mesh.plist.SetMus (hmus);
-    mesh.plist.SetN (href);
-
     mesh.Setup();
     cout << "Mesh initialised" << endl;
 

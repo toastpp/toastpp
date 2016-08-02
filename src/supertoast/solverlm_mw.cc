@@ -284,8 +284,7 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	CVector projdelta = ProjectSingle (&mesh, q, mvec, phi_h_delta);
 
 	if (FWS.GetDataScaling() == DATA_LOG) {
-	    CVector proj (nm);
-	    Project_cplx (mesh, q, dphi_h[q], proj);
+	    CVector proj = ProjectSingle (&mesh, q, mvec, dphi_h[q]);
 	    for (i = 0; i < nm; i++) {
 		double scl = norm (proj[i]);
 		std::complex<double> c = projdelta[i]*conj(proj[i]);
@@ -369,7 +368,7 @@ RVector FrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	if (FWS.GetDataScaling() == DATA_LOG) {
 	    proj[q].New (mesh.nQMref[q]);
-	    Project_cplx (mesh, q, dphi_h[q], proj[q]);
+	    proj[q] = ProjectSingle (&mesh, q, mvec, dphi_h[q]);
 	}
 	pd_alpha = pd * xacg;
 	pds_alpha[q].New (slen);
@@ -470,8 +469,7 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 	RVector ype(n);
 	ype = 1.0;  // will change if data type is normalised
 
-	CVector cproj(n);
-	Project_cplx (mesh, q, dphi_h[q], cproj);
+	CVector cproj = ProjectSingle (&mesh, q, mvec, dphi_h[q]);
 	wqa = std::complex<double>(0,0);
 	wqb = 0.0;
 
@@ -574,7 +572,7 @@ RVector AdjointFrechetDerivative (const QMMesh &mesh, const Raster &raster,
 
 	if (FWS.GetDataScaling() == DATA_LOG) {
 	    proj[q].New (mesh.nQMref[q]);
-	    Project_cplx (mesh, q, dphi_h[q], proj[q]);
+	    proj[q] = ProjectSingle (&mesh, q, mvec, dphi_h[q]);
 	}
 	pds[q].New(slen);
 	raster.Map_GridToSol (pd, pds[q]);
@@ -671,8 +669,7 @@ RVector ImplicitHessianScaling (const QMMesh &mesh, const Raster &raster,
 
 	if (FWS.GetDataScaling() == DATA_LOG) {
 	    proj[q].New (mesh.nQMref[q]);
-	    Project_cplx (mesh, q, dphi_h[q], proj[q]);
-	    
+	    proj[q] = ProjectSingle (&mesh, q, mvec, dphi_h[q]);	    
 	}
     }
 

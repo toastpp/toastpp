@@ -25,7 +25,7 @@ fwd_real_direct ::
 	@echo -----------------------------------------------------------
 	@echo fwd_real_direct: real, direct solver
 	@echo -----------------------------------------------------------
-	@time (echo "../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 2 1 1 2 2 2 2 4 ../meshes/tgt_mua_ellips_tri10.nim 4 ../meshes/tgt_mus_ellips_tri10.nim 2 1.4 0 1" | $(TBIN)/fwdfem_cw > /dev/null)
+	@time (echo "../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 2 1 1 2 2 2 2 3 ../meshes/tgt_mua_ellips_tri10.nim 3 ../meshes/tgt_mus_ellips_tri10.nim 1 1.4 0 1" | $(TBIN)/fwdfem_cw > /dev/null)
 	@unzip -q testdata.zip fmod_real_direct.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_real_direct.fem -r=1e-8
 	@rm fmod.fem fmod_real_direct.fem fwdfem.out 
@@ -69,7 +69,7 @@ fwd_cplx_direct ::
 	@echo -----------------------------------------------------------
 	@echo fwd_cplx_direct: complex, direct solver
 	@echo -----------------------------------------------------------
-	@time(echo "../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 2 1 1 2 2 2 2 100 4 ../meshes/tgt_mua_ellips_tri10.nim 4 ../meshes/tgt_mus_ellips_tri10.nim 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
+	@time(echo "../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 2 1 1 2 2 2 2 100 3 ../meshes/tgt_mua_ellips_tri10.nim 3 ../meshes/tgt_mus_ellips_tri10.nim 1 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_direct.fem
 	@$(TBIN)/cmpvec fmod.fem fmod_cplx_direct.fem -r=1e-8
 	@$(TBIN)/cmpvec farg.fem farg_cplx_direct.fem -r=1e-8
@@ -131,8 +131,8 @@ fwd_cplx_gmres ::
 	@echo -----------------------------------------------------------
 	@time(echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 2 5 1e-15 10000 0 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres.fem -r=1e-7
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_gmres.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo
@@ -143,8 +143,8 @@ fwd_cplx_gmres_diag ::
 	@echo -----------------------------------------------------------
 	@time(echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 2 5 1e-15 10000 1 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres_diag.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_diag.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_diag.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_diag.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_diag.fem -r=1e-7
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_gmres_diag.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo

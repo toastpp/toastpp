@@ -40,7 +40,7 @@ plot(M(:,1),M(:,2),'bs','MarkerFaceColor','b');
 
 % Create the source and boundary projection vectors
 qvec = mesh.Qvec('Neumann', 'Gaussian', 2);
-mvec = mesh.Mvec('Gaussian', 2);
+mvec = mesh.Mvec('Gaussian', 2, ref);
 
 % Solve the FEM linear system
 K = dotSysmat (mesh,mua,mus,ref,0);
@@ -63,7 +63,7 @@ for i=1:size(Y,2)
     ywrap = [Y(i:end,i); Y(1:i-1,i)];
     plot(angle,log(ywrap),'o-');
 end
-axis([0 360 -13 -2]);
+axis([0 360 -14 -3]);
 xlabel('angular source-detector separation');
 ylabel('log intensity');
 
