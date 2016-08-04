@@ -6,7 +6,7 @@
 	>
 	<UserMacro
 		Name="MatlabDir"
-		Value="C:\Program Files\MATLAB\R2012a\"
+		Value="C:\Program Files\MATLAB\R2015b\"
 		PerformEnvironmentSet="true"
 	/>
 </VisualStudioPropertySheet>
