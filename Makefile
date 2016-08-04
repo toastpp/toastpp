@@ -160,10 +160,11 @@ distro_common::
 	mv toast_common.zip $(TOASTRELDIR)
 
 distro_bin_win64::
-	ln -T -s $(PWD) ../$(TOASTRELDIR); \
-	cd ..; \
-	zip -9 -r toast_bin_win64.zip $(TOASTRELDIR)/win/x64/Release/bin $(TOASTRELDIR)/win/x64/Release/mex2 -x@$(TOASTRELDIR)/exclude.lst ; \
-	mv toast_bin_win64.zip $(TOASTRELDIR)
+	zip -9 -r toast_bin_win64.zip \
+	win/x64/Release/bin \
+	win/x64/Release/mex2 -x@exclude.lst
+	@echo "Windows binary distro created in toast_bin_win64.zip"
+
 
 distro_bin_linux::
 	zip -9 -r toast_bin_$(ARCHDIR).zip \
@@ -171,7 +172,7 @@ distro_bin_linux::
 	$(ARCHDIR)/lib \
 	$(ARCHDIR)/mex2 \
 	toastenv.csh toastenv.sh
-	@echo "Linux bin tarball created in toast_bin_$(ARCHDIR).zip"
+	@echo "Linux binary distro created in toast_bin_$(ARCHDIR).zip"
 
 distro_bin_darwin::
 	ln  -s $(PWD) ../$(TOASTRELDIR); \
