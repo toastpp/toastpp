@@ -48,7 +48,7 @@ mus = toastNim([meshdir 'tgt_mus_ellips_tri10.nim']); % target scattering
 ref = ones(n,1)*refind;   % target refractive index (homogeneous)
 
 qvec = hmesh.Qvec ('Neumann', 'Gaussian', 2); % source specification
-mvec = hmesh.Mvec ('Gaussian', 2);            % detector specification
+mvec = hmesh.Mvec ('Gaussian', 2, ref);       % detector specification
 
 smat = dotSysmat (hmesh, mua, mus, ref, freq);% compute FEM system matrix
 phi = full (smat\qvec);                       % solve linear FEM problem for photon density
@@ -109,7 +109,7 @@ hbasis = toastBasis (hmesh, grd, 'LINEAR');         % maps between mesh and reco
 qvec = hmesh.Qvec ('Neumann', 'Gaussian', 2);       % nodal source vectors
 
 % Generate measurement vectors
-mvec = hmesh.Mvec ('Gaussian', 2);                  % nodal measurement vectors
+mvec = hmesh.Mvec ('Gaussian', 2, ref);             % nodal measurement vectors
 
 % Initial data set f[x0]
 smat = dotSysmat (hmesh, mua, mus, ref, freq);      % FEM system matrix
