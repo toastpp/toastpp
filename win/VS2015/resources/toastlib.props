@@ -17,11 +17,9 @@
     </Link>
     <PostBuildEvent>
       <Command>if not exist "$(ToastBinDir)" mkdir "$(ToastBinDir)"
-copy "$(TargetPath)" "$(ToastBinDir)"
-if not exist "$(ToastMexDir)" mkdir "$(ToastMexDir)"
-copy "$(TargetPath)" "$(ToastMexDir)"
+copy "$(ToastLibDir)$(ProjectName).dll" "$(ToastBinDir)"
 if not exist "$(ToastMex2Dir)" mkdir "$(ToastMex2Dir)"
-copy "$(TargetPath)" "$(ToastMex2Dir)"
+copy "$(ToastLibDir)$(ProjectName).dll" "$(ToastMex2Dir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

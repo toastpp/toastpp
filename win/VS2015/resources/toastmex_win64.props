@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="toast.props" />
+    <Import Project="matlab_version.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <MatlabIncludeDir>$(MatlabDir)extern\include\</MatlabIncludeDir>
+    <MatlabLibDir>$(MatlabDir)extern\lib\win64\microsoft\</MatlabLibDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+    <OutDir>$(SolutionDir)..\$(Configuration)\obj\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)..\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MatlabIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>FDOT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libmath.lib;libfe.lib;libstoast.lib;libfdot.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ToastMexDir)$(ProjectName).mexw64</OutputFile>
+      <AdditionalLibraryDirectories>$(MatlabLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(SolutionDir)matlab\resources\mexfunc.def</ModuleDefinitionFile>
+      <ImportLibrary>$(ToastLibDir)$(ProjectName).lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="MatlabIncludeDir">
+      <Value>$(MatlabIncludeDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="MatlabLibDir">
+      <Value>$(MatlabLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
