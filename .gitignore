@@ -56,5 +56,6 @@ win/**/x64/
 *.ncb
 *.suo
 *.user
+*.sdf
 
 numerics/cuda/cusp_v0.2.0/cusp_v0.2.0
