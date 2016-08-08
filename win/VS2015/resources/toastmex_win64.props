@@ -26,7 +26,7 @@
       <ImportLibrary>$(ToastLibDir)$(ProjectName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ToastLibDir)*.dll $(ToastMex2Dir)</Command>
+      <Command />
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
