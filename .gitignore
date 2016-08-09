@@ -1,4 +1,6 @@
 
+*~
+
 *.dylib
 
 *.mexmaci64
@@ -8,3 +10,52 @@
 *.plist
 
 *.xcuserstate
+
+*.xcbkptlist
+
+autom4te.cache
+
+bin
+
+config.log
+
+config.status
+
+darwin64/gcc_shared
+
+gcc_shared/mexopts.incl
+
+gcc_shared/toast.env
+
+lib
+
+linux
+
+linux64
+
+Makefile.incl
+
+numerics/cuda/cusp
+
+pathdef.m
+
+script/matlab/demos/*.mat
+
+toast.env
+
+toastenv.csh
+
+toastenv.sh
+
+toastpp
+
+toast_bin_darwin64.zip
+
+# Windows-specific patterns
+win/**/x64/
+*.ncb
+*.suo
+*.user
+*.sdf
+
+numerics/cuda/cusp_v0.2.0/cusp_v0.2.0

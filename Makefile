@@ -154,27 +154,25 @@ distro_common::
 	zip -9 -r toast_common.zip $(TOASTRELDIR)/doc -x@$(TOASTRELDIR)/exclude.lst -x \*/.svn/\* ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast_install.m ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/mtoast2_install.m ; \
-	zip -9    toast_common.zip $(TOASTRELDIR)/README ; \
+	zip -9    toast_common.zip $(TOASTRELDIR)/README.md ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/COPYING ; \
-	zip -9    toast_common.zip $(TOASTRELDIR)/COPYRIGHT ; \
 	zip -9    toast_common.zip $(TOASTRELDIR)/INSTALL ; \
 	mv toast_common.zip $(TOASTRELDIR)
 
 distro_bin_win64::
-	ln -T -s $(PWD) ../$(TOASTRELDIR); \
-	cd ..; \
-	zip -9 -r toast_bin_win64.zip $(TOASTRELDIR)/win/x64/Release/bin $(TOASTRELDIR)/win/x64/Release/mex2 -x@$(TOASTRELDIR)/exclude.lst ; \
-	mv toast_bin_win64.zip $(TOASTRELDIR)
+	zip -9 -r toast_bin_win64.zip \
+	win/x64/Release/bin \
+	win/x64/Release/mex2 -x@exclude.lst
+	@echo "Windows binary distro created in toast_bin_win64.zip"
+
 
 distro_bin_linux::
-	cd ..; \
-	ln -T -s trunk $(TOASTRELDIR); \
-	zip -9 -r toast_bin_linux.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
-	$(TOASTRELDIR)/$(ARCHDIR)/lib \
-	$(TOASTRELDIR)/$(ARCHDIR)/mex2 \
-	$(TOASTRELDIR)/toastenv.csh $(TOASTRELDIR)/toastenv.sh; \
-	mv toast_bin_linux.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip
-	@echo "Linux distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"
+	zip -9 -r toast_bin_$(ARCHDIR).zip \
+	$(ARCHDIR)/bin \
+	$(ARCHDIR)/lib \
+	$(ARCHDIR)/mex2 \
+	toastenv.csh toastenv.sh
+	@echo "Linux binary distro created in toast_bin_$(ARCHDIR).zip"
 
 distro_bin_darwin::
 	ln  -s $(PWD) ../$(TOASTRELDIR); \
@@ -182,5 +180,5 @@ distro_bin_darwin::
 	zip -9 -r toast_bin_darwin64.zip $(TOASTRELDIR)/$(ARCHDIR)/bin \
 		$(TOASTRELDIR)/$(ARCHDIR)/lib \
 		$(TOASTRELDIR)/$(ARCHDIR)/mex2 -x "*.DS_Store" ; \
-	mv toast_bin_darwin64.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip 
+	mv toast_bin_darwin64.zip $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip
 	@echo "Darwin distro tarball created in $(TOASTRELDIR)/toast_bin_$(ARCHDIR).zip"

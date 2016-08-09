@@ -10,7 +10,8 @@ if test "x$TOASTDIR" = x ; then
     exit
 fi
 
-dnl LDFLAGS=-L/usr/X11R6/lib
+dnl Location of auxiliary configure scripts
+AC_CONFIG_AUX_DIR(config)
 
 dnl Checks for programs.
 AC_PROG_CXX
@@ -886,10 +887,7 @@ rm -f bin
 ln -s ${OBJDIR}/bin bin
 rm -f lib
 ln -s ${OBJDIR}/lib lib
-rm -f ${ARCHDIR}
-ln -s ${OBJDIR} ${ARCHDIR}
-rm -f linux
-ln -s ${ARCHDIR} linux
+ln -s -f ${OBJDIR} ${ARCHDIR}
 
 # ========================================================================
 # Prepare TOAST environment file
@@ -905,7 +903,6 @@ echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
 
 rm -f toast.env
 ln -s ${TOASTENV} toast.env
-
 ln -f -s ${TOASTDIR}/numerics/cuda/cusp_v0.2.0 ${TOASTDIR}/numerics/cuda/cusp
 
 # write out the distribution configuration shell scripts

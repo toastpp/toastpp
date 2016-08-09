@@ -67,7 +67,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
@@ -107,9 +107,9 @@
     <ClCompile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>NDEBUG;_USRDLL;LIBMATH_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader />
       <WarningLevel>Level2</WarningLevel>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -124,11 +124,6 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
-    <PostBuildEvent />
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\libmath\crmatrix.cc" />
@@ -182,6 +177,10 @@
     <ClInclude Include="..\..\..\src\libmath\vector_imp.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\numerics\liblbfgs\lib\lib.vcxproj">
+      <Project>{c4405b73-a899-44bf-8681-04ce040b6705}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\numerics\SuperLU\SuperLU_50.vcxproj">
       <Project>{efeddadf-959f-4069-be3f-311db371943f}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

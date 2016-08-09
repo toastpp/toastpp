@@ -58,7 +58,7 @@ plot(M(:,1),M(:,2),'bs','MarkerFaceColor','b');
 
 % Create the source and boundary projection vectors
 qvec = mesh.Qvec ('Neumann', 'Gaussian', 2);
-mvec = mesh.Mvec ('Gaussian', 2);
+mvec = mesh.Mvec ('Gaussian', 2, ref);
 
 % Solve the FEM linear system
 K = dotSysmat (mesh,mua,mus,ref,0);
@@ -81,7 +81,7 @@ for i=1:size(Y,2)
     ywrap = [Y(i:end,i); Y(1:i-1,i)];
     plot(angle,log(ywrap),'o-');
 end
-axis([0 360 -14 -2]);
+axis([0 360 -15 -3]);
 xlabel('angular source-detector separation');
 ylabel('log intensity');
 
@@ -90,9 +90,12 @@ data = reshape(log(Y'),[],1);
 toastWriteVector('demo_matlab_fwd2.dat', data);
 
 % Show differences to homogeneous results
-data_homog = toastReadVector('demo_matlab_fwd1.dat');
-logYhomog = reshape(data_homog,nq,nq)';
-dlogY = log(Y)-logYhomog;
+mua = ones(nnd,1)*0.01;
+mus = ones(nnd,1)*1;
+K = dotSysmat (mesh,mua,mus,ref,0);
+Phi = K\qvec;
+Yhomog = mvec.' * Phi;
+dlogY = log(Y)-log(Yhomog);
 
 figure
 imagesc(dlogY);

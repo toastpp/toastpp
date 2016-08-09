@@ -486,44 +486,24 @@ int main (void) {
         sscanf (cbuf, "%lf%lf", &mind, &maxd);
     }
 
-    cout << "Mesh parameter encoding:\n";
-    cout << "(0) none\n";
-    cout << "(1) displacements\n";
-    cout << "(2) strain energy density\n";
-    cout << "(3) element volume change\n";
+    cout << "Write out displacements?\n";
+    cout << "(0) no\n";
+    cout << "(1) yes\n";
     cin  >> encoding;
 
-    if (encoding == 1) {
-
-        // Encode z-displacement magnitude in mua parameter
-        ofs7 << "z-displacement" << endl;
+    if (encoding) {
+	ofstream ofs("displacement.dat");
 	for (i = 0; i < n; i++) {
-	    dsp = fabs(x[i*3+2]);
-	    ofs7 << "i = " << i << ", i*3+2 = " << i*3+2 << ", x[i*3+2] = " << x[i*3+2] << ", dsp = " << dsp << endl;
-	    mesh.plist[i].SetMua (dsp);
-	    //mesh.plist[i].SetMua ((dsp-mind)/(maxd-mind));
+	    ofs << x[i*3+0] << '\t' << x[i*3+1] << '\t' << x[i*3+2] << endl;
 	}
+    }
 
-	// Encode x-displacement component in mus parameter
-        ofs7 << "x-displacement" << endl;
-	for (i = 0; i < n; i++) {
-	    dsp = fabs(x[i*3+0]);
-	    ofs7 << "i = " << i << ", i*3+2 = " << i*3+2 << ", x[i*3+2] = " << x[i*3+2] << ", dsp = " << dsp << endl;
-	    mesh.plist[i].SetMus(dsp);
-	    //mesh.plist[i].SetMus ((dsp-mind)/(maxd-mind));
-	}
+    cout << "Write out strain enery densities?\n";
+    cout << "(0) no\n";
+    cout << "(1) yes\n";
+    cin >> encoding;
 
-	// Encode y-displacement component in n parameter
-        ofs7 << "y-displacement" << endl;
-	for (i = 0; i < n; i++) {
-	    dsp = fabs(x[i*3+1]);
-	    ofs7 << "i = " << i << ", i*3+2 = " << i*3+2 << ", x[i*3+2] = " << x[i*3+2] << ", dsp = " << dsp << endl;
-	    mesh.plist[i].SetN (dsp);
-	    //mesh.plist[i].SetN ((dsp-mind)/(maxd-mind));
-	}
-
-    } else if (encoding == 2) {
-
+    if (encoding) {
         RVector nSED(mesh.nlen());
 	IVector count(mesh.nlen());
 	for (el = 0; el < mesh.elen(); el++) {
@@ -535,11 +515,17 @@ int main (void) {
 		count[nd]++;
 	    }
 	}
+	ofstream ofs("SED.dat");
 	for (nd = 0; nd < mesh.nlen(); nd++)
-	    mesh.plist[nd].SetMua (nSED[nd]/count[nd]);
+	    ofs << nSED[nd]/count[nd] << endl;
+    }
 
-    } else if (encoding == 3) {
-	
+    cout << "Write out element volume change?\n";
+    cout << "(0) no\n";
+    cout << "(1) yes\n";
+    cin >> encoding;
+
+    if (encoding) {
 	RVector ds(mesh.nlen());
 	RVector count(mesh.nlen());
 	for (el = 0; el < mesh.elen(); el++) {
@@ -551,9 +537,9 @@ int main (void) {
 		count[nd]++;
 	    }
 	}
+	ofstream ofs("volchange.dat");
 	for (nd = 0; nd < mesh.nlen(); nd++)
-	    mesh.plist[nd].SetMua (ds[nd]/count[nd]);
-
+	    ofs << ds[nd] / count[nd] << endl;
     }
 
     ofs7 << "Total mesh size after displacement: " << mesh.FullSize() << endl;

@@ -52,7 +52,6 @@ void Convert2DMesh (Mesh &mesh)
     nlen = mesh.nlen();
 
     NodeList nnlist (7*elen); // max number of new nodes
-    ParameterList nplist (7*elen);
     int nnlen = 0;
 
     for (el = 0; el < elen; el++) {
@@ -93,15 +92,6 @@ void Convert2DMesh (Mesh &mesh)
 		        nnlist[nnlen].SetBndTp (mesh.nlist[n0].BndTp());
 		    else
 		        nnlist[nnlen].SetBndTp (BND_NONE);
-
-		    nplist[nnlen].SetMua ((2.0-s)/3.0*mesh.plist[n0].Mua() +
-					  (1.0+s)/3.0*mesh.plist[n1].Mua());
-		    nplist[nnlen].SetKappa ((2.0-s)/3.0*mesh.plist[n0].Kappa()+
-					   (1.0+s)/3.0*mesh.plist[n1].Kappa());
-		    nplist[nnlen].SetN ((2.0-s)/3.0*mesh.plist[n0].N() +
-					(1.0+s)/3.0*mesh.plist[n1].N());
-		    nplist[nnlen].SetA ((2.0-s)/3.0*mesh.plist[n0].A() +
-					(1.0+s)/3.0*mesh.plist[n1].A());
 		    nnlen++;
 		} else {
 		  nd[inew] += nlen;
@@ -117,18 +107,6 @@ void Convert2DMesh (Mesh &mesh)
 					  mesh.nlist[pel->Node[1]][j] +
 					  mesh.nlist[pel->Node[2]][j]);
 	}
-	nplist[nnlen].SetMua (1.0/3.0 * (mesh.plist[pel->Node[0]].Mua() +
-					 mesh.plist[pel->Node[1]].Mua() +
-					 mesh.plist[pel->Node[2]].Mua()));
-	nplist[nnlen].SetKappa (1.0/3.0 * (mesh.plist[pel->Node[0]].Kappa() +
-					 mesh.plist[pel->Node[1]].Kappa() +
-					 mesh.plist[pel->Node[2]].Kappa()));
-	nplist[nnlen].SetN (1.0/3.0 * (mesh.plist[pel->Node[0]].N() +
-					 mesh.plist[pel->Node[1]].N() +
-					 mesh.plist[pel->Node[2]].N()));
-	nplist[nnlen].SetA (1.0/3.0 * (mesh.plist[pel->Node[0]].A() +
-					 mesh.plist[pel->Node[1]].A() +
-					 mesh.plist[pel->Node[2]].A()));
 	nd[inew++] = nlen + nnlen;
 	nnlen++;
 	
@@ -147,10 +125,8 @@ void Convert2DMesh (Mesh &mesh)
     }
     if (nnlen) {
         mesh.nlist.Append (nnlen);
-	mesh.plist.Append (nnlen);
 	for (i = 0; i < nnlen; i++) {
 	    mesh.nlist[nlen+i].Copy (nnlist[i]);
-	    mesh.plist[nlen+i] = nplist[i];
 	}
     }
 }
@@ -167,7 +143,6 @@ void Convert3DMesh (Mesh &mesh)
     nlen = mesh.nlen();
 
     NodeList nnlist (6*elen); // max number of new nodes
-    ParameterList nplist (6*elen);
     int nnlen = 0;
 
     for (el = 0; el < elen; el++) {
@@ -191,15 +166,6 @@ void Convert3DMesh (Mesh &mesh)
 		    nnlist[nnlen].SetBndTp (mesh.nlist[n0].BndTp());
 		else
 		    nnlist[nnlen].SetBndTp (BND_NONE);
-
-		nplist[nnlen].SetMua ((mesh.plist[n0].Mua() +
-				       mesh.plist[n1].Mua())*0.5);
-		nplist[nnlen].SetKappa ((mesh.plist[n0].Kappa() +
-					 mesh.plist[n1].Kappa())*0.5);
-		nplist[nnlen].SetN ((mesh.plist[n0].N() +
-				     mesh.plist[n1].N())*0.5);
-		nplist[nnlen].SetA ((mesh.plist[n0].A() +
-				     mesh.plist[n1].A())*0.5);
 		nnlen++;
 	    } else {
 	        nd[edge] += nlen;
@@ -214,10 +180,8 @@ void Convert3DMesh (Mesh &mesh)
     }
     if (nnlen) {
         mesh.nlist.Append (nnlen);
-	mesh.plist.Append (nnlen);
 	for (i = 0; i < nnlen; i++) {
 	    mesh.nlist[nlen+i].Copy (nnlist[i]);
-	    mesh.plist[nlen+i] = nplist[i];
 	}
     }
 #endif

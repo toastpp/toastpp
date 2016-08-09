@@ -920,7 +920,6 @@ void Triangle3::Bisect (Mesh *mesh, int side, int newnode,
     if (newnode < 0) {
 	newnode = mesh->nlist.Len();
 	mesh->nlist.Append(1);
-	mesh->plist.Append(1);
 	mesh->nlist[newnode].New(2);
 	for (i = 0; i < 2; i++)
 	    mesh->nlist[newnode][i] =

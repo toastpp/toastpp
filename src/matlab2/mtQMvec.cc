@@ -301,8 +301,7 @@ void MatlabToast::Mvec (int nlhs, mxArray *plhs[], int nrhs,
 	} else
 	    CopyVector (ref, prhs[3]);
     } else {
-	mexWarnMsgTxt("Mvec: Using nodal refractive index values stored with mesh");
-	ref = mesh->plist.N();
+	mexErrMsgTxt("Mvec: no refractive index values supplied");
     }
     
     // build the measurement vectors

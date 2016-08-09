@@ -158,7 +158,6 @@ void Mesh::Copy (const Mesh &mesh)
 {
     nlist = mesh.nlist;
     elist = mesh.elist;
-    plist = mesh.plist;
     nbhrs = 0;
     fullsize = 0.0;
     lastel_found = 0;
@@ -325,7 +324,6 @@ void Mesh::Reorder (const IVector &perm)
 	ii = iperm[i], ij = iperm[j];
         if (i == j) continue;
 	nlist.Swap (i, j);
-	plist.Swap (i, j);
 	perm[ii] = j, perm[ij] = i;
 	iperm[i] = ij, iperm[j] = ii;
     }
@@ -367,17 +365,6 @@ void Mesh::ScaleMesh (const RVector &scale)
     }
     if (boundary) boundary->Scale (scale);
     if (is_set_up) Setup (); // update settings
-}
-
-double Mesh::ParamAverage (const ParameterType prmtp) const
-{
-    // instead of just summing up nodal values it would be better to
-    // actually integrate
-
-    double sum = 0.0;
-    for (int i = 0; i < plist.Len(); i++)
-	sum += plist[i].Param (prmtp);
-    return sum / (double)plist.Len();
 }
 
 int Mesh::MaxNodeDiff (int mode) const
@@ -1105,7 +1092,7 @@ bool Mesh::PullToBoundary (const Point &p, Point &pshift, int &element,
 		    RDenseMatrix lder  = elist[el]->LocalShapeD (pnew);
 		    RDenseMatrix jacin = inverse (lder * egeom);
 		    RVector dcos  = elist[el]->DirectionCosine (sd, jacin);
-		    double ofs = (sub > 0 ? sub : 1.0/plist[nmin].Mus());
+		    double ofs = sub;
 		    pshift -= dcos*ofs;
 		    element = ElFind (pshift);
 	        } else {
@@ -1174,7 +1161,7 @@ bool Mesh::PullToBoundary_old (const Point &p, Point &pshift, int &element,
     }
     if (sub) {
 	normal /= length (normal);
-	ofs = (sub > 0 ? sub : 1.0/plist[nmin].Mus());
+	ofs = sub;
 	pnew = p - (normal * ofs);
 	element = ElFind (pnew);
     }
@@ -1703,28 +1690,6 @@ void Mesh::PopulateNeighbourLists ()
 
 // ***********************************************
 
-void Mesh::ResetCoeff_region (ParameterType prmtp, double val, int region)
-{
-    for (int i = 0; i < nlist.Len(); i++)
-	if (nlist[i].Region() == region)
-	    plist[i].SetParam (prmtp, val);
-}
-
-void Mesh::ResetCoeff_sqrt (ParameterType prmtp, double cnt, double bnd)
-{
-    double rad, rad0, val;
-    Point pcnt(nlist[0].Dim());
-    Size (&pcnt);
-
-    for (int i = 0; i < nlist.Len(); i++) {
-	Point sec = BndIntersect (pcnt, nlist[i]);
-	rad0 = pcnt.Dist (sec);
-	rad  = pcnt.Dist (nlist[i]);
-	val  = sqrt (cnt*cnt - (cnt*cnt-bnd*bnd)*rad/rad0);
-	plist[i].SetParam (prmtp, val);
-    }
-}
-
 FELIB istream& operator>> (istream& i, Mesh& mesh)
 {
     char cbuf[200];
@@ -1737,16 +1702,7 @@ FELIB istream& operator>> (istream& i, Mesh& mesh)
 	    xERROR("Mesh file not found or invalid");
 	return i;
     }
-    i >> mesh.nlist >> mesh.elist >> mesh.plist;
-    //cout << "Parameter list type " << (mesh.plist.pltype() == PLIST_BY_ELEMENT ? "by element" : "by node (default) " ) <<endl;
-    if( mesh.plist.pltype() == PLIST_BY_ELEMENT) {
-      xASSERT(mesh.elist.Len() == mesh.plist.Len(),
-	    "Element list and parameter list sizes differ.");
-    }
-    else {
-      xASSERT(mesh.nlist.Len() == mesh.plist.Len(),
-	    "Node list and parameter list sizes differ.");
-    }
+    i >> mesh.nlist >> mesh.elist;
     for (int nd = 0; nd < mesh.nlist.Len(); nd++)
 	switch (mesh.nlist[nd].BndTp()) {
 	    case BND_DIRICHLET: bDirichlet=true; break;
@@ -1777,7 +1733,7 @@ FELIB istream& operator>> (istream& i, Mesh& mesh)
 FELIB ostream& operator<< (ostream& o, Mesh& mesh)
 {
     o << "MeshData 5.0\n\n";
-    o << mesh.nlist << endl << mesh.elist << endl << mesh.plist;
+    o << mesh.nlist << endl << mesh.elist;
     if (mesh.Boundary()) {
         Surface *bnd = mesh.Boundary();
         o << endl << (*bnd) << endl;
@@ -1788,9 +1744,8 @@ FELIB ostream& operator<< (ostream& o, Mesh& mesh)
 void Mesh::put (ostream &os, ParameterType p1, ParameterType p2,
 		ParameterType p3)
 {
-    plist.SetOutputParameterTypes (p1, p2, p3);
     os << "MeshData 5.0\n\n";
-    os << nlist << endl << elist << endl << plist;
+    os << nlist << endl << elist;
     if (Boundary()) {
         Surface *bnd = Boundary();
         os << endl << (*bnd) << endl;
@@ -3955,9 +3910,6 @@ void CreateVoxelMesh (int ex, int ey, int ez, bool *egrid,
 	}
     }
 
-    // generate parameter list
-    mesh.plist.New (nnd);
-    
     // label boundary nodes
     //mesh.MarkBoundary ();
 
@@ -4003,7 +3955,6 @@ FELIB Mesh *Lin2Quad (const Mesh &linmesh)
     // allocate lists for new nodes
     Mesh *quadmesh = new Mesh;
     NodeList nnlist (maxnew);
-    ParameterList nplist (maxnew);
 
     // find neighbour nodes for each node in the mesh
     cout << "Setting up node neighbour list\n";
@@ -4074,22 +4025,15 @@ FELIB Mesh *Lin2Quad (const Mesh &linmesh)
         nn = nd_nnbhr[i];
 	nb = nd_nbhr[i];
 	Node &ni = linmesh.nlist[i];
-	Parameter &pi = linmesh.plist[i];
 	for (j = 0; j < nn; j++) {
 	    if ((nbj = nb[j]) <= i) continue; // to avoid counting twice
 	    Node &nj = linmesh.nlist[nbj];
-	    Parameter &pj = linmesh.plist[nbj];
 	    // create a new node between i and its jth neighbour
 	    nnlist[nnlen].New(dim);
 	    for (k = 0; k < dim; k++)
 	        nnlist[nnlen][k] = 0.5*(ni[k]+nj[k]);
 	    if (ni.BndTp() == nj.BndTp()) nnlist[nnlen].SetBndTp (ni.BndTp());
 	    else                          nnlist[nnlen].SetBndTp (BND_NONE);
-
-	    nplist[nnlen].SetMua ((pi.Mua()+pj.Mua())*0.5);
-	    nplist[nnlen].SetKappa ((pi.Kappa()+pj.Kappa())*0.5);
-	    nplist[nnlen].SetN ((pi.N()+pj.N())*0.5);
-	    nplist[nnlen].SetA ((pi.A()+pj.A())*0.5);
 
 	    // now find all elements sharing the new node
 	    for (k = 0; k < nelref[i]; k++) {
@@ -4138,14 +4082,11 @@ FELIB Mesh *Lin2Quad (const Mesh &linmesh)
 
     cout << "Finalising mesh\n";
     quadmesh->nlist.New (nlen+nnlen);
-    quadmesh->plist.New (nlen+nnlen);
     for (i = 0; i < nlen; i++) {
 	quadmesh->nlist[i].Copy(linmesh.nlist[i]);
-	quadmesh->plist[i] = linmesh.plist[i];
     }
     for (i = 0; i < nnlen; i++) {
 	quadmesh->nlist[nlen+i].Copy (nnlist[i]);
-	quadmesh->plist[nlen+i] = nplist[i];
     }
     //quadmesh->MarkBoundary();
     quadmesh->Setup();

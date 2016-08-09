@@ -18,7 +18,13 @@
 // work around language incompatibilities
 #define strcasecmp(str1,str2) _stricmp((str1),(str2))
 #define strncasecmp(str1,str2,n) _strnicmp((str1),(str2),(n))
-#define isnan(arg) _isnan((arg))
+
+#if _MSC_VER <= 1500 // version limit may be higher
+namespace std {
+	inline bool isnan(double arg) { return _isnan(arg); }
+}
+#endif
+//#define std::isnan(arg) _isnan((arg))
 
 // avoid annoying warnings
 #define hypot _hypot
