@@ -3,7 +3,6 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="pthreads.props" />
     <Import Project="superlu.props" />
-    <Import Project="..\numerics\liblbfgs\lib\liblbfgs.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
     <ExtPackageDir>D:\src\packages\</ExtPackageDir>

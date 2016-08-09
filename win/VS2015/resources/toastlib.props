@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets">
-    <Import Project="toast.props" />
+    <Import Project="$(SolutionDir)resources\toast.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -16,8 +16,11 @@
       <ImportLibrary>$(ToastLibDir)$(ProjectName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>if not exist "$(ToastBinDir)" mkdir "$(ToastBinDir)"
+copy "$(ToastLibDir)$(ProjectName).dll" "$(ToastBinDir)"
+if not exist "$(ToastMex2Dir)" mkdir "$(ToastMex2Dir)"
+copy "$(ToastLibDir)$(ProjectName).dll" "$(ToastMex2Dir)"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />

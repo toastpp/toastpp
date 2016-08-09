@@ -9061,10 +9061,7 @@ rm -f bin
 ln -s ${OBJDIR}/bin bin
 rm -f lib
 ln -s ${OBJDIR}/lib lib
-rm -f ${ARCHDIR}
-ln -s ${OBJDIR} ${ARCHDIR}
-rm -f linux
-ln -s ${ARCHDIR} linux
+ln -s -f ${OBJDIR} ${ARCHDIR}
 
 # ========================================================================
 # Prepare TOAST environment file
@@ -9080,7 +9077,6 @@ echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
 
 rm -f toast.env
 ln -s ${TOASTENV} toast.env
-
 ln -f -s ${TOASTDIR}/numerics/cuda/cusp_v0.2.0 ${TOASTDIR}/numerics/cuda/cusp
 
 # write out the distribution configuration shell scripts
