@@ -25,7 +25,6 @@ void Integrate_u_Cosine (double d, double a, double x0, double x1,
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
 static const int nsample_tot = (nsample_lin*(nsample_lin + 1)) / 2;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_sample[nsample_tot];
 
 static const RDenseMatrix full_intff = RDenseMatrix (6,6,

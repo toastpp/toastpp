@@ -34,8 +34,6 @@ static const double sqrt3_05 = 0.5 *sqrt3;
 
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
-static const int nsample_tot = (nsample_lin*(nsample_lin + 1)) / 2;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_bndsample[3][nsample_lin];
 static const RSymMatrix sym_intff = RSymMatrix (3,
    "2 \

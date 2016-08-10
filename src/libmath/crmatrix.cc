@@ -30,10 +30,7 @@ void LU (TCompRowMatrix<std::complex<double> > &A,
     TVector<std::complex<double> > &x)
 {
     int n = b.Dim();
-    char fact   = 'N';
-    char refact = 'N';
     char equed  = 'N';
-    char trans  = 'N';
     int *perm_c = new int[n];
     int *perm_r = new int[n];
     int *etree  = new int[n];

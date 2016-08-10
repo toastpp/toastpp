@@ -8,7 +8,6 @@
 #include "tetsplit.h"
 #include "timing.h"
 
-static double t_rot = 0.0, t_cut = 0.0;
 // ==========================================================================
 // Local prototypes
 
@@ -758,9 +757,8 @@ RCompRowMatrix *Raster_Blob2::CreateBvv_tet4 () const
 
 RCompRowMatrix *Raster_Blob2::CreateBuv_tet4 () const
 {
-    int i, j, k, r, s, m, nd, el, nel = meshptr->elen(), n = meshptr->nlen();
-    int ii, jj, idx_i, idx_j;
-    int imin, imax, jmin, jmax, kmin, kmax;
+    int i, j, k, s, m, nd, el, nel = meshptr->elen(), n = meshptr->nlen();
+    int ii, idx_i, idx_j;
     bool intersect;
     RVector fun;
     int *npx = new int[n];
@@ -772,7 +770,7 @@ RCompRowMatrix *Raster_Blob2::CreateBuv_tet4 () const
     double dx = xrange/(bdim[0]-1.0);
     double dy = yrange/(bdim[1]-1.0);
     double dz = zrange/(bdim[2]-1.0);
-    double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v;
+    double djac, v;
     double rx, ry, rz;
     int stride1 = bdim[0], stride2 = bdim[0]*bdim[1];
     double radlimit2 = sup*sup;

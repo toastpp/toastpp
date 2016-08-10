@@ -9,7 +9,7 @@
 RCompRowMatrix *Raster_CPixel::CreateBuv_tet4 () const
 {
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
-    int ii, jj, idx_i, idx_j;
+    int ii, idx_i, idx_j;
     int imin, imax, jmin, jmax, kmin, kmax;
     RVector fun;
 
@@ -19,7 +19,7 @@ RCompRowMatrix *Raster_CPixel::CreateBuv_tet4 () const
     double dx = xrange/bdim[0];
     double dy = yrange/bdim[1];
     double dz = zrange/bdim[2];
-    double xmin, xmax, ymin, ymax, zmin, zmax, djac, vb, v;
+    double djac, v;
     int stride_i = bdim[0], stride_j = stride_i*bdim[1];
 
     // quadrature rule for local tetrahedron
@@ -111,16 +111,12 @@ RCompRowMatrix *Raster_CPixel::CreateBuv_tet4 () const
     submesh.nlen_used = 0;
     submesh.elen_used = 0;
 
-    double t_split = 0.0, t_integrate = 0.0;
-
     // pass 2: fill the matrix
     for (el = 0; el < nel; el++) {
         std::cerr << "pass 2, " << el << "/" << nel << std::endl;
 	Element *pel = meshptr->elist[el];
 	xASSERT(pel->Type() == ELID_TET4,
 		"Currently only implemented for 4-noded tetrahedra");
-
-	double orig_size = pel->Size();
 
 	// element bounding box
 	double exmin = meshptr->nlist[pel->Node[0]][0];

@@ -1248,7 +1248,6 @@ double Voxel8::IntFdd (int i, int j, int k, int l, int m) const
 	RSymMatrix &m7 = fidd[7];
 
 	double dx2 = dx*dx, dy2 = dy*dy, dz2 = dz*dz;
-	double dxy = dx*dy, dxz = dx*dz, dyz = dy*dz;
 	double dx2y2 = dx2*dy2, dx2z2 = dx2*dz2, dy2z2 = dy2*dz2;
 	double dx2yz = dx2*dy*dz, dxy2z = dx*dy2*dz, dxyz2 = dx*dy*dz2;
 

@@ -48,7 +48,7 @@ FELIB int ReadNim (const char *name, int idx, RVector &img,
 FELIB bool ReadNimAll (char *name, RDenseMatrix &img)
 {
     char cbuf[256];
-    int i, j = 0, imgsize = 0;
+    int i, imgsize = 0;
 
     ifstream ifs (name);
     if (!ifs.getline (cbuf, 256)) return false;
