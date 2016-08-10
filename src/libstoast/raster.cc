@@ -638,13 +638,7 @@ void Raster::NeighbourGraph (idxtype *&rowptr, idxtype *&colidx, int &nzero) con
     int xofs, yofs, zofs;
 
     // neighbour position offsets
-    int dx = 1, dy = bdim[0], dz = bdim[0]*bdim[1];
-    int dx1 = -dx;
-    int dx2 =  dx;
-    int dy1 = -dy;
-    int dy2 =  dy;
-    int dz1 = -dz;
-    int dz2 =  dz;
+    int dy = bdim[0], dz = bdim[0]*bdim[1];
 
     // step 1: build row pointer list
     if (dim == 2) {
@@ -837,12 +831,6 @@ void Raster::NeighbourGraph (ICompRowMatrix &NG) const
 
     // neighbour position offsets
     int dx = 1, dy = gdim[0], dz = gdim[0]*gdim[1];
-    int dx1 = -dx;
-    int dx2 =  dx;
-    int dy1 = -dy;
-    int dy2 =  dy;
-    int dz1 = -dz;
-    int dz2 =  dz;
 
     // step 1: build row pointer list
     if (dim == 2) {

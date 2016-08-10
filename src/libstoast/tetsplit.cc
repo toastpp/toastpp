@@ -133,8 +133,7 @@ int CalcIntersections_tet(Mesh *mesh, int el, int cut_orient, double cut_pos,
 		}
 	}
 	Point &psingle = mesh->nlist[pel->Node[nsingle]];
-	double vsingle = psingle[cut_orient];
-
+        
 	// find the intersection points on the 3 edges connected to psingle
 	for (i = j = 0; i < 4; i++) {
 	    if (i == nsingle) continue;
@@ -193,7 +192,7 @@ int CalcIntersections_tet(Mesh *mesh, int el, int cut_orient, double cut_pos,
 int Tetsplit_1_3 (BufMesh *mesh, int el, int inode, const Point *isect,
     int *mod_el_idx)
 {
-    int i, j;
+    int i;
 
     Element *pel[4];
     pel[0] = mesh->elist[el];

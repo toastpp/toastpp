@@ -26,7 +26,7 @@ void MatlabToast::Regul (int nlhs, mxArray *plhs[], int nrhs,
     Regularisation *reg = 0;    // regularisation instance
     const mxArray *regp = 0;    // parameter structure
     mxArray *field, *subfield;  // struct field pointers
-    int i, prm = 0;
+    int prm = 0;
     char cbuf[256];
 
     // some global default settings

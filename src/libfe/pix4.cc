@@ -171,7 +171,7 @@ double Pixel4::IntFFF(int i, int j, int k) const
 RSymMatrix Pixel4::IntPFF (const RVector &P) const
 {
     static RSymMatrix pff(4);
-    static const double f0 = 1.0/16.0, f1 = 1.0/48.0, f2 = 1.0/144.0;
+    // static const double f0 = 1.0/16.0, f1 = 1.0/48.0, f2 = 1.0/144.0;
     double p0 = P[Node[0]], p1 = P[Node[1]], p2 = P[Node[2]], p3 = P[Node[3]];
     double fac = size/144.0;
 

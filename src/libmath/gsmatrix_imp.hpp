@@ -25,12 +25,10 @@ template<class MT>
 int QRFactorize (TGenericSparseMatrix<MT> &A, TVector<MT> &x,
     TVector<MT> &d)
 {
-    int res = 0;
     int n = A.nRows();
     int m = A.nCols();
     int i, j, k;
     double sum;
-    double scale = 0.0;
     TVector<MT> Ak(n), Aj(n);
     TCompRowMatrix<MT> *A_cr;
     MT b, c;
@@ -75,8 +73,7 @@ void RSolve (const TGenericSparseMatrix<MT> &A, const TVector<MT> &d,
     TVector<MT> &b)
 {
     int i, j;
-    int n = A.nCols(); // note that we work with the transpose of A_factor
-    int m = A.nRows();
+    int m = A.nRows(); // note that we work with the transpose of A_factor
     double sum;
     b[m-1] /= -d[m-1];
     for (i = m-2; i >= 0; i--) {

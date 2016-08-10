@@ -27,7 +27,7 @@ TDenseMatrix<MT>::TDenseMatrix (const TDenseMatrix<MT> &m,
     dASSERT(j1 >= j0, "Argument 5 >= argument 3 required");
     dASSERT(m.nCols() >= j1, "Argument 5 out of range");
 
-    int i, j;
+    int i;
     this->rows = i1-i0;
     this->cols = j1-j0;
     Alloc (this->rows, this->cols);
@@ -938,7 +938,6 @@ template<class MT>
 void RSolve (const TDenseMatrix<MT> &A, const TVector<MT> &d, TVector<MT> &b)
 {
     int i, j;
-    int n = A.nRows();
     int m = A.nCols();
     MT sum;
     b[m-1] /= -d[m-1];

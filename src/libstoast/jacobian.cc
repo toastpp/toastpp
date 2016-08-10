@@ -520,7 +520,6 @@ void GenerateJacobian_cw_grid_engine (task_data *td)
     GENJAC_CW_GRID_THREADDATA *thdata = (GENJAC_CW_GRID_THREADDATA*)td->data;
     int nq  = thdata->mesh->nQ;
     int nm  = thdata->mesh->nM;
-    int nqm = thdata->mesh->nQM;
     int q0  = (itask*nq)/ntask;
     int q1  = ((itask+1)*nq)/ntask;
     int q, m;
@@ -613,7 +612,6 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     RDenseMatrix *Jmua, RDenseMatrix *Jkap)
 {
     int i, dim, glen, slen;
-    const IVector &gdim = raster->GDim();
     const IVector &bdim = raster->BDim();
     const RVector &gsize = raster->GSize();
     dim  = raster->Dim();
@@ -638,7 +636,8 @@ void GenerateJacobian_cw_grid (const Raster *raster, const QMMesh *mesh,
     thdata.Jkap   = Jkap;
     Task::Multiprocess (GenerateJacobian_cw_grid_engine, &thdata);
 #else
-    int j, k, idx, nQ, nM, nQM;
+    const IVector &gdim = raster->GDim();
+    int j, nQ, nM, nQM;
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
@@ -744,7 +743,7 @@ void GenerateJacobian_cw_mesh (const QMMesh *mesh,
 	std::cout << "--> Basis...........Mesh ("
 		  << (elbasis ? "elements":"nodal") << ')' << std::endl;
 
-    int i, j, k, n, nsol, idx, nQ, nM, nQM;
+    int i, j, n, nsol, nQ, nM, nQM;
     n    = mesh->nlen();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
@@ -916,7 +915,7 @@ TVector<T> IntGradFGradG_el (const Mesh &mesh,
     dASSERT(f.Dim() == mesh.nlen(), "Wrong vector size");
     dASSERT(g.Dim() == mesh.nlen(), "Wrong vector size");
 
-    int dim, el, nnode, *node, i, j, ni, nj, nbr;
+    int el, nnode, *node, i, j, ni, nj;
     T sum;
     Element *pel;
     TVector<T> tmp(mesh.elen());

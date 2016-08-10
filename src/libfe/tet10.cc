@@ -18,7 +18,6 @@
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
 static const int nsample_tot = (((nsample_lin+3)*nsample_lin+2)*nsample_lin)/6;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_sample[nsample_tot];
 
 static const RSymMatrix sym_intff = RSymMatrix (10,
@@ -3060,13 +3059,6 @@ RVector Tetrahedron10::BndIntFCos (int side, const RVector &cntcos, double a,
 {
     // Note: this is copied directly from Tetrahedron4.
     // Needs to be checked.
-
-    static int npp = 0;
-    static double *pwght;
-    static Point  *pabsc;
-    static RVector *F;
-    static RDenseMatrix *D;
-
     int j, p;
     double d, f;
     RVector sum(10);
