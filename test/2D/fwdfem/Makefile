@@ -167,8 +167,8 @@ fwd_cplx_gmres_dilu ::
 	@echo -----------------------------------------------------------
 	@time(echo "../meshes/circle25_32.msh ../meshes/circle25_32x32.qm 2 5 1e-15 10000 3 1 2 2 2 2 100 2 0.025 2 2 2 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null)
 	@unzip -q testdata.zip {fmod,farg}_cplx_gmres_dilu.fem
-	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_dilu.fem -r=1e-8
-	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_dilu.fem -r=1e-8
+	@$(TBIN)/cmpvec fmod.fem fmod_cplx_gmres_dilu.fem -r=1e-7
+	@$(TBIN)/cmpvec farg.fem farg_cplx_gmres_dilu.fem -r=1e-7
 	@rm {fmod,farg}.fem {fmod,farg}_cplx_gmres_dilu.fem fwdfem.out
 	@echo "#### Test passed! ####"
 	@echo

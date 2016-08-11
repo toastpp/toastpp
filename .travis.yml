@@ -27,6 +27,7 @@ script:
     ./configure $CONFIGOPTS;
     make numerics;
     make toast;
+    make test;
     fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     success=true;
