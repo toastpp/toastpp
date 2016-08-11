@@ -10,7 +10,7 @@ lbfgs :: inv_lbfgs inv_lbfgs_tk1 inv_lbfgs_tv inv_lbfgs_huber
 
 fmod.fem ::
 	@echo "Generating forward data ..."
-	echo "../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 2 1 1 2 2 2 2 100 3 ../meshes/tgt_mua_ellips_tri10.nim 3 ../meshes/tgt_mus_ellips_tri10.nim 1 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null
+	@echo "../meshes/ellips_tri10.msh ../meshes/circle25_32x32.qm 2 1 1 2 2 2 2 100 3 ../meshes/tgt_mua_ellips_tri10.nim 3 ../meshes/tgt_mus_ellips_tri10.nim 1 1.4 0 1" | $(TBIN)/fwdfem >& /dev/null
 	@rm fwdfem.out
 
 fmod_clean ::
