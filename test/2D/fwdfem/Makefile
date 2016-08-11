@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-TBIN = $(TOASTVER)/bin
+TBIN = $(TOASTDIR)/bin
 
 # run all tests
 all :: real cplx
