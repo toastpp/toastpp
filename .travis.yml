@@ -25,6 +25,7 @@ script:
     export TOASTDIR=$PWD;
     echo $CONFIGOPTS;
     ./configure $CONFIGOPTS;
+    export LD_LIBRARY_PATH=$TOASTDIR/lib;
     make numerics;
     make toast;
     make test;
