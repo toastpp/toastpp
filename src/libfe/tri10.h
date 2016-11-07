@@ -121,10 +121,8 @@ public:
     RSymMatrix BndIntPFF (const RVector &P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only)
     { ERROR_UNDEF; return 0; }
 
 

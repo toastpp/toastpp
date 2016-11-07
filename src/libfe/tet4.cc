@@ -1206,80 +1206,66 @@ RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     return sum;
 }
     
-int Tetrahedron4::Intersection (const Point &p1, const Point &p2, Point **pi)
+int Tetrahedron4::Intersection (const Point &p1, const Point &p2,
+    Point *s, bool add_endpoints, bool boundary_only)
 {
     int i, n = 0;
     double a, rx, ry, rz;
     double sx = p1[0], sy = p1[1], sz = p1[2];
     double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];
-
-    static Point pi_local[2];
-    static bool need_setup = true;
-
-    if (need_setup) {
-	for (i = 0; i < 2; i++)
-	    pi_local[i].New(3);
-    }
-
+    Point p(3);
+    
     // intersection with plane z=0
-    if (dz) {
+    if ((!boundary_only || bndside[0]) && dz) {
 	a = -sz/dz;
 	rx = sx + a*dx;
 	ry = sy + a*dy;
 	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
-	    pi_local[n][0] = rx;
-	    pi_local[n][1] = ry;
-	    pi_local[n][2] = 0.0;
-	    n++;
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = 0.0;
+	    s[n++] = p;
 	}
     }
 
     // intersection with plane y=0
-    if (dy) {
+    if ((!boundary_only || bndside[1]) && dy) {
 	a = -sy/dy;
 	rx = sx + a*dx;
 	rz = sz + a*dz;
 	if (rx >= 0 && rz >= 0 && rx+rz <= 1) {
-	    pi_local[n][0] = rx;
-	    pi_local[n][1] = 0.0;
-	    pi_local[n][2] = rz;
-	    n++;
+	    p[0] = rx;
+	    p[1] = 0.0;
+	    p[2] = rz;
+	    s[n++] = p;
 	}
     }
 
     // intersection with plane x=0
-    if (dx) {
+    if ((!boundary_only || bndside[2]) && dx) {
 	a = -sx/dx;
 	ry = sy + a*dy;
 	rz = sz + a*dz;
 	if (ry >= 0 && rz >= 0 && ry+rz <= 1) {
-	    pi_local[n][0] = 0.0;
-	    pi_local[n][1] = ry;
-	    pi_local[n][2] = rz;
-	    n++;
+	    p[0] = 0.0;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
 	}
     }
 
     // intersection with plane 1-x-y-z=0
-    a = (1-sx-sy-sz)/(dx+dy+dz);
-    rx = sx + a*dx;
-    ry = sy + a*dy;
-    rz = sz + a*dz;
-    if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
-	pi_local[n][0] = rx;
-	pi_local[n][1] = ry;
-	pi_local[n][2] = rz;
-	n++;
+    if (!boundary_only || bndside[3]) {
+	a = (1-sx-sy-sz)/(dx+dy+dz);
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
     }
-
-    if (n) *pi = pi_local;
-    else *pi = NULL;
-
     return n;
-}
-
-int Tetrahedron4::GlobalIntersection (const NodeList &nlist, const Point &p1,
-    const Point &p2, Point **list)
-{
-    return Intersection (Local (nlist, p1), Local (nlist, p2), list);
 }

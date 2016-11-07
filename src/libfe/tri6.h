@@ -143,11 +143,8 @@ public:
     RVector BndIntFDelta (int side, const Surface *surf, const RVector &pos,
         const NodeList &nlist) const;
     int GetLocalSubsampleAbsc (const Point *&absc) const;
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { ERROR_UNDEF; return 0; }
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+        bool add_endpoints, bool boundary_only);
 
 protected:
 

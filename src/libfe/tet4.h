@@ -97,9 +97,9 @@ public:
     RVector GlobalShapeF (const NodeList& nlist, const Point& glob) const;
     RDenseMatrix GlobalShapeD (const NodeList& nlist, const Point& glob) const;
 
-    RSymMatrix IntFF() const;
     double IntF (int i) const;
     double IntFF (int i, int j) const;
+    RSymMatrix IntFF() const;
     double IntFFF (int i, int j, int k) const;
     RSymMatrix IntPFF (const RVector& P) const;
     double IntPFF (int i, int j, const RVector& P) const;
@@ -182,23 +182,28 @@ public:
         double dT);
     RVector DThermalExpansionVector (double E, double nu);
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-	const Point &p2, Point **list);
-
     /**
-     * \brief Calculate intersection of a ray with element surfaces.
-     * \param p1 First point defining the ray
-     * \param p2 Second point defining the ray
-     * \param pi On return, points to list of intersection points
-     * \return Number of points found (should be 0 or 2)
-     * \note The ray is assumed to be of infinite length, not just the
-     *  segment between p1 and p2
-     * \note On return, pi points to a static list. It should not be
-     *  deallocated by the caller, and it will be overwritten by the next
-     *  call to Intersection.
-     * \note If no intersection points are found, pi is set to NULL.
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in local element frame)
+     * \param p2 second ray endpoint (in local element frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \sa GlobalIntersection
      */
-    int Intersection (const Point &p1, const Point &p2, Point** pi);
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
 

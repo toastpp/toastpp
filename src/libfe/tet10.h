@@ -95,11 +95,29 @@ public:
     RVector ThermalExpansionVector (double E, double nu, double alpha, double dT);
     int GetLocalSubsampleAbsc (const Point *&absc) const;
     int GetBndSubsampleAbsc (int side, const Point *&absc) const;
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { ERROR_UNDEF; return 0; }
+
+    /**
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in local element frame)
+     * \param p2 second ray endpoint (in local element frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \sa GlobalIntersection
+     */
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
 

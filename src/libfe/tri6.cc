@@ -1430,3 +1430,86 @@ void Integrate_u_Cosine (double d, double a, double x0, double x1,
 			     (16.0*a*a - Pi*Pi*(x0-x1)*(x0-x1))*sin(arg2));
     }
 }
+
+int Triangle6::Intersection (const Point &p1, const Point &p2,
+    Point *s, bool add_endpoints, bool boundary_only)
+{
+    double xs, ys;
+    double pmin, pmax, smin, smax;
+    const double EPS = 1e-12;
+    int pindx = 0;
+    Point p(2);
+    
+    dASSERT(p1.Dim() == 2 && p2.Dim() == 2, "Points must be 2D.");
+    
+    // a) check whether one of the end points of the line is within the element
+    if (add_endpoints) {
+	if (LContains (p1)) s[pindx++]=p1;
+	if (LContains (p2)) s[pindx++]=p2;
+	if (pindx==2) goto Done;
+    }
+    
+    if (boundary_only && !bndel) goto Done;
+    
+    // b) check whether line intersects side 0 of the triangle
+    if (!boundary_only || bndside[0]) {
+	if (p1[1]*p2[1] < 0.0) {
+	    xs = p1[0] - p1[1]/(p2[1]-p1[1])*(p2[0]-p1[0]);
+	    if (xs > -EPS && xs < 1.0+EPS) {
+		p[0] = xs, p[1] = 0.0;
+		s[pindx++] = p;
+	    }
+	}
+    }
+    
+    // c) check whether line intersects side 1 of the triangle
+    if (!boundary_only || bndside[1]) {
+	if (p1[0]*p2[0] < 0.0) {
+	    ys = p1[1] - p1[0]/(p2[0]-p1[0])*(p2[1]-p1[1]);
+	    if (ys > -EPS && ys < 1.0+EPS) {
+		p[0] = 0.0, p[1] = ys;
+		s[pindx++] = p;
+	    }
+	}
+    }
+    
+    // d) check whether line intersects side 2 of the triangle
+    if (!boundary_only || bndside[2]) {
+	if (fabs(p1[0]-p2[0]) > EPS) {
+	    double a = (p1[1]-p2[1])/(p1[0]-p2[0]);
+	    double c = p1[1] - a*p1[0];
+	    xs = (1.0-c)/(a+1.0);
+	    if (xs > -EPS && xs < 1.0+EPS) {
+		p[0] = xs, p[1] = 1.0-xs;
+		s[pindx++] = p;
+	    }
+	} else {
+	    xs = p1[0];
+	    if (xs > -EPS && xs < 1.0+EPS) {
+		p[0] = xs, p[1] = 1.0-xs;
+		s[pindx++] = p;
+	    }
+	}
+    }
+    Done:
+
+    // check whether intersection points lie between line endpoints
+    if (pindx) {
+	double dp, a;
+	int i, j, d=0;
+	dp = p2[d] - p1[d];
+	if (fabs(dp) < EPS) {
+	    d = 1; dp = p2[d] - p1[d];
+	}	    
+	for (i = 0; i < pindx; i++) {
+	    a = (s[i][d]-p1[d])/dp;
+	    if (a < -EPS || a > 1.0+EPS) { // point outside ray
+		for (j = i+1; j < pindx; j++)
+		    s[j-1] = s[j];
+		pindx--;
+		i--;
+	    }
+	}
+    }
+    return pindx;
+}

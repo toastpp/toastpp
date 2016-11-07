@@ -1356,8 +1356,26 @@ void Mesh::BoundingBox (Point &mmin, Point &mmax, double pad) const
 	}
 }
 
-Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
+Point Mesh::BndIntersect (const Point &pt1, const Point &pt2, int *el)
 {
+    int i, j, n;
+    double dst, dstmin = 1e10;
+    Point s[2], pmin;
+    if (el) *el = -1;
+    for (i = 0; i < elen(); i++) {
+	n = elist[i]->GlobalIntersection (nlist, pt1, pt2, s,
+	    false, true);
+	for (j = 0; j < n; j++) {
+	    dst = pt1.Dist(s[j]);
+	    if (dst < dstmin) {
+		dstmin = dst;
+		pmin = s[j];
+		if (el) *el = i;
+	    }
+	}
+    }
+    return pmin;
+#ifdef UNDEF
     // Calculates the intersection of a straight line, given by points pt1
     // and pt2, with the mesh surface. The boundary must be bracketed by
     // pt1 and pt2 such that pt1 is inside, pt2 outside the mesh
@@ -1386,6 +1404,7 @@ Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
     for (i = 0; i < p1.Dim(); i++) m[i] = p1[i];
     // we use p1 to ensure that the returned point is inside the mesh
     return m;
+#endif
 }
 
 // ***********************************************

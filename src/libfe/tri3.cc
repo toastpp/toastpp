@@ -688,137 +688,86 @@ RVector Triangle3::BndIntFDelta (int side, const Surface *surf,
     return res;
 }
 
-int Triangle3::GlobalIntersection (const NodeList &nlist,
-    const Point &p1, const Point &p2, Point **list)
-{
-    double bbx1 = 1e6, bbx2 = -1e6, bby1 = 1e6, bby2 = -1e6;
-    double m0, m;
-    int i, below, above;
-
-    // generate bounding box
-    RDenseMatrix egeom = Elgeom (nlist);
-    for (i = 0; i < 3; i++) {
-	if (egeom(i,0) < bbx1) bbx1 = egeom(i,0);
-	if (egeom(i,0) > bbx2) bbx2 = egeom(i,0);
-	if (egeom(i,1) < bby1) bby1 = egeom(i,1);
-	if (egeom(i,1) > bby2) bby2 = egeom(i,1);
-    }
-
-    // test whether line is completely outside bounding box
-    if (p1[0] < bbx1 && p2[0] < bbx1 ||
-	p1[0] > bbx2 && p2[0] > bbx2 ||
-	p1[1] < bby1 && p2[1] < bby1 ||
-	p1[1] > bby2 && p2[1] > bby2) return 0;
-
-    // test whether all points lie below or above the line
-    below = 0, above = 0;
-    if (p1[0] != p2[0]) {
-	m0 = (p2[1] - p1[1]) / (p2[0] - p1[0]);
-	for (i = 0; i < 3; i++) {
-	    if (egeom(i,0) != p1[0])
-		m = (egeom(i,1) - p1[1]) / (egeom(i,0) - p1[0]);
-	    else if (egeom(i,1) > p1[1])
-		m = 1e10;
-	    else m = -1e10;
-	    if (m > m0) above++;
-	    else below++;
-	}
-    } else {
-	for (i = 0; i < 3; i++) {
-	    if (egeom(i,0) < p1[0]) above++;
-	    else below++;
-	}
-    }
-    if (!above || !below) return 0;
-
-    // do the rest on local basis
-    Point loc1 = Local (nlist, p1);
-    Point loc2 = Local (nlist, p2);
-    return Intersection (loc1, loc2, list);
-}
-
-int Triangle3::Intersection (const Point &p1, const Point &p2, Point **list)
+int Triangle3::Intersection (const Point &p1, const Point &p2,
+    Point *s, bool add_endpoints, bool boundary_only)
 {
     double xs, ys;
     double pmin, pmax, smin, smax;
-    const double EPS = 1e-20;
+    const double EPS = 1e-12;
     int pindx = 0;
-    Point *s;
-
+    Point p(2);
+    
     dASSERT(p1.Dim() == 2 && p2.Dim() == 2, "Points must be 2D.");
-    s = new Point[2];
-    s[0].New(2), s[1].New(2);
-
+    
     // a) check whether one of the end points of the line is within the element
-    if (LContains (p1)) s[pindx++]=p1;
-    if (LContains (p2)) s[pindx++]=p2;
-    if (pindx==2) goto Done;
-
-    // b) check whether line intersects side 1 of the triangle
-    if (p1[0]-p2[0] == sqrt3*(p1[1]-p2[1])) goto DoneSide1;
-    if (p1[0] == p2[0]) {
-	xs = p1[0];
-    } else {
-	double m = (p1[1]-p2[1])/(p1[0]-p2[0]);
-	xs = (-m*p1[0] + p1[1] + 1.0/sqrt3) / (1.0/sqrt3 - m);
+    if (add_endpoints) {
+	if (LContains (p1)) s[pindx++]=p1;
+	if (LContains (p2)) s[pindx++]=p2;
+	if (pindx==2) goto Done;
     }
-    ys = 1.0/sqrt3 * xs - 1.0/sqrt3;
-    if (xs < -0.5 || xs > 1.0) goto DoneSide1;
-    s[pindx][0] = xs;
-    s[pindx][1] = ys;
-    pindx++;
-    if (pindx == 2) goto Done;
-    DoneSide1:
-
-    // c) check whether line intersects side 2 of the triangle
-    if (p1[0]-p2[0] == -sqrt3 * (p1[1]-p2[1])) goto DoneSide2;
-    if (p1[0] == p2[0]) {
-	xs = p1[0];
-    } else {
-	double m = (p1[1]-p2[1])/(p1[0]-p2[0]);
-	xs = (-m*p1[0] + p1[1] - 1.0/sqrt3) / (-1.0/sqrt3 - m);
-    }
-    ys = -1.0/sqrt3 * xs + 1.0/sqrt3;
-    if (xs < -0.5 || xs > 1.0) goto DoneSide2;
-    s[pindx][0] = xs;
-    s[pindx][1] = ys;
-    pindx++;
-    if (pindx == 2) goto Done;
-    DoneSide2:
-
-    // d) check whether line intersects side 3 of the triangle
-    if (p1[0] == p2[0]) goto Done;
-    ys = (p1[1]-p2[1])/(p1[0]-p2[0]) * (-0.5-p1[0]) + p1[1];
-    if (fabs(ys) > sqrt3_05) goto Done;
-    s[pindx][0] = -0.5;
-    s[pindx][1] = ys;
-    pindx++;
-
-    Done:
-    if (pindx == 1) pindx=0; // if only one intersection found, forget it
-
-    // check whether intersection points lie between line endpoints
-    if (pindx == 2) {
-	if (fabs(p1[0]-p2[0]) > EPS) {
-	    if (p1[0] < p2[0]) pmin=p1[0], pmax=p2[0];
-	    else               pmin=p2[0], pmax=p1[0];
-	    if (s[0][0] < s[1][0]) smin=s[0][0], smax=s[1][0];
-	    else                   smin=s[1][0], smax=s[0][0];
-	    if (smax+EPS < pmin || smin-EPS > pmax) pindx=0;
-	} else {
-	    if (p1[1] < p2[1]) pmin=p1[1], pmax=p2[1];
-	    else               pmin=p2[1], pmax=p1[1];
-	    if (s[0][1] < s[1][1]) smin=s[0][1], smax=s[1][1];
-	    else                   smin=s[1][1], smax=s[0][1];
-	    if (smax+EPS < pmin || smin-EPS > pmax) pindx=0;
+    
+    if (boundary_only && !bndel) goto Done;
+    
+    // b) check whether line intersects side 0 of the triangle
+    if (!boundary_only || bndside[0]) {
+	if (p1[1]*p2[1] < 0.0) {
+	    xs = p1[0] - p1[1]/(p2[1]-p1[1])*(p2[0]-p1[0]);
+	    if (xs > -EPS && xs < 1.0+EPS) {
+		p[0] = xs, p[1] = 0.0;
+		s[pindx++] = p;
+	    }
 	}
     }
-    xASSERT(pindx == 0 || pindx == 2, "Something went wrong...");
-    if (!pindx) {
-	s[0].New(0), s[1].New(0);
-	delete s;
-	*list = NULL;
-    } else *list = s;
+    
+    // c) check whether line intersects side 1 of the triangle
+    if (!boundary_only || bndside[1]) {
+	if (p1[0]*p2[0] < 0.0) {
+	    ys = p1[1] - p1[0]/(p2[0]-p1[0])*(p2[1]-p1[1]);
+	    if (ys > -EPS && ys < 1.0+EPS) {
+		p[0] = 0.0, p[1] = ys;
+		s[pindx++] = p;
+	    }
+	}
+    }
+    
+    // d) check whether line intersects side 2 of the triangle
+    if (!boundary_only || bndside[2]) {
+	if (fabs(p1[0]-p2[0]) > EPS) {
+	    double a = (p1[1]-p2[1])/(p1[0]-p2[0]);
+	    double c = p1[1] - a*p1[0];
+	    xs = (1.0-c)/(a+1.0);
+	    if (xs > -EPS && xs < 1.0+EPS) {
+		p[0] = xs, p[1] = 1.0-xs;
+		s[pindx++] = p;
+	    }
+	} else {
+	    xs = p1[0];
+	    if (xs > -EPS && xs < 1.0+EPS) {
+		p[0] = xs, p[1] = 1.0-xs;
+		s[pindx++] = p;
+	    }
+	}
+    }
+    Done:
+
+    // check whether intersection points lie between line endpoints
+    if (pindx) {
+	double dp, a;
+	int i, j, d=0;
+	dp = p2[d] - p1[d];
+	if (fabs(dp) < EPS) {
+	    d = 1; dp = p2[d] - p1[d];
+	}	    
+	for (i = 0; i < pindx; i++) {
+	    a = (s[i][d]-p1[d])/dp;
+	    if (a < -EPS || a > 1.0+EPS) { // point outside ray
+		for (j = i+1; j < pindx; j++)
+		    s[j-1] = s[j];
+		pindx--;
+		i--;
+	    }
+	}
+    }
     return pindx;
 }
 

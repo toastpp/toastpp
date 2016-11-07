@@ -3092,3 +3092,67 @@ RVector Tetrahedron10::BndIntFCos (int side, const RVector &cntcos, double a,
     sum *= ssize;
     return sum;
 }
+
+int Tetrahedron10::Intersection (const Point &p1, const Point &p2,
+    Point *s, bool add_endpoints, bool boundary_only)
+{
+    int i, n = 0;
+    double a, rx, ry, rz;
+    double sx = p1[0], sy = p1[1], sz = p1[2];
+    double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];
+    Point p(3);
+    
+    // intersection with plane z=0
+    if ((!boundary_only || bndside[0]) && dz) {
+	a = -sz/dz;
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = 0.0;
+	    s[n++] = p;
+	}
+    }
+
+    // intersection with plane y=0
+    if ((!boundary_only || bndside[1]) && dy) {
+	a = -sy/dy;
+	rx = sx + a*dx;
+	rz = sz + a*dz;
+	if (rx >= 0 && rz >= 0 && rx+rz <= 1) {
+	    p[0] = rx;
+	    p[1] = 0.0;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+
+    // intersection with plane x=0
+    if ((!boundary_only || bndside[2]) && dx) {
+	a = -sx/dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (ry >= 0 && rz >= 0 && ry+rz <= 1) {
+	    p[0] = 0.0;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+
+    // intersection with plane 1-x-y-z=0
+    if (!boundary_only || bndside[3]) {
+	a = (1-sx-sy-sz)/(dx+dy+dz);
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+    return n;
+}

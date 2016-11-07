@@ -102,8 +102,11 @@ public:
 
     RSymMatrix IntPDD (const RVector& P) const;
     double IntPDD (int i, int j, const RVector &P) const;
+    RVector BndIntF () const;
+    double BndIntF (int i);
+    double BndIntFSide (int i, int sd);
     double BndIntFF (int i, int j);
-    double BndIntFFSide (int i, int j,int sd);
+    double BndIntFFSide (int i, int j, int sd);
     RSymMatrix BndIntFF () const
     { ERROR_UNDEF; return RSymMatrix(); }
     RSymMatrix BndIntPFF (const RVector &P) const
@@ -131,17 +134,15 @@ public:
     RDenseMatrix ElasticityStiffnessMatrix (double modulus, double pratio)
         const;
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { ERROR_UNDEF; return 0; }
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
     void ComputeIntFF () const;
     void ComputeIntFFF () const;
     void ComputeIntDD () const;
     void ComputeIntFDD () const;
+    void ComputeBndIntF () const;
     void ComputeBndIntFF () const;
     void ComputeBndIntFFF () const;
 
@@ -158,6 +159,7 @@ private:
     static RSymMatrix intfff[8];
     static RSymMatrix intdd;
     static RSymMatrix intfdd[8];
+    static RVector bndintf[6];
     static RSymMatrix bndintff[6];
     static RDenseMatrix bndintfff[6][8];
 

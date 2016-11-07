@@ -440,6 +440,13 @@ RDenseMatrix Element::ElasticStrainDisplacement (const RVector &loc,
     }
 }
 
+int Element::GlobalIntersection (const NodeList &nlist,
+    const Point &p1, const Point &p2, Point *s,
+    bool add_endpoints, bool boundary_only)
+{
+    return Intersection (Local(nlist, p1), Local(nlist, p2), s,
+        add_endpoints, boundary_only);
+}
 
 // ==========================================================================
 // class Element_Unstructured
