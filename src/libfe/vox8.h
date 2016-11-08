@@ -102,9 +102,47 @@ public:
 
     RSymMatrix IntPDD (const RVector& P) const;
     double IntPDD (int i, int j, const RVector &P) const;
+
+    /**
+     * \brief Boundary integral of all shape functions over all boundary sides
+     *   of the element.
+     * \return Vector of size 8 of integrals
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The return vector contains nonzero entries only for nodes that
+     *   are part of the mesh surface.
+     * \note If the element doesn't contain boundary faces, the returned vector
+     *   is all zeros.
+     * \sa BndIntFSide
+     */
     RVector BndIntF () const;
+
+    /**
+     * \brief Boundary integral of a shape function over all boundary
+     *   sides of the element.
+     * \param i node index (range 0 .. 7)
+     * \return Integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The return value is nonzero only if node i is a boundary node.
+     * \sa BndIntFSide, BndIntFF, BndIntFFSide
+     */
     double BndIntF (int i);
-    double BndIntFSide (int i, int sd);
+
+    /**
+     * \brief Surface integral of a shape function over one of the sides of
+     *   the element.
+     * \param i node index (range 0 .. 7)
+     * \param sd side index (range 0 .. 5)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \sa BndIntF, BndIntFF, BndIntFFSide
+     */
+    double BndIntFSide (int i, int sd) const;
+    
     double BndIntFF (int i, int j);
     double BndIntFFSide (int i, int j, int sd);
     RSymMatrix BndIntFF () const

@@ -80,6 +80,18 @@ public:
     RSymMatrix IntPDD (const RVector& P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double IntPDD (int i, int j, const RVector &P) const;
+
+    /**
+     * \brief Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 9)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \sa BndIntF, BndIntFF, BndIntFFSide
+     */
+    double BndIntFSide (int i, int sd) const;
+    
     double BndIntFFSide (int i, int j, int sd)
     { ERROR_UNDEF; return 0; }
     RSymMatrix BndIntPFF (const RVector &P) const

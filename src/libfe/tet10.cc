@@ -1644,6 +1644,14 @@ double Tetrahedron10::IntPDD (int i, int j, const RVector &P) const
     return res;
 }
 
+// boundary integrals of shape functions on local element
+static const RDenseMatrix bndintf = RDenseMatrix (4, 10,
+    "0 0 0 0 1 1 0 1 0 0\
+     0 0 0 0 1 0 1 0 1 0\
+     0 0 0 0 0 1 1 0 0 1\
+     0 0 0 0 0 0 0 1 1 1") * (2.0/6.0);
+
+// boundary integrals of products of 3 shape functions on local element
 static const RDenseMatrix sd0_intf0ff = RDenseMatrix (10, 10,
    "18 -2 -2  0 12 12  0  4  0  0 \
     -2 -2  1  0 -4  0  0  0  0  0 \
@@ -1979,6 +1987,13 @@ static const RDenseMatrix **bndintfff[4] = {
     sd2_intfff,
     sd3_intfff
 };
+
+double Tetrahedron10::BndIntFSide (int i, int sd) const
+{
+    dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 2: out of range");
+    return bndintf(sd,i) * side_size[sd];
+}
 
 double Tetrahedron10::BndIntPFF (int i, int j, const RVector &P) const
 {

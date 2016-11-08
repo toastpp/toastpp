@@ -1011,9 +1011,11 @@ RSymMatrix Voxel8::IntPDD (const RVector &P) const
 RVector Voxel8::BndIntF () const
 {
     RVector intf(8);
-    for (int sd = 0; sd < 6; sd++)
-	for (int i = 0; i < 8; i++)
-	    intf[i] += bndintf[sd][i];
+    for (int sd = 0; sd < 6; sd++) {
+	if (bndside[sd])
+	    for (int i = 0; i < 8; i++)
+		intf[i] += bndintf[sd][i];
+    }
     return intf;
 }
 
@@ -1029,7 +1031,7 @@ double Voxel8::BndIntF (int i)
     return res;
 }
 
-double Voxel8::BndIntFSide (int i, int sd)
+double Voxel8::BndIntFSide (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 8, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 6, "Argument 3: out of range");

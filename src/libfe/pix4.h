@@ -121,6 +121,17 @@ public:
     double IntPfd(const RVector &p,int j,int k,int l) const;
     // Int f(r) u_j du_k/du_l dr
 
+    /**
+     * \brief Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 3)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \sa BndIntF, BndIntFF, BndIntFFSide
+     */
+    double BndIntFSide (int i, int sd) const;
+    
     double BndIntFFSide (int i, int j, int sd);
     double BndIntFF (int i, int j);
     RSymMatrix BndIntFF () const;

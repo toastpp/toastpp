@@ -708,20 +708,30 @@ public:
      *   sides of the element.
      * \return Vector of size \ref nNode, containing the integrals
      *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over all sides of teh element that
+     *   where the integration is performed over all sides of the element that
      *   are part of the mesh surface.
-     * \note The returned matrix contains nonzero entries at index i only if
+     * \note The returned vector contains nonzero entries at index i only if
      *   node i is a boundary node.
      * \note If the element does not contain boundary sides, the returned
      *   vector is zero.
      * \sa BndIntFSide, BndIntFF, BndIntFFSide
      */
-    virtual RVector BndIntF () const
-    { ERROR_UNDEF; return 0; }
+    virtual RVector BndIntF () const;
 
     /**
-     * \brief Surface integral of a shape function over one of the sides of
-     *   the element.
+     * \brief Boundary integral of a shape function over all boundary sides
+     *   of the element.
+     * \param i node index (range 0 .. \ref nNode-1)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned value is nonzero only if node i is a boundary node.
+     */
+    virtual double BndIntF (int i) const;
+    
+    /**
+     * \brief Surface integral of a shape function over an element face.
      * \param i node index (range 0 .. \ref nNode-1)
      * \param sd side index (range 0 .. \ref nSide-1)
      * \return Value of the integral
@@ -729,8 +739,7 @@ public:
      *   where the integration is performed over side \e sd.
      * \sa BndIntF, BndIntFF, BndIntFFSide
      */
-    virtual double BndIntFSide (int i, int sd)
-    { ERROR_UNDEF; return 0; }
+    virtual double BndIntFSide (int i, int sd) const = 0;
 
     /**
      * \brief Boundary integral of all products of two shape functions over

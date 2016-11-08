@@ -88,6 +88,24 @@ RVector Element::IntF () const
     return intf;
 }
 
+RVector Element::BndIntF () const
+{
+    RVector bf(nNode());
+    for (int i = 0; i < nNode(); i++)
+	bf[i] = BndIntF(i);
+    return bf;
+}
+
+double Element::BndIntF (int i) const
+{
+    dASSERT(i >= 0 && i < nNode(), "Argument 1: out of range");
+    double bf = 0.0;
+    for (int sd = 0; sd < nSide(); sd++)
+	if (bndside[sd])
+	    bf += BndIntFSide (i, sd);
+    return bf;
+}
+
 void Element::operator= (const Element& el)
 {
     dASSERT(Type() == el.Type(), "Assignment of incompatible element types.");

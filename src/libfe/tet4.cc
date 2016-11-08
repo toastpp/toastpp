@@ -1034,7 +1034,7 @@ static const RDenseMatrix bndintf = RDenseMatrix (4, 4,
    "1 1 1 0\
     1 1 0 1\
     1 0 1 1\
-    0 1 1 1") * (1.0/6.0);
+    0 1 1 1") * (2.0/6.0);
 
 static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (4,
    "2 \
@@ -1077,19 +1077,32 @@ RVector Tetrahedron4::BndIntF () const
     return bf;
 }
 
-
-double Tetrahedron4::BndIntFSide (int i, int sd)
+double Tetrahedron4::BndIntF (int i) const
 {
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    double bf = 0.0;
+    for (int sd = 0; sd < 4; sd++)
+	if (bndside[sd])
+	    bf += bndintf(sd, i) * side_size[sd];
+    return bf;
+}
+
+double Tetrahedron4::BndIntFSide (int i, int sd) const
+{
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 2: out of range");
     return bndintf(sd,i) * side_size[sd];
 }
 
 
 double Tetrahedron4::BndIntFFSide (int i, int j, int sd)
 {
-  RSymMatrix bff;
-  bff= *sym_bndintff[sd];
-  return bff(i,j) * side_size[sd]; //to check if we need this multiplyer-yes we do
-     
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 4, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 3: out of range");
+    RSymMatrix bff;
+    bff= *sym_bndintff[sd];
+    return bff(i,j) * side_size[sd];
 }
 
 

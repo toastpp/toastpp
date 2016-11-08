@@ -127,9 +127,43 @@ public:
     double IntPfd(const RVector &p,int j,int k,int l) const;
     // Int f(r) u_j du_k/du_l dr
 
+    /**
+     * \brief Boundary integral of all shape functions over all boundary
+     *   sides of the element.
+     * \return Vector of size 4, containing the integrals
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned vector contains nonzero entries at index i only if
+     *   node i is a boundary node.
+     * \note If the element does not contain boundary sides, the returned
+     *   vector is zero.
+     * \sa BndIntFSide, BndIntFF, BndIntFFSide
+     */
     RVector BndIntF () const;
 
-    double BndIntFSide (int i, int sd);
+    /**
+     * \brief Boundary integral of a shape function over all boundary sides
+     *   of the element.
+     * \param i node index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned value is nonzero only if node i is a boundary node.
+     */
+    double BndIntF (int i) const;
+    
+    /**
+     * \brief Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 3)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \sa BndIntF, BndIntFF, BndIntFFSide
+     */
+    double BndIntFSide (int i, int sd) const;
 
     double BndIntFFSide (int i, int j, int sd);
 

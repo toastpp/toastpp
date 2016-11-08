@@ -235,7 +235,16 @@ public:
     RSymMatrix Intdd() const;
     // returns matrix of mixed derivatives
 
-    double BndIntFSide (int i, int sd);
+    /**
+     * \brief Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 2)
+     * \param sd side index (range 0 .. 2)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over side \e sd.
+     * \sa BndIntF, BndIntFF, BndIntFFSide
+     */
+    double BndIntFSide (int i, int sd) const;
 
     double BndIntFFSide (int i, int j, int sd);
     // Int [u_i u_j] dr along side sd

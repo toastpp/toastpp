@@ -164,6 +164,9 @@ public:
     { return intdd.Get(i,j) * ((P[Node[0]]+P[Node[1]])/2.0); }
     // Returns a single element of IntPDD
 
+    double BndIntFSide (int i, int sd) const
+    { ERROR_UNDEF; return 0; }
+    
     double BndIntFFSide (int i, int j, int sd)
     { ERROR_UNDEF; return 0; }
 

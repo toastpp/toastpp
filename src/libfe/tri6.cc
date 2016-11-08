@@ -1109,10 +1109,10 @@ RSymMatrix Triangle6::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
-double Triangle6::BndIntFSide (int i, int sd)
+double Triangle6::BndIntFSide (int i, int sd) const
 {
-    dASSERT(sd >= 0 && sd < 3, "Side index out of range");
-    dASSERT(i >= 0 && i < 6, "Node index out of range");
+    dASSERT(i >= 0 && i < 6, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 2: out of range");
 
     double f = bndintf(sd,i);
     if (!f) return f;
