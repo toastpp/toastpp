@@ -2199,7 +2199,7 @@ RSymMatrix Triangle10::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
-double Triangle10::BndIntFSide (int i, int sd) const
+double Triangle10::SurfIntF (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 3, "Argument 2: out of range");
@@ -2214,8 +2214,12 @@ double Triangle10::BndIntFSide (int i, int sd) const
     }
 }
 
-double Triangle10::BndIntFFSide (int i, int j, int sd)
+double Triangle10::SurfIntFF (int i, int j, int sd) const
 {
+    dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 10, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 3: out of range");
+    
     switch (sd) {
     case 0:
 	return hypot (c2, b2) * sym_bndintff_sd0(i,j);
@@ -2224,7 +2228,7 @@ double Triangle10::BndIntFFSide (int i, int j, int sd)
     case 2:
 	return hypot (c1, b1) * sym_bndintff_sd2(i,j);
     default:
-	xERROR("Invalid side index");
+	xERROR("Argument 3: out of range");
 	return 0.0;
     }
 }

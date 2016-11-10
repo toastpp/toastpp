@@ -1031,7 +1031,7 @@ double Voxel8::BndIntF (int i)
     return res;
 }
 
-double Voxel8::BndIntFSide (int i, int sd) const
+double Voxel8::SurfIntF (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 8, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 6, "Argument 3: out of range");
@@ -1049,7 +1049,7 @@ double Voxel8::BndIntFF (int i, int j)
     return res;
 }
 
-double Voxel8::BndIntFFSide (int i, int j, int sd)
+double Voxel8::SurfIntFF (int i, int j, int sd) const
 {
     dASSERT(i >= 0 && i < 8, "Argument 1: out of range");
     dASSERT(j >= 0 && j < 8, "Argument 2: out of range");

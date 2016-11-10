@@ -1109,7 +1109,7 @@ RSymMatrix Triangle6::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
-double Triangle6::BndIntFSide (int i, int sd) const
+double Triangle6::SurfIntF (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 6, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 3, "Argument 2: out of range");
@@ -1124,8 +1124,12 @@ double Triangle6::BndIntFSide (int i, int sd) const
     return 0.0;
 }
 
-double Triangle6::BndIntFFSide (int i, int j, int sd)
+double Triangle6::SurfIntFF (int i, int j, int sd) const
 {
+    dASSERT(i >= 0 && i < 6, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 6, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 3: out of range");
+    
     switch (sd) {
     case 0:
 	return hypot (c2, b2) * sym_bndintff_sd0(i,j);

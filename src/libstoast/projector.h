@@ -18,7 +18,7 @@ class STOASTLIB Projector
     public:
 	Projector() {}
 	Projector(Camera * cam, QMMesh * mesh);
-	void init(Camera * cam, QMMesh * mesh);
+	virtual void init(Camera * cam, QMMesh * mesh);
 
 	// Masked
 	void projectFieldToImage(const RVector & field, RVector & image, RCompRowMatrix & mask)
@@ -64,13 +64,13 @@ class STOASTLIB Projector
 
 class RayProjector : public Projector
 {
-    public:
-	RayProjector() {}
-	RayProjector(Camera * cam, QMMesh * mesh);
-	void init(Camera * cam, QMMesh * mesh);
-	void constructMatrix();
-    protected:
-	int intersectBoundary(const RVector & ray);
+ public:
+    RayProjector() {}
+    RayProjector(Camera * cam, QMMesh * mesh);
+
+ protected:
+    int intersectBoundary(const RVector & ray);
+    void constructMatrix();
 };
 
 

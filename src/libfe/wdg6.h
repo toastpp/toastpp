@@ -114,13 +114,13 @@ public:
     }
     // Returns a single element of IntPDD
 
-    double BndIntFSide (int i, int sd) const
+    double SurfIntF (int i, int sd) const
     { ERROR_UNDEF; return 0; }
     
-    double BndIntFFSide (int i, int j, int sd)
+    double SurfIntFF (int i, int j, int sd) const
     { ERROR_UNDEF; return 0; }
 
-	RSymMatrix BndIntPFF (const RVector &P) const
+    RSymMatrix BndIntPFF (const RVector &P) const
     {
         ERROR_UNDEF;
 	return RSymMatrix(); // dummy

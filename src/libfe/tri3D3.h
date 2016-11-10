@@ -186,7 +186,7 @@ public:
   //    RSymMatrix Intdd() const;
     // returns matrix of mixed derivatives
 
-  //    double BndIntFFSide (int i, int j, int sd);
+  //    double SurfIntFF (int i, int j, int sd);
     // Int [u_i u_j] dr along side sd
 
   //   RVector BndIntFX (int side, double (*func)(const Point&),

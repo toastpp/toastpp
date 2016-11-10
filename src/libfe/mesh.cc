@@ -72,6 +72,7 @@ Mesh::~Mesh ()
     if (IndexNode2Bnd) delete []IndexNode2Bnd;
     if (boundary) delete boundary;
     if (bnd_param) delete []bnd_param;
+    if (intersect_prm) delete intersect_prm;
 }
 
 #ifdef TOAST_PARALLEL
@@ -150,6 +151,8 @@ void Mesh::Setup (bool mark_boundary)
 	}
     }
 
+    intersect_prm = 0;
+    
     //SetupElementMatrices ();
     is_set_up = true;
 }
@@ -1356,21 +1359,93 @@ void Mesh::BoundingBox (Point &mmin, Point &mmax, double pad) const
 	}
 }
 
+Mesh::BndIntersectParam *Mesh::ComputeBndIntersectParam ()
+{
+    BndIntersectParam *prm = new BndIntersectParam;
+    BoundingBox (prm->bbmin, prm->bbmax);
+    return prm;
+}
+
 Point Mesh::BndIntersect (const Point &pt1, const Point &pt2, int *el)
 {
+    if (!intersect_prm) intersect_prm = ComputeBndIntersectParam();
+    int dim = Dimension();
+    Point pmin;
+    if (el) *el = -1;
+    const double EPS = 1e-12;
+
+    // check for intersection with bounding box
+    bool bb_intersect = false;
+    double xmin, xmax, ymin, ymax, zmin, zmax, a, rx, ry, rz;
+    xmin = intersect_prm->bbmin[0];
+    xmax = intersect_prm->bbmax[0];
+    ymin = intersect_prm->bbmin[1];
+    ymax = intersect_prm->bbmax[1];
+    zmin = (dim > 2 ? intersect_prm->bbmin[2] : 0.0);
+    zmax = (dim > 2 ? intersect_prm->bbmax[2] : 0.0);
+    Point d = pt2-pt1;
+    if (dim > 2) {
+	if (d[2]) {
+	    a = (zmin-pt1[2])/d[2];
+	    rx = pt1[0] + a*d[0];
+	    ry = pt1[1] + a*d[1];
+	    if (rx>xmin-EPS && rx<xmax+EPS && ry>ymin-EPS && ry<ymax+EPS)
+		bb_intersect = true;
+	    else {
+		a = (zmax-pt1[2])/d[2];
+		rx = pt1[0] + a*d[0];
+		ry = pt1[1] + a*d[1];
+		if (rx>xmin-EPS && rx<xmax+EPS && ry>ymin-EPS && ry<ymax+EPS)
+		    bb_intersect = true;
+	    }
+	}
+	if (!bb_intersect && d[1]) {
+	    a = (ymin-pt1[1])/d[1];
+	    rx = pt1[0] + a*d[0];
+	    rz = pt1[2] + a*d[2];
+	    if (rx>xmin-EPS && rx<xmax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		bb_intersect = true;
+	    else {
+		a = (ymax-pt1[1])/d[1];
+		rx = pt1[0] + a*d[0];
+		rz = pt1[2] + a*d[2];
+		if (rx>xmin-EPS && rx<xmax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		    bb_intersect = true;
+	    }
+	}
+	if (!bb_intersect && d[0]) {
+	    a = (xmin-pt1[0])/d[0];
+	    ry = pt1[1] + a*d[1];
+	    rz = pt1[2] + a*d[2];
+	    if (ry>ymin-EPS && ry<ymax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		bb_intersect = true;
+	    else {
+		a = (xmax-pt1[0])/d[0];
+		ry = pt1[1] + a*d[1];
+		rz = pt1[2] + a*d[2];
+		if (ry>ymin-EPS && ry<ymax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		    bb_intersect = true;
+	    }
+	}
+	if (!bb_intersect)
+	    return pmin;
+    }
+    
     int i, j, n;
     double dst, dstmin = 1e10;
-    Point s[2], pmin;
-    if (el) *el = -1;
+    Point s[2];
     for (i = 0; i < elen(); i++) {
-	n = elist[i]->GlobalIntersection (nlist, pt1, pt2, s,
-	    false, true);
-	for (j = 0; j < n; j++) {
-	    dst = pt1.Dist(s[j]);
-	    if (dst < dstmin) {
-		dstmin = dst;
-		pmin = s[j];
-		if (el) *el = i;
+	if (elist[i]->HasBoundarySide()) {
+	    n = elist[i]->GlobalIntersection (nlist, pt1, pt2, s,
+	        false, true);
+	    for (j = 0; j < n; j++) {
+		s[j] = elist[i]->Global(nlist, s[j]);
+		dst = pt1.Dist(s[j]);
+		if (dst < dstmin) {
+		    dstmin = dst;
+		    pmin = s[j];
+		    if (el) *el = i;
+		}
 	    }
 	}
     }

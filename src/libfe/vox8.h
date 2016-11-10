@@ -114,7 +114,7 @@ public:
      *   are part of the mesh surface.
      * \note If the element doesn't contain boundary faces, the returned vector
      *   is all zeros.
-     * \sa BndIntFSide
+     * \sa SurfIntF
      */
     RVector BndIntF () const;
 
@@ -127,24 +127,37 @@ public:
      *   where the integration is performed over all sides of the element that
      *   are part of the mesh surface.
      * \note The return value is nonzero only if node i is a boundary node.
-     * \sa BndIntFSide, BndIntFF, BndIntFFSide
+     * \sa SurfIntF, BndIntFF, SurfIntFF
      */
     double BndIntF (int i);
 
     /**
-     * \brief Surface integral of a shape function over one of the sides of
+     * \brief %Surface integral of a shape function over one of the sides of
      *   the element.
      * \param i node index (range 0 .. 7)
      * \param sd side index (range 0 .. 5)
      * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over side \e sd.
-     * \sa BndIntF, BndIntFF, BndIntFFSide
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntF, BndIntFF, SurfIntFF
      */
-    double BndIntFSide (int i, int sd) const;
+    double SurfIntF (int i, int sd) const;
     
+    /**
+     * \brief %Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 7)
+     * \param j second node index (range 0 .. 7)
+     * \param sd side index (range 0 .. 5)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
+
     double BndIntFF (int i, int j);
-    double BndIntFFSide (int i, int j, int sd);
+    
     RSymMatrix BndIntFF () const
     { ERROR_UNDEF; return RSymMatrix(); }
     RSymMatrix BndIntPFF (const RVector &P) const

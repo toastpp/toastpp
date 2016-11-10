@@ -254,7 +254,7 @@ public:
      *   any calls to HasBoundarySide.
      * \sa Initialise, IsBoundarySide
      */
-    bool HasBoundarySide ()
+    inline bool HasBoundarySide () const
     { return bndel; }
 
     /**
@@ -704,26 +704,33 @@ public:
     virtual double IntPDD (int i, int j, const RVector &P) const = 0;
 
     /**
-     * \brief Boundary integral of all shape functions over all boundary
-     *   sides of the element.
-     * \return Vector of size \ref nNode, containing the integrals
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over all sides of the element that
-     *   are part of the mesh surface.
-     * \note The returned vector contains nonzero entries at index i only if
-     *   node i is a boundary node.
-     * \note If the element does not contain boundary sides, the returned
-     *   vector is zero.
-     * \sa BndIntFSide, BndIntFF, BndIntFFSide
+     * \brief %Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. \ref nNode-1)
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa SurfIntF(int), BndIntF(int), SurfIntFF(int,int,int)
      */
-    virtual RVector BndIntF () const;
+    virtual double SurfIntF (int i, int sd) const = 0;
 
     /**
-     * \brief Boundary integral of a shape function over all boundary sides
+     * \brief %Surface integrals of all shape functions over an element face.
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Vector of size \ref nNode containing the integrals
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   for all element nodes i, where the integration is performed over side
+     *   \f$S_{sd}\f$.
+     % \sa SurfIntF(int,int), BndIntF()
+     */
+    virtual RVector SurfIntF (int sd) const;
+    
+    /**
+     * \brief %Surface integral of a shape function over all boundary faces
      *   of the element.
      * \param i node index (range 0 .. \ref nNode-1)
      * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   \f$ \oint_S u_i(\vec{r}) d\vec{r} \f$
      *   where the integration is performed over all sides of the element that
      *   are part of the mesh surface.
      * \note The returned value is nonzero only if node i is a boundary node.
@@ -731,33 +738,63 @@ public:
     virtual double BndIntF (int i) const;
     
     /**
-     * \brief Surface integral of a shape function over an element face.
-     * \param i node index (range 0 .. \ref nNode-1)
-     * \param sd side index (range 0 .. \ref nSide-1)
-     * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over side \e sd.
-     * \sa BndIntF, BndIntFF, BndIntFFSide
+     * \brief %Surface integrals of all shape functions over all boundary
+     *   faces of the element.
+     * \return Vector of size \ref nNode containing the integrals
+     *   \f$ \oint_S u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned vector contains nonzero entries at index i only if
+     *   node i is a boundary node.
+     * \note If the element does not contain boundary sides, the returned
+     *   vector is zero.
+     * \sa SurfIntF(int), BndIntF(int), BndIntFF
      */
-    virtual double BndIntFSide (int i, int sd) const = 0;
+    virtual RVector BndIntF () const;
 
     /**
-     * \brief Boundary integral of all products of two shape functions over
+     * \brief %Surface integral of a product of two shape functions over an
+     *   element side.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    virtual double SurfIntFF (int i, int j, int sd) const = 0;
+
+    /**
+     * \brief %Surface integrals of all products of two shape functions over
+     *   and element side.
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Symmetrix matrix of size \ref nNode x \ref nNode, containing
+     *   the integrals
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa SurfIntFF(int,int,int)const
+     */
+    virtual RSymMatrix SurfIntFF (int sd) const;
+    
+    /**
+     * \brief %Surface integrals of all products of two shape functions over
      *   all boundary sides of the element.
-     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     * \return Symmetric matrix of size \ref nNode x \ref nNode, containing
+     *   the integrals
+     *   \f$ \oint_S u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
      *   where the integration is performed over all sides of the element that
      *   are part of the mesh surface.
      * \note The returned matrix contains nonzero entries at (i,j) only if
      *   nodes i and j are both boundary nodes.
      * \note If the element does not contain boundary sides, the returned
      *   matrix is zero.
-     * \sa BndIntFF(int,int), BndIntFFSide
+     * \sa BndIntFF(int,int), SurfIntFF
      */
-    virtual RSymMatrix BndIntFF () const = 0;
+    virtual RSymMatrix BndIntFF () const;
 
     /**
-     * \brief Boundary integral of a product of two shape functions over
+     * \brief %Surface integral of a product of two shape functions over
      *   all boundary sides of the element.
      * \param i first node index (range 0 .. \ref nNode-1)
      * \param j second node index (range 0 .. \ref nNode-1)
@@ -767,23 +804,9 @@ public:
      *   are part of the mesh surface.
      * \note The return value is nonzero only if both nodes \p i and \p j are
      *   boundary nodes.
-     * \sa BndIntFF()const, BndIntFFSide
+     * \sa BndIntFF()const, SurfIntFF
      */
-    virtual double BndIntFF (int i, int j) = 0;
-
-    /**
-     * \brief Surface integral of a product of two shape functions over one of
-     *   the sides of the element.
-     * \param i first node index (range 0 .. \ref nNode-1)
-     * \param j second node index (range 0 .. \ref nNode-1)
-     * \param sd side index (range 0 .. \ref nSide-1)
-     * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over side \e sd.
-     * \note Nodes i and j must both belong to side sd.
-     * \sa BndIntFF()const, BndIntFF(int,int)
-     */
-    virtual double BndIntFFSide (int i, int j, int sd) = 0;
+    virtual double BndIntFF (int i, int j) const;
 
     /**
      * \brief Surface integrals of all products of a nodal function and two
@@ -1206,7 +1229,7 @@ public:
     inline RSymMatrix IntDD () const { return intdd; }
     inline double IntDD (int i, int j) const { return intdd.Get(i,j); }
     inline RSymMatrix BndIntFF () const { return intbff; }
-    inline double BndIntFF (int i, int j) { return intbff.Get(i,j); }
+    inline double BndIntFF (int i, int j) const { return intbff.Get(i,j); }
 
 protected:
     virtual double ComputeSize (const NodeList&) const = 0;

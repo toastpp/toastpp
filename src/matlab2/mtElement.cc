@@ -269,7 +269,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	pr = mxGetPr(elmat);
 	if (sd >= 0) { // integral over a single side
 	    for (i = 0; i < nnd; i++) {
-		pr[i] = pel->BndIntFSide(i,sd);
+		pr[i] = pel->SurfIntF(i,sd);
 	    }
 	} else {
 	    RVector bndintf = pel->BndIntF();
@@ -287,10 +287,10 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	if (sd >= 0) { // integral over a single side
 	    for (ii = 0; ii < pel->nSideNode(sd); ii++) {
 		i = pel->SideNode(sd,ii);
-		pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
+		pr[i*nnd+i] = pel->SurfIntFF(i,i,sd);
 		for (jj = 0; jj < ii; jj++) {
 		    j = pel->SideNode(sd,jj);
-		    pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
+		    pr[i*nnd+j] = pr[j*nnd+i] = pel->SurfIntFF(i,j,sd);
 		}
 	    }
 	} else { // integral over all boundary sides
@@ -298,10 +298,10 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 		if (!pel->IsBoundarySide (sd)) continue;
 		for (ii = 0; ii < pel->nSideNode(sd); ii++) {
 		    i = pel->SideNode(sd,ii);
-		    pr[i*nnd+i] += pel->BndIntFFSide(i,i,sd);
+		    pr[i*nnd+i] += pel->SurfIntFF(i,i,sd);
 		    for (jj = 0; jj < ii; jj++) {
 			j = pel->SideNode(sd,jj);
-			pr[i*nnd+j] = pr[j*nnd+i] += pel->BndIntFFSide(i,j,sd);
+			pr[i*nnd+j] = pr[j*nnd+i] += pel->SurfIntFF(i,j,sd);
 		    }
 		}
 	    }

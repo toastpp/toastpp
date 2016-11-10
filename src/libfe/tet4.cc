@@ -1087,7 +1087,7 @@ double Tetrahedron4::BndIntF (int i) const
     return bf;
 }
 
-double Tetrahedron4::BndIntFSide (int i, int sd) const
+double Tetrahedron4::SurfIntF (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 4, "Argument 2: out of range");
@@ -1095,7 +1095,7 @@ double Tetrahedron4::BndIntFSide (int i, int sd) const
 }
 
 
-double Tetrahedron4::BndIntFFSide (int i, int j, int sd)
+double Tetrahedron4::SurfIntFF (int i, int j, int sd) const
 {
     dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
     dASSERT(j >= 0 && j < 4, "Argument 2: out of range");
@@ -1222,6 +1222,8 @@ RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
 int Tetrahedron4::Intersection (const Point &p1, const Point &p2,
     Point *s, bool add_endpoints, bool boundary_only)
 {
+    if (boundary_only && !bndel) return 0;
+    
     int i, n = 0;
     double a, rx, ry, rz;
     double sx = p1[0], sy = p1[1], sz = p1[2];
@@ -1268,7 +1270,7 @@ int Tetrahedron4::Intersection (const Point &p1, const Point &p2,
     }
 
     // intersection with plane 1-x-y-z=0
-    if (!boundary_only || bndside[3]) {
+    if ((!boundary_only || bndside[3]) && (dx+dy+dz)) {
 	a = (1-sx-sy-sz)/(dx+dy+dz);
 	rx = sx + a*dx;
 	ry = sy + a*dy;

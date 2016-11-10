@@ -546,28 +546,32 @@ RSymMatrix Triangle3old::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
-double Triangle3old::BndIntFFSide (int i, int j, int sd)
+double Triangle3old::SurfIntFF (int i, int j, int sd) const
 {
+    dASSERT(i >= 0 && i < 3, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 3, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 3: out of range");
+    
     double d, dx, dy;
 
-	int opp_nd = (sd+2) % 3;
-	if (i == opp_nd || j == opp_nd) return 0.0;
+    int opp_nd = (sd+2) % 3;
+    if (i == opp_nd || j == opp_nd) return 0.0;
 
-	switch (sd) {
-	case 0:
-		dx = jac(0,0);
-		dy = jac(0,1);
-		break;
-	case 1:
-		dx = jac(1,0)-jac(0,0);
-		dy = jac(1,1)-jac(0,1);
-		break;
-	case 2:
-		dx = jac(1,0);
-		dy = jac(1,1);
-		break;
-	}
-	d  = hypot (dx, dy);
+    switch (sd) {
+    case 0:
+	dx = jac(0,0);
+	dy = jac(0,1);
+	break;
+    case 1:
+	dx = jac(1,0)-jac(0,0);
+	dy = jac(1,1)-jac(0,1);
+	break;
+    case 2:
+	dx = jac(1,0);
+	dy = jac(1,1);
+	break;
+    }
+    d  = hypot (dx, dy);
     return d / (i == j ? 3.0 : 6.0);
 }
 

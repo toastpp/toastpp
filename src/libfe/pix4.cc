@@ -460,7 +460,7 @@ double Pixel4::IntPfd (const RVector &P, int j, int k, int l) const
     return val;
 }
 
-double Pixel4::BndIntFSide (int i, int sd) const
+double Pixel4::SurfIntF (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 4, "Argument 2: out of range");
@@ -473,18 +473,13 @@ double Pixel4::BndIntFSide (int i, int sd) const
     }
 }
 
-double Pixel4::BndIntFFSide (int i, int j, int sd)
+double Pixel4::SurfIntFF (int i, int j, int sd) const
 {
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 4, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 3: out of range");
     if (!bndintff) ComputeBndIntFF();
     return bndintff[sd](i,j);
-}
-
-double Pixel4::BndIntFF (int i, int j)
-{
-    double res = 0.0;
-    for (int sd = 0; sd < 4; sd++)
-	if (bndside[sd]) res += BndIntFFSide (i, j, sd);
-    return res;
 }
 
 RSymMatrix Pixel4::BndIntFF () const

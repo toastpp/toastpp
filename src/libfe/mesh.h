@@ -668,6 +668,13 @@ private:
     // assembly). SetupElementMatrices can be called repeatedly to reflect
     // topology changes
 
+    struct BndIntersectParam {
+	Point bbmin, bbmax;
+    } *intersect_prm;
+    // structure to help with ray intersection computation
+
+    BndIntersectParam *ComputeBndIntersectParam();
+    
 #ifdef TOAST_PARALLEL
     static void Setup_engine (void*,int,int);
 #endif

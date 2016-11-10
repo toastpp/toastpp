@@ -505,7 +505,7 @@ RSymMatrix Triangle3::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
-double Triangle3::BndIntFSide (int i, int sd) const
+double Triangle3::SurfIntF (int i, int sd) const
 {
     dASSERT(i >= 0 && i < 3, "Argument 1: out of range");
     dASSERT(sd >= 0 && sd < 3, "Argument 2: out of range");
@@ -531,8 +531,12 @@ double Triangle3::BndIntFSide (int i, int sd) const
     return d * 0.5;
 }
 
-double Triangle3::BndIntFFSide (int i, int j, int sd)
+double Triangle3::SurfIntFF (int i, int j, int sd) const
 {
+    dASSERT(i >= 0 && i < 3, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 3, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 3: out of range");
+    
     double d;
     switch (sd) {
     case 0:

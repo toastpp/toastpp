@@ -96,7 +96,20 @@ public:
     RSymMatrix IntPDD (const RVector& P) const;
     double IntPDD (int i, int j, const RVector &P) const;
     double BndIntFF (int i, int j);
-    double BndIntFFSide (int i, int j,int sd);
+    
+    /**
+     * \brief %Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 26)
+     * \param j second node index (range 0 .. 26)
+     * \param sd side index (range 0 .. 5)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa SurfIntF(int,int)const, BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
+
     RSymMatrix BndIntFF () const
     { ERROR_UNDEF; return RSymMatrix(); }
     RSymMatrix BndIntPFF (const RVector &P) const

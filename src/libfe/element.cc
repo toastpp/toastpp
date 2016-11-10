@@ -88,12 +88,13 @@ RVector Element::IntF () const
     return intf;
 }
 
-RVector Element::BndIntF () const
+RVector Element::SurfIntF (int sd) const
 {
-    RVector bf(nNode());
+    dASSERT(sd >= 0 && sd < nSide(), "Argument 1: out of range");
+    RVector sf(nNode());
     for (int i = 0; i < nNode(); i++)
-	bf[i] = BndIntF(i);
-    return bf;
+	sf[i] = SurfIntF (i, sd);
+    return sf;
 }
 
 double Element::BndIntF (int i) const
@@ -102,8 +103,51 @@ double Element::BndIntF (int i) const
     double bf = 0.0;
     for (int sd = 0; sd < nSide(); sd++)
 	if (bndside[sd])
-	    bf += BndIntFSide (i, sd);
+	    bf += SurfIntF (i, sd);
     return bf;
+}
+
+RVector Element::BndIntF () const
+{
+    RVector bf(nNode());
+    for (int sd = 0; sd < nSide(); sd++)
+	if (bndside[sd])
+	    bf += SurfIntF (sd);
+    return bf;
+}
+
+RSymMatrix Element::SurfIntFF (int sd) const
+{
+    dASSERT(sd >= 0 && sd < nSide(), "Argument 1: out of range");
+    RSymMatrix sff(nNode());
+    for (int i = 0; i < nNode(); i++)
+	for (int j = 0; j <= i; j++)
+	    sff(i,j) = SurfIntFF (i, j, sd);
+    return sff;
+}
+
+double Element::BndIntFF (int i, int j) const
+{
+    dASSERT(i >= 0 && i < nNode(), "Argument 1: out of range");
+    dASSERT(j >= 0 && j < nNode(), "Argument 2: out of range");
+    double bff = 0.0;
+    if (bndel) {
+	for (int sd = 0; sd < nSide(); sd++)
+	    if (bndside[sd])
+		bff += SurfIntFF (i, j, sd);
+    }
+    return bff;
+}
+
+RSymMatrix Element::BndIntFF () const
+{
+    RSymMatrix bff(nNode());
+    if (bndel) {
+	for (int sd = 0; sd < nSide(); sd++)
+	    if (bndside[sd])
+		bff += SurfIntFF (sd);
+    }
+    return bff;
 }
 
 void Element::operator= (const Element& el)

@@ -236,18 +236,28 @@ public:
     // returns matrix of mixed derivatives
 
     /**
-     * \brief Surface integral of a shape function over an element face.
+     * \brief %Surface integral of a shape function over an element face.
      * \param i node index (range 0 .. 2)
      * \param sd side index (range 0 .. 2)
      * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over side \e sd.
-     * \sa BndIntF, BndIntFF, BndIntFFSide
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntF, BndIntFF, SurfIntFF
      */
-    double BndIntFSide (int i, int sd) const;
+    double SurfIntF (int i, int sd) const;
 
-    double BndIntFFSide (int i, int j, int sd);
-    // Int [u_i u_j] dr along side sd
+    /**
+     * \brief %Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 2)
+     * \param j second node index (range 0 .. 2)
+     * \param sd side index (range 0 .. 2)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
 
     RVector BndIntFX (int side, double (*func)(const Point&),
         const NodeList &nlist) const;

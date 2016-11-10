@@ -164,10 +164,10 @@ public:
     { return intdd.Get(i,j) * ((P[Node[0]]+P[Node[1]])/2.0); }
     // Returns a single element of IntPDD
 
-    double BndIntFSide (int i, int sd) const
+    double SurfIntF (int i, int sd) const
     { ERROR_UNDEF; return 0; }
     
-    double BndIntFFSide (int i, int j, int sd)
+    double SurfIntFF (int i, int j, int sd) const
     { ERROR_UNDEF; return 0; }
 
 	RSymMatrix BndIntPFF (const RVector &P) const
@@ -197,7 +197,7 @@ public:
     // returns matrix of mixed derivatives
 #ifdef DO_THE_REST
 
-    double BndIntFFSide (int i, int j, int sd);
+    double SurfIntFF (int i, int j, int sd) const;
     // Int [u_i u_j] dr along side sd
 
     RVector BndIntFX (int side, double (*func)(const Point&),
