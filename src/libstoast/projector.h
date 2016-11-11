@@ -62,7 +62,7 @@ class STOASTLIB Projector
 	virtual void constructMatrix()=0;
 };
 
-class RayProjector : public Projector
+class STOASTLIB RayProjector : public Projector
 {
  public:
     RayProjector() {}
