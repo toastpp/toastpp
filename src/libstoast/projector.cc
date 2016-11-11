@@ -60,7 +60,14 @@ void RayProjector::constructMatrix()
 
     PinholeCamera *ph_camera = dynamic_cast<PinholeCamera*>(camera);
     if (ph_camera) {
-	RVector ph = p0 + vd*ph_camera->getFocalLength();
+
+	// this is for an (upright) "perspective" camera
+	RVector ph = p0;
+	p0 = ph + vd*ph_camera->getFocalLength();
+
+	// this is for an actual (inverted) pinhole camera
+	//RVector ph = p0 + vd*ph_camera->getFocalLength();
+
 	int i, j, k, r, el;
 	for (j = r = 0; j < ih; j++) {
 	    for (i = 0; i < iw; i++) {
