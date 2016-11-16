@@ -56,7 +56,8 @@ class STOASTLIB PinholeCamera : public Camera
 	void getRayVector(const double ix, const double iy, RVector & rayStart, RVector & rayDir) const;
 	void getPixelCoords(const RVector & p, double & ix, double & iy) const;
 	double getFoVy() const; 
-
+	double getFocalLength() const { return f; }
+	
     protected:
 	double f;	
 };

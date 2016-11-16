@@ -335,16 +335,8 @@ void Wedge6::ConvLineQuadrature (Point** absc, double* labsc,
 
 // ***************************************************************************
 
-int Wedge6::GlobalIntersection (const NodeList &nlist,
-    const Point &p1, const Point &p2, Point **list)
-{
-    ERROR_UNDEF;
-    return 0; // dummy
-}
-
-// ***************************************************************************
-
-int Wedge6::Intersection (const Point &p1, const Point &p2, Point **list)
+int Wedge6::Intersection (const Point &p1, const Point &p2, Point *s,
+    bool add_endpoints, bool boundary_only)
 {
     ERROR_UNDEF;
     return 0; // dummy

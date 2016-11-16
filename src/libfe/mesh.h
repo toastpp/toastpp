@@ -404,9 +404,10 @@ public:
     // min[i] <= N[i] <= max[i], where i=0..1 or 0..2
     // If pad > 0, the bounding box is enlarged by this margin in all directions
 
-    Point BndIntersect (const Point &pt1, const Point &pt2);
+    Point BndIntersect (const Point &pt1, const Point &pt2, int *el = NULL);
     // this calculates the point of intersection of the mesh boundary and the
     // straight line from pt1 to pt2
+    // if el != NULL, it gets assigned the index of the intersected element.
 
     int CheckConsistency () const;
     // performs some tests to check the consistency of the mesh
@@ -667,6 +668,13 @@ private:
     // assembly). SetupElementMatrices can be called repeatedly to reflect
     // topology changes
 
+    struct BndIntersectParam {
+	Point bbmin, bbmax;
+    } *intersect_prm;
+    // structure to help with ray intersection computation
+
+    BndIntersectParam *ComputeBndIntersectParam();
+    
 #ifdef TOAST_PARALLEL
     static void Setup_engine (void*,int,int);
 #endif

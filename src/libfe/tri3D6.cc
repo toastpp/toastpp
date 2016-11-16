@@ -285,14 +285,6 @@ RDenseMatrix Triangle3D6::GlobalShapeD (const NodeList &nlist,
 }
 
 
-int Triangle3D6::GlobalIntersection (const NodeList &nlist,
-    const Point &p1, const Point &p2, Point **list)
-{
-  /* definitely not done */
-  cerr << "Triangle3D6::GlobalIntersection not implemented \n";
-	return 0;
-}
-
 RDenseMatrix  Triangle3D6::FTAMat () const 
 {
     RDenseMatrix A(2,3);

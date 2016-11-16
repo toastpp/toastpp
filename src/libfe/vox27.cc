@@ -991,9 +991,11 @@ double Voxel27::BndIntFF (int i, int j)
     return res;
 }
 
-double Voxel27::BndIntFFSide (int i, int j,int sd)
+double Voxel27::SurfIntFF (int i, int j, int sd) const
 {
-    if (!bndel) return 0.0;
+    dASSERT(i >= 0 && i < 27, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 27, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 6, "Argument 3: out of range");
     return bndintff[sd](i,j);
 
 }
