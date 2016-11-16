@@ -816,7 +816,7 @@ void genmat_boundint_3D(const Mesh& mesh,  const Mesh& S2mesh, RCompRowMatrix& A
 	    if ((is = mesh.elist[el]->Node[i]) >= sysdim) continue;
 	    for (j = 0; j < nodel; j++) {
 		if ((js = mesh.elist[el]->Node[j]) >= sysdim) continue;
-		ela_ij = mesh.elist[el]->BndIntFFSide (i, j,sd);
+		ela_ij = mesh.elist[el]->SurfIntFF (i, j,sd);
 		kronsdplus(is, js, SN, ela_ij, Angbintplus, A2);
 	 	kronsdplus(is, js, SN, ela_ij, Angbintminus, b1);	
 	     }

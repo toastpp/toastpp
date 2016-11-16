@@ -76,15 +76,15 @@ public:
     RSymMatrix IntPDD (const RVector& P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double IntPDD (int i, int j, const RVector &P) const;
-    double BndIntFFSide (int i, int j, int sd)
+    double SurfIntF (int i, int sd) const
+    { ERROR_UNDEF; return 0; }
+    double SurfIntFF (int i, int j, int sd) const
     { ERROR_UNDEF; return 0; }
     RSymMatrix BndIntPFF (const RVector &P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only)
     { ERROR_UNDEF; return 0; }
 
 

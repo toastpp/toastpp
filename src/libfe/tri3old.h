@@ -150,10 +150,13 @@ public:
     { return intdd.Get(i,j) * ((P[Node[0]]+P[Node[1]]+P[Node[2]])/3.0); }
     // Returns a single element of IntPDD
 
-    double BndIntFFSide (int i, int j, int sd);
+    double SurfIntF (int i, int sd) const
+    { ERROR_UNDEF; return 0.0; }
 
-	RSymMatrix BndIntPFF (const RVector &P) const
-	{ return intbff * ((P[Node[0]]+P[Node[1]]+P[Node[2]])/3.0); }
+    double SurfIntFF (int i, int j, int sd) const;
+
+    RSymMatrix BndIntPFF (const RVector &P) const
+    { return intbff * ((P[Node[0]]+P[Node[1]]+P[Node[2]])/3.0); }
     // This is a hack! Really P would have to be taken into the integral,
     // rather than just averaged.
 
@@ -189,12 +192,8 @@ public:
     // coordinates of boundary element (dim-1). Use SurfToLocal to convert
     // into local element coordinates
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list);
-    // Same as 'Intersection' but p1 and p2 given in global coords
-    // The return list however is still in local coords
-
-    int Intersection (const Point &p1, const Point &p2, Point** pi);
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+        bool add_endpoints, bool boundary_only);
     // creates a list of points where the line defined by p1 and p2 intersects
     // the element (in local coordinates) or starts/ends within the element.
     // Returns the length of the list

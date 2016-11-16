@@ -2199,23 +2199,27 @@ RSymMatrix Triangle10::ComputeIntDD (const NodeList &nlist) const
     return dd;
 }
 
-double Triangle10::BndIntFSide (int i, int sd)
+double Triangle10::SurfIntF (int i, int sd) const
 {
-    dASSERT(sd >= 0 && sd < 3, "Side index out of range");
-    dASSERT(i >= 0 && i < 10, "Node index out of range");
+    dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 2: out of range");
 
     double f = bndintf(sd,i);
-    if (!f) return f;
+    if (!f) return 0.0;
     switch (sd) {
     case 0: return f * hypot (c2, b2);
     case 1: return f * hypot (c0, b0);
     case 2: return f * hypot (c1, b1);
+    default: xERROR("Argument 2: out of range"); return 0.0;
     }
-    return 0.0;    
 }
 
-double Triangle10::BndIntFFSide (int i, int j, int sd)
+double Triangle10::SurfIntFF (int i, int j, int sd) const
 {
+    dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 10, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 3, "Argument 3: out of range");
+    
     switch (sd) {
     case 0:
 	return hypot (c2, b2) * sym_bndintff_sd0(i,j);
@@ -2224,7 +2228,7 @@ double Triangle10::BndIntFFSide (int i, int j, int sd)
     case 2:
 	return hypot (c1, b1) * sym_bndintff_sd2(i,j);
     default:
-	xERROR("Invalid side index");
+	xERROR("Argument 3: out of range");
 	return 0.0;
     }
 }
