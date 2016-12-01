@@ -13,6 +13,8 @@
 
 *.xcbkptlist
 
+*.pyc
+
 autom4te.cache
 
 bin

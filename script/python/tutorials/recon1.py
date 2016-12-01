@@ -12,7 +12,7 @@
 # to avoid python blocking on opening the figure
 
 
-import pdb
+#import pdb
 
 # Import various modules
 import os
@@ -48,9 +48,9 @@ def objective_ls(logx):
     smua = scmua/cm
     skap = sckap/cm
     smus = 1/(3*skap) - smua
-    mua = raster.MapBasis(hraster, 'S->M', smua)
-    mus = raster.MapBasis(hraster, 'S->M', smus)
-    phi = mesh.Fields(hmesh,-1,qvec,mvec,mua,mus,ref,freq,'d')
+    mua = tr.MapBasis(hraster, 'S->M', smua)
+    mus = tr.MapBasis(hraster, 'S->M', smus)
+    phi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
     p = projection(phi,mvec)
     return objective(p,data,sd,logx)
 
@@ -79,8 +79,8 @@ def imerr(im1,im2):
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 
 # Import the toast modules
-from toast import mesh
-from toast import raster
+from toast import mesh as tm
+from toast import raster as tr
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
@@ -93,25 +93,22 @@ musfile = meshdir + "tgt_mus_ellips_tri10.nim"
 # A few general parameters
 c0 = 0.3        # speed of light in vacuum [mm/ps]
 refind = 1.4    # refractive index in medium (homogeneous)
-cm = c0/refind; # speed of light in medium
-
+cm = c0/refind  # speed of light in medium
 
 # ---------------------------------------------------
 # Generate target data
-hmesh_fwd = mesh.Read(meshfile1)
-mesh.ReadQM(hmesh_fwd,qmfile)
-qvec = mesh.Qvec (hmesh_fwd,type='Neumann',shape='Gaussian',width=2)
-mvec = mesh.Mvec (hmesh_fwd,shape='Gaussian',width=2)
-nlen = mesh.NodeCount (hmesh_fwd)
+mesh_fwd = tm.Mesh(meshfile1)
+mesh_fwd.ReadQM(qmfile)
+qvec = mesh_fwd.Qvec(type='Neumann', shape='Gaussian', width=2)
+mvec = mesh_fwd.Mvec(shape='Gaussian', width=2, ref=refind)
+nlen = mesh_fwd.NodeCount()
 nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
 
 # Target parameters
-#mua = np.matrix(mesh.ReadNim (muafile))
-#mus = np.matrix(mesh.ReadNim (musfile))
-mua = mesh.ReadNim (muafile)
-mus = mesh.ReadNim (musfile)
-ref = np.ones((1,nlen)) * 1.4
+mua = mesh_fwd.ReadNim (muafile)
+mus = mesh_fwd.ReadNim (musfile)
+ref = np.ones((1,nlen)) * refind
 freq = 100
 
 # Target ranges (for display)
@@ -121,28 +118,27 @@ mus_min = 1     # np.min(mus)
 mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
-phi = mesh.Fields(hmesh_fwd,-1,qvec,mvec,mua,mus,ref,freq)
+phi = mesh_fwd.Fields(-1,qvec,mua,mus,ref,freq)
 data = projection(phi,mvec)
 lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
 
 # Map target parameters to images for display
-hraster_fwd = raster.Make (hmesh_fwd,grd)
-bmua_tgt = np.reshape(raster.MapBasis (hraster_fwd, 'M->B', mua),grd)
-bmus_tgt = np.reshape(raster.MapBasis (hraster_fwd, 'M->B', mus),grd)
+hraster_fwd = tr.Make (mesh_fwd.Handle(),grd)
+bmua_tgt = np.reshape(tr.MapBasis (hraster_fwd, 'M->B', mua),grd)
+bmus_tgt = np.reshape(tr.MapBasis (hraster_fwd, 'M->B', mus),grd)
 
 # Clear objects
-raster.Clear (hraster_fwd)
-mesh.Clear (hmesh_fwd)
+tr.Clear (hraster_fwd)
 
 
 # ---------------------------------------------------
 # Set up inverse problem
-hmesh = mesh.Read(meshfile2)
-mesh.ReadQM(hmesh,qmfile)
-qvec = mesh.Qvec (hmesh,type='Neumann',shape='Gaussian',width=2)
-mvec = mesh.Mvec (hmesh,shape='Gaussian',width=2)
-nlen = mesh.NodeCount (hmesh)
+mesh_inv = tm.Mesh(meshfile2)
+mesh_inv.ReadQM(qmfile)
+qvec = mesh_inv.Qvec (type='Neumann',shape='Gaussian',width=2)
+mvec = mesh_inv.Mvec (shape='Gaussian',width=2,ref=1.4)
+nlen = mesh_inv.NodeCount ()
 
 # Initial parameter estimates
 mua = np.ones(nlen) * 0.025
@@ -152,10 +148,10 @@ ref = np.ones(nlen) * 1.4
 freq = 100
 
 # Solution basis
-hraster = raster.Make (hmesh,grd);
+hraster = tr.Make (mesh_inv.Handle(),grd);
 
 # Initial projections
-phi = mesh.Fields(hmesh,-1,qvec,mvec,mua,mus,ref,freq)
+phi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
 proj = projection(phi,mvec)
 lnamp = proj[0:nqm]
 phase = proj[nqm:nqm*2]
@@ -166,13 +162,13 @@ sd_phase = np.ones(phase.shape) * np.linalg.norm(phase_tgt-phase)
 sd = np.concatenate((sd_lnamp,sd_phase))
 
 # Map parameters to solution basis
-bmua = raster.MapBasis(hraster,'M->B',mua)
-bmus = raster.MapBasis(hraster,'M->B',mus)
-bkap = raster.MapBasis(hraster,'M->B',kap)
+bmua = tr.MapBasis(hraster,'M->B',mua)
+bmus = tr.MapBasis(hraster,'M->B',mus)
+bkap = tr.MapBasis(hraster,'M->B',kap)
 bcmua = bmua * cm
 bckap = bkap * cm
-scmua = raster.MapBasis(hraster,'B->S',bcmua)
-sckap = raster.MapBasis(hraster,'B->S',bckap)
+scmua = tr.MapBasis(hraster,'B->S',bcmua)
+sckap = tr.MapBasis(hraster,'B->S',bckap)
 
 # Vector of unknowns
 x = np.asmatrix(np.concatenate((scmua,sckap))).transpose()
@@ -189,28 +185,20 @@ errmus = np.array([imerr(bmus,bmus_tgt)])
 itr = 1
 step = 1.0
 
-#pdb.set_trace()
-hfig=plt.figure(1)
+hfig=plt.figure()
 plt.show()
 
 while itr <= itrmax:
     errp = err
-    dphi,aphi = mesh.Fields(hmesh,-1,qvec,mvec,mua,mus,ref,freq,'da')
+    dphi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
+    aphi = mesh_inv.Fields(-1,mvec,mua,mus,ref,freq)
     proj = np.reshape (mvec.transpose() * dphi,(-1,1),'F')
-    J = mesh.Jacobian(hmesh,hraster,dphi,aphi,proj)
-    pdb.set_trace()
-
-    # Data normalisation
-    for i in range(J.shape[0]):
-        J[i,:] = J[i,:] / np.asscalar(sd[i])
-
-    # Parameter normalisation
-    for i in range(J.shape[1]):
-        J[:,i] = J[:,i] * np.asscalar(x[i])
+    J = mesh_inv.Jacobian(hraster, dphi, aphi, proj)
 
     #Gradient of cost function
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
-    r = matrix(J).transpose() * (2*(data-proj)/sd)
+    r = matrix(J).transpose() * (2*(data-proj)/sd**2)
+    r = np.multiply(r,x)
 
     if itr > 1:
         delta_old = delta_new
@@ -231,7 +219,7 @@ while itr <= itrmax:
             d = s + d*beta
 
     delta_d = np.dot(d.transpose(),d)
-    step,err = mesh.Linesearch (logx, d, step, err, objective_ls)
+    step,err = tm.Linesearch (logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
@@ -241,59 +229,61 @@ while itr <= itrmax:
     smua = scmua/cm
     skap = sckap/cm
     smus = 1/(3*skap) - smua
-    mua = raster.MapBasis(hraster, 'S->M', smua)
-    mus = raster.MapBasis(hraster, 'S->M', smus)
+    mua = tr.MapBasis(hraster, 'S->M', smua)
+    mus = tr.MapBasis(hraster, 'S->M', smus)
 
-    bmua = np.reshape(raster.MapBasis(hraster, 'S->B', smua),grd)
-    bmus = np.reshape(raster.MapBasis(hraster, 'S->B', smus),grd)
+    bmua = np.reshape(tr.MapBasis(hraster, 'S->B', smua),grd)
+    bmus = np.reshape(tr.MapBasis(hraster, 'S->B', smus),grd)
 
     erri=np.concatenate((erri,[err]))
     errmua = np.concatenate((errmua,[imerr(bmua,bmua_tgt)]))
     errmus = np.concatenate((errmus,[imerr(bmus,bmus_tgt)]))
     print ("Iteration "+str(itr)+", objective "+str(err))
+
     plt.clf()
     hfig.suptitle("Iteration "+str(itr))
 
-    plt.subplot(2,3,1)
-    im = plt.imshow(bmua_tgt, vmin=mua_min, vmax=mua_max)
+    ax1 = hfig.add_subplot(231)
+    im = ax1.imshow(bmua_tgt, vmin=mua_min, vmax=mua_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
-    plt.title("mua target")
-    plt.colorbar()
+    ax1.set_title("mua target")
+    plt.colorbar(im)
 
-    plt.subplot(2,3,2)
-    im = plt.imshow(bmus_tgt, vmin=mus_min, vmax=mus_max)
+    ax2 = hfig.add_subplot(232)
+    im = ax2.imshow(bmus_tgt, vmin=mus_min, vmax=mus_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
-    plt.title("mus target")
-    plt.colorbar()
+    ax2.set_title("mus target")
+    plt.colorbar(im)
 
-    plt.subplot(2,3,4)
-    im = plt.imshow(bmua, vmin=mua_min, vmax=mua_max)
+    ax3 = hfig.add_subplot(234)
+    im = ax3.imshow(bmua, vmin=mua_min, vmax=mua_max)
     im.axes.get_xaxis().set_visible(False)
     im.axes.get_yaxis().set_visible(False)
-    plt.title("mua recon")
-    plt.colorbar()
-    
-    plt.subplot(2,3,5)
-    im = plt.imshow(bmus, vmin=mus_min, vmax=mus_max)
-    im.axes.get_xaxis().set_visible(False)
-    im.axes.get_yaxis().set_visible(False)
-    plt.title("mus recon")
-    plt.colorbar()
+    ax3.set_title("mua recon")
+    plt.colorbar(im)
 
-    plt.subplot(2,3,3)
-    im = plt.semilogy(erri)
-    plt.title("objective function")
+    ax4 = hfig.add_subplot(235)
+    im = ax4.imshow(bmus, vmin=mus_min, vmax=mus_max)
+    im.axes.get_xaxis().set_visible(False)
+    im.axes.get_yaxis().set_visible(False)
+    ax4.set_title("mus recon")
+    plt.colorbar(im)
+
+    ax5 = hfig.add_subplot(233)
+    im = ax5.semilogy(erri)
+    ax5.set_title("objective function")
     plt.xlabel("iteration")
     
-    plt.subplot(2,3,6)
-    im = plt.semilogy(errmua)
-    im = plt.semilogy(errmus)
-    plt.title("rel. image error")
+    ax6 = hfig.add_subplot(236)
+    im = ax6.semilogy(errmua)
+    im = ax6.semilogy(errmus)
+    ax6.set_title("rel. image error")
     plt.xlabel("iteration")
     
-    plt.draw()
+#    plt.draw()
+    plt.pause(0.05)
     
     itr = itr+1
 

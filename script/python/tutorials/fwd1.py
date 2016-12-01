@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 
 # Import the toast modules
-from toast import mesh
+from toast import mesh as tm
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
@@ -23,9 +23,9 @@ meshfile = meshdir + "circle25_32.msh"
 qmfile = meshdir + "circle25_32x32.qm"
 
 # Load the mesh and source/detector specs
-hmesh = mesh.Read(meshfile)
-mesh.ReadQM(hmesh,qmfile)
-nlen = mesh.NodeCount(hmesh)
+mesh = tm.Mesh(meshfile)
+mesh.ReadQM(qmfile)
+nlen = mesh.NodeCount()
 
 # Homogeneous parameter distributions
 mua = np.ones ((1,nlen)) * 0.025
@@ -34,9 +34,9 @@ ref = np.ones ((1,nlen)) * 1.4
 freq = 100
 
 # Set up the linear system
-smat = mesh.Sysmat (hmesh, mua, mus, ref, freq)
-qvec = mesh.Qvec (hmesh)
-mvec = mesh.Mvec (hmesh)
+smat = mesh.Sysmat (mua, mus, ref, freq)
+qvec = mesh.Qvec ()
+mvec = mesh.Mvec ()
 
 # Solve the linear system
 nq = qvec.shape[1]

@@ -100,7 +100,7 @@ cm = c0/refind; # speed of light in medium
 hmesh_fwd = mesh.Read(meshfile1)
 mesh.ReadQM(hmesh_fwd,qmfile)
 qvec = mesh.Qvec (hmesh_fwd,type='Neumann',shape='Gaussian',width=2)
-mvec = mesh.Mvec (hmesh_fwd,shape='Gaussian',width=2)
+mvec = mesh.Mvec (hmesh_fwd,shape='Gaussian',width=2,ref=refind)
 nlen = mesh.NodeCount (hmesh_fwd)
 nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
@@ -144,7 +144,7 @@ mesh.Clear (hmesh_fwd)
 hmesh = mesh.Read(meshfile2)
 mesh.ReadQM(hmesh,qmfile)
 qvec = mesh.Qvec (hmesh,type='Neumann',shape='Gaussian',width=2)
-mvec = mesh.Mvec (hmesh,shape='Gaussian',width=2)
+mvec = mesh.Mvec (hmesh,shape='Gaussian',width=2,ref=refind)
 nlen = mesh.NodeCount (hmesh)
 
 # Initial parameter estimates

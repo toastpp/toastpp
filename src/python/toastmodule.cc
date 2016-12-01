@@ -109,11 +109,17 @@ static PyObject *mesh_data (PyObject *self, PyObject *args)
     int hmesh;
     Mesh *mesh;
 
-    if (!PyArg_ParseTuple (args, "i", &hmesh))
+    if (!PyArg_ParseTuple (args, "i", &hmesh)) {
+	PyErr_SetString(PyExc_ValueError,
+	    "Error parsing argument list.");
         return NULL;
-    if (!(mesh = g_meshmgr.Get (hmesh)))
+    }
+    if (!(mesh = g_meshmgr.Get (hmesh))) {
+	PyErr_SetString(PyExc_ValueError,
+	    "Not a valid mesh handle.");
         return NULL;
-
+    }
+    
     int i, j;
     int nlen = mesh->nlen();
     int elen = mesh->elen();
@@ -463,12 +469,6 @@ static PyObject *toast_make_mesh (PyObject *self, PyObject *args)
 	}
     }
 
-    // create dummy parameter list
-    mesh->plist.New (nvtx);
-    mesh->plist.SetMua (0.01);
-    mesh->plist.SetMus (1);
-    mesh->plist.SetN (1);
-
     // set up mesh
     mesh->Setup();
     int hmesh = g_meshmgr.Add (mesh);
@@ -724,7 +724,7 @@ static PyObject *toast_read_nim (PyObject *self, PyObject *args)
     
     std::ifstream ifs(nimname);
     if (!ifs.getline (cbuf, 256)) return NULL;
-    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return false;
+    if (strcmp (cbuf, "NIM") && strcmp (cbuf, "RIM")) return NULL;
     do {
         ifs.getline (cbuf, 256);
 	if (!strncasecmp (cbuf, "ImageSize", 9))
@@ -998,7 +998,7 @@ static PyObject *toast_qvec (PyObject *self, PyObject *args, PyObject *keywds)
 // ===========================================================================
 
 void CalcMvec (const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
-    CCompRowMatrix *mvec) 
+	       RVector *ref, CCompRowMatrix *mvec) 
 {
     int n, nM;
     int i, j;
@@ -1024,7 +1024,8 @@ void CalcMvec (const QMMesh *mesh, SRC_PROFILE mprof, double mwidth,
 	    //m = CompleteTrigSourceVector (*mesh, i);
 	    break;
 	}
-	for (j = 0; j < n; j++) m[j] *= mesh->plist[j].C2A();
+	for (j = 0; j < n; j++)
+	    m[j] *= c0/(2.0*(*ref)[j]*A_Keijzer((*ref)[j]));
 	mvec->SetRow (i, m);
     }
 }
@@ -1035,11 +1036,13 @@ static PyObject *toast_mvec (PyObject *self, PyObject *args, PyObject *keywds)
     const char *profstr = "Gaussian";
     double mwidth = 1.0;
     QMMesh *mesh;
+    //PyObject *py_ref;
+    double refind = 1.0;
+    
+    static char *kwlist[] = {"mesh", "shape", "width", "ref", NULL};
 
-    static char *kwlist[] = {"mesh", "shape", "width", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords (args, keywds, "i|sd", kwlist, &hmesh,
-        &profstr, &mwidth))
+    if (!PyArg_ParseTupleAndKeywords (args, keywds, "isdd", kwlist, &hmesh,
+        &profstr, &mwidth, &refind))
         return NULL;
     if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
         return NULL;
@@ -1051,13 +1054,28 @@ static PyObject *toast_mvec (PyObject *self, PyObject *args, PyObject *keywds)
     else if (!strcasecmp (profstr, "TrigBasis")) mprof = PROF_COMPLETETRIG;
     else    std::cerr << "toast.Qvec: Invalid source profile" << std::endl;
 
+#ifdef UNDEF
+    npy_intp *ref_dims = PyArray_DIMS(py_ref);
+    int reflen = ref_dims[0] * ref_dims[1];
+    RVector ref(mesh->nlen());
+    if (reflen == 1) {
+	ref = *(double*)PyArray_DATA(py_ref);
+    } else {
+	if (reflen != mesh->nlen())
+	    return NULL;
+	memcpy (ref.data_buffer(), PyArray_DATA(py_ref), reflen*sizeof(double));
+    }
+#endif
+    RVector ref(mesh->nlen());
+    ref = refind;
+    
     if (mprof != PROF_POINT) {
         if (mwidth <= 0.0)
 	    std::cerr << "toast.Mvec: Invalid detector width" << std::endl;
     }
 
     CCompRowMatrix mvec;
-    CalcMvec (mesh, mprof, mwidth, &mvec);
+    CalcMvec (mesh, mprof, mwidth, &ref, &mvec);
 
     const idxtype *rowptr, *colidx;
     npy_intp nnz = mvec.GetSparseStructure (&rowptr, &colidx);
@@ -1083,18 +1101,16 @@ static PyObject *toast_mvec (PyObject *self, PyObject *args, PyObject *keywds)
 // ===========================================================================
 
 void CalcFields (QMMesh *mesh, Raster *raster,
-    const CCompRowMatrix &qvec, const CCompRowMatrix &mvec,
-    const RVector &mua, const RVector &mus, const RVector &ref,
-    double freq, char *solver, double tol,
-    PyObject **dfield, PyObject **afield)
+    const CCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
+    const RVector &ref, double freq, char *solver, double tol,
+    PyObject **dfield)
 {
     const double c0 = 0.3;
-    int i, j, n, dim, nQ, nM, slen;
+    int i, j, n, dim, nQ, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
-    nQ   = mesh->nQ;
-    nM   = mesh->nM;
+    nQ   = qvec.nRows();
     slen = (raster ? raster->SLen() : n);
 
     CVector *dphi, *aphi;
@@ -1117,7 +1133,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
 
     double omega = freq * 2.0*Pi*1e-6; // convert from MHz to rad
 
-    // Calculate direct and adjoint fields
+    // Calculate fields
     FWS.Allocate ();
     FWS.Reset (msol, omega);
     CVector sphi(slen);
@@ -1142,50 +1158,23 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     }
     delete []dphi;
     *dfield = dmx;
-
-    // build adjoint field vectors
-    if (afield) {
-	aphi = new CVector[nM];
-	for (i = 0; i < nM; i++) aphi[i].New (n);
-	FWS.CalcFields (mvec, aphi);
-
-	npy_intp amx_dims[2] = {slen,nM};
-	PyObject *amx = PyArray_SimpleNew (2, amx_dims, NPY_CDOUBLE);
-	std::complex<double> *amx_ptr = (std::complex<double>*)PyArray_DATA (amx);
-	for (i = 0; i < nM; i++) {
-	    std::complex<double> *ap = amx_ptr + i;
-	    if (raster) raster->Map_MeshToSol (aphi[i], sphi);
-	    else        sphi = aphi[i];
-	    for (j = 0; j < slen; j++) {
-		*ap = sphi[j];
-		ap += nM;
-	    }
-	}
-	delete []aphi;
-	*afield = amx;
-    }
 }                                                    
 
 static PyObject *toast_fields (PyObject *self, PyObject *args)
 {
-    int hmesh, hraster;
+    int hmesh, hraster, nQ;
     double freq;
     QMMesh *mesh;
     Raster *raster;
-    const char *modestr = "d";
-    bool do_direct = false;
-    bool do_adjoint = false;
 
     PyObject *py_qvec_vl, *py_qvec_rp, *py_qvec_ci;
-    PyObject *py_mvec_vl, *py_mvec_rp, *py_mvec_ci;
     PyObject *py_mua, *py_mus, *py_ref;
 
-    if (!PyArg_ParseTuple (args, "iiOOOOOOOOOds",
+    if (!PyArg_ParseTuple (args, "iiiOOOOOOd",
 	&hmesh, &hraster,
-        &py_qvec_vl, &py_qvec_rp, &py_qvec_ci,
-	&py_mvec_vl, &py_mvec_rp, &py_mvec_ci,
+	&nQ, &py_qvec_vl, &py_qvec_rp, &py_qvec_ci,
 	&py_mua, &py_mus, &py_ref,
-	&freq, &modestr))
+	&freq))
         return NULL;
 
     if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
@@ -1195,32 +1184,11 @@ static PyObject *toast_fields (PyObject *self, PyObject *args)
     else if (!(raster = (Raster*)g_rastermgr.Get (hraster)))
         return NULL;
 
-    for (const char *c = modestr; *c; c++) {
-        switch(*c) {
-     
-                case 'd': case 'D':
-                do_direct = true;
-                break;
-                
-                case 'a': case 'A':
-                do_adjoint = true;
-                break;
-        }
-    }
-
     int n = mesh->nlen();
-    int nQ = mesh->nQ;
-    int nM = mesh->nM;
-
     int *qrowptr = (int*)PyArray_DATA(py_qvec_rp);
     int *qcolidx = (int*)PyArray_DATA(py_qvec_ci);
     std::complex<double> *qval = (std::complex<double>*)PyArray_DATA(py_qvec_vl);
     CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval);
-
-    int *mrowptr = (int*)PyArray_DATA(py_mvec_rp);
-    int *mcolidx = (int*)PyArray_DATA(py_mvec_ci);
-    std::complex<double> *mval = (std::complex<double>*)PyArray_DATA(py_mvec_vl);
-    CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval);
 
     double *mua_ptr = (double*)PyArray_DATA(py_mua);
     RVector mua (n, mua_ptr);
@@ -1233,24 +1201,13 @@ static PyObject *toast_fields (PyObject *self, PyObject *args)
 
     PyObject *dfield, *afield;
 
-    CalcFields (mesh, raster, qvec, mvec, mua, mus, ref, freq,
-		"DIRECT", 1e-12, &dfield, do_adjoint ? &afield : NULL);
+    CalcFields (mesh, raster, qvec, mua, mus, ref, freq,
+		"DIRECT", 1e-12, &dfield);
 
     PyObject *ret;
 
-    if (do_direct) {
-	if (do_adjoint)
-	    ret = Py_BuildValue ("OO", dfield, afield);
-	else
-	    ret = Py_BuildValue ("O", dfield);
-    } else {
-	if (do_adjoint)
-	    ret = Py_BuildValue ("O", afield);
-	else
-	    ret = NULL;
-    }
+    ret = Py_BuildValue ("O", dfield);
     Py_DECREF(dfield);
-    if (do_adjoint) Py_DECREF(afield);
 
     if (ret)
 	return ret;
@@ -1364,6 +1321,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 static PyObject *toast_jacobian (PyObject *self, PyObject *args)
 {
     int hmesh, hraster, i, j;
+    npy_intp *dims;
     QMMesh *mesh;
     Raster *raster;
     PyObject *py_dphi, *py_aphi, *py_proj;
@@ -1383,17 +1341,43 @@ static PyObject *toast_jacobian (PyObject *self, PyObject *args)
     int nqm = mesh->nQM;
 
     // set up direct fields
+    dims = PyArray_DIMS(py_dphi);
+    if (dims[0] != n) {
+	PyErr_SetString(PyExc_ValueError,
+	    "dphi: incorrect dim[0]. Should be #mesh nodes.");
+	return NULL;
+    }
+    if (dims[1] != nq) {
+	PyErr_SetString(PyExc_ValueError,
+	    "dphi: incorrect dim[1]. Should be #sources.");
+	return NULL;
+    }
     std::complex<double> *dphi_ptr = (std::complex<double>*)PyArray_DATA(py_dphi);
     CVector *dphi = new CVector[nq];
     for (i = 0; i < nq; i++) {
-	dphi[i].Relink (dphi_ptr + i*n, n);
+	dphi[i].New(n);
+	for (j = 0; j < n; j++)
+	    dphi[i][j] = dphi_ptr[i + j*nq];
     }
 
     // set up adjoint fields
+    dims = PyArray_DIMS(py_aphi);
+    if (dims[0] != n) {
+	PyErr_SetString(PyExc_RuntimeError,
+	    "aphi: incorrect dim[0]. Should be #mesh nodes.");
+	return NULL;
+    }
+    if (dims[1] != nm) {
+	PyErr_SetString(PyExc_RuntimeError,
+	    "aphi: incorrect dim[1]. Should be #detectors.");
+	return NULL;
+    }
     std::complex<double> *aphi_ptr = (std::complex<double>*)PyArray_DATA(py_aphi);
     CVector *aphi = new CVector[nm];
     for (i = 0; i < nm; i++) {
-	aphi[i].Relink (aphi_ptr + i*n, n);
+	aphi[i].New(n);
+	for (j = 0; j < n; j++)
+	    aphi[i][j] = aphi_ptr[i + j*nm];
     }
 
     // copy projections
