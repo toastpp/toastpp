@@ -12,7 +12,7 @@
 # to avoid python blocking on opening the figure
 
 
-import pdb
+#import pdb
 
 # Import various modules
 import os
@@ -68,9 +68,9 @@ def projection(phi, mvec):
 
 # ---------------------------------------------------
 # Image error
-def imerr(im1,im2):
-    im1 = np.reshape(im1,-1,1)
-    im2 = np.reshape(im2,-1,1)
+def imerr(im1, im2):
+    im1 = np.reshape(im1, -1, 1)
+    im2 = np.reshape(im2, -1, 1)
     err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
@@ -86,9 +86,9 @@ from toast import raster as tr
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
 meshfile1 = meshdir + "ellips_tri10.msh"  # mesh for target data generation
 meshfile2 = meshdir + "circle25_32.msh"   # mesh for reconstruction
-qmfile = meshdir + "circle25_32x32.qm"
-muafile = meshdir + "tgt_mua_ellips_tri10.nim"
-musfile = meshdir + "tgt_mus_ellips_tri10.nim"
+qmfile = meshdir + "circle25_32x32.qm"    # source-detector file
+muafile = meshdir + "tgt_mua_ellips_tri10.nim" # nodal target absorption
+musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
 
 # A few general parameters
 c0 = 0.3        # speed of light in vacuum [mm/ps]
@@ -107,8 +107,8 @@ nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
 
 # Target parameters
-mua = mesh_fwd.ReadNim (muafile)
-mus = mesh_fwd.ReadNim (musfile)
+mua = mesh_fwd.ReadNim(muafile)
+mus = mesh_fwd.ReadNim(musfile)
 ref = np.ones((1, nlen)) * refind
 freq = 100  # MHz
 
@@ -119,15 +119,15 @@ mus_min = 1     # np.min(mus)
 mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
-phi = mesh_fwd.Fields(-1,qvec,mua,mus,ref,freq)
+phi = mesh_fwd.Fields(-1, qvec, mua, mus, ref, freq)
 data = projection(phi, mvec)
 lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
 
 # Map target parameters to images for display
 basis_fwd = tr.Raster(mesh_fwd, grd)
-bmua_tgt = np.reshape (basis_fwd.Map('M->B', mua), grd)
-bmus_tgt = np.reshape (basis_fwd.Map('M->B', mus), grd)
+bmua_tgt = np.reshape(basis_fwd.Map('M->B', mua), grd)
+bmus_tgt = np.reshape(basis_fwd.Map('M->B', mus), grd)
 
 
 # ---------------------------------------------------
@@ -159,7 +159,7 @@ sd_lnamp = np.ones(lnamp.shape) * np.linalg.norm(lnamp_tgt-lnamp)
 sd_phase = np.ones(phase.shape) * np.linalg.norm(phase_tgt-phase)
 sd = np.concatenate((sd_lnamp,sd_phase))
 
-# Map parameters to solution basis
+# Map parameter estimates to solution basis
 bmua = basis_inv.Map('M->B', mua)
 bmus = basis_inv.Map('M->B', mus)
 bkap = basis_inv.Map('M->B', kap)
@@ -198,7 +198,7 @@ while itr <= itrmax:
     r = matrix(J).transpose() * (2*(data-proj)/sd**2)
     r = np.multiply(r, x)
 
-    pdb.set_trace()
+#    pdb.set_trace()
 
     if itr > 1:
         delta_old = delta_new
@@ -219,7 +219,7 @@ while itr <= itrmax:
             d = s + d*beta
 
     delta_d = np.dot(d.transpose(), d)
-    step,err = tm.Linesearch (logx, d, step, err, objective_ls)
+    step,err = tm.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
@@ -287,4 +287,3 @@ while itr <= itrmax:
     
     itr = itr+1
 
-    

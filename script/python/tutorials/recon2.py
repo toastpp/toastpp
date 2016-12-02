@@ -6,7 +6,7 @@
 #
 # Note: run this with
 #
-#     ipython -pylab recon1.py
+#     ipython -pylab recon2.py
 #
 # to avoid python blocking on opening the figure
 
@@ -86,9 +86,9 @@ from toast import raster as tr
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
 meshfile1 = meshdir + "ellips_tri10.msh"  # mesh for target data generation
 meshfile2 = meshdir + "circle25_32.msh"   # mesh for reconstruction
-qmfile = meshdir + "circle25_32x32.qm"
-muafile = meshdir + "tgt_mua_ellips_tri10.nim"
-musfile = meshdir + "tgt_mus_ellips_tri10.nim"
+qmfile = meshdir + "circle25_32x32.qm"    # source-detector file
+muafile = meshdir + "tgt_mua_ellips_tri10.nim" # nodal target absorption
+musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
 
 # A few general parameters
 c0 = 0.3        # speed of light in vacuum [mm/ps]
@@ -103,12 +103,12 @@ mesh_fwd.ReadQM(qmfile)
 qvec = mesh_fwd.Qvec(type='Neumann', shape='Gaussian', width=2)
 mvec = mesh_fwd.Mvec(shape='Gaussian', width=2, ref=refind)
 nlen = mesh_fwd.NodeCount()
-nqm = qvec.shape[0] * mvec.shape[0]
+nqm = qvec.shape[1] * mvec.shape[1]
 ndat = nqm*2
 
 # Target parameters
-mua = mesh_fwd.ReadNim (muafile)
-mus = mesh_fwd.ReadNim (musfile)
+mua = mesh_fwd.ReadNim(muafile)
+mus = mesh_fwd.ReadNim(musfile)
 ref = np.ones((1, nlen)) * refind
 freq = 100  # MHz
 
@@ -123,7 +123,7 @@ phi = mesh_fwd.Fields(-1, qvec, mua, mus, ref, freq)
 data = projection(phi, mvec)
 
 # Add noise
-data = data + data*noiselevel*np.random.normal(0,1,data.shape)
+data = data + data*noiselevel*np.random.normal(0, 1, data.shape)
 
 lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
@@ -163,7 +163,7 @@ sd_lnamp = np.ones(lnamp.shape) * np.linalg.norm(lnamp_tgt-lnamp)
 sd_phase = np.ones(phase.shape) * np.linalg.norm(phase_tgt-phase)
 sd = np.concatenate((sd_lnamp,sd_phase))
 
-# Map parameters to solution basis
+# Map parameter estimates to solution basis
 bmua = basis_inv.Map('M->B', mua)
 bmus = basis_inv.Map('M->B', mus)
 bkap = basis_inv.Map('M->B', kap)
@@ -187,14 +187,14 @@ errmus = np.array([imerr(bmus, bmus_tgt)])
 itr = 1
 step = 1.0
 
-hfig=plt.figure(1)
+hfig=plt.figure()
 plt.show()
 
 while itr <= itrmax:
     errp = err
     
     r = -tm.Gradient(mesh_inv.Handle(), basis_inv.Handle(),
-                       qvec, mvec, mua, mus, ref, freq, data, sd)
+                     qvec, mvec, mua, mus, ref, freq, data, sd)
     r = matrix(r).transpose()
     r = np.multiply(r, x)
     
@@ -217,7 +217,7 @@ while itr <= itrmax:
             d = s + d*beta
 
     delta_d = np.dot(d.transpose(), d)
-    step,err = tm.Linesearch (logx, d, step, err, objective_ls)
+    step,err = tm.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
@@ -237,7 +237,7 @@ while itr <= itrmax:
     errmua = np.concatenate((errmua, [imerr(bmua, bmua_tgt)]))
     errmus = np.concatenate((errmus, [imerr(bmus, bmus_tgt)]))
     print ("Iteration "+str(itr)+", objective "+str(err))
-    
+
     plt.clf()
     hfig.suptitle("Iteration "+str(itr))
 
