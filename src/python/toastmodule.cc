@@ -1232,10 +1232,6 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 
     RDenseMatrix J(ndat,nprm);
 
-    ofstream ofs("dbg_p.dat");
-    ofs << dphi[0] << endl;
-    ofs.close();
-
     GenerateJacobian (raster, mesh, dphi, aphi, proj, dscale, J);
 
     npy_intp J_dims[2] = {ndat, nprm};
@@ -1256,14 +1252,13 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     double freq, char *solver, double tol, PyObject **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM, slen;
+    int i, n, dim, nQ, nM, nQM;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
-    slen = (raster ? raster->SLen() : n);
 
     CVector *dphi, *aphi;
     CFwdSolver FWS (mesh, solver, tol);
@@ -1305,10 +1300,6 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
 	*proj = FWS.ProjectAll (mvec, dphi, DATA_LIN);
     	//ProjectAll (*mesh, FWS, mvec, dphi, *proj);
     }
-
-    ofstream ofs("dbg_p.dat");
-    ofs << *proj << endl;
-    ofs.close();
 
     // Calculate Jacobian
     CalcJacobian (mesh, raster, dphi, aphi, proj, dscale, res);
@@ -1575,12 +1566,12 @@ static PyObject *toast_gradient (PyObject *self, PyObject *args)
     int *qrowptr = (int*)PyArray_DATA(py_qvec_rp);
     int *qcolidx = (int*)PyArray_DATA(py_qvec_ci);
     std::complex<double> *qval = (std::complex<double>*)PyArray_DATA(py_qvec_vl);
-    CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval, SHALLOW_COPY);
+    CCompRowMatrix qvec(nQ, n, qrowptr, qcolidx, qval/*, SHALLOW_COPY*/);
 
     int *mrowptr = (int*)PyArray_DATA(py_mvec_rp);
     int *mcolidx = (int*)PyArray_DATA(py_mvec_ci);
     std::complex<double> *mval = (std::complex<double>*)PyArray_DATA(py_mvec_vl);
-    CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval, SHALLOW_COPY);
+    CCompRowMatrix mvec(nM, n, mrowptr, mcolidx, mval/*, SHALLOW_COPY*/);
 
     double *mua_ptr = (double*)PyArray_DATA(py_mua);
     RVector mua (n, mua_ptr, SHALLOW_COPY);

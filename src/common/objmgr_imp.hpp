@@ -65,7 +65,6 @@ bool ObjectManager<ObjTp>::Delete (int idx)
         delete obj;
 	list[idx-1] = 0;
 	nobj--;
-	std::cerr << "Deleting mesh " << idx << std::endl;
 	return true;
     } else {
         std::cerr << "Not a valid object handle: " << idx << std::endl;

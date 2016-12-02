@@ -12,7 +12,7 @@
 # to avoid python blocking on opening the figure
 
 
-#import pdb
+import pdb
 
 # Import various modules
 import os
@@ -29,12 +29,12 @@ plt.ion()
 
 itrmax = 100  # max number of nonlinear iterations
 resetCG = 10
-grd = np.array([100,100])
+grd = np.array([100, 100])
 
 # ---------------------------------------------------
 # Objective function
 def objective(proj,data,sd,logx):
-    err_data = np.sum(np.power((data-proj)/sd,2))
+    err_data = np.sum(np.power((data-proj)/sd, 2))
     return err_data
 
 
@@ -48,22 +48,22 @@ def objective_ls(logx):
     smua = scmua/cm
     skap = sckap/cm
     smus = 1/(3*skap) - smua
-    mua = tr.MapBasis(hraster, 'S->M', smua)
-    mus = tr.MapBasis(hraster, 'S->M', smus)
-    phi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
-    p = projection(phi,mvec)
-    return objective(p,data,sd,logx)
+    mua = basis_inv.Map('S->M', smua)
+    mus = basis_inv.Map('S->M', smus)
+    phi = mesh_inv.Fields(-1, qvec, mua, mus, ref, freq)
+    p = projection(phi, mvec)
+    return objective(p, data, sd, logx)
 
 
 # ---------------------------------------------------
 # Projections from fields
-def projection(phi,mvec):
+def projection(phi, mvec):
     gamma = mvec.transpose() * phi
-    gamma = np.reshape(gamma,(-1,1),'F')
+    gamma = np.reshape(gamma, (-1, 1), 'F')
     lgamma = np.log(gamma)
     lnamp = lgamma.real
     phase = lgamma.imag
-    return np.concatenate((lnamp,phase))
+    return np.concatenate((lnamp, phase))
 
 
 # ---------------------------------------------------
@@ -71,7 +71,7 @@ def projection(phi,mvec):
 def imerr(im1,im2):
     im1 = np.reshape(im1,-1,1)
     im2 = np.reshape(im2,-1,1)
-    err = np.sum(np.power(im1-im2,2))/np.sum(np.power(im2,2))
+    err = np.sum(np.power(im1-im2, 2))/np.sum(np.power(im2, 2))
     return err
 
 
@@ -95,6 +95,7 @@ c0 = 0.3        # speed of light in vacuum [mm/ps]
 refind = 1.4    # refractive index in medium (homogeneous)
 cm = c0/refind  # speed of light in medium
 
+
 # ---------------------------------------------------
 # Generate target data
 mesh_fwd = tm.Mesh(meshfile1)
@@ -108,8 +109,8 @@ ndat = nqm*2
 # Target parameters
 mua = mesh_fwd.ReadNim (muafile)
 mus = mesh_fwd.ReadNim (musfile)
-ref = np.ones((1,nlen)) * refind
-freq = 100
+ref = np.ones((1, nlen)) * refind
+freq = 100  # MHz
 
 # Target ranges (for display)
 mua_min = 0.015 # np.min(mua)
@@ -119,40 +120,37 @@ mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
 phi = mesh_fwd.Fields(-1,qvec,mua,mus,ref,freq)
-data = projection(phi,mvec)
+data = projection(phi, mvec)
 lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
 
 # Map target parameters to images for display
-hraster_fwd = tr.Make (mesh_fwd.Handle(),grd)
-bmua_tgt = np.reshape(tr.MapBasis (hraster_fwd, 'M->B', mua),grd)
-bmus_tgt = np.reshape(tr.MapBasis (hraster_fwd, 'M->B', mus),grd)
-
-# Clear objects
-tr.Clear (hraster_fwd)
+basis_fwd = tr.Raster(mesh_fwd, grd)
+bmua_tgt = np.reshape (basis_fwd.Map('M->B', mua), grd)
+bmus_tgt = np.reshape (basis_fwd.Map('M->B', mus), grd)
 
 
 # ---------------------------------------------------
 # Set up inverse problem
 mesh_inv = tm.Mesh(meshfile2)
 mesh_inv.ReadQM(qmfile)
-qvec = mesh_inv.Qvec (type='Neumann',shape='Gaussian',width=2)
-mvec = mesh_inv.Mvec (shape='Gaussian',width=2,ref=1.4)
-nlen = mesh_inv.NodeCount ()
+qvec = mesh_inv.Qvec(type='Neumann', shape='Gaussian', width=2)
+mvec = mesh_inv.Mvec(shape='Gaussian', width=2, ref=refind)
+nlen = mesh_inv.NodeCount()
 
 # Initial parameter estimates
 mua = np.ones(nlen) * 0.025
 mus = np.ones(nlen) * 2
 kap = 1/(3*(mua+mus))
-ref = np.ones(nlen) * 1.4
+ref = np.ones(nlen) * refind
 freq = 100
 
 # Solution basis
-hraster = tr.Make (mesh_inv.Handle(),grd);
+basis_inv = tr.Raster(mesh_inv, grd)
 
 # Initial projections
-phi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
-proj = projection(phi,mvec)
+phi = mesh_inv.Fields(-1, qvec, mua, mus, ref, freq)
+proj = projection(phi, mvec)
 lnamp = proj[0:nqm]
 phase = proj[nqm:nqm*2]
 
@@ -162,25 +160,25 @@ sd_phase = np.ones(phase.shape) * np.linalg.norm(phase_tgt-phase)
 sd = np.concatenate((sd_lnamp,sd_phase))
 
 # Map parameters to solution basis
-bmua = tr.MapBasis(hraster,'M->B',mua)
-bmus = tr.MapBasis(hraster,'M->B',mus)
-bkap = tr.MapBasis(hraster,'M->B',kap)
+bmua = basis_inv.Map('M->B', mua)
+bmus = basis_inv.Map('M->B', mus)
+bkap = basis_inv.Map('M->B', kap)
 bcmua = bmua * cm
 bckap = bkap * cm
-scmua = tr.MapBasis(hraster,'B->S',bcmua)
-sckap = tr.MapBasis(hraster,'B->S',bckap)
+scmua = basis_inv.Map('B->S', bcmua)
+sckap = basis_inv.Map('B->S', bckap)
 
 # Vector of unknowns
-x = np.asmatrix(np.concatenate((scmua,sckap))).transpose()
+x = np.asmatrix(np.concatenate((scmua, sckap))).transpose()
 logx = np.log(x)
 
 # Initial error
-err0 = objective(proj,data,sd,logx)
+err0 = objective(proj, data, sd, logx)
 err = err0
 errp = 1e10
 erri = np.array([err])
-errmua = np.array([imerr(bmua,bmua_tgt)])
-errmus = np.array([imerr(bmus,bmus_tgt)])
+errmua = np.array([imerr(bmua, bmua_tgt)])
+errmus = np.array([imerr(bmus, bmus_tgt)])
 
 itr = 1
 step = 1.0
@@ -193,32 +191,34 @@ while itr <= itrmax:
     dphi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
     aphi = mesh_inv.Fields(-1,mvec,mua,mus,ref,freq)
     proj = np.reshape (mvec.transpose() * dphi,(-1,1),'F')
-    J = mesh_inv.Jacobian(hraster, dphi, aphi, proj)
+    J = mesh_inv.Jacobian(basis_inv.Handle(), dphi, aphi, proj)
 
     #Gradient of cost function
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
     r = matrix(J).transpose() * (2*(data-proj)/sd**2)
-    r = np.multiply(r,x)
+    r = np.multiply(r, x)
+
+    pdb.set_trace()
 
     if itr > 1:
         delta_old = delta_new
-        delta_mid = np.dot (r.transpose(),s)
+        delta_mid = np.dot(r.transpose(), s)
         
     s = r # replace this with preconditioner
 
     if itr == 1:
         d = s
-        delta_new = np.dot(r.transpose(),d)
+        delta_new = np.dot(r.transpose(), d)
         delta0 = delta_new
     else:
-        delta_new = np.dot(r.transpose(),s)
+        delta_new = np.dot(r.transpose(), s)
         beta = (delta_new-delta_mid) / delta_old
         if itr % resetCG == 0 or beta <= 0:
             d = s
         else:
             d = s + d*beta
 
-    delta_d = np.dot(d.transpose(),d)
+    delta_d = np.dot(d.transpose(), d)
     step,err = tm.Linesearch (logx, d, step, err, objective_ls)
 
     logx = logx + d*step
@@ -229,15 +229,15 @@ while itr <= itrmax:
     smua = scmua/cm
     skap = sckap/cm
     smus = 1/(3*skap) - smua
-    mua = tr.MapBasis(hraster, 'S->M', smua)
-    mus = tr.MapBasis(hraster, 'S->M', smus)
+    mua = basis_inv.Map('S->M', smua)
+    mus = basis_inv.Map('S->M', smus)
 
-    bmua = np.reshape(tr.MapBasis(hraster, 'S->B', smua),grd)
-    bmus = np.reshape(tr.MapBasis(hraster, 'S->B', smus),grd)
+    bmua = np.reshape(basis_inv.Map('S->B', smua), grd)
+    bmus = np.reshape(basis_inv.Map('S->B', smus), grd)
 
-    erri=np.concatenate((erri,[err]))
-    errmua = np.concatenate((errmua,[imerr(bmua,bmua_tgt)]))
-    errmus = np.concatenate((errmus,[imerr(bmus,bmus_tgt)]))
+    erri = np.concatenate((erri, [err]))
+    errmua = np.concatenate((errmua, [imerr(bmua, bmua_tgt)]))
+    errmus = np.concatenate((errmus, [imerr(bmus, bmus_tgt)]))
     print ("Iteration "+str(itr)+", objective "+str(err))
 
     plt.clf()
