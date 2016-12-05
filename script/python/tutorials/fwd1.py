@@ -13,9 +13,7 @@ import matplotlib.pyplot as plt
 
 # PyToast environment
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
-
-# Import the toast modules
-from toast import mesh as tm
+import toast
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
@@ -23,7 +21,7 @@ meshfile = meshdir + "circle25_32.msh"
 qmfile = meshdir + "circle25_32x32.qm"
 
 # Load the mesh and source/detector specs
-mesh = tm.Mesh(meshfile)
+mesh = toast.Mesh(meshfile)
 mesh.ReadQM(qmfile)
 nlen = mesh.NodeCount()
 

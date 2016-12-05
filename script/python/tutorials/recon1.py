@@ -12,8 +12,6 @@
 # to avoid python blocking on opening the figure
 
 
-#import pdb
-
 # Import various modules
 import os
 import math
@@ -50,7 +48,7 @@ def objective_ls(logx):
     smus = 1/(3*skap) - smua
     mua = basis_inv.Map('S->M', smua)
     mus = basis_inv.Map('S->M', smus)
-    phi = mesh_inv.Fields(-1, qvec, mua, mus, ref, freq)
+    phi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
     p = projection(phi, mvec)
     return objective(p, data, sd, logx)
 
@@ -77,10 +75,7 @@ def imerr(im1, im2):
 
 # PyToast environment
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
-
-# Import the toast modules
-from toast import mesh as tm
-from toast import raster as tr
+import toast
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
@@ -98,7 +93,7 @@ cm = c0/refind  # speed of light in medium
 
 # ---------------------------------------------------
 # Generate target data
-mesh_fwd = tm.Mesh(meshfile1)
+mesh_fwd = toast.Mesh(meshfile1)
 mesh_fwd.ReadQM(qmfile)
 qvec = mesh_fwd.Qvec(type='Neumann', shape='Gaussian', width=2)
 mvec = mesh_fwd.Mvec(shape='Gaussian', width=2, ref=refind)
@@ -119,20 +114,20 @@ mus_min = 1     # np.min(mus)
 mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
-phi = mesh_fwd.Fields(-1, qvec, mua, mus, ref, freq)
+phi = mesh_fwd.Fields(None, qvec, mua, mus, ref, freq)
 data = projection(phi, mvec)
 lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
 
 # Map target parameters to images for display
-basis_fwd = tr.Raster(mesh_fwd, grd)
+basis_fwd = toast.Raster(mesh_fwd, grd)
 bmua_tgt = np.reshape(basis_fwd.Map('M->B', mua), grd)
 bmus_tgt = np.reshape(basis_fwd.Map('M->B', mus), grd)
 
 
 # ---------------------------------------------------
 # Set up inverse problem
-mesh_inv = tm.Mesh(meshfile2)
+mesh_inv = toast.Mesh(meshfile2)
 mesh_inv.ReadQM(qmfile)
 qvec = mesh_inv.Qvec(type='Neumann', shape='Gaussian', width=2)
 mvec = mesh_inv.Mvec(shape='Gaussian', width=2, ref=refind)
@@ -146,10 +141,10 @@ ref = np.ones(nlen) * refind
 freq = 100
 
 # Solution basis
-basis_inv = tr.Raster(mesh_inv, grd)
+basis_inv = toast.Raster(mesh_inv, grd)
 
 # Initial projections
-phi = mesh_inv.Fields(-1, qvec, mua, mus, ref, freq)
+phi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
 proj = projection(phi, mvec)
 lnamp = proj[0:nqm]
 phase = proj[nqm:nqm*2]
@@ -188,8 +183,8 @@ plt.show()
 
 while itr <= itrmax:
     errp = err
-    dphi = mesh_inv.Fields(-1,qvec,mua,mus,ref,freq)
-    aphi = mesh_inv.Fields(-1,mvec,mua,mus,ref,freq)
+    dphi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
+    aphi = mesh_inv.Fields(None, mvec, mua, mus, ref, freq)
     proj = np.reshape (mvec.transpose() * dphi,(-1,1),'F')
     J = mesh_inv.Jacobian(basis_inv.Handle(), dphi, aphi, proj)
 
@@ -197,8 +192,6 @@ while itr <= itrmax:
     proj = np.concatenate ((np.log(proj).real, np.log(proj).imag))
     r = matrix(J).transpose() * (2*(data-proj)/sd**2)
     r = np.multiply(r, x)
-
-#    pdb.set_trace()
 
     if itr > 1:
         delta_old = delta_new
@@ -219,7 +212,7 @@ while itr <= itrmax:
             d = s + d*beta
 
     delta_d = np.dot(d.transpose(), d)
-    step,err = tm.Linesearch(logx, d, step, err, objective_ls)
+    step,err = toast.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)

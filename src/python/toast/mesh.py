@@ -199,13 +199,13 @@ class Mesh:
         rp,ci,vl=toastmod.Sysmat(self.handle, mua, mus, ref, freq)
         return sparse.csr_matrix((vl,ci,rp))
 
-    def Fields(self, hraster, qvec, mua, mus, ref, freq):
+    def Fields(self, raster, qvec, mua, mus, ref, freq):
         """Calculate the nodal photon density fields.
         
         Syntax: phi = mesh.Fields(raster,qvec,mua,mus,ref,freq)
 
         Parameters:
-            raster: raster handle (or -1 for mesh basis)
+            raster: raster object (or None for mesh basis)
             qvec:   sparse matrix of source vectors
             mua:    vector of nodal absorption coefficients
             mus:    vector of nodal scattering coefficients
@@ -214,14 +214,24 @@ class Mesh:
 
         Return values:
             phi:    Matrix of photon density fields, one column per source.
+
+        Note:
+            If a valid raster object is passed, the resulting fields will
+            automatically be mapped to that basis. Otherwise, the fields are
+            returned in the mesh basis.
         """
         if sparse.isspmatrix_csr(qvec)==True:
             qvec = sparse.csc_matrix(qvec)
             # convert to per-source order
 
         nq = qvec.shape[1]
-        
-        return toastmod.Fields(self.handle, hraster,
+
+        if raster is None:
+            rhandle = -1
+        else:
+            rhandle = raster.handle
+            
+        return toastmod.Fields(self.handle, rhandle,
             nq, qvec.data, qvec.indptr, qvec.indices,
             mua, mus, ref, freq)
 

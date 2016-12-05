@@ -8,8 +8,6 @@
 # to avoid python blocking on opening the figure
 
 
-import pdb
-
 # Import various modules
 import os
 import math
@@ -26,7 +24,7 @@ plt.ion()
 itrmax = 100  # max number of nonlinear iterations
 tolCG = 1e-7
 resetCG = 10
-grd = np.array([256, 256])
+grd = np.array([100, 100])
 noiselevel = 0.01
 tau = 1e-3
 beta = 0.01
@@ -51,7 +49,7 @@ def objective_ls(logx):
     smus = 1/(3*skap) - smua
     mua = basis_inv.Map('S->M', smua)
     mus = basis_inv.Map('S->M', smus)
-    phi = mesh_inv.Fields(-1, qvec, mua, mus, ref, freq)
+    phi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
     p = projection(phi, mvec)
     return objective(p, data, sd, logx)
 
@@ -78,16 +76,13 @@ def imerr(im1, im2):
 
 # PyToast environment
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
-
-# Import the toast modules
-from toast import mesh as tm
-from toast import raster as tr
+import toast
 from toast import regul as treg
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
 meshfile1 = meshdir + "ellips_tri10.msh"  # mesh for target data generation
-meshfile2 = meshdir + "circle25_64.msh"   # mesh for reconstruction
+meshfile2 = meshdir + "circle25_32.msh"   # mesh for reconstruction
 qmfile = meshdir + "circle25_32x32.qm"    # source-detector file
 muafile = meshdir + "tgt_mua_ellips_tri10.nim" # nodal target absorption
 musfile = meshdir + "tgt_mus_ellips_tri10.nim" # nodal target scattering
@@ -108,7 +103,7 @@ mwidth = 2              # detector width
 # Generate target data
 
 # Set up mesh geometry
-mesh_fwd = tm.Mesh(meshfile1)
+mesh_fwd = toast.Mesh(meshfile1)
 mesh_fwd.ReadQM(qmfile)
 qvec = mesh_fwd.Qvec(type=qtype, shape=qprof, width=qwidth)
 mvec = mesh_fwd.Mvec(shape=mprof, width=mwidth, ref=refind)
@@ -128,7 +123,7 @@ mus_min = 1     # np.min(mus)
 mus_max = 4.5   # np.max(mus)
 
 # Solve forward problem
-phi = mesh_fwd.Fields(-1, qvec, mua, mus, ref, freq)
+phi = mesh_fwd.Fields(None, qvec, mua, mus, ref, freq)
 data = projection(phi, mvec)
 
 # Add noise
@@ -138,7 +133,7 @@ lnamp_tgt = data[0:nqm]
 phase_tgt = data[nqm:nqm*2]
 
 # Map target parameters to images for display
-basis_fwd = tr.Raster(mesh_fwd, grd)
+basis_fwd = toast.Raster(mesh_fwd, grd)
 bmua_tgt = np.reshape(basis_fwd.Map('M->B', mua), grd)
 bmus_tgt = np.reshape(basis_fwd.Map('M->B', mus), grd)
 
@@ -147,7 +142,7 @@ bmus_tgt = np.reshape(basis_fwd.Map('M->B', mus), grd)
 # Solve inverse problem
 
 # Set up mesh geometry
-mesh_inv = tm.Mesh(meshfile2)
+mesh_inv = toast.Mesh(meshfile2)
 mesh_inv.ReadQM(qmfile)
 qvec = mesh_inv.Qvec(type=qtype, shape=qprof, width=qwidth)
 mvec = mesh_inv.Mvec(shape=mprof, width=mwidth, ref=refind)
@@ -160,10 +155,10 @@ kap = 1/(3*(mua+mus))
 ref = np.ones(nlen) * refind
 
 # Solution basis
-basis_inv = tr.Raster(mesh_inv, grd)
+basis_inv = toast.Raster(mesh_inv, grd)
 
 # Initial projections
-phi = mesh_inv.Fields(-1, qvec, mua, mus, ref, freq)
+phi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
 proj = projection(phi, mvec)
 lnamp = proj[0:nqm]
 phase = proj[nqm:nqm*2]
@@ -211,7 +206,7 @@ plt.show()
 while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     errp = err
     
-    r = -tm.Gradient(mesh_inv.Handle(), basis_inv.Handle(),
+    r = -toast.Gradient(mesh_inv.Handle(), basis_inv.Handle(),
                      qvec, mvec, mua, mus, ref, freq, data, sd)
     r = matrix(r).transpose()
     r = np.multiply(r, x)  # parameter scaling
@@ -272,7 +267,7 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
             d = s + d*beta
 
     delta_d = np.dot(d.transpose(), d)
-    step,err = tm.Linesearch(logx, d, step, err, objective_ls)
+    step,err = toast.Linesearch(logx, d, step, err, objective_ls)
 
     logx = logx + d*step
     x = np.exp(logx)
