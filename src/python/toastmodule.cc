@@ -1,6 +1,7 @@
 // -*- C++ -*-
 #include <Python.h>
 #include <numpy/arrayobject.h>
+#include "toastarch.h"
 #include "felib.h"
 #include "stoastlib.h"
 #include <fstream>

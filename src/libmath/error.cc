@@ -5,7 +5,6 @@
 // ==========================================================================
 
 #define MATHLIB_IMPLEMENTATION
-#define __ERROR_CC
 
 #include <iostream>
 #include <fstream>
@@ -18,6 +17,8 @@
 #include <time.h>
 
 #include "mathlib.h"
+
+#define __ERROR_CC
 
 using namespace std;
 

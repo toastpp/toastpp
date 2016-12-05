@@ -30,8 +30,6 @@
 #define __PRETTY_FUNCTION__ ""
 #endif
 
-MATHLIB extern int toastVerbosity;  // global verbosity flag
-
 #define ERROR_UNDEF Error_Undef(__PRETTY_FUNCTION__,__FILE__,__LINE__)
 
 // unconditional error checking
@@ -133,6 +131,7 @@ MATHLIB void LogOut_InitProgressbar (const char *name, int len, int maxcount);
 MATHLIB void LogOut_Progress (int count);
     // set progress bar to show state `count' of `maxcount'
 #ifndef __ERROR_CC
+MATHLIB extern int toastVerbosity;  // global verbosity flag
 MATHLIB extern char logbuf[256];
 MATHLIB extern std::ofstream logfile;
 #endif

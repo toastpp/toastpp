@@ -33,7 +33,7 @@ beta = 0.01
 # Objective function
 def objective(proj,data,sd,logx):
     err_data = np.sum(np.power((data-proj)/sd, 2))
-    err_prior = treg.Value(hreg, logx)
+    err_prior = regul.Value(logx)
     return err_data + err_prior
 
 
@@ -77,7 +77,6 @@ def imerr(im1, im2):
 # PyToast environment
 execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
-from toast import regul as treg
 
 # Set the file paths
 meshdir = os.path.expandvars("$TOASTDIR/test/2D/meshes/")
@@ -185,7 +184,7 @@ slen = x.shape[0]/2
 # Create regularisation object
 #pdb.set_trace()
 #hreg = regul.Make ("TK1", hraster, logx, tau);
-hreg = treg.Make("TV", basis_inv.Handle(), logx, tau, beta=beta);
+regul = toast.Regul("TV", basis_inv, logx, tau, beta=beta);
 
 # Initial error
 err0 = objective(proj, data, sd, logx)
@@ -211,7 +210,7 @@ while itr <= itrmax and err > tolCG*err0 and errp-err > tolCG:
     r = matrix(r).transpose()
     r = np.multiply(r, x)  # parameter scaling
 
-    rr = -treg.Gradient(hreg, logx)
+    rr = -regul.Gradient(logx)
     rr = np.transpose(np.matrix(rr))
 
     r = r + rr
