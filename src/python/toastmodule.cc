@@ -239,21 +239,6 @@ static PyObject *toast_surf_data (PyObject *self, PyObject *args)
 
 // ===========================================================================
 
-static PyObject *toast_element_data (PyObject *self, PyObject *args)
-{
-    int hmesh;
-    Mesh *mesh;
-
-    if (!PyArg_ParseTuple (args, "i", &hmesh))
-        return NULL;
-    if (!(mesh = g_meshmgr.Get (hmesh)))
-        return NULL;
-    
-    // TO BE DONE
-}
-
-// ===========================================================================
-
 static PyObject *toast_mesh_node_count (PyObject *self, PyObject *args)
 {
     int hmesh;
@@ -1200,7 +1185,7 @@ static PyObject *toast_fields (PyObject *self, PyObject *args)
     double *ref_ptr = (double*)PyArray_DATA(py_ref);
     RVector ref (n, ref_ptr);
 
-    PyObject *dfield, *afield;
+    PyObject *dfield;
 
     CalcFields (mesh, raster, qvec, mua, mus, ref, freq,
 		"DIRECT", 1e-12, &dfield);
@@ -1743,6 +1728,288 @@ static PyObject *toast_regul_hdiag (PyObject *self, PyObject *args)
 
 // ===========================================================================
 
+static PyObject *toast_element_dof (PyObject *self, PyObject *args)
+{
+    int hmesh, elid;
+    QMMesh *mesh;
+    
+    if (!PyArg_ParseTuple (args, "ii", &hmesh, &elid))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    if (elid < 0 || elid >= mesh->nlen())
+	return NULL;
+
+    Element *pel = mesh->elist[elid];
+    long int nnd = (long int)pel->nNode();
+
+    PyObject *pydof = PyArray_SimpleNew (1, &nnd, PyArray_INT32);
+    int *data = (int*)PyArray_DATA (pydof);
+    memcpy (data, pel->Node, nnd*sizeof(int));
+
+    return Py_BuildValue ("N", pydof);
+}
+
+// ===========================================================================
+
+static PyObject *toast_element_size(PyObject *self, PyObject *args)
+{
+    int hmesh, elid;
+    QMMesh *mesh;
+    
+    if (!PyArg_ParseTuple (args, "ii", &hmesh, &elid))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    if (elid < 0) { // run over entire mesh
+	long int nel = (long int)mesh->elen();
+	PyObject *pyelsize = PyArray_SimpleNew (1, &nel, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(pyelsize);
+	for (int i = 0; i < mesh->elen(); i++)
+	    data[i] = mesh->ElSize(i);
+	return Py_BuildValue("N", pyelsize);
+    } else { // single element
+	if (elid >= mesh->nlen())
+	    return NULL;
+	return Py_BuildValue("d", mesh->ElSize(elid));
+    }
+}
+
+// ===========================================================================
+
+static PyObject *toast_element_region(PyObject *self, PyObject *args)
+{
+    int hmesh, elid;
+    QMMesh *mesh;
+    
+    if (!PyArg_ParseTuple (args, "ii", &hmesh, &elid))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    if (elid < 0) { // run over entire mesh
+	long int nel = (long int)mesh->elen();
+	PyObject *pyelreg = PyArray_SimpleNew (1, &nel, NPY_INT);
+	int *data = (int*)PyArray_DATA(pyelreg);
+	for (int i = 0; i < mesh->elen(); i++)
+	    data[i] = mesh->elist[i]->Region();
+	return Py_BuildValue("N", pyelreg);
+    } else { // single element
+	if (elid >= mesh->elen())
+	    return NULL;
+	return Py_BuildValue("i", mesh->elist[elid]->Region());
+    }
+}
+
+// ===========================================================================
+
+static PyObject *toast_element_setregion(PyObject *self, PyObject *args)
+{
+    int hmesh, elid, reg;
+    QMMesh *mesh;
+    
+    if (!PyArg_ParseTuple (args, "iii", &hmesh, &elid, &reg))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    if (elid >= 0 && elid < mesh->elen())
+	mesh->elist[elid]->SetRegion(reg);
+
+    Py_RETURN_NONE;
+}
+
+// ===========================================================================
+
+static PyObject *toast_mesh_setregion(PyObject *self, PyObject *args)
+{
+    int hmesh;
+    QMMesh *mesh;
+    PyObject *py_reglist;
+    
+    if (!PyArg_ParseTuple (args, "iO", &hmesh, &py_reglist))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    npy_intp *dims = PyArray_DIMS(py_reglist);
+    int *reg = (int*)PyArray_DATA(py_reglist);
+
+    if (dims[0]*dims[1] < mesh->elen())
+	return NULL;
+
+    for (int i = 0; i < mesh->elen(); i++)
+	mesh->elist[i]->SetRegion(reg[i]);
+    
+    Py_RETURN_NONE;
+}
+
+// ===========================================================================
+
+static PyObject *toast_element_data(PyObject *self, PyObject *args)
+{
+    int hmesh, elid, i, j;
+    QMMesh *mesh;
+    
+    if (!PyArg_ParseTuple (args, "ii", &hmesh, &elid))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    Element *pel = mesh->elist[elid];
+    int dim = pel->Dimension();
+    int nnd = pel->nNode();
+    int nsd = pel->nSide();
+    int nsn = pel->nSideNode(0);
+    for (i = 1; i < nsd; i++)
+	nsn = ::max(nsn, pel->nSideNode(i));
+    
+    npy_intp node_dims[2] = {nnd, dim};
+    PyObject *nodelist = PyArray_SimpleNew (2, node_dims, NPY_DOUBLE);
+    double *v, *vtx_data = (double*)PyArray_DATA(nodelist);
+    for (i = 0, v = vtx_data; i < nnd; i++)
+	for (j = 0; j < dim; j++)
+	    *v++ = mesh->nlist[pel->Node[i]][j];
+
+    npy_intp el_dims = nnd;
+    PyObject *idx = PyArray_SimpleNew (1, &el_dims, PyArray_INT32);
+    int *e, *el_data = (int*)PyArray_DATA(idx);
+    for (i = 0, e = el_data; i < nnd; i++)
+	*e++ = pel->Node[i];
+
+    return Py_BuildValue("OOi", nodelist, idx, pel->Type());
+}
+
+// ===========================================================================
+
+static PyObject *toast_element_mat(PyObject *self, PyObject *args)
+{
+    int hmesh, elid, sideidx, i, j, k, l;
+    QMMesh *mesh;
+    const char *intstr;
+    PyObject *py_prm, *elmat = NULL;
+    
+    if (!PyArg_ParseTuple (args, "iisOi", &hmesh, &elid, &intstr, &py_prm,
+			   &sideidx))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    Element *pel = mesh->elist[elid];
+    int dim = pel->Dimension();
+    int nnd = pel->nNode();
+    
+    if (!strcmp(intstr, "F")) {
+	npy_intp dims = nnd;
+	elmat = PyArray_SimpleNew(1, &dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++)
+	    data[i] = pel->IntF(i);
+    } else if (!strcmp(intstr, "FF")) {
+	npy_intp dims[2] = {nnd, nnd};
+	elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++) {
+	    data[i*nnd+i] = pel->IntFF(i,i);
+	    for (j = 0; j < i; j++)
+		data[i*nnd+j] = data[j*nnd+i] = pel->IntFF(i,j);
+	}
+    } else if (!strcmp(intstr, "FFF")) {
+	npy_intp dims[3] = {nnd, nnd, nnd};
+	elmat = PyArray_SimpleNew(3, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++) {
+	    for (j = 0; j < nnd; j++) {
+		for (k = 0; k < nnd; k++) {
+		    data[(i*nnd+j)*nnd+k] = pel->IntFFF(i, j, k);
+		}
+	    }
+	}
+    } else if (!strcmp(intstr, "DD")) {
+	npy_intp dims[2] = {nnd, nnd};
+	elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++) {
+	    data[i*nnd+i] = pel->IntDD(i, i);
+	    for (j = 0; j < i; j++)
+		data[i*nnd+j] = data[j*nnd+i] = pel->IntDD(i, j);
+	}
+    } else if (!strcmp(intstr, "FD")) {
+	npy_intp dims[3] = {nnd, nnd, dim};
+	elmat = PyArray_SimpleNew(3, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++)
+	    for (j = 0; j < nnd; j++) {
+		RVector fd = pel->IntFD(i, j);
+		if (fd.Dim() == 0)
+		    return NULL;
+		for (k = 0; k < dim; k++)
+		    data[i*nnd*dim + j*dim + k] = fd[k];
+	    }
+    } else if (!strcmp(intstr, "FDD")) {
+	npy_intp dims[3] = {nnd, nnd, nnd};
+	elmat = PyArray_SimpleNew(3, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++)
+	    for (j = 0; j < nnd; j++)
+		for (k = 0; k < nnd; k++)
+		    data[i*nnd*nnd + j*nnd + k] = pel->IntFDD(i, j, k);
+    } else if (!strcmp(intstr, "dd")) {
+	npy_intp dims[4] = {nnd, dim, nnd, dim};
+	elmat = PyArray_SimpleNew(4, dims, NPY_DOUBLE);
+	double *v, *data = (double*)PyArray_DATA(elmat);
+	RSymMatrix intdd = pel->Intdd();
+	for (i = 0, v = data; i < nnd; i++)
+	    for (j = 0; j < dim; j++)
+		for (k = 0; k < nnd; k++)
+		    for (l = 0; l < dim; l++)
+			*v++ = intdd(i*dim+j, k*dim+l);
+    } else if (!strcmp(intstr, "PFF")) {
+	if (py_prm == Py_None)
+	    return NULL;
+	RVector prm = RVector(mesh->nlen(), (double*)PyArray_DATA(py_prm),
+			      SHALLOW_COPY);
+	RSymMatrix intPFF = pel->IntPFF(prm);
+	npy_intp dims[2] = {nnd, nnd};
+	elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++) {
+	    data[i*nnd+i] = intPFF(i, i);
+	    for (j = 0; j < i; j++)
+		data[i*nnd+j] = data[j*nnd+i] = intPFF(i, j);
+	}
+    } else if (!strcmp(intstr, "PDD")) {
+	if (py_prm == Py_None)
+	    return NULL;
+	RVector prm = RVector(mesh->nlen(), (double*)PyArray_DATA(py_prm),
+			      SHALLOW_COPY);
+	RSymMatrix intPDD = pel->IntPDD(prm);
+	npy_intp dims[2] = {nnd, nnd};
+	elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	for (i = 0; i < nnd; i++) {
+	    data[i*nnd+i] = intPDD(i, i);
+	    for (j = 0; j < i; j++)
+		data[i*nnd+j] = data[j*nnd+i] = intPDD(i, j);
+	}
+    }
+
+    if (!elmat) return NULL;
+
+    return Py_BuildValue("O", elmat);
+}
+
+// ===========================================================================
+
 static PyObject *toast_test (PyObject *self, PyObject *args)
 {
     npy_intp dmx_dims[2] = {100,10000};
@@ -1761,6 +2028,7 @@ static PyMethodDef ToastMethods[] = {
     {"ClearMesh", mesh_clear, METH_VARARGS, "Delete a mesh from memory"},
     {"MeshData", mesh_data, METH_VARARGS, "Extract node and element data from a mesh"},
     {"SurfData", toast_surf_data, METH_VARARGS, "Extract surface node and face data from a mesh"},
+    {"meshSetRegion", toast_mesh_setregion, METH_VARARGS, "Set region values for all mesh elements"},
     {"ElementData", toast_element_data, METH_VARARGS, "Extract node data for a mesh element"},
     {"MeshNodeCount", toast_mesh_node_count, METH_VARARGS, "Return the number of mesh nodes"},
     {"MeshElementCount", toast_mesh_element_count, METH_VARARGS, "Return the number of mesh elements"},
@@ -1787,7 +2055,13 @@ static PyMethodDef ToastMethods[] = {
     {"RegValue", toast_regul_value, METH_VARARGS, "Returns the regularisation value R(x) for a parameter vector x"},
     {"RegGradient", toast_regul_grad, METH_VARARGS, "Returns the regularisation gradient for a parameter vector x"},
     {"RegHDiag", toast_regul_hdiag, METH_VARARGS, "Returns the diagonal of the Hessian of the regularisation operator"},
-
+    {"elementDof", toast_element_dof, METH_VARARGS, "Returns a permutation array for the global degrees of freedom of the element"},
+    {"elementSize", toast_element_size, METH_VARARGS, "Returns the element size"},
+    {"elementRegion", toast_element_region, METH_VARARGS, "Returns the element region index"},
+    {"elementSetRegion", toast_element_setregion, METH_VARARGS, "Sets the element region index"},
+    {"elementData", toast_element_data, METH_VARARGS, "Returns the element geometry"},
+    {"elementMat", toast_element_mat, METH_VARARGS, "Returns an integral over the element or element surface"},
+    
     {"Test", toast_test, METH_VARARGS, "A dummy test function"},
     {NULL, NULL, 0, NULL}
 };

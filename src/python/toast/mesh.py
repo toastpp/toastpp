@@ -1,4 +1,5 @@
 import numpy as np
+import toast
 from toast import toastmod
 #import tglumpy
 from scipy import sparse
@@ -164,6 +165,30 @@ class Mesh:
         """
         return toastmod.MeshBB(self.handle)
 
+    def ElementSize(self):
+        """Returns an array of element sizes.
+        """
+        return toastmod.elementSize(self.handle, -1)
+
+    def ElementRegion(self, val=None):
+        """Returns or sets the region indices of all mesh elements.
+
+        Syntax: reg = mesh.ElementRegion()
+                mesh.ElementRegion(reg)
+
+        reg: int array of length elen (number of elements) containing
+        the region indices.
+        """
+        if val is None:
+            return toastmod.elementRegion(self.handle, -1)
+        else:
+            toastmod.meshSetRegion(self.handle, val)
+            
+    def Element(self, elid):
+        """Returns the element for element index elid (>= 0)
+        """
+        return toast.Element(self, elid)
+        
     def ReadQM(self, name):
         return toastmod.ReadQM(self.handle, name)
 
