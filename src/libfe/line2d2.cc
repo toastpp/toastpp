@@ -451,7 +451,7 @@ RSymMatrix Line2D2::ComputeIntDD (const NodeList &nlist) const
 }
 #ifdef DO_THE_REST
 
-double Line2D2::BndIntFFSide (int i, int j, int sd)
+double Line2D2::SurfIntFF (int i, int j, int sd)
 {
     double d;
     switch (sd) {

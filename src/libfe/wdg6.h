@@ -114,10 +114,13 @@ public:
     }
     // Returns a single element of IntPDD
 
-    double BndIntFFSide (int i, int j, int sd)
+    double SurfIntF (int i, int sd) const
+    { ERROR_UNDEF; return 0; }
+    
+    double SurfIntFF (int i, int j, int sd) const
     { ERROR_UNDEF; return 0; }
 
-	RSymMatrix BndIntPFF (const RVector &P) const
+    RSymMatrix BndIntPFF (const RVector &P) const
     {
         ERROR_UNDEF;
 	return RSymMatrix(); // dummy
@@ -130,15 +133,28 @@ public:
     }
     // Returns a single element of BndIntPFF
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list);
-    // same as 'Intersection' but p1 and p2 given in global coords
-    // The return list however is still in local coords
- 
-    int Intersection (const Point &p1, const Point &p2, Point** pi);
-    // creates a list of points where the line defined by p1 and p2 intersects
-    // the element (in local coordinates) or starts/ends within the element.
-    // Returns the length of the list
+    /**
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in local element frame)
+     * \param p2 second ray endpoint (in local element frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \sa GlobalIntersection
+     */
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
 

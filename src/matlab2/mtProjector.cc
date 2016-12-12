@@ -24,7 +24,7 @@
 using namespace std;
 
 typedef enum { CAMTYPE_PINHOLE, CAMTYPE_ORTHO, CAMTYPE_NONE } CameraType;
-typedef enum { PROJTYPE_MESAGL, PROJTYPE_NONE } ProjectorType;
+typedef enum { PROJTYPE_MESAGL, PROJTYPE_SOFTWARE } ProjectorType;
 
 
 void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
@@ -36,6 +36,9 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
      */
     size_t nr, nc;
     double * dpr;
+
+    // projector driver
+    ProjectorType projtp = PROJTYPE_SOFTWARE;
 
     // get mesh pointer from handle
     extern MatlabToast *mtoast;
@@ -111,6 +114,15 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
 		    shift[0] = dpr[0];
 		    shift[1] = dpr[1];
 		}
+	    } else if (!strcasecmp (cbuf, "driver")) {
+		char drv[256];
+		mxGetString (mxGetCell(prhs[4], prm+1), drv, 256);
+		if (!strcasecmp (drv, "software"))
+		    projtp = PROJTYPE_SOFTWARE;
+		else if (!strcasecmp (drv, "mesagl"))
+		    projtp = PROJTYPE_MESAGL;
+		else
+		    xERROR("Invalid projector driver requested");
 	    }
 	}
     }
@@ -127,9 +139,6 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
     // Construct cameras and projectors
     Projector ** projPList = new Projector*[nM];
     Camera ** camPList = new Camera*[nM];
-
-    // Get projector type - assume MESAGL for now
-    ProjectorType projtp = PROJTYPE_MESAGL;
 
     // Create cameras - assume:
     //	    1. Detector positions are set in mesh
@@ -183,7 +192,7 @@ void MatlabFDOT::MakeProjectorList (int nlhs, mxArray *plhs[],
         mexErrMsgTxt("This function requires Mesa-3D, but Toast has been compiled without Mesa support.");
 #endif
 	} else {
-	    mexErrMsgTxt("Unsupported projector type requested.");
+	    projPList[m] = new RayProjector (camPList[m], mesh);
 	}
 	dpr[m] = Ptr2Handle (projPList[m]);
 
