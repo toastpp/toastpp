@@ -2001,6 +2001,64 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args)
 	    for (j = 0; j < i; j++)
 		data[i*nnd+j] = data[j*nnd+i] = intPDD(i, j);
 	}
+    } else if (!strcmp(intstr, "BndF")) {
+	npy_intp dims = nnd;
+	elmat = PyArray_SimpleNew(1, &dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	if (sideidx >= 0) {
+	    for (i = 0; i < nnd; i++)
+		data[i] = pel->SurfIntF(i, sideidx);
+	} else {
+	    RVector bndintf = pel->BndIntF();
+	    for (i = 0; i < nnd; i++)
+		data[i] = bndintf[i];
+	}
+    } else if (!strcmp(intstr, "BndFF")) {
+	int ii, jj;
+	npy_intp dims[2] = {nnd, nnd};
+	elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	memset(data, 0, nnd*nnd*sizeof(double));
+	if (sideidx >= 0) {
+	    for (ii = 0; ii < pel->nSideNode(sideidx); ii++) {
+		i = pel->SideNode(sideidx, ii);
+		data[i*nnd+i] = pel->SurfIntFF(i, i, sideidx);
+		for (jj = 0; jj < ii; jj++) {
+		    j = pel->SideNode(sideidx, jj);
+		    data[i*nnd+j] = data[j*nnd+i] =
+			pel->SurfIntFF(i, j, sideidx);
+		}
+	    }
+	} else {
+	    for (sideidx = 0; sideidx < pel->nSide(); sideidx++) {
+		if (!pel->IsBoundarySide (sideidx)) continue;
+		for (ii = 0; ii < pel->nSideNode(sideidx); ii++) {
+		    i = pel->SideNode(sideidx, ii);
+		    data[i*nnd+i] +=pel->SurfIntFF(i, i, sideidx);
+		    for (jj = 0; jj < ii; jj++) {
+			j = pel->SideNode(sideidx, jj);
+			data[i*nnd+j] = data[j*nnd+i]
+			    += pel->SurfIntFF (i, j, sideidx);
+		    }
+		}
+	    }
+	}
+    } else if (!strcmp(intstr, "BndPFF")) {
+	if (py_prm == Py_None)
+	    return NULL;
+	RVector prm = RVector(mesh->nlen(), (double*)PyArray_DATA(py_prm),
+			      SHALLOW_COPY);
+	npy_intp dims[2] = {nnd, nnd};
+	elmat = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	double *data = (double*)PyArray_DATA(elmat);
+	if (sideidx >= 0) {
+	    PyErr_SetString(PyExc_ValueError, "Not implemented yet");
+	    return NULL;
+	} else {
+	    for (i = 0; i < nnd; i++)
+		for (j = 0; j < nnd; j++)
+		    data[i+j*nnd] = pel->BndIntPFF(i, j, prm);
+	}
     }
 
     if (!elmat) return NULL;
