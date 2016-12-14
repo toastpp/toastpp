@@ -411,17 +411,18 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
 
     // evaluation points
     const mwSize *gdim = mxGetDimensions (prhs[2]);
-    int npoint = gdim[1];
-    ASSERTARG(gdim[0] == dim, 1, "Invalid point dimensions");
+    int npoint = gdim[0];
+    ASSERTARG(gdim[1] == dim, 1, "Invalid point dimensions");
 
-    mwSize dims[3] = {dim, nn, npoint};
-    mxArray *sg = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
+    mwSize dims[3] = {nn, dim, npoint};
+    mxArray *sg = mxCreateNumericArray (npoint == 1 ? 2:3, dims,
+        mxDOUBLE_CLASS, mxREAL);
     double *pgrad = mxGetPr (sg);
 
     Point pt(dim);
-    for (j = 0; j < npoint; j++) {
-        for (i = 0; i < dim; i++)
-	    pt[i] = ppt[i+j*dim];
+    for (k = 0; k < npoint; k++) {
+        for (j = 0; j < dim; j++)
+	    pt[j] = ppt[k + j*npoint];
 
 	// calculate shape function derivatives
 	RDenseMatrix fgrad = (isglobal ?
@@ -431,8 +432,8 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
 
 	// store shape function derivatives
 	for (i = 0; i < nn; i++)
-	    for (k = 0; k < dim; k++)
-	        pgrad[k + (i + j*nn)*dim] = pg[i + k*nn];
+	    for (j = 0; j < dim; j++)
+	        pgrad[k*dim*nn + j*nn + i] = pg[j*nn + i];
     }
     plhs[0] = sg;
 }

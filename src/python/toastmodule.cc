@@ -1088,18 +1088,17 @@ static PyObject *toast_mvec (PyObject *self, PyObject *args, PyObject *keywds)
 
 void CalcFields (QMMesh *mesh, Raster *raster,
     const CCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
-    const RVector &ref, double freq, char *solver, double tol,
+    const RVector &ref, double freq, const char *solver, double tol,
     PyObject **dfield)
 {
     const double c0 = 0.3;
-    int i, j, n, dim, nQ, slen;
+    int i, j, n, nQ, slen;
 
     n    = mesh->nlen();
-    dim  = mesh->Dimension();
     nQ   = qvec.nRows();
     slen = (raster ? raster->SLen() : n);
 
-    CVector *dphi, *aphi;
+    CVector *dphi;
     CFwdSolver FWS (mesh, solver, tol);
 
     // Solution in mesh basis
@@ -1238,10 +1237,9 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     double freq, char *solver, double tol, PyObject **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM;
+    int i, n, nQ, nM, nQM;
 
     n    = mesh->nlen();
-    dim  = mesh->Dimension();
     nQ   = mesh->nQ;
     nM   = mesh->nM;
     nQM  = mesh->nQM;
@@ -2068,6 +2066,104 @@ static PyObject *toast_element_mat(PyObject *self, PyObject *args)
 
 // ===========================================================================
 
+static PyObject *toast_element_shapef(PyObject *self, PyObject *args)
+{
+    int i, j, hmesh, elid, global = 0;
+    QMMesh *mesh;
+    PyObject *py_pos;
+    if (!PyArg_ParseTuple (args, "iiO|i", &hmesh, &elid, &py_pos, &global))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    if (elid < 0 || elid >= mesh->elen())
+	return NULL;
+
+    if (py_pos == Py_None)
+	return NULL;
+    
+    int dim = mesh->Dimension();
+
+    Element *pel = mesh->elist[elid];
+    int nn = pel->nNode();
+
+    double *pos = (double*)PyArray_DATA(py_pos);
+    int nd = PyArray_NDIM(py_pos);
+    npy_intp *dims = PyArray_DIMS(py_pos);
+    if (dims[0] != dim)
+	return NULL;
+    int npoint = (nd == 1 ? 1 : dims[1]);
+
+    npy_intp outd[2] = {nn, npoint};
+    PyObject *py_shapef = PyArray_SimpleNew(2, outd, NPY_DOUBLE);
+    double *shapef = (double*)PyArray_DATA(py_shapef);
+    Point pt(dim);
+    for (j = 0; j < npoint; j++) {
+	for (i = 0; i < dim; i++)
+	    pt[i] = pos[i*npoint+j];
+	RVector fun = (global ? pel->GlobalShapeF (mesh->nlist, pt) :
+		       pel->LocalShapeF (pt));
+	for (i = 0; i < nn; i++)
+	    shapef[i*npoint+j] = fun[i];
+    }
+
+    return Py_BuildValue("O", py_shapef);
+}
+
+// ===========================================================================
+
+static PyObject *toast_element_shaped (PyObject *self, PyObject *args)
+{
+    int i, j, k, hmesh, elid, global = 0;
+    QMMesh *mesh;
+    PyObject *py_pos;
+    if (!PyArg_ParseTuple (args, "iiO|i", &hmesh, &elid, &py_pos, &global))
+	return NULL;
+
+    if (!(mesh = (QMMesh*)g_meshmgr.Get (hmesh)))
+	return NULL;
+
+    if (elid < 0 || elid >= mesh->elen())
+	return NULL;
+
+    if (py_pos == Py_None)
+	return NULL;
+    
+    int dim = mesh->Dimension();
+
+    Element *pel = mesh->elist[elid];
+    int nn = pel->nNode();
+
+    double *pos = (double*)PyArray_DATA(py_pos);
+    int nd = PyArray_NDIM(py_pos);
+    npy_intp *dims = PyArray_DIMS(py_pos);
+    if (dims[0] != dim)
+	return NULL;
+    int npoint = (nd == 1 ? 1 : dims[1]);
+
+
+    npy_intp outd[3] = {nn, dim, npoint};
+    PyObject *py_shaped = PyArray_SimpleNew(npoint == 1 ? 2 : 3, outd,
+					    NPY_DOUBLE);
+    double *shaped = (double*)PyArray_DATA(py_shaped);
+    Point pt(dim);
+    for (j = 0; j < npoint; j++) {
+	for (i = 0; i < dim; i++)
+	    pt[i] = pos[i*npoint+j];
+	RDenseMatrix fgrad = (global ? pel->GlobalShapeD (mesh->nlist, pt) :
+			      pel->LocalShapeD (pt));
+	double *pg = fgrad.ValPtr();
+	for (i = 0; i < nn; i++)
+	    for (k = 0; k < dim; k++)
+		shaped[j*nn*dim + i*dim + k] = pg[i + k*nn];
+    }
+
+    return Py_BuildValue("O", py_shaped);
+}
+
+// ===========================================================================
+
 static PyObject *toast_test (PyObject *self, PyObject *args)
 {
     npy_intp dmx_dims[2] = {100,10000};
@@ -2119,6 +2215,8 @@ static PyMethodDef ToastMethods[] = {
     {"elementSetRegion", toast_element_setregion, METH_VARARGS, "Sets the element region index"},
     {"elementData", toast_element_data, METH_VARARGS, "Returns the element geometry"},
     {"elementMat", toast_element_mat, METH_VARARGS, "Returns an integral over the element or element surface"},
+    {"elementShapeF", toast_element_shapef, METH_VARARGS, "Returns shape function values for points in the element"},
+    {"elementShapeD", toast_element_shaped, METH_VARARGS, "Returns shape function derivatives for points in the element"},
     
     {"Test", toast_test, METH_VARARGS, "A dummy test function"},
     {NULL, NULL, 0, NULL}

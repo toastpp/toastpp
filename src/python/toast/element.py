@@ -128,3 +128,44 @@ class Element:
         return toastmod.elementMat(self.mesh.handle, self.elid,
                                    intstr, param, sideidx)
     
+    def ShapeFun(self, pt, frame=0):
+        """Return the shape functions for all element nodes at multiple points.
+
+        Syntax: fun = element.ShapeFun(pts)
+                fun = element.ShapeFun(pts, frame)
+
+        Parameters:
+            pts [real matrix d x np]:
+                array of evaluation point coordinates
+            frame [integer]
+                0: points in local frame, 1: points in global frame
+        
+        Return value:
+            fun [real matrix nn x np]:
+                array of element shape functions
+
+        Notes:
+            For each of the supplied evaluation points, this method returns
+            the values of the shape functions associated with all emement nodes.
+
+            Parameter 'pts' is a matrix of dimension d x np, representing a
+            list of np evaluation points. d is the dimension (2 or 3).
+
+            By default, input coordinates are interpreted in the local element
+            frame. If coordinates are in the global mesh frame, set frame=1.
+
+            The dimension of the returned matrix is nn x np, where np is the
+            number of input points, and nn is the number of element nodes.
+            Thus, fun(i,j) is the shape function for the j-th point and i-th
+            node. 
+            
+            The order of the shape function array is defined by the local
+            element node order.
+        """
+        return toastmod.elementShapeF(self.mesh.handle, self.elid,
+                                      pt, frame)
+    
+    def ShapeDer(self, pt, frame=0):
+        return toastmod.elementShapeD(self.mesh.handle, self.elid,
+                                      pt, frame)
+    
