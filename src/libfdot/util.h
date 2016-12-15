@@ -37,7 +37,7 @@ void SelectInitialParams (ParamParser &pp, const Mesh &mesh, Solution &msol);
 void SelectProjectors (ParamParser &pp, QMMesh & mesh, Projector ** projPtrs, Camera ** camPtrs, RVector * norms);
 RVector ProjectToBoundaryNode(const QMMesh & mesh, const RVector & pos, const RVector & ray, int nBndElems, int * bndellist, int * bndsdlist);
 void ReadData (char *fname, RVector &data);
-void WriteBinaryData (const RVector &data, char *fname);
+void WriteBinaryData (const RVector &data, const char *fname);
 bool SelectPriorImage(ParamParser &pp, char* pfname, IVector & gDim);
 bool SelectLabelImage(ParamParser &pp, char * labelFname, IVector & gDim);
 double SelectNoise(ParamParser &pp);

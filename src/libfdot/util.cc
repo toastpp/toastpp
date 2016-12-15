@@ -17,7 +17,7 @@ from file or console input
 
 using namespace std;
 
-char *colormap = "../../scales/fire2.pal";
+const char *colormap = "../../scales/fire2.pal";
 
 bool SelectLabelImage(ParamParser &pp, char * labelFname, IVector & gDim)
 {
@@ -977,7 +977,7 @@ void ReadData (char *fname, RVector &data)
     ifs.close();
 }
 
-void WriteBinaryData(const RVector &data, char *fname)
+void WriteBinaryData(const RVector &data, const char *fname)
 {
     ofstream ofs (fname, ofstream::binary);
     /*int i;

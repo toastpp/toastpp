@@ -1741,7 +1741,7 @@ static PyObject *toast_element_dof (PyObject *self, PyObject *args)
 	return NULL;
 
     Element *pel = mesh->elist[elid];
-    long int nnd = (long int)pel->nNode();
+    npy_intp nnd = (npy_intp)pel->nNode();
 
     PyObject *pydof = PyArray_SimpleNew (1, &nnd, PyArray_INT32);
     int *data = (int*)PyArray_DATA (pydof);
@@ -1764,7 +1764,7 @@ static PyObject *toast_element_size(PyObject *self, PyObject *args)
 	return NULL;
 
     if (elid < 0) { // run over entire mesh
-	long int nel = (long int)mesh->elen();
+	npy_intp nel = (npy_intp)mesh->elen();
 	PyObject *pyelsize = PyArray_SimpleNew (1, &nel, NPY_DOUBLE);
 	double *data = (double*)PyArray_DATA(pyelsize);
 	for (int i = 0; i < mesh->elen(); i++)
@@ -1791,7 +1791,7 @@ static PyObject *toast_element_region(PyObject *self, PyObject *args)
 	return NULL;
 
     if (elid < 0) { // run over entire mesh
-	long int nel = (long int)mesh->elen();
+	npy_intp nel = (npy_intp)mesh->elen();
 	PyObject *pyelreg = PyArray_SimpleNew (1, &nel, NPY_INT);
 	int *data = (int*)PyArray_DATA(pyelreg);
 	for (int i = 0; i < mesh->elen(); i++)

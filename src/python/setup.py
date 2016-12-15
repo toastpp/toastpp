@@ -7,9 +7,14 @@ import numpy.distutils as npd
 toastdir = os.getenv('TOASTDIR')
 if toastdir == None:
     print 'Expected environment variable TOASTDIR is not defined!'
-    sys.exit(1)
+    print 'Please enter the path to the TOAST root directory:'
+    toastdir = raw_input()
+    #sys.exit(1)
 
 toastver = os.getenv('TOASTVER')
+if os.name == 'nt':
+    toastver = toastdir + '/win/x64/Release'
+	
 major = "%d" % sys.version_info[0]
 minor = "%d" % sys.version_info[1]
 pyinc = get_python_inc(plat_specific=1)
