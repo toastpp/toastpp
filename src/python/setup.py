@@ -30,6 +30,7 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libstoast'],
                     libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
                     library_dirs = [toastver+'/lib'],
+					runtime_library_dirs = [toastver+'/lib'],
                     sources = ['toastmodule.cc'])
 
 setup (name = 'PyToast',
