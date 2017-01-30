@@ -11,10 +11,6 @@ if toastdir == None:
     toastdir = raw_input()
     #sys.exit(1)
 
-toastver = os.getenv('TOASTVER')
-if os.name == 'nt':
-    toastver = toastdir + '/win/x64/Release'
-	
 major = "%d" % sys.version_info[0]
 minor = "%d" % sys.version_info[1]
 pyinc = get_python_inc(plat_specific=1)
@@ -29,8 +25,8 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libfe',
                                     toastdir+'/src/libstoast'],
                     libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
-                    library_dirs = [toastver+'/lib'],
-					runtime_library_dirs = [toastver+'/lib'],
+                    library_dirs = [toastdir+'/lib'],
+					runtime_library_dirs = [toastdir+'/lib'],
                     sources = ['toastmodule.cc'])
 
 setup (name = 'PyToast',
