@@ -158,7 +158,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 
     int idx = (int)mxGetScalar(prhs[1]) - 1; // convert to zero-based
     Element *pel = mesh->elist[idx];
-    int i, j, k, l, nnd = pel->nNode();
+    int i, j, k, l, m, nnd = pel->nNode();
     int dim = mesh->Dimension();
     int nprm = 3;
 
@@ -224,17 +224,6 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 		for (k = 0; k < nnd; k++)
 		    pr[i+nnd*(j+nnd*k)] = pel->IntFDD(i,j,k);
 
-    } else if (!strcmp(cbuf, "dd")) {
-	mwSize dims[4] = {nnd, dim, nnd, dim};
-	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
-	RSymMatrix intdd = pel->Intdd();
-	pr = mxGetPr(elmat);
-	for (l = 0; l < dim; l++)
-	    for (k = 0; k < nnd; k++)
-		for (j = 0; j < dim; j++)
-		    for (i = 0; i < nnd; i++)
-			*pr++ = intdd(i*dim+j,k*dim+l);
-
     } else if (!strcmp(cbuf, "PFF")) {
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	RVector prm;
@@ -260,6 +249,47 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	        pr[i*nnd+j] = pr[j*nnd+i] = intPDD(i,j);
 	}
 	nprm++;
+
+    } else if (!strcmp(cbuf, "dd")) {
+	mwSize dims[4] = {nnd, dim, nnd, dim};
+	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
+	RSymMatrix intdd = pel->Intdd();
+	pr = mxGetPr(elmat);
+	for (l = 0; l < dim; l++)
+	    for (k = 0; k < nnd; k++)
+		for (j = 0; j < dim; j++)
+		    for (i = 0; i < nnd; i++)
+			*pr++ = intdd(i*dim+j,k*dim+l);
+
+    } else if (!strcmp(cbuf, "Fdd")) {
+	mwSize dims[5] = {nnd, nnd, dim, nnd, dim};
+	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
+	for (m = 0; m < nnd; m++)
+	    for (l = 0; l < dim; l++)
+		for (k = 0; k < nnd; k++)
+		    for (j = 0; j < dim; j++)
+			for (i = 0; i < nnd; i++)
+			    *pr++ = pel->IntFdd(m, i, k, j, l);
+
+    } else if (!strcmp(cbuf, "Pd")) {
+	RVector prm;
+	CopyVector (prm, prhs[3]);
+	mwSize dims[2] = {nnd, dim};
+	elmat = mxCreateNumericArray (2, dims, mxDOUBLE_CLASS, mxREAL);
+	for (j = 0; j < dim; j++)
+	    for (i = 0; i < nnd; i++)
+		*pr++ = pel->IntPd(prm, i, k);
+	
+    } else if (!strcmp(cbuf, "Pdd")) {
+	RVector prm;
+	CopyVector (prm, prhs[3]);
+	mwSize dims[4] = {nnd, dim, nnd, dim};
+	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
+	for (l = 0; l < dim; l++)
+	    for (k = 0; k < nnd; k++)
+		for (j = 0; j < dim; j++)
+		    for (i = 0; i < nnd; i++)
+			*pr++ = pel->IntPdd(prm, i, k, j, l);
 	
     } else if (!strcmp(cbuf, "BndF")) {
 	int sd;
