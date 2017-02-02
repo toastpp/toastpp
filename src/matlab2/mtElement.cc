@@ -264,6 +264,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
     } else if (!strcmp(cbuf, "Fdd")) {
 	mwSize dims[5] = {nnd, nnd, dim, nnd, dim};
 	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
+	pr = mxGetPr(elmat);
 	for (m = 0; m < nnd; m++)
 	    for (l = 0; l < dim; l++)
 		for (k = 0; k < nnd; k++)
@@ -276,6 +277,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	CopyVector (prm, prhs[3]);
 	mwSize dims[2] = {nnd, dim};
 	elmat = mxCreateNumericArray (2, dims, mxDOUBLE_CLASS, mxREAL);
+	pr = mxGetPr(elmat);
 	for (j = 0; j < dim; j++)
 	    for (i = 0; i < nnd; i++)
 		*pr++ = pel->IntPd(prm, i, k);
@@ -285,6 +287,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	CopyVector (prm, prhs[3]);
 	mwSize dims[4] = {nnd, dim, nnd, dim};
 	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
+	pr = mxGetPr(elmat);
 	for (l = 0; l < dim; l++)
 	    for (k = 0; k < nnd; k++)
 		for (j = 0; j < dim; j++)
