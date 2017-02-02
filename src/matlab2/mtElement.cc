@@ -339,8 +339,10 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 
     } else if (!strcmp(cbuf, "BndPFF")) {
         int sd;
-        if (nrhs > nprm) sd =  (int)mxGetScalar(prhs[nprm+1]) - 1; // side index
-	else sd = -1;
+        if (nrhs > 4)
+	    sd =  (int)mxGetScalar(prhs[4]) - 1; // side index
+	else
+	    sd = -1;
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	pr = mxGetPr(elmat);
 	RVector prm;
