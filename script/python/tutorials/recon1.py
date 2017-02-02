@@ -178,14 +178,14 @@ errmus = np.array([imerr(bmus, bmus_tgt)])
 itr = 1
 step = 1.0
 
-hfig=plt.figure()
+hfig = plt.figure()
 plt.show()
 
 while itr <= itrmax:
     errp = err
     dphi = mesh_inv.Fields(None, qvec, mua, mus, ref, freq)
     aphi = mesh_inv.Fields(None, mvec, mua, mus, ref, freq)
-    proj = np.reshape (mvec.transpose() * dphi,(-1,1),'F')
+    proj = np.reshape(mvec.transpose() * dphi, (-1, 1), 'F')
     J = mesh_inv.Jacobian(basis_inv.Handle(), dphi, aphi, proj)
 
     #Gradient of cost function
