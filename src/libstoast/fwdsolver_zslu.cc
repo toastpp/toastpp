@@ -143,8 +143,7 @@ void ZSuperLU::CalcFields (const CCompRowMatrix &qvec, CVector *phi,
     IterativeSolverResult *res, int en) const
 {
     SuperMatrix sB, sX;
-    int i, r;
-    const idxtype *rptr, *cidx;
+    int i;
 
     int m = qvec.nCols();
     int n = phi[0].Dim();

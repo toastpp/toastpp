@@ -1,3 +1,9 @@
+![Toast++ logo](http://web4.cs.ucl.ac.uk/research/vis/toast/images/toast_logo_small.jpg)
+![Toast++ header text](http://web4.cs.ucl.ac.uk/research/vis/toast/images/toastpp_label.png)
+
+[![Build Status](https://travis-ci.org/toastpp/toastpp.svg?branch=master)](https://travis-ci.org/toastpp/toastpp) 
+[![Build status](https://ci.appveyor.com/api/projects/status/6mvhactrbdfot94o/branch/master?svg=true)](https://ci.appveyor.com/project/samuelpowell/toastpp/branch/master)
+
 Toast++ - Image Reconstruction in Optical Tomography
 ====================================================
 

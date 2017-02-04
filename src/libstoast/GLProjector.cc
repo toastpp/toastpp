@@ -334,9 +334,8 @@ void GLProjector::constructMatrix_SF()
 		{
 		    int elemNodeIdx = elem->SideNode(sideIdx, n);
 		    int meshNodeIdx = elem->Node[elemNodeIdx];
-		    Node & node = FEMMesh->nlist[meshNodeIdx];
-
-		    // To field matrix maps node to 1 pixel only
+		   
+            // To field matrix maps node to 1 pixel only
 		    /*double npx, npy;
 		    camera->getPixelCoords(node, npx, npy);
 		    double pixel = npx + npy*w;

@@ -61,7 +61,7 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     mxArray **dfield)
 {
     const double c0 = 0.3;
-    int i, j, idx, n, dim, nQ, nQM, slen;
+    int i, j, idx, n, dim, nQ, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();

@@ -265,59 +265,6 @@ RDenseMatrix Triangle3D3::GlobalShapeD (const NodeList &nlist,
     return der;
 }
 
-
-int Triangle3D3::GlobalIntersection (const NodeList &nlist,
-    const Point &p1, const Point &p2, Point **list)
-{
-  /* definitely not done */
-  cerr << "Triangle3D3::GlobalIntersection not implemented \n";
-
-    double bbx1 = 1e6, bbx2 = -1e6, bby1 = 1e6, bby2 = -1e6;
-    double m0, m;
-    int i, below, above;
-
-    // generate bounding box
-    RDenseMatrix egeom = Elgeom (nlist);
-    for (i = 0; i < 3; i++) {
-	if (egeom(i,0) < bbx1) bbx1 = egeom(i,0);
-	if (egeom(i,0) > bbx2) bbx2 = egeom(i,0);
-	if (egeom(i,1) < bby1) bby1 = egeom(i,1);
-	if (egeom(i,1) > bby2) bby2 = egeom(i,1);
-    }
-
-    // test whether line is completely outside bounding box
-    if (p1[0] < bbx1 && p2[0] < bbx1 ||
-	p1[0] > bbx2 && p2[0] > bbx2 ||
-	p1[1] < bby1 && p2[1] < bby1 ||
-	p1[1] > bby2 && p2[1] > bby2) return 0;
-
-    // test whether all points lie below or above the line
-    below = 0, above = 0;
-    if (p1[0] != p2[0]) {
-	m0 = (p2[1] - p1[1]) / (p2[0] - p1[0]);
-	for (i = 0; i < 3; i++) {
-	    if (egeom(i,0) != p1[0])
-		m = (egeom(i,1) - p1[1]) / (egeom(i,0) - p1[0]);
-	    else if (egeom(i,1) > p1[1])
-		m = 1e10;
-	    else m = -1e10;
-	    if (m > m0) above++;
-	    else below++;
-	}
-    } else {
-	for (i = 0; i < 3; i++) {
-	    if (egeom(i,0) < p1[0]) above++;
-	    else below++;
-	}
-    }
-    if (!above || !below) return 0;
-
-    // do the rest on local basis
-    Point loc1 = Local (nlist, p1);
-    Point loc2 = Local (nlist, p2);
-    return Intersection (loc1, loc2, list);
-}
-
 RDenseMatrix  Triangle3D3::FTAMat () const 
 {
     RDenseMatrix A(2,3);

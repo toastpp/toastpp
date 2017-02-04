@@ -26,14 +26,8 @@ int Triangle_GetBndSubsampleAbsc (int side, const Point *&absc);
 #endif
 
 // some global constants
-
-static const double sqrt3    = sqrt(3.0);
-static const double sqrt3_05 = 0.5 *sqrt3;
-
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
-static const int nsample_tot = (nsample_lin*(nsample_lin + 1)) / 2;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_bndsample[3][nsample_lin];
 static const RSymMatrix sym_intff = RSymMatrix (2,
    "2 \
@@ -76,8 +70,8 @@ Element *Line2D2::Copy ()
 
 void Line2D2::Initialise (const NodeList& nlist)
 {
-    double x0 = nlist[Node[0]][0], y0 = nlist[Node[0]][1];
-    double x1 = nlist[Node[1]][0], y1 = nlist[Node[1]][1];
+    double x0 = nlist[Node[0]][0];
+    double x1 = nlist[Node[1]][0];
 
     // Set up line geometry parameters (almost trivial)
     a0 = x1;  b0 = -1;
@@ -457,7 +451,7 @@ RSymMatrix Line2D2::ComputeIntDD (const NodeList &nlist) const
 }
 #ifdef DO_THE_REST
 
-double Line2D2::BndIntFFSide (int i, int j, int sd)
+double Line2D2::SurfIntFF (int i, int j, int sd)
 {
     double d;
     switch (sd) {

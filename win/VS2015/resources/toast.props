@@ -26,7 +26,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ToastRootDir);$(ToastRootDir)include;$(ToastSrcDir)libmath;$(ToastSrcDir)libfe;$(ToastSrcDir)libstoast;$(ToastSrcDir)libfdot;$(ToastSrcDir)libbemdiff;$(ToastSrcDir)libbem;$(ToastRootDir)numerics\SuperLU_5.0\SRC;$(ToastRootDir)numerics\ILUPACK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ToastRootDir);$(ToastRootDir)include;$(ToastSrcDir)libmath;$(ToastSrcDir)libfe;$(ToastSrcDir)libstoast;$(ToastSrcDir)libfdot;$(ToastSrcDir)libbemdiff;$(ToastSrcDir)libbem;$(ToastRootDir)numerics\SuperLU_5.0\SRC;$(ToastRootDir)numerics\ILUPACK\include;$(ToastRootDir)numerics\Mesa-7.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>

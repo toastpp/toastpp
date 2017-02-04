@@ -239,8 +239,8 @@ void SelectProjectors (ParamParser &pp, QMMesh & mesh, Projector ** projPtrs, Ca
 
 RVector ProjectToBoundaryNode(const QMMesh & mesh, const RVector & pos, const RVector & ray, int nBndElems, int * bndellist, int * bndsdlist)
 {
-    double dmin = 1000000.0;
-    int idx=-1;
+    //double dmin = 1000000.0;
+    //int idx=-1;
     RVector sourcePos;
  /*   for (int nidx=0; nidx<mesh.nlen(); ++nidx)
     {
@@ -267,7 +267,6 @@ RVector ProjectToBoundaryNode(const QMMesh & mesh, const RVector & pos, const RV
 	int eidx = bndellist[e];
 	Element * elem = mesh.elist[eidx];
 	int side = bndsdlist[e];
-	int nSideNodes = elem->nSideNode(side);
 	RVector normal = elem->DirectionCosine(side, jacMat);
 	RVector elemPos = mesh.nlist[elem->Node[elem->SideNode(side, 0)]];
 	Point intersect = pos + ray * dot(elemPos-pos, normal) / dot(ray, normal);
@@ -319,7 +318,6 @@ double SelectNoise(ParamParser &pp)
 
 void SelectSolvers (ParamParser &pp, bool & solveMua, bool & solveFluo, int & iters, bool & logSolve, double & fluoTol, IVector & dataWin)
 {
-    char str[100];
     if (pp.GetBool ("MUASOLVE", solveMua) && solveMua)
     {
 	if (!pp.GetInt ("MUAITERS", iters)) {

@@ -121,17 +121,37 @@ public:
     double IntPfd(const RVector &p,int j,int k,int l) const;
     // Int f(r) u_j du_k/du_l dr
 
-    double BndIntFFSide (int i, int j, int sd);
-    double BndIntFF (int i, int j);
+    /**
+     * \brief %Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 3)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntF, BndIntFF, SurfIntFF
+     */
+    double SurfIntF (int i, int sd) const;
+    
+    /**
+     * \brief %Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 3)
+     * \param j second node index (range 0 .. 3)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
+
     RSymMatrix BndIntFF () const;
     RSymMatrix BndIntPFF (const RVector &P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only)
     { ERROR_UNDEF; return 0; }
 
 protected:

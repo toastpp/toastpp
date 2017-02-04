@@ -254,7 +254,7 @@ public:
      *   any calls to HasBoundarySide.
      * \sa Initialise, IsBoundarySide
      */
-    bool HasBoundarySide ()
+    inline bool HasBoundarySide () const
     { return bndel; }
 
     /**
@@ -704,51 +704,97 @@ public:
     virtual double IntPDD (int i, int j, const RVector &P) const = 0;
 
     /**
-     * \brief Boundary integral of all shape functions over all boundary
-     *   sides of the element.
-     * \return Vector of size \ref nNode, containing the integrals
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over all sides of teh element that
-     *   are part of the mesh surface.
-     * \note The returned matrix contains nonzero entries at index i only if
-     *   node i is a boundary node.
-     * \note If the element does not contain boundary sides, the returned
-     *   vector is zero.
-     * \sa BndIntFSide, BndIntFF, BndIntFFSide
-     */
-    virtual RVector BndIntF () const
-    { ERROR_UNDEF; return 0; }
-
-    /**
-     * \brief Surface integral of a shape function over one of the sides of
-     *   the element.
+     * \brief %Surface integral of a shape function over an element face.
      * \param i node index (range 0 .. \ref nNode-1)
      * \param sd side index (range 0 .. \ref nSide-1)
      * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over side \e sd.
-     * \sa BndIntF, BndIntFF, BndIntFFSide
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa SurfIntF(int), BndIntF(int), SurfIntFF(int,int,int)
      */
-    virtual double BndIntFSide (int i, int sd)
-    { ERROR_UNDEF; return 0; }
+    virtual double SurfIntF (int i, int sd) const = 0;
 
     /**
-     * \brief Boundary integral of all products of two shape functions over
+     * \brief %Surface integrals of all shape functions over an element face.
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Vector of size \ref nNode containing the integrals
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   for all element nodes i, where the integration is performed over side
+     *   \f$S_{sd}\f$.
+     % \sa SurfIntF(int,int), BndIntF()
+     */
+    virtual RVector SurfIntF (int sd) const;
+    
+    /**
+     * \brief %Surface integral of a shape function over all boundary faces
+     *   of the element.
+     * \param i node index (range 0 .. \ref nNode-1)
+     * \return Value of the integral
+     *   \f$ \oint_S u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned value is nonzero only if node i is a boundary node.
+     */
+    virtual double BndIntF (int i) const;
+    
+    /**
+     * \brief %Surface integrals of all shape functions over all boundary
+     *   faces of the element.
+     * \return Vector of size \ref nNode containing the integrals
+     *   \f$ \oint_S u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned vector contains nonzero entries at index i only if
+     *   node i is a boundary node.
+     * \note If the element does not contain boundary sides, the returned
+     *   vector is zero.
+     * \sa SurfIntF(int), BndIntF(int), BndIntFF
+     */
+    virtual RVector BndIntF () const;
+
+    /**
+     * \brief %Surface integral of a product of two shape functions over an
+     *   element side.
+     * \param i first node index (range 0 .. \ref nNode-1)
+     * \param j second node index (range 0 .. \ref nNode-1)
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    virtual double SurfIntFF (int i, int j, int sd) const = 0;
+
+    /**
+     * \brief %Surface integrals of all products of two shape functions over
+     *   and element side.
+     * \param sd side index (range 0 .. \ref nSide-1)
+     * \return Symmetrix matrix of size \ref nNode x \ref nNode, containing
+     *   the integrals
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa SurfIntFF(int,int,int)const
+     */
+    virtual RSymMatrix SurfIntFF (int sd) const;
+    
+    /**
+     * \brief %Surface integrals of all products of two shape functions over
      *   all boundary sides of the element.
-     * \return Matrix of size \ref nNode x \ref nNode, containing the integrals
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
+     * \return Symmetric matrix of size \ref nNode x \ref nNode, containing
+     *   the integrals
+     *   \f$ \oint_S u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
      *   where the integration is performed over all sides of the element that
      *   are part of the mesh surface.
      * \note The returned matrix contains nonzero entries at (i,j) only if
      *   nodes i and j are both boundary nodes.
      * \note If the element does not contain boundary sides, the returned
      *   matrix is zero.
-     * \sa BndIntFF(int,int), BndIntFFSide
+     * \sa BndIntFF(int,int), SurfIntFF
      */
-    virtual RSymMatrix BndIntFF () const = 0;
+    virtual RSymMatrix BndIntFF () const;
 
     /**
-     * \brief Boundary integral of a product of two shape functions over
+     * \brief %Surface integral of a product of two shape functions over
      *   all boundary sides of the element.
      * \param i first node index (range 0 .. \ref nNode-1)
      * \param j second node index (range 0 .. \ref nNode-1)
@@ -758,23 +804,9 @@ public:
      *   are part of the mesh surface.
      * \note The return value is nonzero only if both nodes \p i and \p j are
      *   boundary nodes.
-     * \sa BndIntFF()const, BndIntFFSide
+     * \sa BndIntFF()const, SurfIntFF
      */
-    virtual double BndIntFF (int i, int j) = 0;
-
-    /**
-     * \brief Surface integral of a product of two shape functions over one of
-     *   the sides of the element.
-     * \param i first node index (range 0 .. \ref nNode-1)
-     * \param j second node index (range 0 .. \ref nNode-1)
-     * \param sd side index (range 0 .. \ref nSide-1)
-     * \return Value of the integral
-     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f]
-     *   where the integration is performed over side \e sd.
-     * \note Nodes i and j must both belong to side sd.
-     * \sa BndIntFF()const, BndIntFF(int,int)
-     */
-    virtual double BndIntFFSide (int i, int j, int sd) = 0;
+    virtual double BndIntFF (int i, int j) const;
 
     /**
      * \brief Surface integrals of all products of a nodal function and two
@@ -1023,16 +1055,54 @@ public:
     // returns derivative of thermal expansion vector with respect to
     // expansion coefficient (assuming temperature change 1)
 
+    /**
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in global frame)
+     * \param p2 second ray endpoint (in global frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \note This method assumes global coordinates for the ray endpoints,
+     *   but still returns the intersection points in the local element frame.
+     * \sa Intersection
+     */
     virtual int GlobalIntersection (const NodeList &nlist,
-	const Point &p1, const Point &p2, Point **list) = 0;
-    // same as 'Intersection' but p1 and p2 given in global coords
-    // The return list however is still in local coords
+        const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
-    virtual int Intersection (const Point &/*p1*/, const Point &/*p2*/,
-        Point** /*pi*/) = 0;
-    // abstract; derived classes create a list of points where the line defined
-    // by p1 and p2 intersects the element (in local coordinates) or starts/ends
-    // within the element. Returns the length of the list
+    /**
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in local element frame)
+     * \param p2 second ray endpoint (in local element frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \sa GlobalIntersection
+     */
+    virtual int Intersection (const Point &p1, const Point &p2,
+        Point *s, bool add_endpoints, bool boundary_only) = 0;
 
     virtual RDenseMatrix LocaltoGlobalMat () const 
     { ERROR_UNDEF; return RDenseMatrix(); }
@@ -1159,7 +1229,7 @@ public:
     inline RSymMatrix IntDD () const { return intdd; }
     inline double IntDD (int i, int j) const { return intdd.Get(i,j); }
     inline RSymMatrix BndIntFF () const { return intbff; }
-    inline double BndIntFF (int i, int j) { return intbff.Get(i,j); }
+    inline double BndIntFF (int i, int j) const { return intbff.Get(i,j); }
 
 protected:
     virtual double ComputeSize (const NodeList&) const = 0;

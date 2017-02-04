@@ -225,7 +225,7 @@ void ObjectiveFunction::add_gradient_data (RVector &grad, const Raster &raster,
     const CCompRowMatrix &mvec) const
 {
     const QMMesh &mesh = *FWS.meshptr;
-    int i, j, q, m, n, idx, ofs_mod, ofs_arg, nQ = mesh.nQ;
+    int i, j, q, m, n, idx, ofs_mod, ofs_arg;
     int glen = raster.GLen();
     int slen = raster.SLen();
     int dim  = raster.Dim();

@@ -97,9 +97,9 @@ public:
     RVector GlobalShapeF (const NodeList& nlist, const Point& glob) const;
     RDenseMatrix GlobalShapeD (const NodeList& nlist, const Point& glob) const;
 
-    RSymMatrix IntFF() const;
     double IntF (int i) const;
     double IntFF (int i, int j) const;
+    RSymMatrix IntFF() const;
     double IntFFF (int i, int j, int k) const;
     RSymMatrix IntPFF (const RVector& P) const;
     double IntPFF (int i, int j, const RVector& P) const;
@@ -127,11 +127,56 @@ public:
     double IntPfd(const RVector &p,int j,int k,int l) const;
     // Int f(r) u_j du_k/du_l dr
 
+    /**
+     * \brief Boundary integral of all shape functions over all boundary
+     *   sides of the element.
+     * \return Vector of size 4, containing the integrals
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned vector contains nonzero entries at index i only if
+     *   node i is a boundary node.
+     * \note If the element does not contain boundary sides, the returned
+     *   vector is zero.
+     * \sa SurfIntF, BndIntFF, SurfIntFF
+     */
     RVector BndIntF () const;
 
-    double BndIntFSide (int i, int sd);
+    /**
+     * \brief Boundary integral of a shape function over all boundary sides
+     *   of the element.
+     * \param i node index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The returned value is nonzero only if node i is a boundary node.
+     */
+    double BndIntF (int i) const;
+    
+    /**
+     * \brief %Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 3)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntF, BndIntFF, SurfIntFF
+     */
+    double SurfIntF (int i, int sd) const;
 
-    double BndIntFFSide (int i, int j, int sd);
+    /**
+     * \brief %Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 3)
+     * \param j second node index (range 0 .. 3)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f$ \int_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
 
     RSymMatrix BndIntPFF (const RVector &P) const
     { ERROR_UNDEF; return RSymMatrix(); }
@@ -182,23 +227,28 @@ public:
         double dT);
     RVector DThermalExpansionVector (double E, double nu);
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-	const Point &p2, Point **list);
-
     /**
-     * \brief Calculate intersection of a ray with element surfaces.
-     * \param p1 First point defining the ray
-     * \param p2 Second point defining the ray
-     * \param pi On return, points to list of intersection points
-     * \return Number of points found (should be 0 or 2)
-     * \note The ray is assumed to be of infinite length, not just the
-     *  segment between p1 and p2
-     * \note On return, pi points to a static list. It should not be
-     *  deallocated by the caller, and it will be overwritten by the next
-     *  call to Intersection.
-     * \note If no intersection points are found, pi is set to NULL.
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in local element frame)
+     * \param p2 second ray endpoint (in local element frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \sa GlobalIntersection
      */
-    int Intersection (const Point &p1, const Point &p2, Point** pi);
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
 

@@ -1,0 +1,6 @@
+version: 1.0.{build}
+configuration: Release_fdot
+platform: x64
+build:
+  project: win\VS2015\toast.sln
+  verbosity: minimal
