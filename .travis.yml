@@ -27,6 +27,7 @@ script:
     ./configure $CONFIGOPTS;
     make numerics;
     make toast;
+    make python;
     fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     success=true;
@@ -55,5 +56,11 @@ script:
     cd ../libdgfe;
     xcodebuild -configuration release;
     if [[ $? -ne 0 ]]; then success=false; fi;
+    cd ../..;
+    export TOASTDIR=$PWD;
+    echo $CONFIGOPTS;
+    ./configure $CONFIGOPTS;
+    make python;
+    if [[ $? -ne 0 ]]; then success=false; fi; 
     $success;
     fi;
