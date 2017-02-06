@@ -319,6 +319,9 @@ else
 	if test "`uname -s`" = "AIX" ; then
 	    system=AIX-`uname -v`.`uname -r`
 	fi
+        if test "`uname`" = "Darwin" ; then
+            system=Darwin
+        fi
 	AC_MSG_RESULT($system)
     fi
 fi
@@ -780,6 +783,10 @@ fi
 
 if test "${TOAST_DEBUG}" = "1" ; then
     OBJDIR="${OBJDIR}_dbg"
+fi
+
+if test "$system" = "Darwin" ; then
+    OBJDIR="Darwin64"
 fi
 
 AC_SUBST(OBJDIR)

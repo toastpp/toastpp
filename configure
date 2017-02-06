@@ -7137,6 +7137,9 @@ $as_echo "unknown (can't find uname command)" >&6; }
 	if test "`uname -s`" = "AIX" ; then
 	    system=AIX-`uname -v`.`uname -r`
 	fi
+        if test "`uname`" = "Darwin" ; then
+            system=Darwin
+        fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $system" >&5
 $as_echo "$system" >&6; }
     fi
@@ -7796,6 +7799,10 @@ fi
 
 if test "${TOAST_DEBUG}" = "1" ; then
     OBJDIR="${OBJDIR}_dbg"
+fi
+
+if test "$system" = "Darwin" ; then
+    OBJDIR="Darwin64"
 fi
 
 
