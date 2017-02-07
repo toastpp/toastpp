@@ -4,3 +4,6 @@ platform: x64
 build:
   project: win\VS2015\toast.sln
   verbosity: minimal
+
+after_build:
+ - make_python.bat
