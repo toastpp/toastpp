@@ -3,7 +3,6 @@ configuration: Release_fdot
 platform: x64
 install:
  - set PATH=C:\Python27-x64;%PATH%
- - pip install numpy
  
 build:
   project: win\VS2015\toast.sln
