@@ -128,8 +128,6 @@ RCompRowMatrix *Raster_Pixel2::CreateBuv_tet4 () const
 	Element *pel = meshptr->elist[el];
 	xASSERT(pel->Type() == ELID_TET4, "Currently only implemented for 4-noded tetrahedra");
 
-	double orig_size = pel->Size();
-
 	// element bounding box
 	double exmin = meshptr->nlist[pel->Node[0]][0];
 	double exmax = meshptr->nlist[pel->Node[0]][0];
@@ -281,10 +279,9 @@ RCompRowMatrix *Raster_Pixel2::CreateBvw_tet4 (const IVector &wdim)
 {
     const int sublen = 100;
     int i, j, k, ii, jj, kk, si, sj, sk, pi, pj, pk, idx_i, idx_j, idx;
+    double xmin, xmax, ymin, ymax, zmin, zmax;
     double x0, x1, y0, y1, z0, z1, xcnt, ycnt, zcnt;
     double px0, px1, py0, py1, pz0, pz1, v, prog;
-    double xmin, xmax, ymin, ymax, zmin, zmax;
-    bool intersect;
     int *npx = new int[blen];
     for (i = 0; i < blen; i++) npx[i] = 0;
     int plen = wdim[0]*wdim[1]*wdim[2];
@@ -482,10 +479,9 @@ void Raster_Pixel2::AddToElMatrix_tet (int el, RGenericSparseMatrix &M,
     dASSERT(pxcoeff, "AddToElMatrix: requires a parameter pointer");
 
     Element *pel = meshptr->elist[el];
-    int nnode = pel->nNode();
-    int i, j, k, m, ii, jj, kk, idx_i, idx_j, idx_k, nv;
+    int i, j, k, m, ii, jj, kk, idx_i, idx_j, idx_k;
     int imin, imax, jmin, jmax, kmin, kmax;
-    double xmin, xmax, ymin, ymax, zmin, zmax, b, v;
+    double b, v;
     RVector fun;
 
     double xrange = bbmax[0]-bbmin[0];
@@ -577,6 +573,7 @@ void Raster_Pixel2::AddToElMatrix_tet (int el, RGenericSparseMatrix &M,
     // replace the subdivided elements by a simple 6-tetra
     // subdivision to reduce the number of elements for the
     // integral
+    double xmin, xmax, ymin, ymax, zmin, zmax;
     for (k = kmin; k <= kmax; k++) {
 	zmax = (zmin = bbmin[2] + dz*k) + dz;
 	for (j = jmin; j <= jmax; j++) {

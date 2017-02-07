@@ -12,7 +12,7 @@ Raster_Blob::Raster_Blob (const IVector &_bdim, const IVector &_gdim,
       // for now, we ignore the intermediate gdim grid
 {
     const double eps = 1e-6;
-    int i, j, k, d, idx, nd, px;
+    int i, j, k, d, idx, nd;
 
     nodevals = 0;
 

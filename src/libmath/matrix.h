@@ -515,7 +515,7 @@ void TMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 template<class MT>
 TSymMatrix<MT> ATA (const TMatrix<MT> &A)
 {
-    int i, j, nr = A.nRows(), nc = A.nCols();
+    int i, j, nc = A.nCols();
     TSymMatrix<MT> ata(nc);
     for (i = 0; i < nc; i++) {
         TVector<MT> col = A.Col(i);

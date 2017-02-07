@@ -102,8 +102,62 @@ public:
 
     RSymMatrix IntPDD (const RVector& P) const;
     double IntPDD (int i, int j, const RVector &P) const;
+
+    /**
+     * \brief Boundary integral of all shape functions over all boundary sides
+     *   of the element.
+     * \return Vector of size 8 of integrals
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The return vector contains nonzero entries only for nodes that
+     *   are part of the mesh surface.
+     * \note If the element doesn't contain boundary faces, the returned vector
+     *   is all zeros.
+     * \sa SurfIntF
+     */
+    RVector BndIntF () const;
+
+    /**
+     * \brief Boundary integral of a shape function over all boundary
+     *   sides of the element.
+     * \param i node index (range 0 .. 7)
+     * \return Integral
+     *   \f[ \int_{\partial\Omega} u_i(\vec{r}) d\vec{r} \f]
+     *   where the integration is performed over all sides of the element that
+     *   are part of the mesh surface.
+     * \note The return value is nonzero only if node i is a boundary node.
+     * \sa SurfIntF, BndIntFF, SurfIntFF
+     */
+    double BndIntF (int i);
+
+    /**
+     * \brief %Surface integral of a shape function over one of the sides of
+     *   the element.
+     * \param i node index (range 0 .. 7)
+     * \param sd side index (range 0 .. 5)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntF, BndIntFF, SurfIntFF
+     */
+    double SurfIntF (int i, int sd) const;
+    
+    /**
+     * \brief %Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 7)
+     * \param j second node index (range 0 .. 7)
+     * \param sd side index (range 0 .. 5)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
+
     double BndIntFF (int i, int j);
-    double BndIntFFSide (int i, int j,int sd);
+    
     RSymMatrix BndIntFF () const
     { ERROR_UNDEF; return RSymMatrix(); }
     RSymMatrix BndIntPFF (const RVector &P) const
@@ -131,17 +185,15 @@ public:
     RDenseMatrix ElasticityStiffnessMatrix (double modulus, double pratio)
         const;
 
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { ERROR_UNDEF; return 0; }
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
     void ComputeIntFF () const;
     void ComputeIntFFF () const;
     void ComputeIntDD () const;
     void ComputeIntFDD () const;
+    void ComputeBndIntF () const;
     void ComputeBndIntFF () const;
     void ComputeBndIntFFF () const;
 
@@ -158,6 +210,7 @@ private:
     static RSymMatrix intfff[8];
     static RSymMatrix intdd;
     static RSymMatrix intfdd[8];
+    static RVector bndintf[6];
     static RSymMatrix bndintff[6];
     static RDenseMatrix bndintfff[6][8];
 

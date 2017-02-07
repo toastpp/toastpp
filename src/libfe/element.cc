@@ -88,6 +88,68 @@ RVector Element::IntF () const
     return intf;
 }
 
+RVector Element::SurfIntF (int sd) const
+{
+    dASSERT(sd >= 0 && sd < nSide(), "Argument 1: out of range");
+    RVector sf(nNode());
+    for (int i = 0; i < nNode(); i++)
+	sf[i] = SurfIntF (i, sd);
+    return sf;
+}
+
+double Element::BndIntF (int i) const
+{
+    dASSERT(i >= 0 && i < nNode(), "Argument 1: out of range");
+    double bf = 0.0;
+    for (int sd = 0; sd < nSide(); sd++)
+	if (bndside[sd])
+	    bf += SurfIntF (i, sd);
+    return bf;
+}
+
+RVector Element::BndIntF () const
+{
+    RVector bf(nNode());
+    for (int sd = 0; sd < nSide(); sd++)
+	if (bndside[sd])
+	    bf += SurfIntF (sd);
+    return bf;
+}
+
+RSymMatrix Element::SurfIntFF (int sd) const
+{
+    dASSERT(sd >= 0 && sd < nSide(), "Argument 1: out of range");
+    RSymMatrix sff(nNode());
+    for (int i = 0; i < nNode(); i++)
+	for (int j = 0; j <= i; j++)
+	    sff(i,j) = SurfIntFF (i, j, sd);
+    return sff;
+}
+
+double Element::BndIntFF (int i, int j) const
+{
+    dASSERT(i >= 0 && i < nNode(), "Argument 1: out of range");
+    dASSERT(j >= 0 && j < nNode(), "Argument 2: out of range");
+    double bff = 0.0;
+    if (bndel) {
+	for (int sd = 0; sd < nSide(); sd++)
+	    if (bndside[sd])
+		bff += SurfIntFF (i, j, sd);
+    }
+    return bff;
+}
+
+RSymMatrix Element::BndIntFF () const
+{
+    RSymMatrix bff(nNode());
+    if (bndel) {
+	for (int sd = 0; sd < nSide(); sd++)
+	    if (bndside[sd])
+		bff += SurfIntFF (sd);
+    }
+    return bff;
+}
+
 void Element::operator= (const Element& el)
 {
     dASSERT(Type() == el.Type(), "Assignment of incompatible element types.");
@@ -440,6 +502,13 @@ RDenseMatrix Element::ElasticStrainDisplacement (const RVector &loc,
     }
 }
 
+int Element::GlobalIntersection (const NodeList &nlist,
+    const Point &p1, const Point &p2, Point *s,
+    bool add_endpoints, bool boundary_only)
+{
+    return Intersection (Local(nlist, p1), Local(nlist, p2), s,
+        add_endpoints, boundary_only);
+}
 
 // ==========================================================================
 // class Element_Unstructured

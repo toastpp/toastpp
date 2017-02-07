@@ -282,7 +282,6 @@ inline RDenseMatrix GenericSigma::tinterp (const RDenseMatrix *mat,
 	gsq += SQR(f[m]);
     }
     double T = 0.5*(mat[i](0,1) + mat[j](0,1));
-    double Tsq = SQR(T);
     RDenseMatrix tmp(dim,dim);
     tmp.Identity (dim);
     double gam = 1.0-exp(-sqrt(gsq)/T);
@@ -336,7 +335,6 @@ protected:
 
     inline double d2func(const double t, const int np, double *p) const{
 	double betasq = SQR(p[0]);
-	double hx =sqrt(SQR(t) + betasq);
 	//  return CUBE(p[0]/hx);
 	return p[0]/sqrt(SQR(t) + betasq);
 	// this is "Gauss-Newton" Hessian : convex

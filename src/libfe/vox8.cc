@@ -41,6 +41,7 @@ void Voxel8::Initialise (const NodeList &nlist)
 	ComputeIntFFF();
 	ComputeIntDD();
 	ComputeIntFDD();
+	ComputeBndIntF();
 	ComputeBndIntFF();
 	ComputeBndIntFFF();
 	need_setup = false;
@@ -731,6 +732,56 @@ void Voxel8::ComputeIntFDD () const
         intfdd[i] /= 288*dx*dy*dz;
 }
 
+void Voxel8::ComputeBndIntF () const
+{
+    double scale;
+
+    // side 0: z = 0
+    scale = dx*dy/4.0;
+    bndintf[0].New(8);
+    bndintf[0][0] = scale;
+    bndintf[0][1] = scale;
+    bndintf[0][2] = scale;
+    bndintf[0][3] = scale;
+
+    // side 1: z = dz
+    bndintf[1].New(8);
+    bndintf[1][4] = scale;
+    bndintf[1][5] = scale;
+    bndintf[1][6] = scale;
+    bndintf[1][7] = scale;
+
+    // side 2: y = 0
+    scale = dx*dz/4.0;
+    bndintf[2].New(8);
+    bndintf[2][0] = scale;
+    bndintf[2][1] = scale;
+    bndintf[2][4] = scale;
+    bndintf[2][5] = scale;
+
+    // side 3: y = dy
+    bndintf[3].New(8);
+    bndintf[3][2] = scale;
+    bndintf[3][3] = scale;
+    bndintf[3][6] = scale;
+    bndintf[3][7] = scale;
+
+    // side 4: x = 0
+    scale = dy*dz/4.0;
+    bndintf[4].New(8);
+    bndintf[4][0] = scale;
+    bndintf[4][2] = scale;
+    bndintf[4][4] = scale;
+    bndintf[4][6] = scale;
+
+    // side 5: x = dx
+    bndintf[5].New(8);
+    bndintf[5][1] = scale;
+    bndintf[5][3] = scale;
+    bndintf[5][5] = scale;
+    bndintf[5][7] = scale;
+}
+
 void Voxel8::ComputeBndIntFF () const
 {
     double scale;
@@ -957,6 +1008,36 @@ RSymMatrix Voxel8::IntPDD (const RVector &P) const
     return pdd;
 }
 
+RVector Voxel8::BndIntF () const
+{
+    RVector intf(8);
+    for (int sd = 0; sd < 6; sd++) {
+	if (bndside[sd])
+	    for (int i = 0; i < 8; i++)
+		intf[i] += bndintf[sd][i];
+    }
+    return intf;
+}
+
+double Voxel8::BndIntF (int i)
+{
+    dASSERT(i >= 0 && i < 8, "Argument 1: out of range");
+    if (!bndel) return 0.0;
+    double res = 0.0;
+    for (int sd = 0; sd < 6; sd++) {
+	if (bndside[sd])
+	    res += bndintf[sd][i];
+    }
+    return res;
+}
+
+double Voxel8::SurfIntF (int i, int sd) const
+{
+    dASSERT(i >= 0 && i < 8, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 6, "Argument 3: out of range");
+    return bndintf[sd][i];
+}
+
 double Voxel8::BndIntFF (int i, int j)
 {
     if (!bndel) return 0.0;
@@ -968,9 +1049,11 @@ double Voxel8::BndIntFF (int i, int j)
     return res;
 }
 
-double Voxel8::BndIntFFSide (int i, int j,int sd)
+double Voxel8::SurfIntFF (int i, int j, int sd) const
 {
-    if (!bndel) return 0.0;
+    dASSERT(i >= 0 && i < 8, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 8, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 6, "Argument 3: out of range");
     return bndintff[sd](i,j);
 
 }
@@ -1248,7 +1331,6 @@ double Voxel8::IntFdd (int i, int j, int k, int l, int m) const
 	RSymMatrix &m7 = fidd[7];
 
 	double dx2 = dx*dx, dy2 = dy*dy, dz2 = dz*dz;
-	double dxy = dx*dy, dxz = dx*dz, dyz = dy*dz;
 	double dx2y2 = dx2*dy2, dx2z2 = dx2*dz2, dy2z2 = dy2*dz2;
 	double dx2yz = dx2*dy*dz, dxy2z = dx*dy2*dz, dxyz2 = dx*dy*dz2;
 
@@ -2788,6 +2870,85 @@ RDenseMatrix Voxel8::ElasticityStiffnessMatrix (double modulus, double pratio)
     return K;
 }
 
+int Voxel8::Intersection (const Point &p1, const Point &p2, Point *s,
+    bool add_endpoints, bool boundary_only)
+{
+    dASSERT(p1.Dim() == 3 && p2.Dim() == 3, "Points must be 3D.");
+
+    const double EPS = 1e-12;
+    Point d = p2-p1;
+    double a, rx, ry, rz;
+    Point p(3);
+    int n = 0;
+    
+    // check surface z=0
+    if (d[2] && (!boundary_only || bndside[0])) {
+	a = -p1[2]/d[2];
+	rx = p1[0] + a*d[0];
+	ry = p1[1] + a*d[1];
+	if (rx > -EPS && rx < 1.0+EPS && ry > -EPS && ry < 1.0+EPS) {
+	    p[0] = rx, p[1] = ry, p[2] = 0.0;
+	    s[n++] = p;
+	}
+    }
+
+    // check surface z=1
+    if (d[2] && (!boundary_only || bndside[1])) {
+	a = (1.0-p1[2])/d[2];
+	rx = p1[0] + a*d[0];
+	ry = p1[1] + a*d[1];
+	if (rx > -EPS && rx < 1.0+EPS && ry > -EPS && ry < 1.0+EPS) {
+	    p[0] = rx, p[1] = ry, p[2] = 0.0;
+	    s[n++] = p;
+	}
+    }
+    
+    // check surface y=0
+    if (d[1] && (!boundary_only || bndside[2])) {
+	a = -p1[1]/d[1];
+	rx = p1[0] + a*d[0];
+	rz = p1[2] + a*d[2];
+	if (rx > -EPS && rx < 1.0+EPS && rz > -EPS && rz < 1.0+EPS) {
+	    p[0] = rx, p[1] = 0.0, p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+
+    // check surface y=1
+    if (d[1] && (!boundary_only || bndside[3])) {
+	a = (1.0-p1[1])/d[1];
+	rx = p1[0] + a*d[0];
+	rz = p1[2] + a*d[2];
+	if (rx > -EPS && rx < 1.0+EPS && rz > -EPS && rz < 1.0+EPS) {
+	    p[0] = rx, p[1] = 0.0, p[2] = rz;
+	    s[n++] = p;
+	}	
+    }
+
+    // check surface x=0
+    if (d[0] && (!boundary_only || bndside[4])) {
+	a = -p1[0]/d[0];
+	ry = p1[1] + a*d[1];
+	rz = p1[2] + a*d[2];
+	if (ry > -EPS && ry < 1.0+EPS && rz > -EPS && rz < 1.0+EPS) {
+	    p[0] = 0.0, p[1] = ry, p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+
+    // check surface x=1
+    if (d[0] && (!boundary_only || bndside[5])) {
+	a = (1.0-p1[0])/d[0];
+	ry = p1[1] + a*d[1];
+	rz = p1[2] + a*d[2];
+	if (ry > -EPS && ry < 1.0+EPS && rz > -EPS && rz < 1.0+EPS) {
+	    p[0] = 0.0, p[1] = ry, p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+    return n;
+}
+
 double Voxel8::dx = 0.0;
 double Voxel8::dy = 0.0;
 double Voxel8::dz = 0.0;
@@ -2797,5 +2958,6 @@ RSymMatrix Voxel8::intff;
 RSymMatrix Voxel8::intfff[8];
 RSymMatrix Voxel8::intdd;
 RSymMatrix Voxel8::intfdd[8];
+RVector Voxel8::bndintf[6];
 RSymMatrix Voxel8::bndintff[6];
 RDenseMatrix Voxel8::bndintfff[6][8];

@@ -33,7 +33,6 @@ double TriangleArea (const Point &p1, const Point &p2, const Point &p3)
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
 static const int nsample_tot = (((nsample_lin+3)*nsample_lin+2)*nsample_lin)/6;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_sample[nsample_tot];
 
 static const RSymMatrix sym_intff = RSymMatrix (4,
@@ -1035,7 +1034,7 @@ static const RDenseMatrix bndintf = RDenseMatrix (4, 4,
    "1 1 1 0\
     1 1 0 1\
     1 0 1 1\
-    0 1 1 1") * (1.0/6.0);
+    0 1 1 1") * (2.0/6.0);
 
 static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (4,
    "2 \
@@ -1078,19 +1077,32 @@ RVector Tetrahedron4::BndIntF () const
     return bf;
 }
 
-
-double Tetrahedron4::BndIntFSide (int i, int sd)
+double Tetrahedron4::BndIntF (int i) const
 {
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    double bf = 0.0;
+    for (int sd = 0; sd < 4; sd++)
+	if (bndside[sd])
+	    bf += bndintf(sd, i) * side_size[sd];
+    return bf;
+}
+
+double Tetrahedron4::SurfIntF (int i, int sd) const
+{
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 2: out of range");
     return bndintf(sd,i) * side_size[sd];
 }
 
 
-double Tetrahedron4::BndIntFFSide (int i, int j, int sd)
+double Tetrahedron4::SurfIntFF (int i, int j, int sd) const
 {
-  RSymMatrix bff;
-  bff= *sym_bndintff[sd];
-  return bff(i,j) * side_size[sd]; //to check if we need this multiplyer-yes we do
-     
+    dASSERT(i >= 0 && i < 4, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 4, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 3: out of range");
+    RSymMatrix bff;
+    bff= *sym_bndintff[sd];
+    return bff(i,j) * side_size[sd];
 }
 
 
@@ -1132,11 +1144,11 @@ RVector Tetrahedron4::BndIntFX (int side, double (*func)(const Point&),
 double Tetrahedron4::BndIntFD (int sd, int i, int j, int k)
 {
     // computes \int_s du_i/dx_j u_k ds over side sd
-    int nd;
     dASSERT (sd >= 0 && sd < 4, "Argument 1: index out of range");
     dASSERT (j >= 0 && j < 3, "Argument 3: index out of range");
-    int nsdnd = nSideNode(sd);
 #ifdef FEM_DEBUG
+    int nd;
+    int nsdnd = nSideNode(sd);
     for (nd = 0; nd < nsdnd; nd++)
 	if (i == SideNode (sd,nd)) break;
     dASSERT (nd < nsdnd, "Argument 2: node index not found in side");
@@ -1173,12 +1185,6 @@ double Tetrahedron4::BndIntFD (Mesh &mesh, int el2, int i, int j, int k)
 RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     const NodeList &nlist) const
 {
-    static int npp = 0;
-    static double *pwght;
-    static Point  *pabsc;
-    static RVector *F;
-    static RDenseMatrix *D;
-
     int j, p;
     double d, f;
     RVector sum(4);
@@ -1213,80 +1219,68 @@ RVector Tetrahedron4::BndIntFCos (int side, const RVector &cntcos, double a,
     return sum;
 }
     
-int Tetrahedron4::Intersection (const Point &p1, const Point &p2, Point **pi)
+int Tetrahedron4::Intersection (const Point &p1, const Point &p2,
+    Point *s, bool add_endpoints, bool boundary_only)
 {
-    int i, j, n = 0;
+    if (boundary_only && !bndel) return 0;
+    
+    int i, n = 0;
     double a, rx, ry, rz;
     double sx = p1[0], sy = p1[1], sz = p1[2];
     double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];
-
-    static Point pi_local[2];
-    static bool need_setup = true;
-
-    if (need_setup) {
-	for (i = 0; i < 2; i++)
-	    pi_local[i].New(3);
-    }
-
+    Point p(3);
+    
     // intersection with plane z=0
-    if (dz) {
+    if ((!boundary_only || bndside[0]) && dz) {
 	a = -sz/dz;
 	rx = sx + a*dx;
 	ry = sy + a*dy;
 	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
-	    pi_local[n][0] = rx;
-	    pi_local[n][1] = ry;
-	    pi_local[n][2] = 0.0;
-	    n++;
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = 0.0;
+	    s[n++] = p;
 	}
     }
 
     // intersection with plane y=0
-    if (dy) {
+    if ((!boundary_only || bndside[1]) && dy) {
 	a = -sy/dy;
 	rx = sx + a*dx;
 	rz = sz + a*dz;
 	if (rx >= 0 && rz >= 0 && rx+rz <= 1) {
-	    pi_local[n][0] = rx;
-	    pi_local[n][1] = 0.0;
-	    pi_local[n][2] = rz;
-	    n++;
+	    p[0] = rx;
+	    p[1] = 0.0;
+	    p[2] = rz;
+	    s[n++] = p;
 	}
     }
 
     // intersection with plane x=0
-    if (dx) {
+    if ((!boundary_only || bndside[2]) && dx) {
 	a = -sx/dx;
 	ry = sy + a*dy;
 	rz = sz + a*dz;
 	if (ry >= 0 && rz >= 0 && ry+rz <= 1) {
-	    pi_local[n][0] = 0.0;
-	    pi_local[n][1] = ry;
-	    pi_local[n][2] = rz;
-	    n++;
+	    p[0] = 0.0;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
 	}
     }
 
     // intersection with plane 1-x-y-z=0
-    a = (1-sx-sy-sz)/(dx+dy+dz);
-    rx = sx + a*dx;
-    ry = sy + a*dy;
-    rz = sz + a*dz;
-    if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
-	pi_local[n][0] = rx;
-	pi_local[n][1] = ry;
-	pi_local[n][2] = rz;
-	n++;
+    if ((!boundary_only || bndside[3]) && (dx+dy+dz)) {
+	a = (1-sx-sy-sz)/(dx+dy+dz);
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
     }
-
-    if (n) *pi = pi_local;
-    else *pi = NULL;
-
     return n;
-}
-
-int Tetrahedron4::GlobalIntersection (const NodeList &nlist, const Point &p1,
-    const Point &p2, Point **list)
-{
-    return Intersection (Local (nlist, p1), Local (nlist, p2), list);
 }

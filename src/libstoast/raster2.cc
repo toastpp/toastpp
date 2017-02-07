@@ -235,7 +235,7 @@ void Raster2::Map_MeshToBasis (const RVector &mvec, RVector &bvec) const
 {
     if (map_tol) {
 	double tol = map_tol;
-	int nit = PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
+	PCG (*Bvv, ATx(*Buv,mvec), bvec, tol, Bvv_precon);
     } else {
 	CholeskySolve (*Bvv_Cholesky_L, *Bvv_Cholesky_d, ATx(*Buv,mvec), bvec);
     }
@@ -274,7 +274,7 @@ void Raster2::Map_BasisToMesh (const RVector &bvec, RVector &mvec) const
 {
     if (map_tol) {
 	double tol = map_tol;
-	int nit = PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
+    PCG (*Buu, Ax(*Buv,bvec), mvec, tol, Buu_precon);
     } else {
 	CholeskySolve (*Buu_Cholesky_L, *Buu_Cholesky_d, Ax(*Buv,bvec), mvec);
     }
