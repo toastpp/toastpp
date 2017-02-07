@@ -74,7 +74,7 @@ def imerr(im1, im2):
 
 
 # PyToast environment
-#execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
+execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
