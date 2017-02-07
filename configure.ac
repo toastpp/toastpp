@@ -786,7 +786,7 @@ if test "${TOAST_DEBUG}" = "1" ; then
 fi
 
 if test "$system" = "Darwin" ; then
-    OBJDIR="Darwin64"
+    OBJDIR="darwin64"
 fi
 
 AC_SUBST(OBJDIR)
