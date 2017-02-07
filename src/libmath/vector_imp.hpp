@@ -1077,6 +1077,21 @@ VT doth (const TVector<VT> &v1, const TVector<VT> &v2)
 
 // --------------------------------------------------------------------------
 
+template<class VT>
+TVector<VT> cross (const TVector<VT> &v1, const TVector<VT> &v2)
+{
+    xASSERT(v1.Dim() == 3 && v2.Dim() == 3,
+        "TVector::cross: invalid argument size");
+
+    TVector<VT> res(3);
+    res[0] = v1[1]*v2[2] - v1[2]*v2[1];
+    res[1] = v1[2]*v2[0] - v1[0]*v2[2];
+    res[2] = v1[0]*v2[1] - v1[1]*v2[0];
+
+    return res;
+}
+
+// --------------------------------------------------------------------------
 #ifdef USE_BLAS_LEVEL1
 template<>
 inline double l2norm (const TVector<double> &v)

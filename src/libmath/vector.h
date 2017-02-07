@@ -104,6 +104,9 @@ template<class VT>
 VT doth (const TVector<VT> &v1, const TVector<VT> &v2);
 
 template<class VT>
+TVector<VT> cross (const TVector<VT> &v1, const TVector<VT> &v2);
+
+template<class VT>
 VT vmin (const TVector<VT> &v);
 
 template<class VT>
@@ -696,6 +699,16 @@ public:
      */
     friend VT doth<> (const TVector<VT> &v1, const TVector<VT> &v2);
 
+    /**
+     * \brief Cross product of two vectors
+     * \param v1 first vector argument
+     * \param v2 second vector argument
+     * \return Result of v1 x v2
+     * \note v1 and v2 must be of size 3.
+     */
+    friend TVector<VT> cross<> (const TVector<VT> &v1,
+        const TVector<VT> &v2);
+    
     /**
      * \brief Extract smallest element in vector.
      * \return \f$ \min_i v_i \f$

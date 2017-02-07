@@ -80,8 +80,31 @@ public:
     RSymMatrix IntPDD (const RVector& P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double IntPDD (int i, int j, const RVector &P) const;
-    double BndIntFFSide (int i, int j, int sd)
-    { ERROR_UNDEF; return 0; }
+
+    /**
+     * \brief Surface integral of a shape function over an element face.
+     * \param i node index (range 0 .. 9)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntF, BndIntFF, SurfIntFF
+     */
+    double SurfIntF (int i, int sd) const;
+    
+    /**
+     * \brief $Surface integral of a product of two shape functions over one of
+     *   the sides of the element.
+     * \param i first node index (range 0 .. 9)
+     * \param j second node index (range 0 .. 9)
+     * \param sd side index (range 0 .. 3)
+     * \return Value of the integral
+     *   \f$ \oint_{S_{sd}} u_i(\vec{r}) u_j(\vec{r}) d\vec{r} \f$
+     *   where the integration is performed over side \f$S_{sd}\f$.
+     * \sa BndIntFF()const, BndIntFF(int,int)
+     */
+    double SurfIntFF (int i, int j, int sd) const;
+    
     RSymMatrix BndIntPFF (const RVector &P) const
     { ERROR_UNDEF; return RSymMatrix(); }
     double BndIntPFF (int i, int j, const RVector &P) const;
@@ -95,11 +118,29 @@ public:
     RVector ThermalExpansionVector (double E, double nu, double alpha, double dT);
     int GetLocalSubsampleAbsc (const Point *&absc) const;
     int GetBndSubsampleAbsc (int side, const Point *&absc) const;
-    int GlobalIntersection (const NodeList &nlist, const Point &p1,
-        const Point &p2, Point **list)
-    { ERROR_UNDEF; return 0; }
-    int Intersection (const Point &p1, const Point &p2, Point** pi)
-    { ERROR_UNDEF; return 0; }
+
+    /**
+     * \brief Return intersection points of a ray with the element surface.
+     * \param p1 first ray endpoint (in local element frame)
+     * \param p2 second ray endpoint (in local element frame)
+     * \param s pointer to list of intersection points
+     * \param add_endpoints flag to add ray endpoints to list if they
+     *   are located inside the element
+     * \param boundary_only flag to look only for intersection points
+     *   with boundary sides
+     * \return number of intersection points found
+     * \note The point buffer \e s must have been assigned to sufficient
+     *   length (2 for convex elements) by the caller.
+     * \note If no intersections are found, pi is set to NULL.
+     * \note If add_enpoints is true and if the ray starts and/or ends
+     *   inside the element, the corresponding end points are added to
+     *   the list.
+     * \note If boundary_only is true, then only intersections with
+     *   boundary sides will be returned.
+     * \sa GlobalIntersection
+     */
+    int Intersection (const Point &p1, const Point &p2, Point *s,
+	bool add_endpoints, bool boundary_only);
 
 protected:
 

@@ -11,15 +11,13 @@ double TriIntF (double *x, double *y, double *z);
 RCompRowMatrix *Raster_CPixel::CreateBuv_tri () const
 {
     int i, j, k, r, m, el, nel = meshptr->elen(), n = meshptr->nlen();
-    int ii, jj, idx_i, idx_j;
+    int ii, idx_i, idx_j;
     int imin, imax, jmin, jmax;
     double djac;
 
     double xrange = bbsize[0];
     double yrange = bbsize[1];
-    double dx = xrange/bdim[0];
-    double dy = yrange/bdim[1];
-
+    
     // quadrature rule for local triangle
     const double *wght;
     const Point *absc;
@@ -182,7 +180,7 @@ RCompRowMatrix *Raster_CPixel::CreateBuv_tri () const
 int Raster_CPixel::SutherlandHodgman (int el, int xgrid, int ygrid,
     Point *clip_poly, int npoly) const
 {
-    int i,j;
+    int i;
 
     Point *list = new Point[npoly];
 
@@ -196,7 +194,7 @@ int Raster_CPixel::SutherlandHodgman (int el, int xgrid, int ygrid,
 	bbsize[1]*(double)(ygrid+1)/(double)bdim[1];
 
     Element *pel = meshptr->elist[el];
-    int ni, nv = pel->nNode();
+    int nv = pel->nNode();
     if (nv > npoly) return -1;
 
     vec_t tri[3];
@@ -246,8 +244,7 @@ void Raster_CPixel::AddToElMatrix_tri (int el, RGenericSparseMatrix &M,
     dASSERT(pxcoeff, "AddToElMatrix: requires a parameter pointer");
 
     Element *pel = meshptr->elist[el];
-    int nnode = pel->nNode();
-    int i, j, k, m, ii, jj, kk, idx_i, idx_j, idx_k, nv;
+    int i, j, k, m, ii, jj, idx_i, idx_j, idx_k, nv;
     int imin, imax, jmin, jmax;
     double b, v;
 

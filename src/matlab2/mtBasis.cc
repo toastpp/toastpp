@@ -16,7 +16,7 @@ void MatlabToast::SetBasis (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
     char optionstr[256];
-    int i, j, basistp = 0;
+    int i, basistp = 0;
     RDenseMatrix *bb = 0;
     double blobrad = 1.0;
     double blobarg = 1.0;

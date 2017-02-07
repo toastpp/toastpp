@@ -11,8 +11,7 @@ double TriIntF (double *x, double *y, double *z);
 RCompRowMatrix *Raster_CPixel_Tree::CreateBuv_tri () const
 {
     int i, j, k, r, m, nd, el, nel = meshptr->elen(), n = meshptr->nlen();
-    int ii, jj, idx_i, idx_j;
-    int imin, imax, jmin, jmax;
+    int ii, idx_i, idx_j;
     double djac;
     int nnode = 10;
     TreeNode **node = new TreeNode*[nnode];
@@ -25,11 +24,6 @@ RCompRowMatrix *Raster_CPixel_Tree::CreateBuv_tri () const
 	ndpx[i] = new int[ndpxbuf[i]];
 	nndpx[i] = 0;
     }
-
-    double xrange = bbsize[0];
-    double yrange = bbsize[1];
-    double dx = xrange/bdim[0];
-    double dy = yrange/bdim[1];
 
     // quadrature rule for local triangle
     const double *wght;
@@ -192,7 +186,7 @@ RCompRowMatrix *Raster_CPixel_Tree::CreateBuv_tri () const
 int Raster_CPixel_Tree::SutherlandHodgman (int el, TreeNode *node,
     Point *clip_poly, int npoly) const
 {
-    int i,j;
+    int i;
 
     Point *list = new Point[npoly];
 
@@ -202,7 +196,7 @@ int Raster_CPixel_Tree::SutherlandHodgman (int el, TreeNode *node,
     double ymax = node->ymax;
 
     Element *pel = meshptr->elist[el];
-    int ni, nv = pel->nNode();
+    int nv = pel->nNode();
     if (nv > npoly) return -1;
 
     vec_t tri[3];

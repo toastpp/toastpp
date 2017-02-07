@@ -18,7 +18,6 @@
 static bool subsampling_initialised = false;
 static const int nsample_lin = NSUBSAMPLE; // from toastdef.h
 static const int nsample_tot = (((nsample_lin+3)*nsample_lin+2)*nsample_lin)/6;
-static const double insample_tot = 1.0/(double)nsample_tot;
 static Point absc_sample[nsample_tot];
 
 static const RSymMatrix sym_intff = RSymMatrix (10,
@@ -1645,6 +1644,66 @@ double Tetrahedron10::IntPDD (int i, int j, const RVector &P) const
     return res;
 }
 
+// boundary integrals of shape functions on local element
+static const RDenseMatrix bndintf = RDenseMatrix (4, 10,
+    "0 0 0 0 1 1 0 1 0 0\
+     0 0 0 0 1 0 1 0 1 0\
+     0 0 0 0 0 1 1 0 0 1\
+     0 0 0 0 0 0 0 1 1 1") * (2.0/6.0);
+
+static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (10,
+   " 6 \
+    -1  6 \
+    -1 -1  6 \
+     0  0  0  0 \
+     0  0 -4  0 32 \
+     0 -4  0  0 16 32 \
+     0  0  0  0  0  0  0 \
+    -4  0  0  0 16 16  0 32 \
+     0  0  0  0  0  0  0  0  0 \
+     0  0  0  0  0  0  0  0  0  0") * (2.0/360.0);
+// see tet4.cc for reason for 2 in numerator
+static const RSymMatrix sym_bndintff_sd1 = RSymMatrix (10,
+   " 6 \
+    -1  6 \
+     0  0  0 \
+    -1 -1  0  6 \
+     0  0  0 -4 32 \
+     0  0  0  0  0  0 \
+     0 -4  0  0 16  0 32 \
+     0  0  0  0  0  0  0  0 \
+    -4  0  0  0 16  0 16  0 32 \
+     0  0  0  0  0  0  0  0  0  0") * (2.0/360.0);
+static const RSymMatrix sym_bndintff_sd2 = RSymMatrix (10,
+   " 6 \
+     0  0 \
+    -1  0  6 \
+    -1  0 -1  6 \
+     0  0  0  0  0 \
+     0  0  0 -4  0 32 \
+     0  0 -4  0  0 16 32 \
+     0  0  0  0  0  0  0  0 \
+     0  0  0  0  0  0  0  0  0 \
+    -4  0  0  0  0 16 16  0  0 32") * (2.0/360.0);
+static const RSymMatrix sym_bndintff_sd3 = RSymMatrix (10,
+   " 0 \
+     0  6 \
+     0 -1  6 \
+     0 -1 -1  6 \
+     0  0  0  0  0 \
+     0  0  0  0  0  0 \
+     0  0  0  0  0  0  0 \
+     0  0  0 -4  0  0  0 32 \
+     0  0 -4  0  0  0  0 16 32 \
+     0 -4  0  0  0  0  0 16 16 32") * (2.0/360.0);
+static const RSymMatrix *sym_bndintff[4] = {
+   &sym_bndintff_sd0,
+   &sym_bndintff_sd1,
+   &sym_bndintff_sd2,
+   &sym_bndintff_sd3
+};
+
+// boundary integrals of products of 3 shape functions on local element
 static const RDenseMatrix sd0_intf0ff = RDenseMatrix (10, 10,
    "18 -2 -2  0 12 12  0  4  0  0 \
     -2 -2  1  0 -4  0  0  0  0  0 \
@@ -1980,6 +2039,21 @@ static const RDenseMatrix **bndintfff[4] = {
     sd2_intfff,
     sd3_intfff
 };
+
+double Tetrahedron10::SurfIntF (int i, int sd) const
+{
+    dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 2: out of range");
+    return bndintf(sd,i) * side_size[sd];
+}
+
+double Tetrahedron10::SurfIntFF (int i, int j, int sd) const
+{
+    dASSERT(i >= 0 && i < 10, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 10, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 4, "Argument 3: out of range");
+    return sym_bndintff[sd]->Get(i,j) * side_size[sd];
+}
 
 double Tetrahedron10::BndIntPFF (int i, int j, const RVector &P) const
 {
@@ -2970,58 +3044,6 @@ RSymMatrix Tetrahedron10::ComputeIntDD (const NodeList &nlist) const
     return dd * (1.0/(180.0*size));
 }
 
-static const RSymMatrix sym_bndintff_sd0 = RSymMatrix (10,
-   " 6 \
-    -1  6 \
-    -1 -1  6 \
-     0  0  0  0 \
-     0  0 -4  0 32 \
-     0 -4  0  0 16 32 \
-     0  0  0  0  0  0  0 \
-    -4  0  0  0 16 16  0 32 \
-     0  0  0  0  0  0  0  0  0 \
-     0  0  0  0  0  0  0  0  0  0") * (2.0/360.0);
-// see tet4.cc for reason for 2 in numerator
-static const RSymMatrix sym_bndintff_sd1 = RSymMatrix (10,
-   " 6 \
-    -1  6 \
-     0  0  0 \
-    -1 -1  0  6 \
-     0  0  0 -4 32 \
-     0  0  0  0  0  0 \
-     0 -4  0  0 16  0 32 \
-     0  0  0  0  0  0  0  0 \
-    -4  0  0  0 16  0 16  0 32 \
-     0  0  0  0  0  0  0  0  0  0") * (2.0/360.0);
-static const RSymMatrix sym_bndintff_sd2 = RSymMatrix (10,
-   " 6 \
-     0  0 \
-    -1  0  6 \
-    -1  0 -1  6 \
-     0  0  0  0  0 \
-     0  0  0 -4  0 32 \
-     0  0 -4  0  0 16 32 \
-     0  0  0  0  0  0  0  0 \
-     0  0  0  0  0  0  0  0  0 \
-    -4  0  0  0  0 16 16  0  0 32") * (2.0/360.0);
-static const RSymMatrix sym_bndintff_sd3 = RSymMatrix (10,
-   " 0 \
-     0  6 \
-     0 -1  6 \
-     0 -1 -1  6 \
-     0  0  0  0  0 \
-     0  0  0  0  0  0 \
-     0  0  0  0  0  0  0 \
-     0  0  0 -4  0  0  0 32 \
-     0  0 -4  0  0  0  0 16 32 \
-     0 -4  0  0  0  0  0 16 16 32") * (2.0/360.0);
-static const RSymMatrix *sym_bndintff[4] = {
-   &sym_bndintff_sd0,
-   &sym_bndintff_sd1,
-   &sym_bndintff_sd2,
-   &sym_bndintff_sd3
-};
-
 RSymMatrix Tetrahedron10::ComputeBndIntFF (const NodeList &nlist) const
 {
     RSymMatrix bff(10);
@@ -3060,13 +3082,6 @@ RVector Tetrahedron10::BndIntFCos (int side, const RVector &cntcos, double a,
 {
     // Note: this is copied directly from Tetrahedron4.
     // Needs to be checked.
-
-    static int npp = 0;
-    static double *pwght;
-    static Point  *pabsc;
-    static RVector *F;
-    static RDenseMatrix *D;
-
     int j, p;
     double d, f;
     RVector sum(10);
@@ -3099,4 +3114,68 @@ RVector Tetrahedron10::BndIntFCos (int side, const RVector &cntcos, double a,
     }
     sum *= ssize;
     return sum;
+}
+
+int Tetrahedron10::Intersection (const Point &p1, const Point &p2,
+    Point *s, bool add_endpoints, bool boundary_only)
+{
+    int i, n = 0;
+    double a, rx, ry, rz;
+    double sx = p1[0], sy = p1[1], sz = p1[2];
+    double dx = p2[0]-p1[0], dy = p2[1]-p1[1], dz = p2[2]-p1[2];
+    Point p(3);
+    
+    // intersection with plane z=0
+    if ((!boundary_only || bndside[0]) && dz) {
+	a = -sz/dz;
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = 0.0;
+	    s[n++] = p;
+	}
+    }
+
+    // intersection with plane y=0
+    if ((!boundary_only || bndside[1]) && dy) {
+	a = -sy/dy;
+	rx = sx + a*dx;
+	rz = sz + a*dz;
+	if (rx >= 0 && rz >= 0 && rx+rz <= 1) {
+	    p[0] = rx;
+	    p[1] = 0.0;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+
+    // intersection with plane x=0
+    if ((!boundary_only || bndside[2]) && dx) {
+	a = -sx/dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (ry >= 0 && rz >= 0 && ry+rz <= 1) {
+	    p[0] = 0.0;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+
+    // intersection with plane 1-x-y-z=0
+    if (!boundary_only || bndside[3]) {
+	a = (1-sx-sy-sz)/(dx+dy+dz);
+	rx = sx + a*dx;
+	ry = sy + a*dy;
+	rz = sz + a*dz;
+	if (rx >= 0 && ry >= 0 && rx+ry <= 1) {
+	    p[0] = rx;
+	    p[1] = ry;
+	    p[2] = rz;
+	    s[n++] = p;
+	}
+    }
+    return n;
 }

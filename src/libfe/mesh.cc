@@ -72,6 +72,7 @@ Mesh::~Mesh ()
     if (IndexNode2Bnd) delete []IndexNode2Bnd;
     if (boundary) delete boundary;
     if (bnd_param) delete []bnd_param;
+    if (intersect_prm) delete intersect_prm;
 }
 
 #ifdef TOAST_PARALLEL
@@ -150,6 +151,8 @@ void Mesh::Setup (bool mark_boundary)
 	}
     }
 
+    intersect_prm = 0;
+    
     //SetupElementMatrices ();
     is_set_up = true;
 }
@@ -331,7 +334,7 @@ void Mesh::Reorder (const IVector &perm)
 
 bool Mesh::Shrink ()
 {
-    int i, j, shift, nds = nlen(), els = elen();
+    int i, j, nds = nlen(), els = elen();
     bool shrink = false;
     bool *usend = new bool[nds];
     for (i = 0; i < nds; i++) usend[i] = false;
@@ -1356,8 +1359,98 @@ void Mesh::BoundingBox (Point &mmin, Point &mmax, double pad) const
 	}
 }
 
-Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
+Mesh::BndIntersectParam *Mesh::ComputeBndIntersectParam ()
 {
+    BndIntersectParam *prm = new BndIntersectParam;
+    BoundingBox (prm->bbmin, prm->bbmax);
+    return prm;
+}
+
+Point Mesh::BndIntersect (const Point &pt1, const Point &pt2, int *el)
+{
+    if (!intersect_prm) intersect_prm = ComputeBndIntersectParam();
+    int dim = Dimension();
+    Point pmin;
+    if (el) *el = -1;
+    const double EPS = 1e-12;
+
+    // check for intersection with bounding box
+    bool bb_intersect = false;
+    double xmin, xmax, ymin, ymax, zmin, zmax, a, rx, ry, rz;
+    xmin = intersect_prm->bbmin[0];
+    xmax = intersect_prm->bbmax[0];
+    ymin = intersect_prm->bbmin[1];
+    ymax = intersect_prm->bbmax[1];
+    zmin = (dim > 2 ? intersect_prm->bbmin[2] : 0.0);
+    zmax = (dim > 2 ? intersect_prm->bbmax[2] : 0.0);
+    Point d = pt2-pt1;
+    if (dim > 2) {
+	if (d[2]) {
+	    a = (zmin-pt1[2])/d[2];
+	    rx = pt1[0] + a*d[0];
+	    ry = pt1[1] + a*d[1];
+	    if (rx>xmin-EPS && rx<xmax+EPS && ry>ymin-EPS && ry<ymax+EPS)
+		bb_intersect = true;
+	    else {
+		a = (zmax-pt1[2])/d[2];
+		rx = pt1[0] + a*d[0];
+		ry = pt1[1] + a*d[1];
+		if (rx>xmin-EPS && rx<xmax+EPS && ry>ymin-EPS && ry<ymax+EPS)
+		    bb_intersect = true;
+	    }
+	}
+	if (!bb_intersect && d[1]) {
+	    a = (ymin-pt1[1])/d[1];
+	    rx = pt1[0] + a*d[0];
+	    rz = pt1[2] + a*d[2];
+	    if (rx>xmin-EPS && rx<xmax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		bb_intersect = true;
+	    else {
+		a = (ymax-pt1[1])/d[1];
+		rx = pt1[0] + a*d[0];
+		rz = pt1[2] + a*d[2];
+		if (rx>xmin-EPS && rx<xmax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		    bb_intersect = true;
+	    }
+	}
+	if (!bb_intersect && d[0]) {
+	    a = (xmin-pt1[0])/d[0];
+	    ry = pt1[1] + a*d[1];
+	    rz = pt1[2] + a*d[2];
+	    if (ry>ymin-EPS && ry<ymax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		bb_intersect = true;
+	    else {
+		a = (xmax-pt1[0])/d[0];
+		ry = pt1[1] + a*d[1];
+		rz = pt1[2] + a*d[2];
+		if (ry>ymin-EPS && ry<ymax+EPS && rz>zmin-EPS && rz<zmax+EPS)
+		    bb_intersect = true;
+	    }
+	}
+	if (!bb_intersect)
+	    return pmin;
+    }
+    
+    int i, j, n;
+    double dst, dstmin = 1e10;
+    Point s[2];
+    for (i = 0; i < elen(); i++) {
+	if (elist[i]->HasBoundarySide()) {
+	    n = elist[i]->GlobalIntersection (nlist, pt1, pt2, s,
+	        false, true);
+	    for (j = 0; j < n; j++) {
+		s[j] = elist[i]->Global(nlist, s[j]);
+		dst = pt1.Dist(s[j]);
+		if (dst < dstmin) {
+		    dstmin = dst;
+		    pmin = s[j];
+		    if (el) *el = i;
+		}
+	    }
+	}
+    }
+    return pmin;
+#ifdef UNDEF
     // Calculates the intersection of a straight line, given by points pt1
     // and pt2, with the mesh surface. The boundary must be bracketed by
     // pt1 and pt2 such that pt1 is inside, pt2 outside the mesh
@@ -1386,6 +1479,7 @@ Point Mesh::BndIntersect (const Point &pt1, const Point &pt2)
     for (i = 0; i < p1.Dim(); i++) m[i] = p1[i];
     // we use p1 to ensure that the returned point is inside the mesh
     return m;
+#endif
 }
 
 // ***********************************************
@@ -2263,7 +2357,6 @@ void AddToRHS_thermal_expansion (const Mesh &mesh, RVector &rhs,
 	pel = mesh.elist[el];
 	nnode = pel->nNode();
 	node = pel->Node;
-	double size = pel->Size();
 	RVector fe = pel->ThermalExpansionVector (modulus[el], pratio[el], thermal_expansion[el], deltaT);
 
 	//for (d = 0; d < dim; d++) eps0[d] = thermal_expansion[el]*deltaT;
@@ -2393,7 +2486,6 @@ void AddElasticStrainDisplacementToSysMatrix (const Mesh &mesh,
 RGenericSparseMatrix *GridMapMatrix (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax, const int *elref)
 {
-    const double EPS = 1e-8;
     int i, j, ix, iy, iz, idx, d, dim = mesh.Dimension();
     int nx = gdim[0], ny = gdim[1], nz = (dim > 2 ? gdim[2]:1);
     int rlen = nx*ny*nz;
@@ -2853,7 +2945,7 @@ int *GenerateElementPixelRef (const Mesh &mesh, const IVector &gdim,
     const Point *bbmin, const Point *bbmax)
 {
     const double EPS = 1e-6;
-    int i, n, ix, iy, iz, idx, el, nnode, *node;
+    int i, ix, iy, iz, idx, el, nnode, *node;
     int d, dim = mesh.Dimension();
     Point p(dim);
 
@@ -2935,7 +3027,7 @@ void GenerateVoxelPositions (const Mesh &mesh, const IVector &gdim,
     double dx = ((*bbmax)[0]-(*bbmin)[0])/(nx-1);
     double dy = ((*bbmax)[1]-(*bbmin)[1])/(ny-1);
     double dz = (dim > 2 ? ((*bbmax)[2]-(*bbmin)[2])/(nz-1) : 0);
-    double x, y, z;
+    double y, z;
 
     pos.New (nvox,dim);
     for (idx = k = 0; k < nz; k++) {

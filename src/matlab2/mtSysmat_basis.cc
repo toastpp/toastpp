@@ -44,7 +44,6 @@ void MatlabToast::Sysmat_basis (int nlhs, mxArray *plhs[], int nrhs,
     RVector mua, mus, ref;
     double freq;
     int blen;
-    bool elbasis = false;
 
     CopyVector (mua, prhs[1]);
     CopyVector (mus, prhs[2]);

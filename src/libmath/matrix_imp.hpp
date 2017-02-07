@@ -31,7 +31,7 @@ typedef TMatrix<int>     IMatrix;	// 'integer'
 template<class MT>
 TSymMatrix<MT> AAT (const TMatrix<MT> &A)
 {
-    int i, j, nr = A.nRows(), nc = A.nCols();
+    int i, j, nr = A.nRows();
     TSymMatrix<MT> aat(nr);
     for (i = 0; i < nr; i++) {
         TVector<MT> row = A.Row(i);

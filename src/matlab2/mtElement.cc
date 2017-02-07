@@ -169,6 +169,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	pr = mxGetPr(elmat);
 	for (i = 0; i < nnd; i++)
 	    pr[i] = pel->IntF(i);
+
     } else if (!strcmp(cbuf, "FF")) {
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	pr = mxGetPr(elmat);
@@ -177,6 +178,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	    for (j = 0; j < i; j++)
 		pr[i*nnd+j] = pr[j*nnd+i] = pel->IntFF(i,j);
 	}
+
     } else if (!strcmp(cbuf, "FFF")) {
 	mwSize dims[3] = {nnd,nnd,nnd};
 	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
@@ -188,6 +190,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 		}
 	    }
 	}
+
     } else if (!strcmp(cbuf, "DD")) {
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	pr = mxGetPr(elmat);
@@ -196,6 +199,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	    for (j = 0; j < i; j++)
 		pr[i*nnd+j] = pr[j*nnd+i] = pel->IntDD(i,j);
 	}
+
     } else if (!strcmp(cbuf, "FD")) {
 	mwSize dims[3] = {nnd, nnd, dim};
 	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
@@ -210,6 +214,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 		for (k = 0; k < dim; k++)
 		    pr[i + nnd*(j + k*nnd)] = fd[k];
 	    }
+
     } else if (!strcmp(cbuf, "FDD")) {
 	mwSize dims[3] = {nnd, nnd, nnd};
 	elmat = mxCreateNumericArray (3, dims, mxDOUBLE_CLASS, mxREAL);
@@ -218,6 +223,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	    for (j = 0; j < nnd; j++)
 		for (k = 0; k < nnd; k++)
 		    pr[i+nnd*(j+nnd*k)] = pel->IntFDD(i,j,k);
+
     } else if (!strcmp(cbuf, "dd")) {
 	mwSize dims[4] = {nnd, dim, nnd, dim};
 	elmat = mxCreateNumericArray (4, dims, mxDOUBLE_CLASS, mxREAL);
@@ -241,6 +247,7 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	        pr[i*nnd+j] = pr[j*nnd+i] = intPFF(i,j);
 	}
 	nprm++;
+	
     } else if (!strcmp(cbuf, "PDD")) {
         elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	RVector prm;
@@ -253,17 +260,26 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	        pr[i*nnd+j] = pr[j*nnd+i] = intPDD(i,j);
 	}
 	nprm++;
+	
     } else if (!strcmp(cbuf, "BndF")) {
-	// for now, only integrals over all boundary sides are supported
+	int sd;
+	if (nrhs > 3) sd = (int)mxGetScalar(prhs[3]) -1; // side index
+	else sd = -1;
 	elmat = mxCreateDoubleMatrix (nnd, 1, mxREAL);
 	pr = mxGetPr(elmat);
-	RVector bndintf = pel->BndIntF();
-	for (i = 0; i < pel->nNode(); i++)
-	    pr[i] = bndintf[i];
-
+	if (sd >= 0) { // integral over a single side
+	    for (i = 0; i < nnd; i++) {
+		pr[i] = pel->SurfIntF(i,sd);
+	    }
+	} else {
+	    RVector bndintf = pel->BndIntF();
+	    for (i = 0; i < nnd; i++)
+		pr[i] = bndintf[i];
+	}
+	
     } else if (!strcmp(cbuf, "BndFF")) {
 	int ii, jj, sd;
-	if (nrhs > nprm) sd = (int)mxGetScalar(prhs[nprm+1]) - 1; // side index
+	if (nrhs > 3) sd = (int)mxGetScalar(prhs[3]) - 1; // side index
 	else sd = -1;
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	pr = mxGetPr(elmat);
@@ -271,10 +287,10 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 	if (sd >= 0) { // integral over a single side
 	    for (ii = 0; ii < pel->nSideNode(sd); ii++) {
 		i = pel->SideNode(sd,ii);
-		pr[i*nnd+i] = pel->BndIntFFSide(i,i,sd);
+		pr[i*nnd+i] = pel->SurfIntFF(i,i,sd);
 		for (jj = 0; jj < ii; jj++) {
 		    j = pel->SideNode(sd,jj);
-		    pr[i*nnd+j] = pr[j*nnd+i] = pel->BndIntFFSide(i,j,sd);
+		    pr[i*nnd+j] = pr[j*nnd+i] = pel->SurfIntFF(i,j,sd);
 		}
 	    }
 	} else { // integral over all boundary sides
@@ -282,18 +298,21 @@ void MatlabToast::ElMat (int nlhs, mxArray *plhs[], int nrhs,
 		if (!pel->IsBoundarySide (sd)) continue;
 		for (ii = 0; ii < pel->nSideNode(sd); ii++) {
 		    i = pel->SideNode(sd,ii);
-		    pr[i*nnd+i] += pel->BndIntFFSide(i,i,sd);
+		    pr[i*nnd+i] += pel->SurfIntFF(i,i,sd);
 		    for (jj = 0; jj < ii; jj++) {
 			j = pel->SideNode(sd,jj);
-			pr[i*nnd+j] = pr[j*nnd+i] += pel->BndIntFFSide(i,j,sd);
+			pr[i*nnd+j] = pr[j*nnd+i] += pel->SurfIntFF(i,j,sd);
 		    }
 		}
 	    }
 	}
+
     } else if (!strcmp(cbuf, "BndPFF")) {
         int sd;
-        if (nrhs > nprm) sd =  (int)mxGetScalar(prhs[nprm+1]) - 1; // side index
-	else sd = -1;
+        if (nrhs > 4)
+	    sd =  (int)mxGetScalar(prhs[4]) - 1; // side index
+	else
+	    sd = -1;
 	elmat = mxCreateDoubleMatrix (nnd, nnd, mxREAL);
 	pr = mxGetPr(elmat);
 	RVector prm;
@@ -321,7 +340,6 @@ void MatlabToast::ShapeFunc (int nlhs, mxArray *plhs[], int nrhs,
     int i, j;
 
     Mesh *mesh = GETMESH_SAFE(0);
-    int nlen = mesh->nlen();
     int elen = mesh->elen();
     int dim  = mesh->Dimension();
     bool isglobal = false;
@@ -374,7 +392,6 @@ void MatlabToast::ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
   int i, j, k;
 
     Mesh *mesh = GETMESH_SAFE(0);
-    int nlen = mesh->nlen();
     int elen = mesh->elen();
     int dim  = mesh->Dimension();
     bool isglobal = false;

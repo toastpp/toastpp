@@ -991,9 +991,11 @@ double Voxel27::BndIntFF (int i, int j)
     return res;
 }
 
-double Voxel27::BndIntFFSide (int i, int j,int sd)
+double Voxel27::SurfIntFF (int i, int j, int sd) const
 {
-    if (!bndel) return 0.0;
+    dASSERT(i >= 0 && i < 27, "Argument 1: out of range");
+    dASSERT(j >= 0 && j < 27, "Argument 2: out of range");
+    dASSERT(sd >= 0 && sd < 6, "Argument 3: out of range");
     return bndintff[sd](i,j);
 
 }
@@ -1100,8 +1102,8 @@ double Voxel27::IntFd (int i, int j, int k) const
 
 RSymMatrix Voxel27::Intdd () const
 {
-    static RSymMatrix *MixedDD = 0;
 #ifdef UNDEF // to be done!
+    static RSymMatrix *MixedDD = 0;
     if (!MixedDD) {
 	MixedDD = new RSymMatrix (24,24);
 	RSymMatrix &MDD = *MixedDD;
@@ -1263,8 +1265,8 @@ RSymMatrix Voxel27::Intdd () const
 
 double Voxel27::IntFdd (int i, int j, int k, int l, int m) const
 {
-    static RSymMatrix *fidd = 0;
 #ifdef UNDEF // to be done!
+    static RSymMatrix *fidd = 0;
     if (!fidd) {
 	int z;
 	fidd = new RSymMatrix[8];
@@ -2214,8 +2216,8 @@ RDenseMatrix Voxel27::ElasticityStiffnessMatrix (double modulus, double pratio)
     const
 {
     static RDenseMatrix K(24,24);
-    static bool need_setup = true;
 #ifdef UNDEF // to be done!
+    static bool need_setup = true;
     if (need_setup) {
         double dx2 = dx*dx, dy2 = dy*dy, dz2 = dz*dz;
 	double e1 = modulus*(1.0-pratio)/((1.0+pratio)*(1.0-2.0*pratio));

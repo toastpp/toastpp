@@ -223,7 +223,7 @@ void CalcJacobian (QMMesh *mesh, Raster *raster,
     double freq, char *solver, double tol, mxArray **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM, blen, slen;
+    int i, n, dim, nQ, nM, nQM, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
@@ -296,7 +296,7 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     char *solver, double tol, mxArray **res)
 {
     const double c0 = 0.3;
-    int i, n, dim, nQ, nM, nQM, blen, slen;
+    int i, n, dim, nQ, nM, nQM, slen;
 
     n    = mesh->nlen();
     dim  = mesh->Dimension();
@@ -319,8 +319,6 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
     for (i = 0; i < n; i++)
 	c2a[i] = c0/(2.0*ref[i]*A_Keijzer (ref[i]));
     msol.SetParam (OT_C2A, c2a);
-
-    bool logdata = true; // make user-definable
 
     // build the field vectors
     dphi = new RVector[nQ];
