@@ -2,8 +2,8 @@ version: 1.0.{build}
 configuration: Release_fdot
 platform: x64
 install:
- - set PATH=C:\Python27-x64;%PATH%
- 
+ - set PATH=C:\Python27-x64;C:\Python27-x64\Scripts;%PATH%
+
 build:
   project: win\VS2015\toast.sln
   verbosity: quiet
