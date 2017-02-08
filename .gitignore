@@ -13,6 +13,8 @@
 
 *.xcbkptlist
 
+*.pyc
+
 autom4te.cache
 
 bin
@@ -50,6 +52,11 @@ toastenv.sh
 toastpp
 
 toast_bin_darwin64.zip
+
+src/python/build
+darwin64
+gcc_shared_smp
+src/doc
 
 # Windows-specific patterns
 win/**/x64/

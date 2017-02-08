@@ -1,14 +1,17 @@
 from toast import toastmod
 
-def Make (regtype,hraster,x0,tau,beta=1):
-    return toastmod.Regul (regtype,hraster,x0,tau,beta)
+class Regul:
 
-def Value (hreg, x):
-    return toastmod.RegValue (hreg, x)
+    def __init__(self, regtype, raster, x0, tau, beta=1):
+        self.handle = toastmod.Regul(regtype, raster.handle, x0,
+                                     tau, beta)
 
-def Gradient (hreg, x):
-    return toastmod.RegGradient (hreg, x)
+    def Value(self, x):
+        return toastmod.RegValue(self.handle, x)
 
-def HDiag (hreg, x):
-    return toastmod.RegHDiag (hreg, x)
+    def Gradient(self, x):
+        return toastmod.RegGradient(self.handle, x)
+
+    def HDiag(self, x):
+        return toastmod.RegHDiag(self.handle, x)
 

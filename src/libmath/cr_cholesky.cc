@@ -75,7 +75,7 @@ MATHLIB int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
 {
     const int fill_factor = 10; // expected fill-in
     int nval = rowptr[dim];
-    int i, c, r, ci, ri, parent, newlen;
+    int i, c, r, ci, ri, n, parent, newlen;
 
     const char *swapname = "/tmp/chswap.tmp";
     FILE *swap = 0; // column swap file
@@ -182,7 +182,9 @@ MATHLIB int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
     for (c = 0; c < dim; c++) {
         int *colp;
         if (c < swap_next) {
-	    fread (colbuf, sizeof(int), nval_col[c], swap);
+	    n = fread (colbuf, sizeof(int), nval_col[c], swap);
+	    xASSERT(n == nval_col[c],
+		    "Unexpected number of elements read from stream");
 	    colp = colbuf;
 	} else {
 	    colp = colref[c];
@@ -203,7 +205,9 @@ MATHLIB int symbolic_cholesky_factor (int dim, idxtype *rowptr, idxtype *colidx,
     for (c = 0; c < dim; c++) {
         int *colp;
 	if (c < swap_next) {
-	    fread (colbuf, sizeof(int), nval_col[c], swap);
+	    n = fread (colbuf, sizeof(int), nval_col[c], swap);
+	    xASSERT(n == nval_col[c],
+		    "Unexpected number of elements read from stream");
 	    colp = colbuf;
 	} else {
 	    colp = colref[c];

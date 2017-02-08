@@ -701,7 +701,7 @@ classdef toastMesh < handle
             % See also:
             %         toastMesh, SYSMATCOMPONENT
            
-            smat = toastmex(uint32(93),obj.handle);
+            smat = toastmex(uint32(92),obj.handle);
             
         end
         

@@ -38,7 +38,7 @@ matlab2::
 python::
 	if test -d python ; then \
 		cd python; \
-		$(MAKE) all; \
+		$(MAKE) python; \
 	fi
 
 doc::

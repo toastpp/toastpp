@@ -7137,6 +7137,9 @@ $as_echo "unknown (can't find uname command)" >&6; }
 	if test "`uname -s`" = "AIX" ; then
 	    system=AIX-`uname -v`.`uname -r`
 	fi
+        if test "`uname`" = "Darwin" ; then
+            system=Darwin
+        fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $system" >&5
 $as_echo "$system" >&6; }
     fi
@@ -7796,6 +7799,10 @@ fi
 
 if test "${TOAST_DEBUG}" = "1" ; then
     OBJDIR="${OBJDIR}_dbg"
+fi
+
+if test "$system" = "Darwin" ; then
+    OBJDIR="darwin64"
 fi
 
 
@@ -9061,7 +9068,8 @@ rm -f bin
 ln -s ${OBJDIR}/bin bin
 rm -f lib
 ln -s ${OBJDIR}/lib lib
-ln -s -f ${OBJDIR} ${ARCHDIR}
+rm -f ${ARCHDIR}
+ln -s ${OBJDIR} ${ARCHDIR}
 
 # ========================================================================
 # Prepare TOAST environment file
@@ -9075,9 +9083,9 @@ echo "setenv TOASTVER \$TOASTDIR/${OBJDIR}" >> ${TOASTENV}
 echo "setenv TOAST_SCRIPT_PATH \$TOASTDIR/script" >> ${TOASTENV}
 echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
 
-rm -f toast.env
-ln -s ${TOASTENV} toast.env
-ln -f -s ${TOASTDIR}/numerics/cuda/cusp_v0.2.0 ${TOASTDIR}/numerics/cuda/cusp
+##rm -f toast.env
+##ln -s ${TOASTENV} toast.env
+##ln -f -s ${TOASTDIR}/numerics/cuda/cusp_v0.2.0 ${TOASTDIR}/numerics/cuda/cusp
 
 # write out the distribution configuration shell scripts
 
@@ -10244,7 +10252,7 @@ fi
 
 
 # move toast-mex options file to target directory
-mv -f mexopts.incl ${TOASTDIR}/${OBJDIR}
+##mv -f mexopts.incl ${TOASTDIR}/${OBJDIR}
 
 echo
 echo "TOAST environment (csh) stored in ${TOASTENV}"
