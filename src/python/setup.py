@@ -6,10 +6,14 @@ import numpy.distutils as npd
 
 toastdir = os.getenv('TOASTDIR')
 if toastdir == None:
-    print 'Expected environment variable TOASTDIR is not defined!'
-    sys.exit(1)
+	if "nt" in os.name:
+		toastdir = os.getcwd() + '/../..'
+	else:
+		print 'Expected environment variable TOASTDIR is not defined!'
+		print 'Please enter the path to the TOAST root directory:'
+		toastdir = raw_input()
+		#sys.exit(1)
 
-toastver = os.getenv('TOASTVER')
 major = "%d" % sys.version_info[0]
 minor = "%d" % sys.version_info[1]
 pyinc = get_python_inc(plat_specific=1)
@@ -24,7 +28,8 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libfe',
                                     toastdir+'/src/libstoast'],
                     libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
-                    library_dirs = [toastver+'/lib'],
+                    library_dirs = [toastdir+'/win/x64/Release/lib'] if "nt" in os.name else [toastdir+'/lib'],
+					runtime_library_dirs = None if "nt" in os.name else [toastdir+'/lib'],
                     sources = ['toastmodule.cc'])
 
 setup (name = 'PyToast',

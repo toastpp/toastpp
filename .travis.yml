@@ -9,6 +9,8 @@ matrix:
         apt:
           packages:
             - gfortran
+            - csh
+            - python-numpy
       env:
         - CONFIGOPTS=
     - os: linux
@@ -16,6 +18,8 @@ matrix:
         apt:
           packages:
             - gfortran
+            - csh
+            - python-numpy      
       env: CONFIGOPTS="--enable-threads --enable-fdot"
     - os: osx
       osx_image: xcode7.3
@@ -28,6 +32,7 @@ script:
     export LD_LIBRARY_PATH=$TOASTDIR/lib;
     make numerics;
     make toast;
+    make python;
     make test;
     fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -56,6 +61,12 @@ script:
     if [[ $? -ne 0 ]]; then success=false; fi;
     cd ../libdgfe;
     xcodebuild -configuration release;
+    if [[ $? -ne 0 ]]; then success=false; fi;
+    cd ../..;
+    export TOASTDIR=$PWD;
+    echo $CONFIGOPTS;
+    ./configure $CONFIGOPTS;
+    make python;
     if [[ $? -ne 0 ]]; then success=false; fi;
     $success;
     fi;

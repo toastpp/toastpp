@@ -256,34 +256,34 @@ classdef toastElement < handle
             %         der = el.ShapeDer(pts,frame)
             %
             % Parameters:
-            %         pt [real matrix d x np]:
+            %         pt [real matrix np x d]:
             %             array of evaluation point coordinates
             %         frame [string]:
             %             reference frame for points pts: 'local' (default)
             %             or 'global'.
             %
             % Return values:
-            %         der [real vector d x nn x np]:
+            %         der [real vector nn x d x np]:
             %             array of element shape function derivatives
             %
             % Notes:  For each of the supplied evaluation points, this
             %         method returns the values of the shape function
             %         derivatives associated with all element nodes.
             %
-            %         Parameter 'pts' is a matrix of dimension d x np,
-            %         representing list of np evaluation points pts(:,i).
+            %         Parameter 'pts' is a matrix of dimension np x d,
+            %         representing list of np evaluation points pts(i,:).
             %         d is the problem dimension (2 or 3).
             %
             %         By default, input point coordinates are interpreted
             %         in the local element frame. If passing coordinates in
             %         the global mesh frame, use flag 'global'.
             %
-            %         The dimension of the returned matrix is d x nn x np,
+            %         The dimension of the returned matrix is nn x d x np,
             %         where np is the number of input points, d is the
             %         problem dimension (2 or 3), and nn is the number of
             %         element nodes. Thus, der(i,j,k) is the shape
-            %         function derivative for the k-th point, j-th node in
-            %         the i-th axis direction.
+            %         function derivative for the k-th point, i-th node in
+            %         the j-th axis direction.
             %
             %         The order of the shape function array is defined by
             %         the local element node order.

@@ -7,7 +7,7 @@ close all
 
 % Load mesh and optode layout
 meshdir = '../../test/2D/meshes/';
-hmesh=toastMesh([meshdir 'ellips_tri10.msh']);
+hmesh = toastMesh([meshdir 'ellips_tri10.msh']);
 hmesh.ReadQM([meshdir 'circle25_32x32.qm']);
 
 % Load parameter distributions
