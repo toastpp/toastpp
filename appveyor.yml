@@ -14,7 +14,7 @@ install:
  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
  - "%PYTHON%\\python.exe --version"
  - "%PYTHON%\\python.exe  -c \"import struct; print(struct.calcsize('P') * 8)\""
- - "%PYTHON%\\Scripts\pip.exe install numpy"
+ - "%PYTHON%\\Scripts\\pip.exe install numpy"
 
 build:
   project: win\VS2015\toast.sln
