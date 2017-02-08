@@ -1,12 +1,27 @@
 version: 1.0.{build}
 configuration: Release_fdot
 platform: x64
+
+environment:
+  - PYTHON: "C:\\Python27"
+    PYTHON_VERSION: "2.7.x"
+    PYTHON_ARCH: "64"
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+
 install:
- - set PATH=C:\Python27-x64;C:\Python27-x64\Scripts;%PATH%
+ - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+ - "%PYTHON%\\python.exe --version"
+ - "%PYTHON%\\python.exe  -c \"import struct; print(struct.calcsize('P') * 8)\""
+ - "%PYTHON%\\Scripts\pip.exe install numpy"
 
 build:
   project: win\VS2015\toast.sln
   verbosity: quiet
 
 after_build:
- - make_python.bat
+ - "cd src\\python"
+ - "%PYTHON%\\python.exe setup.py build --build-base=../../win/x64/Release/python"
+ - "%PYTHON%\\python.exe setup.py install"
+ - "cd ..\\.."
