@@ -3,9 +3,10 @@ configuration: Release_fdot
 platform: x64
 
 environment:
-  - PYTHON: "C:\\Python27"
-    PYTHON_VERSION: "2.7.x"
-    PYTHON_ARCH: "64"
+  global:
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7.x"
+      PYTHON_ARCH: "64"
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
