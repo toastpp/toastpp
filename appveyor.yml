@@ -23,8 +23,8 @@ build:
   project: win\VS2015\toast.sln
   verbosity: quiet
 
-after_build:
- - "cd src\\python"
- - "%PYTHON%\\python.exe setup.py build --build-base=../../win/x64/Release/python"
- - "%PYTHON%\\python.exe setup.py install"
- - "cd ..\\.."
+#after_build:
+# - "cd src\\python"
+# - "%PYTHON%\\python.exe setup.py build --build-base=../../win/x64/Release/python"
+# - "%PYTHON%\\python.exe setup.py install"
+# - "cd ..\\.."
