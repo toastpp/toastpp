@@ -9,6 +9,7 @@ matrix:
         apt:
           packages:
             - gfortran
+            - csh
       env:
         - CONFIGOPTS=
     - os: linux
@@ -16,6 +17,7 @@ matrix:
         apt:
           packages:
             - gfortran
+            - csh
       env: CONFIGOPTS="--enable-threads --enable-fdot"
     - os: osx
       osx_image: xcode7.3
