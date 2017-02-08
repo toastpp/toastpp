@@ -29,9 +29,11 @@ script:
     export TOASTDIR=$PWD;
     echo $CONFIGOPTS;
     ./configure $CONFIGOPTS;
+    export LD_LIBRARY_PATH=$TOASTDIR/lib;
     make numerics;
     make toast;
     make python;
+    make test;
     fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     success=true;

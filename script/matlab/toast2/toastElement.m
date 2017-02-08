@@ -160,6 +160,7 @@ classdef toastElement < handle
             %         'FD'     : \int Fi Dj dr      :  n x n x d
             %         'FDD'    : \int Fi Dj Dk dr   :  n x n x n
             %         'dd'     : \int dFi/dxj dFk/dxl dr : n x d x n x d
+            %         'Fdd'    : \int Fi dFj/dxk dFl/dxm dr :  n x n x d x n x d
             %         'BndF'   : \int Fi ds         :  n x 1
             %         'BndFF'  : \int Fi Fj ds      :  n x n
             %
@@ -172,6 +173,8 @@ classdef toastElement < handle
             %
             %         'PFF'    : \int Pi Fj Fk dr :  n x n
             %         'PDD'    : \int Pi Dj Dk dr :  n x n
+            %         'Pd'     : \int Pi dFj/dxk dr : n x d
+            %         'Pdd'    : \int Pi dFj/dxk dFl/dxm dr : n x d x n x d
             %         'BndPFF' : \int Pi Fj Fk ds :  n x n  
             %
             %         For boundary integrals ('BndF' and 'BndFF'), the
