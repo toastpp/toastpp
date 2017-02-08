@@ -17,7 +17,7 @@ install:
  - "%PYTHON%\\python.exe  -c \"import struct; print(struct.calcsize('P') * 8)\""
  - "%PYTHON%\\Scripts\\pip.exe install numpy"
  - "SET VS90COMNTOOLS=%VS140COMNTOOLS%"
- - "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\bin\\x86_amd64\\vcvarsx86_amd64.bat"
+ - "C:\\Program\ Files\ (x86)\\Microsoft\ Visual\ Studio\ 14.0\\VC\\bin\\x86_amd64\\vcvarsx86_amd64.bat"
 
 build:
   project: win\VS2015\toast.sln
