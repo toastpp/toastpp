@@ -112,25 +112,6 @@ void SolverPCG::Solve (CFwdSolver &FWS, const Raster &raster,
     // initialise regularisation instance
     reg = Regularisation::Create (pp, &x0, &raster);
 
-
-
-
-
-    // DEBUG
-    RVector muaim, musim, bkapref(raster.BLen()*2);
-    RVector akap(bkapref,0,raster.BLen());
-    RVector skap(bkapref,raster.BLen(),raster.BLen());
-    ReadNim ("/home/ucacmas/src/toast/trunk/test/2D/meshes/tgt_mua_ellips_tri10.nim", 0, muaim);
-    ReadNim ("/home/ucacmas/src/toast/trunk/test/2D/meshes/tgt_mus_ellips_tri10.nim", 0, musim);
-    raster.Map_MeshToBasis (muaim, akap);
-    raster.Map_MeshToBasis (musim, skap);
-    ((MRF*)reg)->SetKaprefImg (&bkapref);
-    
-
-
-    
-    
-
     // Set up the context data for the line search callback
     OF_CLBK_DATA ofdata;
     ofdata.fws = &FWS;
