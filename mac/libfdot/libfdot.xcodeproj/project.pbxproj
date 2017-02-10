@@ -252,7 +252,6 @@
 					DEBUG,
 					TOAST_THREAD,
 					NEED_EXPLICIT_INSTANTIATION,
-					"$(inherited)",
 				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
@@ -275,6 +274,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NEED_EXPLICIT_INSTANTIATION,
 					TOAST_THREAD,
+					FDOT,
 				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../darwin64/lib/";
