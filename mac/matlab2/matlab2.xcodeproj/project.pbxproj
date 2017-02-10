@@ -302,7 +302,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2016b.app;
+				MATLABVER = MATLAB_R2013b.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
@@ -326,7 +326,10 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = mexmaci64;
 				EXECUTABLE_PREFIX = "";
-				GCC_PREPROCESSOR_DEFINITIONS = TOAST_THREAD;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					TOAST_THREAD,
+					FDOT,
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -338,7 +341,7 @@
 				);
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				MATLABVER = MATLAB_R2016b.app;
+				MATLABVER = MATLAB_R2013b.app;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lmat",
