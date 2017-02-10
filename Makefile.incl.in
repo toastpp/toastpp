@@ -206,5 +206,8 @@ MEXFLAGS =
 ifeq ($(BUILD_FDOT),1)
       MEXFLAGS += -DMESA_SUPPORT
 endif
+ifeq ($(ENABLE_PTHREAD),yes)
+     MEXFLAGS += -DTOAST_THREAD
+endif
 MEXINC = $(INCLUDE)
 MEXLIB = $(STOASTLIB) -llbfgs
