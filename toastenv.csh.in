@@ -4,7 +4,7 @@
 if ( $?TOASTDIR ) then
 else
     echo "TOASTDIR environment variable not set!"
-    if ( -e mtoast_install.m ) then
+    if ( -e mtoast2_install.m ) then
 	setenv TOASTDIR $PWD
     endif
 endif

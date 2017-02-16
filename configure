@@ -9074,14 +9074,14 @@ ln -s ${OBJDIR} ${ARCHDIR}
 # ========================================================================
 # Prepare TOAST environment file
 
-TOASTENV=${OBJDIR}/toast.env
-echo "#!csh" > ${TOASTENV}
-echo "# TOAST environment variables generated with configure" >> ${TOASTENV}
-echo "# for target ${OBJDIR}" >> ${TOASTENV}
-echo "setenv TOASTDIR ${TOASTDIR}" >> ${TOASTENV}
-echo "setenv TOASTVER \$TOASTDIR/${OBJDIR}" >> ${TOASTENV}
-echo "setenv TOAST_SCRIPT_PATH \$TOASTDIR/script" >> ${TOASTENV}
-echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
+##TOASTENV=${OBJDIR}/toast.env
+##echo "#!csh" > ${TOASTENV}
+##echo "# TOAST environment variables generated with configure" >> ${TOASTENV}
+##echo "# for target ${OBJDIR}" >> ${TOASTENV}
+##echo "setenv TOASTDIR ${TOASTDIR}" >> ${TOASTENV}
+##echo "setenv TOASTVER \$TOASTDIR/${OBJDIR}" >> ${TOASTENV}
+##echo "setenv TOAST_SCRIPT_PATH \$TOASTDIR/script" >> ${TOASTENV}
+##echo "setenv LD_LIBRARY_PATH \$TOASTVER/lib" >> ${TOASTENV}
 
 ##rm -f toast.env
 ##ln -s ${TOASTENV} toast.env
