@@ -1439,7 +1439,7 @@ Optional Features:
   --enable-debug          build debug version
   --enable-prof           build profiling version
   --enable-zoltan         build with Zoltan load-balancing support
-  --enable-threads        build pthreads parallel version
+  --disable-threads        do not build multithreaded version
   --enable-mpi            build MPI distributed version
   --enable-cuda           enable CUDA GPU support
   --disable-shared        do not build shared TOAST libraries
@@ -7124,8 +7124,8 @@ if test -f /usr/lib/NextStep/software_version; then
 else
     system=`uname -s`-`uname -r`
     if test "$?" -ne 0 ; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: unknown (can't find uname command)" >&5
-$as_echo "unknown (can't find uname command)" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: unknown (cannot find uname command)" >&5
+$as_echo "unknown (cannot find uname command)" >&6; }
 	system=unknown
     else
 	# Special check for weird MP-RAS system (uname returns weird
@@ -7420,12 +7420,12 @@ fi
 
 # Check whether --enable-threads was given.
 if test "${enable_threads+set}" = set; then :
-  enableval=$enable_threads; isok=$enableval
+  enableval=$enable_threads; isok=yes
 else
   isok=no
 fi
 
-if test "$isok" = "yes" ; then
+if test "$isok" = "no" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
     MATLAB_TOASTFLAGS="-DTOAST_THREAD"
     NEED_PTHREAD=yes

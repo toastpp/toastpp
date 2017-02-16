@@ -307,7 +307,7 @@ if test -f /usr/lib/NextStep/software_version; then
 else
     system=`uname -s`-`uname -r`
     if test "$?" -ne 0 ; then
-	AC_MSG_RESULT([unknown (can't find uname command)])
+	AC_MSG_RESULT([unknown (cannot find uname command)])
 	system=unknown
     else
 	# Special check for weird MP-RAS system (uname returns weird
@@ -522,9 +522,9 @@ AC_SUBST(ZOLTANLIBDIR)
 # Check whether user wants to build a threaded version
 
 AC_ARG_ENABLE(threads,
-    [  --enable-threads        build pthreads parallel version],
-    [isok=$enableval], [isok=no])
-if test "$isok" = "yes" ; then
+    [  --disable-threads        do not build multithreaded version],
+    [isok=yes], [isok=no])
+if test "$isok" = "no" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"
     MATLAB_TOASTFLAGS="-DTOAST_THREAD"
     NEED_PTHREAD=yes
