@@ -40,6 +40,10 @@ doc::
 	cd src; \
 	$(MAKE) doc
 
+python_doc::
+	cd src/python/doc; \
+	make html;
+
 test::
 	@cd test; $(MAKE)
 
