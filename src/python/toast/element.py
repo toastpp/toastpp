@@ -4,6 +4,16 @@ from scipy import sparse
 
 class Element:
     """The Element class represents a single element in a FEM mesh.
+
+       Syntax:
+           el = toast.Element(mesh,index)
+
+       Parameters:
+           * mesh: toast.Mesh object
+           * index: element index (0 <= index < mesh.NodeCount())
+
+       See also:
+           toast.Mesh.Element
     """
     
     def __init__(self, mesh, index):
@@ -46,12 +56,13 @@ class Element:
     def Data(self):
         """Returns the geometry of the mesh element.
 
-        Syntax evtx,eidx,eltp = element.Data()
+        Syntax:
+            evtx,eidx,eltp = element.Data()
 
         Return values:
-            evtx: matrix of node coordinates
-            eidx: list of global node indices (see element.Dof)
-            eltp: element type identifier
+            * evtx: matrix of node coordinates
+            * eidx: list of global node indices (see element.Dof)
+            * eltp: element type identifier
         """
         return toastmod.elementData(self.mesh.handle, self.elid)
         
@@ -59,15 +70,17 @@ class Element:
         """Returns an integrals of a combination of shape functions and shape
         function derivatives over the surface or interior of the element.
 
-        Syntax: mat = element.Mat(intstr)
-                mat = element.Mat(intstr, param=prm)
-                mat = element.Mat(intstr, sideidx=idx)
+        Syntax:
+            * mat = element.Mat(intstr)
+            * mat = element.Mat(intstr, param=prm)
+            * mat = element.Mat(intstr, sideidx=idx)
 
         Parameters:
-            intstr:  string defining the integral (see notes)
-            sideidx: side index (only for surface integrals over a single face)
-            param:   nodal parameter array (only for integrals involving a
-                     field parameter)
+            * intstr:  string defining the integral (see notes)
+            * sideidx: side index (only for surface integrals over a single
+              face)
+            * param:   nodal parameter array (only for integrals involving a
+              field parameter)
 
         Return value:
             mat: matrix of integral values. Each dimension of mat is of length
@@ -87,15 +100,15 @@ class Element:
             
             int_type : integral type      : matrix dimension
             
-            'F'      : \int Fi dr         :  n x 1
-            'FF'     : \int Fi Fj dr      :  n x n
-            'FFF'    : \int Fi Fj Fk dr   :  n x n x n
-            'DD'     : \int Di Dj dr      :  n x n
-            'FD'     : \int Fi Dj dr      :  n x n x d
-            'FDD'    : \int Fi Dj Dk dr   :  n x n x n
-            'dd'     : \int dFi/dxj dFk/dxl dr : n x d x n x d
-            'BndF'   : \int Fi ds         :  n x 1
-            'BndFF'  : \int Fi Fj ds      :  n x n
+            * 'F'      : \int Fi dr         :  n x 1
+            * 'FF'     : \int Fi Fj dr      :  n x n
+            * 'FFF'    : \int Fi Fj Fk dr   :  n x n x n
+            * 'DD'     : \int Di Dj dr      :  n x n
+            * 'FD'     : \int Fi Dj dr      :  n x n x d
+            * 'FDD'    : \int Fi Dj Dk dr   :  n x n x n
+            * 'dd'     : \int dFi/dxj dFk/dxl dr : n x d x n x d
+            * 'BndF'   : \int Fi ds         :  n x 1
+            * 'BndFF'  : \int Fi Fj ds      :  n x n
             
             The following integrals include an integral of a
             function defined in the element, given by nodal
@@ -104,9 +117,9 @@ class Element:
             
             int_type : integral type      : matrix dimension
             
-            'PFF'    : \int Pi Fj Fk dr :  n x n
-            'PDD'    : \int Pi Dj Dk dr :  n x n
-            'BndPFF' : \int Pi Fj Fk ds :  n x n  
+            * 'PFF'    : \int Pi Fj Fk dr :  n x n
+            * 'PDD'    : \int Pi Dj Dk dr :  n x n
+            * 'BndPFF' : \int Pi Fj Fk ds :  n x n  
             
             For boundary integrals ('BndF' and 'BndFF'), the
             integrals are performed over all element sides that
@@ -131,14 +144,15 @@ class Element:
     def ShapeFun(self, pt, frame=0):
         """Return the shape functions for all element nodes at multiple points.
 
-        Syntax: fun = element.ShapeFun(pts)
-                fun = element.ShapeFun(pts, frame)
+        Syntax:
+            * fun = element.ShapeFun(pts)
+            * fun = element.ShapeFun(pts, frame)
 
         Parameters:
-            pts [real matrix d x np]:
-                array of evaluation point coordinates
-            frame [integer]
-                0: points in local frame, 1: points in global frame
+            * pts [real matrix d x np]:
+              array of evaluation point coordinates
+            * frame [integer]
+              0: points in local frame, 1: points in global frame
         
         Return value:
             fun [real matrix nn x np]:

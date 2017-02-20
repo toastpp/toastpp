@@ -8,22 +8,27 @@ from types import *
 class Mesh:
     """Finite element mesh object.
 
-    Syntax: mesh = toast.mesh.Mesh()
-            mesh = toast.mesh.Mesh(name=filename)
-            mesh = toast.mesh.Mesh(data=(nlist,elist,eltp))
+    Syntax:
+        * mesh = toast.mesh.Mesh()
+        * mesh = toast.mesh.Mesh(name=filename)
+        * mesh = toast.mesh.Mesh(data=(nlist,elist,eltp))
 
     Parameters:
-        filename: mesh file name (string)
-        nlist: node coordinate list
-        elist: element index list
-        eltp:  element type list
+        * filename: mesh file name (string)
+        * nlist: node coordinate list
+        * elist: element index list
+        * eltp:  element type list
 
     Notes:
-        The default constructor creates an object without associated mesh data
-        and a 0 handle.
+        The default constructor creates an empty mesh object. Call "Make" or
+        "Read" to assign a valid mesh.
+
         If name is provided, the mesh is initialised from file.
+
         If the data tuple is provided, the mesh is initialised from that.
+
         See mesh.Make() for details of the nlist, elist, eltp parameters.
+
         name and data should not both be assigned.
     """
     
@@ -40,14 +45,16 @@ class Mesh:
     def Handle(self):
         """Returns the internal mesh handle.
         
-        Syntax: handle = mesh.Handle()
+        Syntax:
+            handle = mesh.Handle()
         """
         return self.handle
 
     def Read(self, name):
         """Read a Toast mesh from file.
 
-        Syntax: handle = mesh.Read(name)
+        Syntax:
+            handle = mesh.Read(name)
     
         Parameters:
             name: mesh file name (string)
@@ -62,7 +69,8 @@ class Mesh:
     def Write(self, name):
         """Write a Toast mesh to file.
 
-        Syntax: mesh.Write(name)
+        Syntax:
+            mesh.Write(name)
 
         Parameters:
             name: mesh file name (string)
@@ -72,12 +80,13 @@ class Mesh:
     def Make(self, nlist, elist, eltp):
         """Create a Toast mesh from node and element index data.
         
-        Syntax: handle = mesh.Make(nlist,elist,eltp)
+        Syntax:
+            handle = mesh.Make(nlist,elist,eltp)
 
         Parameters:
-            nlist: node coordinate list (double, n x d)
-            elist: element index list (int32, m x smax)
-            eltp: element type list (int32, m x 1)
+            * nlist: node coordinate list (double, n x d)
+            * elist: element index list (int32, m x smax)
+            * eltp: element type list (int32, m x 1)
 
         Return values:
             handle: mesh handle (int32). Usually the returned handle will not
@@ -93,7 +102,8 @@ class Mesh:
     def Clear(self):
         """Deallocate the associated mesh data
         
-        Syntax: mesh.Clear()
+        Syntax:
+            mesh.Clear()
 
         Notes:
             Releases the mesh data and resets the handle to 0
@@ -105,12 +115,13 @@ class Mesh:
     def Data(self):
         """Returns node, element and element type data for the mesh
 
-        Syntax: nlist,elist,eltp = mesh.Data()
+        Syntax:
+            nlist,elist,eltp = mesh.Data()
 
         Return values:
-            nlist: node coordinate list (double, n x d)
-            elist: element index list (int32, m x smax)
-            eltp: element type list (int32, m x 1)
+            * nlist: node coordinate list (double, n x d)
+            * elist: element index list (int32, m x smax)
+            * eltp: element type list (int32, m x 1)
 
         Notes:
             If no mesh has been loaded or constructed for the object, the
@@ -121,12 +132,13 @@ class Mesh:
     def SurfData(self):
         """Returns node and element lists for the mesh surface faces.
 
-        Syntax: nlist,elist,perm = mesh.SurfData()
+        Syntax:
+            nlist,elist,perm = mesh.SurfData()
 
         Return values:
-            nlist: node coordinate list (double, n x d)
-            elist: element index list (int32, m x smax)
-            perm: permutation array (int32, n x 1)
+            * nlist: node coordinate list (double, n x d)
+            * elist: element index list (int32, m x smax)
+            * perm: permutation array (int32, n x 1)
 
         Notes:
             Returns the node coordinates and element vertex index list for the
