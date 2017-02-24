@@ -14,16 +14,16 @@ using namespace std;
 // ============================================================================
 // Local prototypes
 
-int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
-	     int ieltop, int jeltop, int *totels, int *nodsort, int *newnod,
-	     int *totnod, int tsz);
+int tinney_ (idxtype *l, idxtype *nl, idxtype *fl, idxtype *il, idxtype *jl, idxtype *eltop,
+	     idxtype ieltop, idxtype jeltop, idxtype *totels, idxtype *nodsort, idxtype *newnod,
+	     idxtype *totnod, idxtype tsz);
 
 // ============================================================================
 // Sort boundary nodes to the end of the node list
 // This only reorders the permutation vector `perm', not the node list itself
 // Returns the number of boundary nodes found
 
-FELIB int SortBndToEnd (Mesh &mesh, int *perm)
+FELIB int SortBndToEnd (Mesh &mesh, idxtype *perm)
 {
     int src, dst, tmp, nbnd = 0;
     NodeList &nlist = mesh.nlist;
@@ -42,14 +42,15 @@ FELIB int SortBndToEnd (Mesh &mesh, int *perm)
 // return value is error flag
 //   0 = success
 
-FELIB int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len)
+FELIB int Optimise_MinBandwidth (Mesh &mesh, idxtype *perm, int ofs, int len)
 {
-    int i, nzero, nfirst, maskval, nds = mesh.nlen();
-	idxtype *rowptr, *colidx;
-    int iperm0 = 0;
-    int *mask = new int[nds];
-    int *riord = new int[nds];
-    int levels[512], nlev, init;
+    int i, nzero, nfirst;
+    idxtype *rowptr, *colidx, init, maskval, nlev;
+    idxtype iperm0 = 0;
+    idxtype nds = mesh.nlen();
+    idxtype *mask = new idxtype[nds];
+    idxtype *riord = new idxtype[nds];
+    idxtype levels[512];
     mesh.SparseRowStructure (rowptr, colidx, nzero);
     
     // adjust lists to 1-based, required by fortran
@@ -89,12 +90,13 @@ FELIB int Optimise_MinBandwidth (Mesh &mesh, int *perm, int ofs, int len)
 //   0 = success
 //  -1 = insufficient working space (should never happen)
 
-FELIB int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
+FELIB int Optimise_MMD (Mesh &mesh, idxtype *perm, int ofs, int len)
 {
-    int i, j, k, idx, iflag, nofsub, nds = mesh.nlen();
-    int iwsiz = 4*nds, *iwork = new int[iwsiz]; // work space
+    int i, j, k, idx;
+    idxtype nds = mesh.nlen(), nofsub, iflag;
+    idxtype iwsiz = 4*nds, *iwork = new idxtype[iwsiz]; // work space
     idxtype *rowptr, *colidx;
-	int nzero;
+    int nzero;
 
     mesh.SparseRowStructure (rowptr, colidx, nzero);
 
@@ -107,7 +109,7 @@ FELIB int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
     for (i = 0; i < nzero; i++) colidx[i]++; // convert to 1-based
     for (i = 0; i <= nds; i++)  rowptr[i]++; // convert to 1-based
 
-    int *iperm = new int[nds];
+    idxtype *iperm = new idxtype[nds];
     for (i = 0; i < nds; i++) {
         iperm[perm[i]] = i+1;
         perm[i]++; // ordmmd expects 1-based
@@ -131,32 +133,34 @@ FELIB int Optimise_MMD (Mesh &mesh, int *perm, int ofs, int len)
 //   1 = mesh contains elements with different number of nodes
 //   2 = fatal error in tinney subroutine
 
-FELIB int Optimise_Tinney2 (Mesh &mesh, int *perm, int ofs, int len)
+FELIB int Optimise_Tinney2 (Mesh &mesh, idxtype *perm, int ofs, int len)
 {
-    int nds = mesh.nlen();
-    int els = mesh.elen();
+    idxtype nds = mesh.nlen();
+    idxtype els = mesh.elen();
     int i, j, res, nnd = mesh.elist[0]->nNode();
     for (i = 1; i < els; i++)
         if (mesh.elist[i]->nNode() != nnd) return 1;
     // we only allow meshes with elements that have the same number of nodes
-    int *l, tsz, il, jl = nds;
-    int *nl = new int[jl];
-    int *fl = new int[jl];
-    int ieltop = els;
-    int jeltop = nnd;
-    int *eltop = new int[ieltop*jeltop];
+    int tsz;
+    idxtype il, jl = nds;
+    idxtype *l;
+    idxtype *nl = new idxtype[jl];
+    idxtype *fl = new idxtype[jl];
+    idxtype ieltop = els;
+    idxtype jeltop = nnd;
+    idxtype *eltop = new idxtype[ieltop*jeltop];
 
     for (i = 0; i < els; i++)
         for (j = 0; j < nnd; j++)
 	    eltop[i+ieltop*j] = mesh.elist[i]->Node[j];
 
-    int *iperm = new int[nds];
+    idxtype *iperm = new idxtype[nds];
     for (i = 0; i < nds; i++) iperm[perm[i]] = i;
 
     il = 131072;
     tsz = 1024;
     do {
-        l = new int[il];
+        l = new idxtype[il];
         res = tinney_ (l, nl, fl, &il, &jl, eltop, ieltop, jeltop, &els,
 		       perm, iperm, &nds, tsz);
 	delete []l;
@@ -193,13 +197,13 @@ FELIB int Optimise_Tinney2 (Mesh &mesh, int *perm, int ofs, int len)
 inline double d_int(double *x) {return *x;};
 
 /* Subroutine */ 
-int symadd_(int *nl, int *l, int *il, int nnode, bool *new__)
+idxtype symadd_(idxtype *nl, idxtype *l, idxtype *il, idxtype nnode, bool *new__)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int i__;
+    static idxtype i__;
 
 
 /*     INSERT SYMBOL IN COLUMN NNODE OF THIS ROW */
@@ -231,33 +235,34 @@ int symadd_(int *nl, int *l, int *il, int nnode, bool *new__)
 // ============================================================================
 
 /* Subroutine */ 
-int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
-	     int ieltop, int jeltop, int *totels, int *nodsort, int *newnod,
-	     int *totnod, int tsz)
+int tinney_ (idxtype *l, idxtype *nl, idxtype *fl, idxtype *il, idxtype *jl,
+	     idxtype *eltop, idxtype ieltop, idxtype jeltop, idxtype *totels,
+	     idxtype *nodsort, idxtype *newnod,
+	     idxtype *totnod, idxtype tsz)
 {
     // System generated locals
-    int i__1, i__2, i__3;
+    idxtype i__1, i__2, i__3;
 
     // Local variables
-    static int iele, lcol;
+    static idxtype iele, lcol;
     static double rcol;
-    static int temp, i__, j, k, inode, jnode, knode, mnode, found,
+    static idxtype temp, i__, j, k, inode, jnode, knode, mnode, found,
         mnval, mxval, ti, nt;
     static double sumcol;
-    static int fli;
+    static idxtype fli;
     static bool new__;
 
     int result = 0;
 
     // static int t[200];
     // `200' was in the original but is not sufficient for large meshes
-    int *t = new int[tsz];
+    idxtype *t = new idxtype[tsz];
 
     // static int valence[5000];
     // `5000' was in the original but must be >= number of nodes!
-    int *valence = new int[*totnod];  // M.S. 24.9.99
+    idxtype *valence = new idxtype[*totnod];  // M.S. 24.9.99
 
-    static int sum, lcolold, nxtsift;
+    static idxtype sum, lcolold, nxtsift;
 
     // Fortran I/O blocks
 /*
@@ -288,14 +293,14 @@ int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
 
     // Function Body
     rcol = (double) (*il) / (double) (*totnod);
-    lcol = (int) d_int(&rcol);
+    lcol = (idxtype) d_int(&rcol);
     sumcol = 0.0;
     fli = 0;
     i__1 = *totnod;
     for (inode = 0; inode < i__1; ++inode) {
 	fl[inode] = fli;
 	sumcol += rcol;
-	fli = (int) d_int(&sumcol);
+	fli = (idxtype) d_int(&sumcol);
 	nl[inode] = 0;
 	valence[inode] = 0;
     }
@@ -359,9 +364,9 @@ int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
 */
 	    lcolold = lcol;
 	    rcol = (double) (*il) / (double) (*totnod - nxtsift + 1);
-	    lcol = (int) d_int(&rcol);
+	    lcol = (idxtype) d_int(&rcol);
 	    sumcol = (float)0.;
-	    fli = (int) sumcol;
+	    fli = (idxtype) sumcol;
 	    i__2 = *totnod;
 	    for (i__ = inode; i__ < i__2; ++i__) {
 		if (nl[i__] >= lcolold) {
@@ -379,7 +384,7 @@ int tinney_ (int *l, int *nl, int *fl, int *il, int *jl, int *eltop,
 		}
 		fl[i__] = fli;
 		sumcol += rcol;
-		fli = (int) d_int(&sumcol);
+		fli = (idxtype) d_int(&sumcol);
 /* L390: */
 	    }
 	    if (lcol < *totnod - (inode+1)) {

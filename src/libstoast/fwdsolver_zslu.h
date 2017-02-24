@@ -25,6 +25,7 @@ private:
     void Deallocate();
     void Solve (SuperMatrix *sB, SuperMatrix *sX) const;
     const CCompRowMatrix *A;
+    int *A_rowptr, *A_colidx;
     int *perm_c;
     int *perm_r;
     int *etree;

@@ -16,7 +16,8 @@ void DisplayInfo (void);
 int main (int argc, char *argv[])
 {
     int optmode = 0;
-    int i, res, len, *perm;
+    int i, res, len;
+    idxtype *perm;
     Mesh mesh;
 
     CHECK_EXPIRED ();
@@ -42,7 +43,7 @@ int main (int argc, char *argv[])
 
     cin >> mesh;
     len = mesh.nlen();
-    perm = new int[len];
+    perm = new idxtype[len];
     for (i = 0; i < len; i++) perm[i] = i;
 
     switch (optmode) {
@@ -62,7 +63,7 @@ int main (int argc, char *argv[])
 	return 1;
     }
 
-    mesh.Reorder (IVector (len, perm, SHALLOW_COPY));
+    mesh.Reorder (TVector<idxtype> (len, perm, SHALLOW_COPY));
     delete []perm;
     cout << mesh;
     return 0;

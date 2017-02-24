@@ -201,7 +201,8 @@ void MatlabToast::WriteMeshVtk (int nlhs, mxArray *plhs[], int nrhs,
 void MatlabToast::MeshOpt (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
-    int i, res, len, *perm;
+    int i, res, len;
+    idxtype *perm;
     char optmode[256] = "\0";
 
     Mesh *mesh = GETMESH_SAFE(0);
@@ -209,7 +210,7 @@ void MatlabToast::MeshOpt (int nlhs, mxArray *plhs[], int nrhs,
     mxGetString (prhs[1], optmode, 256);
 
     len = mesh->nlen();
-    perm = new int[len];
+    perm = new idxtype[len];
     for (i = 0; i < len; i++) perm[i] = i;
 
     if (!strcasecmp(optmode, "mmd")) {
@@ -241,9 +242,9 @@ void MatlabToast::MeshReorder (int nlhs, mxArray *plhs[], int nrhs,
     double *pr = mxGetPr(prhs[1]);
 
     int nlen = mesh->nlen();
-    IVector perm(nlen);
+    TVector<idxtype> perm(nlen);
     for (int i = 0; i < nlen; i++)
-	perm[i] = (int)(pr[i]-0.5); // switch to 0-based
+	perm[i] = (idxtype)(pr[i]-0.5); // switch to 0-based
     
     mesh->Reorder(perm);
 }
@@ -464,7 +465,8 @@ void MatlabToast::SysmatSparsityStructure (int nlhs, mxArray *plhs[],
     QMMesh *mesh = (QMMesh*)GETMESH_SAFE(0);
 
     int n = mesh->nlen();
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+    int nzero;
     double *ndata;
     
     mesh->SparseRowStructure (rowptr, colidx, nzero);
@@ -498,7 +500,8 @@ void CalcSysmatComponent (QMMesh *mesh, RVector &prm, char *integral_type,
     }
     else {
         
-        int *rowptr, *colidx, nzero;
+        idxtype *rowptr, *colidx;
+	int nzero;
         
         mesh->SparseRowStructure (rowptr, colidx, nzero);
         F.New(n, n);
@@ -677,7 +680,7 @@ void MatlabToast::WriteQM (int nlhs, mxArray *plhs[], int nrhs,
     ofs << endl;
 
     ofs << "LinkList" << endl;
-    int *ci = new int[nm];
+    idxtype *ci = new idxtype[nm];
     double *idx = new double[nm];
 
     for (i = 0; i < nq; i++) {

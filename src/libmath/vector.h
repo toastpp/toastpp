@@ -182,9 +182,9 @@ template<class VT>
 std::istream &operator>> (std::istream &is, TVector<VT> &v);
 
 template<class VT>
-VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
-	       const TVector<VT> &v2, idxtype *idx2, int nidx2,
-	       int from, int to);
+VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, idxtype nidx1,
+	       const TVector<VT> &v2, idxtype *idx2, idxtype nidx2,
+	       idxtype from, idxtype to);
 
 template<class VT>
 TVector<double> UnfoldComplex (const TVector<VT> &v);
@@ -233,14 +233,14 @@ public:
      * \brief Constructor. Create a vector of length 'dim' and zero all elements.
      * \param dim vector size (>= 0)
      */
-    TVector (int dim);
+    TVector (idxtype dim);
 
     /**
      * \brief Constructor. Creates a vector of length 'dim' and set all values to 's'
      * \param dim vector size (>= 0)
      * \param s element value
      */
-    TVector (int dim, const VT s);
+    TVector (idxtype dim, const VT s);
 
     /**
      * \brief Constructor. Create a vector of length 'dim' and initialise
@@ -254,7 +254,7 @@ public:
      *   of the vector, and the caller is responsible for cleaning it
      *   up after use.
      */
-    TVector (int dim, VT *values, CopyMode cmode=DEEP_COPY);
+    TVector (idxtype dim, VT *values, CopyMode cmode=DEEP_COPY);
 
     /**
      * \brief Constructor. Create a vector of length 'dim' and initialise
@@ -266,7 +266,7 @@ public:
      *   stream-in operator ('>>') for the appropriate template type.
      * \note Elements must be separated by whitespace.
      */
-    TVector (int dim, const char *init);
+    TVector (idxtype dim, const char *init);
 
     /**
      * \brief Copy constructor. Create vector as copy of another vector.
@@ -289,7 +289,7 @@ public:
      * \note This constructor is not threadsafe if used by multiple threads
      *   referencing the same vector v.
      */
-    TVector (const TVector<VT> &v, int ofs, int dim);
+    TVector (const TVector<VT> &v, idxtype ofs, idxtype dim);
 
     /**
      * \brief Destructor. Delete vector and deallocate data block.
@@ -300,14 +300,14 @@ public:
      * \brief Returns the size of the vector.
      * \return Size (number of elements) of the vector.
      */
-    int Dim () const { return size; }
+    idxtype Dim () const { return size; }
 
     /**
      * \brief Vector element access operator (read and write)
      * \param i element index (0 <= i < TVector::Dim())
      * \note The operator syntax is: x = v[i]
      */
-    VT &operator[] (int i) const;
+    VT &operator[] (idxtype i) const;
 
     /// \brief Assignment operator.
     ///
@@ -336,14 +336,14 @@ public:
     /// - If n < 0 then the chunk size is maximised.
     /// - This method calls the xCOPY BLAS functions for float and double
     ///   types, if USE_BLAS_LEVEL1 is defined.
-    void Copy (const TVector &v, int tofs, int sofs, int n);
+    void Copy (const TVector &v, idxtype tofs, idxtype sofs, idxtype n);
 
     /// \brief Resize the vector.
     /// \param dim New vector length
     /// \remarks Re-allocates the data block to size 'dim' and resets all
     ///   values to zero.
     /// \sa Allocate(), Unlink()
-    void New (int dim) { Unlink (); Allocate (dim); }
+    void New (idxtype dim) { Unlink (); Allocate (dim); }
 
     /**
      * \brief Zeroes all elements.
@@ -996,9 +996,9 @@ public:
      * \return sparse dot product
      * \note idx1 and idx2 are assumed sorted (ascending)
      */
-    friend VT SparseDotp<> (const TVector<VT> &v1, idxtype *idx1, int nidx1,
-			    const TVector<VT> &v2, idxtype *idx2, int nidx2,
-			    int from, int to);
+    friend VT SparseDotp<> (const TVector<VT> &v1, idxtype *idx1, idxtype nidx1,
+			    const TVector<VT> &v2, idxtype *idx2, idxtype nidx2,
+			    idxtype from, idxtype to);
 
     /**
      * \brief Unfold real and imaginary parts of a complex vector.

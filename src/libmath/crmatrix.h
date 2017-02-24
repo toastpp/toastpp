@@ -38,8 +38,8 @@ template<class MT>class TPrecon_IC;
 template<class MT>class TDenseMatrix;
 template<class MT>class TDiagMatrix;
 
-void BlockExpand (int *rowptr, int *colidx, int n,
-		  int *&browptr, int *&bcolidx, int &bn,
+void BlockExpand (idxtype *rowptr, idxtype *colidx, int n,
+		  idxtype *&browptr, idxtype *&bcolidx, int &bn,
 		  int blockn, int blockm);
 // expand the nonsparsity structure (rowptr,colidx) of an (n x m) matrix
 // into a (n blockn x m blockm) matrix structure (browptr, bcolidx) by

@@ -365,14 +365,14 @@ RCompRowMatrix *Raster_Blob2::CreateBvv_tet4 () const
 	}
     }
 
-    int *rowptr = new int[blen+1];
+    idxtype *rowptr = new idxtype[blen+1];
     rowptr[0] = 0;
     for (i = 0; i < blen; i++) {
 	rowptr[i+1] = rowptr[i]+npx[i];
 	npx[i] = 0;
     }
-    int nz = rowptr[blen];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[blen];
+    idxtype *colidx = new idxtype[nz];
 
     // pass 2: determine matrix sparsity pattern
     for (idx_i = 0; idx_i < blen; idx_i++) {
@@ -811,12 +811,12 @@ RCompRowMatrix *Raster_Blob2::CreateBuv_tet4 () const
 	}
     }
 
-    int *rowptr = new int[n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (i = 0; i < n; i++)
 	rowptr[i+1] = rowptr[i]+npx[i];
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (i = 0; i < n; i++)
 	npx[i] = 0;
     for (el = 0; el < nel; el++) {
@@ -991,14 +991,14 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tet4 (const IVector &pxdim) const
 	}
     }
 
-    int *rowptr = new int[blen+1];
+    idxtype *rowptr = new idxtype[blen+1];
     rowptr[0] = 0;
     for (i = 0; i < blen; i++) {
 	rowptr[i+1] = rowptr[i]+npx[i];
 	npx[i] = 0;
     }
-    int nz = rowptr[blen];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[blen];
+    idxtype *colidx = new idxtype[nz];
 
     // pass 2: determine matrix sparsity pattern
     for (idx_i = 0; idx_i < blen; idx_i++) {

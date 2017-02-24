@@ -1,11 +1,13 @@
+#include "mathdef.h"
+
 //typedef int int;
 //typedef bool logical;
 typedef double doublereal;
 
-int perphn_(int *n, int *ja, int *ia, int *init,
-	int *iperm, int *mask, int *maskval, int *nlev,
-	int *riord, int *levels);
-int bfs_(int *n, int *ja, int *ia, int *
-	nfirst, int *iperm, int *mask, int *maskval, int *
-	riord, int *levels, int *nlev);
-int reversp_(int *n, int *riord);
+idxtype perphn_(idxtype *n, idxtype *ja, idxtype *ia, idxtype *init,
+	idxtype *iperm, idxtype *mask, idxtype *maskval, idxtype *nlev,
+	idxtype *riord, idxtype *levels);
+idxtype bfs_(idxtype *n, idxtype *ja, idxtype *ia, idxtype *
+	nfirst, idxtype *iperm, idxtype *mask, idxtype *maskval, idxtype *
+	riord, idxtype *levels, idxtype *nlev);
+idxtype reversp_(idxtype *n, idxtype *riord);

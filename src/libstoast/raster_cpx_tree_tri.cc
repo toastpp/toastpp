@@ -75,12 +75,12 @@ RCompRowMatrix *Raster_CPixel_Tree::CreateBuv_tri () const
 	}
     }
 
-    int *rowptr = new int [n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (r = 0; r < n; r++)
 	rowptr[r+1] = rowptr[r] + nndpx[r];
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (r = k = 0; r < n; r++) {
 	for (j = 0; j < nndpx[r]; j++)
 	    colidx[k++] = ndpx[r][j];

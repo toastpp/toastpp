@@ -39,9 +39,8 @@ int main (void) {
     int ex, ey, ez;
     double dx, dy, dz;
     bool *egrid;
-    int i, j, k, nd, res, cmd, el;
-    int *rowptr, *colidx, nzero;
-    int *drowptr, *dcolidx, dn;
+    int i, j, k, nd, res, cmd, el, nzero, dn;
+    idxtype *rowptr, *colidx, *drowptr, *dcolidx;
     int encoding;
     bool bDisp, bBndf, bAuto;
     ifstream disp_f, bndf_f;

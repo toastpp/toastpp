@@ -45,8 +45,19 @@ void LU (TCompRowMatrix<std::complex<double> > &A,
     SuperLUStat_t stat;
     GlobalLU_t Glu;
     doublecomplex *cdat = (doublecomplex*)A.ValPtr();
+    int *colidx = (int*)A.colidx;
+    int *rowptr = (int*)A.rowptr;
+    if (!isIntIdx) { // conversion required
+	colidx = new int[A.nVal()];
+	for (int i = 0; i < A.nVal(); i++)
+	    colidx[i] = (int)A.colidx[i];
+	rowptr = new int[A.nRows()+1];
+	for (int i = 0; i <= A.nRows(); i++)
+	    rowptr[i] = (int)A.rowptr[i];
+    }
+    
     zCreate_CompCol_Matrix (&smA, A.nRows(), A.nCols(), A.nVal(),
-			    cdat, A.colidx, A.rowptr, SLU_NR, SLU_Z, SLU_GE);
+			    cdat, colidx, rowptr, SLU_NR, SLU_Z, SLU_GE);
 
     doublecomplex *bdat = (doublecomplex*)b.data_buffer();
     doublecomplex *xdat = (doublecomplex*)x.data_buffer();
@@ -82,5 +93,9 @@ void LU (TCompRowMatrix<std::complex<double> > &A,
     Destroy_SuperMatrix_Store (&smA);
     Destroy_SuperNode_Matrix (&L);
     Destroy_CompCol_Matrix (&U);
+    if (!isIntIdx) {
+	delete []colidx;
+	delete []rowptr;
+    }
 }
 

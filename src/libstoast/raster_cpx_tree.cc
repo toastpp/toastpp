@@ -59,7 +59,7 @@ void Raster_CPixel_Tree::FinaliseTree ()
 	std::cerr << "reset cholesky" << std::endl;
 	if (Bvv_Cholesky_L) delete Bvv_Cholesky_L;
 	if (Bvv_Cholesky_d) delete Bvv_Cholesky_d;
-	int *rowptr, *colidx;
+	idxtype *rowptr, *colidx;
 	Bvv->SymbolicCholeskyFactorize (rowptr, colidx);
 	Bvv_Cholesky_L = new RCompRowMatrix(blen, blen, rowptr, colidx);
 	delete []rowptr;

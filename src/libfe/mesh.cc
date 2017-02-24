@@ -306,7 +306,7 @@ double Mesh::ElDist (int el1, int el2) const
     return length (ElCentre(el1) - ElCentre(el2));
 }
 
-void Mesh::Reorder (const IVector &perm)
+void Mesh::Reorder (const TVector<idxtype> &perm)
 {
     dASSERT(perm.Dim() == nlen(),
 	    "Mesh::Reorder: permutation vector has unexpected length");

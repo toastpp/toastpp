@@ -1857,7 +1857,8 @@ void MRF::SetKaprefImg (const RVector *kap)
 
     // Build up the neighbour graph
     int i, j, k, m1, m2, bm1, bm2;
-    int *rp, *ci, nz;
+    int nz;
+    idxtype *rp, *ci;
     int slen = raster->SLen();
     int blen = raster->BLen();
     int dim = raster->Dim();

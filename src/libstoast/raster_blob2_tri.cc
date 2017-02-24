@@ -199,12 +199,12 @@ RCompRowMatrix *Raster_Blob2::CreateBvv_tri () const
     }
     std::cout << "]" << std::endl;
 
-    int *rowptr = new int[blen_pad+1];
+    idxtype *rowptr = new idxtype[blen_pad+1];
     rowptr[0] = 0;
     for (i = 0; i < blen_pad; i++)
 	rowptr[i+1] = rowptr[i] + npx[i];
-    int nz = rowptr[blen_pad];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[blen_pad];
+    idxtype *colidx = new idxtype[nz];
     npx.Clear();
 
     std::cout << "Bvv: pass 2 [" << std::flush; prog = 0;
@@ -651,12 +651,12 @@ RCompRowMatrix *Raster_Blob2::CreateBuv_tri () const
     }
     std::cout << "]" << std::endl;
 
-    int *rowptr = new int[n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (i = 0; i < n; i++)
 	rowptr[i+1] = rowptr[i]+npx[i];
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (i = 0; i < n; i++)
 	npx[i] = 0;
 
@@ -815,12 +815,12 @@ RCompRowMatrix *Raster_Blob2::CreateDvv_tri () const
     }
     std::cout << "]" << std::endl;
 
-    int *rowptr = new int[blen_pad+1];
+    idxtype *rowptr = new idxtype[blen_pad+1];
     rowptr[0] = 0;
     for (i = 0; i < blen_pad; i++)
 	rowptr[i+1] = rowptr[i] + npx[i];
-    int nz = rowptr[blen_pad];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[blen_pad];
+    idxtype *colidx = new idxtype[nz];
     npx.Clear();
 
     std::cout << "Dvv: pass 2 [" << std::flush; prog = 0;
@@ -992,12 +992,12 @@ RCompRowMatrix *Raster_Blob2::CreateDuv_tri () const
     }
     std::cout << "]" << std::endl;
 
-    int *rowptr = new int[n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (i = 0; i < n; i++)
 	rowptr[i+1] = rowptr[i]+npx[i];
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (i = 0; i < n; i++)
 	npx[i] = 0;
 
@@ -1375,14 +1375,14 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_tri (const IVector &pxdim) const
     }
     std::cout << "]" << std::endl;
 
-    int *rowptr = new int[blen_pad+1];
+    idxtype *rowptr = new idxtype[blen_pad+1];
     rowptr[0] = 0;
     for (i = 0; i < blen_pad; i++) {
         rowptr[i+1] = rowptr[i]+npx[i];
 	npx[i] = 0;
     }
-    int nz = rowptr[blen_pad];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[blen_pad];
+    idxtype *colidx = new idxtype[nz];
 
     // pass 2: determine matrix sparsity pattern
     std::cout << "Bvw: pass 2 [" << std::flush; prog = 0;
@@ -1558,12 +1558,12 @@ RCompRowMatrix *Raster_Blob2::CreateBvw_linw_tri (const IVector &pxdim) const
 	}
     }
     // cut off unused entries
-    int *rowptr = new int[blen_pad+1];
+    idxtype *rowptr = new idxtype[blen_pad+1];
     rowptr[0] = 0;
     for (i = 0; i < blen_pad; i++)
 	rowptr[i+1] = rowptr[i] + npx[i];
     nz = rowptr[blen_pad];
-    int *colidx = new int[nz];
+    idxtype *colidx = new idxtype[nz];
     for (i = 0; i < blen_pad; i++)
 	for (j = 0; j < npx[i]; j++)
 	    colidx[rowptr[i]+j] = colidx0[rowptr0[i]+j];

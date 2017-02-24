@@ -474,8 +474,8 @@ void ATA_diag (const RMatrix &A, RVector &diag)
 void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     RCompRowMatrix &ata_L, RVector &ata_d)
 {
-    int i, i0, i1, k, row, col;
-    int *rowptr, *rowptr2, *colidx, *colidx2, nzero, nzero2;
+    int i, i0, i1, k, row, col, nzero, nzero2;
+    idxtype *rowptr, *rowptr2, *colidx, *colidx2;
     int slen = raster.SLen();
     int n    = slen*2; // mua and kappa
     int nr   = a.nRows();
@@ -487,14 +487,15 @@ void ATA_sparse (const Raster &raster, const RDenseMatrix &a,
     // duplicate the nonzero structure in both rows and columns
     LOGOUT ("Building ATA sparsity pattern");
     nzero2 = nzero*4;
-    rowptr2 = new int[n+1];
-    colidx2 = new int[nzero2];
+    rowptr2 = new idxtype[n+1];
+    colidx2 = new idxtype[nzero2];
     for (i = 0; i <= slen; i++)
         rowptr2[i] = rowptr[i]*2;
     for (i = 1; i <= slen; i++)
         rowptr2[i+slen] = rowptr2[i+slen-1] + rowptr2[i] - rowptr2[i-1];
     for (i = 0; i < slen; i++) {
-        int j, c, nc = rowptr[i+1] - rowptr[i];
+        int j, c;
+	idxtype nc = rowptr[i+1] - rowptr[i];
 	for (j = 0; j < nc; j++) {
 	    c = colidx[rowptr[i]+j];
 	    colidx2[rowptr2[i]+j]         = c;

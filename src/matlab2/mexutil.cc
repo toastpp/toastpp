@@ -124,8 +124,8 @@ void CopyMatrix (mxArray **array, const RCompRowMatrix &mat)
     int i, j, k;
     int m = mat.nRows();
     int n = mat.nCols();
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
+    idxtype *rowptr = mat.rowptr;
+    idxtype *colidx = mat.colidx;
     const double *pval = mat.ValPtr();
     int nz = rowptr[m];
     mwIndex *rcount = new mwIndex[n];
@@ -163,8 +163,8 @@ void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
     int i, j, k;
     int m = mat.nRows();
     int n = mat.nCols();
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
+    idxtype *rowptr = mat.rowptr;
+    idxtype *colidx = mat.colidx;
     const std::complex<double> *pval = mat.ValPtr();
     int nz = rowptr[m];
     mwIndex *rcount = new mwIndex[n];
@@ -206,8 +206,8 @@ void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
     int i, j, k, nz;
     int m = mat.nRows();
     int n = mat.nCols();
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
+    idxtype *rowptr = mat.rowptr;
+    idxtype *colidx = mat.colidx;
     const std::complex<double> *pval = mat.ValPtr();
     mwIndex *rcount = new mwIndex[n];
     mwIndex idx;
@@ -289,8 +289,8 @@ void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat)
     int m = mat.nCols();
     int n = mat.nRows();
 
-    int *rowptr = mat.rowptr;
-    int *colidx = mat.colidx;
+    idxtype *rowptr = mat.rowptr;
+    idxtype *colidx = mat.colidx;
     const std::complex<double> *pval = mat.ValPtr();
     int nz = rowptr[n];
 
@@ -439,14 +439,14 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
     mwIndex nz  = mxGetNzmax (array);
     double *pr  = mxGetPr (array);
     double *pi  = mxGetPi (array);
-    int *rowptr, *colidx;
+    idxtype *rowptr, *colidx;
 
 #ifdef INDEX64
     mwIndex i;
     mwIndex *ir = mxGetIr (array);
     mwIndex *jc = mxGetJc (array);
-    rowptr = new int[n+1];
-    colidx = new int[nz];
+    rowptr = new idxtype[n+1];
+    colidx = new idxtype[nz];
     for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
     for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
 #else
@@ -480,14 +480,14 @@ void CopyTMatrix (RCompRowMatrix &mat, const mxArray *array)
     mwIndex n   = mxGetDimensions (array)[1];
     mwIndex nz  = mxGetNzmax (array);
     double *pr  = mxGetPr (array);
-    int *rowptr, *colidx;
+    idxtype *rowptr, *colidx;
 
 #ifdef INDEX64
     mwIndex i;
     mwIndex *ir = mxGetIr (array);
     mwIndex *jc = mxGetJc (array);
-    rowptr = new int[n+1];
-    colidx = new int[nz];
+    rowptr = new idxtype[n+1];
+    colidx = new idxtype[nz];
     for (i = 0; i <= n; i++) rowptr[i] = (int)jc[i];
     for (i = 0; i < nz; i++) colidx[i] = (int)ir[i];
 #else

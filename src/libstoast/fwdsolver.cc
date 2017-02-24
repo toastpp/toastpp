@@ -156,7 +156,8 @@ void TFwdSolver<T>::SetPrecon (PreconType type)
 template<>
 void TFwdSolver<float>::Allocate ()
 {
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+    int nzero;
     int n = meshptr->nlen();
 
     // allocate system matrix
@@ -263,7 +264,8 @@ void TFwdSolver<std::complex<double> >::Allocate ()
 template<>
 void TFwdSolver<std::complex<float> >::Allocate ()
 {
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+    int nzero;
     int n = meshptr->nlen();
 
     // allocate system matrix

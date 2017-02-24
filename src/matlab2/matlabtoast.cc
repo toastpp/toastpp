@@ -492,8 +492,8 @@ void CalcVolmat (Mesh *mesh, const char *intstr, RVector &prm, bool elbasis,
     mxArray **res)
 {
     // sysmatrix structure
-    int n = mesh->nlen();
-    int *rowptr, *colidx, nzero;
+    int nzero, n = mesh->nlen();
+    idxtype *rowptr, *colidx;
     mesh->SparseRowStructure (rowptr, colidx, nzero);
     RCompRowMatrix F (n, n, rowptr, colidx);
     delete []rowptr;
@@ -586,7 +586,8 @@ void CalcBndmat (Mesh *mesh, char *intstr, int dim, int rel, double v,
     int el, i, j, is, js, nside, nnode;
     int n = mesh->nlen();
     int nel = mesh->elen();
-    int *rowptr, *colidx, nzero;
+    idxtype *rowptr, *colidx;
+    int nzero;
     double val;
     bool subreg = (dim >= 0);
     mesh->SparseRowStructure (rowptr, colidx, nzero);
@@ -885,7 +886,8 @@ static RVector JTJx_clbk (const RVector &x, void *context)
 
     // add prior to Hessian
     if (RHess) {
-	int i, j, k, nz, *colidx = new int[n];
+	int i, j, k, nz;
+	idxtype *colidx = new idxtype[n];
 	double *val = new double[n];
 	for (i = 0; i < n; i++) {
 	    nz = RHess->SparseRow (i, colidx, val);

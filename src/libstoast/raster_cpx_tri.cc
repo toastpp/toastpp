@@ -60,14 +60,14 @@ RCompRowMatrix *Raster_CPixel::CreateBuv_tri () const
 	}
     }
 
-    int *rowptr = new int [n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (r = 0; r < n; r++) {
 	int nentry = (nimax[r]-nimin[r]+1)*(njmax[r]-njmin[r]+1);
 	rowptr[r+1] = rowptr[r]+nentry;
     }
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (r = k = 0; r < n; r++) {
 	for (j = njmin[r]; j <= njmax[r]; j++) {
 	    for (i = nimin[r]; i <= nimax[r]; i++) {

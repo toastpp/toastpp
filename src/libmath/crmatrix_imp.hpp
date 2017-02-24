@@ -952,8 +952,8 @@ void TCompRowMatrix<MT>::SetRows (int r0, const TCompRowMatrix<MT> &rws)
     int nnz_remove = rowptr[r0+rr]-rowptr[r0]; // number of nonzeros to remove
     int nnz_new = this->nval+nnz_insert-nnz_remove;// nonzeros in updated matrix
 
-    int *rp = new int[this->rows+1];
-    int *ci = new int[nnz_new];
+    idxtype *rp = new idxtype[this->rows+1];
+    idxtype *ci = new idxtype[nnz_new];
     MT *v   = new MT[nnz_new];
 
     for (i = 0; i <= r0; i++)
@@ -1940,19 +1940,19 @@ void TCompRowMatrix<MT>::ReplaceRow (int row, const TVector<MT>& vec)
     delete []rval;
 }
 
-inline void BlockExpand (int *rowptr, int *colidx, int n,
-		  int *&browptr, int *&bcolidx, int &bn,
+inline void BlockExpand (idxtype *rowptr, idxtype *colidx, int n,
+		  idxtype *&browptr, idxtype *&bcolidx, int &bn,
 		  int blockn, int blockm)
 {
     // expand an (n x m) matrix into an (n blockn x m blockm) matrix by
     // expanding every entry into a (blockn x blockm) block
-    int nzero = rowptr[n];
-    int bnzero = nzero * blockn * blockm;
+    idxtype nzero = rowptr[n];
+    idxtype bnzero = nzero * blockn * blockm;
     int i, ii, j, jj, idx, ncol, bncol;
 
     bn = n*blockn;
-    browptr = new int[bn+1];
-    bcolidx = new int[bnzero];
+    browptr = new idxtype[bn+1];
+    bcolidx = new idxtype[bnzero];
     browptr[0] = 0;
     for (i = idx = 0; i < n; i++) {
         ncol  = rowptr[i+1] - rowptr[i];

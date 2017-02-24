@@ -98,7 +98,8 @@ void NonconformingMesh::SetupEdgeTables()
 }
 
 // Hack: assumes all elements in the mesh are of the same type 
-void NonconformingMesh::SparseRowStructure (int *&rowptr, int *&colidx, int &nzero) const
+void NonconformingMesh::SparseRowStructure (idxtype *&rowptr, idxtype *&colidx,
+    int &nzero) const
 {
     // M.S. 1.10.99: Check that this works for higher-order element types
     // (TRI6 and TET10)
@@ -134,7 +135,7 @@ void NonconformingMesh::SparseRowStructure (int *&rowptr, int *&colidx, int &nze
 	}
      }}
      
-     rowptr = new int[dim*elen()+1];
+     rowptr = new idxtype[dim*elen()+1];
      rowptr[0] = 0;
      rowptr[1] = temp[0].size();
      for(int i=1; i<dim*elen(); i++){
@@ -143,7 +144,7 @@ void NonconformingMesh::SparseRowStructure (int *&rowptr, int *&colidx, int &nze
 	}
 
      nzero = rowptr[dim*elen()];	
-     colidx = new int[nzero];
+     colidx = new idxtype[nzero];
      int k=0;
      std::vector<int> :: iterator it2;
      for(int i=0; i<dim*elen(); i++){

@@ -91,7 +91,7 @@ void Raster_Blob::ComputeNodeValues ()
     nodevals = 0;
 
     // pass 1: generate row ptr list
-    int *rowptr = new int[nlen+1];
+    idxtype *rowptr = new idxtype[nlen+1];
     rowptr[0] = 0;
     for (i = 0; i < nlen; i++) {
 	NodeValues (i, nv);
@@ -101,7 +101,7 @@ void Raster_Blob::ComputeNodeValues ()
     }
 
     // pass 2: generate col idx and data lists
-    int *colidx = new int[rowptr[nlen]];
+    idxtype *colidx = new idxtype[rowptr[nlen]];
     double *data = new double[rowptr[nlen]];
     for (i = idx = 0; i < nlen; i++) {
 	NodeValues (i, nv);

@@ -249,14 +249,14 @@ RCompRowMatrix *Raster_Pixel2::CreateBuv_tri () const
 	}
     }
 
-    int *rowptr = new int[n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (r = 0; r < n; r++) {
 	int nentry = (nimax[r]-nimin[r]+2)*(njmax[r]-njmin[r]+2);
 	rowptr[r+1] = rowptr[r]+nentry;
     }
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (r = k = 0; r < n; r++) {
 	for (j = njmin[r]; j <= njmax[r]+1; j++) {
 	    for (i = nimin[r]; i <= nimax[r]+1; i++) {
@@ -405,14 +405,14 @@ RCompRowMatrix *Raster_Pixel2::CreateBvw_tri (const IVector &wdim)
 	}
     }
 
-    int *rowptr = new int[blen+1];
+    idxtype *rowptr = new idxtype[blen+1];
     rowptr[0] = 0;
     for (i = 0; i < blen; i++) {
 	rowptr[i+1] = rowptr[i]+npx[i];
 	npx[i] = 0;
     }
-    int nz = rowptr[blen];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[blen];
+    idxtype *colidx = new idxtype[nz];
     double *scale = new double[nz];
     
     // pass 2: sparsity pattern

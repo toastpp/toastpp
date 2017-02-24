@@ -209,7 +209,8 @@ static RVector JTJx_clbk (const RVector &x, void *context)
 
     // add prior to Hessian
     if (RHess) {
-	int i, j, k, nz, *colidx = new int[n];
+	int i, j, k, nz;
+	idxtype *colidx = new idxtype[n];
 	double *val = new double[n];
 	for (i = 0; i < n; i++) {
 	    nz = RHess->SparseRow (i, colidx, val);
@@ -1122,7 +1123,8 @@ static RVector Frechet_clbk (const RVector &x, void *context)
 
     // add prior to Hessian
     if (RHess) {
-	int i, j, k, nz, *colidx = new int[n];
+	int i, j, k, nz;
+	idxtype *colidx = new idxtype[n];
 	double *val = new double[n];
 	for (i = 0; i < n; i++) {
 	    nz = RHess->SparseRow (i, colidx, val);

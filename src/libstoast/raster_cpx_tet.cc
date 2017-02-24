@@ -76,15 +76,15 @@ RCompRowMatrix *Raster_CPixel::CreateBuv_tet4 () const
 	}
     }
 
-    int *rowptr = new int[n+1];
+    idxtype *rowptr = new idxtype[n+1];
     rowptr[0] = 0;
     for (r = 0; r < n; r++) {
 	int nentry = (nimax[r]-nimin[r]+1)*(njmax[r]-njmin[r]+1)*
 	    (nkmax[r]-nkmin[r]+1);
 	rowptr[r+1] = rowptr[r]+nentry;
     }
-    int nz = rowptr[n];
-    int *colidx = new int[nz];
+    idxtype nz = rowptr[n];
+    idxtype *colidx = new idxtype[nz];
     for (r = m = 0; r < n; r++) {
 	for (k = nkmin[r]; k <= nkmax[r]; k++) {
 	    for (j = njmin[r]; j <= njmax[r]; j++) {

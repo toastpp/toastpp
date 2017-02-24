@@ -273,7 +273,7 @@ public:
      *   be updated with the same permutation list to conform to the
      *   modified mesh.
      */
-    void Reorder (const IVector &perm);
+    void Reorder (const TVector<idxtype> &perm);
 
     /**
      * \brief Remove unused nodes and update the index list

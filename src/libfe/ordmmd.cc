@@ -46,13 +46,13 @@
 /* *********************************************************************** */
 
 /* Subroutine */ 
-int ordmmd_(int *neqns, int *xadj, int *adjncy, int *invp, 
-	    int *perm, int *iwsiz, int *iwork, int *nofsub, 
-	    int *iflag)
+idxtype ordmmd_(idxtype *neqns, idxtype *xadj, idxtype *adjncy, idxtype *invp, 
+	    idxtype *perm, idxtype *iwsiz, idxtype *iwork, idxtype *nofsub, 
+	    idxtype *iflag)
 {
-    static int delta;
-    //    extern /* Subroutine */ int genmmd_();
-    static int maxint;
+    static idxtype delta;
+    //    extern /* Subroutine */ idxtype genmmd_();
+    static idxtype maxint;
 
 
 /* *********************************************************************** */
@@ -146,17 +146,17 @@ int ordmmd_(int *neqns, int *xadj, int *adjncy, int *invp,
 /* *********************************************************************** */
 
 /* Subroutine */ 
-int genmmd_(int *neqns, int *xadj, int *adjncy, int *invp, 
-	    int *perm, int *delta, int *dhead, int *qsize, 
-	    int *llist, int *marker, int *maxint, int *nofsub)
+idxtype genmmd_(idxtype *neqns, idxtype *xadj, idxtype *adjncy, idxtype *invp, 
+	    idxtype *perm, idxtype *delta, idxtype *dhead, idxtype *qsize, 
+	    idxtype *llist, idxtype *marker, idxtype *maxint, idxtype *nofsub)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int mdeg, ehead, i__, mdlmt, mdnode;
+    static idxtype mdeg, ehead, i__, mdlmt, mdnode;
 //  extern /* Subroutine */ int mmdelm_(), mmdupd_(), mmdint_(), mmdnum_();
-    static int nextmd, tag, num;
+    static idxtype nextmd, tag, num;
 
 
 /* ************************************************************************/
@@ -336,15 +336,15 @@ L1000:
 /* *********************************************************************** */
 
 /* Subroutine */ 
-int mmdint_(int *neqns, int *xadj, int *adjncy, int *dhead, 
-	    int *dforw, int *dbakw, int *qsize, int *llist, 
-	    int *marker)
+idxtype mmdint_(idxtype *neqns, idxtype *xadj, idxtype *adjncy, idxtype *dhead, 
+	    idxtype *dforw, idxtype *dbakw, idxtype *qsize, idxtype *llist, 
+	    idxtype *marker)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int ndeg, node, fnode;
+    static idxtype ndeg, node, fnode;
 
 
 /* ***********************************************************************
@@ -433,15 +433,15 @@ int mmdint_(int *neqns, int *xadj, int *adjncy, int *dhead,
 /* *********************************************************************** */
 
 /* Subroutine */ 
-int mmdelm_(int *mdnode, int  *xadj, int *adjncy, int *dhead, 
-	    int *dforw, int *dbakw, int *qsize, int *llist, 
-	    int *marker,int  *maxint, int *tag)
+idxtype mmdelm_(idxtype *mdnode, idxtype  *xadj, idxtype *adjncy, idxtype *dhead, 
+	    idxtype *dforw, idxtype *dbakw, idxtype *qsize, idxtype *llist, 
+	    idxtype *marker,idxtype  *maxint, idxtype *tag)
 {
     /* System generated locals */
-    int i__1, i__2;
+    idxtype i__1, i__2;
 
     /* Local variables */
-    static int node, link, rloc, rlmt, i__, j, nabor, rnode, elmnt, xqnbr,
+    static idxtype node, link, rloc, rlmt, i__, j, nabor, rnode, elmnt, xqnbr,
 	     istop, jstop, istrt, jstrt, nxnode, pvnode, nqnbrs, npv;
 
 
@@ -691,13 +691,13 @@ L1800:
 /* *********************************************************************** */
 
 /* Subroutine */ 
-int mmdnum_(int *neqns, int *perm, int *invp, int *qsize)
+idxtype mmdnum_(idxtype *neqns, idxtype *perm, idxtype *invp, idxtype *qsize)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int node, root, nextf, father, nqsize, num;
+    static idxtype node, root, nextf, father, nqsize, num;
 
 
 /* ***********************************************************************
@@ -822,16 +822,16 @@ L500:
 /* *********************************************************************** */
 
 /* Subroutine */ 
-int mmdupd_(int *ehead, int *neqns, int *xadj, int *adjncy, 
-	    int *delta, int *mdeg, int *dhead, int *dforw, 
-	    int *dbakw, int *qsize, int *llist, int *marker, 
-	    int *maxint, int *tag)
+idxtype mmdupd_(idxtype *ehead, idxtype *neqns, idxtype *xadj, idxtype *adjncy, 
+	    idxtype *delta, idxtype *mdeg, idxtype *dhead, idxtype *dforw, 
+	    idxtype *dbakw, idxtype *qsize, idxtype *llist, idxtype *marker, 
+	    idxtype *maxint, idxtype *tag)
 {
     /* System generated locals */
-    int i__1, i__2;
+    idxtype i__1, i__2;
 
     /* Local variables */
-    static int node, mtag, link, mdeg0, i__, j, enode, fnode, nabor, 
+    static idxtype node, mtag, link, mdeg0, i__, j, enode, fnode, nabor, 
 	    elmnt, istop, jstop, q2head, istrt, jstrt, qxhead, iq2, deg, deg0;
 
 

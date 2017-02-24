@@ -17,6 +17,7 @@ public:
     void Reset (const SCCompRowMatrix *F);
     void Solve (SuperMatrix *B, SuperMatrix *X);
     SuperMatrix A, L, U;
+    int *A_rowptr, *A_colidx;
     int *perm_c;
     int *perm_r;
     int *etree;
@@ -33,11 +34,13 @@ private:
 
 CSuperLU_engine::CSuperLU_engine ()
 {
-    perm_c = 0;
-    perm_r = 0;
-    etree  = 0;
-    R      = 0;
-    C      = 0;
+    A_rowptr = 0;
+    A_colidx = 0;
+    perm_c   = 0;
+    perm_r   = 0;
+    etree    = 0;
+    R        = 0;
+    C        = 0;
     allocated = false;
     
     set_default_options(&options);
@@ -66,6 +69,14 @@ void CSuperLU_engine::Deallocate ()
 	delete []R;
 	delete []C;
 	Destroy_SuperMatrix_Store (&A);
+	if (A_rowptr) {
+	    delete []A_rowptr;
+	    A_rowptr = 0;
+	}
+	if (A_colidx) {
+	    delete []A_colidx;
+	    A_colidx = 0;
+	}
 	allocated = false;
 	if (options.Fact != DOFACT) {
 	    Destroy_SuperNode_Matrix (&L);
@@ -100,8 +111,24 @@ void CSuperLU_engine::AllocMatrix (const SCCompRowMatrix *F)
     int n = F->nCols();
     int nz = F->nVal();
     ::complex *cdat = (::complex*)F->ValPtr();
+    int *rowptr, *colidx;
+    if (isIntIdx) {
+	colidx = (int*)F->colidx;
+	rowptr = (int*)F->rowptr;
+    } else {
+	if (A_colidx) delete []A_colidx;
+	A_colidx = new int[F->nVal()];
+	for (int i = 0; i < F->nVal(); i++)
+	    A_colidx[i] = (int)F->colidx[i];
+	colidx = A_colidx;
+	if (A_rowptr) delete []A_rowptr;
+	A_rowptr = new int[F->nRows()+1];
+	for (int i = 0; i <= F->nRows(); i++)
+	    A_rowptr[i] = (int)F->rowptr[i];
+	rowptr = A_rowptr;
+    }
     cCreate_CompCol_Matrix (&A, m, n, nz, cdat, 
-        F->colidx, F->rowptr, SLU_NR, SLU_C, SLU_GE);
+        colidx, rowptr, SLU_NR, SLU_C, SLU_GE);
 }
 
 // =========================================================================

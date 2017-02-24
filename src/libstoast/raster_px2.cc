@@ -112,8 +112,8 @@ RCompRowMatrix *Raster_Pixel2::CreateBvv () const
 	nentry += nrowentry[r];
     }
 
-    int *rowptr = new int[blen+1];
-    int *colidx = new int[nentry];
+    idxtype *rowptr = new idxtype[blen+1];
+    idxtype *colidx = new idxtype[nentry];
 	
     rowptr[0] = 0;
     for (r = i = 0; r < blen; r++) {

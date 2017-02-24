@@ -92,7 +92,8 @@ TDGFwdSolver<std::complex<double> >::~TDGFwdSolver ()
 template<> 
 void TDGFwdSolver<double>::Allocate (NonconformingMesh &mesh)
 {
-    int *rowptr, *colidx, nzero;
+    int nzero;
+    idxtype *rowptr, *colidx;
     int n = mesh.nlen();
     //int nq = mesh.nQ;
 
@@ -127,8 +128,9 @@ void TDGFwdSolver<double>::Allocate (NonconformingMesh &mesh)
 template<> 
 void TDGFwdSolver<std::complex<double> >::Allocate (NonconformingMesh &mesh)
 {
-    int *rowptr, *colidx, nzero;
-   
+    int nzero;
+    idxtype *rowptr, *colidx;
+    
     meshptr = &mesh;
     int dim = meshptr->elist[0]->nNode(); // Hack: assumes the entire mesh is composed of these type of elements
 

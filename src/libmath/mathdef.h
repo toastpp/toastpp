@@ -15,6 +15,7 @@
 #include <math.h>
 #include <algorithm>
 #include <complex>
+#include <typeinfo>
 
 #ifdef FEM_DEBUG
 #define MATH_DEBUG  		// switch on error checks
@@ -25,8 +26,11 @@
                                 // selected calculations
 
 // matrix/vector index types
-typedef int idxtype;
+typedef size_t idxtype;
 //typedef long idxtype;
+
+const idxtype IDX_UNDEFINED = (idxtype)-1;
+const bool isIntIdx = (typeid(idxtype) == typeid(int));
 
 // some constants ===========================================================
 

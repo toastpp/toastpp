@@ -12,7 +12,7 @@
 
 /* Table of constant values */
 
-static int c__1 = 1;
+static idxtype c__1 = 1;
 
 /* ----------------------------------------------------------------------c */
 /*                          S P A R S K I T                             c */
@@ -27,20 +27,20 @@ static int c__1 = 1;
 /* reversp : routine to reverse a given permuation (e.g., for RCMK)     c */
 /* maskdeg : int function to compute the `masked' of a node         c */
 /* ----------------------------------------------------------------------c */
-/* Subroutine */ int bfs_(int *n, int *ja, int *ia, int *
-	nfirst, int *iperm, int *mask, int *maskval, int *
-	riord, int *levels, int *nlev)
+/* Subroutine */ idxtype bfs_(idxtype *n, idxtype *ja, idxtype *ia, idxtype *
+	nfirst, idxtype *iperm, idxtype *mask, idxtype *maskval, idxtype *
+	riord, idxtype *levels, idxtype *nlev)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int iend;
-    extern /* Subroutine */ int add_lvst__(int *, int *, int *, 
-	    int *, int *, int *, int *, int *);
-    static int j, ii, istart;
+    static idxtype iend;
+    extern /* Subroutine */ idxtype add_lvst__(idxtype *, idxtype *, idxtype *, 
+	    idxtype *, idxtype *, idxtype *, idxtype *, idxtype *);
+    static idxtype j, ii, istart;
     static bool permut;
-    static int nod;
+    static idxtype nod;
 
 /* -----------------------------------------------------------------------
  */
@@ -189,26 +189,26 @@ L2:
 } /* bfs_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int dblstr_(int *n, int *ja, int *ia, int *
-	ip1, int *ip2, int *nfirst, int *riord, int *ndom, 
-	int *map, int *mapptr, int *mask, int *levels, 
-	int *iwk)
+/* Subroutine */ idxtype dblstr_(idxtype *n, idxtype *ja, idxtype *ia, idxtype *
+	ip1, idxtype *ip2, idxtype *nfirst, idxtype *riord, idxtype *ndom, 
+	idxtype *map, idxtype *mapptr, idxtype *mask, idxtype *levels, 
+	idxtype *iwk)
 {
     /* System generated locals */
-    int i__1, i__2;
+    idxtype i__1, i__2;
 
     /* Local variables */
-    static int idom, jdom, kdom, init, nlev, j, k;
-    extern /* Subroutine */ int perphn_(int *, int *, int *, 
-	    int *, int *, int *, int *, int *, int *, 
-	    int *);
-    static int numnod;
-    extern /* Subroutine */ int bfs_(int *, int *, int *, int 
-	    *, int *, int *, int *, int *, int *, int 
+    static idxtype idom, jdom, kdom, init, nlev, j, k;
+    extern /* Subroutine */ idxtype perphn_(idxtype *, idxtype *, idxtype *, 
+	    idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, 
+	    idxtype *);
+    static idxtype numnod;
+    extern /* Subroutine */ idxtype bfs_(idxtype *, idxtype *, idxtype *, idxtype 
+	    *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype 
 	    *);
-    static int maskval, nextdom, ndp1;
-    extern /* Subroutine */ int stripes_(int *, int *, int *, 
-	    int *, int *, int *, int *);
+    static idxtype maskval, nextdom, ndp1;
+    extern /* Subroutine */ idxtype stripes_(idxtype *, idxtype *, idxtype *, 
+	    idxtype *, idxtype *, idxtype *, idxtype *);
 
 /* -----------------------------------------------------------------------
  */
@@ -338,21 +338,21 @@ L2:
 } /* dblstr_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int perphn_(int *n, int *ja, int *ia, int *
-	init, int *iperm, int *mask, int *maskval, int *nlev, 
-	int *riord, int *levels)
+/* Subroutine */ idxtype perphn_(idxtype *n, idxtype *ja, idxtype *ia, idxtype *
+	init, idxtype *iperm, idxtype *mask, idxtype *maskval, idxtype *nlev, 
+	idxtype *riord, idxtype *levels)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int j, nlevp, mindeg, nfirst, deg;
-    extern /* Subroutine */ int bfs_(int *, int *, int *, int 
-	    *, int *, int *, int *, int *, int *, int 
+    static idxtype j, nlevp, mindeg, nfirst, deg;
+    extern /* Subroutine */ idxtype bfs_(idxtype *, idxtype *, idxtype *, idxtype 
+	    *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype 
 	    *);
-    static int nod;
-    extern int maskdeg_(int *, int *, int *, int *, 
-	    int *);
+    static idxtype nod;
+    extern idxtype maskdeg_(idxtype *, idxtype *, idxtype *, idxtype *, 
+	    idxtype *);
 
 /* -----------------------------------------------------------------------
  */
@@ -410,15 +410,15 @@ L1:
 } /* perphn_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int add_lvst__(int *istart, int *iend, int *nlev,
-	 int *riord, int *ja, int *ia, int *mask, int *
+/* Subroutine */ idxtype add_lvst__(idxtype *istart, idxtype *iend, idxtype *nlev,
+	 idxtype *riord, idxtype *ja, idxtype *ia, idxtype *mask, idxtype *
 	maskval)
 {
     /* System generated locals */
-    int i__1, i__2;
+    idxtype i__1, i__2;
 
     /* Local variables */
-    static int i__, j, k, ir, nod;
+    static idxtype i__, j, k, ir, nod;
 
 /* ---------------------------------------------------------------------- 
 */
@@ -457,14 +457,14 @@ L1:
 } /* add_lvst__ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int stripes_(int *nlev, int *riord, int *levels, 
-	int *ip, int *map, int *mapptr, int *ndom)
+/* Subroutine */ idxtype stripes_(idxtype *nlev, idxtype *riord, idxtype *levels, 
+	idxtype *ip, idxtype *map, idxtype *mapptr, idxtype *ndom)
 {
     /* System generated locals */
-    int i__1, i__2, i__3, i__4;
+    idxtype i__1, i__2, i__3, i__4;
 
     /* Local variables */
-    static int ilev, nsiz, psiz, k, ib, ktr;
+    static idxtype ilev, nsiz, psiz, k, ib, ktr;
 
 /* -----------------------------------------------------------------------
  */
@@ -548,13 +548,13 @@ L1:
 } /* stripes_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int reversp_(int *n, int *riord)
+/* Subroutine */ idxtype reversp_(idxtype *n, idxtype *riord)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int j, k;
+    static idxtype j, k;
 
 /* -----------------------------------------------------------------------
  */
@@ -577,14 +577,14 @@ L1:
 } /* reversp_ */
 
 /* ----------------------------------------------------------------------- */
-int maskdeg_(int *ja, int *ia, int *nod, int *mask, 
-	int *maskval)
+idxtype maskdeg_(idxtype *ja, idxtype *ia, idxtype *nod, idxtype *mask, 
+	idxtype *maskval)
 {
     /* System generated locals */
-    int ret_val, i__1;
+    idxtype ret_val, i__1;
 
     /* Local variables */
-    static int k, deg;
+    static idxtype k, deg;
 
 /* -----------------------------------------------------------------------
  */
@@ -606,15 +606,15 @@ int maskdeg_(int *ja, int *ia, int *nod, int *mask,
 } /* maskdeg_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int rperm_(int *nrow, doublereal *a, int *ja, 
-	int *ia, doublereal *ao, int *jao, int *iao, int *
-	perm, int *job)
+/* Subroutine */ idxtype rperm_(idxtype *nrow, doublereal *a, idxtype *ja, 
+	idxtype *ia, doublereal *ao, idxtype *jao, idxtype *iao, idxtype *
+	perm, idxtype *job)
 {
     /* System generated locals */
-    int i__1, i__2;
+    idxtype i__1, i__2;
 
     /* Local variables */
-    static int i__, j, k, ii, ko;
+    static idxtype i__, j, k, ii, ko;
     static bool values;
 
 /* -----------------------------------------------------------------------
@@ -716,15 +716,15 @@ int maskdeg_(int *ja, int *ia, int *nod, int *mask,
 } /* rperm_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int cperm_(int *nrow, doublereal *a, int *ja, 
-	int *ia, doublereal *ao, int *jao, int *iao, int *
-	perm, int *job)
+/* Subroutine */ idxtype cperm_(idxtype *nrow, doublereal *a, idxtype *ja, 
+	idxtype *ia, doublereal *ao, idxtype *jao, idxtype *iao, idxtype *
+	perm, idxtype *job)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int i__, k, nnz;
+    static idxtype i__, k, nnz;
 
 /* -----------------------------------------------------------------------
  */
@@ -815,15 +815,15 @@ int maskdeg_(int *ja, int *ia, int *nod, int *mask,
 } /* cperm_ */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int dperm_(int *nrow, doublereal *a, int *ja, 
-	int *ia, doublereal *ao, int *jao, int *iao, int *
-	perm, int *qperm, int *job)
+/* Subroutine */ idxtype dperm_(idxtype *nrow, doublereal *a, idxtype *ja, 
+	idxtype *ia, doublereal *ao, idxtype *jao, idxtype *iao, idxtype *
+	perm, idxtype *qperm, idxtype *job)
 {
-    extern /* Subroutine */ int cperm_(int *, doublereal *, int *, 
-	    int *, doublereal *, int *, int *, int *, int 
-	    *), rperm_(int *, doublereal *, int *, int *, 
-	    doublereal *, int *, int *, int *, int *);
-    static int locjob;
+    extern /* Subroutine */ idxtype cperm_(idxtype *, doublereal *, idxtype *, 
+	    idxtype *, doublereal *, idxtype *, idxtype *, idxtype *, idxtype 
+	    *), rperm_(idxtype *, doublereal *, idxtype *, idxtype *, 
+	    doublereal *, idxtype *, idxtype *, idxtype *, idxtype *);
+    static idxtype locjob;
 
 /* -----------------------------------------------------------------------
  */
@@ -920,15 +920,15 @@ int maskdeg_(int *ja, int *ia, int *nod, int *mask,
  */
 } /* dperm_ */
 
-/* Subroutine */ int csrcoo_(int *nrow, int *job, int *nzmax, 
-	doublereal *a, int *ja, int *ia, int *nnz, doublereal *ao,
-	 int *ir, int *jc, int *ierr)
+/* Subroutine */ idxtype csrcoo_(idxtype *nrow, idxtype *job, idxtype *nzmax, 
+	doublereal *a, idxtype *ja, idxtype *ia, idxtype *nnz, doublereal *ao,
+	 idxtype *ir, idxtype *jc, idxtype *ierr)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int i__, k, k1, k2;
+    static idxtype i__, k, k1, k2;
 
 /* -----------------------------------------------------------------------
  */
@@ -1034,15 +1034,15 @@ L3:
  */
 } /* csrcoo_ */
 
-/* Subroutine */ int amudia_(int *nrow, int *job, doublereal *a, 
-	int *ja, int *ia, doublereal *diag, doublereal *b, int *
-	jb, int *ib)
+/* Subroutine */ idxtype amudia_(idxtype *nrow, idxtype *job, doublereal *a, 
+	idxtype *ja, idxtype *ia, doublereal *diag, doublereal *b, idxtype *
+	jb, idxtype *ib)
 {
     /* System generated locals */
-    int i__1, i__2;
+    idxtype i__1, i__2;
 
     /* Local variables */
-    static int k, k1, k2, ii;
+    static idxtype k, k1, k2, ii;
 
 /* -----------------------------------------------------------------------
  */
@@ -1121,30 +1121,30 @@ L3:
  */
 } /* amudia_ */
 
-/* Subroutine */ int ilutp_(int *n, doublereal *a, int *ja, int *
-	ia, int *lfil, doublereal *droptol, doublereal *permtol, int *
-	mbloc, doublereal *alu, int *jlu, int *ju, int *iwk, 
-	doublereal *wu, doublereal *wl, int *jr, int *jwl, int *
-	jwu, int *iperm, int *ierr)
+/* Subroutine */ idxtype ilutp_(idxtype *n, doublereal *a, idxtype *ja, idxtype *
+	ia, idxtype *lfil, doublereal *droptol, doublereal *permtol, idxtype *
+	mbloc, doublereal *alu, idxtype *jlu, idxtype *ju, idxtype *iwk, 
+	doublereal *wu, doublereal *wl, idxtype *jr, idxtype *jwl, idxtype *
+	jwu, idxtype *iperm, idxtype *ierr)
 {
     /* System generated locals */
-    int i__1, i__2, i__3;
+    idxtype i__1, i__2, i__3;
     doublereal d__1;
 
     /* Local variables */
     static doublereal fact;
-    static int lenl, imax, lenu, icut, jpos;
+    static idxtype lenl, imax, lenu, icut, jpos;
     static doublereal xmax;
-    static int jrow, lenl0, lenu0;
+    static idxtype jrow, lenl0, lenu0;
     static doublereal xmax0;
-    static int i__, j, k;
+    static idxtype i__, j, k;
     static doublereal s, t;
-    static int j1, j2;
+    static idxtype j1, j2;
     static doublereal tnorm;
-    static int ii, jj, nl;
-    extern /* Subroutine */ int qsplit_(doublereal *, int *, int *, 
-	    int *);
-    static int ju0, len;
+    static idxtype ii, jj, nl;
+    extern /* Subroutine */ idxtype qsplit_(doublereal *, idxtype *, idxtype *, 
+	    idxtype *);
+    static idxtype ju0, len;
     static doublereal tmp;
 
 /* -----------------------------------------------------------------------
@@ -1693,17 +1693,17 @@ L999:
 } /* ilutp_ */
 
 /* ---------------------------------------------------------------------- */
-/* Subroutine */ int qsplit_(doublereal *a, int *ind, int *n, int 
+/* Subroutine */ idxtype qsplit_(doublereal *a, idxtype *ind, idxtype *n, idxtype 
 	*ncut)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
     doublereal d__1;
 
     /* Local variables */
-    static int last, itmp, j, first;
+    static idxtype last, itmp, j, first;
     static doublereal abskey;
-    static int mid;
+    static idxtype mid;
     static doublereal tmp;
 
 /* -----------------------------------------------------------------------
@@ -1776,14 +1776,14 @@ L1:
  */
 } /* qsplit_ */
 
-/* Subroutine */ int atob_(int *n, doublereal *a, int *ja, int *
-	ia, doublereal *b, int *jb, int *ib)
+/* Subroutine */ idxtype atob_(idxtype *n, doublereal *a, idxtype *ja, idxtype *
+	ia, doublereal *b, idxtype *jb, idxtype *ib)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    static int i__;
+    static idxtype i__;
 
 /* ... Copy matrix a,ja,ia to b,jb,ib.  Both matrices are in */
 /*     compressed sparse row format. */
@@ -1813,27 +1813,27 @@ L1:
 
 /*  end of atob */
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int djreord_(int *neq, int *neqp1, int *nnzmx, 
-	char *premeth, doublereal *jac, int *ja, int *ia, doublereal *
-	awk, int *jwk, int *iwk, int *perm, int *qperm, 
-	int *levels, int *mask, int *ireorder)
+/* Subroutine */ idxtype djreord_(idxtype *neq, idxtype *neqp1, idxtype *nnzmx, 
+	char *premeth, doublereal *jac, idxtype *ja, idxtype *ia, doublereal *
+	awk, idxtype *jwk, idxtype *iwk, idxtype *perm, idxtype *qperm, 
+	idxtype *levels, idxtype *mask, idxtype *ireorder)
 {
     /* System generated locals */
-    int i__1;
+    idxtype i__1;
 
     /* Local variables */
-    extern /* Subroutine */ int atob_(int *, doublereal *, int *, 
-	    int *, doublereal *, int *, int *);
-    static int nlev, i__;
-    extern /* Subroutine */ int dperm_(int *, doublereal *, int *, 
-	    int *, doublereal *, int *, int *, int *, int 
-	    *, int *);
-    static int nfirst;
-    extern /* Subroutine */ int bfs_(int *, int *, int *, int 
-	    *, int *, int *, int *, int *, int *, int 
+    extern /* Subroutine */ idxtype atob_(idxtype *, doublereal *, idxtype *, 
+	    idxtype *, doublereal *, idxtype *, idxtype *);
+    static idxtype nlev, i__;
+    extern /* Subroutine */ idxtype dperm_(idxtype *, doublereal *, idxtype *, 
+	    idxtype *, doublereal *, idxtype *, idxtype *, idxtype *, idxtype 
+	    *, idxtype *);
+    static idxtype nfirst;
+    extern /* Subroutine */ idxtype bfs_(idxtype *, idxtype *, idxtype *, idxtype 
+	    *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype 
 	    *);
-    static int maskval;
-    extern /* Subroutine */ int reversp_(int *, int *);
+    static idxtype maskval;
+    extern /* Subroutine */ idxtype reversp_(idxtype *, idxtype *);
 
 /* ... Version of 10-6-95 */
 /* ... If desired, reorder the Jacobian matrix. */

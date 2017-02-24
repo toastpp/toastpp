@@ -77,7 +77,8 @@ public:
     void SetupEdgeTables();
     
     // Computes 'rowptr', 'colidx' data structures required to initilaise the system matrix in CRS format
-    void SparseRowStructure (int *&rowptr, int *&colidx, int &nzero) const; 
+    void SparseRowStructure (idxtype *&rowptr, idxtype *&colidx, int &nzero)
+	const; 
    
     // Outputs the number of interior edges
     int iedgelen() const { return iedge_elist.size(); }

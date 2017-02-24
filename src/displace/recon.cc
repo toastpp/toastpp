@@ -166,7 +166,8 @@ void Displace (Mesh &mesh, const RVector &x)
 
 void SetupSysmat (const Mesh &mesh, RCompRowMatrix &F)
 {
-    int *rowptr, *colidx, *drowptr, *dcolidx, nzero, dn; 
+    idxtype *rowptr, *colidx, *drowptr, *dcolidx;
+    int nzero, dn; 
     int n = mesh.nlen();
     int dim = mesh.Dimension();
 

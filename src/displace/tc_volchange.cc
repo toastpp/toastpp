@@ -91,14 +91,15 @@ void Displace (Mesh &mesh, const RVector &x)
 
 void SetupSysmat (const Mesh &mesh, RCompRowMatrix &F)
 {
-  int *rowptr, *colidx, *drowptr, *dcolidx, nzero, dn; 
-  int n = mesh.nlen();
-  int dim = mesh.Dimension();
+    idxtype *rowptr, *colidx, *drowptr, *dcolidx;
+    int nzero, dn; 
+    int n = mesh.nlen();
+    int dim = mesh.Dimension();
   
-  mesh.SparseRowStructure (rowptr, colidx, nzero);
-  BlockExpand (rowptr, colidx, n, drowptr, dcolidx, dn, dim, dim);
-  F.New (dn, dn);
-  F.Initialise (drowptr, dcolidx);
+    mesh.SparseRowStructure (rowptr, colidx, nzero);
+    BlockExpand (rowptr, colidx, n, drowptr, dcolidx, dn, dim, dim);
+    F.New (dn, dn);
+    F.Initialise (drowptr, dcolidx);
 }
 
 

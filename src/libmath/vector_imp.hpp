@@ -44,7 +44,7 @@ TVector<VT>::TVector ()
 // constructor (vector of size 'dim' with zero elements)
 
 template<class VT>
-TVector<VT>::TVector (int dim)
+TVector<VT>::TVector (idxtype dim)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
@@ -56,7 +56,7 @@ TVector<VT>::TVector (int dim)
 // constructor (uniform element assignment from scalar)
 
 template<class VT>
-TVector<VT>::TVector (int dim, const VT s)
+TVector<VT>::TVector (idxtype dim, const VT s)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
@@ -69,7 +69,7 @@ TVector<VT>::TVector (int dim, const VT s)
 // constructor (assign elements from array or use array directly)
 
 template<class VT>
-TVector<VT>::TVector (int dim, VT *values, CopyMode cmode)
+TVector<VT>::TVector (idxtype dim, VT *values, CopyMode cmode)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
@@ -85,7 +85,7 @@ TVector<VT>::TVector (int dim, VT *values, CopyMode cmode)
 // constructor (element assignment from string)
 
 template<class VT>
-TVector<VT>::TVector (int dim, const char *init)
+TVector<VT>::TVector (idxtype dim, const char *init)
 {
     dASSERT(dim >= 0, "Parameter 1 must be >= 0");
     base_nref = 0;
@@ -112,7 +112,7 @@ TVector<VT>::TVector (const TVector<VT> &v)
 // reference constructor
 
 template<class VT>
-TVector<VT>::TVector (const TVector<VT> &v, int ofs, int dim)
+TVector<VT>::TVector (const TVector<VT> &v, idxtype ofs, idxtype dim)
 {
     dASSERT(ofs >= 0 && ofs < v.Dim(), "Parameter 1 index out of range");
     dASSERT(dim >= 0, "Parameter 3 must be >= 0");
@@ -320,7 +320,7 @@ inline void TVector<float>::Copy (const TVector<float> &v,
 
 template<class VT>
 void TVector<VT>::Copy (const TVector<VT> &v,
-    int tofs, int sofs, int n)
+    idxtype tofs, idxtype sofs, idxtype n)
 {
     if (n < 0) n = v.size - sofs;
     if (n > size - tofs) n = size - tofs;
@@ -391,7 +391,7 @@ void TVector<VT>::ShiftRight (int n)
 // --------------------------------------------------------------------------
 
 template<class VT>
-VT &TVector<VT>::operator[] (int i) const
+VT &TVector<VT>::operator[] (idxtype i) const
 {
     dASSERT(i >= 0 && i < size, "Index out of range");
     return data[i];
@@ -402,7 +402,7 @@ VT &TVector<VT>::operator[] (int i) const
 template<class VT>
 TVector<VT> &TVector<VT>::operator= (VT s)
 {
-    for (int i = 0; i < size; i++) data[i] = s;
+    for (idxtype i = 0; i < size; i++) data[i] = s;
     return *this;
 }
 
@@ -1426,9 +1426,9 @@ istream &operator>> (istream &is, TVector<VT> &v)
 }
 
 template<class VT>
-VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, int nidx1,
-	       const TVector<VT> &v2, idxtype *idx2, int nidx2,
-	       int from, int to)
+VT SparseDotp (const TVector<VT> &v1, idxtype *idx1, idxtype nidx1,
+	       const TVector<VT> &v2, idxtype *idx2, idxtype nidx2,
+	       idxtype from, idxtype to)
 {
     VT sum = 0;
     if (!nidx1 || !nidx2) return sum; // sanity check

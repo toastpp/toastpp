@@ -14,6 +14,8 @@
 ZSuperLU::ZSuperLU (int n)
 {
     A         = 0;
+    A_rowptr  = 0;
+    A_colidx  = 0;
     perm_c    = 0;
     perm_r    = 0;
     etree     = 0;
@@ -44,8 +46,24 @@ void ZSuperLU::AllocMatrix (const CCompRowMatrix *F)
     int n = F->nCols();
     int nz = F->nVal();
     doublecomplex *cdat = (doublecomplex*)F->ValPtr();
+    int *rowptr, *colidx;
+    if (isIntIdx) {
+	colidx = (int*)F->colidx;
+	rowptr = (int*)F->rowptr;
+    } else { // need to copy index list to SuperLU compatible format
+	if (A_colidx) delete []A_colidx;
+	A_colidx = new int[F->nVal()];
+	for (int i = 0; i < F->nVal(); i++)
+	    A_colidx[i] = (int)F->colidx[i];
+	colidx = A_colidx;
+	if (A_rowptr) delete []A_rowptr;
+	A_rowptr = new int[F->nRows()+1];
+	for (int i = 0; i <= F->nRows(); i++)
+	    A_rowptr[i] = (int)F->rowptr[i];
+	rowptr = A_rowptr;
+    }
     zCreate_CompCol_Matrix (&sA, m, n, nz, cdat, 
-        F->colidx, F->rowptr, SLU_NR, SLU_Z, SLU_GE);    
+        colidx, rowptr, SLU_NR, SLU_Z, SLU_GE);    
 }
 
 // =========================================================================
@@ -59,6 +77,14 @@ void ZSuperLU::Deallocate()
 	delete []R;
 	delete []C;
 	Destroy_SuperMatrix_Store (&sA);
+	if (A_rowptr) {
+	    delete []A_rowptr;
+	    A_rowptr = 0;
+	}
+	if (A_colidx) {
+	    delete []A_colidx;
+	    A_colidx = 0;
+	}
 	allocated = false;
 	if (options.Fact != DOFACT) {
 	    Destroy_SuperNode_Matrix (&sL);

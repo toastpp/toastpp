@@ -133,7 +133,7 @@ void Raster2::Init ()
 	Buu_precon = 0;
 	Bvv_precon = 0;
 	int nlen = meshptr->nlen();
-	int *rowptr, *colidx;
+	idxtype *rowptr, *colidx;
 	Buu->SymbolicCholeskyFactorize (rowptr, colidx);
 	Buu_Cholesky_L = new RCompRowMatrix(nlen, nlen, rowptr, colidx);
 	delete []rowptr;

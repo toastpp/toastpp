@@ -9,7 +9,8 @@ int main (void)
     double tol = 1e-8;
 
     Mesh mesh;
-    int *rowptr, *colidx, nzero, niter;
+    int nzero, niter;
+    idxtype *rowptr, *colidx;
     int i, j, el, idx, nd, dofnod, totdof, nloads, *nf;
     double load, E, nu;
 
@@ -38,8 +39,8 @@ int main (void)
 	}
     }
 
-    rowptr = new int[totdof+1];
-    colidx = new int[totdof*totdof];
+    rowptr = new idxtype[totdof+1];
+    colidx = new idxtype[totdof*totdof];
     for (i = 0; i <= totdof; i++) rowptr[i] = i*totdof;
     for (i = 0; i < totdof; i++)
         for (j = 0; j < totdof; j++) colidx[i*totdof+j] = j;
