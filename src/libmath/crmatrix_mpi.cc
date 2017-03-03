@@ -263,7 +263,7 @@ void TCompRowMatrixMPI<MT>::Unlink ()
     if (this->nval) {
       //delete []colidx;
       //delete []val;
-      //memset (rowptr, 0, (rows+1)*sizeof(int));
+      //memset (rowptr, 0, (rows+1)*sizeof(idxtype));
 	this->nval = 0;
     }
 }

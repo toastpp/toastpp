@@ -370,7 +370,7 @@ public:
     ///   - ofs >= 0
     ///   - n > 0
     ///   - ofs+n <= v.Dim()
-    void Relink (const TVector &v, int ofs, int n);
+    void Relink (const TVector &v, idxtype ofs, idxtype n);
 
     /**
      * \brief Link vector to an external data array.
@@ -380,7 +380,7 @@ public:
      *   directly. It must exist during the lifetime of the vector, or until
      *   it is linked to a different buffer.
      */
-    void Relink (VT *values, int dim);
+    void Relink (VT *values, idxtype dim);
 
     /// \brief Direct access to vector data array.
     ///
@@ -412,7 +412,7 @@ public:
     ///   indices)
     /// - The n leftmost elements are dropped.
     /// - The n rightmost elements are reset to zero.
-    void ShiftLeft (int n);
+    void ShiftLeft (idxtype n);
 
     /// \brief Move vector elements right.
     ///
@@ -420,7 +420,7 @@ public:
     ///   indices)
     /// - The n rightmost elements are dropped.
     /// - The n leftmost elements are reset to zero.
-    void ShiftRight (int n);
+    void ShiftRight (idxtype n);
 
     // arithmetic operators
 
@@ -1029,7 +1029,7 @@ protected:
     /// \remarks If the vector already had an associated data block, this
     ///   must be detached with Unlink first.
     /// \sa Unlink(), New()
-    void Allocate (int dim);
+    void Allocate (idxtype dim);
 
     /// \brief Link the vector to the data block of another vector.
     /// \param vec referenced vector
@@ -1054,7 +1054,7 @@ protected:
     /// \remarks If the vector already had an associated data block, this
     ///   must be detached with Unlink first.
     /// \sa Unlink(), Relink()
-    void Link (const TVector<VT> &vec, int ofs, int dim);
+    void Link (const TVector<VT> &vec, idxtype ofs, idxtype dim);
 
     /**
      * \brief Link vector to an external data buffer
@@ -1063,16 +1063,16 @@ protected:
      * \note The external buffer must be guaranteed to exist while linked
      *   by the vector.
      */
-    void Link (VT *values, int dim);
+    void Link (VT *values, idxtype dim);
 
     /// \brief Unlink vector from its data block.
     /// \remarks This results in a (valid) vector of length zero.
     /// \sa New(), Clear()
     void Unlink ();
 
-    int size;		 ///< vector length
-    int *base_size;	 ///< pointer to length of linked data block
-    int *base_nref;	 ///< pointer to data block reference counter
+    idxtype size;	 ///< vector length
+    idxtype *base_size;	 ///< pointer to length of linked data block
+    idxtype *base_nref;	 ///< pointer to data block reference counter
     VT *data;		 ///< pointer to first vector element
     VT *base_data;	 ///< pointer to linked data block
 

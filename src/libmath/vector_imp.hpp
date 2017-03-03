@@ -92,7 +92,7 @@ TVector<VT>::TVector (idxtype dim, const char *init)
     ext_data = false;
     Allocate (dim);
     std::istringstream iss(init);
-    for (int i = 0; i < dim; i++)
+    for (idxtype i = 0; i < dim; i++)
         iss >> data[i];
 }
 
@@ -155,7 +155,7 @@ void TVector<VT>::Link (const TVector<VT> &vec)
 // a constructor, or after a call to Unlink()
 
 template<class VT>
-void TVector<VT>::Link (const TVector<VT> &vec, int ofs, int dim)
+void TVector<VT>::Link (const TVector<VT> &vec, idxtype ofs, idxtype dim)
 {
     dASSERT(ofs >= 0 && dim >= 0, "Invalid arguments");
     dASSERT(ofs+dim <= vec.size,
@@ -177,7 +177,7 @@ void TVector<VT>::Link (const TVector<VT> &vec, int ofs, int dim)
 // Link to an external data buffer
 
 template<class VT>
-void TVector<VT>::Link (VT *values, int dim)
+void TVector<VT>::Link (VT *values, idxtype dim)
 {
     dASSERT (values, "Invalid data buffer");
     dASSERT (dim >= 0, "Invalid buffer size");
@@ -218,7 +218,7 @@ void TVector<VT>::Relink (const TVector<VT> &v)
 // Relink vector to part of a different data block
 
 template<class VT>
-void TVector<VT>::Relink (const TVector<VT> &v, int ofs, int dim)
+void TVector<VT>::Relink (const TVector<VT> &v, idxtype ofs, idxtype dim)
 {
     Unlink ();				// remove existing link
     Link (v, ofs, dim);                 // link into v's data block
@@ -228,7 +228,7 @@ void TVector<VT>::Relink (const TVector<VT> &v, int ofs, int dim)
 // Relink vector to an external buffer
 
 template<class VT>
-void TVector<VT>::Relink (VT *values, int dim)
+void TVector<VT>::Relink (VT *values, idxtype dim)
 {
     Unlink();
     Link (values, dim);
@@ -239,14 +239,14 @@ void TVector<VT>::Relink (VT *values, int dim)
 // a constructor, or after a call to Unlink()
 
 template<class VT>
-void TVector<VT>::Allocate (int dim)
+void TVector<VT>::Allocate (idxtype dim)
 {
     dASSERT(!base_nref, "Data block present. Use Unlink first.");
     if (dim) {
-	char *base = (char*)malloc (2*sizeof(int) + dim*sizeof(VT));
+	char *base = (char*)malloc (2*sizeof(idxtype) + dim*sizeof(VT));
 	dASSERT(base, "Memory allocation failed.");
-	memset (base, 0, 2*sizeof(int) + dim*sizeof(VT));
-	base_nref = (int*)base;			 // 1st int: refcount
+	memset (base, 0, 2*sizeof(idxtype) + dim*sizeof(VT));
+	base_nref = (idxtype*)base;		 // 1st int: refcount
 	base_size = base_nref + 1;		 // 2nd int: array size
 	data = base_data = (VT*)(base_nref + 2); // data are offset by 2
 	size = *base_size = dim;		 // init array size
@@ -300,19 +300,23 @@ void TVector<VT>::Copy (const TVector<VT> &v)
 #ifdef USE_BLAS_LEVEL1
 template<>
 inline void TVector<double>::Copy (const TVector<double> &v,
-    int tofs, int sofs, int n)
+    idxtype tofs, idxtype sofs, idxtype n)
 {
     const int incr = 1;
-    if (n < 0) n = v.size - sofs;
+    if (sofs > v.size) sofs = v.size;
+    if (tofs > size) tofs = size;
+    if (n == IDX_UNDEFINED) n = v.size - sofs;
     if (n > size - tofs) n = size - tofs;
     dcopy_(n, v.data+sofs, incr, data+tofs, incr);
 }
 template<>
 inline void TVector<float>::Copy (const TVector<float> &v,
-    int tofs, int sofs, int n)
+    idxtype tofs, idxtype sofs, idxtype n)
 {
     const int incr = 1;
-    if (n < 0) n = v.size - sofs;
+    if (sofs > v.size) sofs = v.size;
+    if (tofs > size) tofs = size;
+    if (n == IDX_UNDEFINED) n = v.size - sofs;
     if (n > size - tofs) n = size - tofs;
     scopy_(n, v.data+sofs, incr, data+tofs, incr);
 }
@@ -340,7 +344,7 @@ inline bool TVector<std::complex<double> >::Clip (std::complex<double> vmin, std
     double vmax_re = vmax.real();
     double vmax_im = vmax.imag();
 
-    for (int i = 0; i < size; i++) {
+    for (idxtype i = 0; i < size; i++) {
       double d_re = data[i].real();
       double d_im = data[i].imag();
       bool d_clip = false;
@@ -361,7 +365,7 @@ bool TVector<VT>::Clip (VT vmin, VT vmax)
 {
     bool clip = false;
 
-    for (int i = 0; i < size; i++) {
+    for (idxtype i = 0; i < size; i++) {
         if      (data[i] < vmin) data[i] = vmin, clip = true;
 	else if (data[i] > vmax) data[i] = vmax, clip = true;
     }
@@ -369,18 +373,18 @@ bool TVector<VT>::Clip (VT vmin, VT vmax)
 }
 
 template<class VT>
-void TVector<VT>::ShiftLeft (int n)
+void TVector<VT>::ShiftLeft (idxtype n)
 {
-    int i;
+    signed_idxtype i;
     if (n > size) n = size;
     for (i = 0; i < size-n; i++) data[i] = data[i+n];
     for (; i < size; i++) data[i] = (VT)0;
 }
 
 template<class VT>
-void TVector<VT>::ShiftRight (int n)
+void TVector<VT>::ShiftRight (idxtype n)
 {
-    int i;
+    signed_idxtype i;
     if (n > size) n = size;
     for (i = size-1; i >= n; i--) data[i] = data[i-n];
     for (; i >= 0; i--) data[i] = (VT)0;
@@ -415,7 +419,7 @@ TVector<VT> TVector<VT>::operator+ (const TVector<VT> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] + v.data[i];
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] + v.data[i];
     return tmp;
 }
 #ifdef USE_BLAS_LEVEL1 // interface to BLAS level 1 xAXPY functions
@@ -452,7 +456,7 @@ template<class VT>
 TVector<VT> TVector<VT>::operator+ (const VT &s) const
 {
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] + s;
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] + s;
     return tmp;
 }
 
@@ -462,7 +466,7 @@ TVector<VT> operator+ (const VT &s, const TVector<VT> &v)
 {
     // pre-addition of scalar (implemented as friend)
     TVector<VT> tmp(v);
-    for (int i = 0; i < v.size; i++) tmp.data[i] += s;
+    for (idxtype i = 0; i < v.size; i++) tmp.data[i] += s;
     return tmp;  
 }
 #endif
@@ -472,7 +476,7 @@ TVector<VT> TVector<VT>::operator- (const TVector<VT> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] - v.data[i];
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] - v.data[i];
     return tmp;
 }
 #ifdef USE_BLAS_LEVEL1 // interface to BLAS level 1 xAXPY functions
@@ -502,7 +506,7 @@ template<class VT>
 TVector<VT> TVector<VT>::operator- (const VT &s) const
 {
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] - s;
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] - s;
     return tmp;
 }
 
@@ -511,7 +515,7 @@ TVector<VT> operator- (const VT &s, const TVector<VT> &v)
 {
     // subtraction from scalar (implemented as friend)
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp.data[i] = s - v.data[i];
+    for (idxtype i = 0; i < v.size; i++) tmp.data[i] = s - v.data[i];
     return tmp;  
 }
 
@@ -519,7 +523,7 @@ template<class VT>
 TVector<VT> TVector<VT>::operator- () const
 {
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = -data[i];
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = -data[i];
     return tmp;
 }
 
@@ -528,7 +532,7 @@ TVector<VT> TVector<VT>::operator* (const TVector<VT> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] * v.data[i];
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] * v.data[i];
     return tmp;
 }
 
@@ -536,7 +540,7 @@ template<class VT>
 TVector<VT> TVector<VT>::operator* (const VT &s) const
 {
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] * s;
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] * s;
     return tmp;
 }
 
@@ -545,7 +549,7 @@ TVector<VT> operator* (const VT &s, const TVector<VT> &v)
 {
     // pre-multiplication with scalar (implemented as friend)
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp.data[i] = s * v[i];
+    for (idxtype i = 0; i < v.size; i++) tmp.data[i] = s * v[i];
     return tmp;  
 }
 
@@ -554,7 +558,7 @@ TVector<VT> TVector<VT>::operator/ (const TVector<VT> &v) const
 {
     dASSERT(size == v.size, "Vectors have different size.");
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) {
+    for (idxtype i = 0; i < size; i++) {
         dASSERT (v.data[i], "Attempt to divide by zero");
         tmp.data[i] = data[i] / v.data[i];
     }
@@ -566,7 +570,7 @@ TVector<VT> TVector<VT>::operator/ (const VT &s) const
 {
     //dASSERT(s, "Attempt to divide by zero");
     TVector<VT> tmp(size);
-    for (int i = 0; i < size; i++) tmp.data[i] = data[i] / s;
+    for (idxtype i = 0; i < size; i++) tmp.data[i] = data[i] / s;
     return tmp;
 }
 
@@ -574,7 +578,7 @@ template<class VT>
 TVector<VT> operator/ (const VT &s, const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) {
+    for (idxtype i = 0; i < v.size; i++) {
         dASSERT (v.data[i], "Attempt to divide by zero");
         tmp.data[i] = s / v.data[i];
     }
@@ -585,14 +589,14 @@ template<class VT>
 TVector<VT> &TVector<VT>::operator+= (const TVector<VT> &v)
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    for (int i = 0; i < size; i++) data[i] += v.data[i];
+    for (idxtype i = 0; i < size; i++) data[i] += v.data[i];
     return *this;
 }
 
 template<class VT>
 TVector<VT> &TVector<VT>::operator+= (const VT &s)
 {
-    for (int i = 0; i < size; i++) data[i] += s;
+    for (idxtype i = 0; i < size; i++) data[i] += s;
     return *this;
 }
 
@@ -600,14 +604,14 @@ template<class VT>
 TVector<VT> &TVector<VT>::operator-= (const TVector<VT> &v)
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    for (int i = 0; i < size; i++) data[i] -= v.data[i];
+    for (idxtype i = 0; i < size; i++) data[i] -= v.data[i];
     return *this;
 }
 
 template<class VT>
 TVector<VT> &TVector<VT>::operator-= (const VT &s)
 {
-    for (int i = 0; i < size; i++) data[i] -= s;
+    for (idxtype i = 0; i < size; i++) data[i] -= s;
     return *this;
 }
 
@@ -615,7 +619,7 @@ template<class VT>
 TVector<VT> &TVector<VT>::operator*= (const TVector<VT> &v)
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    for (int i = 0; i < size; i++) data[i] *= v.data[i];
+    for (idxtype i = 0; i < size; i++) data[i] *= v.data[i];
     return *this;
 }
 
@@ -649,7 +653,7 @@ inline TVector<std::complex<double> > &TVector<std::complex<double> >::operator*
 template<class VT>
 TVector<VT> &TVector<VT>::operator*= (const VT &s)
 {
-    for (int i = 0; i < size; i++) data[i] *= s;
+    for (idxtype i = 0; i < size; i++) data[i] *= s;
     return *this;
 }
 
@@ -659,7 +663,7 @@ template<class VT>
 TVector<VT> &TVector<VT>::operator/= (const TVector<VT> &v)
 {
     dASSERT(size == v.size, "Vectors have different size.");
-    for (int i = 0; i < size; i++) {
+    for (idxtype i = 0; i < size; i++) {
         dASSERT (v.data[i], "Attempt to divide by zero");
         data[i] /= v.data[i];
     }
@@ -798,9 +802,9 @@ void TVector<VT>::ReadIndexed (istream &is, int n)
 template<class VT>
 bool operator== (const TVector<VT> &v1, const TVector<VT> &v2)
 {
-    int dim = v1.Dim();
+    idxtype dim = v1.Dim();
     if (dim != v2.Dim()) return false;
-    for (int i = 0; i < dim; i++)
+    for (idxtype i = 0; i < dim; i++)
         if (v1[i] != v2[i]) return false;
     return true;
 }
@@ -810,9 +814,9 @@ bool operator== (const TVector<VT> &v1, const TVector<VT> &v2)
 template<class VT>
 bool operator!= (const TVector<VT> &v1, const TVector<VT> &v2)
 {
-    int dim = v1.Dim();
+    idxtype dim = v1.Dim();
     if (dim != v2.Dim()) return true;
-    for (int i = 0; i < dim; i++)
+    for (idxtype i = 0; i < dim; i++)
         if (v1[i] != v2[i]) return true;
     return false;
 }
@@ -824,7 +828,7 @@ TVector<VT> inv (const TVector<VT> &v)
 {
     const VT one = (VT)1;
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) {
+    for (idxtype i = 0; i < v.size; i++) {
         //dASSERT (v[i], "Attempt to divide by zero");
         tmp[i] = one/v[i];
     }
@@ -837,7 +841,7 @@ template<class VT>
 TVector<VT> sqr (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = v[i]*v[i];
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = v[i]*v[i];
     return tmp;
 }
 
@@ -847,7 +851,7 @@ template<class VT>
 TVector<VT> sqrt (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = sqrt (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = sqrt (v[i]);
     return tmp;
 }
 
@@ -857,7 +861,7 @@ template<class VT>
 TVector<VT> log (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = log (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = log (v[i]);
     return tmp;
 }
 
@@ -867,7 +871,7 @@ template<class VT>
 TVector<VT> exp (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = exp (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = exp (v[i]);
     return tmp;
 }
 
@@ -877,7 +881,7 @@ template<class VT>
 TVector<VT> pow (const TVector<VT> &v, const VT &s)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = pow (v[i], s);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = pow (v[i], s);
     return tmp;
 }
 
@@ -887,7 +891,7 @@ template<class VT>
 TVector<VT> conj (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = toast::conj (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = toast::conj (v[i]);
     return tmp;
 }
 
@@ -897,7 +901,7 @@ template<class VT>
 TVector<VT> sin (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = sin (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = sin (v[i]);
     return tmp;
 }
 
@@ -907,7 +911,7 @@ template<class VT>
 TVector<VT> cos (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = cos (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = cos (v[i]);
     return tmp;
 }
 
@@ -917,7 +921,7 @@ template<class VT>
 TVector<VT> tan (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = tan (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = tan (v[i]);
     return tmp;
 }
 
@@ -927,7 +931,7 @@ template<class VT>
 TVector<VT> asin (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = asin (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = asin (v[i]);
     return tmp;
 }
 
@@ -937,7 +941,7 @@ template<class VT>
 TVector<VT> acos (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = acos (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = acos (v[i]);
     return tmp;
 }
 
@@ -947,7 +951,7 @@ template<class VT>
 TVector<VT> atan (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = atan (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = atan (v[i]);
     return tmp;
 }
 
@@ -957,7 +961,7 @@ template<class VT>
 TVector<VT> sinh (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = sinh (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = sinh (v[i]);
     return tmp;
 }
 
@@ -967,7 +971,7 @@ template<class VT>
 TVector<VT> cosh (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = cosh (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = cosh (v[i]);
     return tmp;
 }
 
@@ -977,7 +981,7 @@ template<class VT>
 TVector<VT> tanh (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = tanh (v[i]);
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = tanh (v[i]);
     return tmp;
 }
 
@@ -987,7 +991,7 @@ template<class VT>
 TVector<VT> asinh (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = (VT)log ( v[i] + sqrt(sqr(v[i])+1.) );
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = (VT)log ( v[i] + sqrt(sqr(v[i])+1.) );
     return tmp;
 }
 
@@ -997,7 +1001,7 @@ template<class VT>
 TVector<VT> acosh (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] = (VT)log ( v[i] + sqrt(sqr(v[i])-1.) );
+    for (idxtype i = 0; i < v.size; i++) tmp[i] = (VT)log ( v[i] + sqrt(sqr(v[i])-1.) );
     return tmp;
 }
 
@@ -1007,7 +1011,7 @@ template<class VT>
 TVector<VT> atanh (const TVector<VT> &v)
 {
     TVector<VT> tmp(v.size);
-    for (int i = 0; i < v.size; i++) tmp[i] =(VT)0.5 * (VT)log ( (1.+v[i]) / (1.-v[i]) );
+    for (idxtype i = 0; i < v.size; i++) tmp[i] =(VT)0.5 * (VT)log ( (1.+v[i]) / (1.-v[i]) );
     return tmp;
 }
 
@@ -1019,7 +1023,7 @@ inline double dot (const TVector<double> &v1, const TVector<double> &v2)
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     const int incr = 1;
-    int size = v1.size;
+    int size = (int)v1.size;
     return ddot_(size, v1.data, incr, v2.data, incr);
 }
 template<>
@@ -1027,7 +1031,7 @@ inline float dot (const TVector<float> &v1, const TVector<float> &v2)
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     const int incr = 1;
-    int size = v1.size;
+    int size = (int)v1.size;
     return sdot_(size, v1.data, incr, v2.data, incr);
 }
 template<>
@@ -1035,7 +1039,7 @@ inline std::complex<double> dot (const TVector<std::complex<double> > &v1, const
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     const int incr = 1;
-    int size = v1.size;
+    int size = (int)v1.size;
     dcomplex z = zdotu_(&size, (dcomplex*)v1.data, &incr,
 			       (dcomplex*)v2.data, &incr);
     return std::complex<double>(z.r, z.i);
@@ -1047,7 +1051,7 @@ VT dot (const TVector<VT> &v1, const TVector<VT> &v2)
 {
     dASSERT (v1.size == v2.size, "Vector dimensions incompatible");
     VT d = (VT)0;
-    for (int i = 0; i < v1.size; i++) d += v1[i] * v2[i];
+    for (idxtype i = 0; i < v1.size; i++) d += v1[i] * v2[i];
     return d;
 }
 
@@ -1064,7 +1068,7 @@ inline std::complex<double> doth (const TVector<std::complex<double> > &v1, cons
     return std::complex<double>(z.r, z.i);
 #else
     std::complex<double> d = (std::complex<double>)0;
-    for (int i = 0; i < v1.size; i++) d += toast::conj(v1[i]) * v2[i];
+    for (idxtype i = 0; i < v1.size; i++) d += toast::conj(v1[i]) * v2[i];
     return d;
 #endif // USE_BLAS_LEVEL1
 }
@@ -1126,7 +1130,7 @@ VT vmin (const TVector<VT> &v)
 {
     if (!v.size) return (VT)0; // trap pathological case
     VT mn = v[0];
-    for (int i = 1; i < v.size; i++)
+    for (idxtype i = 1; i < v.size; i++)
         if (v[i] < mn) mn = v[i];
     return mn;
 }
@@ -1138,7 +1142,7 @@ VT vmax (const TVector<VT> &v)
 {
     if (!v.size) return (VT)0;
     VT mx = v[0];
-    for (int i = 1; i < v.size; i++)
+    for (idxtype i = 1; i < v.size; i++)
         if (v[i] > mx) mx = v[i];
     return mx;
 }

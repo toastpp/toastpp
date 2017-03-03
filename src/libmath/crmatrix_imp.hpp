@@ -966,19 +966,19 @@ void TCompRowMatrix<MT>::SetRows (int r0, const TCompRowMatrix<MT> &rws)
     ofs = 0;
     ncpy = rowptr[r0];
     if (ncpy) {
-	memcpy(ci+ofs, colidx, ncpy*sizeof(int));
+	memcpy(ci+ofs, colidx, ncpy*sizeof(idxtype));
 	memcpy(v+ofs, this->val, ncpy*sizeof(MT));
 	ofs += ncpy;
     }
     ncpy = rws.rowptr[rr];
     if (ncpy) {
-	memcpy(ci+ofs, rws.colidx, ncpy*sizeof(int));
+	memcpy(ci+ofs, rws.colidx, ncpy*sizeof(idxtype));
 	memcpy(v+ofs, rws.val, ncpy*sizeof(MT));
 	ofs += ncpy;
     }
     ncpy = rowptr[this->rows] - rowptr[r0+rr];
     if (ncpy) {
-	memcpy(ci+ofs, colidx+rowptr[r0+rr], ncpy*sizeof(int));
+	memcpy(ci+ofs, colidx+rowptr[r0+rr], ncpy*sizeof(idxtype));
 	memcpy(v+ofs, this->val+rowptr[r0+rr], ncpy*sizeof(MT));
 	ofs += ncpy;
     }
@@ -1915,7 +1915,7 @@ void TCompRowMatrix<MT>::ReplaceRow (int row, int nz, int *rcolidx, MT *rval)
 	this->nval += dnz;
     }
     // insert new row
-    memcpy (colidx+rp0, rcolidx, nz * sizeof(int));
+    memcpy (colidx+rp0, rcolidx, nz * sizeof(idxtype));
     if (rval) memcpy (this->val+rp0, rval, nz * sizeof(MT));
     else      for (i = 0; i < nz; i++) this->val[rp0+i] = 0;
     col_access = false; // column index lists no longer valid

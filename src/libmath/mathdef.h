@@ -27,7 +27,7 @@
 
 // matrix/vector index types
 typedef size_t idxtype;
-//typedef long idxtype;
+typedef long signed_idxtype;
 
 const idxtype IDX_UNDEFINED = (idxtype)-1;
 const bool isIntIdx = (typeid(idxtype) == typeid(int));
