@@ -49,17 +49,18 @@ void TDenseMatrixMPI<MT>::New (int r, int c)
 }
 
 template<class MT>
-MT TDenseMatrixMPI<MT>::Get (int r, int c) const
+MT TDenseMatrixMPI<MT>::Get (idxtype r, idxtype c) const
 {
     // not implemented yet
     return (MT)0;
 }
 
 template<class MT>
-MT &TDenseMatrixMPI<MT>::operator() (int r, int c)
+MT &TDenseMatrixMPI<MT>::operator() (idxtype r, idxtype c)
 {
-    dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols, Index out of range);
-    dASSERT (r >= r0 && r < r1, Row index not within process support);
+    dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
+	     "Index out of range");
+    dASSERT (r >= r0 && r < r1, "Row index not within process support");
     return val[(r-r0)*this->cols + c];
 }
 
@@ -86,7 +87,7 @@ TVector<MT> TDenseMatrixMPI<MT>::Col (int c) const
 }
 
 template<class MT>
-int TDenseMatrixMPI<MT>::SparseRow (int r, int *ci, MT *rv) const
+idxtype TDenseMatrixMPI<MT>::SparseRow (idxtype r, int *ci, MT *rv) const
 {
     // not implemented yet
     return 0;

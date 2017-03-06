@@ -45,7 +45,7 @@ public:
     SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m);
     ~SCCompRowMatrixMixed ();
 
-    int SparseRow (int r, idxtype *ci, std::complex<double> *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, std::complex<double> *rv) const;
 
     // matrix x vector methods using double precision vectors
     void Ax (const CVector &x, CVector &b) const;

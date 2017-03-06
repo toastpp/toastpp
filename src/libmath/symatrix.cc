@@ -47,11 +47,11 @@ void TSymMatrix<MT>::Identity ()
 }
 
 template<class MT>
-TVector<MT> TSymMatrix<MT>::Row (int r) const
+TVector<MT> TSymMatrix<MT>::Row (idxtype r) const
 {
     TVector<MT> row(this->cols);
     MT *v = val + Idx(r,0);
-    int i;
+    idxtype i;
     for (i = 0; i < r; i++) row[i] = *v++;
     for (; i < this->cols; i++) {
 	row[i] = *v;
@@ -61,9 +61,9 @@ TVector<MT> TSymMatrix<MT>::Row (int r) const
 }
 
 template<class MT>
-int TSymMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
+idxtype TSymMatrix<MT>::SparseRow (idxtype r, idxtype *ci, MT *rv) const
 {
-    int i;
+    idxtype i;
     MT *v = val + Idx(r,0);
     for (i = 0; i < r; i++) {
         ci[i] = i;

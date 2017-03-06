@@ -141,38 +141,38 @@ void TSymCompRowMatrix<MT>::AllowColIndexing (bool yes)
 
 
 template<class MT>
-MT &TSymCompRowMatrix<MT>::operator() (int r, int c)
+MT &TSymCompRowMatrix<MT>::operator() (idxtype r, idxtype c)
 {
     static MT dummy;
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
-    if (r < c) { int tmp = r; r = c; c = tmp; }
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    if (r < c) { idxtype tmp = r; r = c; c = tmp; }
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
     xERROR("Attempt to access non-existing entry");
     return dummy;
 }
 
 template<class MT>
-MT TSymCompRowMatrix<MT>::Get (int r, int c) const
+MT TSymCompRowMatrix<MT>::Get (idxtype r, idxtype c) const
 {
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
     if (r < c) { int tmp = r; r = c; c = tmp; }
     const static MT zero = (MT)0;
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
     return zero;
 }
 
 template<class MT>
-int TSymCompRowMatrix<MT>::Get_index (int r, int c) const
+idxtype TSymCompRowMatrix<MT>::Get_index (idxtype r, idxtype c) const
 {
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return rp;
-    return -1;
+    return IDX_UNDEFINED;
 }
 
 template<class MT>
@@ -214,10 +214,10 @@ TVector<MT> TSymCompRowMatrix<MT>::Row (int r) const
 }
 
 template<class MT>
-int TSymCompRowMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
+idxtype TSymCompRowMatrix<MT>::SparseRow (idxtype r, idxtype *ci, MT *rv) const
 {
     TVector<MT> row = Row(r);
-    int i, nz;
+    idxtype i, nz;
     for (i = nz = 0; i < this->cols; i++)
 	if (row[i] != (MT)0) {
 	    ci[nz] = i;
@@ -230,11 +230,11 @@ int TSymCompRowMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 // ==========================================================================
 
 template<class MT>
-MT TSymCompRowMatrix<MT>::GetNext (int &r, int &c) const
+MT TSymCompRowMatrix<MT>::GetNext (idxtype &r, idxtype &c) const
 {
     if (r >= 0) {
         if (++iterator_pos >= this->nval) { // end reached
-	    r = -1;
+	    r = IDX_UNDEFINED;
 	    return (MT)0; // dummy
 	}
     } else {

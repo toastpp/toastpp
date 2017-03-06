@@ -89,19 +89,19 @@ void TDenseMatrix<MT>::New_dirty (int r, int c)
 }
 
 template<class MT>
-TVector<MT> TDenseMatrix<MT>::Col (int c) const
+TVector<MT> TDenseMatrix<MT>::Col (idxtype c) const
 {
     TVector<MT> colvec(this->rows);
-    for (int r = 0; r < this->rows; r++)
+    for (idxtype r = 0; r < this->rows; r++)
         colvec[r] = val[r*this->cols+c];
     return colvec;
 }
 
 template<class MT>
-int TDenseMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
+idxtype TDenseMatrix<MT>::SparseRow (idxtype r, idxtype *ci, MT *rv) const
 {
     MT *rv0 = val+r*this->cols;
-    for (int i = 0; i < this->cols; i++) {
+    for (idxtype i = 0; i < this->cols; i++) {
         ci[i] = i;
 	rv[i] = rv0[i];
     }

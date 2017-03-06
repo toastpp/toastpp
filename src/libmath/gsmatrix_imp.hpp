@@ -425,7 +425,8 @@ template<class MT>
 int GaussSeidel (const TGenericSparseMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, int maxit)
 {
-    int i, j, k, nz, niter;
+    int niter;
+    idxtype i, j, k, nz;
     idxtype *colidx = new idxtype[A.nCols()];
     MT *val = new MT[A.nCols()];
     MT aii;

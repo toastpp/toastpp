@@ -74,9 +74,9 @@ public:
      */
     void MPIRange (int *_r0, int *_r1) const { *_r0 = r0; *_r1 = r1; }
 
-    MT Get (int r, int c) const;
+    MT Get (idxtype r, idxtype c) const;
 
-    MT &operator() (int r, int c);
+    MT &operator() (idxtype r, idxtype c);
 
     /**
      * \brief Returns a row of the matrix.
@@ -91,7 +91,7 @@ public:
 
     TVector<MT> Col (int c) const;
 
-    int SparseRow (int r, int *ci, MT *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, MT *rv) const;
 
     /**
      * \brief Replace entries in row r with the values provided in rval.

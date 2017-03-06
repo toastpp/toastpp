@@ -43,7 +43,7 @@ public:
     TVector<MT> &operator[] (int i) const;
     // line-vector reference
 
-    MT Get (int r, int c) const;
+    MT Get (idxtype r, idxtype c) const;
     TVector<MT> Row (int r) const;
     TVector<MT> Col (int c) const;
     void New (int rc, int hb);

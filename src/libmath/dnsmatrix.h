@@ -198,7 +198,7 @@ public:
     inline void Identity (int r, int c) { New_dirty(r,c); Identity(); }
     // Resize to r x c matrix and set to identity
 
-    inline MT Get (int r, int c) const {
+    inline MT Get (idxtype r, idxtype c) const {
         dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
 		 "Index out of range");
 	return val[r*this->cols + c];
@@ -212,11 +212,11 @@ public:
     }
     // Write value into element
 
-    inline MT operator() (int r, int c) const { 
+    inline MT operator() (idxtype r, idxtype c) const { 
       return Get(r,c); }
     // Retrieve value of an element (alternative syntax to 'Get')
 
-    inline MT &operator() (int r, int c) {
+    inline MT &operator() (idxtype r, idxtype c) {
         dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
 		 "Index out of range");
 	return val[r*this->cols + c];
@@ -226,16 +226,16 @@ public:
     inline MT *ValPtr() { return val; }
     // Return pointer to data array
 
-    inline TVector<MT> Row (int r) const {
+    inline TVector<MT> Row (idxtype r) const {
         dASSERT (r >= 0 && r < this->rows, "Index out of range");
 	return TVector<MT>(this->cols, val+r*this->cols);
     }
     // Retrieve a row
 
-    TVector<MT> Col (int c) const;
+    TVector<MT> Col (idxtype c) const;
     // Retrieve a column
 
-    int SparseRow (int r, idxtype *ci, MT *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, MT *rv) const;
 
     void SetRow (int r, const TVector<MT> &rval);
     // replace row 'r' of *this with 'rval'

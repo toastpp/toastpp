@@ -17,13 +17,13 @@ TDiagMatrix<MT>::TDiagMatrix (): TGenericSparseMatrix<MT> ()
 {}
 
 template<class MT>
-TDiagMatrix<MT>::TDiagMatrix (int r, int c, const MT v):
+TDiagMatrix<MT>::TDiagMatrix (idxtype r, idxtype c, const MT v):
     TGenericSparseMatrix<MT> (r, c)
 {
     this->nbuf = this->nval = min(r,c);
     if (this->nbuf) {
 	this->val = new MT[this->nval];
-	for (int i = 0; i < this->nval; i++) this->val[i] = v;
+	for (idxtype i = 0; i < this->nval; i++) this->val[i] = v;
     }
 }
 
@@ -43,16 +43,17 @@ TDiagMatrix<MT>::~TDiagMatrix ()
 {}
 
 template<class MT>
-void TDiagMatrix<MT>::New (int nrows, int ncols)
+void TDiagMatrix<MT>::New (idxtype nrows, idxtype ncols)
 {
     TGenericSparseMatrix<MT>::New (nrows, ncols);
     this->nbuf = this->nval = min (nrows, ncols);
     this->val = new MT[this->nval];
-    for (int i = 0; i < this->nval; i++) this->val[i] = (MT)0;
+    for (idxtype i = 0; i < this->nval; i++)
+	this->val[i] = (MT)0;
 }
 
 template<class MT>
-TVector<MT> TDiagMatrix<MT>::Row (int r) const
+TVector<MT> TDiagMatrix<MT>::Row (idxtype r) const
 {
     TVector<MT> row(this->cols);
     row[r] = this->val[r];
@@ -60,7 +61,7 @@ TVector<MT> TDiagMatrix<MT>::Row (int r) const
 }
 
 template<class MT>
-TVector<MT> TDiagMatrix<MT>::Col (int c) const
+TVector<MT> TDiagMatrix<MT>::Col (idxtype c) const
 {
     TVector<MT> col(this->rows);
     col[c] = this->val[c];
@@ -68,12 +69,12 @@ TVector<MT> TDiagMatrix<MT>::Col (int c) const
 }
 
 template<class MT>
-int TDiagMatrix<MT>::SparseRow (int r, idxtype *colidx, MT *v) const
+idxtype TDiagMatrix<MT>::SparseRow (idxtype r, idxtype *colidx, MT *v) const
 {
     if (r < this->nval) {
 	colidx[0] = r;
 	v[0] = this->val[r];
-	return 1;
+	return (idxtype)1;
     } else {
 	return 0;
     }
@@ -137,7 +138,7 @@ TDiagMatrix<MT>::operator TDenseMatrix<MT> ()
 }
 
 template<class MT>
-MT &TDiagMatrix<MT>::operator() (int r, int c)
+MT &TDiagMatrix<MT>::operator() (idxtype r, idxtype c)
 {
     static MT zero = (MT)0;
     dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
@@ -169,7 +170,7 @@ TDiagMatrix<MT> TDiagMatrix<MT>::operator- (const TDiagMatrix<MT> &mat) const
 }
 
 template<class MT>
-bool TDiagMatrix<MT>::Exists (int r, int c) const
+bool TDiagMatrix<MT>::Exists (idxtype r, idxtype c) const
 {
     if (r >= 0 && r < this->rows &&
         c >= 0 && c < this->cols &&
@@ -178,16 +179,16 @@ bool TDiagMatrix<MT>::Exists (int r, int c) const
 }
 
 template<class MT>
-int TDiagMatrix<MT>::Get_index (int r, int c) const
+idxtype TDiagMatrix<MT>::Get_index (idxtype r, idxtype c) const
 {
     dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
     dASSERT(c >= 0 && c < this->cols, "Argument 2 out of range");
     if (r == c) return r;
-    else return -1;
+    else return IDX_UNDEFINED;
 }
 
 template<class MT>
-MT TDiagMatrix<MT>::GetNext (int &r, int &c) const
+MT TDiagMatrix<MT>::GetNext (idxtype &r, idxtype &c) const
 {
     if (r < 0) { // first nonzero
 	if (this->nval) {
@@ -200,7 +201,7 @@ MT TDiagMatrix<MT>::GetNext (int &r, int &c) const
 	    r++, c++;
 	    return this->val[r];
 	} else {
-	    r = -1;
+	    r = IDX_UNDEFINED;
 	    return (MT)0;
 	}
     }
@@ -216,12 +217,13 @@ void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
     if (b.Dim() != this->rows) b.New (this->rows);
 
     int nz = min (this->nval, this->rows);
-    for (int i = 0; i < nz; i++)
+    for (idxtype i = 0; i < nz; i++)
 	b[i] = this->val[i] * x[i];
 }
 
 template<class MT>
-void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2)
+void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
+    idxtype r1, idxtype r2)
     const
 {
     dASSERT(x.Dim() == this->cols,
@@ -232,7 +234,7 @@ void TDiagMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2)
     
     r2 = min (r2, min (this->rows, this->nval));
     r1 = min (r1, r2);
-    for (int r = r1; r < r2; r++)
+    for (idxtype r = r1; r < r2; r++)
 	b[r] = this->val[r] * x[r];
 }
 
@@ -245,8 +247,8 @@ void TDiagMatrix<MT>::ATx (const TVector<MT> &x, TVector<MT> &b) const
 
     if (b.Dim() != this->cols) b.New (this->cols);
 
-    int nz = min (this->nval, this->cols);
-    for (int i = 0; i < nz; i++)
+    idxtype nz = min (this->nval, this->cols);
+    for (idxtype i = 0; i < nz; i++)
 	b[i] = this->val[i] * x[i];
 }
 

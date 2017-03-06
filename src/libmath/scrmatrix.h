@@ -71,8 +71,8 @@ public:
     void SetColAccess (bool yes) const;
     // create/delete index arrays for column access
 
-    MT &operator() (int r, int c);
-    MT Get (int r, int c) const;
+    MT &operator() (idxtype r, idxtype c);
+    MT Get (idxtype r, idxtype c) const;
 
     void Add (int r, int c, const MT &val)
     { if (r >= c) (*this)(r,c) += val; }
@@ -84,7 +84,7 @@ public:
     { ERROR_UNDEF; return TVector<MT>(); }
     // Returns column c as a vector
 
-    int SparseRow (int r, idxtype *ci, MT *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, MT *rv) const;
 
     void RowScale (const TVector<MT> &scale)
     { ERROR_UNDEF; }
@@ -94,7 +94,7 @@ public:
     { ERROR_UNDEF; }
     // scales the columns with 'scale'
 
-    MT GetNext (int &r, int &c) const;
+    MT GetNext (idxtype &r, idxtype &c) const;
 
     void Ax (const TVector<MT> &x, TVector<MT> &b) const;
 
@@ -132,7 +132,7 @@ public:
     // IO in generic format
 
 private:
-    int Get_index (int r, int c) const;
+    idxtype Get_index (idxtype r, idxtype c) const;
     // returns offset into data array of element at row r and column c
     // returns -1 if entry does not exist
     // This always returns -1 if r < c

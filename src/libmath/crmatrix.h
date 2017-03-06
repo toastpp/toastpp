@@ -188,7 +188,7 @@ public:
      * \note No space is allocated for matrix element storage. Use Initialise()
      *   to allocate data space.
      */
-    TCompRowMatrix (int rows, int cols);
+    TCompRowMatrix (idxtype rows, idxtype cols);
 
     /**
      * \brief Creates a compressed-row matrix of dimension rows x cols, and
@@ -203,11 +203,11 @@ public:
      * \note If no data array is provided, all allocated entries are
      *   initialised to zero.
      */
-    TCompRowMatrix (int rows, int cols,
+    TCompRowMatrix (idxtype rows, idxtype cols,
         const idxtype *_rowptr, const idxtype *_colidx,
 	const MT *data = 0);
 
-    TCompRowMatrix (int rows, int cols,
+    TCompRowMatrix (idxtype rows, idxtype cols,
 	idxtype *_rowptr, idxtype *_colidx,
 	MT *data, CopyMode cmode);
 
@@ -333,21 +333,21 @@ public:
     // Merges (adds) 'm' into 'this'. m can have different dimensions and
     // different fill structure
 
-    MT &operator() (int r, int c);
-    MT Get (int r, int c) const;
+    MT &operator() (idxtype r, idxtype c);
+    MT Get (idxtype r, idxtype c) const;
     // access to element in row r, col c.
     // First version for write access, second for read access
 
-    bool Exists (int r, int c) const;
+    bool Exists (idxtype r, idxtype c) const;
     // true if an entry for the element is allocated
 
-    TVector<MT> Row (int r) const;
+    TVector<MT> Row (idxtype r) const;
     // Returns row r as a vector
 
-    TVector<MT> Col (int c) const;
+    TVector<MT> Col (idxtype c) const;
     // Returns column c as a vector
 
-    int SparseRow (int r, idxtype *ci, MT *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, MT *rv) const;
     // See TMatrix
 
     void SetRow (int r, const TVector<MT> &row);
@@ -365,10 +365,11 @@ public:
     void RowScale (const TVector<MT> &scale);
     // scales the rows with 'scale'
 
-    MT GetNext (int &r, int &c) const;
+    MT GetNext (idxtype &r, idxtype &c) const;
 
     void Ax (const TVector<MT> &x, TVector<MT> &b) const;
-    void Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2) const;
+    void Ax (const TVector<MT> &x, TVector<MT> &b,
+	idxtype r1, idxtype r2) const;
     void ATx (const TVector<MT> &x, TVector<MT> &b) const;
 
     void Ax_cplx (const TVector<std::complex<double> > &x,
@@ -576,7 +577,7 @@ public:
     idxtype *colidx;
 
 private:
-    int Get_index (int r, int c) const;
+    idxtype Get_index (idxtype r, idxtype c) const;
     // returns offset into data array of element at row r and column c
     // returns -1 if entry does not exist
 

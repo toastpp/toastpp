@@ -95,7 +95,7 @@ public:
     int PDim() const { return base->psize; }
     // returns physical dimension of data array
 
-    VT Get (int i) const;		// i: logical index
+    VT Get (idxtype i) const;		// i: logical index
 
     void Put (int i, VT val);
 

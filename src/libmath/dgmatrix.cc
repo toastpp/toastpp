@@ -70,12 +70,12 @@ TVector<MT> TDiagMatrix<MT>::Col (int c) const
 }
 
 template<class MT>
-int TDiagMatrix<MT>::SparseRow (int r, idxtype *colidx, MT *v) const
+idxtype TDiagMatrix<MT>::SparseRow (idxtype r, idxtype *colidx, MT *v) const
 {
     if (r < this->nval) {
 	colidx[0] = r;
 	v[0] = this->val[r];
-	return 1;
+	return (idxtype)1;
     } else {
 	return 0;
     }
@@ -180,12 +180,12 @@ bool TDiagMatrix<MT>::Exists (int r, int c) const
 }
 
 template<class MT>
-int TDiagMatrix<MT>::Get_index (int r, int c) const
+int TDiagMatrix<MT>::Get_index (idxtype r, idxtype c) const
 {
     dASSERT(r >= 0 && r < this->rows, "Argument 1 out of range");
     dASSERT(c >= 0 && c < this->cols, "Argument 2 out of range");
     if (r == c) return r;
-    else return -1;
+    else return IDX_UNDEFINED;
 }
 
 template<class MT>

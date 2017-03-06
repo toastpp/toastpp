@@ -166,7 +166,7 @@ public:
      * \brief Create a matrix of size 0 x 0.
      */
     TMatrix ()
-    { rows = cols = 0; }
+    { rows = cols = (idxtype)0; }
 
     /**
      * \brief Create a matrix of logical size nrows x ncols
@@ -175,7 +175,7 @@ public:
      * \remarks This constructor does not allocate memory for data storage.
      *   Storage details are left to derived classes.
      */
-    TMatrix (int nrows, int ncols)
+    TMatrix (idxtype nrows, idxtype ncols)
     { rows = nrows, cols = ncols; }
 
     /**
@@ -196,21 +196,21 @@ public:
      * \return size of the specified dimension
      * \sa nRows(), nCols()
      */
-    int Dim (RC rc) const { return (rc==ROW ? rows : cols); }
+    idxtype Dim (RC rc) const { return (rc==ROW ? rows : cols); }
 
     /**
      * \brief Return number of rows of the matrix
      * \return number of rows
      * \sa nCols(), Dim()
      */
-    int nRows () const { return rows; }
+    idxtype nRows () const { return rows; }
 
     /**
      * \brief Return number of columns of the matrix
      * \return number of columns
      * \sa nRows(), Dim()
      */
-    int nCols () const { return cols; }
+    idxtype nCols () const { return cols; }
 
     /**
      * \brief Return sparse storage flag
@@ -248,7 +248,7 @@ public:
      *   writing operations, use Put() or operator().
      * \sa operator()
      */
-    virtual MT Get (int r, int c) const = 0;
+    virtual MT Get (idxtype r, idxtype c) const = 0;
 
     /**
      * \brief Matrix element access (read only)
@@ -257,7 +257,7 @@ public:
      * \return matrix element (r,c)
      * \sa Get
      */
-    inline MT operator () (int r, int c) const { return Get (r,c); }
+    inline MT operator () (idxtype r, idxtype c) const { return Get (r,c); }
 
     /**
      * \brief Returns a vector containing a copy of row `r'
@@ -267,7 +267,7 @@ public:
      *   filled with zeros, so this can be used as a "scatter" operation.
      * \sa SparseRow, SetRow
      */
-    virtual TVector<MT> Row (int r) const = 0;
+    virtual TVector<MT> Row (idxtype r) const = 0;
 
     /**
      * \brief Substitute a row of the matrix.
@@ -298,7 +298,7 @@ public:
      *   size.
      * \sa Row, SetRow
      */
-    virtual int SparseRow (int r, idxtype *colidx, MT *val) const = 0;
+    virtual idxtype SparseRow (idxtype r, idxtype *colidx, MT *val) const = 0;
 
     /**
      * \brief Returns a vector containing a copy of column 'c'
@@ -308,7 +308,7 @@ public:
      *   filled with zeros, so this can be used as a "scatter" operation.
      * \sa Row
      */
-    virtual TVector<MT> Col (int c) const = 0;
+    virtual TVector<MT> Col (idxtype c) const = 0;
 
     /**
      * \brief Returns the matrix diagonal as a vector
@@ -432,7 +432,7 @@ public:
     // stream output
 
 protected:
-    int rows, cols;	// number of rows and columns of the matrix
+    idxtype rows, cols;	// number of rows and columns of the matrix
 };
 
 // ==========================================================================

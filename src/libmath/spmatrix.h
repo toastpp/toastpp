@@ -48,7 +48,7 @@ public:
     // type matrix. This allocates storage AND initialises the index
     // list.
 
-    virtual MT Get (int r, int c) const;
+    virtual MT Get (idxtype r, idxtype c) const;
     virtual void Put (int r, int c, MT val);
     virtual void Add (int r, int c, MT val);
     TVector<MT> Row (int r) const;

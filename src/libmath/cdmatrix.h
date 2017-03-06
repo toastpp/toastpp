@@ -93,21 +93,21 @@ public:
     TCoordMatrix &operator= (const TCoordMatrix<MT> &m);
     // assignment operator
 
-    MT &operator() (int r, int c);
-    MT Get (int r, int c) const;
+    MT &operator() (idxtype r, idxtype c);
+    MT Get (idxtype r, idxtype c) const;
     // access to element in row r, col c.
     // First version for write acces, second for read access
 
-    bool Exists (int r, int c) const;
+    bool Exists (idxtype r, idxtype c) const;
     // true if an entry for the element is allocated
 
-    TVector<MT> Row (int r) const;
+    TVector<MT> Row (idxtype r) const;
     // Returns row r as a vector
 
-    TVector<MT> Col (int c) const;
+    TVector<MT> Col (idxtype c) const;
     // Returns column c as a vector
 
-    int SparseRow (int r, idxtype *ci, MT *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, MT *rv) const;
     // See TRootMatrix
     // Note: 1. returned column indices may be unsorted
     //       2. This is expensive since complete matrix must be traversed
@@ -118,10 +118,11 @@ public:
     void RowScale (const TVector<MT> &scale);
     // scales the rows with 'scale'
 
-    MT GetNext (int &r, int &c) const;
+    MT GetNext (idxtype &r, idxtype &c) const;
 
     void Ax (const TVector<MT> &x, TVector<MT> &b) const;
-    void Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2) const;
+    void Ax (const TVector<MT> &x, TVector<MT> &b,
+	idxtype r1, idxtype r2) const;
     void ATx (const TVector<MT> &x, TVector<MT> &b) const;
 
     void Transpone ();
@@ -171,7 +172,7 @@ public:
         const TCoordMatrix<MT> &m);
 
 private:
-    int Get_index (int r, int c) const;
+    idxtype Get_index (idxtype r, idxtype c) const;
 
     int Insert (int r, int c, MT v = 0);
     // create an entry for row r, col c, set value to v,

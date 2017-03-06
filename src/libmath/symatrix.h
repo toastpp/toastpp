@@ -106,21 +106,21 @@ public:
     }
     // Resize to r x c matrix and set to identity. r==c is required
 
-    inline MT Get (int r, int c) const {
+    inline MT Get (idxtype r, idxtype c) const {
         dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
 		 "Index out of range");
 	return val[Idx(r,c)];
     }
     // Retrieve value of an element
 
-    inline const MT operator() (int r, int c) const {
+    inline const MT operator() (idxtype r, idxtype c) const {
         dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
 		 "Index out of range");
 	return val[Idx(r,c)];
     }
     // Retrieve value of an element (alternative syntax to 'Get')
 
-    inline MT &operator() (int r, int c) {
+    inline MT &operator() (idxtype r, idxtype c) {
         dASSERT (r >= 0 && r < this->rows && c >= 0 && c < this->cols,
 		 "Index out of range");
 	return val[Idx(r,c)];
@@ -133,13 +133,13 @@ public:
     inline TSymMatrix<MT> &operator/= (MT f)
     { for (int i = 0; i < nz; i++) val[i] /= f; return *this; }
 
-    TVector<MT> Row (int r) const;
+    TVector<MT> Row (idxtype r) const;
     // Retrieve a row
 
-    inline TVector<MT> Col (int c) const { return Row(c); }
+    inline TVector<MT> Col (idxtype c) const { return Row(c); }
     // Retrieve a column. Identical to Row(c) since symmetric
 
-    int SparseRow (int r, idxtype *ci, MT *rv) const;
+    idxtype SparseRow (idxtype r, idxtype *ci, MT *rv) const;
     // See TMatrix
 
     void ColScale (const TVector<MT> &scale);

@@ -53,7 +53,7 @@ public:
      * \param c number of columns
      * \param v diagonal value (default: zero)
      */
-    TDiagMatrix (int r, int c, const MT v = (MT)0);
+    TDiagMatrix (idxtype r, idxtype c, const MT v = (MT)0);
 
     /**
      * \brief Creates a diagonal matrix as a copy of another.
@@ -78,7 +78,7 @@ public:
      * \param ncols new number of columns
      * \note All diagonal elements are reset to zero.
      */
-    void New (int nrows, int ncols);
+    void New (idxtype nrows, idxtype ncols);
 
     /**
      * \brief Retrieves a matrix element.
@@ -87,7 +87,7 @@ public:
      * \return Matrix element (*this)<sub>r,c</sub>
      * \note For any off-diagonal elements, this returns zero.
      */
-    virtual MT Get (int r, int c) const
+    virtual MT Get (idxtype r, idxtype c) const
 	{ return (r == c) ? this->val[r] : (MT)0; }
 
     /**
@@ -97,7 +97,7 @@ public:
      * \note At most, element r of the returned vector (if it exists) is
      *    non-zero.
      */
-    TVector<MT> Row (int r) const;
+    TVector<MT> Row (idxtype r) const;
 
     /**
      * \brief Returns a vector containing a copy of column 'c'.
@@ -106,7 +106,7 @@ public:
      * \note At most, element c of the returned vector (if it exists) is
      *   non-zero.
      */
-    TVector<MT> Col (int c) const;
+    TVector<MT> Col (idxtype c) const;
 
     /**
      * \brief Returns a row of the matrix in sparse format.
@@ -120,7 +120,7 @@ public:
      *   element of row r, if it exists)
      * \note colidx and val can therefore be pointers instead of arrays.
      */
-    int SparseRow (int r, idxtype *colidx, MT *val) const;
+    idxtype SparseRow (idxtype r, idxtype *colidx, MT *val) const;
 
     /**
      * \brief Scales the matrix columns.
@@ -175,7 +175,7 @@ public:
      * \note For all off-diagonal elements (r != c) this returns a reference
      *   to a static zero value.
      */
-    MT &operator() (int r, int c);
+    MT &operator() (idxtype r, idxtype c);
 
     /**
      * \brief Matrix addition.
@@ -199,7 +199,7 @@ public:
      * \param c column index (0 <= c < nCols())
      * \returns \e true for diagonal elements (r==c), \e false otherwise.
      */
-    bool Exists (int r, int c) const;
+    bool Exists (idxtype r, idxtype c) const;
 
     /**
      * \brief Returns data array index for an element.
@@ -207,7 +207,7 @@ public:
      * \param c column index (0 <= c < nCols())
      * \return index of element (r,c) in data array, or -1 if not allocated.
      */
-    int Get_index (int r, int c) const;
+    idxtype Get_index (idxtype r, idxtype c) const;
 
     /**
      * \brief Element iterator.
@@ -224,7 +224,7 @@ public:
      * \note A return value r < 0 indicates the end of the nonzero elements.
      * \note Returns the diagonal elements in order, starting from (0,0).
      */
-    MT GetNext (int &r, int &c) const;
+    MT GetNext (idxtype &r, idxtype &c) const;
 
     /**
      * \brief Matrix-vector multiplication
@@ -244,7 +244,8 @@ public:
      * \note For all rows r with r1 <= r < r2 of the matrix, this sets b[r]
      *   to the result of the inner product *this[r] * x.
      */
-    void Ax (const TVector<MT> &x, TVector<MT> &b, int r1, int r2) const;
+    void Ax (const TVector<MT> &x, TVector<MT> &b, idxtype r1, idxtype r2)
+	const;
 
     /**
      * \brief Transpose matrix-vector multiplication

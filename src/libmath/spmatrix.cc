@@ -139,7 +139,7 @@ void TSparseMatrix<MT>::Initialise (int *rowptr, int *colidx)
 }
 
 template<class MT>
-MT TSparseMatrix<MT>::Get (int r, int c) const
+MT TSparseMatrix<MT>::Get (idxtype r, idxtype c) const
 {
     dASSERT(r >= 0 && r < rows, Index out of range);
     return data[r].Get (c);

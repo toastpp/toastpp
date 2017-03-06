@@ -54,11 +54,11 @@ TCompRowMatrix<MT>::TCompRowMatrix ()
 }
 
 template<class MT>
-TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols)
+TCompRowMatrix<MT>::TCompRowMatrix (idxtype rows, idxtype cols)
   : TGenericSparseMatrix<MT> (rows, cols)
 {
     rowptr = new idxtype[rows+1];
-    for (int i = 0; i <= rows; i++)
+    for (idxtype i = 0; i <= rows; i++)
         rowptr[i] = 0;
 
     diag_access = false;
@@ -75,11 +75,11 @@ TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols)
 }
 
 template<class MT>
-TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols,
+TCompRowMatrix<MT>::TCompRowMatrix (idxtype rows, idxtype cols,
     const idxtype *_rowptr, const idxtype *_colidx, const MT *data)
   : TGenericSparseMatrix<MT> (rows, cols, _rowptr[rows], data)
 {
-    int i;
+    idxtype i;
 
     rowptr = new idxtype[rows+1];
     for (i = 0; i <= rows; i++) rowptr[i] = _rowptr[i];
@@ -102,13 +102,13 @@ TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols,
 }
 
 template<class MT>
-TCompRowMatrix<MT>::TCompRowMatrix (int rows, int cols,
+TCompRowMatrix<MT>::TCompRowMatrix (idxtype rows, idxtype cols,
     idxtype *_rowptr, idxtype *_colidx, MT *data,
     CopyMode cmode)
     : TGenericSparseMatrix<MT> (rows, cols, _rowptr[rows], data, cmode)
 {
     if (cmode == DEEP_COPY) {
-	int i;
+	idxtype i;
 
 	rowptr = new idxtype[rows+1];
 	for (i = 0; i <= rows; i++) rowptr[i] = _rowptr[i];
@@ -755,47 +755,47 @@ TCompRowMatrix<MT> &TCompRowMatrix<MT>::operator+= (
 }
 
 template<class MT>
-MT &TCompRowMatrix<MT>::operator() (int r, int c)
+MT &TCompRowMatrix<MT>::operator() (idxtype r, idxtype c)
 {
     static MT dummy;
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
     xERROR("Attempt to access non-existing entry");
     return dummy;
 }
 
 template<class MT>
-MT TCompRowMatrix<MT>::Get (int r, int c) const
+MT TCompRowMatrix<MT>::Get (idxtype r, idxtype c) const
 {
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
     const static MT zero = (MT)0;
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
     return zero;
 }
 
 template<class MT>
-bool TCompRowMatrix<MT>::Exists (int r, int c) const
+bool TCompRowMatrix<MT>::Exists (idxtype r, idxtype c) const
 {
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return true;
     return false;
 }
 
 template<class MT>
-int TCompRowMatrix<MT>::Get_index (int r, int c) const
+idxtype TCompRowMatrix<MT>::Get_index (idxtype r, idxtype c) const
 {
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return rp;
-    return -1;
+    return IDX_UNDEFINED;
 }
 
 template<class MT>
@@ -854,9 +854,9 @@ void TCompRowMatrix<MT>::Put_sorted (int r, int c, MT v)
 }
 
 template<class MT>
-TVector<MT> TCompRowMatrix<MT>::Row (int r) const
+TVector<MT> TCompRowMatrix<MT>::Row (idxtype r) const
 {
-    int i, i1 = rowptr[r], i2 = rowptr[r+1];
+    idxtype i, i1 = rowptr[r], i2 = rowptr[r+1];
     TVector<MT> tmp (this->cols);
     for (i = i1; i < i2; i++)
         tmp[colidx[i]] = this->val[i];
@@ -864,20 +864,20 @@ TVector<MT> TCompRowMatrix<MT>::Row (int r) const
 }
 
 template<class MT>
-TVector<MT> TCompRowMatrix<MT>::Col (int c) const
+TVector<MT> TCompRowMatrix<MT>::Col (idxtype c) const
 {
     if (!col_access) SetColAccess();
     TVector<MT> tmp (this->rows);
-    int i, i1 = colptr[c], i2 = colptr[c+1];
+    idxtype i, i1 = colptr[c], i2 = colptr[c+1];
     for (i = i1; i < i2; i++)
         tmp[rowidx[i]] = this->val[vofs[i]];
     return tmp;
 }
 
 template<class MT>
-int TCompRowMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
+idxtype TCompRowMatrix<MT>::SparseRow (idxtype r, idxtype *ci, MT *rv) const
 {
-    int i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
+    idxtype i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
     for (i = 0; i < nz; i++) {
         ci[i] = colidx[r0+i];
 	rv[i] = this->val[r0+i];
@@ -1042,11 +1042,11 @@ void TCompRowMatrix<MT>::RowScale (const TVector<MT> &scale)
 }
 
 template<class MT>
-MT TCompRowMatrix<MT>::GetNext (int &r, int &c) const
+MT TCompRowMatrix<MT>::GetNext (idxtype &r, idxtype &c) const
 {
     if (r >= 0) {
         if (++iterator_pos >= this->nval) { // end reached
-	    r = -1;
+	    r = IDX_UNDEFINED;
 	    return (MT)0; // dummy
 	}
     } else {
@@ -1267,14 +1267,14 @@ void TCompRowMatrix<scomplex>::Ax (const TVector<scomplex> &x,
 
 template<class MT>
 void TCompRowMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
-    int r1, int r2) const
+    idxtype r1, idxtype r2) const
 {
     dASSERT(x.Dim() == this->cols,
         "Parameter 1 invalid size (expected %d, actual %d)",
 	this->cols, x.Dim());
 
-    int r, i2;
-    register int i = rowptr[r1];
+    idxtype r, i2;
+    register idxtype i = rowptr[r1];
     register idxtype *pcolidx = colidx+i;
     register MT br, *pval = this->val+i;
 

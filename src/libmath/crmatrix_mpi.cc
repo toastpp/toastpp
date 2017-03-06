@@ -164,7 +164,7 @@ void TCompRowMatrixMPI<MT>::Zero ()
 }
 
 template<class MT>
-MT TCompRowMatrixMPI<MT>::Get (int r, int c) const
+MT TCompRowMatrixMPI<MT>::Get (idxtype r, idxtype c) const
 {
     xERROR("Not implemented yet");
     return (MT)0;
@@ -192,7 +192,7 @@ TVector<MT> TCompRowMatrixMPI<MT>::Row (int r) const
 
 
 template<class MT>
-int TCompRowMatrixMPI<MT>::SparseRow (int r, int *colidx, MT *val) const
+idxtype TCompRowMatrixMPI<MT>::SparseRow (idxtype r, int *colidx, MT *val) const
 {
     xERROR("Not implemented yet");
     return 0;
@@ -207,39 +207,39 @@ TVector<MT> TCompRowMatrixMPI<MT>::Col (int c) const
 }
 
 template<class MT>
-bool TCompRowMatrixMPI<MT>::Exists (int r, int c) const
+bool TCompRowMatrixMPI<MT>::Exists (idxtype r, idxtype c) const
 {
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return true;
     return false;
 }
 
 template<class MT>
-MT &TCompRowMatrixMPI<MT>::operator() (int r, int c)
+MT &TCompRowMatrixMPI<MT>::operator() (idxtype r, idxtype c)
 {
     static MT dummy;
     dASSERT(r < this->rows, "Row index out of range");
     dASSERT(c < this->cols, "Col index out of range");
 
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return this->val[rp];
     xERROR("Attempt to access non-existing entry");
     return dummy;
 }
 
 template<class MT>
-int TCompRowMatrixMPI<MT>::Get_index (int r, int c) const
+idxtype TCompRowMatrixMPI<MT>::Get_index (idxtype r, idxtype c) const
 {
-    for (int rp = rowptr[r]; rp < rowptr[r+1]; rp++)
+    for (idxtype rp = rowptr[r]; rp < rowptr[r+1]; rp++)
         if (colidx[rp] == c) return rp;
-    return -1;
+    return IDX_UNDEFINED;
 }
 
 template<class MT>
-MT TCompRowMatrixMPI<MT>::GetNext (int &r, int &c) const
+MT TCompRowMatrixMPI<MT>::GetNext (idxtype &r, idxtype &c) const
 {
     xERROR("Not implemented");
     return (MT)0;

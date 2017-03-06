@@ -176,10 +176,10 @@ VT TSparseVector<VT>::operator& (const TVector<VT> &vec) const
 #endif // MATH_DEBUG
 
 template<class VT>
-VT TSparseVector<VT>::Get (int i) const
+VT TSparseVector<VT>::Get (idxtype i) const
 {
     dASSERT(i >= 0 && i < base->lsize, Index out of range.);
-    int j = PIndex (i);
+    idxtype j = PIndex (i);
     if (j >= 0) return data[j];
     else return (VT)0;
 }

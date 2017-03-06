@@ -48,7 +48,7 @@ void TBandSymMatrix<MT>::Allocate (int rc, int hb)
 }
 
 template<class MT>
-MT TBandSymMatrix<MT>::Get (int r, int c) const
+MT TBandSymMatrix<MT>::Get (idxtype r, idxtype c) const
 {
     dASSERT(r >= 0 && r < rows && c >= 0 && c < rows, Index out of range.);
     if (r < c) { int tmp = r; r = c; c = tmp; }

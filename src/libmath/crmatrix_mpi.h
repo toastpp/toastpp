@@ -117,7 +117,7 @@ public:
      * \note This is a read operation and returns the element value. For
      *   writing operations, use Put().
      */
-    MT Get (int r, int c) const;
+    MT Get (idxtype r, idxtype c) const;
 
     /**
      * \brief Returns a vector containing a copy of row `r'
@@ -141,7 +141,7 @@ public:
      *   size.
      * \sa Row, SetRow
      */
-    int SparseRow (int r, int *colidx, MT *val) const;
+    idxtype SparseRow (idxtype r, int *colidx, MT *val) const;
 
     /**
      * \brief Returns a vector containing a copy of column 'c'
@@ -163,13 +163,13 @@ public:
     // removes the matrix' link to its data block and deletes the data
     // block, if necessary
 
-    bool Exists (int r, int c) const;
+    bool Exists (idxtype r, idxtype c) const;
 
-    MT &operator() (int r, int c);
+    MT &operator() (idxtype r, idxtype c);
 
-    int Get_index (int r, int c) const;
+    idxtype Get_index (idxtype r, idxtype c) const;
 
-    MT GetNext (int &r, int &c) const;
+    MT GetNext (idxtype &r, idxtype &c) const;
 
     /**
      * \brief Matrix-vector product.

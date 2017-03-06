@@ -37,10 +37,10 @@ SCCompRowMatrixMixed::SCCompRowMatrixMixed (const SCCompRowMatrixMixed &m)
 SCCompRowMatrixMixed::~SCCompRowMatrixMixed ()
 {}
 
-int SCCompRowMatrixMixed::SparseRow (int r, idxtype *ci,
+idxtype SCCompRowMatrixMixed::SparseRow (idxtype r, idxtype *ci,
     std::complex<double> *rv) const
 {
-    int i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
+    idxtype i, r0 = rowptr[r], nz = rowptr[r+1]-r0;
     for (i = 0; i < nz; i++) {
         ci[i] = colidx[r0+i];
 	rv[i] = (std::complex<double>)val[r0+i];

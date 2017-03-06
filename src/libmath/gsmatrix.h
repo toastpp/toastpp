@@ -122,9 +122,11 @@ public:
      * \note If nv>0 and data=0, all allocated elements are initialised to
      *   zero.
      */
-    TGenericSparseMatrix (int rows, int cols, int nv=0, const MT *data=0);
+    TGenericSparseMatrix (idxtype rows, idxtype cols, idxtype nv=0,
+        const MT *data=0);
 
-    TGenericSparseMatrix (int rows, int cols, int nv, MT *data, CopyMode cmode=DEEP_COPY);
+    TGenericSparseMatrix (idxtype rows, idxtype cols, idxtype nv,
+	MT *data, CopyMode cmode=DEEP_COPY);
 
     /**
      * \brief Constructs a matrix as a copy of 'm'
@@ -147,9 +149,9 @@ public:
      *    Initialise().
      * \sa Unlink, Initialise, TMatrix::New
      */
-    virtual void New (int nrows, int ncols);
+    virtual void New (idxtype nrows, idxtype ncols);
 
-    virtual MT Get (int r, int c) const = 0;
+    virtual MT Get (idxtype r, idxtype c) const = 0;
     // derived classes (also sparse versions) return the value of matrix
     // element (r,c). (Not reference because element might not be stored
     // for some matrix types).
@@ -161,13 +163,13 @@ public:
      * \return \e true if memory space is allocated for the element, \e false
      *   if not.
      */
-    virtual bool Exists (int r, int c) const = 0;
+    virtual bool Exists (idxtype r, idxtype c) const = 0;
 
     virtual void Unlink ();
     // deallocate data block
 
-    void Initialise (int nv, const MT *data);
-    void Initialise (int nv, MT *data, CopyMode cmode);
+    void Initialise (idxtype nv, const MT *data);
+    void Initialise (idxtype nv, MT *data, CopyMode cmode);
     // reallocates data vector of length nv and initialises it with 'data',
     // if given, or zero otherwise
 
@@ -175,9 +177,9 @@ public:
     // Reset data to zero, but preserve sparse structure (no deallocation,
     // keep index lists)
 
-    inline int nVal() const { return nval; }
+    inline idxtype nVal() const { return nval; }
 
-    inline MT &Val (int i)
+    inline MT &Val (idxtype i)
     { dASSERT(i >= 0 && i < nval, "Index out of range");
       return val[i];
     }
@@ -186,17 +188,17 @@ public:
     inline MT *ValPtr () { return val; }
     inline const MT *ValPtr () const { return val; }
 
-    virtual MT &operator() (int r, int c) = 0;
+    virtual MT &operator() (idxtype r, idxtype c) = 0;
     // element access
 
-    virtual void Add (int r, int c, const MT &val)
+    virtual void Add (idxtype r, idxtype c, const MT &val)
     { (*this)(r,c) += val; }
 
-    virtual int Get_index (int r, int c) const = 0;
+    virtual idxtype Get_index (idxtype r, idxtype c) const = 0;
     // returns offset into data array of entry for row r and column c
     // returns -1 if entry does not exist
 
-    virtual MT GetNext (int &r, int &c) const = 0;
+    virtual MT GetNext (idxtype &r, idxtype &c) const = 0;
     // Iterator; Returns the next nonzero element, together with its row and
     // column index. In the first call set r < 0 to retrieve first nonzero.
     // In the following calls set r and c to the result of the previous call
@@ -211,8 +213,8 @@ public:
     // Multiplies *this with x and returns the result
 
     virtual void Ax (const TVector<MT> &x, TVector<MT> &b) const = 0;
-    virtual void Ax (const TVector<MT> &x, TVector<MT> &b, int i1, int i2)
-        const = 0;
+    virtual void Ax (const TVector<MT> &x, TVector<MT> &b,
+        idxtype i1, idxtype i2) const = 0;
     // Returns result of (*this) * x in b
     // The second version processes only rows i1 <= i < i2 of A
 
@@ -313,9 +315,9 @@ protected:
     // Adds an additional entry to the end of the data array, reallocating
     // buffers as required. Used by derived classes which allow dynamic growth
 
-    MT *val;   // data block
-    int nbuf;  // data block allocation size
-    int nval;  // data block entry count (<= nbuf)
+    MT *val;       // data block
+    idxtype nbuf;  // data block allocation size
+    idxtype nval;  // data block entry count (<= nbuf)
 
 #ifdef CG_PARALLEL
     static void cg_loop1(void*,int,int);
@@ -354,28 +356,28 @@ template<class MT>
 TGenericSparseMatrix<MT>::TGenericSparseMatrix ()
 : TMatrix<MT> ()
 {
-    nbuf = nval = 0;
+    nbuf = nval = (idxtype)0;
 }
 
 // --------------------------------------------------------------------------
 
 template<class MT>
-TGenericSparseMatrix<MT>::TGenericSparseMatrix (int rows, int cols,
-    int nv, const MT *data)
+TGenericSparseMatrix<MT>::TGenericSparseMatrix (idxtype rows, idxtype cols,
+    idxtype nv, const MT *data)
 : TMatrix<MT> (rows, cols)
 {
-    nbuf = nval = 0;
+    nbuf = nval = (idxtype)0;
     Initialise (nv, data);
 }
 
 // --------------------------------------------------------------------------
 
 template<class MT>
-TGenericSparseMatrix<MT>::TGenericSparseMatrix (int rows, int cols,
-    int nv, MT *data, CopyMode cmode)
+TGenericSparseMatrix<MT>::TGenericSparseMatrix (idxtype rows, idxtype cols,
+    idxtype nv, MT *data, CopyMode cmode)
 : TMatrix<MT> (rows, cols)
 {
-    nbuf = nval = 0;
+    nbuf = nval = (idxtype)0;
     Initialise (nv, data, cmode);
 }
 
@@ -388,10 +390,10 @@ TGenericSparseMatrix<MT>::TGenericSparseMatrix (const TGenericSparseMatrix<MT>
 {
     nval = m.nval;
     nbuf = m.nbuf;
-    int nsize = (nbuf > nval ? nbuf : nval);
+    idxtype nsize = (nbuf > nval ? nbuf : nval);
     if (nsize) {
         val = new MT[nsize];
-	for (int i = 0; i < nval; i++) val[i] = m.val[i];
+	for (idxtype i = 0; i < nval; i++) val[i] = m.val[i];
     }
 }
 
@@ -406,7 +408,7 @@ TGenericSparseMatrix<MT>::~TGenericSparseMatrix ()
 // --------------------------------------------------------------------------
 
 template<class MT>
-void TGenericSparseMatrix<MT>::New (int nrows, int ncols)
+void TGenericSparseMatrix<MT>::New (idxtype nrows, idxtype ncols)
 {
     TGenericSparseMatrix<MT>::Unlink ();
     TMatrix<MT>::New (nrows, ncols);
@@ -418,15 +420,15 @@ template<class MT>
 void TGenericSparseMatrix<MT>::Unlink ()
 {
     if (nbuf) delete []val;
-    nbuf = nval = 0;
+    nbuf = nval = (idxtype)0;
 }
 
 // --------------------------------------------------------------------------
 
 template<class MT>
-void TGenericSparseMatrix<MT>::Initialise (int nv, const MT *data)
+void TGenericSparseMatrix<MT>::Initialise (idxtype nv, const MT *data)
 {
-    int i;
+    idxtype i;
     if (nv != nval) {
 	if (nbuf) delete []val;
 	if ((nbuf = (nval = nv))) val = new MT[nv];
@@ -438,7 +440,7 @@ void TGenericSparseMatrix<MT>::Initialise (int nv, const MT *data)
 // --------------------------------------------------------------------------
 
 template<class MT>
-void TGenericSparseMatrix<MT>::Initialise (int nv, MT *data, CopyMode cmode)
+void TGenericSparseMatrix<MT>::Initialise (idxtype nv, MT *data, CopyMode cmode)
 {
     if (cmode == SHALLOW_COPY) {
 	dASSERT (data, "Nonzero data buffer reference required");
@@ -456,7 +458,7 @@ void TGenericSparseMatrix<MT>::Initialise (int nv, MT *data, CopyMode cmode)
 template<class MT>
 void TGenericSparseMatrix<MT>::Zero ()
 {
-    for (int i = 0; i < nval; i++)
+    for (idxtype i = 0; i < nval; i++)
         val[i] = (MT)0;
 }
 
@@ -465,7 +467,7 @@ void TGenericSparseMatrix<MT>::Zero ()
 template<class MT>
 TGenericSparseMatrix<MT> &TGenericSparseMatrix<MT>::operator*= (const MT &sc)
 {
-    for (int i = 0; i < nval; i++)
+    for (idxtype i = 0; i < nval; i++)
         val[i] *= sc;
     return *this;
 }
@@ -477,7 +479,7 @@ void TGenericSparseMatrix<MT>::Append (MT v)
 {
     if (nval == nbuf) { // no slack buffer - reallocation required
         MT *tmp_val = new MT[nbuf+BUFFER_CHUNK_SIZE];
-	for (int i = 0; i < nval; i++) tmp_val[i] = val[i];
+	for (idxtype i = 0; i < nval; i++) tmp_val[i] = val[i];
 	if (nbuf) delete []val;
 	val = tmp_val;
 	nbuf += BUFFER_CHUNK_SIZE;
@@ -490,8 +492,8 @@ void TGenericSparseMatrix<MT>::Append (MT v)
 template<class MT>
 void TGenericSparseMatrix<MT>::Display (std::ostream &os) const
 {
-    for (int r = 0; r < this->rows; r++)
-        for (int c = 0; c < this->cols; c++)
+    for (idxtype r = 0; r < this->rows; r++)
+        for (idxtype c = 0; c < this->cols; c++)
 	    os << Get(r,c) << (c < this->cols-1 ? ' ' : '\n');
 }
 
@@ -503,8 +505,9 @@ template<class MT>
 void TGenericSparseMatrix<MT>::PrintFillinGraph (const char *fname, int maxdim,
     bool binary, bool antialias)
 {
-    int i, v, nx, ny, c, r = -1, *img;
-
+    int i, v, *img;
+    idxtype nx, ny, c, r = IDX_UNDEFINED;
+    
     if (this->cols <= maxdim && this->rows <= maxdim) {
         nx = this->cols, ny = this->rows;
 	img = new int[nx*ny];

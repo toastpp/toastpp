@@ -151,23 +151,23 @@ bool TCoordMatrix<MT>::Exists (int r, int c) const
 }
 
 template<class MT>
-TVector<MT> TCoordMatrix<MT>::Row (int r) const
+TVector<MT> TCoordMatrix<MT>::Row (idxtype r) const
 {
     ERROR_UNDEF;
     return TVector<MT>(); // dummy
 }
 
 template<class MT>
-TVector<MT> TCoordMatrix<MT>::Col (int c) const
+TVector<MT> TCoordMatrix<MT>::Col (idxtype c) const
 {
     ERROR_UNDEF;
     return TVector<MT>(); // dummy
 }
 
 template<class MT>
-int TCoordMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
+idxtype TCoordMatrix<MT>::SparseRow (idxtype r, idxtype *ci, MT *rv) const
 {
-    int i, j = 0;
+    idxtype i, j = 0;
     for (i = 0; i < this->nval; i++) {
         if (rowidx[i] == r) {
 	    ci[j] = colidx[i];
@@ -178,11 +178,11 @@ int TCoordMatrix<MT>::SparseRow (int r, idxtype *ci, MT *rv) const
 }
 
 template<class MT>
-int TCoordMatrix<MT>::Get_index (int r, int c) const
+int TCoordMatrix<MT>::Get_index (idxtype r, idxtype c) const
 {
-    for (int i = 0; i < this->nval; i++)
+    for (idxtype i = 0; i < this->nval; i++)
         if (rowidx[i] == r && colidx[i] == c) return i;
-    return -1;
+    return IDX_UNDEFINED;
 }
 
 template<class MT>
@@ -202,11 +202,11 @@ void TCoordMatrix<MT>::RowScale (const TVector<MT> &scale)
 }
 
 template<class MT>
-MT TCoordMatrix<MT>::GetNext (int &r, int &c) const
+MT TCoordMatrix<MT>::GetNext (idxtype &r, idxtype &c) const
 {
     if (r >= 0) {
         if (++iterator_pos >= this->nval) { // end reached
-	    r = -1;
+	    r = IDX_UNDEFINED;
 	    return (MT)0; // dummy
 	}
     } else {
@@ -228,16 +228,16 @@ void TCoordMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b) const
 
 template<class MT>
 void TCoordMatrix<MT>::Ax (const TVector<MT> &x, TVector<MT> &b,
-    int r1, int r2) const
+    idxtype r1, idxtype r2) const
 {
     // this implementation is not efficient since matrix is not assumed
     // to be sorted
 
-    int i;
+    idxtype i;
     for (i = r1; i < r2; i++) b[i] = 0;
     
-    for (int i = 0; i < this->nval; i++) {
-        int ri = rowidx[i];
+    for (i = 0; i < this->nval; i++) {
+        idxtype ri = rowidx[i];
 	if (ri >= r1 && ri < r2)
 	    b[ri] += this->val[i] * x[colidx[i]];
     }
