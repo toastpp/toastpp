@@ -1140,8 +1140,8 @@ void Ax_engine (int ith, void *context)
 #ifdef NEED_EXPLICIT_INSTANTIATION
 template void Ax_engine<double> (int ith, void *context);
 template void Ax_engine<float> (int ith, void *context);
-template void Ax_engine<complex> (int ith, void *context);
-template void Ax_engine<scomplex> (int ith, void *context);
+template void Ax_engine<std::complex<double> > (int ith, void *context);
+template void Ax_engine<std::complex<float> > (int ith, void *context);
 template void Ax_engine<int> (int ith, void *context);
 #endif
 
@@ -1250,8 +1250,9 @@ void TCompRowMatrix<float>::Ax (const TVector<float> &x, TVector<float> &b)
 
 // Specialisation: single precision complex
 template<>
-void TCompRowMatrix<scomplex>::Ax (const TVector<scomplex> &x,
-    TVector<scomplex> &b) const
+void TCompRowMatrix<std::complex<float> >::Ax (
+    const TVector<std::complex<float> > &x,
+    TVector<std::complex<float> > &b) const
 {
     dASSERT(x.Dim() == cols,
 	"Parameter 1 invalid size (expected %d, actual %d)", cols, x.Dim());
@@ -2413,7 +2414,6 @@ inline int ILUSymSolve (TCompRowMatrix<std::complex<double> > &A,
 
 #ifdef USE_CUDA_FLOAT
 
-
 template<class MT>
 int PCG (const TCompRowMatrix<MT> &A, const TVector<MT> &b,
     TVector<MT> &x, double &tol, TPreconditioner<MT> *precon, int maxit)
@@ -2568,14 +2568,15 @@ inline int BiCGSTAB<float> (const FCompRowMatrix &A, const FVector &b,
 }
 
 template<> // specialisation: single complex
-inline int BiCGSTAB<scomplex> (const SCCompRowMatrix &A, const SCVector &b,
-    SCVector &x, double &tol, SCPreconditioner *precon, int maxit)
+inline int BiCGSTAB<std::complex<float> > (const SCCompRowMatrix &A,
+    const SCVector &b, SCVector &x, double &tol, SCPreconditioner *precon,
+    int maxit)
 {
-    const scomplex *A_val = A.ValPtr();
+    const std::complex<float> *A_val = A.ValPtr();
     const int *A_rowptr = A.rowptr;
     const int *A_colidx = A.colidx;
-    scomplex *x_val = x.data_buffer();
-    const scomplex *b_val = b.data_buffer();
+    std::complex<float> *x_val = x.data_buffer();
+    const std::complex<float> *b_val = b.data_buffer();
     int m = A.nRows();
     int n = A.nCols();
     SolverResult res;
@@ -2605,14 +2606,15 @@ inline int BiCGSTAB<double> (const RCompRowMatrix &A, const RVector &b,
 }
 
 template<> // specialisation: double complex
-inline int BiCGSTAB<complex> (const CCompRowMatrix &A, const CVector &b,
-    CVector &x, double &tol, CPreconditioner *precon, int maxit)
+inline int BiCGSTAB<std::complex<double> > (const CCompRowMatrix &A,
+    const CVector &b, CVector &x, double &tol, CPreconditioner *precon,
+    int maxit)
 {
-    const complex *A_val = A.ValPtr();
+    const std::complex<double> *A_val = A.ValPtr();
     const int *A_rowptr = A.rowptr;
     const int *A_colidx = A.colidx;
-    complex *x_val = x.data_buffer();
-    const complex *b_val = b.data_buffer();
+    std::complex<double> *x_val = x.data_buffer();
+    const std::complex<double> *b_val = b.data_buffer();
     int m = A.nRows();
     int n = A.nCols();
     SolverResult res;
@@ -2670,22 +2672,23 @@ inline void BiCGSTAB<float> (const FCompRowMatrix &A, const FVector *b,
 }
 
 template<> // specialisation: single complex
-inline void BiCGSTAB<scomplex> (const SCCompRowMatrix &A, const SCVector *b,
-    SCVector *x, int nrhs, double tol, int maxit,
+inline void BiCGSTAB<std::complex<float> > (const SCCompRowMatrix &A,
+    const SCVector *b, SCVector *x, int nrhs, double tol, int maxit,
     SCPreconditioner *precon, IterativeSolverResult *res)
 {
     static int nbuf = 32;
-    static scomplex **x_val = new scomplex*[nbuf];
-    static const scomplex **b_val = new const scomplex*[nbuf];
+    static std::complex<float> **x_val = new std::complex<float>*[nbuf];
+    static const std::complex<float> **b_val =
+        new const std::complex<float>*[nbuf];
     if (nrhs > nbuf) {
         nbuf = nrhs;
         delete []x_val;
 	delete []b_val;
-	x_val = new scomplex*[nbuf];
-	b_val = new const scomplex*[nbuf];
+	x_val = new std::complex<float>*[nbuf];
+	b_val = new const std::complex<float>*[nbuf];
     }
     
-    const scomplex *A_val = A.ValPtr();
+    const std::complex<float> *A_val = A.ValPtr();
     const int *A_rowptr = A.rowptr;
     const int *A_colidx = A.colidx;
     for (int i = 0; i < nrhs; i++) {
@@ -2739,22 +2742,23 @@ inline void BiCGSTAB<double> (const RCompRowMatrix &A, const RVector *b,
 }
 
 template<> // specialisation: double complex
-inline void BiCGSTAB<complex> (const CCompRowMatrix &A, const CVector *b,
-    CVector *x, int nrhs, double tol, int maxit,
+inline void BiCGSTAB<std::complex<double> > (const CCompRowMatrix &A,
+    const CVector *b, CVector *x, int nrhs, double tol, int maxit,
     CPreconditioner *precon, IterativeSolverResult *res)
 {
     static int nbuf = 32;
-    static complex **x_val = new complex*[nbuf];
-    static const complex **b_val = new const complex*[nbuf];
+    static std::complex<double> **x_val = new std::complex<double>*[nbuf];
+    static const std::complex<double> **b_val =
+        new const std::complex<double>*[nbuf];
     if (nrhs > nbuf) {
         nbuf = nrhs;
         delete []x_val;
 	delete []b_val;
-	x_val = new complex*[nbuf];
-	b_val = new const complex*[nbuf];
+	x_val = new std::complex<double>*[nbuf];
+	b_val = new const std::complex<double>*[nbuf];
     }
     
-    const complex *A_val = A.ValPtr();
+    const std::complex<double> *A_val = A.ValPtr();
     const int *A_rowptr = A.rowptr;
     const int *A_colidx = A.colidx;
     for (int i = 0; i < nrhs; i++) {
@@ -2842,8 +2846,9 @@ int TCompRowMatrix<float>::bicgstab (const FVector &b, FVector &x,
 }
 
 template<>
-int TCompRowMatrix<scomplex>::bicgstab (const SCVector &b, SCVector &x,
-    double &tol, TPreconditioner<scomplex> *precon, int maxit) const
+int TCompRowMatrix<std::complex<float> >::bicgstab (const SCVector &b,
+    SCVector &x, double &tol, TPreconditioner<std::complex<float> > *precon,
+    int maxit) const
 {
     return BiCGSTAB (*this, b, x, tol, precon, maxit);
 }
@@ -2856,8 +2861,9 @@ int TCompRowMatrix<double>::bicgstab (const RVector &b, RVector &x,
 }
 
 template<>
-int TCompRowMatrix<complex>::bicgstab (const CVector &b, CVector &x,
-    double &tol, TPreconditioner<complex> *precon, int maxit) const
+int TCompRowMatrix<std::complex<double> >::bicgstab (const CVector &b,
+    CVector &x, double &tol, TPreconditioner<std::complex<double> > *precon,
+    int maxit) const
 {
     return BiCGSTAB (*this, b, x, tol, precon, maxit);
 }
@@ -2892,9 +2898,10 @@ void TCompRowMatrix<double>::bicgstab (const RVector *b, RVector *x, int nrhs,
 }
 
 template<>
-void TCompRowMatrix<scomplex>::bicgstab (const SCVector *b, SCVector *x,
-    int nrhs, double tol, int maxit, TPreconditioner<scomplex> *precon,
-    IterativeSolverResult *res) const
+void TCompRowMatrix<std::complex<float> >::bicgstab (const SCVector *b,
+    SCVector *x, int nrhs, double tol, int maxit,
+    TPreconditioner<std::complex<float> > *precon, IterativeSolverResult *res)
+    const
 {
     BiCGSTAB (*this, b, x, nrhs, tol, maxit, precon, res);
 }
@@ -3159,8 +3166,8 @@ int ML_getrow<double> (ML_Operator *Amat, int N_requested_rows,
 
 template class MATHLIB TCompRowMatrix<double>;
 template class MATHLIB TCompRowMatrix<float>;
-template class MATHLIB TCompRowMatrix<toast::complex>;
-template class MATHLIB TCompRowMatrix<scomplex>;
+template class MATHLIB TCompRowMatrix<std::complex<double> >;
+template class MATHLIB TCompRowMatrix<std::complex<float> >;
 template class MATHLIB TCompRowMatrix<int>;
 
 template MATHLIB TCompRowMatrix<double> transp (const TCompRowMatrix<double> &m);

@@ -2,8 +2,8 @@
 
 #include "toastdef.h"
 #define MATHLIB DLLEXPORT
-#include "complex.h"
-#include "scomplex.h"
+//#include "complex.h"
+//#include "scomplex.h"
 #include "toastcuda.h"
 
 #include <cuda_runtime.h>
@@ -178,8 +178,9 @@ void cuda_Ax (const float *A_val, const int *A_rowptr, const int *A_colidx,
 
 // ===========================================================
 
-void cuda_Ax_cplx (const scomplex *A_val, const int *A_rowptr,
-    const int *A_colidx, int m, int n, const scomplex *x_val, scomplex *b_val)
+void cuda_Ax_cplx (const std::complex<float> *A_val, const int *A_rowptr,
+    const int *A_colidx, int m, int n, const std::complex<float> *x_val,
+    std::complex<float> *b_val)
 {
     // solve this by expanding the complex problem into a real one:
     // | A_re  -A_im | | x_re |     | b_re |
@@ -786,12 +787,14 @@ template void cuda_BiCGSTAB (const float *A_val, const int *A_rowptr,
     const int *A_colidx, int m, int n, const float **b, float **x, int nrhs,
     float tol, int maxit, SolverResult *res);
 
-template void cuda_BiCGSTAB_cplx (const scomplex *A_val, const int *A_rowptr,
-    const int *A_colidx, int m, int n, const scomplex *b, scomplex *x,
+template void cuda_BiCGSTAB_cplx (const std::complex<float> *A_val,
+    const int *A_rowptr, const int *A_colidx, int m, int n,
+    const std::complex<float> *b, std::complex<float> *x,
     float tol, int maxit, SolverResult *res);
 
-template void cuda_BiCGSTAB_cplx (const scomplex *A_val, const int *A_rowptr,
-    const int *A_colidx, int m, int n, const scomplex **b, scomplex **x,
+template void cuda_BiCGSTAB_cplx (const std::complex<float> *A_val,
+    const int *A_rowptr, const int *A_colidx, int m, int n,
+    const std::complex<float> **b, std::complex<float> **x,
     int nrhs, float tol, int maxit, SolverResult *res);
 
 // Double-precision instantiations
@@ -815,15 +818,15 @@ template void cuda_BiCGSTAB (const double *A_val, const int *A_rowptr,
     const int *A_colidx, int m, int n, const double **b, double **x, int nrhs,
     double tol, int maxit, SolverResult *res);
 
-template void cuda_BiCGSTAB_cplx (const toast::complex *A_val,
+template void cuda_BiCGSTAB_cplx (const std::complex<double> *A_val,
     const int *A_rowptr, const int *A_colidx, int m, int n,
-    const toast::complex *b, toast::complex *x, double tol, int maxit,
-    SolverResult *res);
-
-template void cuda_BiCGSTAB_cplx (const toast::complex *A_val,
-    const int *A_rowptr, const int *A_colidx, int m, int n,
-    const toast::complex **b, toast::complex **x, int nrhs, double tol,
+    const std::complex<double> *b, std::complex<double> *x, double tol,
     int maxit, SolverResult *res);
+
+template void cuda_BiCGSTAB_cplx (const std::complex<double> *A_val,
+    const int *A_rowptr, const int *A_colidx, int m, int n,
+    const std::complex<double> **b, std::complex<double> **x, int nrhs,
+    double tol, int maxit, SolverResult *res);
 
 template void Tstep_loop (int n, int nq, int nm,
     const double *K0_val, const int *K0_rowptr, const int *K0_colidx,

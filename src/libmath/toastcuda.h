@@ -27,8 +27,9 @@ void cuda_SetCuspPrecon (CuspPreconType precontp);
 void cuda_Ax (const float *A_val, const int *A_rowptr,
     const int *A_colidx, int m, int n, const float *x, float *b);
 
-void cuda_Ax_cplx (const scomplex *A_val, const int *A_rowptr,
-    const int *A_colidx, int m, int n, const scomplex *x, scomplex *b);
+void cuda_Ax_cplx (const std::complex<float> *A_val, const int *A_rowptr,
+    const int *A_colidx, int m, int n, const std::complex<float> *x,
+    std::complex<float> *b);
 
 template<class T>
 void cuda_CG (const T *A_val, const int *A_rowptr,
