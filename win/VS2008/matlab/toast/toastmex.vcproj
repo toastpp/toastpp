@@ -92,6 +92,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(ToastWinDir)dll\*.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libmath.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfe.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libstoast.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfdot.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -165,7 +166,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(ToastWinDir)dll\*.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libmath.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfe.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libstoast.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(ToastWinDir)dll\*.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libmath.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfe.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libstoast.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;copy &quot;$(ToastLibDir)libfdot.dll&quot; &quot;$(ToastMex2Dir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
