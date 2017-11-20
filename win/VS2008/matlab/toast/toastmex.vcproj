@@ -289,6 +289,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\matlab2\mtGmsh.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\matlab2\mtGradient.cc"
 				>
 			</File>

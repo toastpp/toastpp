@@ -136,7 +136,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libblas64.lib SuperLU_50.lib"
+				AdditionalDependencies="libblas64.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""

@@ -14,7 +14,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies="libmath.lib libfe.lib libstoast.lib libfdot.lib libmx.lib libmex.lib libmat.lib"
+		AdditionalDependencies="libmath.lib libfe.lib libstoast.lib libtoastgmsh.lib libfdot.lib libmx.lib libmex.lib libmat.lib"
 		OutputFile="$(ToastMexDir)$(ProjectName).mexw64"
 		AdditionalLibraryDirectories="$(MatlabLibDir)"
 		ModuleDefinitionFile="$(SolutionDir)matlab\resources\mexfunc.def"

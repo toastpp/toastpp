@@ -8,7 +8,7 @@
 	>
 	<Tool
 		Name="VCCLCompilerTool"
-		AdditionalIncludeDirectories="&quot;$(ToastRootDir)&quot;;&quot;$(ToastRootDir)include&quot;;&quot;$(ToastSrcDir)libmath&quot;;&quot;$(ToastSrcDir)libfe&quot;;&quot;$(ToastSrcDir)libstoast&quot;;&quot;$(ToastSrcDir)libfdot&quot;;&quot;$(ToastSrcDir)libbemdiff&quot;;&quot;$(ToastSrcDir)libbem&quot;;&quot;$(ToastRootDir)numerics\SuperLU_5.0\SRC&quot;;&quot;$(ToastRootDir)numerics\ILUPACK\include&quot;"
+		AdditionalIncludeDirectories="&quot;$(ToastRootDir)&quot;;&quot;$(ToastRootDir)include&quot;;&quot;$(ToastSrcDir)libmath&quot;;&quot;$(ToastSrcDir)libfe&quot;;&quot;$(ToastSrcDir)libstoast&quot;;&quot;$(ToastSrcDir)libfdot&quot;;&quot;$(ToastSrcDir)libbemdiff&quot;;&quot;$(ToastSrcDir)libbem&quot;;&quot;$(ToastSrcDir)libtoastgmsh&quot;;&quot;$(ToastRootDir)numerics\SuperLU_5.0\SRC&quot;;&quot;$(ToastRootDir)numerics\ILUPACK\include&quot;"
 		PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE"
 	/>
 	<Tool

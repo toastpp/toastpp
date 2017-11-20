@@ -117,7 +117,7 @@ int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 	alpha = dnew / (d & q);
 	
 	// check failure
-	if (!alpha || std::isnan(alpha)) {
+	if (!alpha || isnan(alpha)) {
 	    cerr << "*** PCG fails to converge" << endl;
 	    break;
 	}
@@ -139,7 +139,7 @@ int PCG (const TMatrix<MT> &A, const TVector<MT> &b, TVector<MT> &x,
 	}
 
 	// check failure
-	if (!beta || std::isnan(beta)) {
+	if (!beta || isnan(beta)) {
 	    cerr << "*** PCG fails to converge" << endl;
 	    break;
 	}

@@ -130,4 +130,12 @@
 #define FDOT_PROJECTTOIMAGE   2009
 #define FDOT_PROJECTTOFIELD   2010
 
+// GMsh support
+#define GMSH_CREATEMODEL      3000
+#define GMSH_LOADMODEL        3001
+#define GMSH_MESHMODEL        3002
+#define GMSH_REMESHMODEL      3003
+#define GMSH_WRITEMESH        3004
+#define GMSH_GETTOASTMESH     3005
+
 #endif // !__MATLAB_TOASTMEX_H

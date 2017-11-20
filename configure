@@ -667,6 +667,9 @@ MPILIBDIR
 MPIINCDIR
 ENABLE_MPI
 ENABLE_PTHREAD
+GMSHLIBDIR
+GMSHINCDIR
+ENABLE_GMSH
 ZOLTANLIBDIR
 ZOLTANINCDIR
 ENABLE_ZOLTAN
@@ -773,6 +776,9 @@ enable_zoltan
 with_zoltan_dir
 with_zoltan_incdir
 with_zoltan_libdir
+enable_gmsh
+with_gmsh_incdir
+with_gmsh_libdir
 enable_threads
 enable_mpi
 with_mpi_dir
@@ -1439,7 +1445,8 @@ Optional Features:
   --enable-debug          build debug version
   --enable-prof           build profiling version
   --enable-zoltan         build with Zoltan load-balancing support
-  --disable-threads        do not build multithreaded version
+  --enable-gmsh           build with Gmsh interface
+  --disable-threads       do not build multithreaded version
   --enable-mpi            build MPI distributed version
   --enable-cuda           enable CUDA GPU support
   --disable-shared        do not build shared TOAST libraries
@@ -1481,6 +1488,8 @@ Optional Packages:
   --with-zoltan-dir       Zoltan source installation directory
   --with-zoltan-incdir    Zoltan include directory
   --with-zoltan-libdir    Zoltan library directory
+  --with-gmsh-incdir        Gmsh include directory
+  --with-gmsh-libdir       Gmsh library directory
   --with-mpi-dir       MPI source installation directory
   --with-mpi-incdir    MPI include directory
   --with-mpi-libdir    MPI library directory
@@ -7410,6 +7419,43 @@ else
 fi
 
 fi
+
+
+
+
+
+# =========================================================================
+# Check whether user wants to add Gmsh support
+
+# Check whether --enable-gmsh was given.
+if test "${enable_gmsh+set}" = set; then :
+  enableval=$enable_gmsh; isok=$enableval
+else
+  isok=no
+fi
+
+if test "$isok" = "yes" ; then
+    ENABLE_GMSH=yes
+
+
+# Check whether --with-gmsh-incdir was given.
+if test "${with_gmsh_incdir+set}" = set; then :
+  withval=$with_gmsh_incdir; GMSHINCDIR=$withval
+else
+  GMSHINCDIR=${GMSHINCDIR}
+fi
+
+
+
+# Check whether --with-gmsh-libdir was given.
+if test "${with_gmsh_libdir+set}" = set; then :
+  withval=$with_gmsh_libdir; GMSHLIBDIR=$withval
+else
+  GMSHLIBDIR=${GMSHLIBDIR}
+fi
+
+fi
+
 
 
 

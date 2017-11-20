@@ -519,10 +519,33 @@ AC_SUBST(ZOLTANINCDIR)
 AC_SUBST(ZOLTANLIBDIR)
 
 # =========================================================================
+# Check whether user wants to add Gmsh support
+
+AC_ARG_ENABLE(gmsh,
+    [  --enable-gmsh           build with Gmsh interface],
+    [isok=$enableval], [isok=no])
+if test "$isok" = "yes" ; then
+    ENABLE_GMSH=yes
+
+    AC_ARG_WITH(gmsh-incdir,
+	[  --with-gmsh-incdir        Gmsh include directory],
+	GMSHINCDIR=$withval, GMSHINCDIR=${GMSHINCDIR})
+
+    AC_ARG_WITH(gmsh-libdir,
+	[  --with-gmsh-libdir       Gmsh library directory],
+	GMSHLIBDIR=$withval, GMSHLIBDIR=${GMSHLIBDIR})
+fi
+
+
+AC_SUBST(ENABLE_GMSH)
+AC_SUBST(GMSHINCDIR)
+AC_SUBST(GMSHLIBDIR)
+
+# =========================================================================
 # Check whether user wants to build a threaded version
 
 AC_ARG_ENABLE(threads,
-    [  --disable-threads        do not build multithreaded version],
+    [  --disable-threads       do not build multithreaded version],
     [isok=yes], [isok=no])
 if test "$isok" = "no" ; then
     CXXFLAGS="${CXXFLAGS} -DTOAST_THREAD"

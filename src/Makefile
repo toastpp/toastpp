@@ -8,6 +8,10 @@ SUBDIRS += libvarPN3D
 # this library requires ILUPACK support
 endif
 
+ifeq ($(ENABLE_GMSH),yes)
+SUBDIRS += libtoastgmsh
+endif
+
 all::
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
 	for i in $(SUBDIRS) ;\

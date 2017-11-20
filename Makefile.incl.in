@@ -129,6 +129,13 @@ ZOLTANINCDIR = @ZOLTANINCDIR@
 ZOLTANLIBDIR = @ZOLTANLIBDIR@
 
 # =======================================================================
+# Gmsh support
+
+ENABLE_GMSH = @ENABLE_GMSH@
+GMSHINCDIR = @GMSHINCDIR@
+GMSHLIBDIR = @GMSHLIBDIR@
+
+# =======================================================================
 # Libraries
 
 LIBS      = @DL_LIBS@ @LIBS@ -lm
@@ -157,6 +164,12 @@ endif
 ifeq ($(ENABLE_MPI),yes)
 	TINC  += -I$(MPIINCDIR)
 	TLIBS += -L$(MPILIBDIR) -lmpich -lmpl
+endif
+
+ifeq ($(ENABLE_GMSH),yes)
+        CCFLAGS += -DGMSH_SUPPORT
+        TINC    += -I$(GMSHINCDIR) -I$(TSRC)/libtoastgmsh
+        TLIBS   += -L$(GMSHLIBDIR) -lGmsh
 endif
 
 MATHLIB   = -L$(TLIB) -larpack @SUPERLULIB@ $(SPBLASLIB) $(LAPACKLIB) $(BLASLIB)
@@ -202,6 +215,9 @@ endif
 MEX      = $(MEXBIN) @MEXFLAGS@
 MEXEXT   = @MEXEXT@
 
+MEXINC = $(INCLUDE)
+MEXLIB = $(STOASTLIB) -llbfgs
+
 MEXFLAGS =
 ifeq ($(BUILD_FDOT),1)
       MEXFLAGS += -DMESA_SUPPORT
@@ -209,5 +225,7 @@ endif
 ifeq ($(ENABLE_PTHREAD),yes)
      MEXFLAGS += -DTOAST_THREAD
 endif
-MEXINC = $(INCLUDE)
-MEXLIB = $(STOASTLIB) -llbfgs
+ifeq ($(ENABLE_GMSH),yes)
+     MEXFLAGS += -DGMSH_SUPPORT
+     MEXLIB += -ltoastgmsh
+endif

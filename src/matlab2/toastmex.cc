@@ -411,6 +411,26 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	mfdot->ProjectToField (nlhs, plhs, nrhs, prhs);
 	break;
 
+// Methods defined in mtGmsh.cc
+    case GMSH_CREATEMODEL:
+	mtoast->CreateGModel (nlhs, plhs, nrhs, prhs);
+	break;
+    case GMSH_LOADMODEL:
+	mtoast->LoadGModel (nlhs, plhs, nrhs, prhs);
+	break;
+    case GMSH_MESHMODEL:
+	mtoast->MeshGModel (nlhs, plhs, nrhs, prhs);
+	break;
+    case GMSH_REMESHMODEL:
+	mtoast->RemeshGModel (nlhs, plhs, nrhs, prhs);
+	break;
+    case GMSH_WRITEMESH:
+	mtoast->gmshWriteMesh (nlhs, plhs, nrhs, prhs);
+	break;
+    case GMSH_GETTOASTMESH:
+	mtoast->GetToastMeshFromGModel (nlhs, plhs, nrhs, prhs);
+	break;
+	
     default:
 	mexPrintf ("toast: requested function id=%d\n", funcid);
 	mexErrMsgTxt ("toast: Invalid toast driver call: function id not recognised.");

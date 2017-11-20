@@ -15,7 +15,8 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <math.h>
+//#include <math.h>
+#include <cmath>
 #include <cstdlib>
 #include "mathlib.h"
 
@@ -1335,7 +1336,7 @@ template<>
 inline bool visnan (const CVector &v)
 {
     for (int i = 0; i < v.size; i++)
-        if (std::isnan(v[i].real()) || std::isnan(v[i].imag())) return true;
+        if (isnan(v[i].real()) || isnan(v[i].imag())) return true;
     return false;
 }
 
@@ -1343,7 +1344,7 @@ template<>
 inline bool visnan (const SCVector &v)
 {
     for (int i = 0; i < v.size; i++)
-        if (std::isnan(v[i].real()) || std::isnan(v[i].imag())) return true;
+        if (isnan(v[i].real()) || isnan(v[i].imag())) return true;
     return false;
 }
 
@@ -1351,7 +1352,7 @@ template<class VT>
 bool visnan (const TVector<VT> &v)
 {
     for (int i = 0; i < v.size; i++)
-	if (std::isnan(v[i])) return true;
+	if (isnan(v[i])) return true;
     return false;
 }
 

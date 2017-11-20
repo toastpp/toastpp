@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="gmsh"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(GmshIncludeDir)&quot;"
+		PreprocessorDefinitions="GMSH_SUPPORT"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="Gmsh.lib"
+		AdditionalLibraryDirectories="&quot;$(GmshLibDir)&quot;"
+	/>
+	<UserMacro
+		Name="GmshDir"
+		Value="&quot;D:\src\packages\gmsh-3.0.2-source\build\gmsh&quot;"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="GmshLibDir"
+		Value="&quot;$(GmshDir)&quot;"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="GmshIncludeDir"
+		Value="&quot;$(GmshDir)\include\gmsh&quot;"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

@@ -6,6 +6,10 @@ TGTOBJ = ${TGTSRC:.cc=.$(MEXEXT)}
 
 AUXSRC = matlabtoast.cc mexutil.cc util.cc mtMesh.cc mtElement.cc mtQMvec.cc mtBasis.cc mtField.cc mtGradient.cc mtJacobian.cc mtRegul.cc toastlbfgs.cc mtSysmat_basis.cc matlabfdot.cc mtProjector.cc
 
+ifeq ($(ENABLE_GMSH),yes)
+AUXSRC += mtGmsh.cc
+endif
+
 AUXOBJ = ${AUXSRC:.cc=.o}
 
 all:: $(TGTOBJ)
@@ -13,8 +17,11 @@ all:: $(TGTOBJ)
 %.o : %.cc
 	$(MEX) $(MEXFLAGS) $(MEXINC) -c $<
 
-%.$(MEXEXT) : %.cc $(AUXOBJ)
-	$(MEX) $(MEXINC) $(MEXLIB) $^
+#%.$(MEXEXT) : %.cc $(AUXOBJ)
+#	$(MEX) $(MEXINC) $(MEXLIB) $^
+%.$(MEXEXT) : %.o $(AUXOBJ)
+	$(MEX) $(MEXLIB) $^
+
 
 clean::
 	rm -f *.$(MEXEXT)

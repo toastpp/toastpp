@@ -168,7 +168,7 @@ public:
     Raster *GetBasis_Safe (const mxArray *arr, const char *func, int argno);
     Regularisation *GetRegul (const mxArray *idx);
 
-	// Methods defined in mtMesh.cc
+    // Methods defined in mtMesh.cc
     void MakeMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void ReadMesh (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
     void WriteMesh (int nlhs, mxArray *plhs[], int nrhs,
@@ -229,6 +229,22 @@ public:
     void ShapeGrad (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);
 
+#ifdef GMSH_SUPPORT
+    // Methods defined in mtGmsh.cc
+    void CreateGModel(int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void LoadGModel(int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void MeshGModel(int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void RemeshGModel(int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void gmshWriteMesh(int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+    void GetToastMeshFromGModel(int nlhs, mxArray *plhs[], int nrhs,
+	const mxArray *prhs[]);
+#endif
+    
 protected:
     void GradientReal (int nlhs, mxArray *plhs[], int nrhs,
         const mxArray *prhs[]);

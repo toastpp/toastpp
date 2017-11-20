@@ -1,0 +1,35 @@
+include $(TOASTDIR)/Makefile.incl
+
+LIBNAME = libtoastgmsh
+LIB = $(LIBNAME)$(LIB_SUFFIX)
+
+VPATH = $(TSRC)/libtoastgmsh
+
+all:: $(LIB)
+
+SRCS = \
+	gmsh_interface.cc
+	
+OBJS = ${SRCS:.cc=.o} 
+HDRS := $(wildcard *.h)
+
+%.o : %.cc $(HDRS)
+	$(CXX) $(FLAGS) $(SHLIB_CFLAGS) -c $<
+
+# make static version of library
+$(LIBNAME)$(STLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	ar cr $@ $(OBJS)
+	$(RANLIB) $@
+
+# make shared version of library
+$(LIBNAME)$(SHLIB_SUFFIX): $(OBJS)
+	@$(RM) $@
+	$(SHLIB_LD) -o $@ $(OBJS) $(SHLIB_LD_LIBS) $(FLIBS) -L$(TLIB) $(MATHLIB) -L$(GMSHLIBDIR) -lGmsh
+
+clean::
+	$(RM) *.o
+
+distclean:: clean
+	$(RM) Makefile
+	$(RM) $(LIB)
