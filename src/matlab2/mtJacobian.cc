@@ -35,7 +35,6 @@ void CalcJacobianCW (QMMesh *mesh, Raster *raster,
 
 // =========================================================================
 // Frequency-domain Jacobian
-
 void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
     const mxArray *prhs[])
 {
@@ -57,48 +56,90 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 
 	// this is the version that provides fields and projections directly
 	int i, j;
-	double *pr, *pi;
-	
+
+        
 	// copy fields
 	const mxArray *mx_dphi = prhs[2];
 	ASSERTARG(mxGetM(mx_dphi) == n, 3, "Unexpected number of rows");
 	ASSERTARG(mxGetN(mx_dphi) == nq, 3, "Unexpected number of columns");
-        ASSERTARG(mxIsComplex (mx_dphi), 3, "Must be complex");
+    ASSERTARG(mxIsComplex (mx_dphi), 3, "Must be complex");
+    CVector *dphi = new CVector[nq];
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(mx_dphi);
+    for (i = 0; i < nq; i++) {
+        dphi[i].New (n);
+        std::complex<double> *v = dphi[i].data_buffer();
+        for (j = 0; j < n; j++)
+          //  *v++ = std::complex<double> (*pr++, *pi++);
+            v[j] = std::complex<double> (xc[j].real, xc[j].imag);
+
+    }
+#else
+    /* separate complex API processing */
+    double *pr, *pi;
 	pr  = mxGetPr (mx_dphi);
 	pi  = mxGetPi (mx_dphi);
-	CVector *dphi = new CVector[nq];
 	for (i = 0; i < nq; i++) {
 	    dphi[i].New (n);
 	    std::complex<double> *v = dphi[i].data_buffer();
 	    for (j = 0; j < n; j++)
 	        *v++ = std::complex<double> (*pr++, *pi++);
 	}
+#endif
+        
+        
 	// copy adjoint fields
 	const mxArray *mx_aphi = prhs[3];
 	ASSERTARG(mxGetM(mx_aphi) == n, 4, "Unexpected number of rows");
 	ASSERTARG(mxGetN(mx_aphi) == nm, 4, "Unexpected number of columns");
 	ASSERTARG(mxIsComplex (mx_aphi), 4, "Must be complex");
+    CVector *aphi = new CVector[nm];
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * yc = mxGetComplexDoubles(mx_aphi);
+    for (i = 0; i < nm; i++) {
+        aphi[i].New (n);
+        std::complex<double> *v = aphi[i].data_buffer();
+        for (j = 0; j < n; j++)
+            //*v++ = std::complex<double> (*pr++, *pi++);
+            v[j] = std::complex<double> (yc[j].real, yc[j].imag);
+
+    }
+#else
+    /* separate complex API processing */
 	pr = mxGetPr (mx_aphi);
 	pi = mxGetPi (mx_aphi);
-	CVector *aphi = new CVector[nm];
 	for (i = 0; i < nm; i++) {
 	    aphi[i].New (n);
 	    std::complex<double> *v = aphi[i].data_buffer();
 	    for (j = 0; j < n; j++)
 	        *v++ = std::complex<double> (*pr++, *pi++);
 	}
-	// copy projections
+#endif
+
+    // copy projections
 	const mxArray *mx_proj = prhs[4];
 	ASSERTARG(mxGetM(mx_proj)*mxGetN(mx_proj) == nqm, 5,"Unexpected size");
 	ASSERTARG(mxIsComplex(mx_proj), 5, "Must be complex");
 	CVector proj(nqm);
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * zc = mxGetComplexDoubles(mx_proj);
+    std::complex<double> *v = proj.data_buffer();
+    for (i = 0; i < nqm; i++)
+     //   *v++ = std::complex<double> (*pr++, *pi++);
+        v[i] = std::complex<double> (zc[i].real, zc[i].imag);
+
+#else
+    /* separate complex API processing */
 	pr = mxGetPr (mx_proj);
 	pi = mxGetPi (mx_proj);
 	std::complex<double> *v = proj.data_buffer();
 	for (i = 0; i < nqm; i++)
 	    *v++ = std::complex<double> (*pr++, *pi++);
-
-	CalcJacobian (mesh, raster, dphi, aphi, &proj, DATA_LOG,
+#endif
+    CalcJacobian (mesh, raster, dphi, aphi, &proj, DATA_LOG,
 		      &plhs[0]);
 
     } else {
@@ -136,6 +177,9 @@ void MatlabToast::Jacobian (int nlhs, mxArray *plhs[], int nrhs,
 		      solver, tol, &plhs[0]);
     }    
 }
+
+
+
 
 // ==========================================================================
 // CW Jacobian

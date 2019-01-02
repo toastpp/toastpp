@@ -54,7 +54,6 @@ void MatlabToast::Fields (int nlhs, mxArray *plhs[], int nrhs,
 
 // =========================================================================
 // Implementation
-
 void CalcFields (QMMesh *mesh, Raster *raster,
     const CCompRowMatrix &qvec, const RVector &mua, const RVector &mus,
     const RVector &ref, double freq, char *solver, double tol,
@@ -99,18 +98,36 @@ void CalcFields (QMMesh *mesh, Raster *raster,
     for (i = 0; i < nQ; i++) dphi[i].New (n);
     FWS.CalcFields (qvec, dphi);
     mxArray *dmx = mxCreateDoubleMatrix (slen, nQ, mxCOMPLEX);
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(dmx);
+
+    for (i = idx = 0; i < nQ; i++) {
+        if (raster) raster->Map_MeshToSol (dphi[i], sphi);
+        else        sphi = dphi[i];
+        for (j = 0; j < slen; j++) {
+            xc[idx].real = sphi[j].real();
+            xc[idx].imag = sphi[j].imag();
+            idx++;
+        }
+    }
+#else
+    /* separate complex API processing */
     double *pr = mxGetPr (dmx);
     double *pi = mxGetPi (dmx);
 
     for (i = idx = 0; i < nQ; i++) {
-	if (raster) raster->Map_MeshToSol (dphi[i], sphi);
-	else        sphi = dphi[i];
-	for (j = 0; j < slen; j++) {
-	    pr[idx] = sphi[j].real();
-	    pi[idx] = sphi[j].imag();
-	    idx++;
-	}
+        if (raster) raster->Map_MeshToSol (dphi[i], sphi);
+        else        sphi = dphi[i];
+        for (j = 0; j < slen; j++) {
+            pr[idx] = sphi[j].real();
+            pi[idx] = sphi[j].imag();
+            idx++;
+        }
     }
+#endif
     delete []dphi;
+
     *dfield = dmx;
 }                                                    
+

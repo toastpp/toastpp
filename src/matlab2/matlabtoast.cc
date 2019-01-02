@@ -809,21 +809,31 @@ void MatlabToast::ReadVector (int nlhs, mxArray *plhs[], int nrhs,
     }
 
     if (cok) {
-	plhs[0] = mxCreateDoubleMatrix (cdata.Dim(), 1, mxCOMPLEX);
-	double *pr = mxGetPr (plhs[0]);
-	double *pi = mxGetPi (plhs[0]);
-	std::complex<double> *buf = cdata.data_buffer();
-	for (int i = 0; i < cdata.Dim(); i++) {
-	    pr[i] = buf[i].real();
-	    pi[i] = buf[i].imag();
-	}
-	    
+        plhs[0] = mxCreateDoubleMatrix (cdata.Dim(), 1, mxCOMPLEX);
+#if MX_HAS_INTERLEAVED_COMPLEX
+        /* add interleaved complex API code here */
+        mxComplexDouble * xc = mxGetComplexDoubles(prhs[0]);
+        std::complex<double> *buf = cdata.data_buffer();
+        for (int i = 0; i < cdata.Dim(); i++) {
+            xc[i].real = buf[i].real();
+            xc[i].imag = buf[i].imag();
+        }
+#else
+        /* separate complex API processing */
+        double *pr = mxGetPr (plhs[0]);
+        double *pi = mxGetPi (plhs[0]);
+        std::complex<double> *buf = cdata.data_buffer();
+        for (int i = 0; i < cdata.Dim(); i++) {
+            pr[i] = buf[i].real();
+            pi[i] = buf[i].imag();
+        }
+#endif
     } else if (rok) {
-	plhs[0] = mxCreateDoubleMatrix (rdata.Dim(), 1, mxREAL);
-	double *pr  = mxGetPr (plhs[0]);
-	double *buf = rdata.data_buffer();
-	for (int i = 0; i < rdata.Dim(); i++)
-	    pr[i] = buf[i];
+        plhs[0] = mxCreateDoubleMatrix (rdata.Dim(), 1, mxREAL);
+        double *pr  = mxGetPr (plhs[0]);
+        double *buf = rdata.data_buffer();
+        for (int i = 0; i < rdata.Dim(); i++)
+            pr[i] = buf[i];
     }
 }
 

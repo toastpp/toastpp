@@ -189,18 +189,35 @@ void MatlabToast::GradientCplx (int nlhs, mxArray *plhs[], int nrhs,
   	    tol = mxGetScalar (prhs[++i]);
 	} else if (!strcasecmp(label, "Fields")) { // fields for all sources
 	    i++;
-	    int q, nq = mesh->nQ, nlen = mesh->nlen();
-	    mwSize m = mxGetM(prhs[i]);
-	    mwSize n = mxGetN(prhs[i]);
+
+        int q, nq = mesh->nQ, nlen = mesh->nlen();
+        mwSize m = mxGetM(prhs[i]);
+        mwSize n = mxGetN(prhs[i]);
+        xASSERT(m == nlen && n == nq, "Parameter phi wrong dimension");
+        phi = new CVector[nq];
+
+#if MX_HAS_INTERLEAVED_COMPLEX
+        /* add interleaved complex API code here */
+        mxComplexDouble * xc = mxGetComplexDoubles(prhs[i]);
+        for (q = 0; q < nq; q++) {
+            phi[q].New (nlen);
+            for (j = 0; j < nlen; j++)
+                // phi[q][j] = std::complex<double> (*pr++, *pi++);
+                phi[q][j] = std::complex<double> (xc[j].real, xc[j].imag);
+
+        }
+#else
+        /* separate complex API processing */
+
 	    double *pr = mxGetPr(prhs[i]);
 	    double *pi = mxGetPi(prhs[i]);
-	    xASSERT(m == nlen && n == nq, "Parameter phi wrong dimension");
-	    phi = new CVector[nq];
 	    for (q = 0; q < nq; q++) {
 	        phi[q].New (nlen);
-		for (j = 0; j < nlen; j++)
-		    phi[q][j] = std::complex<double> (*pr++, *pi++);
+            for (j = 0; j < nlen; j++)
+                phi[q][j] = std::complex<double> (*pr++, *pi++);
 	    }
+        
+#endif
 	} else if (!strcasecmp(label,"Projections")) {
 	    proj = new RVector(mesh->nQM*2, mxGetPr (prhs[++i]));
 	} else if (!strcasecmp(label,"Unwrap")) {

@@ -34,22 +34,37 @@ void CopyVector (mxArray **array, const RVector &vec, VectorOrientation vo)
 
 // ============================================================================
 // Copy a dense CVector from TOAST to MATLAB format
-
 void CopyVector (mxArray **array, const CVector &vec, VectorOrientation vo)
 {
-    int i, m = vec.Dim();
+    int m = vec.Dim();
     mxArray *tmp;
 
     // note: these seem transposed, but produce correct result
     if (vo==ROWVEC) tmp = mxCreateDoubleMatrix (1, m, mxCOMPLEX);
     else            tmp = mxCreateDoubleMatrix (m, 1, mxCOMPLEX);
+
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(tmp);
+    
+    int i;
+    for (i = 0; i < m; i++) {
+        xc[i].real = vec[i].real();
+        xc[i].imag = vec[i].imag();
+    }
+    
+#else
+    /* separate complex API processing */
+
     double *pr = mxGetPr (tmp);
     double *pi = mxGetPi (tmp);
 
+    int i;
     for (i = 0; i < m; i++) {
         pr[i] = vec[i].real();
-	pi[i] = vec[i].imag();
+        pi[i] = vec[i].imag();
     }
+#endif
 
     *array = tmp;
 }
@@ -103,15 +118,29 @@ void CopyMatrix (mxArray **array, const CDenseMatrix &mat)
     int i, j, idx;
 
     mxArray *tmp = mxCreateDoubleMatrix (m, n, mxCOMPLEX);
+    
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(tmp);
+    
+    for (j = idx = 0; j < n; j++)
+        for (i = 0; i < m; i++) {
+            xc[idx].real = mat(i,j).real();
+            xc[idx].imag = mat(i,j).imag();
+            idx++;
+        }
+#else
+    /* separate complex API processing */
     double *pr = mxGetPr (tmp);
     double *pi = mxGetPi (tmp);
 
     for (j = idx = 0; j < n; j++)
       for (i = 0; i < m; i++) {
-	pr[idx] = mat(i,j).real();
-	pi[idx] = mat(i,j).imag();
-	idx++;
+        pr[idx] = mat(i,j).real();
+        pi[idx] = mat(i,j).imag();
+        idx++;
       }
+#endif
 
     *array = tmp;
 }
@@ -175,24 +204,44 @@ void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
     for (i = 0; i < n; i++) rcount[i] = 0;
     for (i = 0; i < nz; i++) rcount[colidx[i]]++;
 
-    double  *pr = mxGetPr(tmp);
-    double  *pi = mxGetPi(tmp);
     mwIndex *ir = mxGetIr(tmp);
     mwIndex *jc = mxGetJc(tmp);
 
     jc[0] = 0;
     for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
     for (i = 0; i < n; i++) rcount[i] = 0;
+    
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    
+    mxComplexDouble * xc = mxGetComplexDoubles(tmp);
 
     for (i = 0; i < m; i++)
-	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
-	    j = colidx[k];
-	    idx = jc[j]+rcount[j];
-	    ir[idx] = i;
-	    pr[idx] = pval[k].real();
-	    pi[idx] = pval[k].imag();
-	    rcount[j]++;	
-	}
+        for (k = rowptr[i]; k < rowptr[i+1]; k++) {
+            j = colidx[k];
+            idx = jc[j]+rcount[j];
+            ir[idx] = i;
+            xc[idx].real = pval[k].real();
+            xc[idx].imag = pval[k].imag();
+            rcount[j]++;
+        }
+
+#else
+    /* separate complex API processing */
+    
+    double  *pr = mxGetPr(tmp);
+    double  *pi = mxGetPi(tmp);
+
+    for (i = 0; i < m; i++)
+        for (k = rowptr[i]; k < rowptr[i+1]; k++) {
+            j = colidx[k];
+            idx = jc[j]+rcount[j];
+            ir[idx] = i;
+            pr[idx] = pval[k].real();
+            pi[idx] = pval[k].imag();
+            rcount[j]++;
+        }
+#endif
     delete []rcount;
 
     *array = tmp;
@@ -200,6 +249,7 @@ void CopyMatrix (mxArray **array, const CCompRowMatrix &mat)
 
 // ============================================================================
 // Copy a symmetric sparse matrix from TOAST to MATLAB format
+
 
 void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
 {
@@ -229,35 +279,63 @@ void CopyMatrix (mxArray **array, const CSymCompRowMatrix &mat)
     }
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
-
-    double  *pr = mxGetPr(tmp);
-    double  *pi = mxGetPi(tmp);
+    
     mwIndex *ir = mxGetIr(tmp);
     mwIndex *jc = mxGetJc(tmp);
-
+    
     jc[0] = 0;
     for (i = 0; i < n; i++) jc[i+1] = jc[i]+rcount[i];
     for (i = 0; i < n; i++) rcount[i] = 0;
+    
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+
+    mxComplexDouble * xc = mxGetComplexDoubles(tmp);
 
     for (i = 0; i < m; i++) {
-	for (k = rowptr[i]; k < rowptr[i+1]; k++) {
-	    j = colidx[k];
-	    idx = jc[j]+rcount[j];
-	    ir[idx] = i;
-	    pr[idx] = pval[k].real();
-	    pi[idx] = pval[k].imag();
-	    rcount[j]++;
-
-	    if (j < i) { // off-diagonal element: transpose
-		idx = jc[i]+rcount[i];
-		ir[idx] = j;
-		pr[idx] = pval[k].real();
-		pi[idx] = pval[k].imag();
-		rcount[i]++;
-	    }
-	}
+        for (k = rowptr[i]; k < rowptr[i+1]; k++) {
+            j = colidx[k];
+            idx = jc[j]+rcount[j];
+            ir[idx] = i;
+            xc[idx].real = pval[k].real();
+            xc[idx].imag = pval[k].imag();
+            rcount[j]++;
+            
+            if (j < i) { // off-diagonal element: transpose
+                idx = jc[i]+rcount[i];
+                ir[idx] = j;
+                xc[idx].real = pval[k].real();
+                xc[idx].imag = pval[k].imag();
+                rcount[i]++;
+            }
+        }
     }
+#else
+    /* separate complex API processing */
+    double  *pr = mxGetPr(tmp);
+    double  *pi = mxGetPi(tmp);
+
+    for (i = 0; i < m; i++) {
+        for (k = rowptr[i]; k < rowptr[i+1]; k++) {
+            j = colidx[k];
+            idx = jc[j]+rcount[j];
+            ir[idx] = i;
+            pr[idx] = pval[k].real();
+            pi[idx] = pval[k].imag();
+            rcount[j]++;
+
+            if (j < i) { // off-diagonal element: transpose
+            idx = jc[i]+rcount[i];
+            ir[idx] = j;
+            pr[idx] = pval[k].real();
+            pi[idx] = pval[k].imag();
+            rcount[i]++;
+            }
+        }
+    }
+#endif
     delete []rcount;
+
     *array = tmp;
 }
 
@@ -283,6 +361,7 @@ void CopyTMatrix (mxArray **array, const RDenseMatrix &mat)
 // ============================================================================
 // Transpose and copy a sparse matrix from TOAST to MATLAB format
 
+
 void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat)
 {
     int i;
@@ -295,22 +374,35 @@ void CopyTMatrix (mxArray **array, const CCompRowMatrix &mat)
     int nz = rowptr[n];
 
     mxArray *tmp = mxCreateSparse (m, n, nz, mxCOMPLEX);
-    double  *pr = mxGetPr (tmp);
-    double  *pi = mxGetPi (tmp);
     mwIndex *ir = mxGetIr (tmp);
     mwIndex *jc = mxGetJc (tmp);
 
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(tmp);
+
+    for (i = 0; i < nz; i++) {
+        xc[i].real = pval[i].real();
+        xc[i].imag = pval[i].imag();
+        ir[i] = colidx[i];
+    }
+    
+#else
+    /* separate complex API processing */
+    double  *pr = mxGetPr (tmp);
+    double  *pi = mxGetPi (tmp);
+
     for (i = 0; i < nz; i++) {
         pr[i] = pval[i].real();
-	pi[i] = pval[i].imag();
-	ir[i] = colidx[i];
+        pi[i] = pval[i].imag();
+        ir[i] = colidx[i];
     }
-    for (i = 0; i <= n; i++)
-	jc[i] = rowptr[i];
+
+#endif
+    for (i = 0; i <= n; i++) jc[i] = rowptr[i];
 
     *array = tmp;
 }
-
 
 // ============================================================================
 // ============================================================================
@@ -361,16 +453,25 @@ void CopyVector (CVector &vec, const mxArray *array)
     mwIndex m = mxGetM(array);
     mwIndex n = mxGetN(array);
     mwIndex d = m*n;
+    
+    vec.New((int)d);
+    std::complex<double> *val = vec.data_buffer();
+    
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(array);
+
+    for (mwIndex i = 0; i < d; i++)
+        val[i] = std::complex<double> (xc[i].real, xc[i].imag);
+#else
+    /* separate complex API processing */
     double *pr = mxGetPr (array);
     double *pi = mxGetPi (array);
  
-    vec.New((int)d);
-    std::complex<double> *val = vec.data_buffer();
-   
     for (mwIndex i = 0; i < d; i++)
         val[i] = std::complex<double> (pr[i], pi[i]);
+#endif
 }
-
 
 
 
@@ -428,7 +529,6 @@ void CopyTMatrix (RDenseMatrix &mat, const mxArray *array)
 
 // ============================================================================
 // Transpose and copy a sparse matrix from MATLAB to TOAST format
-
 void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
 {
     mwIndex dim = mxGetNumberOfDimensions (array);
@@ -437,8 +537,7 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
     mwIndex m   = mxGetDimensions (array)[0];
     mwIndex n   = mxGetDimensions (array)[1];
     mwIndex nz  = mxGetNzmax (array);
-    double *pr  = mxGetPr (array);
-    double *pi  = mxGetPi (array);
+
     int *rowptr, *colidx;
 
 #ifdef INDEX64
@@ -455,8 +554,20 @@ void CopyTMatrix (CCompRowMatrix &mat, const mxArray *array)
 #endif
 
     std::complex<double> *val = new std::complex<double>[nz];
+#if MX_HAS_INTERLEAVED_COMPLEX
+    /* add interleaved complex API code here */
+    mxComplexDouble * xc = mxGetComplexDoubles(array);
+    
+    for (mwIndex i = 0; i < nz; i++)
+        val[i] = std::complex<double> (xc[i].real, xc[i].imag);
+#else
+    /* separate complex API processing */
+    double *pr  = mxGetPr (array);
+    double *pi  = mxGetPi (array);
+    
     for (mwIndex i = 0; i < nz; i++)
         val[i] = std::complex<double> (pr[i], pi[i]);
+#endif
 
     mat.New ((int)n, (int)m);
     mat.Initialise (rowptr, colidx, val);
