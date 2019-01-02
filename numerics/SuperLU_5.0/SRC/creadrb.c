@@ -241,7 +241,7 @@ FormFullA(int n, int *nonz, complex **nzval, int **rowind, int **colptr)
 	  a_rowind[k] = t_rowind[i];
 	  a_val[k] = t_val[i];
 #ifdef DEBUG
-	  if ( fabs(a_val[k]) < 4.047e-300 )
+	  if ( fabs(a_val[k].r) < 4.047e-300 )
 	      printf("%5d: %e\n", k, a_val[k]);
 #endif
 	  ++k;
@@ -252,7 +252,7 @@ FormFullA(int n, int *nonz, complex **nzval, int **rowind, int **colptr)
 	a_rowind[k] = al_rowind[i];
 	a_val[k] = al_val[i];
 #ifdef DEBUG
-	if ( fabs(a_val[k]) < 4.047e-300 )
+	if ( fabs(a_val[k].r) < 4.047e-300 )
 	    printf("%5d: %e\n", k, a_val[k]);
 #endif
 	++k;
