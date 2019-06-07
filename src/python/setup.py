@@ -1,16 +1,18 @@
+from __future__ import print_function
 from distutils.core import setup, Extension
 import os
 import sys
 from distutils.sysconfig import get_python_inc
 import numpy.distutils as npd
 
+
 toastdir = os.getenv('TOASTDIR')
 if toastdir == None:
 	if "nt" in os.name:
 		toastdir = os.getcwd() + '/../..'
 	else:
-		print 'Expected environment variable TOASTDIR is not defined!'
-		print 'Please enter the path to the TOAST root directory:'
+		print('Expected environment variable TOASTDIR is not defined!')
+		print('Please enter the path to the TOAST root directory:')
 		toastdir = raw_input()
 		#sys.exit(1)
 
