@@ -8,8 +8,18 @@ int toastVerbosity;  // global verbosity flag
 #include "stoastlib.h"
 #include <fstream>
 
-
 #include "../common/objmgr.h"
+
+struct module_state {
+    PyObject *error;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
 
 // ===========================================================================
 // A python wrapper object that handled deallocation of C++ allocated memory
@@ -2226,9 +2236,64 @@ static PyMethodDef ToastMethods[] = {
 
 // ===========================================================================
 
+
+
+#if PY_MAJOR_VERSION >= 3
+
+static int toastmod_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
+}
+
+static int toastmod_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "toastmod",
+        NULL,
+        sizeof(struct module_state),
+        ToastMethods,
+        NULL,
+        toastmod_traverse,
+        toastmod_clear,
+        NULL
+};
+
+#define INITERROR return NULL
+
 PyMODINIT_FUNC
+PyInit_toastmod(void)
+
+#else
+#define INITERROR return
+
+void
 inittoastmod(void)
+#endif
 {
-    (void)Py_InitModule ("toastmod", ToastMethods);
+#if PY_MAJOR_VERSION >= 3
+    PyObject *module = PyModule_Create(&moduledef);
     import_array();
+#else
+    PyObject *module = Py_InitModule ("toastmod", ToastMethods);
+    import_array();
+#endif
+
+    if (module == NULL)
+        INITERROR;
+    struct module_state *st = GETSTATE(module);
+
+    st->error = PyErr_NewException("toastmod.Error", NULL, NULL);
+    if (st->error == NULL) {
+        Py_DECREF(module);
+        INITERROR;
+    }
+
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
 }
