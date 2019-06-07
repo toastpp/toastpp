@@ -40,7 +40,7 @@ def objective(proj,data,sd,logx):
 # Objective function for line search callback
 def objective_ls(logx):
     x = np.exp(logx)
-    slen = x.shape[0]/2
+    slen = int(x.shape[0]/2)
     scmua = x[0:slen]
     sckap = x[slen:2*slen]
     smua = scmua/cm
@@ -216,7 +216,7 @@ while itr <= itrmax:
 
     logx = logx + d*step
     x = np.exp(logx)
-    slen = x.shape[0]/2
+    slen = int(x.shape[0]/2)
     scmua = x[0:slen]
     sckap = x[slen:2*slen]
     smua = scmua/cm
