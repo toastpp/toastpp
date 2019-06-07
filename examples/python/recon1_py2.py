@@ -74,7 +74,7 @@ def imerr(im1, im2):
 
 
 # PyToast environment
-exec(compile(open(os.getenv("TOASTDIR") + "/ptoast_install.py", "rb").read(), os.getenv("TOASTDIR") + "/ptoast_install.py", 'exec'))
+execfile(os.getenv("TOASTDIR") + "/ptoast_install.py")
 import toast
 
 # Set the file paths
@@ -231,7 +231,7 @@ while itr <= itrmax:
     erri = np.concatenate((erri, [err]))
     errmua = np.concatenate((errmua, [imerr(bmua, bmua_tgt)]))
     errmus = np.concatenate((errmus, [imerr(bmus, bmus_tgt)]))
-    print(("Iteration "+str(itr)+", objective "+str(err)))
+    print ("Iteration "+str(itr)+", objective "+str(err))
 
     plt.clf()
     hfig.suptitle("Iteration "+str(itr))
