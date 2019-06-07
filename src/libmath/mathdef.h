@@ -120,6 +120,11 @@ inline bool iszero (std::complex<double> d)
     return d.real() == 0 && d.imag() == 0;
 }
 
+inline bool iszero (std::complex<float> d)
+{
+    return d.real() == 0 && d.imag() == 0;
+}
+
 inline bool operator> (const std::complex<double> &z1,
 		       const std::complex<double> &z2)
 {
