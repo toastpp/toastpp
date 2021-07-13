@@ -1,5 +1,5 @@
 include $(TOASTDIR)/Makefile.incl
-SHELL = /bin/csh
+#SHELL = /bin/csh
 VPATH = $(TSRC)/python
 
 all:: python doc
