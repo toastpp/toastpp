@@ -131,7 +131,7 @@
     <PostBuildEvent>
       <Command>if not exist ..\..\..\..\lib md ..\..\..\..\lib
 copy "$(TargetDir)osmesa.lib" ..\..\..\..\lib
-copy "$(TargetDir)osmesa.dll" ..\..\..\..\lib
+if exist "$(TargetDir)osmesa.dll" copy "$(TargetDir)osmesa.dll" ..\..\..\..\lib
 if exist ..\..\..\..\progs\demos copy "$(TargetDir)osmesa.dll" ..\..\..\..\progs\demos
 </Command>
     </PostBuildEvent>
