@@ -1,4 +1,5 @@
 from __future__ import print_function
+import setuptools  # To enable bdist_wheel
 from distutils.core import setup, Extension
 import os
 import sys
@@ -31,15 +32,19 @@ module1 = Extension('toast.toastmod',
                                     toastdir+'/src/libstoast'],
                     libraries = ['libmath','libfe','libstoast'] if "nt" in os.name else ['math','fe','stoast'],
                     library_dirs = [toastdir+'/win/x64/Release/lib'] if "nt" in os.name else [toastdir+'/lib'],
-					runtime_library_dirs = None if "nt" in os.name else [toastdir+'/lib'],
+                    runtime_library_dirs = None if "nt" in os.name else [toastdir+'/lib'],
                     sources = ['toastmodule.cc'])
 
-setup (name = 'PyToast',
-       version = '120529',
-       description = 'Python TOAST extension',
-       author = 'Martin Schweiger',
-       url = 'http://www.toastplusplus.org',
-       ext_modules = [module1],
-       packages = ['toast']
+setup(
+    name = 'PyToast',
+    version = '120529',
+    description = 'Python TOAST extension',
+    author = 'Martin Schweiger',
+    url = 'http://www.toastplusplus.org',
+    ext_modules = [module1],
+    packages = ['toast'],
+    data_files = [('', [toastdir+'/win/x64/Release/bin/pthreadVC2.dll',
+                        toastdir+'/win/x64/Release/bin/libfe.dll',
+                        toastdir+'/win/x64/Release/bin/libmath.dll',
+                        toastdir+'/win/x64/Release/bin/libstoast.dll'])] if "nt" in os.name else []
 )
-

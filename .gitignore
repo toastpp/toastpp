@@ -55,6 +55,8 @@ toastpp
 toast_bin_darwin64.zip
 
 src/python/build
+src/python/dist
+src/python/PyToast.egg-info
 darwin64
 gcc_shared_smp
 src/doc
@@ -65,5 +67,9 @@ win/**/x64/
 *.suo
 *.user
 *.sdf
+.vs/
 
 numerics/cuda/cusp_v0.2.0/cusp_v0.2.0
+
+numerics/Mesa*/windows/VC8/mesa/*/*.lib
+numerics/Mesa*/windows/VC8/mesa/*/x64/
