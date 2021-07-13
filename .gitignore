@@ -65,5 +65,9 @@ win/**/x64/
 *.suo
 *.user
 *.sdf
+.vs/
 
 numerics/cuda/cusp_v0.2.0/cusp_v0.2.0
+
+numerics/Mesa*/windows/VC8/mesa/*/*.lib
+numerics/Mesa*/windows/VC8/mesa/*/x64/
