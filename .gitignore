@@ -55,6 +55,8 @@ toastpp
 toast_bin_darwin64.zip
 
 src/python/build
+src/python/dist
+src/python/PyToast.egg-info
 darwin64
 gcc_shared_smp
 src/doc
