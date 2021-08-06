@@ -677,7 +677,7 @@ static PyObject *toast_make_raster (PyObject *self, PyObject *args)
     
     std::cerr << "bdim=" << bdim << std::endl;
     std::cerr << size[0] << ", " << size[1];
-    if (dim == 3) std::cerr << size[2];
+    if (dim == 3) std::cerr << ", " << size[2];
     std::cerr << std::endl;
 
     npy_intp *dims_intm = PyArray_DIMS(py_size_intm);
@@ -689,7 +689,7 @@ static PyObject *toast_make_raster (PyObject *self, PyObject *args)
     
     std::cerr << "gdim=" << gdim << std::endl;
     std::cerr << size_intm[0] << ", " << size_intm[1];
-    if (dim_intm == 3) std::cerr << size_intm[2];
+    if (dim_intm == 3) std::cerr << ", " << size_intm[2];
     std::cerr << std::endl;
 
     Raster *raster;
