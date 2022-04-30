@@ -3,7 +3,7 @@
 
 if test "x$TOASTDIR" = x; then
     echo "TOASTDIR environment variable not set!"
-    if test -f "mtoast_install.m" ; then
+    if test -f "mtoast2_install.m" ; then
 	export TOASTDIR=$PWD
     fi
 fi
