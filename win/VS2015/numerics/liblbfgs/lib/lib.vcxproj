@@ -93,7 +93,7 @@
       <OutputFile>$(ToastLibDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\include\*.h $(ToastRootDir)include</Command>
+      <Command>copy "$(ProjectDir)..\..\..\..\..\numerics\liblbfgs-1.10\include\*.h" "$(ToastRootDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

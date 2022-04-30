@@ -455,6 +455,12 @@ public:
     {   return *B; }
 
     /**
+     * \brief Return the grid->mesh transformation matrix.
+     */
+    inline const RGenericSparseMatrix &Grid2MeshMatrix()  const
+    {   return *BI; }
+
+    /**
      * \brief Return the mesh->basis transformation matrix.
      * \note Not all basis types may implement the basis->mesh transformation
      *   with an explicit matrix operator. For these classes, calling this
@@ -472,6 +478,39 @@ public:
      *   method will throw an error.
      */
     virtual const RGenericSparseMatrix &Basis2MeshMatrix() const
+    {   ERROR_UNDEF;
+	static RCompRowMatrix dummy;
+	return dummy; }
+
+    /**
+     * \brief Return the grid->basis transformation matrix.
+     * \note Not all basis types may implement the grid->mesh transformation
+     *   with an explicit matrix operator. For these classes, calling this
+     *   method will throw an error.
+     */
+    virtual const RGenericSparseMatrix &Grid2BasisMatrix() const
+    {   ERROR_UNDEF;
+	static RCompRowMatrix dummy;
+	return dummy; }
+
+    /**
+     * \brief Return the basis->grid transformation matrix.
+     * \note Not all basis types may implement the basis->grid transformation
+     *   with an explicit matrix operator. For these classes, calling this
+     *   method will throw an error.
+     */
+    virtual const RGenericSparseMatrix &Basis2GridMatrix() const
+    {   ERROR_UNDEF;
+	static RCompRowMatrix dummy;
+	return dummy; }
+
+    /**
+     * \brief Return the basis->sol transformation matrix (D).
+     * \note Not all basis types may implement the basis->sol transformation
+     *   with an explicit matrix operator. For these classes, calling this
+     *   method will throw an error.
+     */
+    virtual const RCompRowMatrix &Basis2SolMatrix() const
     {   ERROR_UNDEF;
 	static RCompRowMatrix dummy;
 	return dummy; }
