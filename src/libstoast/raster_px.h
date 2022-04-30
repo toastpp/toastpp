@@ -130,6 +130,16 @@ public:
     void Map_SolToMesh (const RVector &svec, RVector &mvec) const;
 
     /**
+     * \brief Return the grid->basis transformation matrix.
+     */
+    const RGenericSparseMatrix &Grid2BasisMatrix() const { return *G; }
+
+    /**
+     * \brief Return the basis->grid transformation matrix.
+     */
+    const RGenericSparseMatrix &Basis2GridMatrix() const { return *GI; }
+    
+    /**
      * \brief Return the mesh->basis transformation matrix.
      */
     const RGenericSparseMatrix &Mesh2BasisMatrix() const { return *C; }
@@ -138,6 +148,11 @@ public:
      * \brief Return the basis->mesh transformation matrix.
      */
     const RGenericSparseMatrix &Basis2MeshMatrix() const { return *CI; }
+
+    /**
+     * \brief Return the basis->sol transformation matrix.
+     */
+    const RCompRowMatrix &Basis2SolMatrix() const { return *D; }
 
 private:
     bool grid_is_basis;       ///< grid and basis dimensions identical?

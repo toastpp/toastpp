@@ -111,7 +111,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../../include;../../../../src/mesa;../../../../src/mesa/main;../../../../src/mesa/glapi;../../../../src/mesa/swrast;../../../../src/mesa/shader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../main;../../../../include;../../../../src/mesa;../../../../src/mesa/main;../../../../src/mesa/glapi;../../../../src/mesa/swrast;../../../../src/mesa/shader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;GDI_EXPORTS;_DLL;BUILD_GL32;MESA_MINWARN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -127,11 +127,14 @@
     </ResourceCompile>
     <PostBuildEvent>
       <Command>if not exist ..\..\..\..\lib md ..\..\..\..\lib
-copy "$(TargetDir)OPENGL32.LIB" ..\..\..\..\lib
-copy "$(TargetDir)OPENGL32.DLL" ..\..\..\..\lib
-if exist ..\..\..\..\progs\demos copy "$(TargetDir)OPENGL32.DLL" ..\..\..\..\progs\demos
+copy "$(TargetDir)gdi.lib" ..\..\..\..\lib
+if exist "$(TargetDir)gdi.dll" copy "$(TargetDir)gdi.dll" ..\..\..\..\lib
+if exist ..\..\..\..\progs\demos copy "$(TargetDir)gdi.dll" ..\..\..\..\progs\demos
 </Command>
     </PostBuildEvent>
+    <Lib>
+      <OutputFile>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).lib</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -158,7 +161,7 @@ if exist ..\..\..\..\progs\demos copy "$(TargetDir)OPENGL32.DLL" ..\..\..\..\pro
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>""</OutputFile>
+      <OutputFile>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command />

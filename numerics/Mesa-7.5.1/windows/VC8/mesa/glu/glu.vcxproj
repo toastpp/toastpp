@@ -124,7 +124,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>""</OutputFile>
+      <OutputFile>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -154,13 +154,13 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>""</OutputFile>
+      <OutputFile>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command>if not exist ..\..\..\..\lib md ..\..\..\..\lib
-copy "$(TargetDir)GLU32.LIB" ..\..\..\..\lib
-copy "$(TargetDir)GLU32.DLL" ..\..\..\..\lib
-if exist ..\..\..\..\progs\demos copy "$(TargetDir)GLU32.DLL" ..\..\..\..\progs\demos
+copy "$(TargetDir)glu.lib" ..\..\..\..\lib
+if exist "$(TargetDir)glu.dll" copy "$(TargetDir)glu.dll" ..\..\..\..\lib
+if exist ..\..\..\..\progs\demos copy "$(TargetDir)glu.dll" ..\..\..\..\progs\demos
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -126,13 +126,13 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>""</OutputFile>
+      <OutputFile>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command>if not exist ..\..\..\..\lib md ..\..\..\..\lib
-copy "$(TargetDir)OSMESA32.LIB" ..\..\..\..\lib
-copy "$(TargetDir)OSMESA32.DLL" ..\..\..\..\lib
-if exist ..\..\..\..\progs\demos copy "$(TargetDir)OSMESA32.DLL" ..\..\..\..\progs\demos
+copy "$(TargetDir)osmesa.lib" ..\..\..\..\lib
+if exist "$(TargetDir)osmesa.dll" copy "$(TargetDir)osmesa.dll" ..\..\..\..\lib
+if exist ..\..\..\..\progs\demos copy "$(TargetDir)osmesa.dll" ..\..\..\..\progs\demos
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -161,13 +161,13 @@ if exist ..\..\..\..\progs\demos copy "$(TargetDir)OSMESA32.DLL" ..\..\..\..\pro
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>""</OutputFile>
+      <OutputFile>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command>if not exist ..\..\..\..\lib md ..\..\..\..\lib
-copy "$(TargetDir)OSMESA32.LIB" ..\..\..\..\lib
-copy "$(TargetDir)OSMESA32.DLL" ..\..\..\..\lib
-if exist ..\..\..\..\progs\demos copy "$(TargetDir)OSMESA32.DLL" ..\..\..\..\progs\demos
+copy "$(TargetDir)osmesa.lib" ..\..\..\..\lib
+if exist "$(TargetDir)osmesa.dll" copy "$(TargetDir)osmesa.dll" ..\..\..\..\lib
+if exist ..\..\..\..\progs\demos copy "$(TargetDir)osmesa.dll" ..\..\..\..\progs\demos
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -1,7 +1,6 @@
 import numpy as np
 import toast
 from toast import toastmod
-#import tglumpy
 from scipy import sparse
 from types import *
 
@@ -288,16 +287,54 @@ class Mesh:
             mesh basis. n in that case is equal to the number of nodes.
         """
         return toastmod.Jacobian(self.handle, hraster, dphi, aphi, proj)
+        
+    def JacobianOptical(self, hraster, qvec, mvec, mua, mus, ref, freq=0, solver='bicgstab', tol=1e-12):
+        """Generate the Jacobian matrix from given optical parameters.
+
+        Syntax: J = mesh.JacobianOptical(raster, qvec, mvec, mua, mus, ref, freq, solver, tol)
+
+        Parameters:
+            raster: raster handle (or -1 for mesh basis)
+            qvec: 
+            mvec: 
+            mua: 
+            mus: 
+            ref: 
+            freq: 
+            solver: 
+            tol: 
+
+        Return value:
+            J: Jacobian matrix (real, dense)
+
+        Note:
+            Calculates the derivative of the data (log amplitude and phase) with
+            respect to the coefficients (absorption and diffusion) of the
+            forward operator.
+
+            J consists of 4 blocks: d lnmod / d mua (top left), d lnmod / d kappa
+            (top right), d phase / d mua (bottom left), and d phase / d kappa
+            (bottom right). Dimension of J is 2m x 2n, where m is the number of
+            measurements, and n is the dimension of the inverse basis.
+
+            If raster is set to -1, the Jacobian is constructed directly in the
+            mesh basis. n in that case is equal to the number of nodes.
+        """
+        if sparse.isspmatrix_csr(qvec)==True:
+            qvec = sparse.csc_matrix(qvec)
+        if sparse.isspmatrix_csr(mvec)==True:
+            mvec = sparse.csc_matrix(mvec)
+        return toastmod.JacobianOptical(self.handle, hraster, qvec.data, qvec.indptr, qvec.indices, mvec.data, mvec.indptr, mvec.indices, mua, mus, ref, freq, solver, tol)
 
     def Show(self, nim=None, col=np.array([1,1,1,1]), cmap='Grey',
              lighting=True, mode='Both'):
+        import tglumpy
         if self.Dim() == 3:
             tglumpy.ShowMesh3D(self.handle, nim, col, cmap, lighting, mode)
         else:
             tglumpy.ShowMesh2D(self.handle, nim, cmap, mode)
-    
 
-        
+
 def ReadNim(nimname,idx=-1):
     return toastmod.ReadNim(nimname,idx)
 
@@ -310,6 +347,23 @@ def Sysmat_CW(hmesh,mua,mus,ref,freq):
 
 def Jacobian(hmesh,hraster,dphi,aphi,proj):
     return toastmod.Jacobian(hmesh,hraster,dphi,aphi,proj)
+
+
+def JacobianCW(hmesh, hraster, qvec, mvec, mua, mus, ref, solver='bicgstab', tol=1e-12):
+    if sparse.isspmatrix_csr(qvec)==True:
+        qvec = sparse.csc_matrix(qvec)
+    if sparse.isspmatrix_csr(mvec)==True:
+        mvec = sparse.csc_matrix(mvec)
+
+    if np.any(np.iscomplex(qvec.data)):
+        raise ValueError("qvec must be real or not have any nonzero complex elements")
+    qvec = np.real(qvec)
+
+    if np.any(np.iscomplex(mvec.data)):
+        raise ValueError("mvec must be real or not have any nonzero complex elements")
+    mvec = np.real(mvec)
+
+    return toastmod.JacobianCW(hmesh, hraster, qvec.data, qvec.indptr, qvec.indices, mvec.data, mvec.indptr, mvec.indices, mua, mus, ref, solver, tol)
 
 
 def Gradient(hmesh,hraster,qvec,mvec,mua,mus,ref,freq,data,sd):
